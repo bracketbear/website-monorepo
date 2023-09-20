@@ -10,14 +10,14 @@
         {{ project.attributes.title }}
       </h1>
       <!-- Main Image -->
-      <div v-if="mainImage" class="hard-shadow-xl bg-secondary overflow-hidden rounded-3xl border-2 border-solid border-black">
+      <div v-if="mainImage" class="overflow-hidden rounded-3xl border-2 border-solid border-black bg-secondary hard-shadow-xl">
         <NuxtImg :src="mainImageRoute" />
       </div>
       <!-- Project Details and Description, Challenges, and Results -->
       <div class="grid gap-6 lg:grid-cols-3">
         <!-- Project Details -->
         <div class="lg:order-2">
-          <div class=" hard-shadow-xl flex h-auto flex-col gap-1 rounded border-2 border-solid border-black bg-white px-4 py-2 text-sm">
+          <div class=" flex h-auto flex-col gap-1 rounded border-2 border-solid border-black bg-white px-4 py-2 text-sm hard-shadow-xl">
             <template v-for="(detail, index) in projectDetails" :key="index">
               <template v-if="detail.value">
                 <div class="grid grid-cols-2">
@@ -71,7 +71,7 @@
             class="inline-block shrink-0"
             @click="handleClick(mediaItem)"
           >
-            <NuxtImg :src="mediaRoutes[index]" class="bg-secondary h-48 rounded border-2 border-solid border-white" />
+            <NuxtImg :src="mediaRoutes[index]" class="h-48 rounded border-2 border-solid border-white bg-secondary" />
           </button>
         </div>
       </div>
@@ -81,7 +81,6 @@
         <p>{{ modal.description }}</p>
       </UiModal>
     </div>
-    <!-- If th -->
     <div v-else>
       <p>Project not found. Dang!</p>
     </div>
