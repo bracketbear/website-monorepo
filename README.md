@@ -1,6 +1,8 @@
 # Bracket Bear Website
+
+## Introduction to the package
 This is a monorepo for the website.
-The app is essentially a Nuxt front-end with a Strapi CMS. Currently, we're using
+The app is essentially a Nuxt front-end with a Strapi CMS.
 
 ## Requirements
 This app requires Yarn.

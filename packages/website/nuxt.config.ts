@@ -1,3 +1,5 @@
+import path from 'path'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/strapi', '@nuxt/image-edge', '@nuxtjs/google-fonts', 'nuxt-svgo'],
@@ -6,6 +8,9 @@ export default defineNuxtConfig({
       title: 'Bracket Bear',
       titleTemplate: '%s | Bracket Bear',
     },
+  },
+  alias: {
+    '%': path.resolve(__dirname, '../cms/types/generated'),
   },
   css: [
     '@/assets/styles/main.css',

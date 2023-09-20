@@ -42,3 +42,9 @@ npm run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+## Import Aliases
+Here's a quick note on path aliases. We use two in this app:
+
+1. `@`: sends you to the root of the `website` package.
+2. `%`: sends you to the `types/generated` directory in the *CMS* directory. We do this so we can incorporate CMS types in our FE app, though this very well might change in the future.
