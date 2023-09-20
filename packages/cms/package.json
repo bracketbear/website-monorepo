@@ -7,7 +7,7 @@
     "name": "Harrison Callahan"
   },
   "scripts": {
-    "develop": "strapi develop",
+    "dev": "strapi develop",
     "start": "strapi start",
     "build": "strapi build",
     "strapi": "strapi"
