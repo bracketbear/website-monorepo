@@ -1,9 +1,9 @@
 <template>
   <button
     :class="[ sizeClasses[props.size], colorClasses[props.color], disabledClass, roundedClass ]"
-    class="font-heading hard-shadow flex items-center
-           justify-center gap-1 border-2 border-solid
-           border-black shadow-black transition-all
+    class="flex items-center justify-center gap-1
+           border-2 border-solid border-black font-heading
+           shadow-black transition-all hard-shadow
            hover:scale-105 hover:shadow-[0.4rem_0.4rem_0] hover:shadow-black
            active:scale-100 active:shadow-[1px_1px_0] active:shadow-black"
     :disabled="props.disabled"

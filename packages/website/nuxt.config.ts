@@ -3,21 +3,26 @@ import path from 'path'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/strapi', '@nuxt/image-edge', '@nuxtjs/google-fonts', 'nuxt-svgo'],
+
   app: {
     head: {
       title: 'Bracket Bear',
       titleTemplate: '%s | Bracket Bear',
     },
   },
+
   alias: {
     '%': path.resolve(__dirname, '../cms/types/generated'),
   },
+
   css: [
     '@/assets/styles/main.css',
   ],
+
   typescript: {
     includeWorkspace: true,
   },
+
   runtimeConfig: {
     public: {
       appName: 'Bracket Bear',
@@ -26,6 +31,7 @@ export default defineNuxtConfig({
       blogEnabled: false,
     },
   },
+
   image: {
     staticFilename: '[publicPath]/images/[name]-[hash][ext]',
     strapi: {
@@ -34,10 +40,15 @@ export default defineNuxtConfig({
     static: {},
     domains: ['localhost:1337'],
   },
+
   googleFonts: {
     families: {
       Bungee: true,
       Heebo: [400, 500, 700],
     },
+  },
+
+  devtools: {
+    enabled: true,
   },
 })

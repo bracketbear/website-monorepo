@@ -4,7 +4,7 @@
     <div
       v-for="(project, i) in projects.data"
       :key="i"
-      class="bg-primary-lightest hard-shadow-xl flex flex-col gap-4 rounded-2xl border-2 border-solid border-black p-8"
+      class="flex flex-col gap-4 rounded-2xl border-2 border-solid border-black bg-primary-lightest p-8 hard-shadow-xl"
     >
       <!-- Title -->
       <h2 class="mb-2 text-center text-xl font-bold">
@@ -21,7 +21,7 @@
         <UiPill v-for="(skill, i) in project.attributes.technical_skills?.data" :key="i" :label="skill.attributes.label" />
       </div>
       <!-- Main Image -->
-      <div v-if="hasMainImage(project)" class="bg-secondary max-h-96 overflow-hidden rounded border-2 border-solid border-black">
+      <div v-if="hasMainImage(project)" class="max-h-96 overflow-hidden rounded border-2 border-solid border-black bg-secondary">
         <NuxtImg :src="getMainImageRoute(project)" />
       </div>
       <!-- Learn More button -->
@@ -60,5 +60,4 @@ const getMainImageRoute = (project) => {
     return ''
   }
 }
-
 </script>

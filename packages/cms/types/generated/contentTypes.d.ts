@@ -682,13 +682,20 @@ export interface ApiCompanyCompany extends Schema.CollectionType {
     singularName: 'company';
     pluralName: 'companies';
     displayName: 'Companies';
+    description: '';
   };
   options: {
     draftAndPublish: false;
   };
   attributes: {
-    Name: Attribute.String;
-    Logo: Attribute.Media;
+    name: Attribute.String;
+    logo: Attribute.Media;
+    jobs: Attribute.Relation<
+      'api::company.company',
+      'oneToMany',
+      'api::job.job'
+    >;
+    order: Attribute.Integer;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -729,7 +736,7 @@ export interface ApiJobJob extends Schema.CollectionType {
     >;
     company: Attribute.Relation<
       'api::job.job',
-      'oneToOne',
+      'manyToOne',
       'api::company.company'
     >;
     employment_type: Attribute.Enumeration<
