@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "bracketbear-website",
+  "workspaces": [
+    "packages/cms",
+    "packages/website"
+  ],
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail \"yarn workspace @bracketbear/cms develop\" \"yarn workspace @bracketbear/website dev\"",
+    "build": "yarn workspace @bracketbear/cms build && yarn workspace @bracketbear/website build",
+    "deploy": "yarn workspace @bracketbear/cms deploy && yarn workspace @bracketbear/website deploy"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.1"
+  }
+}

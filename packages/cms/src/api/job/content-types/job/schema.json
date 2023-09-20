@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "jobs",
+  "info": {
+    "singularName": "job",
+    "pluralName": "jobs",
+    "displayName": "Job",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "date_from": {
+      "type": "date",
+      "required": true
+    },
+    "is_still_working": {
+      "type": "boolean",
+      "required": true
+    },
+    "date_to": {
+      "type": "date"
+    },
+    "technical_skills": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::technical-skill.technical-skill",
+      "inversedBy": "jobs"
+    },
+    "company": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::company.company"
+    },
+    "employment_type": {
+      "type": "enumeration",
+      "enum": [
+        "Freelance",
+        "Contract",
+        "Full-time",
+        "Self-employed"
+      ],
+      "default": "Full-time"
+    },
+    "location": {
+      "type": "string"
+    },
+    "description": {
+      "type": "richtext",
+      "required": false
+    }
+  }
+}

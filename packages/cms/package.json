@@ -1,0 +1,30 @@
+{
+  "name": "@bracketbear/cms",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The Backend CMS for Bracket Bear",
+  "author": {
+    "name": "Harrison Callahan"
+  },
+  "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi"
+  },
+  "dependencies": {
+    "@strapi/plugin-i18n": "^4.13.7",
+    "@strapi/plugin-seo": "^1.9.0",
+    "@strapi/plugin-users-permissions": "^4.13.7",
+    "@strapi/strapi": "^4.13.7",
+    "better-sqlite3": "8.0.1"
+  },
+  "strapi": {
+    "uuid": "99b831bc-e78a-4f20-bade-e5002cce5180"
+  },
+  "engines": {
+    "node": ">=14.19.1 <=18.x.x",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}
