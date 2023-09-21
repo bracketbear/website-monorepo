@@ -28,68 +28,94 @@
         </div>
       </FlateralusCanvas>
     </div>
-    <!-- Welcome -->
-    <section class="py-[50vh]">
-      <div class="mx-auto flex flex-col items-center gap-8 p-4 text-center font-heading text-2xl text-white text-stroke text-hard-shadow lg:max-w-2xl">
-        <p>From my early days working at a microbrewery to crafting tailored web solutions at Bracket Bear, my path has been diverse.</p>
-        <p>But the goal? Always the same: delivering top-notch digital experiences.</p>
+    <!-- Loop through page sections. -->
+    <section
+      v-for="section in sections"
+      :key="section.name"
+      class="py-[50vh]"
+    >
+      <div :id="section.name" class="mx-auto flex flex-col items-center gap-8 p-4 text-center font-heading text-2xl text-black">
+        <p v-for="(text, i) in section.text" :key="i">
+          {{ text }}
+        </p>
       </div>
-    </section>
-    <!-- Work History -->
-    <section class="py-[50vh]">
-      <div class="mx-auto flex flex-col items-center gap-8 p-4 text-center font-heading text-2xl font-bold text-white text-hard-shadow lg:max-w-2xl">
-        <p>Name an industry and there's a good chance that I've worked in it.</p>
-        <p>From brews to boxes to mind blowing immersive experiences, I've been lucky to experience a ton of different things. Here's a brief timeline of my work history.</p>
-      </div>
-      <div class="mx-auto p-4 lg:max-w-2xl">
-        <WorkHistory />
-      </div>
-    </section>
-    <!-- Technical Skills -->
-    <section class="py-[50vh]">
-      <div class="mx-auto flex flex-col items-center gap-8 p-4 text-center font-heading text-2xl font-bold text-white text-hard-shadow lg:max-w-2xl">
-        <p>In my digital toolbox, you'll find an array of tools, each with its own tale.</p>
-        <p>From the elegance of Vue.js to the power of C++, these are the instruments of my symphony.</p>
-      </div>
-      <div class="mx-auto p-4">
-        <SkillList />
-      </div>
-    </section>
-    <!-- New Projects -->
-    <section class="py-[50vh]">
-      <div class="mx-auto flex flex-col items-center gap-8 p-4 text-center font-heading text-2xl font-bold text-white text-hard-shadow lg:max-w-2xl">
-        <p>I’ve gotten to work on some cool projects over the years.</p>
-        <p>Here are a handful of them.</p>
-      </div>
-      <div class="mx-auto p-4">
-        <ProjectList />
-      </div>
-    </section>
-    <!-- New Reach Out -->
-    <section class="py-[50vh]">
-      <div id="contact" class="mx-auto flex flex-col items-center gap-8 p-4 text-center font-heading text-2xl font-bold text-white text-hard-shadow lg:max-w-2xl">
-        <p>Alrighty, I've said enough. Now I'd love to hear from you.</p>
-        <p>Feel free to fill out the form below and I'll get back to you as soon as possible.</p>
-      </div>
-      <div class="mx-auto max-w-3xl p-4">
-        <ContactForm />
+      <div v-if="section.component" :class="section.componentClass" class="mx-auto p-4">
+        <Component :is="section.component" />
       </div>
     </section>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-// import ParticleGridAnimation, { ParticleGridConfig } from '~/utils/canvas/animations/particle-grid'
+import type { Component } from 'vue'
+import WorkHistory from '~/components/WorkHistory/WorkHistory.vue'
+import ContactForm from '~/components/ContactForm.vue'
+import SkillList from '~/components/SkillList.vue'
+import ProjectList from '~/components/ProjectList.vue'
+import ParticleGridAnimation, { ParticleGridConfig } from '~/utils/canvas/animations/particle-grid'
 
-// const animationConfig: ParticleGridConfig = {
-//   noiseStrength: 0,
-//   particleColor: 'darkorange',
-//   particleWidth: 50,
-//   driftSpeed: 0,
-//   repulsionStrength: 2,
-//   xPad: -10,
-//   yPad: -10,
-// }
+const animationConfig: ParticleGridConfig = {
+  noiseStrength: 10,
+  particleColor: '#B8D5B8',
+  particleWidth: 50,
+  driftSpeed: 10,
+  repulsionStrength: 10,
+  xPad: 10,
+  yPad: 10,
+}
+
+interface IndexSection {
+  name: string,
+  text: string[],
+  component?: Component,
+  componentClass?: string,
+}
+
+const sections: IndexSection[] = [
+  {
+    name: 'welcome',
+    text: [
+      'Welcome to Bracket Bear!',
+      'This is my portfolio - my space on the web.',
+      'Make yourself at home.',
+    ],
+  },
+  {
+    name: 'work-history',
+    text: [
+      "Name an industry and there's a good chance that I've worked in it.",
+      "From brews to boxes to mind blowing immersive experiences, I've been lucky to experience a ton of different things. Heck, I even worked in a toxicology lab!",
+      "Here's a brief timeline of my work history.",
+    ],
+    component: WorkHistory,
+    componentClass: 'max-w-2xl',
+  },
+  {
+    name: 'technical-skills',
+    text: [
+      "In my digital toolbox, you'll find an array of tools, each with its own tale.",
+      'From my ',
+    ],
+    component: SkillList,
+  },
+  {
+    name: 'projects',
+    text: [
+      "I've gotten to work on some cool projects over the years.",
+      'Here are a handful of them.',
+    ],
+    component: ProjectList,
+  },
+  {
+    name: 'contact',
+    text: [
+      "Alrighty, I've said enough. Now I'd love to hear from you.",
+      "Feel free to fill out the form below and I'll get back to you as soon as possible.",
+    ],
+    component: ContactForm,
+    componentClass: 'max-w-2xl',
+  },
+]
 
 useSeoMeta({
   title: 'Home',
