@@ -1,7 +1,7 @@
 <template>
   <div
     ref="container"
-    class="canvas-container"
+    class="relative h-full w-full"
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
     @mousedown="handleMouseDown"
@@ -54,15 +54,12 @@ const resizeCanvas = debounce(() => {
 
   settingUp.value = true
 
-  console.log('resizing canvas')
-
   const ctx = canvas.value.getContext('2d')
   if (!ctx) { return }
 
   // eslint-disable-next-line new-cap
   animation = new props.animationClass(ctx, props.config)
 
-  console.log('should be resizing')
   const dpr = window.devicePixelRatio
   const rect = canvas.value.getBoundingClientRect()
 
@@ -213,9 +210,3 @@ const setResizeObserver = () => {
 }
 
 </script>
-
-<style scoped>
-.canvas-container {
-  @apply w-full h-full relative;
-}
-</style>
