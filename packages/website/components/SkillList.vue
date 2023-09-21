@@ -18,9 +18,9 @@
       <template v-for="skill in skillsByRank" :key="skill">
         <div
           v-if="isActiveCategory(skill.category) || isActiveCategory(ALL_CATEGORY)"
-          class="bg-alt-1 flex aspect-square w-32 flex-wrap items-center justify-center rounded-full border-2 border-solid border-black p-4 shadow-xl shadow-black"
+          class="flex aspect-square w-32 flex-wrap items-center justify-center rounded-full border-2 border-solid border-black bg-red-700 p-4 hard-shadow-xl"
         >
-          <p class="text-center text-sm font-bold text-white">
+          <p class="text-center font-heading text-sm text-white text-hard-shadow">
             {{ skill.attributes.label }}
           </p>
         </div>
