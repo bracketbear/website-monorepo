@@ -21,7 +21,9 @@
                 </UiButton>
               </NuxtLink>
               <NuxtLink to="#contact">
-                <UiButton>Let's Chat!</UiButton>
+                <UiButton class="w-full md:w-auto">
+                  Let's Chat!
+                </UiButton>
               </NuxtLink>
             </div>
           </div>
@@ -32,15 +34,17 @@
     <section
       v-for="section in sections"
       :key="section.name"
-      class="py-[50vh]"
+      class="min-h-screen py-[50vh]"
     >
-      <div :id="section.name" class="mx-auto flex flex-col items-center gap-8 p-4 text-center font-heading text-2xl text-black">
-        <p v-for="(text, i) in section.text" :key="i">
-          {{ text }}
-        </p>
-      </div>
-      <div v-if="section.component" :class="section.componentClass" class="mx-auto p-4">
-        <Component :is="section.component" />
+      <div :id="section.name" class="flex min-h-screen flex-col justify-center">
+        <div class="mx-auto flex flex-col items-center justify-center gap-8 p-4 text-center font-heading text-2xl text-black">
+          <p v-for="(text, i) in section.text" :key="i">
+            {{ text }}
+          </p>
+        </div>
+        <div v-if="section.component" :class="section.componentClass" class="mx-auto p-4">
+          <Component :is="section.component" />
+        </div>
       </div>
     </section>
   </NuxtLayout>
