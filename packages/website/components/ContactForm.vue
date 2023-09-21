@@ -28,18 +28,18 @@
     </UiFormField>
     <small class="col-span-full font-bold text-black">An asterisk (*) means that the field is required.</small>
     <div class="mt-4 flex justify-center md:col-span-2">
-      <UiButton color="secondary" type="submit">
+      <UiButton color="secondary" type="submit" title="Click here to submit your message">
         Submit
       </UiButton>
     </div>
   </form>
   <div v-else>
-    <div class="text-center text-2xl font-bold text-white">
+    <p class="text-center font-heading text-2xl text-black">
       Thanks for reaching out!
-    </div>
-    <div class="text-center text-xl text-white">
+    </p>
+    <p class="text-center text-lg text-black">
       I'll get back to you as soon as possible.
-    </div>
+    </p>
   </div>
 </template>
 
@@ -73,9 +73,10 @@ const rules = reactive({
   name: { required: helpers.withMessage('Name is required', required) },
   email: {
     required: helpers.withMessage('Email is required', required),
-    email: helpers.withMessage('Email must be valid', email),
+    email: helpers.withMessage('Email must be a valid email address', email),
   },
-  message: { required: helpers.withMessage('Message is required', required) },
+  subject: { required: helpers.withMessage('The subject is required', required) },
+  message: { required: helpers.withMessage('The message is required', required) },
 })
 
 const v$ = useVuelidate(rules, formData)
@@ -83,8 +84,9 @@ const v$ = useVuelidate(rules, formData)
 const formName = 'contact-form'
 const formFields: FormField[] = [
   { label: 'Your Name', model: 'name', component: UiTextInput, placeholder: 'Jack' },
-  { label: 'Your Email', model: 'email', component: UiTextInput, placeholder: 'Sparrow' },
-  { label: 'Your Message', model: 'message', component: UiTextareaInput, placeholder: 'Why is the rum always gone?', class: 'md:col-span-2' },
+  { label: 'Your Email Address', model: 'email', component: UiTextInput, placeholder: 'Sparrow' },
+  { label: 'Subject', model: 'subject', component: UiTextInput, placeholder: 'Why is the rum always gone?', class: 'md:col-span-2' },
+  { label: 'Your Message', model: 'message', component: UiTextareaInput, placeholder: 'Did everyone see that? Because I will not be doing it again', class: 'md:col-span-2' },
 ]
 
 const handleSubmit = () => {
