@@ -46,6 +46,7 @@
               class="w-full"
               size="large"
               color="secondary"
+              @click="closeMenu"
             >
               {{ link.label }}
             </UiButton>
