@@ -1,13 +1,14 @@
 <template>
-  <footer class="flex flex-col gap-8 bg-black py-12">
+  <footer class="flex flex-col justify-center gap-8 bg-black">
     <!-- Copyright Text -->
-    <p class="font-heading text-center text-gray-100">
+    <p class="text-center font-heading text-gray-100">
       &copy;{{ formattedYear }} Harrison Callahan. All Rights Reserved.
     </p>
     <!-- Links -->
-    <div class="container grid gap-4 sm:grid-cols-2">
+    <div class="mx-auto grid w-max gap-32 sm:grid-cols-[repeat(2,1fr)]">
+      <!-- Website Navitagtion -->
       <nav>
-        <div class="font-heading text-primary text-lg">
+        <div class="font-heading text-lg text-primary">
           Website Navigation
         </div>
         <ul class="flex flex-col">
@@ -19,7 +20,7 @@
               class="inline-block w-max"
             >
               <div
-                class="font-heading inline-block
+                class="inline-block font-heading
                        text-sm font-semibold tracking-wider text-white underline-offset-4
                        hover:text-orange-800 hover:underline"
               >
@@ -31,7 +32,7 @@
       </nav>
       <!-- Social & External Links -->
       <div>
-        <div class="font-heading text-primary text-lg">
+        <div class="font-heading text-lg text-primary">
           Find Me On The Web
         </div>
         <ul class="flex flex-col">
@@ -40,12 +41,13 @@
               :key="index"
               :to="link.to"
               :title="link.alt"
+              target="_new"
               class="inline-block w-max"
             >
               <div
-                class="font-heading inline-block
-                       text-sm font-semibold tracking-wider text-white underline underline-offset-4
-                       hover:text-orange-800"
+                class="inline-block font-heading
+                       text-sm font-semibold tracking-wider text-white
+                       hover:text-secondary hover:underline"
               >
                 {{ link.label }}
               </div>

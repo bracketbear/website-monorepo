@@ -16,8 +16,8 @@
       <!-- Menu (Navigation) Items -->
       <ul
         :class="{ 'max-lg:translate-x-full': !menuOpen }"
-        class="bg-primary-lightest fixed right-0
-              top-0 z-50 flex h-full w-full flex-col gap-10
+        class="fixed right-0 top-0
+              z-50 flex h-full w-full flex-col gap-10 bg-primary-lightest
               p-8 transition-transform duration-300 ease-in-out
               lg:static lg:h-auto lg:w-auto lg:flex-row lg:items-center lg:bg-transparent lg:p-0"
       >
@@ -31,14 +31,14 @@
             :to="link.to"
             :title="link.alt"
           >
-            <div
+            <p
               v-if="!link.emphasized"
-              class="font-heading inline-block
+              class="inline-block font-heading
                      text-xl font-semibold tracking-wide text-gray-900
                      hover:text-gray-700 hover:underline hover:underline-offset-4"
             >
               {{ link.label }}
-            </div>
+            </p>
             <UiButton
               v-else
               :to="link.to"
