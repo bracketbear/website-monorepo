@@ -4,8 +4,6 @@ import RepulsionBehavior from '../behaviors/repulsion-behavior'
 import { Pointer } from '../types'
 import { BehaviorContext } from '../behaviors'
 import BaseAnimation from './base-animation'
-// import DriftBehavior from './behaviors/drift-behavior'
-// import NoiseBehavior from './behaviors/noise-behavior'
 
 export interface ParticleGridConfig {
   particleWidth?: number

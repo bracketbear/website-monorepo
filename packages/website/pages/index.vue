@@ -1,20 +1,32 @@
 <template>
   <NuxtLayout class="bg-primary">
     <!-- Hero -->
-    <div class="flex min-h-[calc(100vh-4rem)] items-center bg-alt-1 md:min-h-[calc(100vh-5rem)]">
-      <div class="container flex flex-col items-center justify-center gap-3 text-center font-heading text-xl md:px-16">
-        <div>Hi! My name is</div>
-        <div class="text-5xl text-white shadow-black drop-shadow-[0.5rem_0.5rem_0_#000000] text-stroke sm:text-7xl md:text-8xl">
-          Harrison
+    <div class="h-[calc(100vh-4rem)] border-b-2 border-solid border-black bg-secondary-dark md:h-[calc(100vh-5rem)] ">
+      <FlateralusCanvas
+        :animation-class="ParticleGridAnimation"
+        :config="animationConfig"
+        class="h-full w-full"
+      >
+        <div class="flex h-full items-center">
+          <div class="container flex flex-col items-center justify-center gap-3 text-center font-heading text-xl md:px-16">
+            <div>Hi! My name is</div>
+            <div class="text-5xl text-white shadow-white text-stroke text-hard-shadow sm:text-7xl md:text-8xl">
+              Harrison
+            </div>
+            <div>I'm a full-stack developer with a background in design, immersive Experiences, and Generative A.I.</div>
+            <div class="mt-4 flex w-full flex-col justify-center gap-4 md:flex-row">
+              <NuxtLink to="#welcome">
+                <UiButton color="white" class="w-full md:w-auto">
+                  Learn More
+                </UiButton>
+              </NuxtLink>
+              <NuxtLink to="#contact">
+                <UiButton>Let's Chat!</UiButton>
+              </NuxtLink>
+            </div>
+          </div>
         </div>
-        <div>I’m a full-stack developer with a background in design, immersive Experiences, and Generative A.I.</div>
-        <div class="mt-4 flex w-full flex-col justify-center gap-4 md:flex-row">
-          <UiButton color="white" class="w-full md:w-auto">
-            Learn More
-          </UiButton>
-          <UiButton>Let's Chat!</UiButton>
-        </div>
-      </div>
+      </FlateralusCanvas>
     </div>
     <!-- Welcome -->
     <section class="py-[50vh]">

@@ -10,8 +10,8 @@
     @touchend="handleTouchEnd"
     @touchcancel="handleTouchEnd"
   >
-    <canvas ref="canvas" class="absolute -z-0 h-full w-full" />
-    <div class="z-10 h-full w-full">
+    <canvas ref="canvas" class="absolute z-0 h-full w-full" />
+    <div class="relative z-10 h-full w-full">
       <slot :setting-up="settingUp" />
     </div>
   </div>
