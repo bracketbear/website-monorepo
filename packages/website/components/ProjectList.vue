@@ -21,8 +21,8 @@
         <UiPill v-for="(skill, i) in project.attributes.technical_skills?.data" :key="i" :label="skill.attributes.label" />
       </div>
       <!-- Main Image -->
-      <div v-if="hasMainImage(project)" class="max-h-96 overflow-hidden rounded border-2 border-solid border-black bg-secondary">
-        <NuxtImg :src="getMainImageRoute(project)" />
+      <div v-if="hasMainImage(project)" class="flex h-fit items-center justify-center">
+        <NuxtImg :src="getMainImageRoute(project)" class="w-fit rounded border-2 border-solid border-black bg-secondary" />
       </div>
       <!-- Learn More button -->
       <div class="flex justify-center">
