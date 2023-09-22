@@ -34,6 +34,12 @@
     },
     "order": {
       "type": "integer"
+    },
+    "date_from": {
+      "type": "date"
+    },
+    "date_to": {
+      "type": "date"
     }
   }
 }
