@@ -82,6 +82,10 @@
     },
     "description": {
       "type": "richtext"
+    },
+    "order": {
+      "min": 0,
+      "type": "integer"
     }
   }
 }

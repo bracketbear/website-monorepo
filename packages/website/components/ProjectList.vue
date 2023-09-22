@@ -48,6 +48,7 @@ import { Project } from '~/config/projects'
 
 const projects = await useStrapi<Project>().find('projects', {
   populate: ['mainImage', 'technical_skills'],
+  sort: 'order:asc',
 })
 
 const hasMainImage = (project) => {
