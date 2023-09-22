@@ -696,6 +696,8 @@ export interface ApiCompanyCompany extends Schema.CollectionType {
       'api::job.job'
     >;
     order: Attribute.Integer;
+    date_from: Attribute.Date;
+    date_to: Attribute.Date;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -785,6 +787,10 @@ export interface ApiProjectProject extends Schema.CollectionType {
       'api::technical-skill.technical-skill'
     >;
     description: Attribute.RichText;
+    order: Attribute.Integer &
+      Attribute.SetMinMax<{
+        min: 0;
+      }>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
