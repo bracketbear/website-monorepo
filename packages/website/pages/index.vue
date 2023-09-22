@@ -77,6 +77,14 @@ interface IndexSection {
 
 const sections: IndexSection[] = [
   {
+    name: 'welcome',
+    text: [
+      'Welcome to Bracket Bear',
+      'This is my portfolio - my space on the web.',
+      "I'm glad you're here.",
+    ],
+  },
+  {
     name: 'work-history',
     text: [
       "Name an industry and there's a good chance that I've worked in it.",
