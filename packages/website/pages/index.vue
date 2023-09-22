@@ -77,14 +77,6 @@ interface IndexSection {
 
 const sections: IndexSection[] = [
   {
-    name: 'welcome',
-    text: [
-      'Welcome to Bracket Bear!',
-      'This is my portfolio - my space on the web.',
-      'Make yourself at home.',
-    ],
-  },
-  {
     name: 'work-history',
     text: [
       "Name an industry and there's a good chance that I've worked in it.",
@@ -92,13 +84,13 @@ const sections: IndexSection[] = [
       "Here's a brief timeline of my work history.",
     ],
     component: WorkHistory,
-    componentClass: 'max-w-2xl',
+    componentClass: 'max-w-2xl w-full',
   },
   {
     name: 'technical-skills',
     text: [
-      "In my digital toolbox, you'll find an array of tools, each with its own tale.",
-      'From my ',
+      "Throughout my career, I've had to adapt and grow. As a result, my digital toolbox has grown as well.",
+      "Here are some of the tools I've used over the years.",
     ],
     component: SkillList,
   },

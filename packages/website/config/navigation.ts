@@ -12,7 +12,7 @@ interface SocialLink extends Link {
 }
 
 const links: Link[] = [
-  { label: 'About', to: '/about', alt: 'Learn more about who I am and where I come from' },
+  // { label: 'About', to: '/about', alt: 'Learn more about who I am and where I come from' },
   { label: 'Projects', to: { name: 'projects' }, alt: "Check out some projects that I've worked on" },
   { label: 'Reach Out!', to: '/#contact', alt: 'Contact us to chat about what I can do for you', emphasized: true },
 ]
