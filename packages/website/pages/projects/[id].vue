@@ -4,14 +4,13 @@
       v-if="project"
       class="container relative flex min-h-screen flex-col gap-8 overflow-hidden py-8"
     >
-      <Meta :title="project.attributes.title" />
       <!-- Title -->
       <h1 v-if="project.attributes.title" class="text-2xl font-bold sm:text-4xl lg:text-6xl">
         {{ project.attributes.title }}
       </h1>
       <!-- Main Image -->
-      <div v-if="mainImage" class="overflow-hidden rounded-3xl border-2 border-solid border-black bg-secondary hard-shadow-xl">
-        <NuxtImg :src="mainImageRoute" />
+      <div v-if="mainImageRoute" class="flex justify-center">
+        <NuxtImg :src="mainImageRoute" class="max-h-[65vh] rounded-xl border-2 border-solid border-black bg-secondary hard-shadow-xl" />
       </div>
       <!-- Project Details and Description, Challenges, and Results -->
       <div class="grid gap-6 lg:grid-cols-3">
@@ -76,20 +75,26 @@
         </div>
       </div>
       <!-- Media Modal -->
-      <UiModal :show-modal="modal.isVisible" class="bg-black" @update:show-modal="modal.isVisible = $event">
-        <NuxtImg :src="modal.image" />
+      <UiModal :show-modal="modal.isVisible" @update:show-modal="modal.isVisible = $event">
+        <div class=" overflow-auto">
+          <NuxtImg :src="modal.image" class="max-h-full max-w-full" />
+        </div>
         <p>{{ modal.description }}</p>
       </UiModal>
     </div>
-    <div v-else>
-      <p>Project not found. Dang!</p>
+    <div v-else class="container flex h-full flex-col items-center justify-center gap-8 text-center">
+      <h1 class="font-heading text-6xl">
+        403 - That project can't be found... :-[
+      </h1>
+      <p class="font-heading text-2xl">
+        Maybe you're from the future and you know that this is something I'll work on someday. 🤷
+      </p>
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
-import { Project } from '~/config/projects'
+import { ApiProjectProject } from '%/contentTypes'
 
 const modal = reactive({
   image: '',
@@ -99,13 +104,21 @@ const modal = reactive({
 
 const route = useRoute()
 const projectId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
-const result = await useStrapi().findOne<Project>('projects', projectId, {
-  populate: ['mainImage', 'media', 'technical_skills'],
-})
-const project = result.data
+let project = null
+let result = null
+
+try {
+  result = await useStrapi().findOne<ApiProjectProject['attributes']>('projects', projectId, {
+    populate: ['mainImage', 'media', 'technical_skills'],
+  })
+  project = result.data
+} catch (error) {
+  console.error(error)
+}
+
 const mainImage = project?.attributes.mainImage?.data ?? {}
 const media = project?.attributes.media?.data ?? []
-const mainImageRoute = mainImage?.attributes.url ? useStrapiMedia(mainImage?.attributes.url) : ''
+const mainImageRoute = mainImage?.attributes?.url ? useStrapiMedia(mainImage?.attributes?.url) : ''
 const mediaRoutes = media.map(mediaItem => mediaItem?.attributes.url ? useStrapiMedia(mediaItem?.attributes.url) : '')
 
 interface LabelValue {
@@ -116,38 +129,36 @@ interface LabelValue {
 const projectDetails: LabelValue[] = [
   {
     label: 'Role',
-    value: project?.attributes.role,
+    value: project?.attributes.role ?? '',
   },
   {
     label: 'Project Type',
-    value: project?.attributes.projectType,
+    value: project?.attributes.projectType ?? '',
   },
   {
     label: 'Duration',
-    value: project?.attributes.duration,
+    value: project?.attributes.duration ?? '',
   },
   {
     label: 'Skills Used',
-    value: project?.attributes.technical_skills?.data,
+    value: project?.attributes.technical_skills?.data ?? [],
   },
 ]
 
 const longTextSections: LabelValue[] = [
   {
     label: 'Description',
-    value: project?.attributes.description,
+    value: project?.attributes.description ?? '',
   },
   {
     label: 'Challenges and Solutions',
-    value: project?.attributes.challengesAndSolutions,
+    value: project?.attributes.challengesAndSolutions ?? '',
   },
   {
     label: 'Results Achieved',
-    value: project?.attributes.resultsAchieved,
+    value: project?.attributes.resultsAchieved ?? '',
   },
 ]
-
-console.log('skills', project?.attributes.technical_skills?.data)
 
 const handleClick = (mediaItem) => {
   modal.image = mediaItem?.attributes.url ? useStrapiMedia(mediaItem?.attributes.url) : ''
@@ -159,6 +170,4 @@ useSeoMeta({
   title: project?.attributes.title,
   description: project?.attributes.description,
 })
-
-console.log('result', result)
 </script>
