@@ -74,14 +74,17 @@
           </button>
         </div>
       </div>
-      <!-- Media Modal -->
-      <UiModal :show-modal="modal.isVisible" @update:show-modal="modal.isVisible = $event">
-        <div class=" overflow-auto">
-          <NuxtImg :src="modal.image" class="max-h-full max-w-full" />
+      <UiModal v-model:is-open="modal.isOpen" :fixed-size="false">
+        <div class="flex justify-center">
+          <NuxtImg
+            :src="modal.image"
+            :alt="modal.alt"
+            class="max-h-[calc(100vh-16rem)] max-w-full object-contain"
+          />
         </div>
-        <p>{{ modal.description }}</p>
       </UiModal>
     </div>
+    <!-- No project found... uh oh! -->
     <div v-else class="container flex h-full flex-col items-center justify-center gap-8 text-center">
       <h1 class="font-heading text-6xl">
         403 - That project can't be found... :-[
@@ -98,8 +101,9 @@ import { ApiProjectProject } from '%/contentTypes'
 
 const modal = reactive({
   image: '',
-  description: '',
-  isVisible: false,
+  caption: '',
+  alt: '',
+  isOpen: false,
 })
 
 const route = useRoute()
@@ -118,6 +122,7 @@ try {
 
 const mainImage = project?.attributes.mainImage?.data ?? {}
 const media = project?.attributes.media?.data ?? []
+media.push(mainImage)
 const mainImageRoute = mainImage?.attributes?.url ? useStrapiMedia(mainImage?.attributes?.url) : ''
 const mediaRoutes = media.map(mediaItem => mediaItem?.attributes.url ? useStrapiMedia(mediaItem?.attributes.url) : '')
 
@@ -162,8 +167,11 @@ const longTextSections: LabelValue[] = [
 
 const handleClick = (mediaItem) => {
   modal.image = mediaItem?.attributes.url ? useStrapiMedia(mediaItem?.attributes.url) : ''
-  modal.description = mediaItem?.attributes.alternativeText ?? ''
-  modal.isVisible = true
+  modal.caption = mediaItem?.attributes.caption ?? ''
+  modal.alt = mediaItem?.attributes.alternativeText ?? ''
+  modal.isOpen = true
+
+  console.log('modal', modal, mediaItem)
 }
 
 useSeoMeta({
