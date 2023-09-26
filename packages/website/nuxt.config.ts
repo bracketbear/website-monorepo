@@ -19,10 +19,6 @@ export default defineNuxtConfig({
     '@/assets/styles/main.css',
   ],
 
-  typescript: {
-    includeWorkspace: true,
-  },
-
   runtimeConfig: {
     public: {
       appName: 'Bracket Bear',
