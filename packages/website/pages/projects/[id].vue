@@ -70,12 +70,12 @@
             class="inline-block shrink-0"
             @click="handleClick(mediaItem)"
           >
-            <NuxtImg :src="mediaRoutes[index]" class="h-48 rounded border-2 border-solid border-white bg-secondary" />
+            <NuxtImg v-if="mediaRoutes[index]" :src="mediaRoutes[index]" class="h-48 rounded border-2 border-solid border-white bg-secondary" />
           </button>
         </div>
       </div>
       <UiModal v-model:is-open="modal.isOpen" :fixed-size="false">
-        <div class="flex justify-center">
+        <div v-if="modal.image" class="flex justify-center">
           <NuxtImg
             :src="modal.image"
             :alt="modal.alt"
@@ -85,14 +85,7 @@
       </UiModal>
     </div>
     <!-- No project found... uh oh! -->
-    <div v-else class="container flex h-full flex-col items-center justify-center gap-8 text-center">
-      <h1 class="font-heading text-6xl">
-        403 - That project can't be found... :-[
-      </h1>
-      <p class="font-heading text-2xl">
-        Maybe you're from the future and you know that this is something I'll work on someday. 🤷
-      </p>
-    </div>
+    <ProjectNotFound v-else />
   </NuxtLayout>
 </template>
 
@@ -122,9 +115,11 @@ try {
 
 const mainImage = project?.attributes.mainImage?.data ?? {}
 const media = project?.attributes.media?.data ?? []
-media.push(mainImage)
 const mainImageRoute = mainImage?.attributes?.url ? useStrapiMedia(mainImage?.attributes?.url) : ''
 const mediaRoutes = media.map(mediaItem => mediaItem?.attributes.url ? useStrapiMedia(mediaItem?.attributes.url) : '')
+if (mainImage) {
+  media.push(mainImage)
+}
 
 interface LabelValue {
   label: string;
@@ -170,12 +165,10 @@ const handleClick = (mediaItem) => {
   modal.caption = mediaItem?.attributes.caption ?? ''
   modal.alt = mediaItem?.attributes.alternativeText ?? ''
   modal.isOpen = true
-
-  console.log('modal', modal, mediaItem)
 }
 
 useSeoMeta({
-  title: project?.attributes.title,
-  description: project?.attributes.description,
+  title: project?.attributes.title || 'Project Not Found',
+  description: project?.attributes.description || 'Project Not Found',
 })
 </script>

@@ -11,3 +11,10 @@
     </div>
   </NuxtLayout>
 </template>
+
+<script setup lang="ts">
+useSeoMeta({
+  title: 'Page Not Found',
+  description: 'Page Not Found',
+})
+</script>
