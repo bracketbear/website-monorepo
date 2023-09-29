@@ -61,4 +61,8 @@ const colorClasses = {
 const roundedClass = computed(() => (props.round ? 'rounded-full aspect-square' : 'rounded'))
 const disabledClass = computed(() => (props.disabled ? 'opacity-50 cursor-not-allowed' : ''))
 const hasIcon = computed(() => !!slots.icon)
+
+defineExpose({
+  sizeClasses,
+})
 </script>

@@ -11,20 +11,25 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "vitest"
   },
   "devDependencies": {
     "@nuxt/devtools": "^0.8.4",
     "@nuxt/image-edge": "^1.0.0-28094923.e859bba",
+    "@nuxt/test-utils": "^3.7.4",
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
     "@nuxtjs/google-fonts": "^3.0.2",
     "@nuxtjs/strapi": "^1.9.3",
     "@nuxtjs/tailwindcss": "^6.6.6",
     "@types/node": "^18",
+    "@vue/test-utils": "^2.4.1",
     "eslint": "^8.40.0",
     "eslint-plugin-tailwindcss": "^3.11.0",
+    "jsdom": "^22.1.0",
     "nuxt": "^3.7.3",
-    "nuxt-svgo": "^3.5.3"
+    "nuxt-svgo": "^3.5.3",
+    "vitest": "^0.34.5"
   },
   "dependencies": {
     "@heroicons/vue": "^2.0.18",
