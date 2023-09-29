@@ -66,6 +66,7 @@ interface FormField {
 }
 
 const emit = defineEmits<{(event: 'submit', value: FormData): void}>()
+const gtm = useGtm()
 
 const hasSubmitted = ref(false)
 const formData = reactive<FormData>({ name: '', email: '', message: '' })
@@ -110,6 +111,7 @@ const handleSubmit = () => {
   })
     .then(() => {
       hasSubmitted.value = true
+      gtm?.trackEvent({ event: 'generate_lead' })
       emit('submit', formData)
     },
     (error) => {
