@@ -2,7 +2,7 @@ import path from 'path'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/strapi', '@nuxt/image-edge', '@nuxtjs/google-fonts', 'nuxt-svgo'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/strapi', '@nuxt/image-edge', '@nuxtjs/google-fonts', 'nuxt-svgo', '@zadigetvoltaire/nuxt-gtm'],
 
   app: {
     head: {
@@ -46,5 +46,9 @@ export default defineNuxtConfig({
 
   devtools: {
     enabled: true,
+  },
+
+  gtm: {
+    id: process.env.NUXT_GTM_ID || 'GTM-KX3KKDT9',
   },
 })
