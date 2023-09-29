@@ -92,7 +92,6 @@ const formFields: FormField[] = [
 
 const handleSubmit = () => {
   v$.value.$touch()
-  gtm?.trackEvent({ event: 'contact_form_submit' })
 
   if (v$.value.$error) {
     return
@@ -112,7 +111,7 @@ const handleSubmit = () => {
   })
     .then(() => {
       hasSubmitted.value = true
-      gtm?.trackEvent({ event: 'generate_lead' })
+      gtm?.trackEvent({ event: 'contact_form_submit' })
       emit('submit', formData)
     },
     (error) => {
