@@ -48,8 +48,8 @@ import { reactive } from 'vue'
 import type { Component } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { required, email, helpers } from '@vuelidate/validators'
-import UiTextInput from './ui/TextInput/TextInput.vue'
-import UiTextareaInput from './ui/TextareaInput/TextareaInput.vue'
+import UiTextInput from './ui/TextInput.vue'
+import UiTextareaInput from './ui/TextareaInput.vue'
 
 interface FormData {
   name: string;
