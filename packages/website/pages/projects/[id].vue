@@ -101,14 +101,17 @@ const modal = reactive({
 
 const route = useRoute()
 const projectId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
+const collectionName: ApiProjectProject['collectionName'] = 'projects'
 let project = null
 let result = null
-
 try {
-  result = await useStrapi().findOne<ApiProjectProject['attributes']>('projects', projectId, {
-    populate: ['mainImage', 'media', 'technical_skills'],
-  })
-  project = result.data
+  result = await useAsyncData(
+    collectionName,
+    () => useStrapi().findOne<ApiProjectProject['attributes']>(collectionName, projectId, {
+      populate: ['mainImage', 'media', 'technical_skills'],
+    }),
+  )
+  project = result.data.value?.data
 } catch (error) {
   console.error(error)
 }
