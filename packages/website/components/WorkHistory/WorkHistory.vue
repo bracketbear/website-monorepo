@@ -26,12 +26,16 @@
 <script lang="ts" setup>
 import { ApiCompanyCompany } from '%/contentTypes'
 
+// This will throw a TS error if the collection name ever changes.
 const collectionName: ApiCompanyCompany['collectionName'] = 'companies'
-const result = await useStrapi<ApiCompanyCompany['attributes']>().find(collectionName, {
-  populate: ['jobs'],
-  sort: 'order:asc',
-})
-const companies = result.data
+const result = await useAsyncData(
+  collectionName,
+  () => useStrapi().find<ApiCompanyCompany['attributes']>(collectionName, {
+    populate: ['jobs'],
+    sort: 'order:asc',
+  }),
+)
+const companies = result.data.value?.data ?? []
 
 const getFormattedDate = (date: string) => {
   if (!date) { return 'Present' }
