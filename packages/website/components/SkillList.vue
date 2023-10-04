@@ -3,7 +3,7 @@
     <!-- Categories -->
     <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
       <!-- Category Pill -->
-      <button v-for="category in categories" :key="category" @click="() => onCategoryClick(category)">
+      <button v-for="category in categoriesWithSkills" :key="category" @click="() => onCategoryClick(category)">
         <UiPill
           :key="category"
           :label="category"
@@ -30,24 +30,28 @@
 </template>
 
 <script lang="ts" setup>
-import { SkillCategory } from '~/config/technical-skills'
+import { ApiSkillCategorySkillCategory } from '%/contentTypes'
 
 const ALL_CATEGORY = 'All'
-
-const skills = await useStrapi<SkillCategory>().find('skill-categories', {
-  populate: {
-    technical_skills: {
-      sort: 'rating:desc',
+const collectionName: ApiSkillCategorySkillCategory['collectionName'] = 'skill_categories'
+const result = await useAsyncData(
+  collectionName,
+  () => useStrapi().find<ApiSkillCategorySkillCategory['attributes']>('skill-categories', {
+    populate: {
+      technical_skills: {
+        sort: 'rating:desc',
+      },
     },
-  },
-})
+  }),
+)
+const skillCategories = result.data.value?.data ?? []
 
 const activeCategory = ref(ALL_CATEGORY)
-const categories = computed(() => {
+const categoriesWithSkills = computed(() => {
   // We always want to show the "All" category
   const labels: string[] = [ALL_CATEGORY]
 
-  skills.data.forEach((category) => {
+  skillCategories.forEach((category) => {
     // We don't want empty categories
     if (category.attributes.technical_skills?.data.length > 0) {
       labels.push(category.attributes.label)
@@ -68,7 +72,7 @@ const isActiveCategory = computed(() => (category: string) => {
 const skillsByRank = computed(() => {
   const skillsByRank: {[key: number]: any[]} = {}
 
-  skills.data.forEach((category) => {
+  skillCategories.forEach((category) => {
     const data = category.attributes.technical_skills?.data
 
     data?.forEach((skill) => {
