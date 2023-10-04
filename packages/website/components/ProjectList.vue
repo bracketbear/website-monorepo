@@ -2,7 +2,7 @@
   <div class="grid grid-cols-1 gap-8 xl:grid-cols-2">
     <!-- Project Card -->
     <div
-      v-for="(project, i) in projects.data"
+      v-for="(project, i) in projects"
       :key="i"
       class="flex flex-col gap-4 rounded-2xl border-2 border-solid border-black bg-primary-lightest p-8 hard-shadow-xl"
     >
@@ -40,16 +40,19 @@
 </template>
 
 <script setup lang="ts">
+import { ApiProjectProject } from '%/contentTypes'
 import ArrowRightIcon from '~/assets/icons/arrow-right.svg'
 
-import { Project } from '~/config/projects'
-
 // TODO: filter by featured in the future?
-
-const projects = await useStrapi<Project>().find('projects', {
-  populate: ['mainImage', 'technical_skills'],
-  sort: 'order:asc',
-})
+const collectionName: ApiProjectProject['collectionName'] = 'projects'
+const result = await useAsyncData(
+  collectionName,
+  () => useStrapi().find<ApiProjectProject['attributes']>(collectionName, {
+    populate: ['mainImage', 'technical_skills'],
+    sort: 'order:asc',
+  }),
+)
+const projects = result.data.value?.data ?? []
 
 const hasMainImage = (project) => {
   return !!project?.attributes.mainImage?.data
