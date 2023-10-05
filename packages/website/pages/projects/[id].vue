@@ -5,8 +5,8 @@
       class="container relative flex min-h-screen flex-col gap-8 overflow-hidden py-8"
     >
       <!-- Title -->
-      <h1 v-if="project.attributes.title" class="text-2xl font-bold sm:text-4xl lg:text-6xl">
-        {{ project.attributes.title }}
+      <h1 v-if="project.attributes?.title" class="text-2xl font-bold sm:text-4xl lg:text-6xl">
+        {{ project.attributes?.title }}
       </h1>
       <!-- Main Image -->
       <div v-if="mainImageRoute" class="flex justify-center">
@@ -27,7 +27,7 @@
                     <UiPill
                       v-for="(skill, i) in detail.value"
                       :key="i"
-                      :label="skill.attributes.label"
+                      :label="skill.attributes?.label"
                       class="w-max"
                     />
                   </div>
@@ -51,13 +51,6 @@
           </div>
         </div>
       </div>
-      <!-- Blog Post Link -->
-      <a
-        v-if="project.attributes.blogPostLink"
-        :href="project.attributes.blogPostLink"
-        target="_blank"
-        class="text-blue-500 underline"
-      >Read More</a>
       <!-- Media Slider -->
       <div v-if="media">
         <p class="font-heading">
@@ -102,24 +95,21 @@ const modal = reactive({
 const route = useRoute()
 const projectId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 const collectionName: ApiProjectProject['collectionName'] = 'projects'
-let project = null
-let result = null
-try {
-  result = await useAsyncData(
-    collectionName,
-    () => useStrapi().findOne<ApiProjectProject['attributes']>(collectionName, projectId, {
-      populate: ['mainImage', 'media', 'technical_skills'],
-    }),
-  )
-  project = result.data.value?.data
-} catch (error) {
-  console.error(error)
-}
+const result = await useAsyncData(
+  `collectionName-${projectId}`,
+  () => useStrapi().findOne<ApiProjectProject['attributes']>(collectionName, projectId, {
+    populate: ['mainImage', 'media', 'technical_skills'],
+  }),
+  { watch: [route.params] },
+)
+const project = result.data.value?.data ?? null
 
-const mainImage = project?.attributes.mainImage?.data ?? {}
-const media = project?.attributes.media?.data ?? []
+console.log('project', project, projectId, collectionName, result)
+
+const mainImage = project?.attributes?.mainImage?.data ?? {}
+const media = project?.attributes?.media?.data ?? []
 const mainImageRoute = mainImage?.attributes?.url ? useStrapiMedia(mainImage?.attributes?.url) : ''
-const mediaRoutes = media.map(mediaItem => mediaItem?.attributes.url ? useStrapiMedia(mediaItem?.attributes.url) : '')
+const mediaRoutes = media.map(mediaItem => mediaItem?.attributes?.url ? useStrapiMedia(mediaItem?.attributes?.url) : '')
 if (mainImage) {
   media.push(mainImage)
 }
@@ -132,46 +122,46 @@ interface LabelValue {
 const projectDetails: LabelValue[] = [
   {
     label: 'Role',
-    value: project?.attributes.role ?? '',
+    value: project?.attributes?.role ?? '',
   },
   {
     label: 'Project Type',
-    value: project?.attributes.projectType ?? '',
+    value: project?.attributes?.projectType ?? '',
   },
   {
     label: 'Duration',
-    value: project?.attributes.duration ?? '',
+    value: project?.attributes?.duration ?? '',
   },
   {
     label: 'Skills Used',
-    value: project?.attributes.technical_skills?.data ?? [],
+    value: project?.attributes?.technical_skills?.data ?? [],
   },
 ]
 
 const longTextSections: LabelValue[] = [
   {
     label: 'Description',
-    value: project?.attributes.description ?? '',
+    value: project?.attributes?.description ?? '',
   },
   {
     label: 'Challenges and Solutions',
-    value: project?.attributes.challengesAndSolutions ?? '',
+    value: project?.attributes?.challengesAndSolutions ?? '',
   },
   {
     label: 'Results Achieved',
-    value: project?.attributes.resultsAchieved ?? '',
+    value: project?.attributes?.resultsAchieved ?? '',
   },
 ]
 
 const handleClick = (mediaItem) => {
-  modal.image = mediaItem?.attributes.url ? useStrapiMedia(mediaItem?.attributes.url) : ''
-  modal.caption = mediaItem?.attributes.caption ?? ''
-  modal.alt = mediaItem?.attributes.alternativeText ?? ''
+  modal.image = mediaItem?.attributes?.url ? useStrapiMedia(mediaItem?.attributes?.url) : ''
+  modal.caption = mediaItem?.attributes?.caption ?? ''
+  modal.alt = mediaItem?.attributes?.alternativeText ?? ''
   modal.isOpen = true
 }
 
 useSeoMeta({
-  title: project?.attributes.title || 'Project Not Found',
-  description: project?.attributes.description || 'Project Not Found',
+  title: project?.attributes?.title || 'Project Not Found',
+  description: project?.attributes?.description || 'Project Not Found',
 })
 </script>
