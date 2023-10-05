@@ -7,18 +7,18 @@
       class="flex flex-col gap-4 rounded-2xl border-2 border-solid border-black bg-primary-lightest p-8 hard-shadow-xl"
     >
       <!-- Title -->
-      <h2 class="mb-2 text-center text-xl font-bold">
-        {{ project.attributes.title }}
+      <h2 v-if="project.attributes?.title" class="mb-2 text-center text-xl font-bold">
+        {{ project.attributes?.title }}
       </h2>
       <!-- Project Type -->
-      <div v-if="project.attributes.projectType" class="flex flex-wrap justify-center gap-2">
+      <div v-if="project.attributes?.projectType" class="flex flex-wrap justify-center gap-2">
         <p class="font-heading">
-          Project type: <span class="text-alt-1">{{ project.attributes.projectType }}</span>
+          Project type: <span class="text-alt-1">{{ project.attributes?.projectType }}</span>
         </p>
       </div>
       <!-- Skill Pills -->
-      <div v-if="project.attributes.technical_skills?.data.length > 0" class="flex flex-wrap justify-center gap-2">
-        <UiPill v-for="(skill, i) in project.attributes.technical_skills?.data" :key="i" :label="skill.attributes.label" />
+      <div v-if="project.attributes?.technical_skills?.data.length > 0" class="flex flex-wrap justify-center gap-2">
+        <UiPill v-for="(skill, i) in project.attributes?.technical_skills?.data" :key="i" :label="skill.attributes?.label" />
       </div>
       <!-- Main Image -->
       <div v-if="hasMainImage(project)" class="flex h-fit items-center justify-center">
@@ -55,11 +55,11 @@ const result = await useAsyncData(
 const projects = result.data.value?.data ?? []
 
 const hasMainImage = (project) => {
-  return !!project?.attributes.mainImage?.data
+  return !!project?.attributes?.mainImage?.data
 }
 const getMainImageRoute = (project) => {
-  if (project?.attributes.mainImage?.data?.attributes?.url) {
-    return useStrapiMedia(project?.attributes.mainImage?.data?.attributes?.url)
+  if (project?.attributes?.mainImage?.data?.attributes?.url) {
+    return useStrapiMedia(project?.attributes?.mainImage?.data?.attributes?.url)
   } else {
     return ''
   }
