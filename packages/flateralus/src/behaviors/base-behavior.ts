@@ -27,7 +27,7 @@ export abstract class BaseBehavior<TConfig> {
   /**
    * Constructor for BaseBehavior class.
    *
-   * @param config - The configuration object for this behav  ior.
+   * @param config - The configuration object for this behavior.
    */
   constructor (config: TConfig) {
     this.config = config

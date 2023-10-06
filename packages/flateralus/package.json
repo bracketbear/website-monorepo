@@ -1,15 +1,30 @@
 {
   "name": "flateralus",
-  "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
+  "private": "true",
+  "main": "./dist/flateralus.umd.cjs",
+  "module": "./dist/flateralus.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/flateralus.js",
+      "require": "./dist/flateralus.umd.cjs"
+    }
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
+    "build:watch": "vite build --watch",
     "preview": "vite preview"
   },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
+    "@types/node": "^20.8.2",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "vite": "^4.4.5",
+    "vite-plugin-dts": "^3.6.0"
   }
 }

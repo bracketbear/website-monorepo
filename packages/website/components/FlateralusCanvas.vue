@@ -18,9 +18,9 @@
 </template>
 
 <script setup lang="ts">
+import type { BaseAnimationConfig, BaseAnimation } from 'flateralus'
 import { Pointer } from '~/utils/canvas/types'
 import debounce from '~/utils/helpers/debounce'
-import BaseAnimation, { BaseAnimationConfig } from '~/utils/canvas/animations/base-animation'
 
 // Define component props with default values
 const props = withDefaults(defineProps<{

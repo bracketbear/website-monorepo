@@ -3,7 +3,7 @@ import BaseSprite from '../sprites/base-sprite'
 import RepulsionBehavior from '../behaviors/repulsion-behavior'
 import { Pointer } from '../types'
 import { BehaviorContext } from '../behaviors'
-import BaseAnimation from './base-animation'
+import { BaseAnimation } from './base-animation'
 
 export interface ParticleGridConfig {
   particleWidth?: number
@@ -27,7 +27,7 @@ const defaultConfig: ParticleGridConfig = {
   noiseStrength: 1,
 }
 
-class ParticleGridAnimation extends BaseAnimation {
+export class ParticleGridAnimation extends BaseAnimation {
   private particles: BaseSprite[] = []
   private repulsionBehavior: RepulsionBehavior
 
@@ -91,5 +91,3 @@ class ParticleGridAnimation extends BaseAnimation {
     this.setup()
   }
 }
-
-export default ParticleGridAnimation

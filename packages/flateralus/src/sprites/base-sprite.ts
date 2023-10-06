@@ -1,14 +1,14 @@
-import { Drawable } from '../types'
+import { Drawable, Vec2D } from '../types'
 
 abstract class BaseSprite implements Drawable {
   width = 0
   height = 0
-  fillColor: string | number | CanvasGradient | CanvasPattern = 'black'
+  fillColor: string | CanvasGradient | CanvasPattern = 'black'
   originalPosition = { x: 0, y: 0 }
 
   constructor (
     protected context: CanvasRenderingContext2D,
-    public position: {x: number, y: number},
+    public position: Vec2D,
   ) {
     this.context = context
     this.originalPosition = position

@@ -1,9 +1,9 @@
-import { Point } from '../types'
+import { Vec2D } from '../types'
 
 /**
  * Determines whether two points in a 2D space are within a specified distance of each other.
  */
-export function isWithinRadius (point1: Point, point2: Point, radius: number): boolean {
+export function isWithinRadius (point1: Vec2D, point2: Vec2D, radius: number): boolean {
   const dx = point1.x - point2.x
   const dy = point1.y - point2.y
 

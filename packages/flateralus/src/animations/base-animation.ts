@@ -5,7 +5,7 @@ export interface BaseAnimationConfig {}
 /**
  * BaseAnimation is an abstract class which represents the basic structure of an animation.
  */
-export default abstract class BaseAnimation {
+export abstract class BaseAnimation {
   /**
    * A reference to the 2D rendering context to use for drawing the animation.
    */
