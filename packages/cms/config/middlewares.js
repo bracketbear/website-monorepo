@@ -1,6 +1,6 @@
 module.exports = ({ env }) => {
   // We need to have special security config if we're using AWS S3 vs local uploads
-  const bucketUrl = `${env('AWS_BUCKET', 'yourBucketName')}.s3.${env('AWS_REGION', 'yourRegion')}.amazonaws.com`
+  const bucketUrl = `${env('AWS_BUCKET', 'yourBucketName')}.s3.amazonaws.com`
   const awsSecurityConfig = {
     contentSecurityPolicy: {
       useDefaults: true,
@@ -10,14 +10,14 @@ module.exports = ({ env }) => {
           "'self'",
           'data:',
           'blob:',
-          'dl.airtable.com',
+          'market-assets.strapi.io',
           bucketUrl
         ],
         'media-src': [
           "'self'",
           'data:',
           'blob:',
-          'dl.airtable.com',
+          'market-assets.strapi.io',
           bucketUrl
         ],
         upgradeInsecureRequests: null,
