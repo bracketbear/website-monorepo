@@ -3,8 +3,8 @@
   "name": "bracketbear-website",
   "workspaces": [
     "packages/flateralus",
-    "packages/cms",
-    "packages/website"
+    "apps/cms",
+    "apps/website"
   ],
   "scripts": {
     "dev": "concurrently --kill-others-on-fail \"yarn workspace flateralus build:watch\" \"yarn workspace @bracketbear/cms dev\" \"yarn workspace @bracketbear/website dev\"",
