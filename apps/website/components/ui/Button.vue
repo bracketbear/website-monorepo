@@ -46,9 +46,9 @@ const handleClick = () => {
 }
 
 const sizeClasses = {
-  small: 'px-2 py-1 text-sm',
-  default: 'px-3 py-2 text-md',
-  large: 'px-4 py-2 text-lg',
+  small: 'px-2 py-[0.53rem] text-sm',
+  default: 'px-2 py-[0.53rem] text-sm sm:px-3 sm:py-2 sm:text-md',
+  large: 'px-3 py-2 text-md sm:px-4 sm:py-2 sm:text-lg',
 }
 
 const colorClasses = {
@@ -59,6 +59,7 @@ const colorClasses = {
 }
 
 const roundedClass = computed(() => (props.round ? 'rounded-full aspect-square' : 'rounded'))
+// TODO: CSSify this
 const disabledClass = computed(() => (props.disabled ? 'opacity-50 cursor-not-allowed' : ''))
 const hasIcon = computed(() => !!slots.icon)
 </script>
