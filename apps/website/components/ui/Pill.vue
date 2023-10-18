@@ -1,7 +1,10 @@
 <template>
   <div
-    class="font-heading border-secondary-dark max-w-sm rounded-full border-2 border-solid px-3 py-2 text-center text-xs transition-all"
-    :class="{'!bg-secondary-dark scale-110 text-white': props.isActive, 'bg-secondary': !props.isActive}"
+    class="rounded-full border-2 border-solid border-secondary-dark px-2 py-1 text-center font-heading text-[0.625rem] transition-all md:px-3 md:py-2 md:text-xs"
+    :class="{
+      'scale-110 !bg-secondary-dark text-white': props.isActive,
+      'bg-secondary': !props.isActive
+    }"
   >
     {{ props.label }}
   </div>
