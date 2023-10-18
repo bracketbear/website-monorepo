@@ -7,9 +7,7 @@ const config = {
   },
 };
 
-const bootstrap = (app) => {
-  console.log(app);
-};
+const bootstrap = (app) => {};
 
 export default {
   config,

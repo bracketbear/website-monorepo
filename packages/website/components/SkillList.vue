@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ApiSkillCategorySkillCategory } from '%/contentTypes'
+import { ApiSkillCategorySkillCategory } from '@bracketbear/cms/types'
 
 const ALL_CATEGORY = 'All'
 const collectionName: ApiSkillCategorySkillCategory['collectionName'] = 'skill_categories'

@@ -32,7 +32,6 @@ module.exports = ({ env }) => {
   if (env('UPLOAD_PROVIDER', undefined) === 'aws-s3') {
     securityMiddleware.config = awsSecurityConfig
   }
-  securityMiddleware.config = env('UPLOAD_PROVIDER', undefined) === 'aws-s3' ? awsSecurityConfig : undefined
 
   return [
     'strapi::errors',

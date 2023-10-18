@@ -100,16 +100,13 @@ const result = await useAsyncData(
   () => useStrapi().findOne<ApiProjectProject['attributes']>(collectionName, projectId, {
     populate: ['mainImage', 'media', 'technical_skills'],
   }),
-  { watch: [route.params] },
 )
 const project = result.data.value?.data ?? null
-
-console.log('project', project, projectId, collectionName, result)
-
 const mainImage = project?.attributes?.mainImage?.data ?? {}
 const media = project?.attributes?.media?.data ?? []
-const mainImageRoute = mainImage?.attributes?.url ? useStrapiMedia(mainImage?.attributes?.url) : ''
-const mediaRoutes = media.map(mediaItem => mediaItem?.attributes?.url ? useStrapiMedia(mediaItem?.attributes?.url) : '')
+const mainImageRoute = mainImage?.attributes?.url ? useCmsMedia(mainImage?.attributes?.url) : ''
+const mediaRoutes = media.map(mediaItem => mediaItem?.attributes?.url ? useCmsMedia(mediaItem?.attributes?.url) : '')
+
 if (mainImage) {
   media.push(mainImage)
 }
@@ -154,7 +151,7 @@ const longTextSections: LabelValue[] = [
 ]
 
 const handleClick = (mediaItem) => {
-  modal.image = mediaItem?.attributes?.url ? useStrapiMedia(mediaItem?.attributes?.url) : ''
+  modal.image = mediaItem?.attributes?.url ? useCmsMedia(mediaItem?.attributes?.url) : ''
   modal.caption = mediaItem?.attributes?.caption ?? ''
   modal.alt = mediaItem?.attributes?.alternativeText ?? ''
   modal.isOpen = true

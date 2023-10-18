@@ -29,11 +29,11 @@ import { ApiCompanyCompany } from '%/contentTypes'
 // This will throw a TS error if the collection name ever changes.
 const collectionName: ApiCompanyCompany['collectionName'] = 'companies'
 const result = await useAsyncData(
-  collectionName,
   () => useStrapi().find<ApiCompanyCompany['attributes']>(collectionName, {
     populate: ['jobs'],
     sort: 'order:asc',
   }),
+  { immediate: true },
 )
 const companies = result.data.value?.data ?? []
 

@@ -29,12 +29,14 @@ export default defineNuxtConfig({
   },
 
   image: {
-    staticFilename: '[publicPath]/images/[name]-[hash][ext]',
-    strapi: {
-      baseURL: 'http://localhost:1337',
+    providers: {
+      strapi: {},
+      ipxStatic: {},
     },
-    static: {},
-    domains: ['localhost:1337'],
+    domains: ['localhost:1337', 'bracket-bear-cms-uploads.s3.amazonaws.com'],
+    alias: {
+      'aws-s3': 'https://bracket-bear-cms-uploads.s3.amazonaws.com',
+    },
   },
 
   googleFonts: {
