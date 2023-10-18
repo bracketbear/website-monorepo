@@ -37,7 +37,7 @@ const result = await useAsyncData(
 )
 const companies = result.data.value?.data ?? []
 
-const getFormattedDate = (date: string) => {
+const getFormattedDate = (date: Attributes.Date) => {
   if (!date) { return 'Present' }
 
   const dateObj = new Date(date)
@@ -46,4 +46,11 @@ const getFormattedDate = (date: string) => {
     month: 'long',
   })
 }
+
+const sections = [
+  {
+    title: 'Duration',
+    value: (company: ApiCompanyCompany) => `${getFormattedDate(company.attributes.date_from)} - ${getFormattedDate(company.attributes.date_to)}`,
+  },
+]
 </script>

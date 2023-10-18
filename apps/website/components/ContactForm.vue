@@ -87,7 +87,7 @@ const formFields: FormField[] = [
   { label: 'Your Name', model: 'name', component: UiTextInput, placeholder: 'Jack' },
   { label: 'Your Email Address', model: 'email', component: UiTextInput, placeholder: 'Sparrow' },
   { label: 'Subject', model: 'subject', component: UiTextInput, placeholder: 'Why is the rum always gone?', class: 'md:col-span-2' },
-  { label: 'Your Message', model: 'message', component: UiTextareaInput, placeholder: 'Did everyone see that? Because I will not be doing it again', class: 'md:col-span-2' },
+  { label: 'Your Message', model: 'message', component: UiTextareaInput, placeholder: 'Did everyone see that? Because I will not be doing it again', class: 'md:col-span-2 [&_textarea]:h-64' },
 ]
 
 const handleSubmit = () => {

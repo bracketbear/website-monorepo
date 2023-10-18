@@ -103,10 +103,6 @@ const project = result.data.value?.data ?? null
 const mainImage = project?.attributes?.mainImage?.data ?? {}
 const media = project?.attributes?.media?.data ?? []
 
-if (mainImage) {
-  media.push(mainImage)
-}
-
 interface LabelValue {
   label: string;
   value: string;
@@ -148,7 +144,6 @@ const longTextSections: LabelValue[] = [
 
 const handleClick = (mediaItem) => {
   modal.image = mediaItem || undefined
-  modal.alt = mediaItem?.attributes?.alternativeText ?? ''
   modal.isOpen = true
 }
 
