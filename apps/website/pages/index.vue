@@ -42,7 +42,7 @@
             {{ text }}
           </p>
         </div>
-        <div v-if="section.component" :class="section.componentClass" class="mx-auto p-4">
+        <div v-if="section.component" :class="section.componentClass" class="p-4">
           <Component :is="section.component" />
         </div>
       </div>
@@ -93,7 +93,7 @@ const sections: IndexSection[] = [
       "Here's a brief timeline of my work history.",
     ],
     component: WorkHistory,
-    componentClass: 'max-w-2xl w-full',
+    componentClass: 'max-w-2xl w-full mx-auto',
   },
   {
     name: 'technical-skills',
@@ -118,7 +118,7 @@ const sections: IndexSection[] = [
       "Feel free to fill out the form below and I'll get back to you as soon as possible.",
     ],
     component: ContactForm,
-    componentClass: 'max-w-2xl',
+    componentClass: 'container max-w-4xl',
   },
 ]
 
