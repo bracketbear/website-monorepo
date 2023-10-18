@@ -9,8 +9,8 @@
         {{ project.attributes?.title }}
       </h1>
       <!-- Main Image -->
-      <div v-if="mainImageRoute" class="flex justify-center">
-        <NuxtImg :src="mainImageRoute" class="max-h-[65vh] rounded-xl border-2 border-solid border-black bg-secondary hard-shadow-xl" />
+      <div v-if="project.attributes.mainImage" class="flex justify-center">
+        <CmsMedia :media="project.attributes.mainImage.data" class="max-h-[65vh] rounded-xl border-2 border-solid border-black bg-secondary hard-shadow-xl" />
       </div>
       <!-- Project Details and Description, Challenges, and Results -->
       <div class="grid gap-6 lg:grid-cols-3">
@@ -63,15 +63,14 @@
             class="inline-block shrink-0"
             @click="handleClick(mediaItem)"
           >
-            <NuxtImg v-if="mediaRoutes[index]" :src="mediaRoutes[index]" class="h-48 rounded border-2 border-solid border-white bg-secondary" />
+            <CmsMedia :media="mediaItem" class="h-48 rounded border-2 border-solid border-white bg-secondary" />
           </button>
         </div>
       </div>
       <UiModal v-model:is-open="modal.isOpen" :fixed-size="false">
         <div v-if="modal.image" class="flex justify-center">
-          <NuxtImg
-            :src="modal.image"
-            :alt="modal.alt"
+          <CmsMedia
+            :media="modal.image"
             class="max-h-[calc(100vh-16rem)] max-w-full object-contain"
           />
         </div>
@@ -86,9 +85,8 @@
 import { ApiProjectProject } from '%/contentTypes'
 
 const modal = reactive({
-  image: '',
+  image: undefined,
   caption: '',
-  alt: '',
   isOpen: false,
 })
 
@@ -104,8 +102,6 @@ const result = await useAsyncData(
 const project = result.data.value?.data ?? null
 const mainImage = project?.attributes?.mainImage?.data ?? {}
 const media = project?.attributes?.media?.data ?? []
-const mainImageRoute = mainImage?.attributes?.url ? useCmsMedia(mainImage?.attributes?.url) : ''
-const mediaRoutes = media.map(mediaItem => mediaItem?.attributes?.url ? useCmsMedia(mediaItem?.attributes?.url) : '')
 
 if (mainImage) {
   media.push(mainImage)
@@ -151,8 +147,7 @@ const longTextSections: LabelValue[] = [
 ]
 
 const handleClick = (mediaItem) => {
-  modal.image = mediaItem?.attributes?.url ? useCmsMedia(mediaItem?.attributes?.url) : ''
-  modal.caption = mediaItem?.attributes?.caption ?? ''
+  modal.image = mediaItem || undefined
   modal.alt = mediaItem?.attributes?.alternativeText ?? ''
   modal.isOpen = true
 }

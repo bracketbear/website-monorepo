@@ -22,7 +22,7 @@
       </div>
       <!-- Main Image -->
       <div v-if="hasMainImage(project)" class="flex h-fit items-center justify-center">
-        <NuxtImg :src="getMainImageRoute(project)" class="w-fit rounded border-2 border-solid border-black bg-secondary" />
+        <CmsMedia :media="getMainImage(project)" class="w-fit rounded border-2 border-solid border-black bg-secondary" />
       </div>
       <!-- Learn More button -->
       <div class="flex justify-center">
@@ -54,14 +54,14 @@ const result = await useAsyncData(
 )
 const projects = result.data.value?.data ?? []
 
-const hasMainImage = (project) => {
+const hasMainImage = (project: ApiProjectProject) => {
   return !!project?.attributes?.mainImage?.data
 }
-const getMainImageRoute = (project) => {
-  if (project?.attributes?.mainImage?.data?.attributes?.url) {
-    return useStrapiMedia(project?.attributes?.mainImage?.data?.attributes?.url)
+const getMainImage = (project: ApiProjectProject) => {
+  if (project?.attributes?.mainImage?.data) {
+    return project?.attributes?.mainImage?.data
   } else {
-    return ''
+    return false
   }
 }
 </script>
