@@ -32,9 +32,9 @@
 import XIcon from '@/assets/icons/x.svg'
 
 interface Props {
-  isOpen: boolean
-  title: string
-  fixedSize: boolean
+  isOpen?: boolean
+  title?: string
+  fixedSize?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
