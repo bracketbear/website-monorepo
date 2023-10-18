@@ -2,7 +2,7 @@ import path from 'path'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/strapi', '@nuxt/image-edge', '@nuxtjs/google-fonts', 'nuxt-svgo', '@zadigetvoltaire/nuxt-gtm'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/strapi', '@nuxt/image-edge', '@nuxtjs/google-fonts', 'nuxt-svgo', '@zadigetvoltaire/nuxt-gtm', 'nuxt-simple-sitemap'],
 
   app: {
     head: {
@@ -52,5 +52,10 @@ export default defineNuxtConfig({
 
   gtm: {
     id: process.env.NUXT_GTM_ID || 'GTM-KX3KKDT9',
+  },
+
+  // https://sitemap.nuxtjs.org/
+  site: {
+    url: 'https://bracketbear.com',
   },
 })
