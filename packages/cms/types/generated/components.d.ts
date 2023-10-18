@@ -51,7 +51,7 @@ export interface SharedSeo extends Schema.Component {
   };
 }
 
-declare module '@strapi/strapi' {
+declare module '@strapi/types' {
   export module Shared {
     export interface Components {
       'shared.meta-social': SharedMetaSocial;
