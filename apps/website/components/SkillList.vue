@@ -12,7 +12,7 @@
       </button>
     </div>
     <!-- Grid of skills -->
-    <div class="mx-auto grid grid-cols-3 justify-center gap-6 md:grid-cols-4 xl:grid-cols-6">
+    <div class="mx-auto grid grid-cols-2 justify-center gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       <!-- TODO: add some sort of animation here so the items -->
       <!-- TODO: figure out in the future how we actually want to initially order skills -->
       <template v-for="skill in skillsByRank" :key="skill">
