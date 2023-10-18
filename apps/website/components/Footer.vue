@@ -1,11 +1,11 @@
 <template>
-  <footer class="flex flex-col justify-center gap-8 bg-black">
+  <footer class="container flex flex-col justify-center gap-8 bg-black py-8">
     <!-- Copyright Text -->
     <p class="text-center font-heading text-gray-100">
       &copy;{{ formattedYear }} Harrison Callahan. All Rights Reserved.
     </p>
     <!-- Links -->
-    <div class="mx-auto grid w-max gap-32 sm:grid-cols-[repeat(2,1fr)]">
+    <div class="flex flex-col gap-x-16 gap-y-8 sm:mx-auto sm:grid sm:w-max sm:grid-cols-[repeat(2,1fr)]">
       <!-- Website Navitagtion -->
       <nav>
         <div class="font-heading text-lg text-primary">
