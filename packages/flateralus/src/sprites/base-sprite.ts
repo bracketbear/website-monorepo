@@ -1,3 +1,4 @@
+import { degreesToRadians } from '..'
 import { Drawable, Vec2D } from '../types'
 
 abstract class BaseSprite implements Drawable {
@@ -6,6 +7,7 @@ abstract class BaseSprite implements Drawable {
   fillColor: string | CanvasGradient | CanvasPattern = 'black'
   position: Vec2D = { x: 0, y: 0 }
   scale: Vec2D = { x: 1, y: 1 }
+  rotation: number = 0 // Rotation in radians
   
   flags = {
     hasSetInitialWidth: false,
@@ -29,6 +31,7 @@ abstract class BaseSprite implements Drawable {
   draw (): void {
     this.context.save()
     this.context.translate(this.position.x, this.position.y)
+    this.context.rotate(this.rotation);
     this.context.scale(this.scale.x, this.scale.y);
     this.context.fill()
     this.render()
@@ -61,6 +64,14 @@ abstract class BaseSprite implements Drawable {
   
   setScale(scale: number) {
     this.scale = { x: scale, y: scale }
+  }
+  
+  setRotation(angleInDegrees: number): void {
+    this.rotation = degreesToRadians(angleInDegrees)
+  }
+  
+  rotate(angleInDegrees: number): void {
+    this.rotation += degreesToRadians(angleInDegrees)
   }
   
   setFillColor(color: string | CanvasGradient | CanvasPattern) {

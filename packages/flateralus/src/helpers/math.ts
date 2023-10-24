@@ -13,3 +13,7 @@ export function isWithinRadius (point1: Vec2D, point2: Vec2D, radius: number): b
   // Check if the distance is less than or equal to the radius
   return distance <= radius
 }
+
+export function degreesToRadians (degrees: number): number {
+  return degrees * Math.PI / 180
+}

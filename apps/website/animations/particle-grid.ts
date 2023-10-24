@@ -63,17 +63,13 @@ export class ParticleGridAnimation extends BaseAnimation {
       for (let y = 0; y < rows; y++) {
         const posX = x * (this.config.particleWidth + this.config.xPad) + this.config.xPad / 2
         const posY = y * (this.config.particleWidth + this.config.yPad) + this.config.yPad / 2
-
-        // const particle = new CircleSprite(
-        //   this.context,
-        //   this.config.particleWidth / 2,
-        //   { x: posX, y: posY },
-        // )
-
         const particle = new CustomPath(this.context, paths)
+
         particle.position = { x: posX, y: posY }
         particle.setFillColor(this.config.particleColor ?? 'red')
         particle.setScale(0.2)
+        particle.setRotation(-45)
+
         this.particles.push(particle)
       }
     }
