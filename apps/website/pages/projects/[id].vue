@@ -100,7 +100,6 @@ const result = await useAsyncData(
   }),
 )
 const project = result.data.value?.data ?? null
-const mainImage = project?.attributes?.mainImage?.data ?? {}
 const media = project?.attributes?.media?.data ?? []
 
 interface LabelValue {

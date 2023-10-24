@@ -16,6 +16,7 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
+    "@bracketbear/cms": "*",
     "@nuxt/devtools": "^0.8.4",
     "@nuxt/image-edge": "^1.0.0-28094923.e859bba",
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
