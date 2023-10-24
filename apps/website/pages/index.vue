@@ -52,8 +52,8 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { ParticleGridAnimation } from 'flateralus'
-import type { ParticleGridConfig } from 'flateralus'
+import { ParticleGridAnimation } from '~/animations/particle-grid'
+import type { ParticleGridConfig } from '~/animations/particle-grid'
 import WorkHistory from '~/components/WorkHistory/WorkHistory.vue'
 import ContactForm from '~/components/ContactForm.vue'
 import SkillList from '~/components/SkillList.vue'
@@ -62,7 +62,7 @@ import ProjectList from '~/components/ProjectList.vue'
 const animationConfig: ParticleGridConfig = {
   noiseStrength: 10,
   particleColor: '#B8D5B8',
-  particleWidth: 50,
+  particleWidth: 100,
   driftSpeed: 10,
   repulsionStrength: 10,
   xPad: 10,

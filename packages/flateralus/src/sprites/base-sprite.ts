@@ -4,20 +4,24 @@ abstract class BaseSprite implements Drawable {
   width = 0
   height = 0
   fillColor: string | CanvasGradient | CanvasPattern = 'black'
-  originalPosition = { x: 0, y: 0 }
+  position: Vec2D = { x: 0, y: 0 }
+  scale: Vec2D = { x: 1, y: 1 }
+  
+  flags = {
+    hasSetInitialWidth: false,
+    hasSetInitialHeight: false,
+  }
 
   constructor (
     protected context: CanvasRenderingContext2D,
-    public position: Vec2D,
   ) {
     this.context = context
-    this.originalPosition = position
   }
 
   /**
-   * Draw the sprite onto the canvas.
+   * How to draw the sprite onto the canvas.
    */
-  abstract onDraw (): void
+  abstract render (): void
 
   /**
    * Draw the sprite onto the canvas with position.
@@ -25,9 +29,45 @@ abstract class BaseSprite implements Drawable {
   draw (): void {
     this.context.save()
     this.context.translate(this.position.x, this.position.y)
-    this.onDraw()
+    this.context.scale(this.scale.x, this.scale.y);
+    this.context.fill()
+    this.render()
     this.context.restore()
   }
+  
+  setWidth(width: number) {
+    this.scale.x = width / this.width
+    
+    if (!this.flags.hasSetInitialWidth) {
+      this.width = width
+      this.flags.hasSetInitialWidth = true
+    }
+  }
+  
+  setHeight(height: number) {
+    this.scale.y = height / this.height
+    
+    if (!this.flags.hasSetInitialHeight) {
+      this.height = height
+      this.flags.hasSetInitialHeight = true
+    }
+  }
+  
+  setSize(width: number, height: number) {
+    this.setWidth(width)
+    this.setHeight(height)
+    console.log('setSize', this.width, this.height, this.scale)
+  }
+  
+  setScale(scale: number) {
+    this.scale = { x: scale, y: scale }
+  }
+  
+  setFillColor(color: string | CanvasGradient | CanvasPattern) {
+    this.fillColor = color
+    this.context.fillStyle = color
+  }
+  
 }
 
 export default BaseSprite

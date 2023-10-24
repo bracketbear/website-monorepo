@@ -10,7 +10,7 @@ export class CircleSprite extends BaseSprite {
     this.height = radius * 2
   }
 
-  onDraw (): void {
+  render (): void {
     this.context.beginPath()
     this.context.arc(this.width / 2, this.height / 2, this.width / 2, 0, Math.PI * 2)
     this.context.fillStyle = this.fillColor

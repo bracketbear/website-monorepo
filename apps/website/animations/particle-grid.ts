@@ -1,9 +1,6 @@
-import { CircleSprite } from '../sprites/circle'
-import BaseSprite from '../sprites/base-sprite'
-import RepulsionBehavior from '../behaviors/repulsion-behavior'
-import { Pointer } from '../types'
-import { BehaviorContext } from '../behaviors'
-import { BaseAnimation } from './base-animation'
+import { BaseSprite, BaseAnimation, CircleSprite, CustomPath, RepulsionBehavior, SvgHelper } from 'flateralus'
+import type { BehaviorContext, Pointer } from 'flateralus'
+import BracketBearLogo from '~/assets/icons/bracket-bear-logo.svg?raw'
 
 export interface ParticleGridConfig {
   particleWidth?: number
@@ -17,8 +14,9 @@ export interface ParticleGridConfig {
 }
 
 const defaultConfig: ParticleGridConfig = {
-  particleWidth: 10,
-  particleColor: '#000000',
+  particleWidth: 100,
+  particleHeight: 100,
+  particleColor: 'red',
   xPad: 10,
   yPad: 10,
   mouseRadius: 100,
@@ -59,23 +57,28 @@ export class ParticleGridAnimation extends BaseAnimation {
     const availableHeight = canvasHeight - this.config.yPad
     const columns = Math.floor(availableWidth / (this.config.particleWidth + this.config.xPad))
     const rows = Math.floor(availableHeight / (this.config.particleWidth + this.config.yPad))
+    const paths = SvgHelper.extractPaths(BracketBearLogo)
 
     for (let x = 0; x < columns; x++) {
       for (let y = 0; y < rows; y++) {
         const posX = x * (this.config.particleWidth + this.config.xPad) + this.config.xPad / 2
         const posY = y * (this.config.particleWidth + this.config.yPad) + this.config.yPad / 2
 
-        const particle = new CircleSprite(
-          this.context,
-          this.config.particleWidth / 2,
-          { x: posX, y: posY },
-        )
+        // const particle = new CircleSprite(
+        //   this.context,
+        //   this.config.particleWidth / 2,
+        //   { x: posX, y: posY },
+        // )
 
+        const particle = new CustomPath(this.context, paths)
         particle.position = { x: posX, y: posY }
-        particle.fillColor = this.config.particleColor ?? '#000000'
+        particle.setFillColor(this.config.particleColor ?? 'red')
+        particle.setScale(0.2)
         this.particles.push(particle)
       }
     }
+
+    console.log('ParticleGrid setup', this.particles)
   }
 
   animate (timestamp: number, pointer: Pointer) {
