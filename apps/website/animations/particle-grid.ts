@@ -73,14 +73,11 @@ export class ParticleGridAnimation extends BaseAnimation {
         this.particles.push(particle)
       }
     }
-
-    console.log('ParticleGrid setup', this.particles)
   }
 
   animate (timestamp: number, pointer: Pointer) {
     this.particles.forEach((particle) => {
       this.repulsionBehavior.performBehavior(particle, { pointer, timestamp })
-
       particle.draw()
     })
   }

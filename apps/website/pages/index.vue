@@ -1,27 +1,31 @@
 <template>
   <NuxtLayout class="bg-primary">
     <!-- Hero -->
-    <div class="h-[calc(100vh-4rem)] border-b-2 border-solid border-black bg-secondary-dark md:h-[calc(100vh-5rem)] ">
+    <div class="h-[calc(100vh-4rem)] border-b-2 border-solid border-black bg-primary-dark bg-gradient-to-br from-black md:h-[calc(100vh-5rem)] ">
       <FlateralusCanvas
         :animation-class="ParticleGridAnimation"
         :config="animationConfig"
         class="h-full w-full"
       >
         <div class="flex h-full items-center">
-          <div class="container flex flex-col items-center justify-center gap-3 text-center font-heading text-xl md:px-16">
-            <div>Hi! My name is</div>
+          <div class="container flex flex-col items-center justify-center gap-3 text-center font-heading text-xl text-white md:px-16">
+            <div class="text-hard-shadow">
+              Hi! My name is
+            </div>
             <div class="text-5xl text-white shadow-white text-stroke text-hard-shadow sm:text-7xl md:text-8xl">
               Harrison
             </div>
-            <div>I'm a full-stack developer with a background in design, immersive Experiences, and Generative A.I.</div>
+            <div class="text-hard-shadow">
+              I'm a full-stack developer with a background in design, immersive Experiences, and Generative A.I.
+            </div>
             <div class="mt-4 flex w-full flex-col justify-center gap-4 md:flex-row">
               <NuxtLink to="#welcome">
-                <UiButton color="white" class="w-full md:w-auto">
+                <UiButton size="large" color="white" class="w-full md:w-auto">
                   Learn More
                 </UiButton>
               </NuxtLink>
               <NuxtLink to="#contact">
-                <UiButton class="w-full md:w-auto">
+                <UiButton size="large" class="w-full md:w-auto">
                   Let's Chat!
                 </UiButton>
               </NuxtLink>
@@ -61,7 +65,7 @@ import ProjectList from '~/components/ProjectList.vue'
 
 const animationConfig: ParticleGridConfig = {
   noiseStrength: 10,
-  particleColor: '#B8D5B8',
+  particleColor: '#111827',
   particleWidth: 100,
   driftSpeed: 10,
   repulsionStrength: 10,

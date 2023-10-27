@@ -59,7 +59,6 @@ abstract class BaseSprite implements Drawable {
   setSize(width: number, height: number) {
     this.setWidth(width)
     this.setHeight(height)
-    console.log('setSize', this.width, this.height, this.scale)
   }
   
   setScale(scale: number) {
@@ -78,7 +77,6 @@ abstract class BaseSprite implements Drawable {
     this.fillColor = color
     this.context.fillStyle = color
   }
-  
 }
 
 export default BaseSprite

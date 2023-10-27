@@ -1,5 +1,5 @@
 <template>
-  <div :class="navClass" class="h-16 border-2 border-solid border-black md:h-20">
+  <div :class="navClass" class="h-16 border-y-2 border-solid border-black md:h-20">
     <nav class="container relative mx-auto flex  h-full items-center justify-between">
       <!-- Branding -->
       <NuxtLink :to="{ name: 'index' }" class="flex items-center gap-4">
