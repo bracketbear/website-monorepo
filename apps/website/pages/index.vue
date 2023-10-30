@@ -3,6 +3,7 @@
     <!-- Hero -->
     <div class="h-[calc(100vh-4rem)] border-b-2 border-solid border-black bg-primary-dark bg-gradient-to-br from-black md:h-[calc(100vh-5rem)] ">
       <FlateralusCanvas
+        v-if="isLoaded"
         :animation-class="ParticleGridAnimation"
         :config="animationConfig"
         class="h-full w-full"
@@ -56,31 +57,49 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
+import { CustomPath, SvgHelper } from 'flateralus'
 import { ParticleGridAnimation } from '~/animations/particle-grid'
 import type { ParticleGridConfig } from '~/animations/particle-grid'
 import WorkHistory from '~/components/WorkHistory/WorkHistory.vue'
 import ContactForm from '~/components/ContactForm.vue'
 import SkillList from '~/components/SkillList.vue'
 import ProjectList from '~/components/ProjectList.vue'
+import BracketBearLogo from '~/assets/icons/bracket-bear-logo.svg?raw'
 
-const animationConfig: ParticleGridConfig = {
-  noiseStrength: 10,
-  particleColor: '#111827',
-  particleWidth: 100,
-  driftSpeed: 10,
-  repulsionStrength: 10,
-  xPad: 10,
-  yPad: 10,
-}
+const animationConfig = ref<Partial<ParticleGridConfig>>({})
+const isLoaded = ref(false)
 
-interface IndexSection {
+onMounted(() => {
+  const paths = SvgHelper.extractPaths(BracketBearLogo)
+
+  animationConfig.value = {
+    noiseStrength: 10,
+    particleColor: '#111827',
+    particleWidth: 100,
+    driftSpeed: 1.5,
+    repulsionStrength: 1.5,
+    xPad: 10,
+    yPad: 10,
+    getSprite: (context, _config) => {
+      const sprite = new CustomPath(context, paths)
+      sprite.setScale(0.2)
+      sprite.rotate(-30)
+
+      return sprite
+    },
+  }
+
+  isLoaded.value = true
+})
+
+interface PageSection {
   name: string,
   text: string[],
   component?: Component,
   componentClass?: string,
 }
 
-const sections: IndexSection[] = [
+const sections: PageSection[] = [
   {
     name: 'welcome',
     text: [

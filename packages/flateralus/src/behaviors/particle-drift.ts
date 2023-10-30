@@ -1,4 +1,3 @@
-import { CircleSprite } from '../sprites/circle'
 import BaseSprite from '../sprites/base-sprite'
 import { BaseBehavior, BehaviorContext } from './base-behavior'
 

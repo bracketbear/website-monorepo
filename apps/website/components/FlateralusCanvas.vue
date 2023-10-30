@@ -26,7 +26,7 @@ import debounce from '~/utils/helpers/debounce'
 const props = withDefaults(defineProps<{
   animationClass: new(...args: any[]) => BaseAnimation,
   resetOnResize?: boolean,
-  config?: BaseAnimationConfig,
+  config?: Partial<BaseAnimationConfig>,
   intersectionThreshold?: number,
 }>(), {
   resetOnResize: true,
@@ -42,8 +42,8 @@ const container = ref<HTMLDivElement | null>(null)
 const pointer: Pointer = { x: -1000, y: -1000, active: false }
 
 // Define non-reactive variables
-let animationFrameId: number
-let animation: BaseAnimation
+let animationFrameId: number = 0
+let animationInstance: BaseAnimation | null = null
 let intersectionObserver: IntersectionObserver | null = null
 let resizeObserver: ResizeObserver | null = null
 let render: (timestamp: number) => void = () => {}
@@ -58,7 +58,7 @@ const resizeCanvas = debounce(() => {
   if (!ctx) { return }
 
   // eslint-disable-next-line new-cap
-  animation = new props.animationClass(ctx, props.config)
+  animationInstance = new props.animationClass(ctx, props.config)
 
   const dpr = window.devicePixelRatio
   const rect = canvas.value.getBoundingClientRect()
@@ -70,14 +70,13 @@ const resizeCanvas = debounce(() => {
   // Scale the context to ensure correct drawing operations
   ctx.scale(dpr, dpr)
 
-  if (settingUp.value) {
-    animation.setup()
-  }
-
   if (props.resetOnResize) {
     cancelAnimationFrame(animationFrameId)
-    animation.reset()
-    animation.setup()
+    animationInstance.reset()
+  }
+
+  if (settingUp.value) {
+    animationInstance.setup()
   }
 
   resolution.value = [rect.width, rect.height]
@@ -94,10 +93,10 @@ onMounted(() => {
 
   // Define the render function
   render = (timestamp: number) => {
-    if (!animation) { return }
+    if (!animationInstance) { return }
 
     ctx.clearRect(0, 0, canvas.value!.width, canvas.value!.height)
-    animation.animate(timestamp, pointer)
+    animationInstance.animate(timestamp, pointer)
     animationFrameId = requestAnimationFrame(render)
   }
 
@@ -123,11 +122,14 @@ onUnmounted(() => {
 
 // Watch for changes in props.config
 watch(() => props.config, () => {
-  if (animation) {
-    animation.reset()
-    animation.setup()
-    render(performance.now())
+  if (animationInstance) {
+    animationInstance.reset()
   }
+
+  animationInstance = new props.animationClass(canvas.value!.getContext('2d')!, props.config)
+  animationInstance.setup()
+
+  render(performance.now())
 })
 
 // Define event handlers

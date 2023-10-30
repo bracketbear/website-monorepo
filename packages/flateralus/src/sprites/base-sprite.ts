@@ -6,17 +6,21 @@ abstract class BaseSprite implements Drawable {
   height = 0
   fillColor: string | CanvasGradient | CanvasPattern = 'black'
   position: Vec2D = { x: 0, y: 0 }
+  originalPosition: Vec2D = { x: 0, y: 0 }
   scale: Vec2D = { x: 1, y: 1 }
   rotation: number = 0 // Rotation in radians
   
   flags = {
     hasSetInitialWidth: false,
     hasSetInitialHeight: false,
+    hasSetInitialPosition: false,
   }
 
   constructor (
     protected context: CanvasRenderingContext2D,
   ) {
+    if (!context) throw new Error('No context provided.')
+    
     this.context = context
   }
 
@@ -29,6 +33,10 @@ abstract class BaseSprite implements Drawable {
    * Draw the sprite onto the canvas with position.
    */
   draw (): void {
+    if (!this.context) {
+      console.log(this)
+      throw new Error('No context found.')
+    }
     this.context.save()
     this.context.translate(this.position.x, this.position.y)
     this.context.rotate(this.rotation);
@@ -71,6 +79,15 @@ abstract class BaseSprite implements Drawable {
   
   rotate(angleInDegrees: number): void {
     this.rotation += degreesToRadians(angleInDegrees)
+  }
+  
+  setPosition(x: number, y: number): void {
+    this.position = { x, y }
+    
+    if (!this.flags.hasSetInitialPosition) {
+      this.originalPosition = { x, y }
+      this.flags.hasSetInitialPosition = true
+    }
   }
   
   setFillColor(color: string | CanvasGradient | CanvasPattern) {

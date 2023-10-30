@@ -24,7 +24,7 @@ export abstract class BaseAnimation {
    */
   constructor (context: CanvasRenderingContext2D, config?: BaseAnimationConfig) {
     this.context = context
-    this.config = config ?? null
+    this.config = config ?? {}
   }
 
   /**
