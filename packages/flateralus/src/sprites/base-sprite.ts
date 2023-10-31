@@ -1,4 +1,5 @@
-import { degreesToRadians } from '..'
+import { Behavior, BehaviorContext, degreesToRadians } from '..'
+import { BehaviorCondition } from '../behaviors/behavior-condition'
 import { Drawable, Vec2D } from '../types'
 
 abstract class BaseSprite implements Drawable {
@@ -9,6 +10,7 @@ abstract class BaseSprite implements Drawable {
   originalPosition: Vec2D = { x: 0, y: 0 }
   scale: Vec2D = { x: 1, y: 1 }
   rotation: number = 0 // Rotation in radians
+  behaviorConditions: BehaviorCondition[] = []
   
   flags = {
     hasSetInitialWidth: false,
@@ -32,12 +34,13 @@ abstract class BaseSprite implements Drawable {
   /**
    * Draw the sprite onto the canvas with position.
    */
-  draw (): void {
-    if (!this.context) {
+  draw (ctx: BehaviorContext): void {
+    if (ctx === undefined) {
       console.log(this)
       throw new Error('No context found.')
     }
     this.context.save()
+    this.handleEvents(ctx)
     this.context.translate(this.position.x, this.position.y)
     this.context.rotate(this.rotation);
     this.context.scale(this.scale.x, this.scale.y);
@@ -93,6 +96,23 @@ abstract class BaseSprite implements Drawable {
   setFillColor(color: string | CanvasGradient | CanvasPattern) {
     this.fillColor = color
     this.context.fillStyle = color
+  }
+  
+  addBehavior(behavior: Behavior<any>): BehaviorCondition {
+    const condition = new BehaviorCondition(behavior);
+    this.behaviorConditions.push(condition);
+    
+    return condition;
+  }
+  
+  handleEvents(ctx: BehaviorContext): void {
+    this.behaviorConditions.forEach(condition => {
+      condition.checkAndExecute(this, ctx)
+    });
+  }
+  
+  getPosition(): Vec2D {
+    return this.position
   }
 }
 

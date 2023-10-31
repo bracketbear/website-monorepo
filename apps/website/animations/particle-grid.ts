@@ -1,5 +1,5 @@
-import { BaseSprite, BaseAnimation, CircleSprite, CustomPath, ParticleDriftBehavior, RepulsionBehavior, SvgHelper } from 'flateralus'
-import type { BehaviorContext, Pointer } from 'flateralus'
+import { BaseSprite, BaseAnimation, CircleSprite } from 'flateralus'
+import type { Pointer } from 'flateralus'
 
 export interface ParticleGridConfig {
   particleWidth: number
@@ -27,33 +27,12 @@ const defaultConfig: ParticleGridConfig = {
 
 export class ParticleGridAnimation extends BaseAnimation {
   private particles: BaseSprite[] = []
-  private repulsionBehavior: RepulsionBehavior
-  private particleDriftBehavior: ParticleDriftBehavior
 
   config: ParticleGridConfig
 
   constructor (context: CanvasRenderingContext2D, config: Partial<ParticleGridConfig> = {}) {
     super(context)
     this.config = { ...defaultConfig, ...config } // merge default values with passed config
-
-    // Initialize behaviors with their respective configurations
-    this.repulsionBehavior = new RepulsionBehavior({
-      mouseRadius: this.config.mouseRadius ?? 100,
-      repulsionStrength: this.config.repulsionStrength ?? 0.1,
-    }).setReactionCondition((particle: BaseSprite, context: BehaviorContext) => {
-      if (!context.pointer) {
-        console.warn('No pointer found in context. Skipping reaction condition.')
-        return false
-      }
-
-      const distanceToMouse = Math.hypot(context.pointer.x - particle.position.x, context.pointer.y - particle.position.y)
-      return distanceToMouse < this.config.mouseRadius
-    })
-
-    this.particleDriftBehavior = new ParticleDriftBehavior({
-      driftSpeed: this.config.driftSpeed,
-      noiseStrength: this.config.noiseStrength,
-    })
   }
 
   setup () {
@@ -77,10 +56,10 @@ export class ParticleGridAnimation extends BaseAnimation {
   }
 
   animate (timestamp: number, pointer: Pointer) {
+    const ctx = { timestamp, pointer }
+
     this.particles.forEach((particle) => {
-      this.repulsionBehavior.performBehavior(particle, { pointer, timestamp })
-      // this.particleDriftBehavior.performBehavior(particle, { pointer, timestamp })
-      particle.draw()
+      particle.draw(ctx)
     })
   }
 

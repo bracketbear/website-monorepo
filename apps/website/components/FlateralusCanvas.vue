@@ -18,8 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import type { BaseAnimationConfig, BaseAnimation } from 'flateralus'
-import { Pointer } from '~/utils/canvas/types'
+import type { BaseAnimationConfig, BaseAnimation, Pointer } from 'flateralus'
 import debounce from '~/utils/helpers/debounce'
 
 // Define component props with default values
@@ -39,7 +38,13 @@ const settingUp = ref(false)
 const resolution = ref([0, 0])
 const canvas = ref<HTMLCanvasElement | null>(null)
 const container = ref<HTMLDivElement | null>(null)
-const pointer: Pointer = { x: -1000, y: -1000, active: false }
+const pointer: Pointer = {
+  position: {
+    x: -1000,
+    y: -1000,
+  },
+  active: false,
+}
 
 // Define non-reactive variables
 let animationFrameId: number = 0
@@ -134,8 +139,8 @@ watch(() => props.config, () => {
 
 // Define event handlers
 const resetPointer = () => {
-  pointer.x = -1000
-  pointer.y = -1000
+  pointer.position.x = -1000
+  pointer.position.y = -1000
   pointer.active = false
 }
 
@@ -143,8 +148,8 @@ const handleMouseMove = (event: MouseEvent) => {
   const rect = canvas.value?.getBoundingClientRect()
   if (!rect) { return }
 
-  pointer.x = event.clientX - rect.left
-  pointer.y = event.clientY - rect.top
+  pointer.position.x = event.clientX - rect.left
+  pointer.position.y = event.clientY - rect.top
 }
 
 const handleMouseDown = () => {
@@ -163,8 +168,8 @@ const handleTouchMove = (event: TouchEvent) => {
   const rect = canvas.value?.getBoundingClientRect()
   if (!rect) { return }
 
-  pointer.x = event.touches[0].clientX - rect.left
-  pointer.y = event.touches[0].clientY - rect.top
+  pointer.position.x = event.touches[0].clientX - rect.left
+  pointer.position.y = event.touches[0].clientY - rect.top
   pointer.active = true
 }
 

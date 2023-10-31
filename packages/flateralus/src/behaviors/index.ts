@@ -1,3 +1,3 @@
 export * from './base-behavior'
-export * from './particle-drift'
+export * from './behavior-condition'
 export * from './repulsion-behavior'
