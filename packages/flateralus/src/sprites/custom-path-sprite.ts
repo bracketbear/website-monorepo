@@ -1,4 +1,4 @@
-import BaseSprite from './base-sprite';
+import { BaseSprite } from './base-sprite';
 
 export class CustomPath extends BaseSprite {
   constructor(

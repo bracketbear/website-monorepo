@@ -7,7 +7,7 @@ export interface RepulsionBehaviorConfig {
   repulsionStrength: number
 }
 
-export const RepulsionBehavior: Behavior<RepulsionBehaviorConfig> = (particle, config, context) => {
+export const repulsionBehavior: Behavior<RepulsionBehaviorConfig> = (particle, config, context) => {
   const { pointer } = context
   const defaultConfig: RepulsionBehaviorConfig = {
     mouseRadius: 100,

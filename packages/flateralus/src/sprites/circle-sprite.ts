@@ -1,4 +1,4 @@
-import BaseSprite from './base-sprite'
+import { BaseSprite } from './base-sprite'
 
 /**
  * A simple circle sprite. The circle is drawn centered at the provided offset.

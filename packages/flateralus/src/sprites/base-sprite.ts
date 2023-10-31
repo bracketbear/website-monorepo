@@ -2,7 +2,7 @@ import { Behavior, BehaviorContext, degreesToRadians } from '..'
 import { BehaviorCondition } from '../behaviors/behavior-condition'
 import { Drawable, Vec2D } from '../types'
 
-abstract class BaseSprite implements Drawable {
+export abstract class BaseSprite implements Drawable {
   width = 0
   height = 0
   fillColor: string | CanvasGradient | CanvasPattern = 'black'
@@ -115,5 +115,3 @@ abstract class BaseSprite implements Drawable {
     return this.position
   }
 }
-
-export default BaseSprite
