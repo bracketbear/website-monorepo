@@ -1,5 +1,5 @@
 import { Behavior, BehaviorContext } from ".";
-import BaseSprite from "../sprites/base-sprite";
+import { BaseSprite } from "../sprites";
 
 export class BehaviorCondition {
   private behavior: Behavior<any>;
