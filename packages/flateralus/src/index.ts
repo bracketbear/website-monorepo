@@ -1,4 +1,3 @@
-export * from './animations';
 export * from './behaviors';
 export * from './helpers';
 export * from './sprites';

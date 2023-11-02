@@ -1,5 +1,5 @@
 import { BaseSprite, BaseAnimation, CircleSprite } from 'flateralus'
-import type { Pointer } from 'flateralus'
+import type { BehaviorContext, Pointer } from 'flateralus'
 
 export interface ParticleGridConfig {
   particleWidth: number
@@ -25,17 +25,16 @@ const defaultConfig: ParticleGridConfig = {
   getSprite: (context, config) => new CircleSprite(context, config.particleWidth ?? 10, { x: 0, y: 0 }),
 }
 
-export class ParticleGridAnimation extends BaseAnimation {
-  private particles: BaseSprite[] = []
-
+export class ParticleGridSprite extends BaseSprite {
   config: ParticleGridConfig
 
   constructor (context: CanvasRenderingContext2D, config: Partial<ParticleGridConfig> = {}) {
     super(context)
     this.config = { ...defaultConfig, ...config } // merge default values with passed config
+    this.setup()
   }
 
-  setup () {
+  setup (): void {
     const canvasWidth = this.context.canvas.width
     const canvasHeight = this.context.canvas.height
     const availableWidth = canvasWidth - this.config.xPad
@@ -50,21 +49,13 @@ export class ParticleGridAnimation extends BaseAnimation {
         const particle = this.config.getSprite(this.context, this.config)
         particle.setPosition(posX, posY)
 
-        this.particles.push(particle)
+        this.addChild(particle)
       }
     }
   }
 
-  animate (timestamp: number, pointer: Pointer) {
-    const ctx = { timestamp, pointer }
-
-    this.particles.forEach((particle) => {
-      particle.draw(ctx)
-    })
-  }
-
-  reset () {
-    this.particles = []
+  reset (): void {
+    this.removeAllChildren()
     this.setup()
   }
 }

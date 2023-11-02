@@ -18,12 +18,12 @@
 </template>
 
 <script setup lang="ts">
-import type { BaseAnimationConfig, BaseAnimation, Pointer } from 'flateralus'
+import type { BaseAnimationConfig, Pointer, BaseSprite } from 'flateralus'
 import debounce from '~/utils/helpers/debounce'
 
 // Define component props with default values
 const props = withDefaults(defineProps<{
-  animationClass: new(...args: any[]) => BaseAnimation,
+  animationClass: new(...args: any[]) => BaseSprite,
   resetOnResize?: boolean,
   config?: Partial<BaseAnimationConfig>,
   intersectionThreshold?: number,
@@ -48,7 +48,7 @@ const pointer: Pointer = {
 
 // Define non-reactive variables
 let animationFrameId: number = 0
-let animationInstance: BaseAnimation | null = null
+let animationInstance: BaseSprite | null = null
 let intersectionObserver: IntersectionObserver | null = null
 let resizeObserver: ResizeObserver | null = null
 let render: (timestamp: number) => void = () => {}
@@ -101,7 +101,7 @@ onMounted(() => {
     if (!animationInstance) { return }
 
     ctx.clearRect(0, 0, canvas.value!.width, canvas.value!.height)
-    animationInstance.animate(timestamp, pointer)
+    animationInstance.draw({ timestamp, pointer })
     animationFrameId = requestAnimationFrame(render)
   }
 

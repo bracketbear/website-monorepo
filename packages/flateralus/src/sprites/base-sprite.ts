@@ -11,6 +11,7 @@ export abstract class BaseSprite implements Drawable {
   scale: Vec2D = { x: 1, y: 1 }
   rotation: number = 0 // Rotation in radians
   behaviorConditions: BehaviorCondition[] = []
+  children: BaseSprite[] = []
   
   flags = {
     hasSetInitialWidth: false,
@@ -29,7 +30,9 @@ export abstract class BaseSprite implements Drawable {
   /**
    * How to draw the sprite onto the canvas.
    */
-  abstract render (): void
+  render (): void {}
+  
+  reset(): void {}
 
   /**
    * Draw the sprite onto the canvas with position.
@@ -41,12 +44,29 @@ export abstract class BaseSprite implements Drawable {
     }
     this.context.save()
     this.handleEvents(ctx)
+    this.update(ctx)
     this.context.translate(this.position.x, this.position.y)
     this.context.rotate(this.rotation);
     this.context.scale(this.scale.x, this.scale.y);
     this.context.fill()
     this.render()
+    this.drawChildren(ctx)
     this.context.restore()
+  }
+  
+  setup(): void {
+    // Default behavior does nothing.
+  }
+  
+  /**
+   * Update the sprite's state for the current frame.
+   * Subclasses can override this method to provide custom animation logic.
+   *
+   * @param timestamp - The timestamp passed from the requestAnimationFrame API.
+   * @param pointer - The object providing current position of the mouse on the canvas.
+   */
+  update(ctx: BehaviorContext): void {
+    // Default behavior does nothing.
   }
   
   setWidth(width: number) {
@@ -113,5 +133,25 @@ export abstract class BaseSprite implements Drawable {
   
   getPosition(): Vec2D {
     return this.position
+  }
+  
+  addChild(child: BaseSprite): void {
+    this.children.push(child)
+  }
+  
+  removeChild(child: BaseSprite): void {
+    this.children = this.children.filter(c => c !== child)
+  }
+  
+  removeAllChildren(): void {
+    this.children = []
+  }
+  
+  getChildren(): BaseSprite[] {
+    return this.children
+  }
+  
+  drawChildren(ctx: BehaviorContext): void {
+    this.getChildren().forEach(child => child.draw(ctx))
   }
 }

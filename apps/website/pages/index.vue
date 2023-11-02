@@ -4,7 +4,7 @@
     <div class="h-[calc(100vh-4rem)] border-b-2 border-solid border-black bg-primary-dark bg-gradient-to-br from-black md:h-[calc(100vh-5rem)] ">
       <FlateralusCanvas
         v-if="isLoaded"
-        :animation-class="ParticleGridAnimation"
+        :animation-class="ParticleGridSprite"
         :config="animationConfig"
         class="h-full w-full"
       >
@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import { CustomPath, repulsionBehavior, SvgHelper, isWithinRadius, slowReturnBehavior } from 'flateralus'
-import { ParticleGridConfig, ParticleGridAnimation } from '~/animations/particle-grid'
+import { ParticleGridConfig, ParticleGridSprite } from '~/animations/particle-grid'
 import WorkHistory from '~/components/WorkHistory/WorkHistory.vue'
 import ContactForm from '~/components/ContactForm.vue'
 import SkillList from '~/components/SkillList.vue'
