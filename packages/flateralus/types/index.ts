@@ -16,12 +16,6 @@ export interface Vec2D {
   y: number,
 }
 
-export interface Drawable {
-  width: number;
-  height: number;
-  draw(ctx: BehaviorContext): void;
-}
-
 /**
  * The Pointer interface represents a generic pointer input, such as a mouse cursor on a desktop device or a finger on a touch device.
  */

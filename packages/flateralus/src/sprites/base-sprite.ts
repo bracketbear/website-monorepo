@@ -1,7 +1,7 @@
-import { Behavior, BehaviorContext, Drawable, degreesToRadians } from '..'
+import { Behavior, BehaviorContext, Vec2D, degreesToRadians } from '..'
 import { BehaviorCondition } from '../behaviors/behavior-condition'
 
-export abstract class BaseSprite implements Drawable {
+export abstract class BaseSprite {
   // Properties
   width: number = 0
   height: number = 0
