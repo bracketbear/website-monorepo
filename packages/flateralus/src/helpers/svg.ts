@@ -1,6 +1,6 @@
 export class SvgHelper {
-  static extractPaths(svgString: string): Path2D[] {
-    if (!window && !window.DOMParser) return
+  static extractPaths(svgString: string): Path2D[] | undefined {
+    if (!window) return
     
     const parser = new DOMParser();
     const svgDoc = parser.parseFromString(svgString, 'image/svg+xml');

@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { CustomPath, repulsionBehavior, SvgHelper, isWithinRadius, slowReturnBehavior } from 'flateralus'
+import { CustomPath, repulsionBehavior, SvgHelper, isWithinRadius, slowReturnBehavior, GeneratorGetSprite } from 'flateralus'
 import { ParticleGridConfig, ParticleGridSprite } from '~/animations/particle-grid'
 import WorkHistory from '~/components/WorkHistory/WorkHistory.vue'
 import ContactForm from '~/components/ContactForm.vue'
@@ -70,28 +70,28 @@ const isLoaded = ref(false)
 
 onMounted(() => {
   const paths = SvgHelper.extractPaths(BracketBearLogo)
+  const getSprite: GeneratorGetSprite | undefined = paths
+    ? (context) => {
+        const sprite = new CustomPath(context, paths)
+        sprite.setScale(0.2)
+        sprite.rotate(-30)
+
+        sprite.addBehavior(repulsionBehavior)
+          .when((sprite, ctx) => {
+            return isWithinRadius(sprite.getPosition(), ctx.pointer.position, 100)
+          })
+        sprite.addBehavior(slowReturnBehavior)
+          .when((sprite, ctx) => {
+            return !isWithinRadius(sprite.getPosition(), ctx.pointer.position, 100)
+          })
+
+        return sprite
+      }
+    : undefined
 
   animationConfig.value = {
-    noiseStrength: 10,
-    particleColor: '#111827',
-    particleWidth: 100,
-    driftSpeed: 1.5,
-    repulsionStrength: 1.5,
-    xPad: 10,
-    yPad: 10,
-    getSprite: (context, _config) => {
-      const sprite = new CustomPath(context, paths)
-      sprite.setScale(0.2)
-      sprite.rotate(-30)
-      sprite.addBehavior(repulsionBehavior).when((sprite, ctx) => {
-        return isWithinRadius(sprite.getPosition(), ctx.pointer.position, 100)
-      })
-      sprite.addBehavior(slowReturnBehavior).when((sprite, ctx) => {
-        return !isWithinRadius(sprite.getPosition(), ctx.pointer.position, 100)
-      })
-
-      return sprite
-    },
+    getSprite,
+    fillCanvas: true,
   }
 
   isLoaded.value = true

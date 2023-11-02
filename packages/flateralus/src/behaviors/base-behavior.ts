@@ -1,4 +1,4 @@
-import BaseSprite from '../sprites/base-sprite'
+import { BaseSprite } from '..';
 import { Pointer } from '../types'
 
 export interface BehaviorContext {

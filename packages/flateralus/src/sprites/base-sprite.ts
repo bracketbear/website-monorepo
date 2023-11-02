@@ -3,8 +3,8 @@ import { BehaviorCondition } from '../behaviors/behavior-condition'
 import { Drawable, Vec2D } from '../types'
 
 export abstract class BaseSprite implements Drawable {
-  width = 0
-  height = 0
+  width: number = 0
+  height: number = 0
   fillColor: string | CanvasGradient | CanvasPattern = 'black'
   position: Vec2D = { x: 0, y: 0 }
   originalPosition: Vec2D = { x: 0, y: 0 }
@@ -12,6 +12,7 @@ export abstract class BaseSprite implements Drawable {
   rotation: number = 0 // Rotation in radians
   behaviorConditions: BehaviorCondition[] = []
   children: BaseSprite[] = []
+  parent?: BaseSprite
   
   flags = {
     hasSetInitialWidth: false,
@@ -38,7 +39,7 @@ export abstract class BaseSprite implements Drawable {
    * Draw the sprite onto the canvas with position.
    */
   draw (ctx: BehaviorContext): void {
-    if (ctx === undefined) {
+    if (!ctx) {
       console.log(this)
       throw new Error('No context found.')
     }
@@ -48,8 +49,8 @@ export abstract class BaseSprite implements Drawable {
     this.context.translate(this.position.x, this.position.y)
     this.context.rotate(this.rotation);
     this.context.scale(this.scale.x, this.scale.y);
-    this.context.fill()
     this.render()
+    this.context.fill()
     this.drawChildren(ctx)
     this.context.restore()
   }
@@ -58,32 +59,25 @@ export abstract class BaseSprite implements Drawable {
     // Default behavior does nothing.
   }
   
-  /**
-   * Update the sprite's state for the current frame.
-   * Subclasses can override this method to provide custom animation logic.
-   *
-   * @param timestamp - The timestamp passed from the requestAnimationFrame API.
-   * @param pointer - The object providing current position of the mouse on the canvas.
-   */
   update(ctx: BehaviorContext): void {
     // Default behavior does nothing.
   }
   
   setWidth(width: number) {
-    this.scale.x = width / this.width
-    
-    if (!this.flags.hasSetInitialWidth) {
-      this.width = width
-      this.flags.hasSetInitialWidth = true
+    if(this.width === 0 && !this.flags.hasSetInitialWidth) {
+      this.width = width;
+      this.flags.hasSetInitialWidth = true;
+    } else {
+      this.scale.x = width / this.width;
     }
   }
   
   setHeight(height: number) {
-    this.scale.y = height / this.height
-    
-    if (!this.flags.hasSetInitialHeight) {
-      this.height = height
-      this.flags.hasSetInitialHeight = true
+    if(this.height === 0 && !this.flags.hasSetInitialHeight) {
+      this.height = height;
+      this.flags.hasSetInitialHeight = true;
+    } else {
+      this.scale.y = height / this.height;
     }
   }
   
@@ -104,11 +98,17 @@ export abstract class BaseSprite implements Drawable {
     this.rotation += degreesToRadians(angleInDegrees)
   }
   
-  setPosition(x: number, y: number): void {
-    this.position = { x, y }
+  setPosition({ x, y }: Vec2D): void;
+  setPosition(x: number, y: number): void;
+  setPosition(xOrVec2D: number | Vec2D, y?: number): void {
+    if (typeof xOrVec2D === 'object') {
+      this.position = xOrVec2D
+    } else {
+      this.position = { x: xOrVec2D, y: y! }
+    }
     
     if (!this.flags.hasSetInitialPosition) {
-      this.originalPosition = { x, y }
+      this.originalPosition = { ...this.position }
       this.flags.hasSetInitialPosition = true
     }
   }
@@ -118,7 +118,7 @@ export abstract class BaseSprite implements Drawable {
     this.context.fillStyle = color
   }
   
-  addBehavior(behavior: Behavior<any>): BehaviorCondition {
+  addBehavior(behavior: Behavior<any>, config?: any): BehaviorCondition {
     const condition = new BehaviorCondition(behavior);
     this.behaviorConditions.push(condition);
     
@@ -136,11 +136,17 @@ export abstract class BaseSprite implements Drawable {
   }
   
   addChild(child: BaseSprite): void {
+    child.setParent(this)
     this.children.push(child)
   }
   
   removeChild(child: BaseSprite): void {
-    this.children = this.children.filter(c => c !== child)
+    this.children = this.children.filter(c => c !== child);
+    child.clearParent();
+  }
+  
+  setChildren(children: BaseSprite[]): void {
+    children.forEach(child => this.addChild(child))
   }
   
   removeAllChildren(): void {
@@ -153,5 +159,17 @@ export abstract class BaseSprite implements Drawable {
   
   drawChildren(ctx: BehaviorContext): void {
     this.getChildren().forEach(child => child.draw(ctx))
+  }
+  
+  setParent(parent: BaseSprite): void {
+    this.parent = parent
+  }
+  
+  clearParent(): void {
+    this.parent = undefined
+  }
+  
+  hasParent(): boolean {
+    return this.parent !== undefined
   }
 }

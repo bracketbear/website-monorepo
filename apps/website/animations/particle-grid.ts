@@ -1,57 +1,34 @@
-import { BaseSprite, BaseAnimation, CircleSprite } from 'flateralus'
-import type { BehaviorContext, Pointer } from 'flateralus'
+import { BaseSprite, CircleSprite, GridGenerator } from 'flateralus'
+import type { GeneratorGetSprite, GridGeneratorConfig } from 'flateralus'
 
-export interface ParticleGridConfig {
-  particleWidth: number
-  particleColor: string | number | CanvasGradient | CanvasPattern
-  xPad: number
-  yPad: number
-  mouseRadius: number
-  repulsionStrength: number
-  driftSpeed: number
-  noiseStrength: number
-  getSprite: (context: CanvasRenderingContext2D, config: ParticleGridConfig) => BaseSprite,
+export interface ParticleGridConfig extends GridGeneratorConfig {
+  getSprite: GeneratorGetSprite
 }
 
 const defaultConfig: ParticleGridConfig = {
-  particleWidth: 100,
-  particleColor: 'red',
-  xPad: 10,
-  yPad: 10,
-  mouseRadius: 100,
-  repulsionStrength: 0.1,
-  driftSpeed: 1,
-  noiseStrength: 1,
-  getSprite: (context, config) => new CircleSprite(context, config.particleWidth ?? 10, { x: 0, y: 0 }),
+  fillCanvas: false,
+  width: 1000,
+  height: 1000,
+  spriteWidth: 100,
+  spriteHeight: 100,
+  gap: 10,
+  getSprite: (context: CanvasRenderingContext2D) => new CircleSprite(context, 10),
 }
 
 export class ParticleGridSprite extends BaseSprite {
   config: ParticleGridConfig
+  generator: GridGenerator
 
   constructor (context: CanvasRenderingContext2D, config: Partial<ParticleGridConfig> = {}) {
     super(context)
     this.config = { ...defaultConfig, ...config } // merge default values with passed config
+    this.generator = new GridGenerator(context, this.config)
     this.setup()
   }
 
   setup (): void {
-    const canvasWidth = this.context.canvas.width
-    const canvasHeight = this.context.canvas.height
-    const availableWidth = canvasWidth - this.config.xPad
-    const availableHeight = canvasHeight - this.config.yPad
-    const columns = Math.floor(availableWidth / (this.config.particleWidth + this.config.xPad))
-    const rows = Math.floor(availableHeight / (this.config.particleWidth + this.config.yPad))
-
-    for (let x = 0; x < columns; x++) {
-      for (let y = 0; y < rows; y++) {
-        const posX = x * (this.config.particleWidth + this.config.xPad) + this.config.xPad / 2
-        const posY = y * (this.config.particleWidth + this.config.yPad) + this.config.yPad / 2
-        const particle = this.config.getSprite(this.context, this.config)
-        particle.setPosition(posX, posY)
-
-        this.addChild(particle)
-      }
-    }
+    const sprites = this.generator.generate(this.config.getSprite)
+    this.setChildren(sprites)
   }
 
   reset (): void {

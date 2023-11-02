@@ -18,14 +18,14 @@
 </template>
 
 <script setup lang="ts">
-import type { BaseAnimationConfig, Pointer, BaseSprite } from 'flateralus'
+import type { Pointer, BaseSprite } from 'flateralus'
 import debounce from '~/utils/helpers/debounce'
 
 // Define component props with default values
 const props = withDefaults(defineProps<{
   animationClass: new(...args: any[]) => BaseSprite,
   resetOnResize?: boolean,
-  config?: Partial<BaseAnimationConfig>,
+  config?: any,
   intersectionThreshold?: number,
 }>(), {
   resetOnResize: true,
