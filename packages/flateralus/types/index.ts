@@ -1,4 +1,11 @@
-import { BehaviorContext } from "..";
+/**
+ * @packageDocumentation
+ * @module @flateralus/types
+ * 
+ * This module contains some of the types used throughout the Flateralus library that don't currently have homes.
+ * This will probably be moved to a more appropriate location in the future.
+ */
+import { BehaviorContext } from "../src";
 
 export interface Animation {
   animate(timestamp: number): void;
