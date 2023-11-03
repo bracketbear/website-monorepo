@@ -1,4 +1,3 @@
-// src/behaviors/particle-repulsion-behavior.ts
 import { Behavior } from './base-behavior'
 
 export interface RepulsionBehaviorConfig {

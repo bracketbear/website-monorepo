@@ -70,10 +70,14 @@ const isLoaded = ref(false)
 
 onMounted(() => {
   const paths = SvgHelper.extractPaths(BracketBearLogo)
+  const boundingBox = SvgHelper.computeBoundingBox(paths)
+
   const getSprite: GeneratorGetSprite | undefined = paths
     ? (context) => {
         const sprite = new CustomPath(context, paths)
-        sprite.setScale(0.2)
+        sprite.width = boundingBox.width
+        sprite.height = boundingBox.height
+        sprite.setScale(0.18)
         sprite.rotate(-30)
 
         sprite.addBehavior(repulsionBehavior)

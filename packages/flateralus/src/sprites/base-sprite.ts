@@ -252,7 +252,7 @@ export abstract class BaseSprite {
    * Removes all children from the sprite.
    */
   removeAllChildren(): void {
-    this.children = []
+    this.children.forEach(child => this.removeChild(child))
   }
   
   /**
