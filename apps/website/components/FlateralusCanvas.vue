@@ -96,12 +96,17 @@ onMounted(() => {
   const ctx = canvas.value?.getContext('2d')
   if (!ctx) { return }
 
+  let deltaTime = 0
+  let lastTimestamp = 0
+
   // Define the render function
   render = (timestamp: number) => {
     if (!animationInstance) { return }
 
     ctx.clearRect(0, 0, canvas.value!.width, canvas.value!.height)
-    animationInstance.draw({ timestamp, pointer })
+    deltaTime = timestamp - lastTimestamp
+    lastTimestamp = timestamp
+    animationInstance.draw({ timestamp, pointer, deltaTime })
     animationFrameId = requestAnimationFrame(render)
   }
 

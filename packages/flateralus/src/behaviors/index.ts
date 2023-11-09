@@ -1,4 +1,5 @@
 export * from './behavior-condition'
 export * from './behavior-types'
+export * from './rotation-behavior'
 export * from './repulsion-behavior'
 export * from './slow-return-behavior'

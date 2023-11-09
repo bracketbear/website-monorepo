@@ -82,11 +82,11 @@ onMounted(() => {
 
         sprite.addBehavior(repulsionBehavior)
           .when((sprite, ctx) => {
-            return isWithinRadius(sprite.getPosition(), ctx.pointer.position, 100)
+            return isWithinRadius(sprite.getGlobalPosition(), ctx.pointer.position, 100)
           })
         sprite.addBehavior(slowReturnBehavior)
           .when((sprite, ctx) => {
-            return !isWithinRadius(sprite.getPosition(), ctx.pointer.position, 100)
+            return !isWithinRadius(sprite.getGlobalPosition(), ctx.pointer.position, 100)
           })
 
         return sprite

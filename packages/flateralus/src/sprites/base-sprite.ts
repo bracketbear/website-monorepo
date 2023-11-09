@@ -1,4 +1,4 @@
-import { Behavior, BehaviorContext, Vec2D, degreesToRadians } from '..'
+import { Behavior, BehaviorContext, Pointer, Vec2D, degreesToRadians } from '..'
 import { BehaviorCondition } from '../behaviors/behavior-condition'
 
 export abstract class BaseSprite {
@@ -59,12 +59,17 @@ export abstract class BaseSprite {
       console.log(this)
       throw new Error('No context found.')
     }
+    
+    const globalPos = this.getGlobalPosition();
+    const globalScale = this.getGlobalScale();
+    const globalRotation = this.getGlobalRotation();
+    
     this.context.save()
     this.handleEvents(ctx)
     this.update(ctx)
-    this.context.translate(this.position.x, this.position.y)
-    this.context.rotate(this.rotation);
-    this.context.scale(this.scale.x, this.scale.y);
+    this.context.translate(globalPos.x, globalPos.y)
+    this.context.rotate(globalRotation);
+    this.context.scale(globalScale.x, globalScale.y);
     this.render()
     this.context.fill()
     this.drawChildren(ctx)
@@ -135,6 +140,18 @@ export abstract class BaseSprite {
     this.scale = { x: scale, y: scale }
   }
   
+  getGlobalScale(): Vec2D {
+    let globalScale = { ...this.scale };
+    const parentGlobalScale = this.parent?.getGlobalScale();
+
+    if (parentGlobalScale) {
+      globalScale.x *= parentGlobalScale.x;
+      globalScale.y *= parentGlobalScale.y;
+    }
+
+    return globalScale;
+  }
+  
   /**
    * Sets the rotation of the sprite.
    * 
@@ -151,6 +168,17 @@ export abstract class BaseSprite {
    */
   rotate(angleInDegrees: number): void {
     this.rotation += degreesToRadians(angleInDegrees)
+  }
+  
+  getGlobalRotation(): number {
+    let globalRotation = this.rotation;
+    let parentGlobalRotation = this.parent?.getGlobalRotation();
+
+    if (parentGlobalRotation) {
+      globalRotation += parentGlobalRotation;
+    }
+
+    return globalRotation;
   }
   
   /**
@@ -172,6 +200,19 @@ export abstract class BaseSprite {
       this.originalPosition = { ...this.position }
       this.flags.hasSetInitialPosition = true
     }
+  }
+  
+  getGlobalPosition(): Vec2D {
+    let globalPos = { ...this.position };
+    const parent = this.parent;
+    const parentPos = parent?.getGlobalPosition();
+
+    if (parentPos) {
+      globalPos.x += parentPos.x;
+      globalPos.y += parentPos.y;
+    }
+
+    return globalPos;
   }
   
   /**
@@ -217,6 +258,43 @@ export abstract class BaseSprite {
    */
   getPosition(): Vec2D {
     return this.position
+  }
+  
+  isPointerOver(pointer: Vec2D, pointerRadius: number): boolean {
+    // Get the global position, scale, and rotation of the sprite
+    const globalPos = this.getGlobalPosition();
+    const globalScale = this.getGlobalScale();
+    const globalRotation = this.getGlobalRotation();
+    
+    // Transform the pointer coordinates into the local coordinate space of the sprite
+    let localPointer = {
+      x: (pointer.x - globalPos.x) / globalScale.x,
+      y: (pointer.y - globalPos.y) / globalScale.y,
+    };
+    if (globalRotation !== 0) {
+      const cos = Math.cos(-globalRotation);
+      const sin = Math.sin(-globalRotation);
+      localPointer = {
+        x: localPointer.x * cos - localPointer.y * sin,
+        y: localPointer.x * sin + localPointer.y * cos,
+      };
+    }
+    
+    // Now check if the localPointer is within the bounds of the sprite
+    // Assuming the sprite's origin is at the top-left corner, adjust as needed
+    const isWithinBounds = 
+      localPointer.x >= 0 &&
+      localPointer.y >= 0 &&
+      localPointer.x <= this.width &&
+      localPointer.y <= this.height;
+
+    // Optionally, you can also check if the localPointer is within a certain radius of the sprite's center
+    const dx = localPointer.x - this.width / 2;
+    const dy = localPointer.y - this.height / 2;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const isWithinRadius = distance <= pointerRadius;
+
+    return isWithinBounds && isWithinRadius;
   }
   
   /**
