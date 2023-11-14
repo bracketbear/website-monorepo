@@ -34,10 +34,6 @@ export abstract class BaseSprite {
     
     this.canvasContext = canvasContext
   }
-  
-  set c(context: CanvasRenderingContext2D) {
-    this.canvasContext = context
-  }
 
   // Methods
 
