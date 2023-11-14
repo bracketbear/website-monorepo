@@ -4,7 +4,7 @@
     <div class="h-[calc(100vh-4rem)] border-b-2 border-solid border-black bg-primary-dark bg-gradient-to-br from-black md:h-[calc(100vh-5rem)] ">
       <FlateralusCanvas
         v-if="isLoaded"
-        :animation-class="ParticleGridSprite"
+        :animation-sprite="ParticleGridSprite"
         :config="animationConfig"
         class="h-full w-full"
       >
@@ -57,7 +57,8 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { CustomPath, repulsionBehavior, SvgHelper, isWithinRadius, slowReturnBehavior, GeneratorGetSprite } from 'flateralus'
+import { CustomPath, repulsionBehavior, SvgHelper, isWithinRadius, slowReturnBehavior } from 'flateralus'
+import type { GeneratorGetSprite } from 'flateralus'
 import { ParticleGridConfig, ParticleGridSprite } from '~/animations/particle-grid'
 import WorkHistory from '~/components/WorkHistory/WorkHistory.vue'
 import ContactForm from '~/components/ContactForm.vue'
@@ -95,7 +96,7 @@ onMounted(() => {
 
   animationConfig.value = {
     getSprite,
-    fillCanvas: true,
+    fillContainer: true,
   }
 
   isLoaded.value = true

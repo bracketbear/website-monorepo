@@ -6,7 +6,7 @@ import { BaseSprite } from "..";
  */
 export interface GridGeneratorConfig extends BaseGeneratorConfig {
   /** If true, width and height are ignored. */
-  fillCanvas: boolean
+  fillContainer: boolean
   /** Width of the area to fill. */
   width: number;
   /** Height of the area to fill. */
@@ -20,7 +20,7 @@ export interface GridGeneratorConfig extends BaseGeneratorConfig {
 }
 
 const defaultConfig: GridGeneratorConfig = {
-  fillCanvas: false,
+  fillContainer: false,
   width: 1000,
   height: 1000,
   spriteWidth: 100,
@@ -37,9 +37,9 @@ export class GridGenerator extends BaseGenerator<GridGeneratorConfig> {
 
   generate(getSprite: GeneratorGetSprite): BaseSprite[] {
     const sprites: BaseSprite[] = [];
-    const { width, height, spriteWidth, spriteHeight, gap, fillCanvas: fillContainer } = this.config;
-    const computedWidth = fillContainer ? this.context.canvas.width : width
-    const computedHeight = fillContainer ? this.context.canvas.height : height
+    const { width, height, spriteWidth, spriteHeight, gap, fillContainer } = this.config;
+    const computedWidth = fillContainer ? this.canvasContext.canvas.width : width
+    const computedHeight = fillContainer ? this.canvasContext.canvas.height : height
 
     // Calculate the number of columns and rows based on the provided dimensions, sprite size and gap.
     const columns = Math.floor((computedWidth + gap) / (spriteWidth + gap));
@@ -49,7 +49,7 @@ export class GridGenerator extends BaseGenerator<GridGeneratorConfig> {
       for (let y = 0; y < rows; y++) {
         const posX = x * (spriteWidth + gap);
         const posY = y * (spriteHeight + gap);
-        const sprite = getSprite(this.context);
+        const sprite = getSprite(this.canvasContext);
         sprite.setPosition(posX, posY);
         
         sprites.push(sprite);

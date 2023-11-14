@@ -6,7 +6,7 @@ export interface ParticleGridConfig extends GridGeneratorConfig {
 }
 
 const defaultConfig: ParticleGridConfig = {
-  fillCanvas: false,
+  fillContainer: false,
   width: 1000,
   height: 1000,
   spriteWidth: 100,

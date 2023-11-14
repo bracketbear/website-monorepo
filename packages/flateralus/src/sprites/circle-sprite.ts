@@ -11,10 +11,9 @@ export class CircleSprite extends BaseSprite {
   }
 
   render (): void {
-    this.context.beginPath()
-    this.context.arc(this.width / 2, this.height / 2, this.width / 2, 0, Math.PI * 2)
-    
-    this.context.fillStyle = this.fillColor
-    this.context.fill()
+    this.canvasContext.beginPath()
+    this.canvasContext.arc(this.width / 2, this.height / 2, this.width / 2, 0, Math.PI * 2)
+    this.canvasContext.fillStyle = this.fillColor
+    this.canvasContext.fill()
   }
 }

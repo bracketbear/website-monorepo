@@ -1,4 +1,4 @@
-import { Behavior, BehaviorContext, Vec2D, degreesToRadians } from '..'
+import { Behavior, DrawContext, Vec2D, degreesToRadians } from '..'
 import { BehaviorCondition } from '../behaviors/behavior-condition'
 
 export abstract class BaseSprite {
@@ -23,16 +23,20 @@ export abstract class BaseSprite {
   /**
    * Creates a new instance of the `BaseSprite` class.
    * 
-   * @param context - The canvas rendering context to use for drawing the sprite.
+   * @param canvasContext - The canvas rendering context to use for drawing the sprite.
    * 
    * @throws An error is thrown if no context is provided.
    */
   constructor (
-    protected context: CanvasRenderingContext2D,
+    protected canvasContext: CanvasRenderingContext2D,
   ) {
-    if (!context) throw new Error('No context provided.')
+    if (!canvasContext) throw new Error('No canvas context provided.')
     
-    this.context = context
+    this.canvasContext = canvasContext
+  }
+  
+  set c(context: CanvasRenderingContext2D) {
+    this.canvasContext = context
   }
 
   // Methods
@@ -50,25 +54,25 @@ export abstract class BaseSprite {
   /**
    * Draw the sprite onto the canvas with position.
    * 
-   * @param ctx - The behavior context to use for handling events.
+   * @param drawContext - The context to use for handling events.
    * 
    * @throws An error is thrown if no context is found.
    */
-  draw (ctx: BehaviorContext): void {
-    if (!ctx) {
-      console.log(this)
-      throw new Error('No context found.')
+  draw (drawContext: DrawContext): void {
+    if (!drawContext) {
+      throw new Error('No draw context found.')
     }
-    this.context.save()
-    this.handleEvents(ctx)
-    this.update(ctx)
-    this.context.translate(this.position.x, this.position.y)
-    this.context.rotate(this.rotation);
-    this.context.scale(this.scale.x, this.scale.y);
+    
+    this.canvasContext.save()
+    this.handleEvents(drawContext)
+    this.update(drawContext)
+    this.canvasContext.translate(this.position.x, this.position.y)
+    this.canvasContext.rotate(this.rotation);
+    this.canvasContext.scale(this.scale.x, this.scale.y);
     this.render()
-    this.context.fill()
-    this.drawChildren(ctx)
-    this.context.restore()
+    this.canvasContext.fill()
+    this.drawChildren(drawContext)
+    this.canvasContext.restore()
   }
   
   /**
@@ -83,7 +87,7 @@ export abstract class BaseSprite {
    * 
    * @param ctx - The behavior context to use for handling events.
    */
-  update(ctx: BehaviorContext): void {
+  update(ctx: DrawContext): void {
     // Default behavior does nothing.
   }
   
@@ -181,7 +185,7 @@ export abstract class BaseSprite {
    */
   setFillColor(color: string | CanvasGradient | CanvasPattern) {
     this.fillColor = color
-    this.context.fillStyle = color
+    this.canvasContext.fillStyle = color
   }
   
   /**
@@ -204,7 +208,7 @@ export abstract class BaseSprite {
    * 
    * @param ctx - The behavior context to use for handling events.
    */
-  handleEvents(ctx: BehaviorContext): void {
+  handleEvents(ctx: DrawContext): void {
     this.behaviorConditions.forEach(condition => {
       condition.checkAndExecute(this, ctx)
     });
@@ -269,7 +273,7 @@ export abstract class BaseSprite {
    * 
    * @param ctx - The behavior context to use for handling events.
    */
-  drawChildren(ctx: BehaviorContext): void {
+  drawChildren(ctx: DrawContext): void {
     this.getChildren().forEach(child => child.draw(ctx))
   }
   

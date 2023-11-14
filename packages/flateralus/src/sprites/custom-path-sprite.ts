@@ -10,7 +10,7 @@ export class CustomPath extends BaseSprite {
 
   render(): void {
     this.paths.forEach((path: Path2D) => {
-      this.context.fill(path);
+      this.canvasContext.fill(path);
     });
   }
 }

@@ -20,7 +20,7 @@ export abstract class BaseGenerator<TConfig extends BaseGeneratorConfig> {
   /** 
    * The canvas rendering context used for drawing sprites.
    * */ 
-  protected context: CanvasRenderingContext2D;
+  protected canvasContext: CanvasRenderingContext2D;
   
   /** 
    * The configuration object for the generator.
@@ -33,7 +33,7 @@ export abstract class BaseGenerator<TConfig extends BaseGeneratorConfig> {
    * @param config - The configuration object for the generator.
    * */ 
   constructor(context: CanvasRenderingContext2D, config: TConfig) {
-    this.context = context;
+    this.canvasContext = context;
     this.config = config;
   }
 
