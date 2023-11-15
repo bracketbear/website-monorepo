@@ -1,5 +1,5 @@
-import { Behavior, DrawContext } from ".";
-import { BaseSprite } from "../sprites";
+import { Behavior } from ".";
+import { BaseSprite, DrawContext } from "..";
 
 /**
  * Represents a behavior condition that can be used to execute a behavior based on a certain condition.
@@ -14,8 +14,8 @@ export class BehaviorCondition<T> {
    * Creates a new instance of the `BehaviorCondition` class.
    * @param behavior - The behavior to execute.
    */
-  constructor(behavior: Behavior<T>) {
-    this.behavior = behavior;
+  constructor(Behavior: new () => Behavior<T>) {
+    this.behavior = new Behavior();
     this.condition = () => true;
   }
 
@@ -42,11 +42,11 @@ export class BehaviorCondition<T> {
   /**
    * Checks if the condition is met and executes the behavior if it is.
    * @param sprite - The sprite to check the condition against.
-   * @param ctx - The context of the behavior.
+   * @param ctx - The draw context.
    */
   checkAndExecute(sprite: BaseSprite, ctx: DrawContext): void {
     if (this.checkCondition(sprite, ctx)) {
-      this.behavior(sprite, this.config, ctx);
+      this.behavior.execute(sprite, this.config, ctx);
     }
   }
 

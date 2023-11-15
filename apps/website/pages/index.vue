@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { CustomPath, repulsionBehavior, SvgHelper, isWithinRadius, slowReturnBehavior } from 'flateralus'
+import { CustomPath, RepulsionBehavior, SvgHelper, isWithinRadius, SlowReturnBehavior } from 'flateralus'
 import type { GeneratorGetSprite } from 'flateralus'
 import { ParticleGridConfig, ParticleGridSprite } from '~/animations/particle-grid'
 import WorkHistory from '~/components/WorkHistory/WorkHistory.vue'
@@ -81,11 +81,11 @@ onMounted(() => {
         sprite.setScale(0.18)
         sprite.rotate(-30)
 
-        sprite.addBehavior(repulsionBehavior)
+        sprite.addBehavior(RepulsionBehavior)
           .when((sprite, ctx) => {
             return isWithinRadius(sprite.getPosition(), ctx.pointer.position, 100)
           })
-        sprite.addBehavior(slowReturnBehavior)
+        sprite.addBehavior(SlowReturnBehavior)
           .when((sprite, ctx) => {
             return !isWithinRadius(sprite.getPosition(), ctx.pointer.position, 100)
           })
