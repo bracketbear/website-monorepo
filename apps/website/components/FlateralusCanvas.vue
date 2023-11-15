@@ -1,6 +1,6 @@
 <template>
   <div
-    ref="container"
+    ref="containerRef"
     class="relative h-full w-full"
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from 'vue'
-import { FlateralusCanvas } from 'flateralus' // Adjust the import path as necessary
+import { FlateralusCanvas, Pointer, MousePointer } from 'flateralus' // Adjust the import path as necessary
 import type { BaseSprite, FlateralusCanvasConfig } from 'flateralus'
 
 const props = withDefaults(defineProps<{
@@ -37,7 +37,9 @@ const props = withDefaults(defineProps<{
 })
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
+const containerRef = ref<HTMLCanvasElement | null>(null)
 let flateralusCanvas: FlateralusCanvas
+let pointer: Pointer
 const flateralusCanvasConfig: FlateralusCanvasConfig = {
   animationSprite: null,
   animationSpriteConfig: {},
@@ -47,12 +49,16 @@ onMounted(() => {
   if (canvasRef.value) {
     flateralusCanvasConfig.animationSprite = props.animationSprite
     flateralusCanvasConfig.animationSpriteConfig = { ...props.config }
-    console.log('Setting up canvas', flateralusCanvasConfig)
 
     flateralusCanvas = new FlateralusCanvas(canvasRef.value, flateralusCanvasConfig)
     flateralusCanvas.setupCanvas()
   } else {
     console.error('No canvas element found')
+  }
+
+  if (containerRef.value) {
+    pointer = new MousePointer(containerRef.value)
+    flateralusCanvas.registerPointer(pointer)
   }
 })
 
@@ -64,20 +70,4 @@ onBeforeUnmount(() => {
 })
 
 const settingUp = ref(false) // Update the logic to reflect the new setup
-
-// Event handling methods that call the corresponding methods in FlateralusCanvas
-// const handleClick = (event: MouseEvent) => {
-//   console.log('Click event', event)
-// }
-
-// const handleMouseMove = () => {
-//   console.log('moving')
-// }
-const handleMouseMove = (event: MouseEvent) => flateralusCanvas.handlePointerMove(event)
-const handleMouseDown = (event: MouseEvent) => flateralusCanvas.handlePointerDown(event)
-const handleMouseUp = (event: MouseEvent) => flateralusCanvas.handlePointerUp(event)
-const handleMouseLeave = (event: MouseEvent) => flateralusCanvas.handlePointerLeave(event)
-const handleTouchMove = (event: TouchEvent) => flateralusCanvas.handlePointerMove(event)
-const handleTouchStart = (event: TouchEvent) => flateralusCanvas.handlePointerDown(event)
-const handleTouchEnd = (event: TouchEvent) => flateralusCanvas.handlePointerUp(event)
 </script>

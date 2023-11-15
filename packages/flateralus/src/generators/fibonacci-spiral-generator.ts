@@ -31,7 +31,7 @@ export class FibonacciSpiralGenerator extends BaseGenerator<FibonacciSpiralGener
       const posX = radius * Math.cos(angle);
       const posY = radius * Math.sin(angle);
 
-      const sprite = getSprite(this.context);
+      const sprite = getSprite(this.canvasContext);
       // Scale down the sprite size as it moves inward
       const scaleFactor = Math.pow(scaleDownFactor, i);
       sprite.setScale(scaleFactor);

@@ -17,14 +17,8 @@ export class FlateralusCanvas {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   private config: FlateralusCanvasConfig;
-  private pointer: Pointer = {
-    position: {
-      x: -1000,
-      y: -1000,
-    },
-    active: false,
-  }
-  private sprite: BaseSprite;
+  private pointers: Pointer[] = []
+  private sprite: InstanceType<BaseSprite>;
   private animationFrameId: number = -1;
   private resizeObserver: ResizeObserver;
   private intersectionObserver: IntersectionObserver;
@@ -70,7 +64,7 @@ export class FlateralusCanvas {
     return new this.config.animationSprite(this.context, this.config.animationSpriteConfig)
   }
 
-  private handleResize(contentRect: DOMRectReadOnly): void {
+  private handleResize(): void {
     console.log('resizing flateralus canvas')
     const dpr = window.devicePixelRatio
     const rect = this.canvas.getBoundingClientRect()
@@ -124,64 +118,15 @@ export class FlateralusCanvas {
       this.intersectionObserver.disconnect();
       this.stopAnimation();
   }
-
-  // setupPointerEvents(): void {
-  //   console.log('setting up pointer events')
-    
-  //   this.canvas.addEventListener('mousemove', this.handlePointerMove.bind(this));
-  //   this.canvas.addEventListener('mousedown', this.handlePointerDown.bind(this));
-  //   this.canvas.addEventListener('mouseup', this.handlePointerUp.bind(this));
-    
-  //   this.canvas.addEventListener('touchmove', this.handlePointerMove.bind(this));
-  //   this.canvas.addEventListener('touchstart', this.handlePointerDown.bind(this));
-  //   this.canvas.addEventListener('touchend', this.handlePointerUp.bind(this));
-    
-  //   console.log('done setting up pointer events', this.canvas)
-  // }
-
-  // Method to handle pointer (mouse or touch) movement
-  handlePointerMove(event: MouseEvent | TouchEvent): void {
-    // Implement logic for handling pointer movement
-    console.log('pointer move')
-    
-    if (event instanceof MouseEvent) {
-      this.pointer.position.x = event.clientX
-      this.pointer.position.y = event.clientY
-    } else if (event instanceof TouchEvent) {
-      this.pointer.position.x = event.touches[0].clientX
-      this.pointer.position.y = event.touches[0].clientY
-    }
-  }
   
-  handlePointerLeave(event: MouseEvent): void {
-    // Implement logic for handling mouse leave
-    console.log('mouse leave')
-    
-    this.pointer.active = false
-    this.pointer.position.x = -1000
-    this.pointer.position.y = -1000
-  }
-
-  // Method to handle pointer down (mouse down or touch start)
-  handlePointerDown(_event: MouseEvent | TouchEvent): void {
-    // Implement logic for handling pointer down
-    console.log('pointer down')
-    
-    this.pointer.active = true
-  }
-
-  // Method to handle pointer up (mouse up or touch end)
-  handlePointerUp(_event: MouseEvent | TouchEvent): void {
-    // Implement logic for handling pointer up
-    console.log('pointer up')
-    
-    this.pointer.active = false
+  registerPointer(pointer: Pointer): void {
+    this.pointers.push(pointer);
   }
   
   getDrawContext(): DrawContext {
     // Implement logic for getting the draw context
     return {
-      pointer: this.pointer,
+      pointer: this.pointers[0],
       timestamp: 0,
     }
   }
