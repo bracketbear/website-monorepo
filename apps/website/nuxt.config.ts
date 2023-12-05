@@ -2,7 +2,15 @@ import path from 'path'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/strapi', '@nuxt/image-edge', '@nuxtjs/google-fonts', 'nuxt-svgo', '@zadigetvoltaire/nuxt-gtm', 'nuxt-simple-sitemap'],
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/strapi',
+    '@nuxtjs/google-fonts',
+    'nuxt-svgo',
+    '@zadigetvoltaire/nuxt-gtm',
+    'nuxt-simple-sitemap',
+    '@nuxt/image',
+  ],
 
   app: {
     head: {
@@ -30,7 +38,9 @@ export default defineNuxtConfig({
 
   image: {
     providers: {
-      strapi: {},
+      strapi: {
+        url: 'http://localhost:1337',
+      },
       ipxStatic: {},
     },
     domains: ['localhost:1337', 'bracket-bear-cms-uploads.s3.amazonaws.com'],
