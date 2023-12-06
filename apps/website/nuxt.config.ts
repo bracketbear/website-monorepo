@@ -39,13 +39,14 @@ export default defineNuxtConfig({
   image: {
     providers: {
       strapi: {
-        url: 'http://localhost:1337',
+        url: process.env.STRAPI_URL || '127.0.0.1:1337',
       },
       ipxStatic: {},
     },
-    domains: ['localhost:1337', 'bracket-bear-cms-uploads.s3.amazonaws.com'],
+    domains: ['127.0.0.1:1337', 'bracket-bear-cms-uploads.s3.amazonaws.com'],
     alias: {
       'aws-s3': 'https://bracket-bear-cms-uploads.s3.amazonaws.com',
+      strapi: process.env.STRAPI_URL || 'http://127.0.0.1:1337',
     },
   },
 
@@ -67,5 +68,10 @@ export default defineNuxtConfig({
   // https://sitemap.nuxtjs.org/
   site: {
     url: 'https://bracketbear.com',
+  },
+
+  strapi: {
+    url: process.env.STRAPI_URL || 'http://127.0.0.1:1337',
+    prefix: '/api',
   },
 })
