@@ -26,11 +26,10 @@ const src = computed(() => {
   const { provider, hash, ext, url } = props.media.attributes
 
   switch (provider) {
-    // TODO: configure CMS so it doesn't return the full URL
     case 'aws-s3':
       return `/aws-s3/${hash}${ext}`
     case 'local':
-      return useStrapiMedia(url)
+      return `/strapi${url}`
     default:
       return url
   }
