@@ -22,14 +22,18 @@ export abstract class Pointer {
               this.updatePosition(e);
           }
       });
+      
+      this.element.addEventListener('mouseleave', (e) => {
+        if (e instanceof MouseEvent) {
+            this.resetPosition();
+        }
+      });
 
       this.element.addEventListener('touchmove', (e) => {
           if (e instanceof TouchEvent) {
               this.updatePosition(e);
           }
       });
-
-      // Additional event listeners for 'mousedown', 'touchstart', etc.
   }
   
   getBoundingBox(): { x: number, y: number, width: number, height: number } {
@@ -39,5 +43,9 @@ export abstract class Pointer {
         width: this.diameter,
         height: this.diameter
     };
-}
+  }
+  
+  resetPosition(): void {
+    this.position = { x: -1000, y: -1000 };
+  }
 }

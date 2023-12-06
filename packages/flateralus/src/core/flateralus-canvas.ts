@@ -32,7 +32,7 @@ export class FlateralusCanvas {
 
       this.resizeObserver = new ResizeObserver(entries => {
           for (let entry of entries) {
-              this.handleResize(entry.contentRect);
+              this.handleResize();
           }
       });
 
@@ -40,11 +40,10 @@ export class FlateralusCanvas {
         for (let entry of entries) {
           this.isIntersecting = entry.isIntersecting;
           if (this.isIntersecting) {
-            console.log('intersecting');
             this.startAnimation();
           } else {
-            console.log('not intersecting');
             this.stopAnimation();
+            this.resetPointers(); // Add this line
           }
         }
       }, { threshold: config.intersectionThreshold });
@@ -106,13 +105,11 @@ export class FlateralusCanvas {
   render(): void {
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.sprite.draw(this.getDrawContext());
-      // console.log('rendinging flateralus canvas')
   }
   
   reset(): void {
     this.sprite?.reset()
     this.animate()
-    console.log('resetting flateralus canvas', this.canvas)
   }
 
   cleanup(): void {
@@ -131,5 +128,9 @@ export class FlateralusCanvas {
       pointer: this.pointers[0],
       timestamp: 0,
     }
+  }
+  
+  resetPointers(): void {
+    this.pointers.forEach(pointer => pointer.resetPosition());
   }
 }
