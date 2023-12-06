@@ -25,7 +25,7 @@
                   Learn More
                 </UiButton>
               </NuxtLink>
-              <NuxtLink to="#contact">
+              <NuxtLink to="#reach-out">
                 <UiButton size="large" class="w-full md:w-auto">
                   Let's Chat!
                 </UiButton>
