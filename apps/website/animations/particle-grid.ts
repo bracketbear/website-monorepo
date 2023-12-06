@@ -2,7 +2,8 @@ import { Sprite, CircleSprite, GridGenerator } from 'flateralus'
 import type { GeneratorGetSprite, GridGeneratorConfig } from 'flateralus'
 
 export interface ParticleGridConfig extends GridGeneratorConfig {
-  getSprite: GeneratorGetSprite
+  getSprite: GeneratorGetSprite,
+  fillContainer?: boolean,
 }
 
 const defaultConfig: ParticleGridConfig = {

@@ -57,45 +57,36 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { CustomPath, RepulsionBehavior, SvgHelper, isWithinRadius, SlowReturnBehavior } from 'flateralus'
+import { CircleSprite, RepulsionBehavior, SvgHelper, isWithinRadius, SlowReturnBehavior } from 'flateralus'
 import type { GeneratorGetSprite } from 'flateralus'
 import { ParticleGridConfig, ParticleGridSprite } from '~/animations/particle-grid'
 import WorkHistory from '~/components/WorkHistory/WorkHistory.vue'
-import ContactForm from '~/components/ContactForm.vue'
 import SkillList from '~/components/SkillList.vue'
 import ProjectList from '~/components/ProjectList.vue'
-import BracketBearLogo from '~/assets/icons/bracket-bear-logo.svg?raw'
 
 const animationConfig = ref<Partial<ParticleGridConfig>>({})
 const isLoaded = ref(false)
 
 onMounted(() => {
-  const paths = SvgHelper.extractPaths(BracketBearLogo)
-  const boundingBox = SvgHelper.computeBoundingBox(paths)
+  const getSprite: GeneratorGetSprite = (context) => {
+    const sprite = new CircleSprite(context, 50)
+    sprite.setFillColor('rgba(255, 255, 255, 0.2)')
 
-  const getSprite: GeneratorGetSprite | undefined = paths
-    ? (context) => {
-        const sprite = new CustomPath(context, paths)
-        sprite.width = boundingBox.width
-        sprite.height = boundingBox.height
-        sprite.setScale(0.18)
-        sprite.rotate(-30)
+    sprite.addBehavior(RepulsionBehavior)
+      .when((sprite, ctx) => {
+        return isWithinRadius(sprite.getPosition(), ctx.pointer.position, 300)
+      })
+    sprite.addBehavior(SlowReturnBehavior)
+      .when((sprite, ctx) => {
+        return !isWithinRadius(sprite.getPosition(), ctx.pointer.position, 300)
+      })
 
-        sprite.addBehavior(RepulsionBehavior)
-          .when((sprite, ctx) => {
-            return isWithinRadius(sprite.getPosition(), ctx.pointer.position, 100)
-          })
-        sprite.addBehavior(SlowReturnBehavior)
-          .when((sprite, ctx) => {
-            return !isWithinRadius(sprite.getPosition(), ctx.pointer.position, 100)
-          })
-
-        return sprite
-      }
-    : undefined
+    return sprite
+  }
 
   animationConfig.value = {
     getSprite,
+    gap: 20,
     fillContainer: true,
   }
 
@@ -143,15 +134,6 @@ const sections: PageSection[] = [
       'Here are a handful of them.',
     ],
     component: ProjectList,
-  },
-  {
-    name: 'contact',
-    text: [
-      "Alrighty, I've said enough. Now I'd love to hear from you.",
-      "Feel free to fill out the form below and I'll get back to you as soon as possible.",
-    ],
-    component: ContactForm,
-    componentClass: 'container max-w-4xl',
   },
 ]
 
