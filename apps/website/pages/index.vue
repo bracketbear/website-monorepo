@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout class="bg-primary">
     <!-- Hero -->
-    <div class="h-[calc(100vh-4rem)] border-b-2 border-solid border-black bg-primary-dark bg-gradient-to-br from-black md:h-[calc(100vh-5rem)] ">
+    <div class="h-[calc(100vh-4rem)] border-b-2 border-solid border-black bg-purple-800 bg-gradient-to-br from-teal-500 md:h-[calc(100vh-5rem)] ">
       <FlateralusCanvas
         v-if="isLoaded"
         :animation-sprite="ParticleGridSprite"
