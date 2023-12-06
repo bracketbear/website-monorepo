@@ -37,18 +37,18 @@ export class FlateralusCanvas {
       });
 
       this.intersectionObserver = new IntersectionObserver(entries => {
-          for (let entry of entries) {
-              this.isIntersecting = entry.isIntersecting;
-              if (this.isIntersecting) {
-                console.log('intersecting')
-                  this.startAnimation();
-              } else {
-                console.log('not intersecting')
-                  this.stopAnimation();
-              }
+        for (let entry of entries) {
+          this.isIntersecting = entry.isIntersecting;
+          if (this.isIntersecting) {
+            console.log('intersecting');
+            this.startAnimation();
+          } else {
+            console.log('not intersecting');
+            this.stopAnimation();
           }
+        }
       }, { threshold: config.intersectionThreshold });
-
+  
       this.animate = this.animate.bind(this);
   }
 
@@ -82,23 +82,25 @@ export class FlateralusCanvas {
   }
 
   private startAnimation(): void {
-      if (!this.animationFrameId) {
-          this.animationFrameId = requestAnimationFrame(this.animate);
-      }
+    if (this.animationFrameId === -1) { // Changed to check for -1 explicitly
+      this.animationFrameId = requestAnimationFrame(this.animate);
+    }
   }
 
   private stopAnimation(): void {
-      if (this.animationFrameId) {
-          cancelAnimationFrame(this.animationFrameId);
-          this.animationFrameId = -1;
-      }
+    if (this.animationFrameId !== -1) { // Check if an animation frame is active
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = -1; // Reset the frame ID
+    }
   }
 
   private animate(): void {
-      if (this.isIntersecting) {
-          this.render();
-          this.animationFrameId = requestAnimationFrame(this.animate);
-      }
+    if (this.isIntersecting) {
+      this.render();
+      this.animationFrameId = requestAnimationFrame(this.animate);
+    } else {
+      this.stopAnimation(); // Ensure that the animation is stopped if not intersecting
+    }
   }
 
   render(): void {
