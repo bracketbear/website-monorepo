@@ -1,9 +1,9 @@
-import { BaseSprite, DrawContext, Pointer } from "..";
+import { Sprite, DrawContext, Pointer } from "..";
 
 export interface FlateralusCanvasConfig {
   // Define any additional configuration properties needed
-  animationSprite: BaseSprite;
-  animationSpriteConfig: BaseSprite
+  animationSprite: Sprite;
+  animationSpriteConfig: Sprite
   intersectionThreshold?: number;
   resetOnResize?: boolean;
 }
@@ -18,7 +18,7 @@ export class FlateralusCanvas {
   private context: CanvasRenderingContext2D;
   private config: FlateralusCanvasConfig;
   private pointers: Pointer[] = []
-  private sprite: InstanceType<BaseSprite>;
+  private sprite: InstanceType<Sprite>;
   private animationFrameId: number = -1;
   private resizeObserver: ResizeObserver;
   private intersectionObserver: IntersectionObserver;
@@ -59,7 +59,7 @@ export class FlateralusCanvas {
     this.startAnimation();
   }
   
-  private setupAnimation(): BaseSprite {
+  private setupAnimation(): Sprite {
     return new this.config.animationSprite(this.context, this.config.animationSpriteConfig)
   }
 

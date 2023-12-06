@@ -1,5 +1,5 @@
 import { Behavior } from "."
-import { BaseSprite, DrawContext } from ".."
+import { Sprite, DrawContext } from ".."
 
 export interface RepulsionBehaviorConfig {
   mouseRadius: number
@@ -7,7 +7,7 @@ export interface RepulsionBehaviorConfig {
 }
 
 export class RepulsionBehavior extends Behavior<RepulsionBehaviorConfig> {
-  execute(sprite: BaseSprite, config: RepulsionBehaviorConfig, context: DrawContext): void {
+  execute(sprite: Sprite, config: RepulsionBehaviorConfig, context: DrawContext): void {
     const { pointer } = context
     const defaultConfig: RepulsionBehaviorConfig = {
       mouseRadius: 100,

@@ -1,4 +1,4 @@
-import { BaseSprite } from "..";
+import { Sprite } from "..";
 
 /** 
  * The base configuration for generators. Subclasses can extend this to include additional configuration options. 
@@ -7,9 +7,9 @@ import { BaseSprite } from "..";
 export interface BaseGeneratorConfig {}
 
 /** 
- * A function that returns a BaseSprite. Used as a callback in the generate method.
+ * A function that returns a Sprite. Used as a callback in the generate method.
  * */ 
-export type GeneratorGetSprite = (context: CanvasRenderingContext2D) => BaseSprite;
+export type GeneratorGetSprite = (context: CanvasRenderingContext2D) => Sprite;
 
 /** 
  * The abstract BaseGenerator class.
@@ -40,8 +40,8 @@ export abstract class BaseGenerator<TConfig extends BaseGeneratorConfig> {
   /** 
    * Generates and arranges sprites.
    * This method should be implemented by subclasses.
-   * @param getSprite - A callback function that returns a BaseSprite.
-   * @returns An array of BaseSprites.
+   * @param getSprite - A callback function that returns a Sprite.
+   * @returns An array of Sprites.
    * */ 
-  abstract generate(getSprite: GeneratorGetSprite): BaseSprite[];
+  abstract generate(getSprite: GeneratorGetSprite): Sprite[];
 }

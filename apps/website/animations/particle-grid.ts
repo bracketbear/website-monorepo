@@ -1,4 +1,4 @@
-import { BaseSprite, CircleSprite, GridGenerator } from 'flateralus'
+import { Sprite, CircleSprite, GridGenerator } from 'flateralus'
 import type { GeneratorGetSprite, GridGeneratorConfig } from 'flateralus'
 
 export interface ParticleGridConfig extends GridGeneratorConfig {
@@ -15,7 +15,7 @@ const defaultConfig: ParticleGridConfig = {
   getSprite: (context: CanvasRenderingContext2D) => new CircleSprite(context, 10),
 }
 
-export class ParticleGridSprite extends BaseSprite {
+export class ParticleGridSprite extends Sprite {
   config: ParticleGridConfig
   generator: GridGenerator
 

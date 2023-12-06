@@ -1,5 +1,5 @@
 import { BaseGenerator, BaseGeneratorConfig, GeneratorGetSprite } from ".";
-import { BaseSprite } from "..";
+import { Sprite } from "..";
 
 export interface FibonacciSpiralGeneratorConfig extends BaseGeneratorConfig {
   totalSprites: number; // Total number of sprites to generate
@@ -19,8 +19,8 @@ export class FibonacciSpiralGenerator extends BaseGenerator<FibonacciSpiralGener
     super(context, configWithDefaults);
   }
 
-  generate(getSprite: GeneratorGetSprite): BaseSprite[] {
-    const sprites: BaseSprite[] = [];
+  generate(getSprite: GeneratorGetSprite): Sprite[] {
+    const sprites: Sprite[] = [];
     const { totalSprites, initialRadius, scaleDownFactor } = this.config;
     const goldenRatio = (1 + Math.sqrt(5)) / 2;
     const angleIncrement = Math.PI * 2 * goldenRatio;

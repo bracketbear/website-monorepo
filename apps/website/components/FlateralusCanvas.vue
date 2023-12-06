@@ -23,10 +23,10 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import { FlateralusCanvas, Pointer, MousePointer } from 'flateralus' // Adjust the import path as necessary
-import type { BaseSprite, FlateralusCanvasConfig } from 'flateralus'
+import type { Sprite, FlateralusCanvasConfig } from 'flateralus'
 
 const props = withDefaults(defineProps<{
-  animationSprite: new(...args: any[]) => BaseSprite,
+  animationSprite: new(...args: any[]) => Sprite,
   resetOnResize?: boolean,
   config?: any,
   intersectionThreshold?: number,

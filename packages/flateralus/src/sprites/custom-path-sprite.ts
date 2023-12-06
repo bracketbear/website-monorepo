@@ -1,6 +1,6 @@
-import { BaseSprite } from './base-sprite';
+import { Sprite } from './sprite';
 
-export class CustomPath extends BaseSprite {
+export class CustomPath extends Sprite {
   constructor(
     context: CanvasRenderingContext2D,
     public paths: Path2D[],

@@ -1,7 +1,7 @@
 import { Behavior, DrawContext, Vec2D, degreesToRadians } from '..'
 import { BehaviorCondition } from '../behaviors/behavior-condition'
 
-export abstract class BaseSprite {
+export abstract class Sprite {
   // Properties
   width: number = 0
   height: number = 0
@@ -11,8 +11,8 @@ export abstract class BaseSprite {
   scale: Vec2D = { x: 1, y: 1 }
   rotation: number = 0 // Rotation in radians
   behaviorConditions: BehaviorCondition<any>[] = []
-  children: BaseSprite[] = []
-  parent?: BaseSprite
+  children: Sprite[] = []
+  parent?: Sprite
   
   flags = {
     hasSetInitialWidth: false,
@@ -21,7 +21,7 @@ export abstract class BaseSprite {
   }
 
   /**
-   * Creates a new instance of the `BaseSprite` class.
+   * Creates a new instance of the `Sprite` class.
    * 
    * @param canvasContext - The canvas rendering context to use for drawing the sprite.
    * 
@@ -224,7 +224,7 @@ export abstract class BaseSprite {
    * 
    * @param child - The child sprite to add.
    */
-  addChild(child: BaseSprite): void {
+  addChild(child: Sprite): void {
     child.setParent(this)
     this.children.push(child)
   }
@@ -234,7 +234,7 @@ export abstract class BaseSprite {
    * 
    * @param child - The child sprite to remove.
    */
-  removeChild(child: BaseSprite): void {
+  removeChild(child: Sprite): void {
     this.children = this.children.filter(c => c !== child);
     child.clearParent();
   }
@@ -244,7 +244,7 @@ export abstract class BaseSprite {
    * 
    * @param children - The new children of the sprite.
    */
-  setChildren(children: BaseSprite[]): void {
+  setChildren(children: Sprite[]): void {
     children.forEach(child => this.addChild(child))
   }
   
@@ -260,7 +260,7 @@ export abstract class BaseSprite {
    * 
    * @returns The children of the sprite.
    */
-  getChildren(): BaseSprite[] {
+  getChildren(): Sprite[] {
     return this.children
   }
   
@@ -278,7 +278,7 @@ export abstract class BaseSprite {
    * 
    * @param parent - The new parent of the sprite.
    */
-  setParent(parent: BaseSprite): void {
+  setParent(parent: Sprite): void {
     this.parent = parent
   }
   

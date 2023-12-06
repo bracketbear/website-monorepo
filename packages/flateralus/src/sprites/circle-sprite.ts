@@ -1,9 +1,9 @@
-import { BaseSprite } from './base-sprite'
+import { Sprite } from './sprite'
 
 /**
  * A simple circle sprite. The circle is drawn centered at the provided offset.
  */
-export class CircleSprite extends BaseSprite {
+export class CircleSprite extends Sprite {
   constructor (context: CanvasRenderingContext2D, radius: number) {
     super(context)
     this.width = radius * 2

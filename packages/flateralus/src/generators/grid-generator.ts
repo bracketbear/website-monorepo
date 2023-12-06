@@ -1,5 +1,5 @@
 import { BaseGenerator, BaseGeneratorConfig, GeneratorGetSprite } from ".";
-import { BaseSprite } from "..";
+import { Sprite } from "..";
 
 /**
  * Configuration options for the GridGenerator.
@@ -35,8 +35,8 @@ export class GridGenerator extends BaseGenerator<GridGeneratorConfig> {
     super(context, configWithDefaults);
   }
 
-  generate(getSprite: GeneratorGetSprite): BaseSprite[] {
-    const sprites: BaseSprite[] = [];
+  generate(getSprite: GeneratorGetSprite): Sprite[] {
+    const sprites: Sprite[] = [];
     const { width, height, spriteWidth, spriteHeight, gap, fillContainer } = this.config;
     const computedWidth = fillContainer ? this.canvasContext.canvas.width : width
     const computedHeight = fillContainer ? this.canvasContext.canvas.height : height
