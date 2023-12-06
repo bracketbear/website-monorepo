@@ -55,7 +55,7 @@ const result = await useAsyncData(
     sort: 'order:asc',
   }),
 )
-const projects = result.data.value?.data ?? []
+const projects = computed(() => result.data.value?.data ?? [])
 
 const hasMainImage = (project: ApiProjectProject) => {
   return !!project?.attributes?.mainImage?.data

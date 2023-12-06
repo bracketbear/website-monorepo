@@ -21,6 +21,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  modelValue: '',
   debounceTime: 300,
   required: false,
   inputClass: '',

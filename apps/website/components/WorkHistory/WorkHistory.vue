@@ -28,16 +28,14 @@ import { ApiCompanyCompany } from '%/contentTypes'
 
 // This will throw a TS error if the collection name ever changes.
 const collectionName: ApiCompanyCompany['collectionName'] = 'companies'
-const result = await useAsyncData(
-  () => useStrapi().find<ApiCompanyCompany['attributes']>(collectionName, {
-    populate: ['jobs'],
-    sort: 'order:asc',
-  }),
-  { immediate: true },
-)
-const companies = result.data.value?.data ?? []
+const result = await useAsyncData(() => useStrapi().find<ApiCompanyCompany['attributes']>(collectionName, {
+  populate: ['jobs'],
+  sort: 'order:asc',
+}))
 
-const getFormattedDate = (date: Attributes.Date) => {
+const companies = computed(() => result.data.value?.data ?? [])
+
+const getFormattedDate = (date: string) => {
   if (!date) { return 'Present' }
 
   const dateObj = new Date(date)
@@ -46,11 +44,4 @@ const getFormattedDate = (date: Attributes.Date) => {
     month: 'long',
   })
 }
-
-const sections = [
-  {
-    title: 'Duration',
-    value: (company: ApiCompanyCompany) => `${getFormattedDate(company.attributes.date_from)} - ${getFormattedDate(company.attributes.date_to)}`,
-  },
-]
 </script>

@@ -52,7 +52,7 @@
         </div>
       </div>
       <!-- Media Slider -->
-      <div v-if="media">
+      <div v-if="media.length > 0">
         <p class="font-heading">
           Media:
         </p>
@@ -93,14 +93,21 @@ const modal = reactive({
 const route = useRoute()
 const projectId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 const collectionName: ApiProjectProject['collectionName'] = 'projects'
-const result = await useAsyncData(
-  `collectionName-${projectId}`,
-  () => useStrapi().findOne<ApiProjectProject['attributes']>(collectionName, projectId, {
-    populate: ['mainImage', 'media', 'technical_skills'],
-  }),
-)
-const project = result.data.value?.data ?? null
-const media = project?.attributes?.media?.data ?? []
+let project = null
+const media = computed(() => {
+  return project?.attributes?.media?.data ?? []
+})
+
+if (projectId) {
+  const result = await useAsyncData(
+      `collectionName-${projectId}`,
+      () => useStrapi().findOne<ApiProjectProject['attributes']>(collectionName, projectId, {
+        populate: ['mainImage', 'media', 'technical_skills'],
+      }),
+  )
+
+  project = result.data.value?.data ?? null
+}
 
 interface LabelValue {
   label: string;

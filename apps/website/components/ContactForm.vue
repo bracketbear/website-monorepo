@@ -54,6 +54,7 @@ import UiTextareaInput from './ui/TextareaInput.vue'
 interface FormData {
   name: string;
   email: string;
+  subject: string;
   message: string;
 }
 
@@ -69,7 +70,7 @@ const emit = defineEmits<{(event: 'submit', value: FormData): void}>()
 const gtm = useGtm()
 
 const hasSubmitted = ref(false)
-const formData = reactive<FormData>({ name: '', email: '', message: '' })
+const formData = reactive<FormData>({ name: '', email: '', subject: '', message: '' })
 const rules = reactive({
   name: { required: helpers.withMessage('Name is required', required) },
   email: {
@@ -98,9 +99,6 @@ const handleSubmit = () => {
   }
 
   const formKeyValues = Object.entries(formData)
-  // const newFormData = new FormData()
-  // formKeyValues.forEach(([key, value]) => newFormData.append(key, value))
-
   const urlEncodedFormData = new URLSearchParams(formKeyValues)
   urlEncodedFormData.append('form-name', 'contact-form')
 
