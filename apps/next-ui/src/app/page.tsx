@@ -9,10 +9,10 @@ export default function Home() {
         <Image src="/logo.svg" alt="Logo" width={48} height={48} />
         <h1 className="text-2xl font-bold">Bracket Bear</h1>
       </header>
-      <main className=" row-start-2 flex flex-col  items-center gap-8 sm:items-start ">
+      <main className="row-start-2 flex flex-col  items-center gap-8 sm:items-start ">
         <div>Home Page</div>
       </main>
-      <footer className="row-start-3 flex flex-wrap items-center justify-center gap-6 bg-red-950">
+      <footer className="row-start-3 flex flex-wrap items-center justify-center gap-6 bg-gray-900 p-4 font-bold text-white">
         Copyright &copy;2022-{thisYear} Harrison Callahan. All rights reserved.
       </footer>
     </div>
