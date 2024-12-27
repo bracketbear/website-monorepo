@@ -2,8 +2,8 @@
   "private": true,
   "name": "bracketbear-website",
   "workspaces": [
-    "packages/cms",
-    "packages/website"
+    "app/*",
+    "packages/*"
   ],
   "scripts": {
     "dev": "concurrently --kill-others-on-fail \"yarn workspace @bracketbear/cms dev\" \"yarn workspace @bracketbear/website dev\"",

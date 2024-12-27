@@ -1,5 +1,8 @@
 node_modules
-cms
-website
 !packages/*
 **/.DS_Store
+dist
+.cache
+.tmp
+.nuxt
+.env
