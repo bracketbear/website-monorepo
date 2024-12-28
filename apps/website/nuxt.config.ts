@@ -2,7 +2,14 @@ import path from 'path'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/strapi', '@nuxt/image-edge', '@nuxtjs/google-fonts', 'nuxt-svgo'],
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/strapi',
+    '@nuxt/image',
+    '@nuxtjs/google-fonts',
+    'nuxt-svgo',
+    '@nuxt/image',
+  ],
   app: {
     head: {
       title: 'Bracket Bear',
@@ -40,4 +47,5 @@ export default defineNuxtConfig({
       Heebo: [400, 500, 700],
     },
   },
+  compatibilityDate: '2024-12-27',
 })

@@ -2,11 +2,11 @@
   "private": true,
   "name": "bracketbear-website",
   "workspaces": [
-    "app/*",
+    "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail \"yarn workspace @bracketbear/cms dev\" \"yarn workspace @bracketbear/website dev\"",
+    "dev": "concurrently --kill-others-on-fail \"npm run dev -w apps/cms\" \"npm run dev -w apps/website\"",
     "build": "yarn workspace @bracketbear/cms build && yarn workspace @bracketbear/website build",
     "deploy": "yarn workspace @bracketbear/cms deploy && yarn workspace @bracketbear/website deploy",
     "generate": "concurrently --kill-others --success second \"yarn workspace @bracketbear/cms start\" \"yarn workspace @bracketbear/website generate\""
