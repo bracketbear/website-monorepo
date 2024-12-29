@@ -1,4 +1,4 @@
-import { Strapi } from '@strapi/strapi';
+import {Core}  from '@strapi/strapi';
 
 export default {
   /**
@@ -7,7 +7,7 @@ export default {
    *
    * This gives you an opportunity to extend code.
    */
-  register( { strapi }: { strapi: Strapi }) {},
+  register( { strapi }: { strapi: Core.Strapi }) {},
 
   /**
    * An asynchronous bootstrap function that runs before

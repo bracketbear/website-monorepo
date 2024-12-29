@@ -74,4 +74,6 @@ export default defineNuxtConfig({
     url: process.env.STRAPI_URL || 'http://127.0.0.1:1337',
     prefix: '/api',
   },
+
+  compatibilityDate: '2024-12-29',
 })
