@@ -1,6 +1,6 @@
 <template>
   <div class="relative z-10 min-h-screen md:grid md:grid-rows-[5rem_auto_auto]">
-    <Navigation />
+    <AppNavigation />
     <!-- Main content goes inside here. 👇 -->
     <main>
       <slot />
