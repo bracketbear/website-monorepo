@@ -1,59 +1,60 @@
-import type { Schema, Attribute } from '@strapi/strapi';
+import type { Schema, Struct } from '@strapi/strapi';
 
-export interface SharedMetaSocial extends Schema.Component {
+export interface SharedMetaSocial extends Struct.ComponentSchema {
   collectionName: 'components_shared_meta_socials';
   info: {
     displayName: 'metaSocial';
     icon: 'project-diagram';
   };
   attributes: {
-    socialNetwork: Attribute.Enumeration<['Facebook', 'Twitter']> &
-      Attribute.Required;
-    title: Attribute.String &
-      Attribute.Required &
-      Attribute.SetMinMaxLength<{
-        maxLength: 60;
-      }>;
-    description: Attribute.String &
-      Attribute.Required &
-      Attribute.SetMinMaxLength<{
+    description: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
         maxLength: 65;
       }>;
-    image: Attribute.Media;
+    image: Schema.Attribute.Media<'images' | 'files' | 'videos'>;
+    socialNetwork: Schema.Attribute.Enumeration<['Facebook', 'Twitter']> &
+      Schema.Attribute.Required;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
   };
 }
 
-export interface SharedSeo extends Schema.Component {
+export interface SharedSeo extends Struct.ComponentSchema {
   collectionName: 'components_shared_seos';
   info: {
     displayName: 'seo';
     icon: 'search';
   };
   attributes: {
-    metaTitle: Attribute.String &
-      Attribute.Required &
-      Attribute.SetMinMaxLength<{
+    canonicalURL: Schema.Attribute.String;
+    keywords: Schema.Attribute.Text;
+    metaDescription: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+        minLength: 50;
+      }>;
+    metaImage: Schema.Attribute.Media<'images' | 'files' | 'videos'> &
+      Schema.Attribute.Required;
+    metaRobots: Schema.Attribute.String;
+    metaSocial: Schema.Attribute.Component<'shared.meta-social', true>;
+    metaTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
         maxLength: 60;
       }>;
-    metaDescription: Attribute.String &
-      Attribute.Required &
-      Attribute.SetMinMaxLength<{
-        minLength: 50;
-        maxLength: 160;
-      }>;
-    metaImage: Attribute.Media & Attribute.Required;
-    metaSocial: Attribute.Component<'shared.meta-social', true>;
-    keywords: Attribute.Text;
-    metaRobots: Attribute.String;
-    structuredData: Attribute.JSON;
-    metaViewport: Attribute.String;
-    canonicalURL: Attribute.String;
+    metaViewport: Schema.Attribute.String;
+    structuredData: Schema.Attribute.JSON;
   };
 }
 
-declare module '@strapi/types' {
-  export module Shared {
-    export interface Components {
+declare module '@strapi/strapi' {
+  export module Public {
+    export interface ComponentSchemas {
       'shared.meta-social': SharedMetaSocial;
       'shared.seo': SharedSeo;
     }
