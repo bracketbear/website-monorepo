@@ -6,7 +6,7 @@
         v-if="isLoaded"
         :animation-sprite="ParticleGridSprite"
         :config="animationConfig"
-        class="h-full w-full"
+        class="size-full"
       >
         <div class="flex h-full items-center">
           <div class="container flex flex-col items-center justify-center gap-3 text-center font-heading text-xl text-white md:px-16">
@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { CircleSprite, RepulsionBehavior, SvgHelper, isWithinRadius, SlowReturnBehavior } from 'flateralus'
+import { CircleSprite, RepulsionBehavior, isWithinRadius, SlowReturnBehavior } from 'flateralus'
 import type { GeneratorGetSprite } from 'flateralus'
 import { ParticleGridConfig, ParticleGridSprite } from '~/animations/particle-grid'
 import WorkHistory from '~/components/WorkHistory/WorkHistory.vue'

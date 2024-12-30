@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect, withDefaults } from 'vue'
+import { ref, watchEffect } from 'vue'
 import debounce from '~/utils/helpers/debounce'
 
 interface Props {
