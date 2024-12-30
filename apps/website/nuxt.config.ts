@@ -75,5 +75,5 @@ export default defineNuxtConfig({
     prefix: '/api',
   },
 
-  compatibilityDate: '2024-12-29',
+  compatibilityDate: '2024-12-30',
 })

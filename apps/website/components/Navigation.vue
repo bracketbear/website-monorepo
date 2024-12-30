@@ -3,23 +3,19 @@
     <nav class="container relative mx-auto flex  h-full items-center justify-between">
       <!-- Branding -->
       <NuxtLink :to="{ name: 'index' }" class="flex items-center gap-4">
-        <img src="/svg/logo.svg" alt="logo" class="h-8 text-black md:h-10" />
-        <!-- We're going to add this back in at some point, just not now. -->
-        <!-- <h1 class="hidden text-4xl font-bold md:block">
-          {{ appName }}
-        </h1> -->
+        <BBLogo class="h-8 text-black md:h-10" />
       </NuxtLink>
       <!-- Menu Button -->
       <UiButton color="secondary" class="lg:hidden" @click="toggleMenu">
-        <Bars3Icon class="h-6 w-6 stroke-black stroke-1" />
+        <Bars3Icon class="size-6 stroke-black stroke-1" />
       </UiButton>
       <!-- Menu (Navigation) Items -->
       <ul
         :class="{ 'max-lg:translate-x-full': !menuOpen }"
         class="fixed right-0 top-0
-              z-50 flex h-full w-full flex-col gap-10 bg-primary-lightest
-              p-8 transition-transform duration-300 ease-in-out
-              lg:static lg:h-auto lg:w-auto lg:flex-row lg:items-center lg:bg-transparent lg:p-0"
+              z-50 flex size-full flex-col gap-10 bg-primary-lightest p-8
+              transition-transform duration-300 ease-in-out lg:static
+              lg:size-auto lg:flex-row lg:items-center lg:bg-transparent lg:p-0"
       >
         <CloseButton
           class="absolute right-4 top-4 lg:hidden"
@@ -63,6 +59,7 @@
 
 <script setup lang="ts">
 import { Bars3Icon } from '@heroicons/vue/24/solid'
+import BBLogo from '~/assets/svg/logo.svg?component'
 import { links } from '~/config/navigation'
 
 const props = withDefaults(defineProps<{
