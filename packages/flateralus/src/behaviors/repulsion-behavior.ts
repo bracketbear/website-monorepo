@@ -1,12 +1,13 @@
 import { Behavior } from "."
-import { Sprite, DrawContext } from ".."
+import { Sprite } from ".."
+import type { DrawContext } from "../types"
 
 export interface RepulsionBehaviorConfig {
   mouseRadius: number
   repulsionStrength: number
 }
 
-export class RepulsionBehavior extends Behavior<RepulsionBehaviorConfig> {
+export class RepulsionBehavior implements Behavior<RepulsionBehaviorConfig> {
   execute(sprite: Sprite, config: RepulsionBehaviorConfig, context: DrawContext): void {
     const { pointer } = context
     const defaultConfig: RepulsionBehaviorConfig = {

@@ -1,5 +1,6 @@
 import { Behavior } from ".";
-import { Sprite, DrawContext } from "..";
+import { Sprite } from "..";
+import type { DrawContext } from "../types";
 
 /**
  * Represents a behavior condition that can be used to execute a behavior based on a certain condition.

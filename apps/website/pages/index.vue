@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout class="bg-primary">
     <!-- Hero -->
-    <div class="h-[calc(100vh-4rem)] border-b-2 border-solid border-black bg-purple-800 bg-gradient-to-br from-teal-500 md:h-[calc(100vh-5rem)] ">
+    <div class="h-[calc(100vh-4rem)] border-b-2 border-solid border-black bg-teal-500 bg-gradient-to-br from-green-500 md:h-[calc(100vh-5rem)] ">
       <FlateralusCanvas
         v-if="isLoaded"
         :animation-sprite="ParticleGridSprite"
@@ -59,7 +59,7 @@
 import type { Component } from 'vue'
 import { CircleSprite, RepulsionBehavior, isWithinRadius, SlowReturnBehavior } from 'flateralus'
 import type { GeneratorGetSprite } from 'flateralus'
-import { ParticleGridConfig, ParticleGridSprite } from '~/animations/particle-grid'
+import { type ParticleGridConfig, ParticleGridSprite } from '~/animations/particle-grid'
 import WorkHistory from '~/components/WorkHistory/WorkHistory.vue'
 import SkillList from '~/components/SkillList.vue'
 import ProjectList from '~/components/ProjectList.vue'
@@ -70,11 +70,11 @@ const isLoaded = ref(false)
 onMounted(() => {
   const getSprite: GeneratorGetSprite = (context) => {
     const sprite = new CircleSprite(context, 50)
-    sprite.setFillColor('rgba(255, 255, 255, 0.2)')
+    sprite.setFillColor('rgba(255, 255, 255, 0.02)')
 
     sprite.addBehavior(RepulsionBehavior)
       .when((sprite, ctx) => {
-        return isWithinRadius(sprite.getPosition(), ctx.pointer.position, 300)
+        return isWithinRadius(sprite.getPosition(), ctx.pointer.position, 100)
       })
     sprite.addBehavior(SlowReturnBehavior)
       .when((sprite, ctx) => {
@@ -86,8 +86,11 @@ onMounted(() => {
 
   animationConfig.value = {
     getSprite,
-    gap: 20,
+    gap: 10,
+    spriteWidth: 10,
+    spriteHeight: 10,
     fillContainer: true,
+
   }
 
   isLoaded.value = true

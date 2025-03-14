@@ -3,16 +3,16 @@ import type { GeneratorGetSprite, GridGeneratorConfig } from 'flateralus'
 
 export interface ParticleGridConfig extends GridGeneratorConfig {
   getSprite: GeneratorGetSprite,
-  fillContainer?: boolean,
+  fillContainer: boolean,
 }
 
 const defaultConfig: ParticleGridConfig = {
   fillContainer: false,
-  width: 1000,
-  height: 1000,
-  spriteWidth: 100,
-  spriteHeight: 100,
-  gap: 10,
+  width: 100,
+  height: 100,
+  spriteWidth: 10,
+  spriteHeight: 10,
+  gap: 100,
   getSprite: (context: CanvasRenderingContext2D) => new CircleSprite(context, 10),
 }
 
@@ -27,12 +27,12 @@ export class ParticleGridSprite extends Sprite {
     this.setup()
   }
 
-  setup (): void {
+  override setup (): void {
     const sprites = this.generator.generate(this.config.getSprite)
     this.setChildren(sprites)
   }
 
-  reset (): void {
+  override reset (): void {
     this.removeAllChildren()
     this.setup()
   }

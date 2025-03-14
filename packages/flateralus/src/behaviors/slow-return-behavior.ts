@@ -1,6 +1,7 @@
-import { Behavior, Sprite, DrawContext } from "..";
+import { Behavior, Sprite } from "..";
+import type { DrawContext } from "../types";
 
-export class SlowReturnBehavior extends Behavior<undefined> {
+export class SlowReturnBehavior implements Behavior<undefined> {
   execute(sprite: Sprite, _config: undefined, _ctx: DrawContext): void {
     const { originalPosition } = sprite;
   

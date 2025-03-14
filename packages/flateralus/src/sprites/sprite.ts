@@ -83,7 +83,7 @@ export abstract class Sprite {
    * 
    * @param ctx - The behavior context to use for handling events.
    */
-  update(ctx: DrawContext): void {
+  update(_ctx: DrawContext): void {
     // Default behavior does nothing.
   }
   
@@ -192,7 +192,7 @@ export abstract class Sprite {
    * 
    * @returns The behavior condition that was added.
    */
-  addBehavior(behavior: Behavior<any>, config?: any): BehaviorCondition<typeof behavior> {
+  addBehavior(behavior: new () => Behavior<any>, _config?: any): BehaviorCondition<InstanceType<typeof behavior>> {
     const condition = new BehaviorCondition(behavior);
     this.behaviorConditions.push(condition);
     

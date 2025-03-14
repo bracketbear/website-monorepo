@@ -1,5 +1,6 @@
-import { Sprite, DrawContext } from '..';
+import { Sprite } from '..';
+import type { DrawContext } from '../types';
 
-export abstract class Behavior<TConfig> {
-  abstract execute (sprite: Sprite, config: TConfig, ctx: DrawContext): void;
+export interface Behavior<TConfig> {
+  execute (sprite: Sprite, config: TConfig, ctx: DrawContext): void;
 } 

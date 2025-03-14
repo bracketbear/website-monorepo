@@ -12,6 +12,7 @@
     "generate": "concurrently --kill-others --success second \"yarn workspace @bracketbear/cms start\" \"yarn workspace @bracketbear/website generate\""
   },
   "dependencies": {
+    "18": "^0.0.0",
     "concurrently": "^8.2.1"
   }
 }

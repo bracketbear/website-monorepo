@@ -1,4 +1,4 @@
-import { Vec2D } from ".."
+import type { Vec2D } from "../types"
 
 /**
  * Determines whether two points in a 2D space are within a specified distance of each other.

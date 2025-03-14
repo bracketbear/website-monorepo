@@ -4,4 +4,4 @@ export * from './generators'
 export * from './helpers';
 export * from './pointers';
 export * from './sprites';
-export * from '../types';
+export * from './types';
