@@ -1,14 +1,21 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
+import keystatic from '@keystatic/astro';
+
+import markdoc from '@astrojs/markdoc';
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [react()],
+  integrations: [react(), markdoc(), keystatic()],
   vite: {
-    // @ts-ignore: Bug with TailwindCSS Vite plugin type definition
-    plugins: [tailwindcss()],
+    plugins: [
+      // @ts-ignore: Bug with TailwindCSS Vite plugin type definition
+      tailwindcss()
+    ],
+  },
+  experimental: {
+    svg: true,
   },
 });
