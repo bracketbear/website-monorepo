@@ -4,6 +4,17 @@ export default config({
   storage: {
     kind: 'local',
   },
+  ui: {
+    brand: {
+      name: 'Bracket Bear',
+      mark: ({ colorScheme }) => {
+        let path = '/src/assets/bracket-bear-logo.svg';
+        
+        return <img src={path} width={24}/>
+      },
+      
+    },
+  },
   collections: {
     workSkills: collection({
       label: 'Work Skills',
