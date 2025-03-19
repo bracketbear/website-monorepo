@@ -11,8 +11,8 @@ export default defineConfig({
   integrations: [react(), markdoc(), keystatic()],
   vite: {
     plugins: [
-      // @ts-ignore: Bug with TailwindCSS Vite plugin type definition
-      tailwindcss()
+      // @ts-expect-error: Bug with TailwindCSS Vite plugin type definition
+      tailwindcss(),
     ],
   },
   experimental: {

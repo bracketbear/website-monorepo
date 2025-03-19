@@ -1,14 +1,13 @@
-import eslintPluginAstro from 'eslint-plugin-astro';
-import love from 'eslint-config-love';
-
-const MAX_LINE_LENGTH = 100;
+import eslintPluginAstro from "eslint-plugin-astro";
+import love from "eslint-config-love";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
 export default [
-  ...eslintPluginAstro.configs.recommended,
   love,
+  ...eslintPluginAstro.configs.recommended,
+  eslintPluginPrettierRecommended,
   {
     rules: {
-      "max-len": ["error", { "code": MAX_LINE_LENGTH, "ignoreUrls": true }],
       "comma-dangle": ["error", "always-multiline"],
     },
     ignores: [

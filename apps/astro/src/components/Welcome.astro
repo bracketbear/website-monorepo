@@ -1,85 +1,93 @@
 ---
-import '@fontsource/fontdiner-swanky';
+import "@fontsource/fontdiner-swanky";
 import Logo from "../assets/bracket-bear-logo.svg";
 import Button from "../components/atoms/Button.astro";
 ---
 
-<div class="parchment flex h-full flex-col items-center justify-center bg-[#ca6702]">
+<div
+  class="parchment flex h-full flex-col items-center justify-center bg-[#ca6702]"
+>
   <div
     class="animated-blob hard-shadow flex flex-col gap-1 rounded-4xl border-4 border-[#94d2bd] bg-[#0a9396] p-24 bg-blend-color-burn"
   >
     <Logo class="glowing-text h-10" />
-    <div class="glowing-text p-8 -rotate-6">
+    <div class="glowing-text -rotate-6 p-8">
       <div class="text-center text-6xl">Experiential</div>
       <div class="text-center text-6xl">Full-Stack</div>
       <div class="text-center text-6xl">Engineer</div>
     </div>
-    <div class="flex flex-col gap-2 justify-center md:flex-row *:min-w-48">
+    <div class="flex flex-col justify-center gap-2 *:min-w-48 md:flex-row">
       <Button variant="outlineLight">Learn More</Button>
       <Button variant="secondary">Let's Work Together</Button>
     </div>
   </div>
 </div>
 
-<style>  
-@keyframes blob {
-  0% {
-    border-radius: 40% 60% 70% 30% / 30% 50% 50% 70%;
+<style>
+  @keyframes blob {
+    0% {
+      border-radius: 40% 60% 70% 30% / 30% 50% 50% 70%;
+    }
+    25% {
+      border-radius: 55% 45% 65% 35% / 35% 55% 45% 65%;
+    }
+    50% {
+      border-radius: 60% 40% 50% 50% / 40% 60% 60% 40%;
+    }
+    75% {
+      border-radius: 45% 55% 35% 65% / 65% 35% 55% 45%;
+    }
+    100% {
+      border-radius: 40% 60% 70% 30% / 30% 50% 50% 70%;
+    }
   }
-  25% {
-    border-radius: 55% 45% 65% 35% / 35% 55% 45% 65%;
+
+  .animated-blob {
+    animation: blob 16s infinite ease-in-out alternate;
   }
-  50% {
-    border-radius: 60% 40% 50% 50% / 40% 60% 60% 40%;
+
+  .parchment {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    box-shadow:
+      2px 3px 20px black,
+      0 0 125px #8f5922 inset;
+    filter: url(#wavy2);
+    background-image: url(data:image/png;base64,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);
   }
-  75% {
-    border-radius: 45% 55% 35% 65% / 65% 35% 55% 45%;
+
+  .hard-shadow {
+    box-shadow: 2rem 2rem 0 rgb(155, 34, 38, 0.5);
   }
-  100% {
-  border-radius: 40% 60% 70% 30% / 30% 50% 50% 70%;
+
+  :root {
+    --glowing-text-primary: #001219;
+    --glowing-text-secondary: #005f73;
+    --glowing-text-shadow: #e9d8a6;
   }
-}
 
-.animated-blob {
-  animation: blob 16s infinite ease-in-out alternate;
-}
-
-.parchment {
-  position: absolute;
-  display: flex;
-	width: 100%;
-	box-shadow: 2px 3px 20px black, 0 0 125px #8f5922 inset;
-	filter: url(#wavy2);
-  background-image: url(data:image/png;base64,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);
-}
-
-.hard-shadow {
-  box-shadow: 2rem 2rem 0 rgb(155, 34, 38, 0.5);
-}
-
-:root {
-  --glowing-text-primary: #001219;
-  --glowing-text-secondary: #005f73;
-  --glowing-text-shadow: #e9d8a6;
-}
-
-.glowing-text {
-  background: linear-gradient(90deg, var(--glowing-text-primary), var(--glowing-text-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: groovy-text 1.5s   infinite alternate;
-  /* font-family: 'Saira Stencil One', system-ui; */
-  font-family: 'Fontdiner Swanky', system-ui;
-  /* text-transform: uppercase; */
-  text-shadow: 0.25rem 0.25rem 0rem var(--glowing-text-shadow);
-}
-@keyframes groovy-text {
-  0% {
+  .glowing-text {
+    background: linear-gradient(
+      90deg,
+      var(--glowing-text-primary),
+      var(--glowing-text-secondary)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: groovy-text 1.5s infinite alternate;
+    /* font-family: 'Saira Stencil One', system-ui; */
+    font-family: "Fontdiner Swanky", system-ui;
+    /* text-transform: uppercase; */
     text-shadow: 0.25rem 0.25rem 0rem var(--glowing-text-shadow);
   }
-  100% {
-    text-shadow: 0.5rem 0.5rem 0rem var(--glowing-text-shadow);
+  @keyframes groovy-text {
+    0% {
+      text-shadow: 0.25rem 0.25rem 0rem var(--glowing-text-shadow);
+    }
+    100% {
+      text-shadow: 0.5rem 0.5rem 0rem var(--glowing-text-shadow);
+    }
   }
-}
 </style>
