@@ -1,0 +1,19 @@
+{
+  "title": "Gumband",
+  "highlights": [
+    "Test"
+  ],
+  "isFeatured": true,
+  "categories": "full-stack-engineering",
+  "skills": [
+    "react",
+    "express",
+    "node",
+    "postgresql",
+    "css",
+    "html",
+    "figma",
+    "typescript",
+    "vite"
+  ]
+}
