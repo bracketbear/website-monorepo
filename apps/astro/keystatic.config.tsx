@@ -1,8 +1,15 @@
-import { collection, config, fields, type Collection } from "@keystatic/core";
+import { collection, config, fields } from "@keystatic/core";
 
-const CONTENT_PATH = 'src/content';
-const contentPath = <T extends string>(slug: T): Collection<{}, T>['path'] => {
-  return `${CONTENT_PATH}/${slug}/*` as Collection<{}, T>['path'];
+const CONTENT_PATH = 'src/content' as const;
+type ContentPath = typeof CONTENT_PATH;
+
+const WORK_PATH = 'work' as const;
+
+const contentPath = <T extends string>(slug: T) => {
+  return `${CONTENT_PATH}/${slug}/*` as const;
+}
+const workPath = <T extends string>(slug: T) => {
+  return contentPath(`${WORK_PATH}/${slug}`);
 }
 
 export default config({
@@ -15,29 +22,50 @@ export default config({
       name: 'Bracket Bear',
       mark: ({ colorScheme }) => {
         let path = '/src/assets/bracket-bear-logo.svg';
-        
-        return <img src={path} width={24}/>
+     
+        return <img src={path} width={24} />
       },
       
     },
   },
   collections: {
+    workJobs: collection({
+      label: 'Jobs',
+      slugField: 'title',
+      format: 'json',
+      path: workPath('jobs'),
+      schema: {
+        title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } }),
+        company: fields.text({ label: 'Company Name', validation: { isRequired: true } }),
+        logo: fields.image({ label: 'Company Logo' }),
+        description: fields.text({ label: 'Description', multiline: true }),
+        startDate: fields.date({ label: 'Start Date', validation: {isRequired: true} }),
+        endDate: fields.date({ label: 'End Date' }),
+        isCurrentJob: fields.checkbox({ label: 'Is Current Job?', defaultValue: false }),
+      },
+    }),
     workSkills: collection({
       label: 'Work Skills',
       slugField: 'title',
-      path: contentPath('work-skills'),
+      path: workPath('skills'),
       schema: {
         title: fields.slug({ name: { label: 'Title' } }),
         description: fields.text({ label: 'Description' }),
         isFeatured: fields.checkbox({ label: 'Is Featured?', defaultValue: false }),
+        categories: fields.child({
+          kind: 'block',
+          label: 'Categories',
+          editIn: 'both',
+          placeholder: 'Select the categories that belong to this skill',
+        })
       },
-      format: 'json'
+      format: 'json',
     }),
     workSkillCategory: collection({
       label: 'Work Skill Category',
       slugField: 'title',
       format: 'json',
-      path: contentPath('work-skill-categories'),
+      path: workPath('skill-categories'),
       schema: {
         title: fields.slug({ name: { label: 'Title' } }),
         description: fields.text({ label: 'Description' }),
@@ -47,6 +75,44 @@ export default config({
           collection: 'workSkills',
         }),
       }
-    })
+    }),
+    workProjectCategory: collection({
+      label: 'Work Project Category',
+      slugField: 'title',
+      format: 'json',
+      path: workPath('project-categories'),
+      schema: {
+        title: fields.slug({ name: { label: 'Title' } }),
+      }
+    }),
+    workProject: collection({
+      label: 'Work Projects',
+      slugField: 'title',
+      format: 'json',
+      path: workPath('projects'),
+      schema: {
+        title: fields.slug({ name: { label: 'Title' } }),
+        description: fields.text({ label: 'Description', multiline: true }),
+        highlights: fields.array(
+          fields.text({ label: 'Project Highlight', multiline: true }),
+          {
+            label: 'Project Highlights',
+            description: 'Emphasize standout moments or successes in the project',
+            itemLabel: (props) => props.value || 'New Accomplishment'
+          }
+        ),
+        isFeatured: fields.checkbox({ label: 'Is Featured?', defaultValue: false }),
+        categories: fields.relationship({
+          label: 'Categories',
+          description: 'Select the categories that belong to this project',
+          collection: 'workProjectCategory',
+        }),
+        skills: fields.multiRelationship({
+          label: 'Skills',
+          description: 'Select the skills that belong to this project',
+          collection: 'workSkills',
+        }),
+      }
+    }),
   }
 });

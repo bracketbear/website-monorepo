@@ -1,5 +1,5 @@
 {
-  "name": "apps-astro",
+  "name": "@bracketbear/astro",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
