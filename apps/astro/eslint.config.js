@@ -1,13 +1,29 @@
 import eslintPluginAstro from 'eslint-plugin-astro';
+import love from 'eslint-config-love';
+
+const MAX_LINE_LENGTH = 100;
 
 export default [
-  // add more generic rule sets here, such as:
-  // js.configs.recommended,
   ...eslintPluginAstro.configs.recommended,
+  love,
   {
     rules: {
-      // override/add rules settings here, such as:
-      // "astro/no-set-html-directive": "error"
-    }
-  }
+      "max-len": ["error", { "code": MAX_LINE_LENGTH, "ignoreUrls": true }],
+      "comma-dangle": ["error", "always-multiline"],
+    },
+    ignores: [
+      "node_modules/",
+      "dist/",
+      ".astro/",
+      ".env",
+      ".env.production",
+      "npm-debug.log*",
+      "yarn-debug.log*",
+      "yarn-error.log*",
+      "pnpm-debug.log*",
+      ".vscode/",
+      ".idea/",
+      "src/assets/",
+    ],
+  },
 ];
