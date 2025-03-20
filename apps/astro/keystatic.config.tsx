@@ -20,26 +20,58 @@ export default config({
   ui: {
     brand: {
       name: 'Bracket Bear',
+      // TODO: add a dark mode logo
       mark: ({ colorScheme }) => {
         let path = '/src/assets/bracket-bear-logo.svg';
-     
+
         return <img src={path} width={24} />
       },
-      
+
     },
   },
   collections: {
+    workCompany: collection({
+      label: 'Companies',
+      slugField: 'title',
+      path: workPath('companies'),
+      format: 'json',
+      schema: {
+        title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } }),
+        logo: fields.image({ label: 'Logo' }),
+        website: fields.url({ label: 'Website' }),
+        location: fields.text({ label: 'Location' }),
+      }
+    }),
     workJobs: collection({
       label: 'Jobs',
       slugField: 'title',
       format: 'json',
       path: workPath('jobs'),
+      columns: [
+        'title',
+        'company',
+        'startDate',
+        'endDate',
+      ],
+      entryLayout: 'content',
       schema: {
         title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } }),
-        company: fields.text({ label: 'Company Name', validation: { isRequired: true } }),
-        logo: fields.image({ label: 'Company Logo' }),
+        company: fields.relationship({
+          label: 'Company',
+          description: 'Select the company that this job belongs to',
+          collection: 'workCompany',
+          validation: { isRequired: true }
+        }),
         description: fields.text({ label: 'Description', multiline: true }),
-        startDate: fields.date({ label: 'Start Date', validation: {isRequired: true} }),
+        highlights: fields.array(
+          fields.text({ label: 'Job Highlight', multiline: true }),
+          {
+            label: 'Job Highlights',
+            description: 'Emphasize standout moments or successes in the job',
+            itemLabel: (props) => props.value || 'New Highlight'
+          }
+        ),
+        startDate: fields.date({ label: 'Start Date', validation: { isRequired: true } }),
         endDate: fields.date({ label: 'End Date' }),
         isCurrentJob: fields.checkbox({ label: 'Is Current Job?', defaultValue: false }),
       },
