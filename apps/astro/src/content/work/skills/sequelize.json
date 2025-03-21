@@ -1,0 +1,6 @@
+{
+  "title": "Sequelize",
+  "description": "Sequelize is a promise-based Node.js ORM for Postgres, MySQL, MariaDB, SQLite, and Microsoft SQL Server, helping developers interact with databases using JavaScript.",
+  "isFeatured": false,
+  "categories": []
+}

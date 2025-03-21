@@ -1,4 +1,4 @@
 {
   "title": "Front-End",
-  "skills": "react"
+  "skills": ["react", "vue", "typescript", "tailwind-css", "nuxt", "bootstrap"]
 }

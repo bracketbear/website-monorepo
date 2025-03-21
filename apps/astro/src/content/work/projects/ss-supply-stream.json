@@ -1,0 +1,25 @@
+{
+  "title": "SupplyStream App",
+  "job": "ss-front-end-developer",
+  "duration": "Nine months",
+  "description": "Developed a headless, API-based front-end e-commerce platform for Trinity Packing Supply.\n\nStarted with BigCommerce's Stencil theme and integrated Vue into the template. Later, migrated the project from Vue 2 to Vue 3 and Nuxt 3. Used TailwindCSS for styling.",
+  "challengesAndSolutions": "One of the challenges was integrating Vue into a template that wasn't designed for it.\n\nThis was solved by transitioning to a headless, API-based front-end. Another challenge was the migration from Vue 2 to Vue 3, which was successfully achieved.",
+  "resultsAchieved": "The development of the application allowed Trinity's business model to switch from a purely sales person driven business to one where sales can happen more organically.",
+  "mediaDescription": "The desktop view of the SupplyStream e-commerce website.",
+  "media": [
+    "The desktop view of the SupplyStream e-commerce website.",
+    "The desktop view of the SupplyStream e-commerce product page.",
+    "Screenshot of the SupplyStream cart page.",
+    "The mobile view of the SupplyStream e-commerce homepage.",
+    "The mobile view of the SupplyStream e-commerce product page."
+  ],
+  "isFeatured": false,
+  "category": "full-stack-engineering",
+  "skills": [
+    "vue",
+    "nuxt-3",
+    "tailwind-css",
+    "git",
+    "javascript"
+  ]
+}

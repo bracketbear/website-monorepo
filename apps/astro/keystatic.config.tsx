@@ -1,16 +1,21 @@
-import { collection, config, fields } from "@keystatic/core";
+import { collection, config, fields, singleton } from "@keystatic/core";
 
 const CONTENT_PATH = 'src/content' as const;
 type ContentPath = typeof CONTENT_PATH;
 
 const WORK_PATH = 'work' as const;
 
-const contentPath = <T extends string>(slug: T) => {
+const collectionPath = <T extends string>(slug: T) => {
   return `${CONTENT_PATH}/${slug}/*` as const;
 }
-const workPath = <T extends string>(slug: T) => {
-  return contentPath(`${WORK_PATH}/${slug}`);
+const singletonPath = <T extends string>(slug: T) => {
+  return `${CONTENT_PATH}/${slug}` as const;
 }
+const workPath = <T extends string>(slug: T) => {
+  return collectionPath(`${WORK_PATH}/${slug}`);
+}
+
+const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default config({
   storage: {
@@ -122,29 +127,73 @@ export default config({
       slugField: 'title',
       format: 'json',
       path: workPath('projects'),
+      columns: [
+        'title',
+        'job',
+      ],
       schema: {
-        title: fields.slug({ name: { label: 'Title' } }),
-        description: fields.text({ label: 'Description', multiline: true }),
-        highlights: fields.array(
-          fields.text({ label: 'Project Highlight', multiline: true }),
+        title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } }),
+        job: fields.relationship({
+          label: 'Job',
+          description: 'Select the job that this project belongs to',
+          collection: 'workJobs',
+          validation: { isRequired: true }
+        }),
+        duration: fields.text({
+          label: 'Duration',
+          validation: { isRequired: true }
+        }),
+        description: fields.text({
+          label: 'Description',
+          multiline: true
+        }),
+        challengesAndSolutions: fields.text({
+          label: 'Challenges and Solutions',
+          multiline: true
+        }),
+        resultsAchieved: fields.text({
+          label: 'Results Achieved',
+          multiline: true
+        }),
+        mediaDescription: fields.text({
+          label: 'Media Description',
+          multiline: true
+        }),
+        media: fields.array(
+          fields.text({ label: 'Media', multiline: true }),
           {
-            label: 'Project Highlights',
-            description: 'Emphasize standout moments or successes in the project',
-            itemLabel: (props) => props.value || 'New Accomplishment'
+            label: 'Media',
+            description: 'Media captions or URLs',
+            itemLabel: (props) => props.value || 'New Media'
           }
         ),
-        isFeatured: fields.checkbox({ label: 'Is Featured?', defaultValue: false }),
-        categories: fields.relationship({
-          label: 'Categories',
-          description: 'Select the categories that belong to this project',
-          collection: 'workProjectCategory',
+        isFeatured: fields.checkbox({
+          label: 'Is Featured?',
+          defaultValue: false
+        }),
+        category: fields.relationship({
+          label: 'Category',
+          description: 'Select the category that this project belongs to',
+          collection: 'workProjectCategory'
         }),
         skills: fields.multiRelationship({
           label: 'Skills',
           description: 'Select the skills that belong to this project',
-          collection: 'workSkills',
+          collection: 'workSkills'
         }),
       }
+    }),
+  },
+  singletons: {
+    contactInfo: singleton({
+      label: 'Contact Info',
+      schema: {
+        email: fields.text({ label: 'Email', validation: { isRequired: true, pattern: { regex: emailRegex, message: 'Invalid email' } } }),
+        linkedin: fields.url({ label: 'LinkedIn' }),
+        github: fields.url({ label: 'GitHub' }),
+      },
+      format: 'json',
+      path: singletonPath('contact-info'),
     }),
   }
 });

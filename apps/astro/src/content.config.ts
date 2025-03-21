@@ -1,25 +1,40 @@
 import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { file, glob } from 'astro/loaders';
 
-// Define the "workJobs" collection to load all JSON files from keystatic’s jobs folder.
+const workCompany = defineCollection({
+  type: 'content_layer',
+  loader: glob({
+    pattern: '**/*.json',
+    base: './content/work/companies'  // path matching your keystatic output
+  }),
+  schema: z.object({
+    title: z.string(),
+    logo: z.string().optional(),
+    website: z.string().optional(),
+    location: z.string().optional(),
+  }),
+});
+
 const workJobs = defineCollection({
-  loader: glob({ 
-    pattern: '**/*.json', 
+  type: 'content_layer',
+  loader: glob({
+    pattern: '**/*.json',
     base: './content/work/jobs'  // path matching your keystatic output
   }),
   schema: z.object({
     title: z.string(),
+    // In Keystatic this is a relationship, but JSON stores it as a string:
     company: z.string(),
-    logo: z.string().optional(),
-    description: z.string(),
+    description: z.string().optional(),
+    highlights: z.array(z.string()).optional(),
     startDate: z.coerce.date(),
     endDate: z.coerce.date().optional(),
     isCurrentJob: z.boolean().default(false),
   }),
 });
 
-// Similarly, define other collections for your skills, project categories, etc.
 const workSkills = defineCollection({
+  type: 'content_layer',
   loader: glob({
     pattern: '**/*.json',
     base: './src/content/work/skills',
@@ -28,14 +43,75 @@ const workSkills = defineCollection({
     title: z.string(),
     description: z.string().optional(),
     isFeatured: z.boolean().default(false),
-    // TODO: Define the relationship to categories
-    categories: z.any(),
+    // Because you used a child block in Keystatic, it may be more complex than a simple array/string:
+    categories: z.any().optional(),
   }),
 });
 
-// Define additional collections as needed…
+const workSkillCategory = defineCollection({
+  type: 'content_layer',
+  loader: glob({
+    pattern: '**/*.json',
+    base: './src/content/work/skill-categories',
+  }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    // multi-relationship in Keystatic => array of strings in JSON
+    skills: z.array(z.string()).optional(),
+  }),
+});
+
+const workProjectCategory = defineCollection({
+  type: 'content_layer',
+  loader: glob({
+    pattern: '**/*.json',
+    base: './src/content/work/project-categories',
+  }),
+  schema: z.object({
+    title: z.string(),
+  }),
+});
+
+const workProject = defineCollection({
+  type: 'content_layer',
+  loader: glob({
+    pattern: '**/*.json',
+    base: './src/content/work/projects',
+  }),
+  schema: z.object({
+    title: z.string(),
+    job: z.string(), // references "workJobs"
+    duration: z.string(),
+    description: z.string().optional(),
+    challengesAndSolutions: z.string().optional(),
+    resultsAchieved: z.string().optional(),
+    mediaDescription: z.string().optional(),
+    media: z.array(z.string()).optional(),
+    isFeatured: z.boolean().default(false),
+    category: z.string().optional(), // references "workProjectCategory"
+    skills: z.array(z.string()).optional(), // references "workSkills"
+  }),
+});
+
+// const contactInfo = defineCollection({
+//   type: 'content_layer',
+//   loader: file('./src/content/contact-info.json', {
+//     parser: (text) => JSON.parse(text),
+//   }),
+//   schema: z.object({
+//     email: z.string().email(),
+//     linkedin: z.string().optional(),
+//     github: z.string().optional(),
+//   }),
+// });
+
 export const collections = {
+  workCompany,
   workJobs,
   workSkills,
-  // workSkillCategory, workProjectCategory, workProject, etc.
+  workSkillCategory,
+  workProjectCategory,
+  workProject,
+  // contactInfo,
 };
