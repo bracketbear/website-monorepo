@@ -11,7 +11,7 @@ export default [
       "comma-dangle": ["error", "always-multiline"],
     },
     ignores: [
-      "node_modules/",
+      "**/node_modules/**",
       "dist/",
       ".astro/",
       ".env",
