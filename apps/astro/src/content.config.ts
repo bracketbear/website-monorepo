@@ -1,12 +1,32 @@
 import { defineCollection, z } from 'astro:content';
 import { file, glob } from 'astro/loaders';
+import type { ZodSchema } from 'astro:schema';
 
-const workCompany = defineCollection({
-  type: 'content_layer',
-  loader: glob({
-    pattern: '**/*.json',
-    base: './content/work/companies'  // path matching your keystatic output
-  }),
+interface CreateJsonCollectionArgs<T> {
+  base: string;
+  schema: ZodSchema<T>;
+}
+
+/**
+ * Creates a typed JSON-based collection using Astro's defineCollection and glob loaders.
+ */
+export function createJsonCollection<T>({
+  base,
+  schema,
+}: CreateJsonCollectionArgs<T>) {
+  return defineCollection({
+    type: 'content_layer',
+    loader: glob({
+      base,
+      pattern: '**/*.json',
+      generateId: (entry) => `${entry.entry.replace(/\.json$/, '')}`, // Generate ID from the entry path
+    }),
+    schema,
+  });
+}
+
+const workCompany = createJsonCollection({
+  base: './content/work/companies',
   schema: z.object({
     title: z.string(),
     logo: z.string().optional(),
@@ -15,12 +35,8 @@ const workCompany = defineCollection({
   }),
 });
 
-const workJobs = defineCollection({
-  type: 'content_layer',
-  loader: glob({
-    pattern: '**/*.json',
-    base: './content/work/jobs'  // path matching your keystatic output
-  }),
+const workJobs = createJsonCollection({
+  base: './content/work/jobs',
   schema: z.object({
     title: z.string(),
     // In Keystatic this is a relationship, but JSON stores it as a string:
@@ -33,12 +49,8 @@ const workJobs = defineCollection({
   }),
 });
 
-const workSkills = defineCollection({
-  type: 'content_layer',
-  loader: glob({
-    pattern: '**/*.json',
-    base: './src/content/work/skills',
-  }),
+const workSkills = createJsonCollection({
+  base: './src/content/work/skills',
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
@@ -48,12 +60,8 @@ const workSkills = defineCollection({
   }),
 });
 
-const workSkillCategory = defineCollection({
-  type: 'content_layer',
-  loader: glob({
-    pattern: '**/*.json',
-    base: './src/content/work/skill-categories',
-  }),
+const workSkillCategory = createJsonCollection({
+  base: './src/content/work/skill-categories',
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
@@ -62,23 +70,15 @@ const workSkillCategory = defineCollection({
   }),
 });
 
-const workProjectCategory = defineCollection({
-  type: 'content_layer',
-  loader: glob({
-    pattern: '**/*.json',
-    base: './src/content/work/project-categories',
-  }),
+const workProjectCategory = createJsonCollection({
+  base: './src/content/work/project-categories',
   schema: z.object({
     title: z.string(),
   }),
 });
 
-const workProject = defineCollection({
-  type: 'content_layer',
-  loader: glob({
-    pattern: '**/*.json',
-    base: './src/content/work/projects',
-  }),
+const workProject = createJsonCollection({
+  base: './src/content/work/projects',
   schema: z.object({
     title: z.string(),
     job: z.string(), // references "workJobs"
