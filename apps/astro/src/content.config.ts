@@ -25,7 +25,7 @@ export function createJsonCollection<T>({
   });
 }
 
-const workCompany = createJsonCollection({
+const workCompanies = createJsonCollection({
   base: './content/work/companies',
   schema: z.object({
     title: z.string(),
@@ -55,29 +55,27 @@ const workSkills = createJsonCollection({
     title: z.string(),
     description: z.string().optional(),
     isFeatured: z.boolean().default(false),
-    // Because you used a child block in Keystatic, it may be more complex than a simple array/string:
     categories: z.any().optional(),
   }),
 });
 
-const workSkillCategory = createJsonCollection({
+const workSkillCategories = createJsonCollection({
   base: './src/content/work/skill-categories',
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
-    // multi-relationship in Keystatic => array of strings in JSON
     skills: z.array(z.string()).optional(),
   }),
 });
 
-const workProjectCategory = createJsonCollection({
+const workProjectCategories = createJsonCollection({
   base: './src/content/work/project-categories',
   schema: z.object({
     title: z.string(),
   }),
 });
 
-const workProject = createJsonCollection({
+const workProjects = createJsonCollection({
   base: './src/content/work/projects',
   schema: z.object({
     title: z.string(),
@@ -107,11 +105,11 @@ const workProject = createJsonCollection({
 // });
 
 export const collections = {
-  workCompany,
+  workCompany: workCompanies,
   workJobs,
   workSkills,
-  workSkillCategory,
-  workProjectCategory,
-  workProject,
+  workSkillCategory: workSkillCategories,
+  workProjectCategory: workProjectCategories,
+  workProject: workProjects,
   // contactInfo,
 };

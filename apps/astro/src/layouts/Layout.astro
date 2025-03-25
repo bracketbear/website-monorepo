@@ -1,6 +1,7 @@
 ---
+import NavBar from "@/components/ui/NavBar.astro";
+import Footer from "@/components/ui/Footer.astro";
 import "../styles/global.css";
-import Logo from "../assets/bracket-bear-logo.svg";
 ---
 
 <!doctype html>
@@ -12,23 +13,9 @@ import Logo from "../assets/bracket-bear-logo.svg";
     <meta name="generator" content={Astro.generator} />
   </head>
   <body>
-    <nav class="bg-gray-800 p-4 text-white">
-      <div class="container mx-auto flex items-center justify-between">
-        <div class="flex items-center">
-          <Logo class="mr-2 h-8 w-8 fill-amber-50" />
-          <div class="text-2xl font-bold">
-            <a href="/">Bracket Bear</a>
-          </div>
-        </div>
-        <ul class="flex space-x-4">
-          <li><a href="/">Home</a></li>
-          <li><a href="/work">Work</a></li>
-          <li><a href="/about">About</a></li>
-          <li><a href="/contact">Contact</a></li>
-        </ul>
-      </div>
-    </nav>
+    <NavBar />
     <slot />
+    <Footer />
   </body>
 
   <style>

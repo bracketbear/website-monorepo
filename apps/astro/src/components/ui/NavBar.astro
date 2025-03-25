@@ -1,0 +1,41 @@
+---
+import Logo from "@/assets/bracket-bear-logo.svg";
+
+const navItems = [
+  { name: "Home", href: "/" },
+  { name: "Work", href: "/work" },
+  { name: "About", href: "/about" },
+  { name: "Hire Me", href: "/contact" },
+];
+---
+
+<nav
+  class="sticky top-0 z-50 border-t-4 border-b-4 border-solid border-white bg-gray-950 text-white"
+>
+  <div class="container mx-auto flex items-center justify-between">
+    <div class="flex items-center">
+      <div
+        class="bg-primary flex h-16 w-18 items-center justify-center border-r-4 border-l-4 border-solid border-white"
+      >
+        <Logo class="h-6 fill-amber-50" />
+      </div>
+      <div class="pl-2 text-2xl font-bold">
+        <a href="/">Bracket Bear</a>
+      </div>
+    </div>
+    <ul class="flex space-x-8">
+      {
+        navItems.map((item) => (
+          <li>
+            <a
+              class="hover:text-primary cursor-pointer font-bold text-white"
+              href={item.href}
+            >
+              {item.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</nav>

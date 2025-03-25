@@ -1,25 +1,13 @@
 ---
-/**
- * @file
- * @description This file is the index page for the work projects section of the website.
- * It imports the work projects from the content collection and generates a list of links to each project.
- */
-
 import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
+import { getKeyedCollection } from "@/utils/content";
 
 const workProjects = await getCollection("workProject");
+const workSkillsById = await getKeyedCollection("workSkills");
 ---
 
 <Layout>
   <title>Projects | Bracket Bear</title>
   <div>Projects</div>
-  {
-    workProjects.map((project) => (
-      <div>
-        <h2>{project.data.title}</h2>
-        <a href={`/work/projects/${project.id}`}>Link</a>
-      </div>
-    ))
-  }
 </Layout>

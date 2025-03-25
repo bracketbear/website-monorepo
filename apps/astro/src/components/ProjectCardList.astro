@@ -1,0 +1,71 @@
+---
+import { getCollection } from "astro:content";
+import { getKeyedCollection } from "@/utils/content";
+import { getProjectUrl } from "@/utils/navigation";
+
+const workProjects = await getCollection("workProject");
+const workSkillsById = await getKeyedCollection("workSkills");
+const workProjectCatergoriesById = await getKeyedCollection(
+  "workProjectCategory"
+);
+
+const workProjectsByType = workProjects.reduce<
+  Record<string, typeof workProjects>
+>((acc, project) => {
+  const type = project.data.category;
+  if (!type) {
+    return acc;
+  }
+  if (!acc[type]) {
+    acc[type] = [];
+  }
+  acc[type].push(project);
+  return acc;
+}, {});
+---
+
+<div>
+  {
+    Object.entries(workProjectsByType).map(([type, projects]) => (
+      <div class="my-8">
+        <h2 class="sticky top-0 z-10 -m-4 bg-white p-4 text-3xl font-bold text-gray-900">
+          {workProjectCatergoriesById[type].data.title}
+        </h2>
+        <div class="grid grid-cols-2 gap-4">
+          {projects.map((project) => (
+            <div class="card bg-base-100 shadow-sm">
+              <figure>
+                <img
+                  src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+                  alt="Shoes"
+                />
+              </figure>
+              <div class="card-body">
+                <a href={getProjectUrl(project.id)}>
+                  <h2 class="card-title">
+                    {project.data.title}
+                    <div class="badge badge-secondary">NEW</div>
+                  </h2>
+                </a>
+                <p>{project.data.description}</p>
+                <div>
+                  <div class="text-accent-content pb-1 font-bold">Skills:</div>
+                  <div class="card-actions">
+                    {project.data.skills?.map(
+                      (skillId) =>
+                        workSkillsById[skillId] && (
+                          <div class="badge badge-ghost">
+                            {workSkillsById[skillId].data.title}
+                          </div>
+                        )
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</div>

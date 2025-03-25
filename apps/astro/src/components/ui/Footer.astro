@@ -1,0 +1,13 @@
+---
+import Logo from "@/assets/bracket-bear-logo.svg";
+const thisYear = new Date().getFullYear();
+---
+
+<div class="text-primary-content bg-black py-32">
+  <div class="container mx-auto flex flex-col items-center justify-center">
+    <Logo class="h-8 fill-white" />
+    <div class="pt-4 text-sm text-gray-200">
+      Copyright &copy;2018-{thisYear} Harrison Callahan. All rights reserved.
+    </div>
+  </div>
+</div>
