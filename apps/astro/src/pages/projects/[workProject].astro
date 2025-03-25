@@ -4,6 +4,13 @@ import Layout from "@/layouts/Layout.astro";
 
 const workProjects = await getCollection("workProject");
 
+export const getStaticPaths = async () => {
+  const workProjects = await getCollection("workProject");
+  return workProjects.map((project) => ({
+    params: { workProject: project.id },
+  }));
+};
+
 const workProject = workProjects.find(
   (project) => project.id === Astro.params.workProject
 );
