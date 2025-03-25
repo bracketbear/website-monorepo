@@ -24,15 +24,13 @@ export default [
       ".idea/",
       "src/assets/",
     ],
-    overrides: [
-      {
-        files: ["*.astro"],
-        parser: "astro-eslint-parser",
-        extends: ["plugin:astro/recommended"],
-        rules: {
-          "quotes": ["error", "single"]
-        },
-      },
-    ],
+  },
+  {
+    files: ["*.astro"],
+    parser: "astro-eslint-parser",
+    extends: ["plugin:astro/recommended"],
+    rules: {
+      "quotes": ["error", "single"],
+    },
   },
 ];
