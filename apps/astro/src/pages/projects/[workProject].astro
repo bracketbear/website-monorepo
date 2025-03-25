@@ -4,7 +4,9 @@ import Layout from "@/layouts/Layout.astro";
 
 const workProjects = await getCollection("workProject");
 
-export const getStaticPaths = async () => {
+export const getStaticPaths = async (): Promise<
+  Array<{ params: { workProject: string } }>
+> => {
   const workProjects = await getCollection("workProject");
   return workProjects.map((project) => ({
     params: { workProject: project.id },
@@ -17,9 +19,13 @@ const workProject = workProjects.find(
 ---
 
 <Layout>
-  { workProject && (
-    <title>{workProject.data.title} | Bracket Bear</title>
-    <div>Project</div>
-    <h2>{workProject.data.title}</h2>
-  )}
+  {
+    workProject !== undefined && (
+      <>
+        <title>{workProject.data.title} | Bracket Bear</title>
+        <div>Project</div>
+        <h2>{workProject.data.title}</h2>
+      </>
+    )
+  }
 </Layout>
