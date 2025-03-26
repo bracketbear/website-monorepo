@@ -1,0 +1,86 @@
+---
+interface Section {
+  title: string;
+  description: string;
+}
+
+const colors = [
+  "#f0f4c3",
+  "#ffccbc",
+  "#bbdefb",
+  "#c8e6c9",
+  "#ffe0b2",
+  "#d1c4e9",
+  "#f8bbd0",
+  "#b2ebf2",
+] as const;
+
+const INDEX_INCREMENT = 1;
+
+const values: Section[] = [
+  {
+    title: "Get Shit Done",
+    description:
+      "Taking decisive action is about more than checking items off a to-do list—it's about driving forward progress and delivering meaningful results. Stay agile, adapt quickly, and never lose sight of the bigger picture.",
+  },
+  {
+    title: "Strive For Better",
+    description:
+      "The  world is always changing, and so should you. Stay curious, embrace new challenges, and never stop growing.",
+  },
+  {
+    title: "Communicate, Communicate, Communicate",
+    description:
+      "Great things in business are never done by one person. They're done by a team of people. Foster open communication, share ideas, and work together to achieve your goals.",
+  },
+];
+---
+
+<script>
+  const sectionsList = document.querySelectorAll("[data-color-section]");
+  const sectionWrapper = document.querySelector("[data-section-wrapper]");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const bgColor = entry.target.getAttribute("data-color") ?? "white";
+
+        if (sectionWrapper !== null) {
+          (sectionWrapper as HTMLElement).style.backgroundColor = bgColor;
+        }
+      }
+    });
+  });
+
+  sectionsList.forEach((section) => {
+    observer.observe(section);
+  });
+</script>
+
+<section
+  class="relative bg-blue-400 pt-96 pb-[50vh] transition-colors duration-1000"
+  data-section-wrapper
+>
+  <!-- Heading pinned in the center -->
+  <div class="sticky top-1/3 m-0 -translate-y-1/2 text-center">
+    <h1 class="text-9xl font-black uppercase">My Beliefs</h1>
+  </div>
+  {
+    values.map(({ description, title }, index) => (
+      <div
+        class="relative my-400 min-h-[200vh]"
+        data-color-section
+        data-color={colors[index]}
+      >
+        <div class="sticky top-1/2">
+          <p class="m-0 text-center text-2xl font-bold">
+            {index + INDEX_INCREMENT}. {title}
+          </p>
+          <p class="mx-auto mt-6 max-w-xl pb-6 text-center text-lg leading-relaxed text-gray-600">
+            {description}
+          </p>
+        </div>
+      </div>
+    ))
+  }
+</section>

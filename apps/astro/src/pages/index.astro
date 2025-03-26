@@ -6,6 +6,7 @@ import Welcome from "@/components/Welcome.astro";
 import type { ObjectKeys } from "@/utils/typescript";
 import { getProjectUrl } from "@/utils/navigation";
 import ProjectCardList from "@/components/ProjectCardList.astro";
+import HomePageAbout from "@/components/HomePageAbout.astro";
 
 const workProjects = await getCollection("workProject");
 const workSkillsById = await getKeyedCollection("workSkills");
@@ -33,6 +34,7 @@ const workProjectsByType = workProjects.reduce(
   <div>
     <title>Welcome to Bracket Bear</title>
     <Welcome />
+    <HomePageAbout />
     <div class="grid grid-cols-2 gap-4 border-y-8 border-solid border-white">
       <div
         class="sticky top-0 flex h-screen flex-col justify-center bg-red-600 p-8 text-right"

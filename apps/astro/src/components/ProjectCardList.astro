@@ -12,14 +12,17 @@ const workProjectCatergoriesById = await getKeyedCollection(
 const workProjectsByType = workProjects.reduce<
   Record<string, typeof workProjects>
 >((acc, project) => {
-  const type = project.data.category;
-  if (!type) {
+  const { data } = project;
+  const { category } = data;
+  if (category === undefined) {
     return acc;
   }
-  if (!acc[type]) {
-    acc[type] = [];
+
+  if (!(category in acc)) {
+    acc[category] = [];
   }
-  acc[type].push(project);
+
+  acc[category].push(project);
   return acc;
 }, {});
 ---
