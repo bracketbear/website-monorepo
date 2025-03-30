@@ -1,40 +1,17 @@
 ---
-import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
-import { getKeyedCollection } from "@/utils/content";
-import Welcome from "@/components/Welcome.astro";
-import type { ObjectKeys } from "@/utils/typescript";
-import { getProjectUrl } from "@/utils/navigation";
+import Hero from "@/components/Hero.astro";
 import ProjectCardList from "@/components/ProjectCardList.astro";
-import HomePageAbout from "@/components/HomePageAbout.astro";
-
-const workProjects = await getCollection("workProject");
-const workSkillsById = await getKeyedCollection("workSkills");
-const workProjectCatergoriesById = await getKeyedCollection(
-  "workProjectCategory"
-);
-const workProjectsByType = workProjects.reduce(
-  (acc: Record<string, typeof workProjects>, project) => {
-    const type = project.data.category;
-
-    if (!type) {
-      return acc;
-    }
-    if (!acc[type]) {
-      acc[type] = [];
-    }
-    acc[type].push(project);
-    return acc;
-  },
-  {}
-);
+import Philosophy from "@/components/Philosophy.astro";
+import About from "@/components/About.astro";
 ---
 
 <Layout>
   <div>
     <title>Welcome to Bracket Bear</title>
-    <Welcome />
-    <HomePageAbout />
+    <Hero />
+    <About />
+    <Philosophy />
     <div class="grid grid-cols-2 gap-4 border-y-8 border-solid border-white">
       <div
         class="sticky top-0 flex h-screen flex-col justify-center bg-red-600 p-8 text-right"

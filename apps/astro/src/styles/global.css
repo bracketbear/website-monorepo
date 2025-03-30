@@ -1,2 +1,10 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@layer base {
+  h1 {
+    font-size: var(--text-9xl);
+    font-weight: var(--font-weight-black);
+    line-height: var(--line-height-1);
+  }
+}

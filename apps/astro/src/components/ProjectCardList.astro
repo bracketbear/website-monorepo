@@ -56,7 +56,7 @@ const workProjectsByType = workProjects.reduce<
                   <div class="card-actions">
                     {project.data.skills?.map(
                       (skillId) =>
-                        workSkillsById[skillId] && (
+                        workSkillsById[skillId] !== undefined && (
                           <div class="badge badge-ghost">
                             {workSkillsById[skillId].data.title}
                           </div>

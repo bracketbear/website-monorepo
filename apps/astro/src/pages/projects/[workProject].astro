@@ -14,7 +14,7 @@ export const getStaticPaths = async (): Promise<
 };
 
 const workProject = workProjects.find(
-  (project) => project.id === Astro.params.workProject
+  (project) => project.id === Astro.params.workProject,
 );
 ---
 

@@ -8,16 +8,7 @@ export default [
   eslintPluginPrettierRecommended,
   {
     rules: {
-      "comma-dangle": [
-        "error",
-        {
-          arrays: "always-multiline",
-          objects: "always-multiline",
-          imports: "always-multiline",
-          exports: "always-multiline",
-          functions: "ignore",
-        },
-      ],
+      "comma-dangle": "off",
     },
     ignores: [
       "**/node_modules/**",
