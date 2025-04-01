@@ -26,7 +26,7 @@ export function createJsonCollection<T>({
 }
 
 const workCompanies = createJsonCollection({
-  base: './content/work/companies',
+  base: './src/content/work/companies',
   schema: z.object({
     title: z.string(),
     logo: z.string().optional(),
@@ -36,10 +36,9 @@ const workCompanies = createJsonCollection({
 });
 
 const workJobs = createJsonCollection({
-  base: './content/work/jobs',
+  base: './src/content/work/jobs',
   schema: z.object({
     title: z.string(),
-    // In Keystatic this is a relationship, but JSON stores it as a string:
     company: z.string(),
     description: z.string().optional(),
     highlights: z.array(z.string()).optional(),
