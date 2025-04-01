@@ -9,5 +9,12 @@
   ],
   "startDate": "2022-08-01",
   "endDate": "2023-04-01",
-  "isCurrentJob": false
+  "isCurrentJob": false,
+  "workSkills": [
+    "vue",
+    "nuxt-3",
+    "tailwind-css",
+    "git",
+    "javascript"
+  ]
 }

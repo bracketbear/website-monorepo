@@ -1,0 +1,113 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  className?: string;
+}
+
+const { title, subtitle, className = "" } = Astro.props;
+---
+
+<div class={`retrowave-heading-container ${className}`}>
+  <div class="neon-lines"></div>
+  <h2 class="retrowave-title">{title}</h2>
+  {subtitle && <p class="retrowave-subtitle">{subtitle}</p>}
+  <div class="neon-lines bottom"></div>
+</div>
+
+<style>
+  .retrowave-heading-container {
+    text-align: center;
+    position: relative;
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .retrowave-title {
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1;
+    margin: 0 0 0.5rem;
+
+    /* Multi-layered text shadow for neon effect */
+    text-shadow:
+      0 0 5px rgba(255, 0, 140, 1),
+      0 0 10px rgba(255, 0, 140, 0.8),
+      0 0 20px rgba(255, 0, 140, 0.6),
+      0 0 30px rgba(255, 0, 140, 0.4),
+      0 0 40px rgba(255, 0, 140, 0.2);
+
+    /* Chrome only effect for better glow */
+    @supports (-webkit-text-stroke: 1px) {
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Clip text for extra effect */
+    background: linear-gradient(
+      to bottom,
+      #ffffff 0%,
+      #f0ddf5 50%,
+      #d8b9ff 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .retrowave-subtitle {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    color: #00dbde;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin: 0;
+    text-shadow:
+      0 0 5px rgba(0, 219, 222, 1),
+      0 0 10px rgba(0, 219, 222, 0.8);
+    padding-top: 0.5rem;
+  }
+
+  /* Neon horizontal lines */
+  .neon-lines {
+    height: 1px;
+    width: 100%;
+    max-width: 600px;
+    margin: 1rem auto;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 0, 140, 0.8) 20%,
+      #ff009c 50%,
+      rgba(255, 0, 140, 0.8) 80%,
+      transparent 100%
+    );
+    box-shadow: 0 0 10px 1px rgba(255, 0, 140, 0.5);
+  }
+
+  .neon-lines.bottom {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 219, 222, 0.8) 20%,
+      #00dbde 50%,
+      rgba(0, 219, 222, 0.8) 80%,
+      transparent 100%
+    );
+    box-shadow: 0 0 10px 1px rgba(0, 219, 222, 0.5);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .retrowave-title {
+      letter-spacing: 0.03em;
+    }
+
+    .retrowave-subtitle {
+      letter-spacing: 0.1em;
+    }
+  }
+</style>

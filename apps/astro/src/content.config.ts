@@ -44,6 +44,7 @@ const workJobs = createJsonCollection({
     highlights: z.array(z.string()).optional(),
     startDate: z.coerce.date(),
     endDate: z.coerce.date().optional(),
+    workSkills: z.array(z.string()).optional(), // references "workSkills"
     isCurrentJob: z.boolean().default(false),
   }),
 });

@@ -1,0 +1,88 @@
+---
+interface Props {
+  position?: "start" | "end" | "auto";
+}
+
+const { position = "auto" } = Astro.props;
+---
+
+<li
+  class={`@container relative grid grid-cols-[1fr_var(--timeline-middle-size)_1fr] items-center 
+    gap-2 @xs:gap-3 @sm:gap-4 @md:gap-6 @lg:gap-8 
+    min-h-20 ${position !== "auto" ? `timeline-item-${position}` : ""}`}
+>
+  <div
+    class="timeline-content relative z-10 col-start-1 row-start-1 w-full justify-self-end rounded-lg"
+  >
+    <slot />
+  </div>
+
+  <div
+    class="timeline-middle relative z-10 col-start-2 row-start-1 justify-self-center"
+  >
+    <slot name="icon">
+      <!-- Default content with neon icon -->
+      <div
+        class="neon-icon flex aspect-square h-5 w-5 items-center justify-center rounded-full @sm:h-6 @sm:w-6"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          class="h-4 w-4 text-white @sm:h-5 @sm:w-5"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+            clip-rule="evenodd"></path>
+        </svg>
+      </div>
+    </slot>
+  </div>
+
+  <div class="col-start-3 row-start-1"></div>
+
+  <hr
+    class="col-span-3 row-start-1 m-0 h-0.5 w-full border-none bg-pink-500/30"
+  />
+</li>
+
+<style>
+  /* Connect lines between items - reverting to original styling */
+  :global(.timeline-vertical) li:not(:last-child):after {
+    content: "";
+    @apply absolute top-1/2 left-1/2 z-0 h-full w-[1/8rem] -translate-x-1/2;
+  }
+
+  /* Flow positioning logic - complex selectors */
+  :global(.timeline-start) li .timeline-content,
+  :global(.timeline-alternating) li.timeline-item-start .timeline-content {
+    @apply col-start-1 justify-self-end;
+  }
+
+  :global(.timeline-end) li .timeline-content,
+  :global(.timeline-alternating) li.timeline-item-end .timeline-content {
+    @apply col-start-3 justify-self-start;
+  }
+
+  /* Define the middle size CSS variable */
+  :root {
+    --timeline-middle-size: 1.5rem;
+    @container (min-width: 640px) {
+      --timeline-middle-size: 2rem;
+    }
+    @container (min-width: 1024px) {
+      --timeline-middle-size: 2.5rem;
+    }
+  }
+
+  /* Neon icon styling */
+  .neon-icon {
+    position: relative;
+    background: linear-gradient(135deg, #9d4edd, #c77dff);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+      0 0 5px rgba(157, 78, 221, 0.7),
+      0 0 10px rgba(157, 78, 221, 0.4);
+  }
+</style>

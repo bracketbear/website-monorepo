@@ -78,6 +78,11 @@ export default config({
         ),
         startDate: fields.date({ label: 'Start Date', validation: { isRequired: true } }),
         endDate: fields.date({ label: 'End Date' }),
+        workSkills: fields.multiRelationship({
+          label: 'Skills',
+          description: 'Select the skills that belong to this job',
+          collection: 'workSkills',
+        }),
         isCurrentJob: fields.checkbox({ label: 'Is Current Job?', defaultValue: false }),
       },
     }),

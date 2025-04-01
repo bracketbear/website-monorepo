@@ -12,5 +12,17 @@
   ],
   "startDate": "2020-07-01",
   "endDate": "2021-12-01",
-  "isCurrentJob": false
+  "isCurrentJob": false,
+  "workSkills": [
+    "vue",
+    "mysql",
+    "php",
+    "git",
+    "javascript",
+    "html",
+    "css",
+    "c-plus-plus",
+    "illustrator",
+    "photoshop"
+  ]
 }
