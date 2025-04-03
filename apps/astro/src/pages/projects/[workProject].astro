@@ -1,31 +1,213 @@
 ---
-import { getCollection } from "astro:content";
-import Layout from "@/layouts/Layout.astro";
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import Layout from '@/layouts/Layout.astro';
+import { getKeyedCollection } from '@/utils/content';
 
-const workProjects = await getCollection("workProject");
-
-export const getStaticPaths = async (): Promise<
-  Array<{ params: { workProject: string } }>
-> => {
-  const workProjects = await getCollection("workProject");
+export const getStaticPaths: GetStaticPaths = async () => {
+  const workProjects = await getCollection('workProject');
   return workProjects.map((project) => ({
     params: { workProject: project.id },
   }));
 };
 
+const workJobs = await getCollection('workJobs');
+const workSkills = await getCollection('workSkills');
+const workProjects = await getCollection('workProject');
+const workCompanies = await getKeyedCollection('workCompany');
+const projectCategories = await getCollection('workProjectCategory');
+
 const workProject = workProjects.find(
-  (project) => project.id === Astro.params.workProject,
+  (project) => project.id === Astro.params.workProject
 );
+
+if (workProject === undefined) {
+  throw new Error(`Project not found: ${Astro.params.workProject}`);
+}
+
+// Get related data
+const job = workJobs.find((job) => job.id === workProject.data.job);
+const category = projectCategories.find(
+  (category) => category.id === workProject.data.category
+);
+const projectSkills = workSkills.filter((skill) =>
+  (workProject.data.skills ?? []).includes(skill.id)
+);
+const companyTitle =
+  job !== undefined ? workCompanies[job.data.company].data.title : 'Unknown';
 ---
 
 <Layout>
-  {
-    workProject !== undefined && (
-      <>
-        <title>{workProject.data.title} | Bracket Bear</title>
-        <div>Project</div>
-        <h2>{workProject.data.title}</h2>
-      </>
-    )
-  }
+  <title>{workProject.data.title} | Bracket Bear</title>
+
+  <!-- Hero Section -->
+  <div
+    class="bg-gradient-to-r from-blue-900 to-indigo-800 px-4 py-16 text-white md:px-8"
+  >
+    <div class="container mx-auto max-w-5xl">
+      <h1 class="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">
+        {workProject.data.title}
+      </h1>
+      {
+        category !== undefined && (
+          <span class="mr-2 inline-block rounded-full bg-blue-700 px-3 py-1 text-sm font-medium">
+            {category.data.title}
+          </span>
+        )
+      }
+      <p class="mt-4 max-w-3xl text-lg opacity-90 md:text-xl">
+        {workProject.data.description}
+      </p>
+    </div>
+  </div>
+
+  <!-- Project Info Bar -->
+  <div class="mb-8 border-b bg-gray-50 px-4 py-4 md:px-8">
+    <div
+      class="container mx-auto flex max-w-5xl flex-wrap items-center gap-y-2"
+    >
+      {
+        job !== undefined && (
+          <div class="mr-8">
+            <h4 class="text-xs font-medium text-gray-500 uppercase">Company</h4>
+            <p class="font-medium">{companyTitle}</p>
+          </div>
+        )
+      }
+      <div class="mr-8">
+        <h4 class="text-xs font-medium text-gray-500 uppercase">Duration</h4>
+        <p class="font-medium">{workProject.data.duration}</p>
+      </div>
+      {
+        workProject.data.isFeatured === true && (
+          <div class="ml-auto">
+            <span class="rounded bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">
+              Featured Project
+            </span>
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto max-w-5xl">
+    <div class="grid gap-8 md:grid-cols-3">
+      <!-- Main Column -->
+      <div class="space-y-10 md:col-span-2">
+        <!-- Description -->
+        {
+          workProject.data.description?.trim() !== '' && (
+            <section class="prose max-w-none">
+              <h2 class="mb-4 border-b pb-2 text-2xl font-semibold">
+                Overview
+              </h2>
+              <p>{workProject.data.description}</p>
+            </section>
+          )
+        }
+
+        <!-- Challenges & Solutions -->
+        {
+          workProject.data.challengesAndSolutions?.trim() !== '' && (
+            <section class="prose max-w-none">
+              <h2 class="mb-4 border-b pb-2 text-2xl font-semibold">
+                Challenges & Solutions
+              </h2>
+              <p>{workProject.data.challengesAndSolutions}</p>
+            </section>
+          )
+        }
+
+        <!-- Results -->
+        {
+          workProject.data.resultsAchieved?.trim() !== '' && (
+            <section class="prose max-w-none">
+              <h2 class="mb-4 border-b pb-2 text-2xl font-semibold">
+                Results Achieved
+              </h2>
+              <p>{workProject.data.resultsAchieved}</p>
+            </section>
+          )
+        }
+
+        <!-- Media Gallery -->
+        {
+          (workProject.data.media ?? []).length > 0 && (
+            <section>
+              <h2 class="mb-4 border-b pb-2 text-2xl font-semibold">
+                Project Gallery
+              </h2>
+              {workProject.data.mediaDescription !== undefined && (
+                <p class="mb-4 text-gray-600">
+                  {workProject.data.mediaDescription}
+                </p>
+              )}
+              <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
+                {(workProject.data.media ?? []).map((imageUrl) => (
+                  <div class="h-48 overflow-hidden rounded shadow-lg">
+                    <img
+                      src={imageUrl}
+                      alt="Project media"
+                      class="h-full w-full object-cover transition-transform hover:scale-105"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )
+        }
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="space-y-8">
+        <!-- Job Info -->
+        {
+          job !== undefined && (
+            <div class="rounded-lg bg-white p-5 shadow">
+              <h3 class="mb-2 text-lg font-medium">Role Info</h3>
+              <p class="mb-3 text-gray-700">
+                {job.data.title} at {companyTitle}
+              </p>
+              {job.data.description?.trim() !== '' && (
+                <p class="text-sm text-gray-600">{job.data.description}</p>
+              )}
+            </div>
+          )
+        }
+
+        <!-- Skills -->
+        {
+          projectSkills.length > 0 && (
+            <div class="rounded-lg bg-white p-5 shadow">
+              <h3 class="mb-3 text-lg font-medium">Technologies Used</h3>
+              <div class="flex flex-wrap gap-2">
+                {projectSkills.map((skill) => (
+                  <span class="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200">
+                    {skill.data.title}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )
+        }
+
+        <!-- Call to Action -->
+        <div class="rounded-lg border border-indigo-100 bg-indigo-50 p-5">
+          <h3 class="mb-2 text-lg font-medium text-indigo-900">
+            Interested in similar work?
+          </h3>
+          <p class="mb-4 text-sm text-indigo-700">
+            I'd love to discuss how I can help with your project.
+          </p>
+          <a
+            href="/contact"
+            class="block rounded-md bg-indigo-600 px-4 py-2 text-center text-white transition-colors hover:bg-indigo-700"
+          >
+            Get in Touch
+          </a>
+        </div>
+      </aside>
+    </div>
+  </div>
 </Layout>
