@@ -10,6 +10,7 @@ export default defineConfig([
   {
     rules: {
       'comma-dangle': 'off',
+      'prefer-destructuring': 'off',
       '@typescript-eslint/no-magic-numbers': [
         'error',
         {
