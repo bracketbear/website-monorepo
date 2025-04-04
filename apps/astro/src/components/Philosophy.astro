@@ -4,115 +4,55 @@ interface Section {
   description: string;
 }
 
-const colors = [
-  "#f0f4c3",
-  "#ffccbc",
-  "#bbdefb",
-  "#c8e6c9",
-  "#ffe0b2",
-  "#d1c4e9",
-  "#f8bbd0",
-  "#b2ebf2",
-] as const;
-
-const INDEX_INCREMENT = 1;
-
 const values: Section[] = [
   {
-    title: "Get Shit Done",
+    title: 'Get Shit Done',
     description:
       "Taking decisive action is about more than checking items off a to-do list—it's about driving forward progress and delivering meaningful results. Stay agile, adapt quickly, and never lose sight of the bigger picture.",
   },
   {
-    title: "Always Get Better",
+    title: 'Always Get Better',
     description:
-      "The  world is always changing, and so should you. Stay curious, embrace new challenges, and never stop growing.",
+      'The world is always changing, and so should you. Stay curious, embrace new challenges, and never stop growing.',
   },
   {
-    title: "Communicate, Communicate, Communicate",
+    title: 'Communicate, Communicate, Communicate',
     description:
       "Great things in business are never done by one person. They're done by a team of people. Foster open communication, share ideas, and work together to achieve your goals.",
   },
 ];
 ---
 
-<script>
-  const sectionsList = document.querySelectorAll("[data-color-section]");
-  const sectionWrapper = document.querySelector("[data-section-wrapper]");
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const bgColor = entry.target.getAttribute("data-color") ?? "white";
-
-        if (sectionWrapper !== null) {
-          (sectionWrapper as HTMLElement).style.backgroundColor = bgColor;
-        }
-      }
-    });
-  });
-
-  sectionsList.forEach((section) => {
-    observer.observe(section);
-  });
-</script>
-
-<section
-  class="relative bg-blue-400 pt-96 pb-[50vh] transition-colors duration-1000"
-  data-section-wrapper
->
-  <!-- Heading pinned in the center -->
-  <div class="sticky top-1/3 m-0 -translate-y-1/2 text-center">
-    <h1 class="halftone text-9xl font-black uppercase">My Beliefs</h1>
-  </div>
-  {
-    values.map(({ description, title }, index) => (
-      <div
-        class="relative my-400 min-h-[200vh]"
-        data-color-section
-        data-color={colors[index]}
-      >
-        <div class="sticky top-1/2">
-          <p class="m-0 text-center text-4xl font-bold">
-            {index + INDEX_INCREMENT}. {title}
-          </p>
-          <p class="mx-auto mt-6 max-w-xl pb-6 text-center text-lg leading-relaxed text-gray-600">
-            {description}
-          </p>
-        </div>
+<section class="relative">
+  <!-- Brutalist Header -->
+  <div class="bg-cream sticky top-0 z-10 py-24">
+    <div class="container mx-auto px-4">
+      <div class="brutalist-border bg-cream inline-block p-8">
+        <h2 class="text-6xl font-black text-black uppercase">My Philosophy</h2>
       </div>
-    ))
-  }
+      <div class="brutalist-border bg-coral mx-auto mt-8 h-1 w-24"></div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4">
+    {
+      values.map(({ description, title }, index) => (
+        <div class="relative flex min-h-[100vh] items-center justify-center py-24">
+          <div class="sticky top-1/2">
+            <div class="brutalist-border bg-cream mx-auto max-w-2xl p-8 text-center">
+              <span class="brutalist-border bg-coral mb-8 inline-block px-6 py-3 text-lg font-black text-black">
+                {(index + 1).toString().padStart(2, '0')}
+              </span>
+              <h3 class="text-coral mb-6 text-4xl font-black uppercase">
+                {title}
+              </h3>
+              <p class="text-xl leading-relaxed font-bold text-black">
+                {description}
+              </p>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
 </section>
-
-<style>
-  .halftone {
-    position: relative;
-  }
-
-  .halftone::after {
-    content: "Hello";
-    /* This is where the background image and repeat come in */
-    background: var(--halftone) repeat;
-    font-size: 15vw;
-    letter-spacing: 6px;
-    left: calc(50% + 6px);
-    position: absolute;
-    top: calc(50% + 6px);
-    transform: translate(-50%, -50%);
-    z-index: -1;
-
-    /* Equivalent of @include stroke-width(0) */
-    -webkit-text-stroke-width: 0;
-    -moz-text-stroke-width: 0;
-
-    /* Equivalent of @include background-clip(text) */
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
-    background-clip: text;
-
-    /* Equivalent of @include fill-color(transparent) */
-    -webkit-text-fill-color: transparent;
-    -moz-text-fill-color: transparent;
-  }
-</style>

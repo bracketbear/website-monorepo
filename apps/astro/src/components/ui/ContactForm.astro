@@ -1,0 +1,115 @@
+---
+---
+
+<section class="bg-cream py-24">
+  <div class="container mx-auto px-6">
+    <div class="brutalist-border bg-cream p-8">
+      <div class="mb-8">
+        <h2 class="text-4xl font-black uppercase text-black mb-4">
+          Let's Work Together
+        </h2>
+        <p class="text-xl font-bold text-black">
+          Have a project in mind? I'd love to hear about it. Drop me a message and I'll get back to you as soon as possible.
+        </p>
+      </div>
+
+      <form class="space-y-6" action="#" method="POST">
+        <div class="grid gap-6 md:grid-cols-2">
+          <div>
+            <label for="name" class="block text-sm font-black uppercase text-black mb-2">
+              Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              required
+              class="brutalist-border-light bg-cream w-full p-3 font-bold text-black placeholder-black/50 focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="Your name"
+            />
+          </div>
+          <div>
+            <label for="email" class="block text-sm font-black uppercase text-black mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              required
+              class="brutalist-border-light bg-cream w-full p-3 font-bold text-black placeholder-black/50 focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="your@email.com"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="subject" class="block text-sm font-black uppercase text-black mb-2">
+            Subject
+          </label>
+          <input
+            type="text"
+            name="subject"
+            id="subject"
+            required
+            class="brutalist-border-light bg-cream w-full p-3 font-bold text-black placeholder-black/50 focus:outline-none focus:ring-2 focus:ring-black"
+            placeholder="What's this about?"
+          />
+        </div>
+
+        <div>
+          <label for="message" class="block text-sm font-black uppercase text-black mb-2">
+            Message
+          </label>
+          <textarea
+            name="message"
+            id="message"
+            rows="6"
+            required
+            class="brutalist-border-light bg-cream w-full p-3 font-bold text-black placeholder-black/50 focus:outline-none focus:ring-2 focus:ring-black"
+            placeholder="Tell me about your project..."
+          ></textarea>
+        </div>
+
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            class="brutalist-border bg-coral px-8 py-3 text-lg font-black uppercase text-black transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
+          >
+            Send Message
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<style>
+  .container {
+    max-width: 1200px;
+  }
+
+  /* Add a subtle floating animation to the form container */
+  .rounded-2xl {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  /* Gradient animation */
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+</style> 

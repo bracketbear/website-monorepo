@@ -1,0 +1,138 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Contact Us">
+  <div class="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-base-100 to-base-200">
+    <div class="container mx-auto px-4 py-16">
+      <div class="max-w-3xl mx-auto">
+        <div class="text-center mb-12">
+          <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Get in Touch
+          </h1>
+          <p class="text-xl text-base-content/80">
+            Have a question or want to work together? I'd love to hear from you.
+          </p>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <form
+              name="contact-form"
+              method="POST"
+              data-netlify="true"
+              class="grid gap-6 md:grid-cols-2"
+              netlify-honeypot="bot-field"
+            >
+              <input type="hidden" name="form-name" value="contact-form" />
+              <p class="hidden">
+                <label>
+                  Don't fill this out if you're human: <input name="bot-field" />
+                </label>
+              </p>
+              
+              <div class="form-control w-full group">
+                <label class="label">
+                  <span class="label-text text-lg font-medium group-focus-within:text-primary transition-colors">
+                    Your Name
+                  </span>
+                  <span class="label-text-alt text-error">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Jack"
+                  class="input input-bordered w-full focus:input-primary transition-colors"
+                  required
+                />
+              </div>
+              
+              <div class="form-control w-full group">
+                <label class="label">
+                  <span class="label-text text-lg font-medium group-focus-within:text-primary transition-colors">
+                    Your Email Address
+                  </span>
+                  <span class="label-text-alt text-error">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Sparrow"
+                  class="input input-bordered w-full focus:input-primary transition-colors"
+                  required
+                />
+              </div>
+              
+              <div class="form-control w-full md:col-span-2 group">
+                <label class="label">
+                  <span class="label-text text-lg font-medium group-focus-within:text-primary transition-colors">
+                    Subject
+                  </span>
+                  <span class="label-text-alt text-error">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="subject"
+                  placeholder="Why is the rum always gone?"
+                  class="input input-bordered w-full focus:input-primary transition-colors"
+                  required
+                />
+              </div>
+              
+              <div class="form-control w-full md:col-span-2 group">
+                <label class="label">
+                  <span class="label-text text-lg font-medium group-focus-within:text-primary transition-colors">
+                    Your Message
+                  </span>
+                  <span class="label-text-alt text-error">*</span>
+                </label>
+                <textarea
+                  name="message"
+                  placeholder="Did everyone see that? Because I will not be doing it again"
+                  class="textarea textarea-bordered h-64 w-full focus:textarea-primary transition-colors"
+                  required
+                ></textarea>
+              </div>
+              
+              <div class="md:col-span-2 flex flex-col items-center gap-4">
+                <small class="text-base-content/70">
+                  An asterisk (*) means that the field is required.
+                </small>
+                
+                <button 
+                  type="submit" 
+                  class="btn btn-primary btn-lg min-w-[200px] hover:scale-105 active:scale-95 transition-transform"
+                >
+                  Send Message
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .container {
+    max-width: 1200px;
+  }
+
+  /* Add a subtle floating animation to the card */
+  .card {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+</style>

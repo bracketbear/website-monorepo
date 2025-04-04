@@ -1,25 +1,22 @@
 ---
-import { getCollection } from "astro:content";
-import Timeline from "./Timeline.astro";
-import TimelineItem from "./TimelineItem.astro";
-import RetrowaveCard from "./RetrowaveCard.astro";
-import Accordion from "./Accordion.astro";
-import { getKeyedCollection } from "@/utils/content";
-import Logo from "@/assets/bracket-bear-logo.svg";
+import { getCollection } from 'astro:content';
+import Timeline from './Timeline.astro';
+import TimelineItem from './TimelineItem.astro';
+import Accordion from './Accordion.astro';
+import { getKeyedCollection } from '@/utils/content';
 
 interface Props {
-  variant?: "simple" | "detailed";
+  variant?: 'simple' | 'detailed';
 }
 
-const { variant = "detailed" } = Astro.props;
+const { variant = 'detailed' } = Astro.props;
 
-const jobs = await getCollection("workJobs");
-const companies = await getKeyedCollection("workCompany");
-const skillsCollection = await getKeyedCollection("workSkills");
+const jobs = await getCollection('workJobs');
+const companies = await getKeyedCollection('workCompany');
+const skillsCollection = await getKeyedCollection('workSkills');
 
 type Job = (typeof jobs)[0];
 type Company = (typeof companies)[0];
-type SkillItem = (typeof skillsCollection)[string];
 
 // Sort jobs by start date (newest first)
 const sortedJobs = jobs.sort((a, b) => {
@@ -29,14 +26,12 @@ const sortedJobs = jobs.sort((a, b) => {
 });
 
 // Group jobs by company
-const jobsByCompany: Record<Company["id"], Job[]> = sortedJobs.reduce(
-  (acc: Record<Company["id"], Job[]>, job: Job) => {
+const jobsByCompany: Record<Company['id'], Job[]> = sortedJobs.reduce(
+  (acc: Record<Company['id'], Job[]>, job: Job) => {
     const { data } = job;
     const { company: companyKey } = data;
 
-    if (!acc[companyKey]) {
-      acc[companyKey] = [];
-    }
+    acc[companyKey] ||= [];
 
     acc[companyKey].push(job);
     return acc;
@@ -48,7 +43,6 @@ const jobsByCompany: Record<Company["id"], Job[]> = sortedJobs.reduce(
 const sortedCompanies = Object.entries(jobsByCompany)
   .map(([companyKey, companyJobs]) => {
     const { [companyKey]: company } = companies;
-    // Find the most recent job for this company
     const mostRecentJob = companyJobs.reduce((latest, current) => {
       const latestDate = new Date(latest.data.startDate);
       const currentDate = new Date(current.data.startDate);
@@ -65,233 +59,84 @@ const sortedCompanies = Object.entries(jobsByCompany)
 
 // Format job date
 const formatDate = (dateString: string | undefined) => {
-  if (!dateString) return "Present";
-  return new Date(dateString).toLocaleDateString("en-US", {
-    month: "short",
-    year: "numeric",
+  if (!dateString) return 'Present';
+  return new Date(dateString).toLocaleDateString('en-US', {
+    month: 'short',
+    year: 'numeric',
   });
-};
-
-// Format job title and responsibilities
-const formatJobDetails = (
-  job: Job
-): {
-  title: string;
-  description: string;
-  responsibilities: string[];
-  skills: { id: string; title: string }[];
-  startDate: string;
-  endDate: string;
-} => {
-  const { data } = job;
-
-  // Map skill IDs to skill objects with titles
-  const skillsWithTitles = (data.workSkills || []).map((skillId) => {
-    const skill = skillsCollection[skillId];
-    return {
-      id: skillId,
-      title: skill ? skill.data.title : skillId, // Fallback to ID if title not found
-    };
-  });
-
-  return {
-    title: data.title,
-    description: data.description || "",
-    responsibilities: data.responsibilities || [],
-    skills: skillsWithTitles,
-    startDate: formatDate(data.startDate),
-    endDate: formatDate(data.endDate),
-  };
-};
-
-// Generate unique IDs for accordions
-const generateId = (companyId: string, jobIndex: number) =>
-  `job-${companyId}-${jobIndex}`;
-
-// Explicitly define the position for each timeline item
-const getCompanyPosition = (index: number): "start" | "end" => {
-  return index % 2 === 0 ? "start" : "end";
 };
 ---
 
-<div class="timeline-container p-4 @sm:p-6 @md:p-8">
-  <Timeline orientation="vertical" flow="alternating">
+<div class="space-y-16">
+  <h2
+    class="brutalist-border bg-cream inline-block p-6 text-4xl font-black text-black uppercase"
+  >
+    Work History
+  </h2>
+
+  <div class="space-y-12">
     {
-      sortedCompanies.map(({ company, jobs }, index) => {
-        const position = getCompanyPosition(index);
+      sortedCompanies.map(({ company, jobs }) => (
+        <div class="brutalist-border bg-cream p-8">
+          <div class="mb-8">
+            <h3 class="text-2xl font-black text-black uppercase">
+              {company.data.title}
+            </h3>
+            {company.data.description && (
+              <p class="mt-2 font-bold text-black">
+                {company.data.description}
+              </p>
+            )}
+          </div>
 
-        return (
-          <TimelineItem position={position}>
-            <div
-              slot="icon"
-              class="retro-pulse flex items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 p-2 shadow-lg"
-            >
-              <Logo class="h-6 w-6 -rotate-12 fill-white" />
-            </div>
-
-            <RetrowaveCard>
-              <div class="retrowave-content w-full">
-                <div class="text-xl font-bold text-pink-300">
-                  {company.data.title}
-                </div>
-                <div class="text-lg font-semibold text-cyan-300">
-                  {company.data.location}
-                </div>
-
-                {variant === "detailed" && (
-                  <div class="mt-4 space-y-2">
-                    {jobs.map((job, jobIndex) => {
-                      const jobDetails = formatJobDetails(job);
-                      const accordionId =
-                        generateId(company.id, jobIndex) +
-                        (index % 2 === 0 ? "-end" : "");
-
-                      return (
-                        <Accordion
-                          id={accordionId}
-                          variant="arrow"
-                          className="retrowave-accordion"
-                          transparent={true}
-                        >
-                          <div slot="button-content">
-                            <div class="job-header">
-                              <div class="font-semibold text-white">
-                                {jobDetails.title}
-                              </div>
-                              <div class="text-sm text-purple-300">{`${jobDetails.startDate} - ${jobDetails.endDate}`}</div>
-                            </div>
-
-                            {jobDetails.skills.length > 0 && (
-                              <div class="skills-container mt-2">
-                                {jobDetails.skills.map((skill) => (
-                                  <span class="skill-pill">{skill.title}</span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-
-                          {jobDetails.description && (
-                            <p class="mb-4 text-slate-200">
-                              {jobDetails.description}
-                            </p>
-                          )}
-
-                          {jobDetails.responsibilities.length > 0 && (
-                            <ul class="mt-3 list-disc space-y-1 pl-5">
-                              {jobDetails.responsibilities.map(
-                                (responsibility) => (
-                                  <li class="text-slate-200">
-                                    {responsibility}
-                                  </li>
-                                )
-                              )}
-                            </ul>
-                          )}
-                        </Accordion>
-                      );
-                    })}
-                  </div>
+          <div class="relative space-y-8">
+            {jobs.map((job, index) => (
+              <div class="relative">
+                {/* Timeline connector */}
+                {index < jobs.length - 1 && (
+                  <div class="absolute top-12 left-[1.65rem] h-full w-0.5 bg-black" />
                 )}
 
-                {variant === "simple" && jobs.length > 0 && (
-                  <div class="mt-2">
-                    <div class="text-sm font-medium text-purple-300">
-                      {formatJobDetails(jobs[0]).startDate} -{" "}
-                      {jobs[0].data.endDate
-                        ? formatJobDetails(jobs[0]).endDate
-                        : "Present"}
+                <div class="flex gap-6">
+                  {/* Timeline dot */}
+                  <div class="brutalist-border bg-coral mt-1.5 h-8 w-8 shrink-0" />
+
+                  <div class="flex-1">
+                    <div class="mb-4">
+                      <h4 class="text-xl font-black text-black uppercase">
+                        {job.data.title}
+                      </h4>
+                      <p class="font-bold text-black">
+                        {formatDate(job.data.startDate)} -{' '}
+                        {formatDate(job.data.endDate)}
+                      </p>
                     </div>
+
+                    {job.data.description && (
+                      <p class="mb-4 font-bold text-black">
+                        {job.data.description}
+                      </p>
+                    )}
+
+                    {job.data.skills && job.data.skills.length > 0 && (
+                      <div class="flex flex-wrap gap-2">
+                        {job.data.skills.map(
+                          (skillId) =>
+                            skillsCollection[skillId] !== undefined && (
+                              <span class="brutalist-border-light bg-cream px-3 py-1 text-sm font-bold text-black">
+                                {skillsCollection[skillId].data.title}
+                              </span>
+                            )
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
-            </RetrowaveCard>
-          </TimelineItem>
-        );
-      })
+            ))}
+          </div>
+        </div>
+      ))
     }
-  </Timeline>
+  </div>
 </div>
-
-<style>
-  /* Pulsing animation for icons - updated to retrowave effect */
-  @keyframes retro-pulse {
-    0% {
-      box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
-      transform: scale(1);
-    }
-
-    50% {
-      box-shadow: 0 0 15px 3px rgba(219, 39, 119, 0.7);
-      transform: scale(1.05);
-    }
-
-    100% {
-      box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7);
-      transform: scale(1);
-    }
-  }
-
-  .retro-pulse {
-    animation: retro-pulse 3s infinite;
-  }
-
-  /* Retrowave accordion styling */
-  :global(.retrowave-accordion) {
-    background: rgba(30, 14, 40, 0.7) !important;
-    border: 1px solid rgba(219, 39, 119, 0.3);
-    box-shadow: 0 0 5px rgba(219, 39, 119, 0.2);
-    border-radius: 0.5rem;
-    margin-top: 0.5rem;
-  }
-
-  :global(.retrowave-accordion .collapse-title) {
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 600;
-  }
-
-  :global(.retrowave-accordion .collapse-title div:last-child) {
-    color: rgba(139, 92, 246, 0.9);
-  }
-
-  /* Skill pills styling - updated with new colors */
-  .skills-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .skill-pill {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: linear-gradient(
-      135deg,
-      rgba(236, 72, 153, 0.3),
-      rgba(139, 92, 246, 0.3)
-    );
-    border: 1px solid rgba(16, 185, 129, 0.4);
-    color: rgb(167, 243, 208);
-    box-shadow: 0 0 5px rgba(236, 72, 153, 0.4);
-    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-  }
-
-  /* Container styling */
-  .timeline-container {
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Job header and skill pills styling */
-  .job-header {
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Ensure the accordion title spacing works well with our custom content */
-  :global(.retrowave-accordion .collapse-title) {
-    display: block;
-    padding: 1rem;
-  }
-</style>

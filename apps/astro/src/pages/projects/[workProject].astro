@@ -41,173 +41,189 @@ const companyTitle =
   <title>{workProject.data.title} | Bracket Bear</title>
 
   <!-- Hero Section -->
-  <div
-    class="bg-gradient-to-r from-blue-900 to-indigo-800 px-4 py-16 text-white md:px-8"
-  >
-    <div class="container mx-auto max-w-5xl">
-      <h1 class="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">
-        {workProject.data.title}
-      </h1>
+  <div class="bg-cream py-24">
+    <div class="container mx-auto px-6">
+      <div class="brutalist-border bg-cream mb-8 inline-block p-8">
+        <h1 class="text-5xl font-black text-black uppercase">
+          {workProject.data.title}
+        </h1>
+      </div>
+
       {
         category !== undefined && (
-          <span class="mr-2 inline-block rounded-full bg-blue-700 px-3 py-1 text-sm font-medium">
+          <span class="brutalist-border bg-coral px-4 py-2 text-lg font-black text-black">
             {category.data.title}
           </span>
         )
       }
-      <p class="mt-4 max-w-3xl text-lg opacity-90 md:text-xl">
+
+      <p class="mt-8 max-w-3xl text-xl font-bold text-black">
         {workProject.data.description}
       </p>
     </div>
   </div>
 
   <!-- Project Info Bar -->
-  <div class="mb-8 border-b bg-gray-50 px-4 py-4 md:px-8">
-    <div
-      class="container mx-auto flex max-w-5xl flex-wrap items-center gap-y-2"
-    >
-      {
-        job !== undefined && (
-          <div class="mr-8">
-            <h4 class="text-xs font-medium text-gray-500 uppercase">Company</h4>
-            <p class="font-medium">{companyTitle}</p>
-          </div>
-        )
-      }
-      <div class="mr-8">
-        <h4 class="text-xs font-medium text-gray-500 uppercase">Duration</h4>
-        <p class="font-medium">{workProject.data.duration}</p>
+  <div class="bg-cream border-y-2 border-black py-8">
+    <div class="container mx-auto px-6">
+      <div class="brutalist-border bg-cream flex flex-wrap gap-8 p-8">
+        {
+          job !== undefined && (
+            <div>
+              <h4 class="mb-2 text-sm font-black text-black uppercase">
+                Company
+              </h4>
+              <p class="font-bold text-black">{companyTitle}</p>
+            </div>
+          )
+        }
+        <div>
+          <h4 class="mb-2 text-sm font-black text-black uppercase">Duration</h4>
+          <p class="font-bold text-black">{workProject.data.duration}</p>
+        </div>
+        {
+          workProject.data.isFeatured === true && (
+            <div class="ml-auto self-center">
+              <span class="brutalist-border bg-coral px-4 py-2 text-sm font-black text-black">
+                Featured Project
+              </span>
+            </div>
+          )
+        }
       </div>
-      {
-        workProject.data.isFeatured === true && (
-          <div class="ml-auto">
-            <span class="rounded bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">
-              Featured Project
-            </span>
-          </div>
-        )
-      }
     </div>
   </div>
 
   <!-- Main Content -->
-  <div class="container mx-auto max-w-5xl">
-    <div class="grid gap-8 md:grid-cols-3">
-      <!-- Main Column -->
-      <div class="space-y-10 md:col-span-2">
-        <!-- Description -->
-        {
-          workProject.data.description?.trim() !== '' && (
-            <section class="prose max-w-none">
-              <h2 class="mb-4 border-b pb-2 text-2xl font-semibold">
-                Overview
-              </h2>
-              <p>{workProject.data.description}</p>
-            </section>
-          )
-        }
-
-        <!-- Challenges & Solutions -->
-        {
-          workProject.data.challengesAndSolutions?.trim() !== '' && (
-            <section class="prose max-w-none">
-              <h2 class="mb-4 border-b pb-2 text-2xl font-semibold">
-                Challenges & Solutions
-              </h2>
-              <p>{workProject.data.challengesAndSolutions}</p>
-            </section>
-          )
-        }
-
-        <!-- Results -->
-        {
-          workProject.data.resultsAchieved?.trim() !== '' && (
-            <section class="prose max-w-none">
-              <h2 class="mb-4 border-b pb-2 text-2xl font-semibold">
-                Results Achieved
-              </h2>
-              <p>{workProject.data.resultsAchieved}</p>
-            </section>
-          )
-        }
-
-        <!-- Media Gallery -->
-        {
-          (workProject.data.media ?? []).length > 0 && (
-            <section>
-              <h2 class="mb-4 border-b pb-2 text-2xl font-semibold">
-                Project Gallery
-              </h2>
-              {workProject.data.mediaDescription !== undefined && (
-                <p class="mb-4 text-gray-600">
-                  {workProject.data.mediaDescription}
+  <div class="bg-cream py-16">
+    <div class="container mx-auto px-6">
+      <div class="grid gap-8 md:grid-cols-3">
+        <!-- Main Column -->
+        <div class="space-y-16 md:col-span-2">
+          <!-- Description -->
+          {
+            workProject.data.description?.trim() !== '' && (
+              <section class="brutalist-border bg-cream p-8">
+                <h2 class="mb-6 text-2xl font-black text-black uppercase">
+                  Overview
+                </h2>
+                <p class="text-lg font-bold text-black">
+                  {workProject.data.description}
                 </p>
-              )}
-              <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
-                {(workProject.data.media ?? []).map((imageUrl) => (
-                  <div class="h-48 overflow-hidden rounded shadow-lg">
-                    <img
-                      src={imageUrl}
-                      alt="Project media"
-                      class="h-full w-full object-cover transition-transform hover:scale-105"
-                    />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )
-        }
-      </div>
+              </section>
+            )
+          }
 
-      <!-- Sidebar -->
-      <aside class="space-y-8">
-        <!-- Job Info -->
-        {
-          job !== undefined && (
-            <div class="rounded-lg bg-white p-5 shadow">
-              <h3 class="mb-2 text-lg font-medium">Role Info</h3>
-              <p class="mb-3 text-gray-700">
-                {job.data.title} at {companyTitle}
-              </p>
-              {job.data.description?.trim() !== '' && (
-                <p class="text-sm text-gray-600">{job.data.description}</p>
-              )}
-            </div>
-          )
-        }
+          <!-- Challenges & Solutions -->
+          {
+            workProject.data.challengesAndSolutions?.trim() !== '' && (
+              <section class="brutalist-border bg-cream p-8">
+                <h2 class="mb-6 text-2xl font-black text-black uppercase">
+                  Challenges & Solutions
+                </h2>
+                <p class="text-lg font-bold text-black">
+                  {workProject.data.challengesAndSolutions}
+                </p>
+              </section>
+            )
+          }
 
-        <!-- Skills -->
-        {
-          projectSkills.length > 0 && (
-            <div class="rounded-lg bg-white p-5 shadow">
-              <h3 class="mb-3 text-lg font-medium">Technologies Used</h3>
-              <div class="flex flex-wrap gap-2">
-                {projectSkills.map((skill) => (
-                  <span class="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200">
-                    {skill.data.title}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )
-        }
+          <!-- Results -->
+          {
+            workProject.data.resultsAchieved?.trim() !== '' && (
+              <section class="brutalist-border bg-cream p-8">
+                <h2 class="mb-6 text-2xl font-black text-black uppercase">
+                  Results Achieved
+                </h2>
+                <p class="text-lg font-bold text-black">
+                  {workProject.data.resultsAchieved}
+                </p>
+              </section>
+            )
+          }
 
-        <!-- Call to Action -->
-        <div class="rounded-lg border border-indigo-100 bg-indigo-50 p-5">
-          <h3 class="mb-2 text-lg font-medium text-indigo-900">
-            Interested in similar work?
-          </h3>
-          <p class="mb-4 text-sm text-indigo-700">
-            I'd love to discuss how I can help with your project.
-          </p>
-          <a
-            href="/contact"
-            class="block rounded-md bg-indigo-600 px-4 py-2 text-center text-white transition-colors hover:bg-indigo-700"
-          >
-            Get in Touch
-          </a>
+          <!-- Media Gallery -->
+          {
+            (workProject.data.media ?? []).length > 0 && (
+              <section class="brutalist-border bg-cream p-8">
+                <h2 class="mb-6 text-2xl font-black text-black uppercase">
+                  Project Gallery
+                </h2>
+                {workProject.data.mediaDescription !== undefined && (
+                  <p class="mb-6 text-lg font-bold text-black">
+                    {workProject.data.mediaDescription}
+                  </p>
+                )}
+                <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
+                  {(workProject.data.media ?? []).map((imageUrl) => (
+                    <div class="brutalist-border bg-cream aspect-video overflow-hidden">
+                      <img
+                        src={imageUrl}
+                        alt="Project media"
+                        class="h-full w-full object-cover transition-transform hover:scale-105"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )
+          }
         </div>
-      </aside>
+
+        <!-- Sidebar -->
+        <aside class="space-y-8">
+          <!-- Job Info -->
+          {
+            job !== undefined && (
+              <div class="brutalist-border bg-cream p-8">
+                <h3 class="mb-4 text-xl font-black text-black uppercase">
+                  Role Info
+                </h3>
+                <p class="mb-4 font-bold text-black">
+                  {job.data.title} at {companyTitle}
+                </p>
+                {job.data.description?.trim() !== '' && (
+                  <p class="font-bold text-black">{job.data.description}</p>
+                )}
+              </div>
+            )
+          }
+
+          <!-- Skills -->
+          {
+            projectSkills.length > 0 && (
+              <div class="brutalist-border bg-cream p-8">
+                <h3 class="mb-4 text-xl font-black text-black uppercase">
+                  Technologies Used
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                  {projectSkills.map((skill) => (
+                    <span class="brutalist-border-light bg-cream px-3 py-1 text-sm font-bold text-black">
+                      {skill.data.title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+
+          <!-- Call to Action -->
+          <div class="brutalist-border bg-coral p-8">
+            <h3 class="mb-4 text-xl font-black text-black uppercase">
+              Interested in similar work?
+            </h3>
+            <p class="mb-6 font-bold text-black">
+              I'd love to discuss how I can help with your project.
+            </p>
+            <a
+              href="/contact"
+              class="brutalist-border bg-cream block py-3 text-center text-lg font-black text-black uppercase transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
+            >
+              Get in Touch
+            </a>
+          </div>
+        </aside>
+      </div>
     </div>
   </div>
 </Layout>

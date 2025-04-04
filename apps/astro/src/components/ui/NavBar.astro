@@ -1,35 +1,109 @@
 ---
-import Logo from "@/assets/bracket-bear-logo.svg";
-import { navItems } from "@/config/navigation";
+import Logo from '@/assets/bracket-bear-logo.svg';
+import { navItems } from '@/config/navigation';
 ---
 
-<nav
-  class="sticky top-0 z-50 border-t-4 border-b-4 border-solid border-white bg-gray-950 text-white"
->
-  <div class="container mx-auto flex items-center justify-between">
-    <div class="flex items-center">
+<nav class="bg-cream border-y-2 border-black">
+  <div class="container mx-auto flex items-center justify-between px-6 py-4">
+    <!-- Logo Section -->
+    <div class="flex items-center gap-6">
       <div
-        class="bg-primary flex h-16 w-18 items-center justify-center border-r-4 border-l-4 border-solid border-white"
+        class="brutalist-border bg-cream flex h-16 w-16 items-center justify-center"
       >
-        <Logo class="h-6 fill-amber-50" />
+        <Logo class="h-8 text-black" />
       </div>
-      <div class="pl-2 text-2xl font-bold">
-        <a href="/">Bracket Bear</a>
+      <div class="text-2xl font-black tracking-tight uppercase">
+        <a href="/" class="text-black hover:opacity-80">Bracket Bear</a>
       </div>
     </div>
-    <ul class="flex space-x-8">
-      {
-        navItems.map((item) => (
-          <li>
-            <a
-              class="hover:text-primary cursor-pointer font-bold text-white"
-              href={item.href}
-            >
-              {item.name}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+
+    <!-- Navigation Links -->
+    <div class="flex items-center gap-8">
+      <ul class="flex gap-8">
+        {
+          navItems.map((item) => (
+            <li class="relative group">
+              {item.children ? (
+                <div>
+                  <button
+                    class="group relative font-black text-black uppercase inline-flex items-center"
+                  >
+                    {item.name}
+                    <svg
+                      class="w-4 h-4 ml-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                    <span class="absolute -bottom-1 left-0 h-0.5 w-0 bg-black transition-all duration-300 group-hover:w-full" />
+                  </button>
+                  <!-- Dropdown menu -->
+                  <div class="absolute left-0 mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                    <div class="brutalist-border bg-cream py-4 shadow-[8px_8px_0_0_#111111]">
+                      {item.children.map((child) => (
+                        <a
+                          href={child.href}
+                          class="block px-4 py-4 text-sm font-black text-black uppercase hover:bg-black hover:text-cream transition-colors"
+                        >
+                          {child.name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <a
+                  class="group relative font-black text-black uppercase transition-all hover:translate-x-[-1px] hover:translate-y-[-1px]"
+                  href={item.href}
+                >
+                  {item.name}
+                  <span class="absolute -bottom-1 left-0 h-0.5 w-0 bg-black transition-all duration-300 group-hover:w-full" />
+                </a>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+
+      <!-- LinkedIn Button -->
+      <a
+        href="https://linkedin.com"
+        class="brutalist-border flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111]"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="text-cream"
+        >
+          <path
+            d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+          ></path>
+        </svg>
+      </a>
+    </div>
   </div>
 </nav>
+
+<style>
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+</style>

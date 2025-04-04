@@ -1,12 +1,12 @@
 ---
-import { getCollection } from "astro:content";
-import { getKeyedCollection } from "@/utils/content";
-import { getProjectUrl } from "@/utils/navigation";
+import { getCollection } from 'astro:content';
+import { getKeyedCollection } from '@/utils/content';
+import { getProjectUrl } from '@/utils/navigation';
 
-const workProjects = await getCollection("workProject");
-const workSkillsById = await getKeyedCollection("workSkills");
+const workProjects = await getCollection('workProject');
+const workSkillsById = await getKeyedCollection('workSkills');
 const workProjectCatergoriesById = await getKeyedCollection(
-  "workProjectCategory"
+  'workProjectCategory'
 );
 
 const workProjectsByType = workProjects.reduce<
@@ -27,45 +27,61 @@ const workProjectsByType = workProjects.reduce<
 }, {});
 ---
 
-<div>
+<div class="space-y-16">
   {
     Object.entries(workProjectsByType).map(([type, projects]) => (
-      <div class="my-8">
-        <h2 class="sticky top-0 z-10 -m-4 bg-white p-4 text-3xl font-bold text-gray-900">
+      <div>
+        <h2 class="brutalist-border bg-cream mb-8 inline-block p-4 text-2xl font-black text-black uppercase">
           {workProjectCatergoriesById[type].data.title}
         </h2>
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid gap-8 md:grid-cols-2">
           {projects.map((project) => (
-            <div class="card bg-base-100 shadow-sm">
-              <figure>
-                <img
-                  src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                  alt="Shoes"
-                />
-              </figure>
-              <div class="card-body">
-                <a href={getProjectUrl(project.id)}>
-                  <h2 class="card-title">
-                    {project.data.title}
-                    <div class="badge badge-secondary">NEW</div>
-                  </h2>
-                </a>
-                <p>{project.data.description}</p>
-                <div>
-                  <div class="text-accent-content pb-1 font-bold">Skills:</div>
-                  <div class="card-actions">
-                    {project.data.skills?.map(
-                      (skillId) =>
-                        workSkillsById[skillId] !== undefined && (
-                          <div class="badge badge-ghost">
-                            {workSkillsById[skillId].data.title}
-                          </div>
-                        )
-                    )}
-                  </div>
+            <a
+              href={getProjectUrl(project.id)}
+              class="brutalist-border bg-cream group block overflow-hidden transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
+            >
+              {project.data.media && project.data.media.length > 0 && (
+                <div class="aspect-video w-full overflow-hidden border-b-2 border-black">
+                  <img
+                    src={project.data.media[0]}
+                    alt={project.data.title}
+                    class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
                 </div>
+              )}
+              <div class="p-6">
+                <div class="mb-4 flex items-center justify-between">
+                  <h3 class="text-xl font-black text-black uppercase">
+                    {project.data.title}
+                  </h3>
+                  {project.data.isFeatured && (
+                    <span class="brutalist-border bg-coral px-3 py-1 text-sm font-bold text-black">
+                      Featured
+                    </span>
+                  )}
+                </div>
+                <p class="mb-4 font-bold text-black">
+                  {project.data.description}
+                </p>
+                {project.data.skills && project.data.skills.length > 0 && (
+                  <div>
+                    <div class="mb-2 text-sm font-bold text-black uppercase">
+                      Technologies
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                      {project.data.skills.map(
+                        (skillId) =>
+                          workSkillsById[skillId] !== undefined && (
+                            <span class="brutalist-border-light bg-cream px-3 py-1 text-sm font-bold text-black">
+                              {workSkillsById[skillId].data.title}
+                            </span>
+                          )
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </div>

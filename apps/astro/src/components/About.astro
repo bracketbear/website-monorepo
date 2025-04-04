@@ -1,30 +1,99 @@
-<div class="bg-gradient-to-bl from-[#1e3a8a] to-[#9333ea] py-[50vh]">
-  <div
-    class="container mx-auto grid h-full grid-cols-1 items-center justify-center gap-x-8 gap-y-32 lg:grid-cols-2"
-  >
-    <div class="flex min-h-screen flex-col items-center justify-center">
-      <div class="text-4xl font-bold text-teal-200 drop-shadow-lg">
-        I am a software engineer with a passion for using technology to unlock
-        creativity and solve problems.
-      </div>
-      <div class="text-secondary-content text-lg font-bold">
-        A full-stack software engineer by trade, my coding outlet is exploring
-        the space between design and technology. I love to merge the two worlds
-        together to create beautiful and functional applications that use clean
-        architecture and design patterns.
-      </div>
+---
+interface Section {
+  title: string;
+  content: string;
+}
+
+const aboutSections: Section[] = [
+  {
+    title: 'Crafting Digital Experiences',
+    content:
+      'I build software that not only works but also delights. At the intersection of creativity and technology, I find the perfect balance between functionality and aesthetics.',
+  },
+  {
+    title: 'Beyond the Code',
+    content:
+      "Great software isn't just about writing code—it's about understanding people. I focus on creating intuitive experiences that users love, backed by robust engineering.",
+  },
+  {
+    title: 'Always Learning, Always Growing',
+    content:
+      'The tech landscape evolves rapidly, and so do I. I embrace new challenges, learn from every project, and write code that stands the test of time.',
+  },
+];
+
+const skills = [
+  {
+    category: 'Frontend',
+    items: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS'],
+  },
+  {
+    category: 'Backend',
+    items: ['Node.js', 'Python', 'PostgreSQL', 'GraphQL'],
+  },
+  { category: 'Tools', items: ['Git', 'Docker', 'AWS', 'Figma'] },
+];
+
+const timeline = [
+  {
+    year: '2023',
+    title: 'Senior Software Engineer',
+    company: 'TechCorp',
+    description:
+      'Leading frontend architecture and mentoring junior developers.',
+  },
+  {
+    year: '2021',
+    title: 'Software Engineer',
+    company: 'StartupX',
+    description: 'Built and scaled core product features from the ground up.',
+  },
+  {
+    year: '2019',
+    title: 'Junior Developer',
+    company: 'DigitalAgency',
+    description: 'Cut my teeth on real-world projects and client work.',
+  },
+];
+---
+
+<section class="relative">
+  <div class="container mx-auto px-4">
+    <div class="brutalist-border bg-cream inline-block p-8">
+      <h2 class="text-6xl font-black text-black uppercase">About Me</h2>
     </div>
-    <div
-      class="col-start-2 row-start-2 flex min-h-screen flex-col items-center justify-center"
-    >
-      <div class="text-4xl font-bold text-teal-200 drop-shadow-lg">
-        Here's another way to say it:
-      </div>
-      <div class="text-secondary-content text-lg font-bold">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Inventore
-        expedita ex alias eius rerum iusto voluptatem dolorem recusandae! Quos,
-        quasi nam eius aut laborum eos id autem repellendus odit corporis!
-      </div>
+    <div class="brutalist-border bg-coral mx-auto mt-8 h-1 w-24"></div>
+
+    <div class="mt-16 grid gap-8 md:grid-cols-3">
+      {
+        aboutSections.map(({ title, content }) => (
+          <div class="brutalist-border bg-cream p-8">
+            <h3 class="mb-4 text-2xl font-black text-black uppercase">
+              {title}
+            </h3>
+            <p class="text-lg font-bold text-black">{content}</p>
+          </div>
+        ))
+      }
     </div>
   </div>
-</div>
+</section>
+
+<style>
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .gradient-animate {
+    background-size: 200% 200%;
+    animation: gradient-shift 15s ease infinite;
+  }
+</style>

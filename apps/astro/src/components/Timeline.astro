@@ -1,28 +1,36 @@
 ---
 interface Props {
-  orientation?: "vertical" | "horizontal";
-  flow?: "start" | "end" | "alternating";
+  orientation?: 'vertical' | 'horizontal';
+  flow?: 'start' | 'end' | 'alternating';
 }
 
-const orientationValue = Astro.props.orientation ?? "vertical";
-const flow = Astro.props.flow ?? "start"; // default to everything on the start side
+const orientationValue = Astro.props.orientation ?? 'vertical';
+const flow = Astro.props.flow ?? 'start';
 ---
 
-<div class="@container">
+<div class="@container relative py-8">
+  <div
+    class="timeline-line absolute inset-y-0 left-1/2 w-[2px] -translate-x-1/2"
+  >
+    <div
+      class="h-full bg-gradient-to-b from-transparent via-indigo-300/30 to-transparent"
+    >
+    </div>
+  </div>
+
   <ul
     class:list={[
-      "timeline-progress text-accent-content relative flex list-none p-0",
+      'relative flex list-none p-0',
       {
-        "flex-row": orientationValue === "horizontal",
-        "flex-col": orientationValue === "vertical",
-        "timeline-horizontal": orientationValue === "horizontal",
-        "timeline-vertical": orientationValue === "vertical",
-        "timeline-start": flow === "start",
-        "timeline-end": flow === "end",
-        "timeline-alternating": flow === "alternating",
+        'flex-row': orientationValue === 'horizontal',
+        'flex-col': orientationValue === 'vertical',
+        'timeline-horizontal': orientationValue === 'horizontal',
+        'timeline-vertical': orientationValue === 'vertical',
+        'timeline-start': flow === 'start',
+        'timeline-end': flow === 'end',
+        'timeline-alternating': flow === 'alternating',
       },
-      // Container query based gaps
-      "gap-2 @xs:gap-3 @sm:gap-4 @md:gap-6 @lg:gap-8 @xl:gap-10",
+      'gap-16',
     ]}
     data-flow={flow}
   >
@@ -31,34 +39,56 @@ const flow = Astro.props.flow ?? "start"; // default to everything on the start 
 </div>
 
 <style>
-  /* Define the middle size CSS variable - this is used by TimelineItem */
-  :root {
-    --timeline-middle-size: 1.5rem;
+  /* Timeline positioning classes */
+  :global(.timeline-item-start) {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 50%;
+    padding-left: 0;
+  }
+
+  :global(.timeline-item-end) {
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 50%;
+    padding-right: 0;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .timeline-line {
+      left: 1.5rem;
+    }
+
+    :global(.timeline-item-start),
+    :global(.timeline-item-end) {
+      justify-content: flex-start;
+      padding-left: 3rem;
+      padding-right: 1rem;
+    }
   }
 </style>
 
 <script>
   // Handle positioning of timeline items based on flow
-  document.addEventListener("astro:page-load", () => {
+  document.addEventListener('astro:page-load', () => {
     document
-      .querySelectorAll(".timeline-vertical, .timeline-horizontal")
+      .querySelectorAll('.timeline-vertical, .timeline-horizontal')
       .forEach((timeline) => {
-        const flow = timeline.getAttribute("data-flow");
-        const items = timeline.querySelectorAll("li");
+        const flow = timeline.getAttribute('data-flow');
+        const items = timeline.querySelectorAll('li');
 
         items.forEach((item, index) => {
-          if (flow === "start") {
-            item.classList.add("timeline-item-start");
-          } else if (flow === "end") {
-            item.classList.add("timeline-item-end");
-          } else if (flow === "alternating") {
+          if (flow === 'start') {
+            item.classList.add('timeline-item-start');
+          } else if (flow === 'end') {
+            item.classList.add('timeline-item-end');
+          } else if (flow === 'alternating') {
             item.classList.add(
-              index % 2 === 0 ? "timeline-item-start" : "timeline-item-end"
+              index % 2 === 0 ? 'timeline-item-start' : 'timeline-item-end'
             );
           }
         });
       });
   });
-
-  // Remove the scroll-based timeline filling effect code
 </script>

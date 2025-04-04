@@ -1,10 +1,119 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+@theme {
+  --color-cream: hsl(28, 80%, 70%);
+}
+
+:root {
+  --coral: #ff8b8b;
+  --cream: hsl(28, 80%, 70%);
+  --black: #111111;
+}
+
+/* Base styles for brutalist theme */
+body {
+  background-color: var(--cream);
+  color: var(--black);
+}
+
+/* Brutalist utility classes */
+.brutalist-border {
+  border: 2px solid var(--black);
+  box-shadow: 4px 4px 0 var(--black);
+}
+
+.brutalist-border-light {
+  border: 1px solid var(--black);
+}
+
+.gradient-text {
+  color: var(--coral);
+  font-weight: 900;
+}
+
+.gradient-bg {
+  background-color: var(--coral);
+  color: var(--black);
+}
+
+.gradient-bg-subtle {
+  background-color: var(--cream);
+  border: 2px solid var(--coral);
+}
+
+.gradient-border {
+  position: relative;
+  border: 2px solid var(--black);
+  background-color: var(--cream);
+  box-shadow: 4px 4px 0 var(--black);
+  transition: all 0.2s ease;
+}
+
+.gradient-border:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--black);
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Inter", sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
 @layer base {
   h1 {
     font-size: var(--text-9xl);
     font-weight: var(--font-weight-black);
     line-height: var(--line-height-1);
+  }
+}
+
+@layer utilities {
+  .gradient-text {
+    background: linear-gradient(
+      to right,
+      var(--gradient-orange),
+      var(--gradient-yellow)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .gradient-border {
+    background: linear-gradient(
+      to bottom right,
+      var(--gradient-orange),
+      var(--gradient-yellow)
+    );
+    padding: 1px;
+  }
+
+  .gradient-bg {
+    background: linear-gradient(
+      to right,
+      var(--gradient-orange),
+      var(--gradient-yellow)
+    );
+  }
+
+  .gradient-bg-subtle {
+    background: linear-gradient(
+      to right,
+      rgba(255, 69, 0, 0.2),
+      rgba(255, 194, 97, 0.2)
+    );
+  }
+
+  .gradient-bg-radial {
+    @apply bg-gradient-to-br from-orange-400 to-yellow-500;
   }
 }
