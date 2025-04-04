@@ -9,7 +9,10 @@ import '../styles/global.css';
 
 <Layout>
   <!-- Brutalist Header Section -->
-  <header class="bg-cream relative overflow-hidden py-24">
+  <header class="bg-cream relative z-0 overflow-hidden py-24">
+    <canvas
+      id="particle-canvas"
+      class="fixed top-0 left-0 -z-10 h-screen w-screen"></canvas>
     <div class="relative z-10 container mx-auto px-6">
       <div class="mb-16 max-w-4xl">
         <div class="brutalist-border bg-cream inline-block p-8">
@@ -53,8 +56,8 @@ import '../styles/global.css';
     </section>
 
     <!-- Projects Section -->
-    <section id="projects" class="py-24">
-      <div class="container mx-auto px-6">
+    <section id="projects" class="relative py-24">
+      <div class="relative z-10 container mx-auto px-6">
         <h2
           class="brutalist-border bg-cream mb-16 inline-block p-6 text-5xl font-black tracking-tight text-black uppercase"
         >
@@ -107,3 +110,164 @@ import '../styles/global.css';
     animation: gradient-shift 15s ease infinite;
   }
 </style>
+
+<script>
+  interface Particle {
+    x: number;
+    y: number;
+    size: number;
+    speedX: number;
+    speedY: number;
+    rotation: number;
+    rotationSpeed: number;
+    type: 'plus' | 'logo';
+  }
+
+  class ParticleAnimation {
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D;
+    private particles: Particle[];
+    private particleCount: number;
+    private logoImage: HTMLImageElement;
+
+    constructor() {
+      this.canvas = document.getElementById(
+        'particle-canvas'
+      ) as HTMLCanvasElement;
+      this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
+      this.particles = [];
+      this.particleCount = 50;
+      this.logoImage = new Image();
+      this.logoImage.src = '/favicon.svg';
+
+      this.init();
+      this.animate();
+    }
+
+    private init(): void {
+      // Set canvas size
+      const resize = (): void => {
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.width = this.canvas.offsetWidth * dpr;
+        this.canvas.height = this.canvas.offsetHeight * dpr;
+        this.ctx.scale(dpr, dpr);
+      };
+
+      window.addEventListener('resize', resize);
+      resize();
+
+      // Create initial particles
+      for (let i = 0; i < this.particleCount; i++) {
+        this.particles.push(this.createParticle());
+      }
+    }
+
+    private createParticle(): Particle {
+      return {
+        x: Math.random() * this.canvas.width,
+        y: Math.random() * this.canvas.height,
+        size: Math.random() * 20 + 10,
+        speedX: Math.random() * 2 - 1,
+        speedY: Math.random() * 2 - 1,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.02,
+        type: Math.random() < 0.2 ? 'logo' : 'plus',
+      };
+    }
+
+    private drawPlus(
+      x: number,
+      y: number,
+      size: number,
+      rotation: number
+    ): void {
+      this.ctx.save();
+      this.ctx.translate(x, y);
+      this.ctx.rotate(rotation);
+
+      this.ctx.strokeStyle = '#000';
+      this.ctx.lineWidth = 2;
+      this.ctx.beginPath();
+
+      // Horizontal line
+      this.ctx.moveTo(-size / 2, 0);
+      this.ctx.lineTo(size / 2, 0);
+
+      // Vertical line
+      this.ctx.moveTo(0, -size / 2);
+      this.ctx.lineTo(0, size / 2);
+
+      this.ctx.stroke();
+      this.ctx.restore();
+    }
+
+    private drawLogo(
+      x: number,
+      y: number,
+      size: number,
+      rotation: number
+    ): void {
+      this.ctx.save();
+      this.ctx.translate(x, y);
+      this.ctx.rotate(rotation);
+
+      // Draw the logo
+      if (this.logoImage.complete) {
+        const aspectRatio = this.logoImage.width / this.logoImage.height;
+        const width = size;
+        const height = size / aspectRatio;
+
+        this.ctx.drawImage(
+          this.logoImage,
+          -width / 2,
+          -height / 2,
+          width,
+          height
+        );
+      }
+
+      this.ctx.restore();
+    }
+
+    private animate(): void {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+      this.particles.forEach((particle: Particle) => {
+        // Update position
+        particle.x += particle.speedX;
+        particle.y += particle.speedY;
+        particle.rotation += particle.rotationSpeed;
+
+        // Wrap around edges
+        if (particle.x < 0) particle.x = this.canvas.width;
+        if (particle.x > this.canvas.width) particle.x = 0;
+        if (particle.y < 0) particle.y = this.canvas.height;
+        if (particle.y > this.canvas.height) particle.y = 0;
+
+        // Draw particle based on type
+        if (particle.type === 'logo') {
+          this.drawLogo(
+            particle.x,
+            particle.y,
+            particle.size,
+            particle.rotation
+          );
+        } else {
+          this.drawPlus(
+            particle.x,
+            particle.y,
+            particle.size,
+            particle.rotation
+          );
+        }
+      });
+
+      requestAnimationFrame(() => this.animate());
+    }
+  }
+
+  // Initialize animation when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    new ParticleAnimation();
+  });
+</script>
