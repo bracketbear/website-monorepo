@@ -20,19 +20,56 @@ import '../styles/global.css';
             Bracket<br />Bear
           </h1>
         </div>
-        <p class="mt-8 text-2xl font-bold tracking-tight text-black uppercase">
-          Software Engineer.<br />Problem Solver.<br />Creative Developer.
-        </p>
+        <div class="snake-text-container mt-8">
+          <p
+            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
+            style="--index: 0"
+          >
+            Software Engineer.
+          </p>
+          <p
+            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
+            style="--index: 1"
+          >
+            Problem Solver.
+          </p>
+          <p
+            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
+            style="--index: 2"
+          >
+            Creative Developer.
+          </p>
+          <p
+            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
+            style="--index: 3"
+          >
+            Software Engineer.
+          </p>
+          <p
+            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
+            style="--index: 4"
+          >
+            Problem Solver.
+          </p>
+          <p
+            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
+            style="--index: 5"
+          >
+            Creative Developer.
+          </p>
+        </div>
       </div>
       <!-- Availability Announcement -->
-      <div class="absolute top-24 right-6 w-96">
+      <div
+        class="mt-16 w-full lg:absolute lg:top-24 lg:right-6 lg:mt-0 lg:w-96"
+      >
         <div
-          class="availability-box brutalist-border rotate-2 transform bg-black p-6"
+          class="availability-box brutalist-border transform bg-black p-6 lg:rotate-2"
         >
           <h2
             class="text-cream mb-2 text-4xl font-black tracking-tight uppercase"
           >
-            Available Now
+            Available Now!
           </h2>
           <p class="text-cream mb-4 text-xl font-bold">
             Open to <span class="bg-cream px-2 py-1 text-black">full-time</span>
@@ -160,6 +197,39 @@ import '../styles/global.css';
     transform-style: preserve-3d;
     transition: transform 0.3s ease;
   }
+
+  .snake-text-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .snake-text {
+    position: relative;
+    transform-origin: left;
+    animation: snake 8s ease-in-out infinite;
+    animation-delay: calc(var(--index) * 0.2s);
+  }
+
+  @keyframes snake {
+    0%,
+    100% {
+      transform: translateX(0) rotate(0deg);
+    }
+    20% {
+      transform: translateX(20px) rotate(2deg);
+    }
+    40% {
+      transform: translateX(40px) rotate(-2deg);
+    }
+    60% {
+      transform: translateX(20px) rotate(1deg);
+    }
+    80% {
+      transform: translateX(10px) rotate(-1deg);
+    }
+  }
 </style>
 
 <script>
@@ -171,7 +241,7 @@ import '../styles/global.css';
     speedY: number;
     rotation: number;
     rotationSpeed: number;
-    type: 'plus' | 'logo';
+    type: 'plus' | 'logo' | 'dot';
   }
 
   class ParticleAnimation {
@@ -250,7 +320,8 @@ import '../styles/global.css';
         speedY: Math.random() * 2 - 1,
         rotation: Math.random() * Math.PI * 2,
         rotationSpeed: (Math.random() - 0.5) * 0.02,
-        type: Math.random() < 0.2 ? 'logo' : 'plus',
+        type:
+          Math.random() < 0.2 ? 'logo' : Math.random() < 0.5 ? 'plus' : 'dot',
       };
     }
 
@@ -264,7 +335,7 @@ import '../styles/global.css';
       this.ctx.translate(x, y);
       this.ctx.rotate(rotation);
 
-      this.ctx.strokeStyle = '#000';
+      this.ctx.strokeStyle = 'rgba(191, 87, 0, 0.3)';
       this.ctx.lineWidth = 2;
       this.ctx.beginPath();
 
@@ -290,6 +361,11 @@ import '../styles/global.css';
       this.ctx.translate(x, y);
       this.ctx.rotate(rotation);
 
+      // Apply the dark orange tint to the logo
+      this.ctx.globalAlpha = 0.3;
+      this.ctx.filter =
+        'sepia(100%) hue-rotate(-15deg) saturate(400%) brightness(50%)';
+
       // Draw the logo
       if (this.logoImage.complete) {
         const aspectRatio = this.logoImage.width / this.logoImage.height;
@@ -304,6 +380,27 @@ import '../styles/global.css';
           height
         );
       }
+
+      this.ctx.restore();
+    }
+
+    private drawDot(
+      x: number,
+      y: number,
+      size: number,
+      rotation: number
+    ): void {
+      this.ctx.save();
+      this.ctx.translate(x, y);
+
+      const color = 'rgba(191, 87, 0, 0.3)';
+      this.ctx.strokeStyle = color;
+      this.ctx.fillStyle = color;
+      this.ctx.lineWidth = 2;
+      this.ctx.beginPath();
+
+      this.ctx.arc(0, 0, size / 6, 0, Math.PI * 2);
+      this.ctx.fill();
 
       this.ctx.restore();
     }
@@ -331,8 +428,16 @@ import '../styles/global.css';
             particle.size,
             particle.rotation
           );
-        } else {
+        } else if (particle.type === 'plus') {
           this.drawPlus(
+            particle.x,
+            particle.y,
+            particle.size,
+            particle.rotation
+          );
+        } else {
+          // dot
+          this.drawDot(
             particle.x,
             particle.y,
             particle.size,

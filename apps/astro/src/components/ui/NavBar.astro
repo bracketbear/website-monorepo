@@ -21,20 +21,18 @@ interface Props {
       </div>
     </div>
 
-    <!-- Navigation Links -->
-    <div class="flex items-center gap-8">
+    <!-- Desktop Navigation -->
+    <div class="hidden items-center gap-8 md:flex">
       <ul class="flex gap-8">
         {
           navItems.map((item) => (
-            <li class="relative group">
+            <li class="group relative">
               {item.children ? (
                 <div>
-                  <button
-                    class="group relative font-black text-black uppercase inline-flex items-center"
-                  >
+                  <button class="group relative inline-flex items-center font-black text-black uppercase">
                     {item.name}
                     <svg
-                      class="w-4 h-4 ml-1"
+                      class="ml-1 h-4 w-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -48,13 +46,12 @@ interface Props {
                     </svg>
                     <span class="absolute -bottom-1 left-0 h-0.5 w-0 bg-black transition-all duration-300 group-hover:w-full" />
                   </button>
-                  <!-- Dropdown menu -->
-                  <div class="absolute left-0 mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                  <div class="invisible absolute left-0 z-50 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100">
                     <div class="brutalist-border bg-cream py-4 shadow-[8px_8px_0_0_#111111]">
                       {item.children.map((child) => (
                         <a
                           href={child.href}
-                          class="block px-4 py-4 text-sm font-black text-black uppercase hover:bg-black hover:text-cream transition-colors"
+                          class="hover:text-cream block px-4 py-4 text-sm font-black text-black uppercase transition-colors hover:bg-black"
                         >
                           {child.name}
                         </a>
@@ -95,8 +92,157 @@ interface Props {
         </svg>
       </a>
     </div>
+
+    <!-- Mobile Menu Button -->
+    <button
+      id="mobile-menu-button"
+      class="brutalist-border p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111] md:hidden"
+    >
+      <svg
+        class="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div
+    id="mobile-menu"
+    class="brutalist-border bg-cream fixed top-0 right-0 z-50 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
+  >
+    <div class="p-6">
+      <button
+        id="close-menu-button"
+        class="brutalist-border absolute top-4 right-4 p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111]"
+      >
+        <svg
+          class="h-6 w-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <ul class="mt-8 space-y-4">
+        {
+          navItems.map((item) => (
+            <li>
+              {item.children ? (
+                <div class="space-y-2">
+                  <div class="font-black text-black uppercase">{item.name}</div>
+                  <ul class="space-y-2 pl-4">
+                    {item.children.map((child) => (
+                      <li>
+                        <a
+                          href={child.href}
+                          class="block font-bold text-black uppercase transition-transform hover:translate-x-1"
+                        >
+                          {child.name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <a
+                  href={item.href}
+                  class="block font-black text-black uppercase transition-transform hover:translate-x-1"
+                >
+                  {item.name}
+                </a>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+
+      <!-- Mobile LinkedIn Button -->
+      <a
+        href="https://linkedin.com"
+        class="brutalist-border mt-8 flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111]"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="text-cream"
+        >
+          <path
+            d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+          ></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div
+    id="mobile-menu-overlay"
+    class="fixed inset-0 z-40 hidden bg-black/60 opacity-0 transition-opacity duration-300"
+    style="background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.4) 1px, transparent 1px); background-size: 8px 8px;"
+  >
   </div>
 </nav>
+
+<script>
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const closeMenuButton = document.getElementById('close-menu-button');
+  const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+  const openMenu = () => {
+    mobileMenu?.classList.remove('translate-x-full');
+    mobileMenuOverlay?.classList.remove('hidden');
+    // Add a small delay to trigger the opacity transition
+    setTimeout(() => {
+      mobileMenuOverlay?.classList.add('opacity-50');
+    }, 10);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeMenu = () => {
+    mobileMenu?.classList.add('translate-x-full');
+    mobileMenuOverlay?.classList.remove('opacity-50');
+    // Wait for the fade out transition before hiding
+    setTimeout(() => {
+      mobileMenuOverlay?.classList.add('hidden');
+    }, 300);
+    document.body.style.overflow = '';
+  };
+
+  mobileMenuButton?.addEventListener('click', openMenu);
+  closeMenuButton?.addEventListener('click', closeMenu);
+
+  // Close menu when clicking overlay
+  mobileMenuOverlay?.addEventListener('click', closeMenu);
+
+  // Close menu when clicking outside (keeping this as a backup)
+  document.addEventListener('click', (e) => {
+    if (
+      !mobileMenu?.contains(e.target as Node) &&
+      !mobileMenuButton?.contains(e.target as Node) &&
+      !mobileMenu?.classList.contains('translate-x-full')
+    ) {
+      closeMenu();
+    }
+  });
+</script>
 
 <style>
   @keyframes gradient-shift {
