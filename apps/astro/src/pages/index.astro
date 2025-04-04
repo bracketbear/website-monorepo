@@ -24,6 +24,30 @@ import '../styles/global.css';
           Software Engineer.<br />Problem Solver.<br />Creative Developer.
         </p>
       </div>
+      <!-- Availability Announcement -->
+      <div class="absolute top-24 right-6 w-96">
+        <div
+          class="availability-box brutalist-border rotate-2 transform bg-black p-6"
+        >
+          <h2
+            class="text-cream mb-2 text-4xl font-black tracking-tight uppercase"
+          >
+            Available Now
+          </h2>
+          <p class="text-cream mb-4 text-xl font-bold">
+            Open to <span class="bg-cream px-2 py-1 text-black">full-time</span>
+            and <span class="bg-cream px-2 py-1 text-black">contract</span> roles.<br
+            />
+            Let's build something amazing together.
+          </p>
+          <a
+            href="mailto:contact@bracketbear.com"
+            class="brutalist-border bg-cream inline-block px-6 py-3 text-lg font-black text-black transition-transform hover:scale-105"
+          >
+            Let's Talk →
+          </a>
+        </div>
+      </div>
     </div>
     <!-- Brutalist background elements -->
     <div class="absolute top-0 left-0 h-full w-full">
@@ -109,6 +133,33 @@ import '../styles/global.css';
     background-size: 200% 200%;
     animation: gradient-shift 15s ease infinite;
   }
+
+  @keyframes shake {
+    0%,
+    100% {
+      transform: rotate(2deg) translate(0, 0) scale(1);
+    }
+    25% {
+      transform: rotate(3deg) translate(-2px, -2px) scale(1.02);
+    }
+    50% {
+      transform: rotate(1deg) translate(2px, 2px) scale(1.05);
+    }
+    75% {
+      transform: rotate(3deg) translate(-2px, 2px) scale(1.02);
+    }
+  }
+
+  .shake-animation {
+    animation: shake 0.5s ease-in-out;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  .availability-box {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+  }
 </style>
 
 <script>
@@ -129,6 +180,7 @@ import '../styles/global.css';
     private particles: Particle[];
     private particleCount: number;
     private logoImage: HTMLImageElement;
+    private announcementBox: HTMLElement | null;
 
     constructor() {
       this.canvas = document.getElementById(
@@ -139,9 +191,36 @@ import '../styles/global.css';
       this.particleCount = 50;
       this.logoImage = new Image();
       this.logoImage.src = '/favicon.svg';
+      this.announcementBox = document.querySelector('.availability-box');
 
       this.init();
       this.animate();
+      this.startShakeAnimation();
+    }
+
+    private startShakeAnimation(): void {
+      if (!this.announcementBox) return;
+
+      const shakeInterval = () => {
+        this.announcementBox?.classList.add('shake-animation');
+        setTimeout(() => {
+          this.announcementBox?.classList.remove('shake-animation');
+        }, 500);
+      };
+
+      // Initial shake
+      setTimeout(shakeInterval, 2000);
+
+      // Repeat every 8-12 seconds
+      const repeatShake = () => {
+        const randomDelay = Math.floor(Math.random() * 4000) + 8000; // 8-12 seconds
+        setTimeout(() => {
+          shakeInterval();
+          repeatShake();
+        }, randomDelay);
+      };
+
+      repeatShake();
     }
 
     private init(): void {
