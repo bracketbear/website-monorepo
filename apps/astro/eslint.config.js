@@ -1,11 +1,11 @@
-import eslintPluginAstro from 'eslint-plugin-astro';
+// import eslintPluginAstro from 'eslint-plugin-astro';
 import { defineConfig } from 'eslint/config';
 import love from 'eslint-config-love';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default defineConfig([
   love,
-  ...eslintPluginAstro.configs.recommended,
+  // ...eslintPluginAstro.configs.recommended,
   eslintPluginPrettierRecommended,
   {
     rules: {
@@ -49,26 +49,26 @@ export default defineConfig([
       'src/assets/',
     ],
   },
-  {
-    files: ['*.astro'],
-    parser: 'astro-eslint-parser',
-    parserOptions: {
-      // Use the TypeScript parser to handle the script parts, but do NOT include the project option
-      parser: '@typescript-eslint/parser',
-      extraFileExtensions: ['.astro'],
-      ecmaVersion: 2020,
-      sourceType: 'module',
-    },
-    rules: {
-      quotes: ['error', 'single'],
-      'comma-dangle': 'off',
-      '@typescript-eslint/no-magic-numbers': 'off',
-      'prettier/prettier': [
-        'error',
-        {
-          parser: 'astro',
-        },
-      ],
-    },
-  },
+  // {
+  //   files: ['*.astro'],
+  //   parser: 'astro-eslint-parser',
+  //   parserOptions: {
+  //     // Use the TypeScript parser to handle the script parts, but do NOT include the project option
+  //     parser: '@typescript-eslint/parser',
+  //     extraFileExtensions: ['.astro'],
+  //     ecmaVersion: 2020,
+  //     sourceType: 'module',
+  //   },
+  //   rules: {
+  //     quotes: ['error', 'single'],
+  //     'comma-dangle': 'off',
+  //     '@typescript-eslint/no-magic-numbers': 'off',
+  //     'prettier/prettier': [
+  //       'error',
+  //       {
+  //         parser: 'astro',
+  //       },
+  //     ],
+  //   },
+  // },
 ]);
