@@ -44,20 +44,20 @@ const companyTitle =
   <div class="bg-cream py-24">
     <div class="container mx-auto px-6">
       <div class="brutalist-border bg-cream mb-8 inline-block p-8">
-        <h1 class="text-5xl font-black text-black uppercase">
+        <h1 class="text-foreground text-5xl font-black uppercase">
           {workProject.data.title}
         </h1>
       </div>
 
       {
         category !== undefined && (
-          <span class="brutalist-border bg-coral px-4 py-2 text-lg font-black text-black">
+          <span class="brutalist-border bg-coral text-foreground px-4 py-2 text-lg font-black">
             {category.data.title}
           </span>
         )
       }
 
-      <p class="mt-8 max-w-3xl text-xl font-bold text-black">
+      <p class="text-foreground mt-8 max-w-3xl text-xl font-bold">
         {workProject.data.description}
       </p>
     </div>
@@ -70,21 +70,23 @@ const companyTitle =
         {
           job !== undefined && (
             <div>
-              <h4 class="mb-2 text-sm font-black text-black uppercase">
+              <h4 class="text-foreground mb-2 text-sm font-black uppercase">
                 Company
               </h4>
-              <p class="font-bold text-black">{companyTitle}</p>
+              <p class="text-foreground font-bold">{companyTitle}</p>
             </div>
           )
         }
         <div>
-          <h4 class="mb-2 text-sm font-black text-black uppercase">Duration</h4>
-          <p class="font-bold text-black">{workProject.data.duration}</p>
+          <h4 class="text-foreground mb-2 text-sm font-black uppercase">
+            Duration
+          </h4>
+          <p class="text-foreground font-bold">{workProject.data.duration}</p>
         </div>
         {
           workProject.data.isFeatured === true && (
             <div class="ml-auto self-center">
-              <span class="brutalist-border bg-coral px-4 py-2 text-sm font-black text-black">
+              <span class="brutalist-border bg-coral text-foreground px-4 py-2 text-sm font-black">
                 Featured Project
               </span>
             </div>
@@ -104,10 +106,10 @@ const companyTitle =
           {
             workProject.data.description?.trim() !== '' && (
               <section class="brutalist-border bg-cream p-8">
-                <h2 class="mb-6 text-2xl font-black text-black uppercase">
+                <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Overview
                 </h2>
-                <p class="text-lg font-bold text-black">
+                <p class="text-foreground text-lg font-bold">
                   {workProject.data.description}
                 </p>
               </section>
@@ -118,10 +120,10 @@ const companyTitle =
           {
             workProject.data.challengesAndSolutions?.trim() !== '' && (
               <section class="brutalist-border bg-cream p-8">
-                <h2 class="mb-6 text-2xl font-black text-black uppercase">
+                <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Challenges & Solutions
                 </h2>
-                <p class="text-lg font-bold text-black">
+                <p class="text-foreground text-lg font-bold">
                   {workProject.data.challengesAndSolutions}
                 </p>
               </section>
@@ -132,10 +134,10 @@ const companyTitle =
           {
             workProject.data.resultsAchieved?.trim() !== '' && (
               <section class="brutalist-border bg-cream p-8">
-                <h2 class="mb-6 text-2xl font-black text-black uppercase">
+                <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Results Achieved
                 </h2>
-                <p class="text-lg font-bold text-black">
+                <p class="text-foreground text-lg font-bold">
                   {workProject.data.resultsAchieved}
                 </p>
               </section>
@@ -146,11 +148,11 @@ const companyTitle =
           {
             (workProject.data.media ?? []).length > 0 && (
               <section class="brutalist-border bg-cream p-8">
-                <h2 class="mb-6 text-2xl font-black text-black uppercase">
+                <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Project Gallery
                 </h2>
                 {workProject.data.mediaDescription !== undefined && (
-                  <p class="mb-6 text-lg font-bold text-black">
+                  <p class="text-foreground mb-6 text-lg font-bold">
                     {workProject.data.mediaDescription}
                   </p>
                 )}
@@ -176,14 +178,16 @@ const companyTitle =
           {
             job !== undefined && (
               <div class="brutalist-border bg-cream p-8">
-                <h3 class="mb-4 text-xl font-black text-black uppercase">
+                <h3 class="text-foreground mb-4 text-xl font-black uppercase">
                   Role Info
                 </h3>
-                <p class="mb-4 font-bold text-black">
+                <p class="text-foreground mb-4 font-bold">
                   {job.data.title} at {companyTitle}
                 </p>
                 {job.data.description?.trim() !== '' && (
-                  <p class="font-bold text-black">{job.data.description}</p>
+                  <p class="text-foreground font-bold">
+                    {job.data.description}
+                  </p>
                 )}
               </div>
             )
@@ -193,12 +197,12 @@ const companyTitle =
           {
             projectSkills.length > 0 && (
               <div class="brutalist-border bg-cream p-8">
-                <h3 class="mb-4 text-xl font-black text-black uppercase">
+                <h3 class="text-foreground mb-4 text-xl font-black uppercase">
                   Technologies Used
                 </h3>
                 <div class="flex flex-wrap gap-2">
                   {projectSkills.map((skill) => (
-                    <span class="brutalist-border-light bg-cream px-3 py-1 text-sm font-bold text-black">
+                    <span class="brutalist-border-light bg-cream text-foreground px-3 py-1 text-sm font-bold">
                       {skill.data.title}
                     </span>
                   ))}
@@ -209,15 +213,15 @@ const companyTitle =
 
           <!-- Call to Action -->
           <div class="brutalist-border bg-coral p-8">
-            <h3 class="mb-4 text-xl font-black text-black uppercase">
+            <h3 class="text-foreground mb-4 text-xl font-black uppercase">
               Interested in similar work?
             </h3>
-            <p class="mb-6 font-bold text-black">
+            <p class="text-foreground mb-6 font-bold">
               I'd love to discuss how I can help with your project.
             </p>
             <a
               href="/contact"
-              class="brutalist-border bg-cream block py-3 text-center text-lg font-black text-black uppercase transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
+              class="brutalist-border bg-cream text-foreground block py-3 text-center text-lg font-black uppercase transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
             >
               Get in Touch
             </a>

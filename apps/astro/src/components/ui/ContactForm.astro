@@ -3,17 +3,17 @@ interface Props {
   class?: string;
 }
 
-const { class: className } = Astro.props;
+const { class: className } = Astro.props satisfies Props;
 ---
 
 <section class:list={['py-24', className]}>
   <div class="container mx-auto px-6">
     <div class="brutalist-border bg-cream p-8">
       <div class="mb-8">
-        <h2 class="mb-4 text-4xl font-black text-black uppercase">
-          Let's Work Together
+        <h2 class="text-foreground mb-4 text-4xl font-black uppercase">
+          Contact Me
         </h2>
-        <p class="text-xl font-bold text-black">
+        <p class="text-foreground text-xl font-bold">
           Have a project in mind? I'd love to hear about it. Drop me a message
           and I'll get back to you as soon as possible.
         </p>
@@ -24,7 +24,7 @@ const { class: className } = Astro.props;
           <div>
             <label
               for="name"
-              class="mb-2 block text-sm font-black text-black uppercase"
+              class="text-foreground mb-2 block text-sm font-black uppercase"
             >
               Name
             </label>
@@ -33,14 +33,14 @@ const { class: className } = Astro.props;
               name="name"
               id="name"
               required
-              class="brutalist-border-light bg-cream w-full p-3 font-bold text-black placeholder-black/50 focus:ring-2 focus:ring-black focus:outline-none"
+              class="brutalist-border-light bg-cream text-foreground placeholder-foreground/50 focus:ring-foreground w-full p-3 font-bold focus:ring-2 focus:outline-none"
               placeholder="Your name"
             />
           </div>
           <div>
             <label
               for="email"
-              class="mb-2 block text-sm font-black text-black uppercase"
+              class="text-foreground mb-2 block text-sm font-black uppercase"
             >
               Email
             </label>
@@ -49,7 +49,7 @@ const { class: className } = Astro.props;
               name="email"
               id="email"
               required
-              class="brutalist-border-light bg-cream w-full p-3 font-bold text-black placeholder-black/50 focus:ring-2 focus:ring-black focus:outline-none"
+              class="brutalist-border-light bg-cream text-foreground placeholder-foreground/50 focus:ring-foreground w-full p-3 font-bold focus:ring-2 focus:outline-none"
               placeholder="your@email.com"
             />
           </div>
@@ -58,7 +58,7 @@ const { class: className } = Astro.props;
         <div>
           <label
             for="subject"
-            class="mb-2 block text-sm font-black text-black uppercase"
+            class="text-foreground mb-2 block text-sm font-black uppercase"
           >
             Subject
           </label>
@@ -67,7 +67,7 @@ const { class: className } = Astro.props;
             name="subject"
             id="subject"
             required
-            class="brutalist-border-light bg-cream w-full p-3 font-bold text-black placeholder-black/50 focus:ring-2 focus:ring-black focus:outline-none"
+            class="brutalist-border-light bg-cream text-foreground placeholder-foreground/50 focus:ring-foreground w-full p-3 font-bold focus:ring-2 focus:outline-none"
             placeholder="What's this about?"
           />
         </div>
@@ -75,7 +75,7 @@ const { class: className } = Astro.props;
         <div>
           <label
             for="message"
-            class="mb-2 block text-sm font-black text-black uppercase"
+            class="text-foreground mb-2 block text-sm font-black uppercase"
           >
             Message
           </label>
@@ -84,14 +84,14 @@ const { class: className } = Astro.props;
             id="message"
             rows="6"
             required
-            class="brutalist-border-light bg-cream w-full p-3 font-bold text-black placeholder-black/50 focus:ring-2 focus:ring-black focus:outline-none"
+            class="brutalist-border-light bg-cream text-foreground placeholder-foreground/50 focus:ring-foreground w-full p-3 font-bold focus:ring-2 focus:outline-none"
             placeholder="Tell me about your project..."></textarea>
         </div>
 
         <div class="flex justify-end">
           <button
             type="submit"
-            class="brutalist-border bg-coral px-8 py-3 text-lg font-black text-black uppercase transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
+            class="brutalist-border bg-primary text-foreground px-8 py-3 text-lg font-black uppercase transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_var(--color-shadow)]"
           >
             Send Message
           </button>

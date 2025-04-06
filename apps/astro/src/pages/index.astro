@@ -5,58 +5,48 @@ import Philosophy from '@/components/Philosophy.astro';
 import About from '@/components/About.astro';
 import WorkTimeline from '@/components/WorkTimeline.astro';
 import '../styles/global.css';
+
+const snakeText = [
+  'Software Engineer.',
+  'Problem Solver.',
+  'Creative Developer.',
+  'Software Engineer.',
+  'Problem Solver.',
+  'Creative Developer.',
+  'Software Engineer.',
+  'Problem Solver.',
+  'Creative Developer.',
+];
 ---
 
 <Layout>
   <!-- Brutalist Header Section -->
-  <header class="bg-cream relative z-0 overflow-hidden py-24">
+  <header class="bg-cream relative z-0 overflow-hidden py-24 dark:bg-black">
     <canvas
       id="particle-canvas"
       class="fixed top-0 left-0 -z-10 h-screen w-screen"></canvas>
     <div class="relative z-10 container mx-auto px-6">
       <div class="mb-16 max-w-4xl">
-        <div class="brutalist-border bg-cream inline-block p-8">
-          <h1 class="text-8xl font-black tracking-tighter text-black uppercase">
+        <div
+          class="brutalist-border bg-cream inline-block p-8 dark:bg-orange-400"
+        >
+          <h1
+            class="text-foreground text-8xl font-black tracking-tighter uppercase"
+          >
             Bracket<br />Bear
           </h1>
         </div>
         <div class="snake-text-container mt-8">
-          <p
-            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
-            style="--index: 0"
-          >
-            Software Engineer.
-          </p>
-          <p
-            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
-            style="--index: 1"
-          >
-            Problem Solver.
-          </p>
-          <p
-            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
-            style="--index: 2"
-          >
-            Creative Developer.
-          </p>
-          <p
-            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
-            style="--index: 3"
-          >
-            Software Engineer.
-          </p>
-          <p
-            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
-            style="--index: 4"
-          >
-            Problem Solver.
-          </p>
-          <p
-            class="snake-text text-2xl font-bold tracking-tight text-black uppercase"
-            style="--index: 5"
-          >
-            Creative Developer.
-          </p>
+          {
+            snakeText.map((text, index) => (
+              <p
+                class="snake-text text-foreground hover:text-primary text-2xl font-bold tracking-tight uppercase"
+                style="--index: {index}"
+              >
+                {text}
+              </p>
+            ))
+          }
         </div>
       </div>
       <!-- Availability Announcement -->
@@ -64,48 +54,38 @@ import '../styles/global.css';
         class="mt-16 w-full lg:absolute lg:top-24 lg:right-6 lg:mt-0 lg:w-96"
       >
         <div
-          class="availability-box brutalist-border transform bg-black p-6 lg:rotate-2"
+          class="availability-box brutalist-border bg-foreground text-background transform p-6 lg:rotate-2"
         >
-          <h2
-            class="text-cream mb-2 text-4xl font-black tracking-tight uppercase"
-          >
+          <h2 class="mb-2 text-4xl font-black tracking-tight uppercase">
             Available Now!
           </h2>
-          <p class="text-cream mb-4 text-xl font-bold">
-            Open to <span class="bg-cream px-2 py-1 text-black">full-time</span>
-            and <span class="bg-cream px-2 py-1 text-black">contract</span> roles.<br
-            />
+          <p class="mb-4 text-xl font-bold">
+            Open to <span
+              class="bg-cream text-foreground bg-background px-2 py-1"
+              >full-time</span
+            >
+            and <span class="bg-cream text-foreground bg-background px-2 py-1"
+              >contract</span
+            > full-stack roles.<br />
             Let's build something amazing together.
           </p>
           <a
             href="mailto:contact@bracketbear.com"
-            class="brutalist-border bg-cream inline-block px-6 py-3 text-lg font-black text-black transition-transform hover:scale-105"
+            class="brutalist-border text-foreground bg-background border-background dark:text-primary inline-block px-6 py-3 text-lg font-black transition-transform hover:scale-105 dark:bg-black"
           >
             Let's Talk →
           </a>
         </div>
       </div>
     </div>
-    <!-- Brutalist background elements -->
-    <div class="absolute top-0 left-0 h-full w-full">
-      <div
-        class="bg-coral absolute top-20 left-20 h-32 w-32 rounded-full opacity-20"
-      >
-      </div>
-      <div
-        class="bg-coral absolute top-40 right-40 h-48 w-48 rounded-full opacity-20"
-      >
-      </div>
-    </div>
   </header>
 
-  <main class="bg-cream">
+  <main class="bg-cream dark:bg-black">
     <!-- About Section -->
     <section id="about" class="relative overflow-hidden py-24">
       <div class="relative z-10 container mx-auto px-6">
         <About />
       </div>
-      <div class="bg-coral absolute top-0 right-0 h-full w-1/2 opacity-5"></div>
     </section>
 
     <!-- Philosophy Section -->
@@ -113,26 +93,27 @@ import '../styles/global.css';
       <div class="relative z-10 container mx-auto px-6">
         <Philosophy />
       </div>
-      <div class="bg-coral absolute top-0 left-0 h-full w-1/2 opacity-5"></div>
     </section>
 
     <!-- Projects Section -->
     <section id="projects" class="relative py-24">
       <div class="relative z-10 container mx-auto px-6">
         <h2
-          class="brutalist-border bg-cream mb-16 inline-block p-6 text-5xl font-black tracking-tight text-black uppercase"
+          class="brutalist-border bg-cream text-foreground dark:bg-primary mb-16 inline-block p-6 text-5xl font-black tracking-tight uppercase"
         >
           Featured Projects
         </h2>
-        <div class="brutalist-border bg-cream p-8">
+        <div class="brutalist-border bg-cream p-8 dark:bg-black">
           <div class="grid gap-8 md:grid-cols-2">
             <div>
               <h3
-                class="text-coral mb-4 text-3xl font-black tracking-tight uppercase"
+                class="text-foreground hover:text-primary mb-4 text-3xl font-black tracking-tight uppercase"
               >
                 Project Showcase
               </h3>
-              <p class="text-xl font-bold text-black">
+              <p
+                class="text-foreground hover:text-primary flex text-xl font-bold"
+              >
                 Here are some of the projects I've been lucky enough to work on.
               </p>
             </div>
@@ -146,8 +127,6 @@ import '../styles/global.css';
     <section id="history" class="relative overflow-hidden py-24">
       <div class="relative z-10 container mx-auto px-6">
         <WorkTimeline />
-      </div>
-      <div class="bg-coral absolute right-0 bottom-0 h-1/2 w-full opacity-5">
       </div>
     </section>
   </main>
@@ -208,27 +187,6 @@ import '../styles/global.css';
   .snake-text {
     position: relative;
     transform-origin: left;
-    animation: snake 8s ease-in-out infinite;
-    animation-delay: calc(var(--index) * 0.2s);
-  }
-
-  @keyframes snake {
-    0%,
-    100% {
-      transform: translateX(0) rotate(0deg);
-    }
-    20% {
-      transform: translateX(20px) rotate(2deg);
-    }
-    40% {
-      transform: translateX(40px) rotate(-2deg);
-    }
-    60% {
-      transform: translateX(20px) rotate(1deg);
-    }
-    80% {
-      transform: translateX(10px) rotate(-1deg);
-    }
   }
 </style>
 

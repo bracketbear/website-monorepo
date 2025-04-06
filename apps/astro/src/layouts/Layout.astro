@@ -3,17 +3,56 @@ import NavBar from '@/components/ui/NavBar.astro';
 import Footer from '@/components/ui/Footer.astro';
 import ContactForm from '@/components/ui/ContactForm.astro';
 import '../styles/global.css';
+
+// Get initial theme from Astro.cookies if available, otherwise default to system preference
+const theme = Astro.cookies.get('theme')?.value ?? 'system';
+const isDark =
+  theme === 'dark' ||
+  (theme === 'system' &&
+    Astro.request.headers.get('sec-ch-prefers-color-scheme') === 'dark');
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class:list={[{ dark: isDark }]}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    <script is:inline>
+      // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+      function updateTheme() {
+        if (
+          localStorage.theme === 'dark' ||
+          (!('theme' in localStorage) &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches)
+        ) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+
+      // Set up a listener for system theme changes
+      window
+        .matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', (e) => {
+          if (!('theme' in localStorage)) {
+            if (e.matches) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+          }
+        });
+
+      // Initial theme setup
+      updateTheme();
+    </script>
   </head>
-  <body class="min-h-screen">
+  <body
+    class="bg-cream dark:bg-dark-cream text-foreground min-h-screen transition-colors duration-300"
+  >
     <NavBar class="relative z-50" />
     <slot />
     <ContactForm class="relative z-10" />

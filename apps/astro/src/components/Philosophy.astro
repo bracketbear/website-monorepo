@@ -27,10 +27,12 @@ const values: Section[] = [
   <!-- Brutalist Header -->
   <div class="sticky top-0 z-10 py-24">
     <div class="container mx-auto px-4">
-      <div class="brutalist-border bg-cream inline-block p-8">
-        <h2 class="text-6xl font-black text-black uppercase">My Philosophy</h2>
+      <div class="brutalist-border bg-background inline-block p-8">
+        <h2 class="text-foreground text-6xl font-black uppercase">
+          My Philosophy
+        </h2>
       </div>
-      <div class="brutalist-border bg-coral mx-auto mt-8 h-1 w-24"></div>
+      <div class="brutalist-border bg-primary mx-auto mt-8 h-1 w-24"></div>
     </div>
   </div>
 
@@ -39,14 +41,14 @@ const values: Section[] = [
       values.map(({ description, title }, index) => (
         <div class="relative flex min-h-[100vh] items-center justify-center py-24">
           <div class="sticky top-1/2">
-            <div class="brutalist-border bg-cream mx-auto max-w-2xl p-8 text-center">
-              <span class="brutalist-border bg-coral mb-8 inline-block px-6 py-3 text-lg font-black text-black">
+            <div class="brutalist-border bg-background mx-auto max-w-2xl p-8 text-center">
+              <span class="brutalist-border bg-primary text-background mb-8 inline-block px-6 py-3 text-lg font-black">
                 {(index + 1).toString().padStart(2, '0')}
               </span>
-              <h3 class="text-coral mb-6 text-4xl font-black uppercase">
+              <h3 class="text-foreground mb-6 text-4xl font-black uppercase">
                 {title}
               </h3>
-              <p class="text-xl leading-relaxed font-bold text-black">
+              <p class="text-foreground text-xl leading-relaxed font-bold">
                 {description}
               </p>
             </div>

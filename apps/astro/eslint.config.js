@@ -20,6 +20,7 @@ export default defineConfig([
           ignore: [-1, 0, 1, 2],
         },
       ],
+      '@typescript-eslint/no-deprecated': 'off',
       'prettier/prettier': [
         'error',
         {
@@ -52,14 +53,16 @@ export default defineConfig([
     files: ['*.astro'],
     parser: 'astro-eslint-parser',
     parserOptions: {
+      // Use the TypeScript parser to handle the script parts, but do NOT include the project option
       parser: '@typescript-eslint/parser',
       extraFileExtensions: ['.astro'],
-      project: './tsconfig.json',
+      ecmaVersion: 2020,
+      sourceType: 'module',
     },
-    extends: [...eslintPluginAstro.configs.recommended],
     rules: {
       quotes: ['error', 'single'],
       'comma-dangle': 'off',
+      '@typescript-eslint/no-magic-numbers': 'off',
       'prettier/prettier': [
         'error',
         {

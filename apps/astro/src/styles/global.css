@@ -1,58 +1,68 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-@theme {
-  --color-cream: hsl(28, 80%, 70%);
-}
-
 :root {
-  --coral: #ff8b8b;
+  /* Base colors */
   --cream: hsl(28, 80%, 70%);
+  --dark-cream: hsl(28, 80%, 20%);
   --black: #111111;
+
+  /* Gradient colors */
+  --gradient-orange: #fb923c; /* Tailwind orange-400 */
+  --gradient-yellow: #fbbf24; /* Tailwind amber-400 */
+  --dark-gradient-orange: #ea580c; /* Tailwind orange-600 */
+  --dark-gradient-yellow: #d97706; /* Tailwind amber-600 */
+
+  --color-primary: var(--gradient-orange);
 }
 
-/* Base styles for brutalist theme */
+@theme {
+  --color-primary: var(--gradient-orange);
+  --color-secondary: var(--gradient-yellow);
+  --color-background-initial: var(--cream);
+  --color-foreground-initial: var(--black);
+  --color-background: var(--color-background-initial);
+  --color-foreground: var(--color-foreground-initial);
+  --color-border: var(--black);
+  --color-shadow: var(--black);
+}
+
+/* Dark theme overrides */
+.dark {
+  --color-primary: #f97316;
+  --color-secondary: var(--dark-gradient-yellow);
+  --color-background: var(--color-foreground-initial);
+  --color-foreground: var(--color-background-initial);
+  --color-border: var(--cream);
+  --color-shadow: var(--cream);
+}
+
+/* Base styles */
 body {
-  background-color: var(--cream);
-  color: var(--black);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Brutalist utility classes */
 .brutalist-border {
-  border: 2px solid var(--black);
-  box-shadow: 4px 4px 0 var(--black);
+  border: 2px solid var(--color-border);
+  box-shadow: 4px 4px 0 var(--color-shadow);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.brutalist-border:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--color-shadow);
 }
 
 .brutalist-border-light {
-  border: 1px solid var(--black);
-}
-
-.gradient-text {
-  color: var(--coral);
-  font-weight: 900;
-}
-
-.gradient-bg {
-  background-color: var(--coral);
-  color: var(--black);
-}
-
-.gradient-bg-subtle {
-  background-color: var(--cream);
-  border: 2px solid var(--coral);
-}
-
-.gradient-border {
-  position: relative;
-  border: 2px solid var(--black);
-  background-color: var(--cream);
-  box-shadow: 4px 4px 0 var(--black);
-  transition: all 0.2s ease;
-}
-
-.gradient-border:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 var(--black);
+  border: 1px solid var(--color-border);
+  transition: border-color 0.3s ease;
 }
 
 /* Typography */
@@ -80,40 +90,56 @@ h6 {
   .gradient-text {
     background: linear-gradient(
       to right,
-      var(--gradient-orange),
-      var(--gradient-yellow)
+      var(--color-primary),
+      var(--color-secondary)
     );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    font-weight: 900;
   }
 
   .gradient-border {
+    position: relative;
+    border: 2px solid var(--color-border);
     background: linear-gradient(
       to bottom right,
-      var(--gradient-orange),
-      var(--gradient-yellow)
+      var(--color-primary),
+      var(--color-secondary)
     );
+    box-shadow: 4px 4px 0 var(--color-shadow);
+    transition: all 0.2s ease;
     padding: 1px;
+  }
+
+  .gradient-border:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--color-shadow);
   }
 
   .gradient-bg {
     background: linear-gradient(
       to right,
-      var(--gradient-orange),
-      var(--gradient-yellow)
+      var(--color-primary),
+      var(--color-secondary)
     );
+    color: var(--color-foreground);
   }
 
   .gradient-bg-subtle {
     background: linear-gradient(
       to right,
-      rgba(255, 69, 0, 0.2),
-      rgba(255, 194, 97, 0.2)
+      color-mix(in srgb, var(--color-primary) 20%, transparent),
+      color-mix(in srgb, var(--color-secondary) 20%, transparent)
     );
+    border: 2px solid var(--color-primary);
   }
 
   .gradient-bg-radial {
-    @apply bg-gradient-to-br from-orange-400 to-yellow-500;
+    @apply bg-gradient-to-br from-orange-400 to-amber-400;
+  }
+
+  .dark .gradient-bg-radial {
+    @apply bg-gradient-to-br from-orange-600 to-amber-600;
   }
 }

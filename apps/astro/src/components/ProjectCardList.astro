@@ -31,17 +31,17 @@ const workProjectsByType = workProjects.reduce<
   {
     Object.entries(workProjectsByType).map(([type, projects]) => (
       <div>
-        <h2 class="brutalist-border bg-cream mb-8 inline-block p-4 text-2xl font-black text-black uppercase">
+        <h2 class="brutalist-border bg-background text-foreground mb-8 inline-block p-4 text-2xl font-black uppercase">
           {workProjectCatergoriesById[type].data.title}
         </h2>
         <div class="grid gap-8 md:grid-cols-2">
           {projects.map((project) => (
             <a
               href={getProjectUrl(project.id)}
-              class="brutalist-border bg-cream group block overflow-hidden transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
+              class="brutalist-border group bg-background block overflow-hidden transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_var(--color-shadow)]"
             >
               {project.data.media && project.data.media.length > 0 && (
-                <div class="aspect-video w-full overflow-hidden border-b-2 border-black">
+                <div class="border-border aspect-video w-full overflow-hidden border-b-2">
                   <img
                     src={project.data.media[0]}
                     alt={project.data.title}
@@ -51,28 +51,28 @@ const workProjectsByType = workProjects.reduce<
               )}
               <div class="p-6">
                 <div class="mb-4 flex items-center justify-between">
-                  <h3 class="text-xl font-black text-black uppercase">
+                  <h3 class="text-foreground text-xl font-black uppercase">
                     {project.data.title}
                   </h3>
                   {project.data.isFeatured && (
-                    <span class="brutalist-border bg-coral px-3 py-1 text-sm font-bold text-black">
+                    <span class="brutalist-border bg-primary text-background px-3 py-1 text-sm font-bold">
                       Featured
                     </span>
                   )}
                 </div>
-                <p class="mb-4 font-bold text-black">
+                <p class="text-foreground mb-4 font-bold">
                   {project.data.description}
                 </p>
                 {project.data.skills && project.data.skills.length > 0 && (
                   <div>
-                    <div class="mb-2 text-sm font-bold text-black uppercase">
+                    <div class="text-foreground mb-2 text-sm font-bold uppercase">
                       Technologies
                     </div>
                     <div class="flex flex-wrap gap-2">
                       {project.data.skills.map(
                         (skillId) =>
                           workSkillsById[skillId] !== undefined && (
-                            <span class="brutalist-border-light bg-cream px-3 py-1 text-sm font-bold text-black">
+                            <span class="brutalist-border-light bg-background text-foreground px-3 py-1 text-sm font-bold">
                               {workSkillsById[skillId].data.title}
                             </span>
                           )
