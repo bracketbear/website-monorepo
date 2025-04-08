@@ -11,10 +11,9 @@ interface NavItem {
 
 export const navItems: NavItem[] = [
   { name: "Home", href: "/" },
-  { name: "Work", href: "/work" },
-  { name: "Projects", href: "/projects" },
+  { name: "Work History", href: "/work" },
   {
-    name: "About",
+    name: "Learn About",
     href: "/about",
     children: [
       { name: "About Me", href: "/about/me" },
@@ -22,5 +21,5 @@ export const navItems: NavItem[] = [
       { name: "About This App", href: "/about/site" }
     ]
   },
-  { name: "Hire Me", href: "/contact" },
+  { name: "Reach Out", href: "/contact" },
 ] as const;

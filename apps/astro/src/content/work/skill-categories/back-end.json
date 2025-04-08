@@ -1,0 +1,14 @@
+{
+  "title": "Back-End",
+  "description": "Back-End Development",
+  "skills": [
+    "node",
+    "express",
+    "postgresql",
+    "mysql",
+    "sequelize",
+    "docker",
+    "rust",
+    "python"
+  ]
+}

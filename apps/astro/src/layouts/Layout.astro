@@ -20,38 +20,39 @@ const isDark =
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <script is:inline>
-      // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-      function updateTheme() {
-        if (
-          localStorage.theme === 'dark' ||
-          (!('theme' in localStorage) &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches)
-        ) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
+      // Theme initialization
+      function initializeTheme() {
+        const getThemePreference = () => {
+          // Check localStorage first
+          if (localStorage.theme === 'dark') return 'dark';
+          if (localStorage.theme === 'light') return 'light';
+
+          // If no localStorage value, check system preference
+          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+          }
+          return 'light';
+        };
+
+        // Set theme based on preference
+        const theme = getThemePreference();
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+
+        // Watch for system theme changes if no manual preference is set
+        if (!localStorage.theme) {
+          const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+          mediaQuery.addEventListener('change', (e) => {
+            document.documentElement.classList.toggle('dark', e.matches);
+          });
         }
       }
 
-      // Set up a listener for system theme changes
-      window
-        .matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', (e) => {
-          if (!('theme' in localStorage)) {
-            if (e.matches) {
-              document.documentElement.classList.add('dark');
-            } else {
-              document.documentElement.classList.remove('dark');
-            }
-          }
-        });
-
-      // Initial theme setup
-      updateTheme();
+      // Run initialization
+      initializeTheme();
     </script>
   </head>
   <body
-    class="bg-cream dark:bg-dark-cream text-foreground min-h-screen transition-colors duration-300"
+    class="bg-background text-foreground min-h-screen transition-colors duration-300"
   >
     <NavBar class="relative z-50" />
     <slot />

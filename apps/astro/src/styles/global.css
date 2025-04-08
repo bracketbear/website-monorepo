@@ -1,91 +1,86 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "daisyui";
 
 :root {
-  /* Base colors */
-  --cream: hsl(28, 80%, 70%);
-  --dark-cream: hsl(28, 80%, 20%);
-  --black: #111111;
 
-  /* Gradient colors */
-  --gradient-orange: #fb923c; /* Tailwind orange-400 */
-  --gradient-yellow: #fbbf24; /* Tailwind amber-400 */
-  --dark-gradient-orange: #ea580c; /* Tailwind orange-600 */
-  --dark-gradient-yellow: #d97706; /* Tailwind amber-600 */
+  /* Animation Durations */
+  --transition-fast: 150ms;
+  --transition-normal: 300ms;
+  --transition-slow: 500ms;
 
-  --color-primary: var(--gradient-orange);
+  /* Shadows */
+  --shadow-sm: 2px 2px 0;
+  --shadow-md: 4px 4px 0;
+  --shadow-lg: 6px 6px 0;
 }
 
+/* Theme Variables */
 @theme {
-  --color-primary: var(--gradient-orange);
-  --color-secondary: var(--gradient-yellow);
-  --color-background-initial: var(--cream);
-  --color-foreground-initial: var(--black);
-  --color-background: var(--color-background-initial);
-  --color-foreground: var(--color-foreground-initial);
-  --color-border: var(--black);
-  --color-shadow: var(--black);
+  /* Base Theme Colors */
+  /* Theme Tokens - Light Mode Defaults */
+  --color-cream: hsl(28, 80%, 70%);
+--color-primary: #f97316;
+--color-secondary: #fbbf24;
+--color-background: var(--color-cream);
+--color-foreground: var(--color-black);
+--color-border: var(--color-black);
+--color-shadow: var(--color-black);
+--color-text-primary: var(--color-foreground);
+--color-text-secondary: var(--color-foreground-muted);
+--color-foreground-muted: color-mix(in srgb, var(--color-foreground) 80%, transparent);
+--color-background-muted: color-mix(in srgb, var(--color-background) 80%, transparent);
 }
 
-/* Dark theme overrides */
-.dark {
+/* Dark Theme Overrides */
+:root[class~="dark"] {
   --color-primary: #f97316;
-  --color-secondary: var(--dark-gradient-yellow);
-  --color-background: var(--color-foreground-initial);
-  --color-foreground: var(--color-background-initial);
-  --color-border: var(--cream);
-  --color-shadow: var(--cream);
+  --color-secondary: #d97706;
+  --color-background: var(--color-black);
+  --color-foreground: var(--color-cream);
+  --color-border: var(--color-cream);
+  --color-shadow: var(--color-cream);
 }
 
-/* Base styles */
+/* Base Styles */
 body {
   background-color: var(--color-background);
-  color: var(--color-foreground);
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  color: var(--color-text-primary);
+  transition: 
+    background-color var(--transition-normal),
+    color var(--transition-normal);
 }
 
-/* Brutalist utility classes */
+/* Brutalist Utility Classes */
 .brutalist-border {
   border: 2px solid var(--color-border);
-  box-shadow: 4px 4px 0 var(--color-shadow);
-  transition:
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
+  box-shadow: var(--shadow-md) var(--color-shadow);
+  transition: 
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal),
+    transform var(--transition-normal);
 }
 
 .brutalist-border:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 var(--color-shadow);
+  box-shadow: var(--shadow-lg) var(--color-shadow);
 }
 
 .brutalist-border-light {
   border: 1px solid var(--color-border);
-  transition: border-color 0.3s ease;
+  transition: border-color var(--transition-normal);
 }
 
 /* Typography */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: "Inter", sans-serif;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-}
-
 @layer base {
-  h1 {
-    font-size: var(--text-9xl);
-    font-weight: var(--font-weight-black);
-    line-height: var(--line-height-1);
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
   }
 }
 
+/* Utility Classes */
 @layer utilities {
   .gradient-text {
     background: linear-gradient(
@@ -107,14 +102,14 @@ h6 {
       var(--color-primary),
       var(--color-secondary)
     );
-    box-shadow: 4px 4px 0 var(--color-shadow);
-    transition: all 0.2s ease;
+    box-shadow: var(--shadow-md) var(--color-shadow);
+    transition: all var(--transition-normal);
     padding: 1px;
   }
 
   .gradient-border:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 var(--color-shadow);
+    box-shadow: var(--shadow-lg) var(--color-shadow);
   }
 
   .gradient-bg {
@@ -123,7 +118,7 @@ h6 {
       var(--color-primary),
       var(--color-secondary)
     );
-    color: var(--color-foreground);
+    color: var(--color-background);
   }
 
   .gradient-bg-subtle {
@@ -135,11 +130,19 @@ h6 {
     border: 2px solid var(--color-primary);
   }
 
-  .gradient-bg-radial {
-    @apply bg-gradient-to-br from-orange-400 to-amber-400;
+  .skill-pill {
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+    border: 2px solid var(--color-border);
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: all var(--transition-normal);
   }
 
-  .dark .gradient-bg-radial {
-    @apply bg-gradient-to-br from-orange-600 to-amber-600;
+  .skill-pill-selected {
+    background-color: var(--color-primary);
+    color: var(--color-background);
   }
 }

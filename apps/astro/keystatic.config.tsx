@@ -111,7 +111,7 @@ export default config({
       schema: {
         title: fields.slug({ name: { label: 'Title' } }),
         description: fields.text({ label: 'Description' }),
-        skills: fields.relationship({
+        skills: fields.multiRelationship({
           label: 'Skills',
           description: 'Select the skills that belong to this category',
           collection: 'workSkills',
@@ -165,11 +165,18 @@ export default config({
           multiline: true
         }),
         media: fields.array(
-          fields.text({ label: 'Media', multiline: true }),
+          fields.object({
+            image: fields.image({
+              label: 'Image',
+              directory: 'src/assets/images/projects',
+              publicPath: '/src/assets/images/projects/'
+            }),
+            caption: fields.text({ label: 'Caption' })
+          }),
           {
             label: 'Media',
-            description: 'Media captions or URLs',
-            itemLabel: (props) => props.value || 'New Media'
+            description: 'Project images and their captions',
+            itemLabel: (props) => props.fields.caption.value || 'New Media'
           }
         ),
         isFeatured: fields.checkbox({

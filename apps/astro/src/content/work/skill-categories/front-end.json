@@ -1,4 +1,18 @@
 {
   "title": "Front-End",
-  "skills": ["react", "vue", "typescript", "tailwind-css", "nuxt", "bootstrap"]
+  "description": "Front-End Development",
+  "skills": [
+    "react",
+    "vue",
+    "typescript",
+    "tailwind-css",
+    "nuxt",
+    "bootstrap",
+    "figma",
+    "html",
+    "mui",
+    "redux",
+    "storybook",
+    "javascript"
+  ]
 }

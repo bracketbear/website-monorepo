@@ -6,10 +6,6 @@
   "challengesAndSolutions": "The custom context menu buttons were a real head scratcher. As a company, we hadn't really done this before so it was up to myself and the Experience Developer I was working with to figure out how to get it done. I designed the database schema and joined these new menu items to existing items that were already in the database. I also wanted to create a cool and intuitive way to manage the menu items, so I created a Vue 2 widget that could be used to drag-and-drop the menu items. This was my first time using Vue and I was very happy with the result!",
   "resultsAchieved": "A more customizable and user-controlled application that gave sales people and executives a really cool tool to sweep their clients off of their feet.",
   "mediaDescription": "Two people walking in front of the Downstream screen.",
-  "media": [
-    "Two people interacting with a screen at Downstream.",
-    "Woman touching a screen with medical information on it."
-  ],
   "isFeatured": false,
   "category": "full-stack-engineering",
   "skills": [

@@ -7,9 +7,10 @@
   "resultsAchieved": "Successful development of a new CMS, Bridge UI, with improved functionality and efficiency.",
   "mediaDescription": "Blue Bridge UI logo.",
   "media": [
-    "A screenshot of a website with a modal showing.",
-    "A screenshot of Downstream Bridge UI.",
-    "A screenshot of Downstream Bridge UI."
+    {
+      "image": "src/assets/images/projects/ds-bridge/media/0/image.png",
+      "caption": "A screenshot of the Bridge setup wizard."
+    }
   ],
   "isFeatured": false,
   "category": "full-stack-engineering",

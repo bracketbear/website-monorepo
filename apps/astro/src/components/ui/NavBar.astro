@@ -1,6 +1,7 @@
 ---
 import Logo from '@/assets/bracket-bear-logo.svg';
 import { navItems } from '@/config/navigation';
+import ThemeSwitch from './ThemeSwitch.astro';
 
 interface Props {
   class?: string;
@@ -8,19 +9,21 @@ interface Props {
 ---
 
 <nav
-  class="bg-cream dark:bg-dark-cream dark:border-cream border-foreground border-y-2"
+  class="bg-background border-foreground border-y-2"
   class:list={Astro.props.class}
 >
   <div class="container mx-auto flex items-center justify-between px-6 py-4">
     <!-- Logo Section -->
     <div class="flex items-center gap-6">
       <div
-        class="brutalist-border bg-cream dark:bg-dark-cream flex h-16 w-16 items-center justify-center"
+        class="brutalist-border bg-background flex h-16 w-16 items-center justify-center"
       >
-        <Logo class="text-foreground h-8" />
+        <Logo class="text-foreground h-1/2" />
       </div>
-      <div class="text-2xl font-black tracking-tight uppercase">
-        <a href="/" class="text-foreground hover:opacity-80">Bracket Bear</a>
+      <div class="text-2xl leading-none font-bold tracking-widest uppercase">
+        <a href="/" class="text-foreground hover:opacity-80"
+          >Bracket<br />Bear</a
+        >
       </div>
     </div>
 
@@ -49,14 +52,14 @@ interface Props {
                         d="M19 9l-7 7-7-7"
                       />
                     </svg>
-                    <span class="dark:bg-cream absolute -bottom-1 left-0 h-0.5 w-0 bg-black transition-all duration-300 group-hover:w-full" />
+                    <span class="absolute -bottom-1 left-0 h-0.5 w-0 bg-black transition-all duration-300 group-hover:w-full" />
                   </button>
                   <div class="invisible absolute left-0 z-50 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100">
                     <div class="brutalist-border bg-background py-4 shadow-[8px_8px_0_0_#111111]">
                       {item.children.map((child) => (
                         <a
                           href={child.href}
-                          class="text-foreground hover:bg-foreground hover:text-primary dark:text-foreground dark:hover:bg-foreground dark:hover:text-foreground block px-4 py-4 text-sm font-black uppercase transition-colors"
+                          class="text-foreground hover:bg-foreground hover:text-primary block px-4 py-4 text-sm font-black uppercase transition-colors"
                         >
                           {child.name}
                         </a>
@@ -70,7 +73,7 @@ interface Props {
                   href={item.href}
                 >
                   {item.name}
-                  <span class="dark:bg-cream absolute -bottom-1 left-0 h-0.5 w-0 bg-black transition-all duration-300 group-hover:w-full" />
+                  <span class="absolute -bottom-1 left-0 h-0.5 w-0 bg-black transition-all duration-300 group-hover:w-full" />
                 </a>
               )}
             </li>
@@ -78,61 +81,33 @@ interface Props {
         }
       </ul>
 
-      <!-- Dark Mode Toggle -->
-      <button
-        id="theme-toggle"
-        type="button"
-        class="brutalist-border text-foreground flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111] dark:hover:shadow-[4px_4px_0_0_#F5F5DC]"
-        aria-label="Toggle dark mode"
-      >
-        <svg
-          id="theme-toggle-dark-icon"
-          class="h-5 w-5"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
+      <!-- Theme and Social Links -->
+      <div class="flex items-center gap-4">
+        <a
+          href="https://linkedin.com"
+          class="brutalist-border flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111]"
         >
-          <path
-            d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
-          ></path>
-        </svg>
-        <svg
-          id="theme-toggle-light-icon"
-          class="hidden h-5 w-5"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-          ></path>
-        </svg>
-      </button>
-
-      <!-- LinkedIn Button -->
-      <a
-        href="https://linkedin.com"
-        class="brutalist-border flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111] dark:hover:shadow-[4px_4px_0_0_#F5F5DC]"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          class="text-foreground dark:text-foreground"
-        >
-          <path
-            d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
-          ></path>
-        </svg>
-      </a>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="text-foreground"
+          >
+            <path
+              d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+            ></path>
+          </svg>
+        </a>
+        <ThemeSwitch />
+      </div>
     </div>
 
     <!-- Mobile Menu Button -->
     <button
       id="mobile-menu-button"
-      class="brutalist-border p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111] md:hidden dark:hover:shadow-[4px_4px_0_0_#F5F5DC]"
+      class="brutalist-border p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111] md:hidden"
     >
       <svg
         class="text-foreground h-6 w-6"
@@ -152,12 +127,12 @@ interface Props {
   <!-- Mobile Menu -->
   <div
     id="mobile-menu"
-    class="brutalist-border bg-background dark:bg-dark-cream fixed top-0 right-0 z-50 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
+    class="brutalist-border bg-background fixed top-0 right-0 z-50 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
   >
     <div class="p-6">
       <button
         id="close-menu-button"
-        class="brutalist-border absolute top-4 right-4 p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111] dark:hover:shadow-[4px_4px_0_0_#F5F5DC]"
+        class="brutalist-border absolute top-4 right-4 p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111]"
       >
         <svg
           class="text-foreground h-6 w-6"
@@ -210,141 +185,85 @@ interface Props {
         }
       </ul>
 
-      <!-- Mobile Dark Mode Toggle -->
-      <button
-        id="mobile-theme-toggle"
-        class="brutalist-border mt-8 flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111] dark:hover:shadow-[4px_4px_0_0_#F5F5DC]"
-      >
-        <svg
-          id="mobile-theme-toggle-dark-icon"
-          class="hidden h-5 w-5"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
+      <!-- Mobile Theme and Social Links -->
+      <div class="mt-8 flex items-center gap-4">
+        <ThemeSwitch />
+        <a
+          href="https://linkedin.com"
+          class="brutalist-border flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111]"
         >
-          <path
-            d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
-          ></path>
-        </svg>
-        <svg
-          id="mobile-theme-toggle-light-icon"
-          class="hidden h-5 w-5"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-          ></path>
-        </svg>
-      </button>
-
-      <!-- Mobile LinkedIn Button -->
-      <a
-        href="https://linkedin.com"
-        class="brutalist-border mt-4 flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111] dark:hover:shadow-[4px_4px_0_0_#F5F5DC]"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          class="text-foreground dark:text-foreground"
-        >
-          <path
-            d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
-          ></path>
-        </svg>
-      </a>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="text-foreground"
+          >
+            <path
+              d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+            ></path>
+          </svg>
+        </a>
+      </div>
     </div>
   </div>
 
   <!-- Mobile Menu Overlay -->
   <div
     id="mobile-menu-overlay"
-    class="dark:bg-cream/60 fixed inset-0 z-40 hidden bg-black/60 opacity-0 transition-opacity duration-300"
+    class="fixed inset-0 z-40 hidden bg-black/60 opacity-0 transition-opacity duration-300"
     style="background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.4) 1px, transparent 1px); background-size: 8px 8px;"
   >
   </div>
 </nav>
 
 <script>
-  function setupThemeToggle() {
-    const themeToggleDarkIcon = document.getElementById(
-      'theme-toggle-dark-icon'
-    );
-    const themeToggleLightIcon = document.getElementById(
-      'theme-toggle-light-icon'
-    );
-    const themeToggleBtn = document.getElementById('theme-toggle');
+  function setupMobileMenu() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const closeMenuButton = document.getElementById('close-menu-button');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
 
-    // Set initial icon state
-    if (document.documentElement.classList.contains('dark')) {
-      themeToggleDarkIcon?.classList.add('hidden');
-      themeToggleLightIcon?.classList.remove('hidden');
-    } else {
-      themeToggleDarkIcon?.classList.remove('hidden');
-      themeToggleLightIcon?.classList.add('hidden');
-    }
+    const openMenu = () => {
+      mobileMenu?.classList.remove('translate-x-full');
+      mobileMenuOverlay?.classList.remove('hidden');
+      setTimeout(() => {
+        mobileMenuOverlay?.classList.add('opacity-50');
+      }, 10);
+      document.body.style.overflow = 'hidden';
+    };
 
-    themeToggleBtn?.addEventListener('click', function () {
-      // Toggle theme
-      const isDark = document.documentElement.classList.toggle('dark');
+    const closeMenu = () => {
+      mobileMenu?.classList.add('translate-x-full');
+      mobileMenuOverlay?.classList.remove('opacity-50');
+      setTimeout(() => {
+        mobileMenuOverlay?.classList.add('hidden');
+      }, 300);
+      document.body.style.overflow = '';
+    };
 
-      // Update localStorage
-      localStorage.theme = isDark ? 'dark' : 'light';
+    mobileMenuButton?.addEventListener('click', openMenu);
+    closeMenuButton?.addEventListener('click', closeMenu);
+    mobileMenuOverlay?.addEventListener('click', closeMenu);
 
-      // Toggle icons
-      themeToggleDarkIcon?.classList.toggle('hidden');
-      themeToggleLightIcon?.classList.toggle('hidden');
+    document.addEventListener('click', (e) => {
+      if (
+        !mobileMenu?.contains(e.target as Node) &&
+        !mobileMenuButton?.contains(e.target as Node) &&
+        !mobileMenu?.classList.contains('translate-x-full')
+      ) {
+        closeMenu();
+      }
     });
   }
 
   // Run setup when the DOM is ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupThemeToggle);
+    document.addEventListener('DOMContentLoaded', setupMobileMenu);
   } else {
-    setupThemeToggle();
+    setupMobileMenu();
   }
-
-  // Handle mobile menu
-  const mobileMenu = document.getElementById('mobile-menu');
-  const mobileMenuButton = document.getElementById('mobile-menu-button');
-  const closeMenuButton = document.getElementById('close-menu-button');
-  const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-
-  const openMenu = () => {
-    mobileMenu?.classList.remove('translate-x-full');
-    mobileMenuOverlay?.classList.remove('hidden');
-    setTimeout(() => {
-      mobileMenuOverlay?.classList.add('opacity-50');
-    }, 10);
-    document.body.style.overflow = 'hidden';
-  };
-
-  const closeMenu = () => {
-    mobileMenu?.classList.add('translate-x-full');
-    mobileMenuOverlay?.classList.remove('opacity-50');
-    setTimeout(() => {
-      mobileMenuOverlay?.classList.add('hidden');
-    }, 300);
-    document.body.style.overflow = '';
-  };
-
-  mobileMenuButton?.addEventListener('click', openMenu);
-  closeMenuButton?.addEventListener('click', closeMenu);
-  mobileMenuOverlay?.addEventListener('click', closeMenu);
-
-  document.addEventListener('click', (e) => {
-    if (
-      !mobileMenu?.contains(e.target as Node) &&
-      !mobileMenuButton?.contains(e.target as Node) &&
-      !mobileMenu?.classList.contains('translate-x-full')
-    ) {
-      closeMenu();
-    }
-  });
 </script>
 
 <style>

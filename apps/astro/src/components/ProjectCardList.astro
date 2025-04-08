@@ -2,13 +2,20 @@
 import { getCollection } from 'astro:content';
 import { getKeyedCollection } from '@/utils/content';
 import { getProjectUrl } from '@/utils/navigation';
+import ProjectCard, { type ProjectCardProps } from './ProjectCard';
+
+interface Props {
+  variant?: ProjectCardProps['variant'];
+}
+
+const { variant = 'default' }: Props = Astro.props;
 
 const workProjects = await getCollection('workProject');
 const workSkillsById = await getKeyedCollection('workSkills');
 const workProjectCatergoriesById = await getKeyedCollection(
   'workProjectCategory'
 );
-
+const workSkills = await getCollection('workSkills');
 const workProjectsByType = workProjects.reduce<
   Record<string, typeof workProjects>
 >((acc, project) => {
@@ -36,52 +43,11 @@ const workProjectsByType = workProjects.reduce<
         </h2>
         <div class="grid gap-8 md:grid-cols-2">
           {projects.map((project) => (
-            <a
-              href={getProjectUrl(project.id)}
-              class="brutalist-border group bg-background block overflow-hidden transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_var(--color-shadow)]"
-            >
-              {project.data.media && project.data.media.length > 0 && (
-                <div class="border-border aspect-video w-full overflow-hidden border-b-2">
-                  <img
-                    src={project.data.media[0]}
-                    alt={project.data.title}
-                    class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-              )}
-              <div class="p-6">
-                <div class="mb-4 flex items-center justify-between">
-                  <h3 class="text-foreground text-xl font-black uppercase">
-                    {project.data.title}
-                  </h3>
-                  {project.data.isFeatured && (
-                    <span class="brutalist-border bg-primary text-background px-3 py-1 text-sm font-bold">
-                      Featured
-                    </span>
-                  )}
-                </div>
-                <p class="text-foreground mb-4 font-bold">
-                  {project.data.description}
-                </p>
-                {project.data.skills && project.data.skills.length > 0 && (
-                  <div>
-                    <div class="text-foreground mb-2 text-sm font-bold uppercase">
-                      Technologies
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                      {project.data.skills.map(
-                        (skillId) =>
-                          workSkillsById[skillId] !== undefined && (
-                            <span class="brutalist-border-light bg-background text-foreground px-3 py-1 text-sm font-bold">
-                              {workSkillsById[skillId].data.title}
-                            </span>
-                          )
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </a>
+            <ProjectCard
+              project={project}
+              skills={workSkills}
+              variant={variant}
+            />
           ))}
         </div>
       </div>

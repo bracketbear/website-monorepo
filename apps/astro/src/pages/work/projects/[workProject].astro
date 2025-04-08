@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import { getKeyedCollection } from '@/utils/content';
+import { getImage, Image } from 'astro:assets';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const workProjects = await getCollection('workProject');
@@ -41,9 +42,9 @@ const companyTitle =
   <title>{workProject.data.title} | Bracket Bear</title>
 
   <!-- Hero Section -->
-  <div class="bg-cream py-24">
+  <div class="bg-background py-24">
     <div class="container mx-auto px-6">
-      <div class="brutalist-border bg-cream mb-8 inline-block p-8">
+      <div class="brutalist-border bg-background mb-8 inline-block p-8">
         <h1 class="text-foreground text-5xl font-black uppercase">
           {workProject.data.title}
         </h1>
@@ -64,9 +65,9 @@ const companyTitle =
   </div>
 
   <!-- Project Info Bar -->
-  <div class="bg-cream border-y-2 border-black py-8">
+  <div class="bg-background border-y-2 border-black py-8">
     <div class="container mx-auto px-6">
-      <div class="brutalist-border bg-cream flex flex-wrap gap-8 p-8">
+      <div class="brutalist-border bg-background flex flex-wrap gap-8 p-8">
         {
           job !== undefined && (
             <div>
@@ -97,7 +98,7 @@ const companyTitle =
   </div>
 
   <!-- Main Content -->
-  <div class="bg-cream py-16">
+  <div class="bg-background py-16">
     <div class="container mx-auto px-6">
       <div class="grid gap-8 md:grid-cols-3">
         <!-- Main Column -->
@@ -105,7 +106,7 @@ const companyTitle =
           <!-- Description -->
           {
             workProject.data.description?.trim() !== '' && (
-              <section class="brutalist-border bg-cream p-8">
+              <section class="brutalist-border bg-background p-8">
                 <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Overview
                 </h2>
@@ -119,7 +120,7 @@ const companyTitle =
           <!-- Challenges & Solutions -->
           {
             workProject.data.challengesAndSolutions?.trim() !== '' && (
-              <section class="brutalist-border bg-cream p-8">
+              <section class="brutalist-border bg-background p-8">
                 <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Challenges & Solutions
                 </h2>
@@ -133,7 +134,7 @@ const companyTitle =
           <!-- Results -->
           {
             workProject.data.resultsAchieved?.trim() !== '' && (
-              <section class="brutalist-border bg-cream p-8">
+              <section class="brutalist-border bg-background p-8">
                 <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Results Achieved
                 </h2>
@@ -147,7 +148,7 @@ const companyTitle =
           <!-- Media Gallery -->
           {
             (workProject.data.media ?? []).length > 0 && (
-              <section class="brutalist-border bg-cream p-8">
+              <section class="brutalist-border bg-background p-8">
                 <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Project Gallery
                 </h2>
@@ -157,15 +158,13 @@ const companyTitle =
                   </p>
                 )}
                 <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
-                  {(workProject.data.media ?? []).map((imageUrl) => (
-                    <div class="brutalist-border bg-cream aspect-video overflow-hidden">
-                      <img
-                        src={imageUrl}
-                        alt="Project media"
-                        class="h-full w-full object-cover transition-transform hover:scale-105"
-                      />
-                    </div>
-                  ))}
+                  {(workProject.data.media ?? []).map(async (imageUrl) => {
+                    return (
+                      <div class="brutalist-border bg-background aspect-video overflow-hidden">
+                        TODO: Add image
+                      </div>
+                    );
+                  })}
                 </div>
               </section>
             )
@@ -177,7 +176,7 @@ const companyTitle =
           <!-- Job Info -->
           {
             job !== undefined && (
-              <div class="brutalist-border bg-cream p-8">
+              <div class="brutalist-border bg-background p-8">
                 <h3 class="text-foreground mb-4 text-xl font-black uppercase">
                   Role Info
                 </h3>
@@ -196,13 +195,13 @@ const companyTitle =
           <!-- Skills -->
           {
             projectSkills.length > 0 && (
-              <div class="brutalist-border bg-cream p-8">
+              <div class="brutalist-border bg-background p-8">
                 <h3 class="text-foreground mb-4 text-xl font-black uppercase">
                   Technologies Used
                 </h3>
                 <div class="flex flex-wrap gap-2">
                   {projectSkills.map((skill) => (
-                    <span class="brutalist-border-light bg-cream text-foreground px-3 py-1 text-sm font-bold">
+                    <span class="skill-pill skill-pill-default">
                       {skill.data.title}
                     </span>
                   ))}
@@ -221,7 +220,7 @@ const companyTitle =
             </p>
             <a
               href="/contact"
-              class="brutalist-border bg-cream text-foreground block py-3 text-center text-lg font-black uppercase transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
+              class="brutalist-border bg-background text-foreground block py-3 text-center text-lg font-black uppercase transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
             >
               Get in Touch
             </a>

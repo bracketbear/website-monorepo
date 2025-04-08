@@ -3,7 +3,8 @@ import Layout from '@/layouts/Layout.astro';
 import ProjectCardList from '@/components/ProjectCardList.astro';
 import Philosophy from '@/components/Philosophy.astro';
 import About from '@/components/About.astro';
-import WorkTimeline from '@/components/WorkTimeline.astro';
+import WorkHistory from '@/components/WorkHistory';
+import { getCollection } from 'astro:content';
 import '../styles/global.css';
 
 const snakeText = [
@@ -17,19 +18,21 @@ const snakeText = [
   'Problem Solver.',
   'Creative Developer.',
 ];
+
+const jobs = await getCollection('workJobs');
+const companies = await getCollection('workCompany');
+const skills = await getCollection('workSkills');
 ---
 
 <Layout>
   <!-- Brutalist Header Section -->
-  <header class="bg-cream relative z-0 overflow-hidden py-24 dark:bg-black">
+  <header class="bg-background relative z-0 overflow-hidden py-24">
     <canvas
       id="particle-canvas"
       class="fixed top-0 left-0 -z-10 h-screen w-screen"></canvas>
     <div class="relative z-10 container mx-auto px-6">
       <div class="mb-16 max-w-4xl">
-        <div
-          class="brutalist-border bg-cream inline-block p-8 dark:bg-orange-400"
-        >
+        <div class="brutalist-border bg-background inline-block p-8">
           <h1
             class="text-foreground text-8xl font-black tracking-tighter uppercase"
           >
@@ -60,18 +63,17 @@ const snakeText = [
             Available Now!
           </h2>
           <p class="mb-4 text-xl font-bold">
-            Open to <span
-              class="bg-cream text-foreground bg-background px-2 py-1"
+            Open to <span class="text-foreground bg-background px-2 py-1"
               >full-time</span
             >
-            and <span class="bg-cream text-foreground bg-background px-2 py-1"
+            and <span class="text-foreground bg-background px-2 py-1"
               >contract</span
             > full-stack roles.<br />
             Let's build something amazing together.
           </p>
           <a
             href="mailto:contact@bracketbear.com"
-            class="brutalist-border text-foreground bg-background border-background dark:text-primary inline-block px-6 py-3 text-lg font-black transition-transform hover:scale-105 dark:bg-black"
+            class="brutalist-border text-foreground bg-background border-background inline-block px-6 py-3 text-lg font-black transition-transform hover:scale-105"
           >
             Let's Talk →
           </a>
@@ -80,7 +82,7 @@ const snakeText = [
     </div>
   </header>
 
-  <main class="bg-cream dark:bg-black">
+  <main class="bg-background">
     <!-- About Section -->
     <section id="about" class="relative overflow-hidden py-24">
       <div class="relative z-10 container mx-auto px-6">
@@ -99,34 +101,23 @@ const snakeText = [
     <section id="projects" class="relative py-24">
       <div class="relative z-10 container mx-auto px-6">
         <h2
-          class="brutalist-border bg-cream text-foreground dark:bg-primary mb-16 inline-block p-6 text-5xl font-black tracking-tight uppercase"
+          class="brutalist-border bg-background text-foreground mb-16 inline-block p-6 text-5xl font-black tracking-tight uppercase"
         >
-          Featured Projects
+          Project Showcase
         </h2>
-        <div class="brutalist-border bg-cream p-8 dark:bg-black">
-          <div class="grid gap-8 md:grid-cols-2">
-            <div>
-              <h3
-                class="text-foreground hover:text-primary mb-4 text-3xl font-black tracking-tight uppercase"
-              >
-                Project Showcase
-              </h3>
-              <p
-                class="text-foreground hover:text-primary flex text-xl font-bold"
-              >
-                Here are some of the projects I've been lucky enough to work on.
-              </p>
-            </div>
-            <ProjectCardList />
-          </div>
-        </div>
+        <ProjectCardList variant="simple" />
       </div>
     </section>
 
     <!-- Work History Section -->
     <section id="history" class="relative overflow-hidden py-24">
       <div class="relative z-10 container mx-auto px-6">
-        <WorkTimeline />
+        <h2
+          class="brutalist-border bg-background text-foreground mb-16 inline-block p-6 text-5xl font-black tracking-tight uppercase"
+        >
+          Work History
+        </h2>
+        <WorkHistory jobs={jobs} companies={companies} skills={skills} />
       </div>
     </section>
   </main>
