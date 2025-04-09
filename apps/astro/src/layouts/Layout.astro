@@ -4,6 +4,13 @@ import Footer from '@/components/ui/Footer.astro';
 import ContactForm from '@/components/ui/ContactForm.astro';
 import '../styles/global.css';
 
+interface Props {
+  title?: string;
+  hideContactForm?: boolean;
+}
+
+const { hideContactForm = false } = Astro.props;
+
 // Get initial theme from Astro.cookies if available, otherwise default to system preference
 const theme = Astro.cookies.get('theme')?.value ?? 'system';
 const isDark =
@@ -56,7 +63,7 @@ const isDark =
   >
     <NavBar class="relative z-50" />
     <slot />
-    <ContactForm class="relative z-10" />
+    {!hideContactForm && <ContactForm class="relative z-10" />}
     <Footer />
   </body>
 
