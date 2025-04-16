@@ -1,47 +1,44 @@
 ---
-import clsx from "clsx";
-import { type ObjectValues } from "../../utils/typescript";
-
-const buttonVariants = {
-  primary: 'primary',
-  secondary: 'secondary',
-  tertiary: 'tertiary',
-  danger: 'danger',
-  success: 'success',
-  warning: 'warning',
-  outlineDark: 'outlineDark',
-  outlineLight: 'outlineLight',
-}
-type ButtonVariant = ObjectValues<typeof buttonVariants>;
+import '@/styles/forms.css';
 
 interface Props {
-  variant?: ButtonVariant;
-  type?: "button" | "submit" | "reset";
+  type?: 'button' | 'submit' | 'reset';
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
   disabled?: boolean;
 }
 
 const {
-  variant = buttonVariants.primary,
-  type = "button",
+  type = 'button',
+  variant = 'primary',
+  size = 'md',
+  class: className,
   disabled = false,
 } = Astro.props;
+
+const variantClasses = {
+  primary: 'bg-foreground text-background',
+  secondary: 'bg-background text-foreground border-foreground',
+  ghost: 'bg-transparent text-foreground',
+};
+
+const sizeClasses = {
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-6 py-3 text-base',
+  lg: 'px-8 py-4 text-xl',
+};
 ---
 
 <button
   type={type}
+  class:list={[
+    'brutalist-border transform font-black uppercase transition-all hover:scale-105 hover:rotate-1 active:scale-95',
+    variantClasses[variant],
+    sizeClasses[size],
+    className,
+  ]}
   disabled={disabled}
-  class={clsx(
-    "inline-flex items-center justify-center rounded-md border-2 border-gray-900 px-4 py-2 text-sm font-bold text-white uppercase shadow-sm focus:ring-2 focus:ring-offset-2 focus:outline-none hover:cursor-pointer",
-    variant === "primary" && "bg-orange-600 hover:bg-orange-700 focus:ring-orange-500",
-    variant === "secondary" && "bg-gray-600 hover:bg-gray-700 focus:ring-gray-500",
-    variant === "tertiary" && "bg-green-600 hover:bg-green-700 focus:ring-green-500",
-    variant === "danger" && "bg-red-600 hover:bg-red-700 focus:ring-red-500",
-    variant === "success" && "bg-green-600 hover:bg-green-700 focus:ring-green-500",
-    variant === "warning" && "bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500",
-    variant === "outlineDark" && "border-gray-900 bg-transparent text-gray-900 hover:bg-gray-900 hover:text-gray-900 focus:ring-gray-900",
-    variant === "outlineLight" && "border-gray-300 bg-transparent text-gray-900 hover:bg-gray-900 hover:text-white focus:ring-gray-900",
-    disabled && "disabled:cursor-not-allowed disabled:opacity-50",
-  )}
 >
-  <slot>Click me</slot>
+  <slot />
 </button>

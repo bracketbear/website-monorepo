@@ -137,7 +137,7 @@ export default function WorkSkillFilter({
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
               className={clsx(
-                'brutalist-border bg-background px-4 py-2',
+                'skill-pill px-4 py-2',
                 selectedCategories.includes(category.id)
                   ? 'skill-pill-selected'
                   : 'border-2'
@@ -158,7 +158,7 @@ export default function WorkSkillFilter({
               key={skill.id}
               onClick={() => toggleSkill(skill.id)}
               className={clsx(
-                'brutalist-border bg-background px-4 py-2',
+                'skill-pill px-4 py-2',
                 selectedSkills.includes(skill.id) ? 'skill-pill-selected' : 'border-2',
                 filteredSkills.includes(skill) ? 'skill-pill-selected' : 'text-foreground'
               )}

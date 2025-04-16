@@ -1,0 +1,187 @@
+---
+interface Props {
+  class?: string;
+  checked?: boolean;
+  onChange?: (checked: boolean) => void;
+}
+
+const { class: className, checked = false, onChange } = Astro.props;
+console.log('Switch', { className, checked, onChange });
+---
+
+<button
+  id="switch"
+  type="button"
+  class:list={[
+    'switch border-foreground bg-background relative h-10 w-20 rounded-full border-2 p-1 transition-colors duration-300',
+    className,
+  ]}
+  aria-label="Toggle switch"
+  data-checked={checked.toString()}
+>
+  <div class="icons-container relative h-full w-full">
+    <!-- Left Icon -->
+    <div
+      class="left-icon absolute left-1 flex h-7 w-7 items-center justify-center"
+    >
+      <slot name="left" />
+    </div>
+    <!-- Right Icon -->
+    <div
+      class="right-icon absolute right-1 flex h-7 w-7 items-center justify-center"
+    >
+      <slot name="right" />
+    </div>
+    <!-- Sliding Indicator -->
+    <div
+      class="slider bg-foreground absolute flex h-7 w-7 items-center justify-center rounded-full transition-all duration-300"
+    >
+      <!-- Selected Left Icon -->
+      <div class="selected-left-icon text-background">
+        <slot name="left" />
+      </div>
+      <!-- Selected Right Icon -->
+      <div class="selected-right-icon text-background hidden">
+        <slot name="right" />
+      </div>
+    </div>
+  </div>
+</button>
+
+<style>
+  .switch {
+    cursor: pointer;
+  }
+
+  .switch .icons-container {
+    color: var(--color-foreground);
+  }
+
+  .switch .slider {
+    transform: translateX(0);
+  }
+
+  .switch[data-checked='true'] .slider {
+    transform: translateX(2.5rem);
+  }
+
+  .left-icon,
+  .right-icon {
+    opacity: 0.5;
+    transition: all 0.3s ease;
+  }
+
+  /* Show/hide selected icons */
+  .selected-left-icon {
+    opacity: 1;
+    transform: scale(1);
+    transition: all 0.3s ease;
+  }
+
+  .selected-right-icon {
+    opacity: 1;
+    transform: scale(1);
+    transition: all 0.3s ease;
+  }
+
+  .switch[data-checked='true'] .selected-left-icon {
+    display: none;
+  }
+
+  .switch[data-checked='true'] .selected-right-icon {
+    display: block;
+  }
+
+  /* Rise animation for active icon */
+  .switch:not([data-checked='true']) .left-icon {
+    opacity: 1;
+    animation: rise 0.3s ease;
+  }
+
+  .switch[data-checked='true'] .right-icon {
+    opacity: 1;
+    animation: rise 0.3s ease;
+  }
+
+  @keyframes rise {
+    0% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-4px) scale(1.1);
+    }
+    100% {
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Hover effects */
+  .switch:hover .slider {
+    transform: scale(1.05);
+  }
+
+  .switch[data-checked='true']:hover .slider {
+    transform: translateX(2.5rem) scale(1.05);
+  }
+</style>
+
+<script define:vars={{ checked, onChange }}>
+  console.log('Switch', { checked, onChange });
+  function setupSwitch() {
+    console.log('setupSwitch');
+    const switchElement = document.getElementById('switch');
+    const selectedLeftIcon = document.querySelector('.selected-left-icon');
+    const selectedRightIcon = document.querySelector('.selected-right-icon');
+
+    // Update icons based on initial state
+    if (checked) {
+      selectedLeftIcon?.classList.add('hidden');
+      selectedRightIcon?.classList.remove('hidden');
+    } else {
+      selectedLeftIcon?.classList.remove('hidden');
+      selectedRightIcon?.classList.add('hidden');
+    }
+
+    switchElement?.addEventListener('click', function () {
+      // Determine new state based on current state attribute
+      const isChecked = switchElement.dataset.checked === 'true';
+      const newChecked = !isChecked;
+
+      // Call the parent's onChange callback
+      if (typeof onChange === 'function') {
+        onChange(newChecked);
+        console.log('onChange', newChecked);
+      } else {
+        console.log('onChange is not a function');
+      }
+
+      // Update the DOM manually to reflect the new state
+      switchElement.dataset.checked = newChecked.toString();
+      console.log(
+        'switchElement.dataset.checked',
+        switchElement.dataset.checked
+      );
+      console.log({ switchElement, newChecked, isChecked });
+
+      // Toggle icon visibility
+      const selectedLeftIcon = document.querySelector('.selected-left-icon');
+      const selectedRightIcon = document.querySelector('.selected-right-icon');
+
+      if (newChecked) {
+        console.log({ selectedLeftIcon, selectedRightIcon });
+        selectedLeftIcon?.classList.add('hidden');
+        selectedRightIcon?.classList.remove('hidden');
+      } else {
+        selectedLeftIcon?.classList.remove('hidden');
+        selectedRightIcon?.classList.add('hidden');
+      }
+    });
+  }
+
+  // Run setup when the DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupSwitch);
+  } else {
+    setupSwitch();
+  }
+</script>

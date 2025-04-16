@@ -10,5 +10,12 @@
   ],
   "startDate": "2012-11-01",
   "endDate": "2016-01-01",
-  "isCurrentJob": false
+  "isCurrentJob": false,
+  "workSkills": [
+    "wordpress",
+    "php",
+    "html",
+    "css",
+    "javascript"
+  ]
 }

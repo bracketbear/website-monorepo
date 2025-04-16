@@ -1,7 +1,7 @@
 ---
-import NavBar from '@/components/ui/NavBar.astro';
-import Footer from '@/components/ui/Footer.astro';
-import ContactForm from '@/components/ui/ContactForm.astro';
+import NavBar from '@/components/NavBar.astro';
+import Footer from '@/components/Footer.astro';
+import ContactForm from '@/components/ContactForm.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -43,13 +43,15 @@ const isDark =
 
         // Set theme based on preference
         const theme = getThemePreference();
-        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.dataset.theme = theme;
 
         // Watch for system theme changes if no manual preference is set
         if (!localStorage.theme) {
           const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
           mediaQuery.addEventListener('change', (e) => {
-            document.documentElement.classList.toggle('dark', e.matches);
+            document.documentElement.dataset.theme = e.matches
+              ? 'dark'
+              : 'light';
           });
         }
       }
@@ -59,7 +61,7 @@ const isDark =
     </script>
   </head>
   <body
-    class="bg-background text-foreground min-h-screen transition-colors duration-300"
+    class="bg-dark dark:bg-brand-dark text-foreground min-h-screen transition-colors duration-300"
   >
     <NavBar class="relative z-50" />
     <slot />

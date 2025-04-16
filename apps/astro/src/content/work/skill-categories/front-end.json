@@ -1,5 +1,5 @@
 {
-  "title": "Front-End",
+  "title": "Front-End Development",
   "description": "Front-End Development",
   "skills": [
     "react",
@@ -13,6 +13,7 @@
     "mui",
     "redux",
     "storybook",
-    "javascript"
+    "javascript",
+    "css"
   ]
 }

@@ -1,0 +1,35 @@
+---
+import '@/styles/forms.css';
+
+interface Props {
+  name: string;
+  type?: 'text' | 'email' | 'tel' | 'url' | 'number';
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+  class?: string;
+}
+
+const {
+  name,
+  type = 'text',
+  label,
+  placeholder,
+  required = false,
+  class: className,
+} = Astro.props;
+---
+
+<div class="form-control group">
+  <label class="label">
+    <span class="form-label">{label}</span>
+    {required && <span class="form-required">*</span>}
+  </label>
+  <input
+    type={type}
+    name={name}
+    placeholder={placeholder}
+    class:list={['form-input', className]}
+    required={required}
+  />
+</div>

@@ -9,5 +9,15 @@
   ],
   "startDate": "2023-04-01",
   "endDate": "2023-12-01",
-  "isCurrentJob": false
+  "isCurrentJob": false,
+  "workSkills": [
+    "react",
+    "typescript",
+    "laravel",
+    "php",
+    "mysql",
+    "docker",
+    "git",
+    "tailwind-css"
+  ]
 }

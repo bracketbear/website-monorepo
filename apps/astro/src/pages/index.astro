@@ -11,12 +11,6 @@ const snakeText = [
   'Software Engineer.',
   'Problem Solver.',
   'Creative Developer.',
-  'Software Engineer.',
-  'Problem Solver.',
-  'Creative Developer.',
-  'Software Engineer.',
-  'Problem Solver.',
-  'Creative Developer.',
 ];
 
 const jobs = await getCollection('workJobs');
@@ -26,17 +20,21 @@ const skills = await getCollection('workSkills');
 
 <Layout>
   <!-- Brutalist Header Section -->
-  <header class="bg-background relative z-0 overflow-hidden py-24">
+  <header
+    class="bg-brand-red dark:bg-brand-red/20 relative z-0 overflow-hidden py-24"
+  >
     <canvas
       id="particle-canvas"
       class="fixed top-0 left-0 -z-10 h-screen w-screen"></canvas>
     <div class="relative z-10 container mx-auto px-6">
       <div class="mb-16 max-w-4xl">
-        <div class="brutalist-border bg-background inline-block p-8">
+        <div class="inline-block">
           <h1
-            class="text-foreground text-8xl font-black tracking-tighter uppercase"
+            class="text-brand-light text-8xl font-black tracking-tight uppercase"
           >
-            Bracket<br />Bear
+            Experiential<br />
+            Full-Stack<br />
+            Pressure Relief Valve
           </h1>
         </div>
         <div class="snake-text-container mt-8">

@@ -1,5 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import '@/styles/forms.css';
+import Input from '@/components/atoms/Input.astro';
+import Textarea from '@/components/atoms/Textarea.astro';
+import Button from '@/components/atoms/Button.astro';
 ---
 
 <Layout title="Contact Us" hideContactForm={true}>
@@ -89,84 +93,38 @@ import Layout from '../layouts/Layout.astro';
                 </p>
 
                 <div class="grid gap-6 md:grid-cols-2">
-                  <div class="form-control group">
-                    <label class="label">
-                      <span
-                        class="text-foreground group-focus-within:text-primary text-lg font-black uppercase transition-colors"
-                      >
-                        Name
-                      </span>
-                      <span class="label-text-alt text-error">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Your name"
-                      class="input input-bordered bg-background text-foreground focus:input-primary w-full transform transition-all hover:-translate-y-0.5"
-                      required
-                    />
-                  </div>
-
-                  <div class="form-control group">
-                    <label class="label">
-                      <span
-                        class="text-foreground group-focus-within:text-primary text-lg font-black uppercase transition-colors"
-                      >
-                        Email
-                      </span>
-                      <span class="label-text-alt text-error">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="your@email.com"
-                      class="input input-bordered bg-background text-foreground focus:input-primary w-full transform transition-all hover:-translate-y-0.5"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div class="form-control group">
-                  <label class="label">
-                    <span
-                      class="text-foreground group-focus-within:text-primary text-lg font-black uppercase transition-colors"
-                    >
-                      Subject
-                    </span>
-                    <span class="label-text-alt text-error">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="subject"
-                    placeholder="What's on your mind?"
-                    class="input input-bordered bg-background text-foreground focus:input-primary w-full transform transition-all hover:-translate-y-0.5"
+                  <Input
+                    name="name"
+                    label="Name"
+                    placeholder="Your name"
+                    required
+                  />
+                  <Input
+                    name="email"
+                    type="email"
+                    label="Email"
+                    placeholder="your@email.com"
                     required
                   />
                 </div>
 
-                <div class="form-control group">
-                  <label class="label">
-                    <span
-                      class="text-foreground group-focus-within:text-primary text-lg font-black uppercase transition-colors"
-                    >
-                      Message
-                    </span>
-                    <span class="label-text-alt text-error">*</span>
-                  </label>
-                  <textarea
-                    name="message"
-                    placeholder="Tell me about your project or idea. Keep Portland weird! 🌲"
-                    class="textarea textarea-bordered bg-background text-foreground focus:textarea-primary h-48 w-full transform transition-all hover:-translate-y-0.5"
-                    required></textarea>
-                </div>
+                <Input
+                  name="subject"
+                  label="Subject"
+                  placeholder="What's on your mind?"
+                  required
+                />
+
+                <Textarea
+                  name="message"
+                  label="Message"
+                  placeholder="Tell me about your project or idea. Keep Portland weird! 🌲"
+                  required
+                  rows={8}
+                />
 
                 <div class="mt-4 flex flex-col items-center gap-4">
-                  <button
-                    type="submit"
-                    class="brutalist-border bg-foreground text-background border-background transform px-8 py-4 text-xl font-black uppercase transition-all hover:scale-105 hover:rotate-1 active:scale-95"
-                  >
-                    Send Message →
-                  </button>
+                  <Button type="submit" size="lg"> Send Message → </Button>
                   <small class="text-foreground/70 font-bold">
                     * Required fields
                   </small>
@@ -181,24 +139,6 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <style>
-  .brutalist-border {
-    position: relative;
-    border: 4px solid var(--color-foreground);
-    box-shadow: 8px 8px 0 var(--color-foreground);
-  }
-
-  .input,
-  .textarea {
-    border: 2px solid var(--color-foreground);
-  }
-
-  .input:focus,
-  .textarea:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 4px 4px 0 var(--color-primary);
-  }
-
   /* Reuse the particle animation from index.astro */
   @keyframes gradient-shift {
     0% {
@@ -379,12 +319,7 @@ import Layout from '../layouts/Layout.astro';
             particle.rotation
           );
         } else {
-          this.drawDot(
-            particle.x,
-            particle.y,
-            particle.size,
-            particle.rotation
-          );
+          this.drawDot(particle.x, particle.y, particle.size);
         }
       });
 

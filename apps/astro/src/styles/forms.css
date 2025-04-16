@@ -1,0 +1,29 @@
+@reference './global.css';
+
+/* Shared form styles */
+.form-control {
+  @apply relative;
+}
+
+.form-label {
+  @apply text-foreground text-lg font-black uppercase group-focus-within:text-primary transition-colors;
+}
+
+.form-input {
+  @apply  bg-background text-foreground w-full transition-all transform hover:-translate-y-0.5 px-4 py-2;
+  border: 2px solid var(--color-foreground);
+}
+
+.form-input:focus {
+  @apply outline-none;
+  border-color: var(--color-primary);
+  box-shadow: 4px 4px 0 var(--color-primary);
+}
+
+.form-button {
+  @apply  bg-foreground text-background border-background px-8 py-4 text-xl font-black uppercase transition-all transform hover:scale-105 hover:rotate-1 active:scale-95;
+}
+
+.form-required {
+  @apply text-brand-red;
+}

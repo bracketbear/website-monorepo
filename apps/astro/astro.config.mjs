@@ -9,9 +9,9 @@ import markdoc from '@astrojs/markdoc';
 export default defineConfig({
   integrations: [
     react(),
-    markdoc(), 
+    markdoc(),
     // Bug when trying to statically render website. This disabless Keystatic when building.
-    !import.meta.env.PROD ? keystatic() : null
+    !import.meta.env.PROD ? keystatic() : null,
   ],
   vite: {
     plugins: [

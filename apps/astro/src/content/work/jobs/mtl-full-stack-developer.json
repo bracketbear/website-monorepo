@@ -11,5 +11,17 @@
   ],
   "startDate": "2016-03-01",
   "endDate": "2020-01-01",
-  "isCurrentJob": false
+  "isCurrentJob": false,
+  "workSkills": [
+    "react",
+    "css",
+    "html",
+    "javascript",
+    "php",
+    "mysql",
+    "laravel",
+    "git",
+    "docker"
+    
+  ]
 }

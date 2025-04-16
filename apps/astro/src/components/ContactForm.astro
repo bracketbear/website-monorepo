@@ -1,0 +1,76 @@
+---
+import '@/styles/forms.css';
+import Input from './atoms/Input.astro';
+import Textarea from './atoms/Textarea.astro';
+import Button from './atoms/Button.astro';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props satisfies Props;
+---
+
+<section class:list={['py-24', className]}>
+  <div class="container mx-auto px-6">
+    <div class="brutalist-border bg-background p-8">
+      <div class="mb-8">
+        <h2 class="text-foreground mb-4 text-4xl font-black uppercase">
+          Contact Me
+        </h2>
+        <p class="text-foreground text-xl font-bold">
+          Have a project in mind? I'd love to hear about it. Drop me a message
+          and I'll get back to you as soon as possible.
+        </p>
+      </div>
+
+      <form
+        name="contact-form"
+        method="POST"
+        data-netlify="true"
+        class="grid gap-6"
+        netlify-honeypot="bot-field"
+      >
+        <input type="hidden" name="form-name" value="contact-form" />
+        <p class="hidden">
+          <label>
+            Don't fill this out if you're human: <input name="bot-field" />
+          </label>
+        </p>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          <Input name="name" label="Name" placeholder="Your name" required />
+          <Input
+            name="email"
+            type="email"
+            label="Email"
+            placeholder="your@email.com"
+            required
+          />
+        </div>
+
+        <Input
+          name="subject"
+          label="Subject"
+          placeholder="What's on your mind?"
+          required
+        />
+
+        <Textarea
+          name="message"
+          label="Message"
+          placeholder="Tell me about your project or idea. Keep Portland weird! 🌲"
+          required
+          rows={8}
+        />
+
+        <div class="mt-4 flex flex-col items-center gap-4">
+          <Button type="submit" size="lg"> Send Message → </Button>
+          <small class="text-foreground/70 font-bold">
+            * Required fields
+          </small>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

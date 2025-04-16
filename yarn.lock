@@ -1053,15 +1053,15 @@
   version "0.0.1"
   resolved "file:apps/astro"
   dependencies:
-    "@astrojs/markdoc" "^0.13.0"
-    "@astrojs/react" "^4.2.1"
+    "@astrojs/markdoc" "^0.13.3"
+    "@astrojs/react" "^4.2.3"
     "@fontsource/fontdiner-swanky" "^5.2.5"
     "@keystatic/astro" "^5.0.6"
     "@keystatic/core" "^0.5.46"
     "@tailwindcss/vite" "^4.0.14"
     "@types/react" "^19.0.10"
     "@types/react-dom" "^19.0.4"
-    astro "^5.5.2"
+    astro "^5.6.0"
     clsx "^2.1.1"
     react "^19.0.0"
     react-dom "^19.0.0"
@@ -1515,6 +1515,11 @@
   version "0.2.8"
   resolved "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.8.tgz"
   integrity sha512-kym7SodPp8/wloecOpcmSnWJsK7M0E5Wg8UcFA+uO4B9s5d0ywXOEro/8HM9x0rW+TljRzul/14UYz3TleT3ig==
+
+"@fontsource-variable/oswald@^5.2.5":
+  version "5.2.5"
+  resolved "https://registry.npmjs.org/@fontsource-variable/oswald/-/oswald-5.2.5.tgz"
+  integrity sha512-ONcE+mSnElfIzA6siZwdWsMMWpEQamhtYvPVuBrP7PEs55OeGL1djDKWIuVksPDZeowHo+6c1vo8ZWTrL1dsVw==
 
 "@fontsource/fontdiner-swanky@^5.2.5":
   version "5.2.5"
