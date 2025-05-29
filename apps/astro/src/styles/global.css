@@ -62,18 +62,6 @@
   --color-dark: var(--color-brand-light);
 }
 
-@utility halftone-shadow {
-  box-shadow: 0 0 0 1px var(--color-border);
-  &::after {
-    content: '';
-    position: relative;
-    top: 10px;
-    left: 10px;
-    width: calc(100% - 20px);
-    height: calc(100% - 20px);
-  }
-}
-
 @layer components {
   /* Brutalist Utility Classes */
   .brutalist-border {
@@ -94,56 +82,7 @@
 
 /* Utility Classes */
 @layer utilities {
-  .gradient-text {
-    background: linear-gradient(
-      to right,
-      var(--color-primary),
-      var(--color-secondary)
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    font-weight: 900;
-  }
-
-  .gradient-border {
-    position: relative;
-    border: 2px solid var(--color-border);
-    background: linear-gradient(
-      to bottom right,
-      var(--color-primary),
-      var(--color-secondary)
-    );
-    box-shadow: var(--shadow-md) var(--color-shadow);
-    transition: all var(--transition-normal);
-    padding: 1px;
-  }
-
-  .gradient-border:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: var(--shadow-lg) var(--color-shadow);
-  }
-
-  .gradient-bg {
-    background: linear-gradient(
-      to right,
-      var(--color-primary),
-      var(--color-secondary)
-    );
-    color: var(--color-background);
-  }
-
-  .gradient-bg-subtle {
-    background: linear-gradient(
-      to right,
-      color-mix(in srgb, var(--color-primary) 20%, transparent),
-      color-mix(in srgb, var(--color-secondary) 20%, transparent)
-    );
-    border: 2px solid var(--color-primary);
-  }
-
   .skill-pill {
-    /* color: var(--color-brand-red); */
     border: 2px solid var(--color-border);
     border-radius: 0.25rem;
     padding: 0.25rem 0.5rem;
