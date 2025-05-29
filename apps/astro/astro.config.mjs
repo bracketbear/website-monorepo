@@ -4,6 +4,7 @@ import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import keystatic from '@keystatic/astro';
 import markdoc from '@astrojs/markdoc';
+import svgr from 'vite-plugin-svgr';
 
 // https://astro.build/config
 export default defineConfig({
@@ -17,6 +18,8 @@ export default defineConfig({
     plugins: [
       // @ts-expect-error: Bug with TailwindCSS Vite plugin type definition
       tailwindcss(),
+      // @ts-expect-error: Bug with TailwindCSS Vite plugin type definition
+      svgr(),
     ],
   },
   output: 'static',

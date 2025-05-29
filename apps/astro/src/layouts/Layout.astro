@@ -61,11 +61,11 @@ const isDark =
     </script>
   </head>
   <body
-    class="bg-dark dark:bg-brand-dark text-foreground min-h-screen transition-colors duration-300"
+    class="bg-background text-foreground min-h-screen transition-colors duration-300"
   >
     <NavBar class="relative z-50" />
     <slot />
-    {!hideContactForm && <ContactForm class="relative z-10" />}
+    {!hideContactForm && <ContactForm class="bg-primary relative z-10 py-36" />}
     <Footer />
   </body>
 

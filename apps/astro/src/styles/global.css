@@ -25,13 +25,16 @@
   --color-brand-red: #bb4430;
   --color-brand-orange: #ffc15e;
   --color-brand-blue: #7ebdc2;
+  --color-brand-green: #98CE00;
   --color-brand-yellow: #f3dfa2;
+  --color-brand-purple: #B185A7;
   --color-brand-light: #efe6dd;
 
   /* Theme Tokens - Light Mode Defaults */
   --color-dark: var(--color-brand-dark);
-  --color-primary: var(--color-brand-red);
-  --color-secondary: var(--color-brand-blue);
+  --color-primary: var(--color-brand-orange);
+  --color-secondary: var(--color-brand-red);
+  --color-tertiary: var(--color-brand-green);
   --color-background: var(--color-brand-light);
   --color-foreground: var(--color-dark);
   --color-border: var(--color-dark);

@@ -9,17 +9,20 @@ interface Props {
 
 const UNDERLINE =
   'bg-foreground absolute -bottom-1 left-0 h-1 w-0 transition-all duration-300 group-hover:w-full' as const;
+
+const BACKGROUND_COLOR = 'bg-brand-orange dark:bg-dark' as const;
+const TEXT_COLOR = 'text-foreground' as const;
 ---
 
 <nav
-  class="bg-brand-orange dark:bg-dark border-foreground border-y-2"
-  class:list={Astro.props.class}
+  class="border-foreground border-y-2"
+  class:list={[Astro.props.class, BACKGROUND_COLOR]}
 >
   <div class="container mx-auto flex items-center justify-between px-6 py-4">
     <!-- Logo Section -->
     <div class="flex items-center gap-4">
       <div class="flex h-16 w-16 items-center justify-center">
-        <Logo class="text-foreground" />
+        <Logo class={TEXT_COLOR} />
       </div>
       <div class="text-lg leading-5.5 font-black tracking-normal uppercase">
         <a href="/" class="text-foreground hover:opacity-80"
@@ -56,7 +59,10 @@ const UNDERLINE =
                     <span class={UNDERLINE} />
                   </button>
                   <div class="invisible absolute left-0 z-50 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100">
-                    <div class="brutalist-border bg-background py-4 shadow-[8px_8px_0_0_#111111]">
+                    <div
+                      class="brutalist-border py-4 shadow-[8px_8px_0_0_#111111]"
+                      class:list={[BACKGROUND_COLOR]}
+                    >
                       {item.children.map((child) => (
                         <a
                           href={child.href}
@@ -266,17 +272,3 @@ const UNDERLINE =
     setupMobileMenu();
   }
 </script>
-
-<style>
-  @keyframes gradient-shift {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-</style>

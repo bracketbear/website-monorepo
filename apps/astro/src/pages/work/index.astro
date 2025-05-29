@@ -1,69 +1,53 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import { getCollection } from 'astro:content';
-import { getKeyedCollection } from '@/utils/content';
 import WorkSkillFilter from '@/components/WorkSkillFilter';
 
 const workProjects = await getCollection('workProject');
 const workSkills = await getCollection('workSkills');
 const workJobs = await getCollection('workJobs');
 const workCompanies = await getCollection('workCompany');
-const keyedWorkCompanies = await getKeyedCollection('workCompany');
 const workSkillCategories = await getCollection('workSkillCategory');
-const keyedWorkSkillCategories = await getKeyedCollection('workSkillCategory');
-const workSkillsByCategory = workSkills.reduce(
-  (acc: Record<string, any[]>, skill) => {
-    const categories = skill.data.categories;
-
-    categories?.forEach((category) => {
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(skill);
-    });
-    return acc;
-  },
-  {}
-);
 ---
 
 <Layout>
   <title>Work | Bracket Bear</title>
-  <div class="container mx-auto px-6">
-    <div class="brutalist-border bg-background mb-8 inline-block p-8">
-      <h1 class="text-foreground text-5xl font-black uppercase">Work</h1>
-    </div>
-  </div>
-  <!-- Introduction -->
-  <div class="container mx-auto px-6">
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
-      <div class="bg-background p-8">
-        <p class="text-foreground space-y-4 pb-5 text-2xl font-medium">
-          I've been working as a software engineer for over 10 years. I've
-          worked in a variety of roles, from a solo developer to a team of 12+
-          engineers. I've worked in a variety of industries, from startups to
-          large corporations.
-        </p>
-        <p class="text-foreground space-y-4 text-2xl font-medium">
-          The tool below is to help you understand my skills and experience.
-          <span
-            class="skill-pill skill-pill-selected brutalist-border mr-1 rounded-none !text-lg"
-            >Select</span
-          > a skill to see projects I've worked on that use that skill, or a category
-          to choose multiple skills at once. We'll filter the list of jobs and projects
-          and show you the ones that match your selection.
-        </p>
+  <div class="bg-primary/50 py-24">
+    <div class="container mx-auto px-6">
+      <div class="brutalist-border bg-background mb-8 inline-block p-8">
+        <h1 class="text-foreground text-5xl font-black uppercase">Work</h1>
+      </div>
+      <!-- Introduction -->
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <div class="p-8">
+          <p class="text-foreground space-y-4 pb-5 text-2xl font-medium">
+            I've been working as a software engineer for over 10 years. I've
+            worked in a variety of roles, from a solo developer to a team of 12+
+            engineers. I've worked in a variety of industries, from startups to
+            large corporations.
+          </p>
+          <p class="text-foreground space-y-4 text-2xl font-medium">
+            The tool below is to help you understand my skills and experience.
+            <span
+              class="skill-pill skill-pill-selected brutalist-border mr-1 rounded-none !text-lg"
+              >Select</span
+            > a skill to see projects I've worked on that use that skill, or a category
+            to choose multiple skills at once. We'll filter the list of jobs and
+            projects and show you the ones that match your selection.
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="container mx-auto px-6 py-16">
-    <WorkSkillFilter
-      skills={workSkills}
-      skillCategories={workSkillCategories}
-      jobs={workJobs}
-      projects={workProjects}
-      companies={workCompanies}
-      client:load
-    />
+
+    <div class="container mx-auto px-6 py-16">
+      <WorkSkillFilter
+        skills={workSkills}
+        skillCategories={workSkillCategories}
+        jobs={workJobs}
+        projects={workProjects}
+        companies={workCompanies}
+        client:load
+      />
+    </div>
   </div>
 </Layout>

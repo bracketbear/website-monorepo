@@ -1,12 +1,12 @@
 ---
+import { getCollection } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import ProjectCardList from '@/components/ProjectCardList.astro';
 import Philosophy from '@/components/Philosophy.astro';
 import About from '@/components/About.astro';
 import WorkHistory from '@/components/WorkHistory';
-import { getCollection } from 'astro:content';
+import SkillsTicker from '@/components/SkillsTicker';
 import '../styles/global.css';
-
 const snakeText = [
   'Software Engineer.',
   'Problem Solver.',
@@ -21,7 +21,7 @@ const skills = await getCollection('workSkills');
 <Layout>
   <!-- Brutalist Header Section -->
   <header
-    class="bg-brand-red dark:bg-brand-red/20 relative z-0 overflow-hidden py-24"
+    class="bg-brand-red dark:bg-brand-red/20 relative z-0 overflow-hidden pt-24"
   >
     <canvas
       id="particle-canvas"
@@ -55,7 +55,7 @@ const skills = await getCollection('workSkills');
         class="mt-16 w-full lg:absolute lg:top-24 lg:right-6 lg:mt-0 lg:w-96"
       >
         <div
-          class="availability-box brutalist-border bg-foreground text-background transform p-6 lg:rotate-2"
+          class="availability-box brutalist-border bg-tertiary text-background transform p-6 lg:rotate-2"
         >
           <h2 class="mb-2 text-4xl font-black tracking-tight uppercase">
             Available Now!
@@ -78,25 +78,27 @@ const skills = await getCollection('workSkills');
         </div>
       </div>
     </div>
+    <!-- Skills Ticker -->
+    <SkillsTicker skills={skills} client:load />
   </header>
 
   <main class="bg-background">
     <!-- About Section -->
-    <section id="about" class="relative overflow-hidden py-24">
+    <section id="about" class="bg-primary relative overflow-hidden py-24">
       <div class="relative z-10 container mx-auto px-6">
         <About />
       </div>
     </section>
 
     <!-- Philosophy Section -->
-    <section id="philosophy" class="relative py-24">
+    <section id="philosophy" class="py- bg-brand-orange relative">
       <div class="relative z-10 container mx-auto px-6">
         <Philosophy />
       </div>
     </section>
 
     <!-- Projects Section -->
-    <section id="projects" class="relative py-24">
+    <section id="projects" class="bg-brand-green relative py-24">
       <div class="relative z-10 container mx-auto px-6">
         <h2
           class="brutalist-border bg-background text-foreground mb-16 inline-block p-6 text-5xl font-black tracking-tight uppercase"
@@ -108,7 +110,10 @@ const skills = await getCollection('workSkills');
     </section>
 
     <!-- Work History Section -->
-    <section id="history" class="relative overflow-hidden py-24">
+    <section
+      id="history"
+      class="bg-brand-purple relative overflow-hidden py-24"
+    >
       <div class="relative z-10 container mx-auto px-6">
         <h2
           class="brutalist-border bg-background text-foreground mb-16 inline-block p-6 text-5xl font-black tracking-tight uppercase"
@@ -122,23 +127,6 @@ const skills = await getCollection('workSkills');
 </Layout>
 
 <style>
-  @keyframes gradient-shift {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-
-  .bg-gradient-animate {
-    background-size: 200% 200%;
-    animation: gradient-shift 15s ease infinite;
-  }
-
   @keyframes shake {
     0%,
     100% {

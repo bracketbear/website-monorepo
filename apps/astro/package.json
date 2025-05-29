@@ -36,6 +36,7 @@
     "eslint-plugin-readable-tailwind": "^2.0.0",
     "prettier": "3.5.3",
     "prettier-plugin-astro": "0.14.1",
-    "prettier-plugin-tailwindcss": "^0.6.11"
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "vite-plugin-svgr": "^4.3.0"
   }
 }
