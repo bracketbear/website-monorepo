@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import ProjectCardList from '@/components/ProjectCardList.astro';
 import Philosophy from '@/components/Philosophy.astro';
-import About from '@/components/About.astro';
+import AboutSection from '@/components/AboutSection.astro';
 import WorkHistory from '@/components/WorkHistory';
 import SkillsTicker from '@/components/SkillsTicker';
 import '../styles/global.css';
@@ -83,12 +83,7 @@ const skills = await getCollection('workSkills');
   </header>
 
   <main class="bg-background">
-    <!-- About Section -->
-    <section id="about" class="bg-primary relative overflow-hidden py-24">
-      <div class="relative z-10 container mx-auto px-6">
-        <About />
-      </div>
-    </section>
+    <AboutSection className="bg-primary" />
 
     <!-- Philosophy Section -->
     <section id="philosophy" class="py- bg-brand-orange relative">
