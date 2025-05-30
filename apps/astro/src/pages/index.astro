@@ -2,8 +2,8 @@
 import { getCollection } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import ProjectCardList from '@/components/ProjectCardList.astro';
-import Philosophy from '@/components/Philosophy.astro';
 import AboutSection from '@/components/AboutSection.astro';
+import ServicesSection from '@/components/ServicesSection.astro';
 import WorkHistory from '@/components/WorkHistory';
 import SkillsTicker from '@/components/SkillsTicker';
 import '../styles/global.css';
@@ -84,13 +84,7 @@ const skills = await getCollection('workSkills');
 
   <main class="bg-background">
     <AboutSection className="bg-primary" />
-
-    <!-- Philosophy Section -->
-    <section id="philosophy" class="py- bg-brand-orange relative">
-      <div class="relative z-10 container mx-auto px-6">
-        <Philosophy />
-      </div>
-    </section>
+    <ServicesSection className="bg-secondary" />
 
     <!-- Projects Section -->
     <section id="projects" class="bg-brand-green relative py-24">

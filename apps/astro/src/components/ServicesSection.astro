@@ -1,0 +1,51 @@
+---
+interface Props {
+  className?: string;
+}
+const { className = '' } = Astro.props;
+
+interface Service {
+  title: string;
+  description: string;
+}
+
+const services: Service[] = [
+  {
+    title: 'Team Augmentation',
+    description:
+      'Our team members work alongside yours to build your project. Whether you need part-time help or a full-time team member, we can help. With our industry experience, we keep onboarding times low so you can be off to the races in no time.',
+  },
+  {
+    title: 'Project Ownership',
+    description:
+      'You tell us where in the process you want us to start and we will be there. Our team is experienced in all aspects of the project, from design to development to deployment. Plus, we keep you in the loop every step of the way.',
+  },
+  {
+    title: 'Custom Solutions',
+    description:
+      'We are not a one-size-fits-all agency. We are a team of creative problem solvers who are passionate about the experiences your audience will have. If you have a unique problem, we can help you solve it.',
+  },
+] as const;
+---
+
+<section class={className}>
+  <div class="container mx-auto py-48">
+    <h2 class="text-foreground mb-16 text-center text-6xl font-medium">
+      Services We Offer
+    </h2>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {
+        services.map((service) => (
+          <div class="bg-background border-foreground flex min-h-60 flex-col justify-between border-2 p-4">
+            <h2 class="text-foreground text-4xl font-medium">
+              {service.title}
+            </h2>
+            <p class="text-foreground text-xl font-medium">
+              {service.description}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
