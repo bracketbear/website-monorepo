@@ -6,12 +6,14 @@ import AboutSection from '@/components/AboutSection.astro';
 import ServicesSection from '@/components/ServicesSection.astro';
 import WorkHistory from '@/components/WorkHistory';
 import SkillsTicker from '@/components/SkillsTicker';
+import ChooseUsSection from '@/components/ChooseUsSection.astro';
 import '../styles/global.css';
+
 const snakeText = [
   'Software Engineer.',
   'Problem Solver.',
   'Creative Developer.',
-];
+] as const;
 
 const jobs = await getCollection('workJobs');
 const companies = await getCollection('workCompany');
@@ -85,6 +87,7 @@ const skills = await getCollection('workSkills');
   <main class="bg-background">
     <AboutSection className="bg-primary" />
     <ServicesSection className="bg-secondary" />
+    <ChooseUsSection className="bg-tertiary" />
 
     <!-- Projects Section -->
     <section id="projects" class="bg-brand-green relative py-24">
