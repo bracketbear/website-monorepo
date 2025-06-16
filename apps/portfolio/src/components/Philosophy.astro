@@ -1,0 +1,60 @@
+---
+interface Section {
+  title: string;
+  description: string;
+}
+
+const values: Section[] = [
+  {
+    title: 'Get Shit Done',
+    description:
+      "Taking decisive action is about more than checking items off a to-do list—it's about driving forward progress and delivering meaningful results. Stay agile, adapt quickly, and never lose sight of the bigger picture.",
+  },
+  {
+    title: 'Always Get Better',
+    description:
+      'The world is always changing, and so should you. Stay curious, embrace new challenges, and never stop growing.',
+  },
+  {
+    title: 'Communicate, Communicate, Communicate',
+    description:
+      "Great things in business are never done by one person. They're done by a team of people. Foster open communication, share ideas, and work together to achieve your goals.",
+  },
+];
+---
+
+<section class="relative">
+  <!-- Brutalist Header -->
+  <div class="sticky top-0 z-10 py-24">
+    <div class="container mx-auto px-4">
+      <div class="brutalist-border bg-brand-red relative inline-block p-8">
+        <h2 class="text-brand-light z-10 text-6xl font-black uppercase">
+          My Philosophy
+        </h2>
+      </div>
+      <div class="brutalist-border bg-primary mx-auto mt-8 h-1 w-24"></div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4">
+    {
+      values.map(({ description, title }, index) => (
+        <div class="relative flex min-h-[100vh] items-center justify-center py-24">
+          <div class="sticky top-1/2">
+            <div class="brutalist-border bg-background mx-auto max-w-2xl p-8 text-center">
+              <span class="brutalist-border bg-secondary text-background mb-8 inline-block px-6 py-3 text-lg font-black">
+                {(index + 1).toString().padStart(2, '0')}
+              </span>
+              <h3 class="text-foreground mb-6 text-4xl font-black uppercase">
+                {title}
+              </h3>
+              <p class="text-foreground text-xl leading-relaxed font-bold">
+                {description}
+              </p>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>

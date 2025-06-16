@@ -1,0 +1,232 @@
+---
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import Layout from '@/layouts/Layout.astro';
+import { getKeyedCollection } from '@/utils/content';
+import { getImage, Image } from 'astro:assets';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const workProjects = await getCollection('workProject');
+  return workProjects.map((project) => ({
+    params: { workProject: project.id },
+  }));
+};
+
+const workJobs = await getCollection('workJobs');
+const workSkills = await getCollection('workSkills');
+const workProjects = await getCollection('workProject');
+const workCompanies = await getKeyedCollection('workCompany');
+const projectCategories = await getCollection('workProjectCategory');
+
+const workProject = workProjects.find(
+  (project) => project.id === Astro.params.workProject
+);
+
+if (workProject === undefined) {
+  throw new Error(`Project not found: ${Astro.params.workProject}`);
+}
+
+// Get related data
+const job = workJobs.find((job) => job.id === workProject.data.job);
+const category = projectCategories.find(
+  (category) => category.id === workProject.data.category
+);
+const projectSkills = workSkills.filter((skill) =>
+  (workProject.data.skills ?? []).includes(skill.id)
+);
+const companyTitle =
+  job !== undefined ? workCompanies[job.data.company].data.title : 'Unknown';
+---
+
+<Layout>
+  <title>{workProject.data.title} | Bracket Bear</title>
+
+  <!-- Hero Section -->
+  <div class="bg-background py-24">
+    <div class="container mx-auto px-6">
+      <div class="brutalist-border bg-background mb-8 inline-block p-8">
+        <h1 class="text-foreground text-5xl font-black uppercase">
+          {workProject.data.title}
+        </h1>
+      </div>
+
+      {
+        category !== undefined && (
+          <span class="brutalist-border bg-coral text-foreground px-4 py-2 text-lg font-black">
+            {category.data.title}
+          </span>
+        )
+      }
+
+      <p class="text-foreground mt-8 max-w-3xl text-xl font-bold">
+        {workProject.data.description}
+      </p>
+    </div>
+  </div>
+
+  <!-- Project Info Bar -->
+  <div class="bg-background border-y-2 border-black py-8">
+    <div class="container mx-auto px-6">
+      <div class="brutalist-border bg-background flex flex-wrap gap-8 p-8">
+        {
+          job !== undefined && (
+            <div>
+              <h4 class="text-foreground mb-2 text-sm font-black uppercase">
+                Company
+              </h4>
+              <p class="text-foreground font-bold">{companyTitle}</p>
+            </div>
+          )
+        }
+        <div>
+          <h4 class="text-foreground mb-2 text-sm font-black uppercase">
+            Duration
+          </h4>
+          <p class="text-foreground font-bold">{workProject.data.duration}</p>
+        </div>
+        {
+          workProject.data.isFeatured === true && (
+            <div class="ml-auto self-center">
+              <span class="brutalist-border bg-coral text-foreground px-4 py-2 text-sm font-black">
+                Featured Project
+              </span>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="bg-background py-16">
+    <div class="container mx-auto px-6">
+      <div class="grid gap-8 md:grid-cols-3">
+        <!-- Main Column -->
+        <div class="space-y-16 md:col-span-2">
+          <!-- Description -->
+          {
+            workProject.data.description?.trim() !== '' && (
+              <section class="brutalist-border bg-background p-8">
+                <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
+                  Overview
+                </h2>
+                <p class="text-foreground text-lg font-bold">
+                  {workProject.data.description}
+                </p>
+              </section>
+            )
+          }
+
+          <!-- Challenges & Solutions -->
+          {
+            workProject.data.challengesAndSolutions?.trim() !== '' && (
+              <section class="brutalist-border bg-background p-8">
+                <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
+                  Challenges & Solutions
+                </h2>
+                <p class="text-foreground text-lg font-bold">
+                  {workProject.data.challengesAndSolutions}
+                </p>
+              </section>
+            )
+          }
+
+          <!-- Results -->
+          {
+            workProject.data.resultsAchieved?.trim() !== '' && (
+              <section class="brutalist-border bg-background p-8">
+                <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
+                  Results Achieved
+                </h2>
+                <p class="text-foreground text-lg font-bold">
+                  {workProject.data.resultsAchieved}
+                </p>
+              </section>
+            )
+          }
+
+          <!-- Media Gallery -->
+          {
+            (workProject.data.media ?? []).length > 0 && (
+              <section class="brutalist-border bg-background p-8">
+                <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
+                  Project Gallery
+                </h2>
+                {workProject.data.mediaDescription !== undefined && (
+                  <p class="text-foreground mb-6 text-lg font-bold">
+                    {workProject.data.mediaDescription}
+                  </p>
+                )}
+                <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
+                  {(workProject.data.media ?? []).map(async (imageUrl) => {
+                    return (
+                      <div class="brutalist-border bg-background aspect-video overflow-hidden">
+                        TODO: Add image
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )
+          }
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="space-y-8">
+          <!-- Job Info -->
+          {
+            job !== undefined && (
+              <div class="brutalist-border bg-background p-8">
+                <h3 class="text-foreground mb-4 text-xl font-black uppercase">
+                  Role Info
+                </h3>
+                <p class="text-foreground mb-4 font-bold">
+                  {job.data.title} at {companyTitle}
+                </p>
+                {job.data.description?.trim() !== '' && (
+                  <p class="text-foreground font-bold">
+                    {job.data.description}
+                  </p>
+                )}
+              </div>
+            )
+          }
+
+          <!-- Skills -->
+          {
+            projectSkills.length > 0 && (
+              <div class="brutalist-border bg-background p-8">
+                <h3 class="text-foreground mb-4 text-xl font-black uppercase">
+                  Technologies Used
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                  {projectSkills.map((skill) => (
+                    <span class="skill-pill skill-pill-default">
+                      {skill.data.title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+
+          <!-- Call to Action -->
+          <div class="brutalist-border bg-coral p-8">
+            <h3 class="text-foreground mb-4 text-xl font-black uppercase">
+              Interested in similar work?
+            </h3>
+            <p class="text-foreground mb-6 font-bold">
+              I'd love to discuss how I can help with your project.
+            </p>
+            <a
+              href="/contact"
+              class="brutalist-border bg-background text-foreground block py-3 text-center text-lg font-black uppercase transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
+            >
+              Get in Touch
+            </a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</Layout>

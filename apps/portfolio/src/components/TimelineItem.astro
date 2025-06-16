@@ -1,0 +1,83 @@
+---
+interface Props {
+  position?: 'start' | 'end' | 'auto';
+}
+
+const { position = 'auto' } = Astro.props;
+---
+
+<li
+  class:list={[
+    'relative flex items-start py-8',
+    position !== 'auto' && `timeline-item-${position}`,
+  ]}
+>
+  <div
+    class:list={[
+      'relative z-10 w-[calc(100%-2rem)] max-w-xl rounded-lg p-12 shadow-sm backdrop-blur-sm transition-all',
+    ]}
+  >
+    <slot />
+  </div>
+
+  <div class="timeline-icon absolute z-20">
+    <slot name="icon">
+      <div
+        class="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500/90 shadow-[0_0_15px_rgba(99,102,241,0.5)] ring-[3px] ring-white/10 transition-transform hover:scale-110"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          class="h-6 w-6 text-white"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+            clip-rule="evenodd"></path>
+        </svg>
+      </div>
+    </slot>
+  </div>
+</li>
+
+<style>
+  /* Timeline item positioning */
+  .timeline-icon {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  :global(.timeline-start) .timeline-icon {
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  :global(.timeline-end) .timeline-icon {
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  :global(.timeline-alternating) .timeline-item-start .timeline-icon {
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  :global(.timeline-alternating) .timeline-item-end .timeline-icon {
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .timeline-icon,
+    :global(.timeline-start) .timeline-icon,
+    :global(.timeline-end) .timeline-icon,
+    :global(.timeline-alternating) .timeline-item-start .timeline-icon,
+    :global(.timeline-alternating) .timeline-item-end .timeline-icon {
+      left: 1.5rem;
+      transform: translate(-50%, -50%);
+    }
+  }
+</style>
