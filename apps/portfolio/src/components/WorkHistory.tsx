@@ -26,7 +26,7 @@ const groupJobsByCompany = (
     const company = companies.find(c => c.id === job.data.company);
     if (!company) return acc;
 
-    const existingGroup = acc.find(g => g.company.id === company.id);
+    const existingGroup = acc.find((g: GroupedJob) => g.company.id === company.id);
     if (existingGroup) {
       existingGroup.jobs.push(job);
     } else {

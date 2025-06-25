@@ -1,12 +1,7 @@
 ---
 import { getCollection } from "astro:content";
+import { Button } from "@bracketbear/ui-kit/astro";
 import Layout from "@/layouts/Layout.astro";
-import ProjectCardList from "@/components/ProjectCardList.astro";
-import AboutSection from "@/components/AboutSection.astro";
-import ServicesSection from "@/components/ServicesSection.astro";
-import WorkHistory from "@/components/WorkHistory";
-import SkillsTicker from "@/components/SkillsTicker";
-import ChooseUsSection from "@/components/ChooseUsSection.astro";
 import "../styles/global.css";
 
 const snakeText = [
@@ -18,6 +13,7 @@ const snakeText = [
 const workJobs = await getCollection("workJobs");
 const workSkills = await getCollection("workSkills");
 const workProjects = await getCollection("workProject");
+const workCompanies = await getCollection("workCompany");
 
 // Sort jobs by start date (most recent first)
 const sortedJobs = workJobs.sort(
@@ -133,11 +129,8 @@ const currentJob = sortedJobs.find((job) => job.data.isCurrentJob);
           }
         </div>
         <div class="mt-12 text-center">
-          <a
-            href="/work"
-            class="brutalist-border bg-background text-foreground inline-block px-8 py-4 text-xl font-black uppercase transition-transform hover:scale-105"
-          >
-            View All Projects →
+          <a href="/work">
+            <Button type="button">View All Projects →</Button>
           </a>
         </div>
       </div>
@@ -218,11 +211,8 @@ const currentJob = sortedJobs.find((job) => job.data.isCurrentJob);
           }
         </div>
         <div class="mt-12 text-center">
-          <a
-            href="/work"
-            class="brutalist-border bg-background text-foreground inline-block px-8 py-4 text-xl font-black uppercase transition-transform hover:scale-105"
-          >
-            View Full Work History →
+          <a href="/work">
+            <Button>View Full Work History →</Button>
           </a>
         </div>
       </div>

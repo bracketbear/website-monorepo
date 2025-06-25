@@ -1,6 +1,6 @@
 ---
-import Layout from '@/layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
 import WorkSkillFilter from '@/components/WorkSkillFilter';
 
 const workProjects = await getCollection('workProject');
@@ -8,8 +8,6 @@ const workSkills = await getCollection('workSkills');
 const workJobs = await getCollection('workJobs');
 const workCompanies = await getCollection('workCompany');
 const workSkillCategories = await getCollection('workSkillCategory');
-
-console.log(workProjects);
 ---
 
 <Layout>

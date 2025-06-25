@@ -1,8 +1,6 @@
 ---
-import '@/styles/forms.css';
-import Input from './atoms/Input.astro';
-import Textarea from './atoms/Textarea.astro';
-import Button from './atoms/Button.astro';
+import "@/styles/forms.css";
+import { Input, Textarea, Button } from "@bracketbear/ui-kit/astro";
 
 interface Props {
   class?: string;
@@ -11,7 +9,7 @@ interface Props {
 const { class: className } = Astro.props satisfies Props;
 ---
 
-<section class:list={['py-24', className]}>
+<section class:list={["py-24", className]}>
   <div class="container mx-auto px-6">
     <div class="brutalist-border bg-background p-8">
       <div class="mb-8">

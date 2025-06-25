@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-const CONTENT_BASE = path.resolve(process.cwd(), 'src/content');
+const CONTENT_BASE = path.resolve(process.cwd(), 'content');
 const PROJECTS_PATH = path.join(CONTENT_BASE, 'work/projects');
 const JOBS_PATH = path.join(CONTENT_BASE, 'work/jobs');
 
@@ -63,23 +63,23 @@ async function updateJobSkills() {
   try {
     const projects = await getAllProjects();
     const jobs = await getAllJobs();
-    
+
     // Track which jobs were updated
     const updatedJobs = new Set<string>();
-    
+
     // Process each project
     for (const [projectId, projectData] of Object.entries(projects)) {
       if (projectData.skills && projectData.skills.length > 0 && projectData.job) {
         const jobId = projectData.job;
-        
+
         if (jobs[jobId]) {
           const job = jobs[jobId];
-          
+
           // Initialize skills array if it doesn't exist
           if (!job.data.skills) {
             job.data.skills = [];
           }
-          
+
           // Add skills that don't already exist in the job
           let updated = false;
           for (const skill of projectData.skills) {
@@ -88,7 +88,7 @@ async function updateJobSkills() {
               updated = true;
             }
           }
-          
+
           if (updated) {
             updatedJobs.add(jobId);
           }
@@ -97,14 +97,14 @@ async function updateJobSkills() {
         }
       }
     }
-    
+
     // Save all updated jobs
     for (const jobId of updatedJobs) {
       const { data, filePath } = jobs[jobId];
       await writeJsonFile(filePath, data);
       console.log(`Updated skills for job: ${jobId}`);
     }
-    
+
     console.log(`Completed. Updated ${updatedJobs.size} job files.`);
   } catch (error) {
     console.error('Error updating job skills:', error);

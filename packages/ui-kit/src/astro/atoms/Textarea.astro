@@ -1,6 +1,4 @@
 ---
-import '@/styles/forms.css';
-
 interface Props {
   name: string;
   label: string;
@@ -29,6 +27,7 @@ const {
     name={name}
     placeholder={placeholder}
     rows={rows}
-    class:list={['form-input', className]}
+    class:list={["form-input", className]}
     required={required}></textarea>
 </div>
+

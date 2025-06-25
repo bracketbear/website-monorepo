@@ -6,14 +6,14 @@ interface Props {
 }
 
 const { class: className, checked = false, onChange } = Astro.props;
-console.log('Switch', { className, checked, onChange });
+console.log("Switch", { className, checked, onChange });
 ---
 
 <button
   id="switch"
   type="button"
   class:list={[
-    'switch border-foreground bg-background relative h-10 w-20 rounded-full border-2 p-1 transition-colors duration-300',
+    "switch border-foreground bg-background relative h-10 w-20 rounded-full border-2 p-1 transition-colors duration-300",
     className,
   ]}
   aria-label="Toggle switch"
@@ -61,7 +61,7 @@ console.log('Switch', { className, checked, onChange });
     transform: translateX(0);
   }
 
-  .switch[data-checked='true'] .slider {
+  .switch[data-checked="true"] .slider {
     transform: translateX(2.5rem);
   }
 
@@ -84,21 +84,21 @@ console.log('Switch', { className, checked, onChange });
     transition: all 0.3s ease;
   }
 
-  .switch[data-checked='true'] .selected-left-icon {
+  .switch[data-checked="true"] .selected-left-icon {
     display: none;
   }
 
-  .switch[data-checked='true'] .selected-right-icon {
+  .switch[data-checked="true"] .selected-right-icon {
     display: block;
   }
 
   /* Rise animation for active icon */
-  .switch:not([data-checked='true']) .left-icon {
+  .switch:not([data-checked="true"]) .left-icon {
     opacity: 1;
     animation: rise 0.3s ease;
   }
 
-  .switch[data-checked='true'] .right-icon {
+  .switch[data-checked="true"] .right-icon {
     opacity: 1;
     animation: rise 0.3s ease;
   }
@@ -120,68 +120,69 @@ console.log('Switch', { className, checked, onChange });
     transform: scale(1.05);
   }
 
-  .switch[data-checked='true']:hover .slider {
+  .switch[data-checked="true"]:hover .slider {
     transform: translateX(2.5rem) scale(1.05);
   }
 </style>
 
 <script define:vars={{ checked, onChange }}>
-  console.log('Switch', { checked, onChange });
+  console.log("Switch", { checked, onChange });
   function setupSwitch() {
-    console.log('setupSwitch');
-    const switchElement = document.getElementById('switch');
-    const selectedLeftIcon = document.querySelector('.selected-left-icon');
-    const selectedRightIcon = document.querySelector('.selected-right-icon');
+    console.log("setupSwitch");
+    const switchElement = document.getElementById("switch");
+    const selectedLeftIcon = document.querySelector(".selected-left-icon");
+    const selectedRightIcon = document.querySelector(".selected-right-icon");
 
     // Update icons based on initial state
     if (checked) {
-      selectedLeftIcon?.classList.add('hidden');
-      selectedRightIcon?.classList.remove('hidden');
+      selectedLeftIcon?.classList.add("hidden");
+      selectedRightIcon?.classList.remove("hidden");
     } else {
-      selectedLeftIcon?.classList.remove('hidden');
-      selectedRightIcon?.classList.add('hidden');
+      selectedLeftIcon?.classList.remove("hidden");
+      selectedRightIcon?.classList.add("hidden");
     }
 
-    switchElement?.addEventListener('click', function () {
+    switchElement?.addEventListener("click", function () {
       // Determine new state based on current state attribute
-      const isChecked = switchElement.dataset.checked === 'true';
+      const isChecked = switchElement.dataset.checked === "true";
       const newChecked = !isChecked;
 
       // Call the parent's onChange callback
-      if (typeof onChange === 'function') {
+      if (typeof onChange === "function") {
         onChange(newChecked);
-        console.log('onChange', newChecked);
+        console.log("onChange", newChecked);
       } else {
-        console.log('onChange is not a function');
+        console.log("onChange is not a function");
       }
 
       // Update the DOM manually to reflect the new state
       switchElement.dataset.checked = newChecked.toString();
       console.log(
-        'switchElement.dataset.checked',
+        "switchElement.dataset.checked",
         switchElement.dataset.checked
       );
       console.log({ switchElement, newChecked, isChecked });
 
       // Toggle icon visibility
-      const selectedLeftIcon = document.querySelector('.selected-left-icon');
-      const selectedRightIcon = document.querySelector('.selected-right-icon');
+      const selectedLeftIcon = document.querySelector(".selected-left-icon");
+      const selectedRightIcon = document.querySelector(".selected-right-icon");
 
       if (newChecked) {
         console.log({ selectedLeftIcon, selectedRightIcon });
-        selectedLeftIcon?.classList.add('hidden');
-        selectedRightIcon?.classList.remove('hidden');
+        selectedLeftIcon?.classList.add("hidden");
+        selectedRightIcon?.classList.remove("hidden");
       } else {
-        selectedLeftIcon?.classList.remove('hidden');
-        selectedRightIcon?.classList.add('hidden');
+        selectedLeftIcon?.classList.remove("hidden");
+        selectedRightIcon?.classList.add("hidden");
       }
     });
   }
 
   // Run setup when the DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupSwitch);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupSwitch);
   } else {
     setupSwitch();
   }
 </script>
+

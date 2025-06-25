@@ -6,10 +6,8 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail \"yarn workspace flateralus build:watch\" \"yarn workspace @bracketbear/cms dev\" \"yarn workspace @bracketbear/website dev\"",
-    "build": "yarn workspace @bracketbear/cms build && yarn workspace @bracketbear/website build",
-    "deploy": "yarn workspace @bracketbear/cms deploy && yarn workspace @bracketbear/website deploy",
-    "generate": "concurrently --kill-others --success second \"yarn workspace @bracketbear/cms start\" \"yarn workspace @bracketbear/website generate\""
+    "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace=@bracketbear/ui-kit\" \"npm run build:watch --workspace=flateralus\" \"npm run dev --workspace=@bracketbear/astro\" \"npm run dev --workspace=@bracketbear/portfolio\"",
+    "build": "concurrently --kill-others-on-fail  \"npm run build --workspace=@bracketbear/ui-kit\" \"npm run build --workspace=flateralus\" \"npm run build --workspace=@bracketbear/astro\" \"npm run build --workspace=@bracketbear/portfolio\""
   },
   "dependencies": {
     "18": "^0.0.0",

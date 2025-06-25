@@ -3,10 +3,10 @@ import { getCollection } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import ProjectCardList from '@/components/ProjectCardList.astro';
 import AboutSection from '@/components/AboutSection.astro';
+import ChooseUsSection from '@/components/ChooseUsSection.astro';
 import ServicesSection from '@/components/ServicesSection.astro';
 import WorkHistory from '@/components/WorkHistory';
-import SkillsTicker from '@/components/SkillsTicker';
-import ChooseUsSection from '@/components/ChooseUsSection.astro';
+import { SkillsTicker } from '@bracketbear/ui-kit/react';
 import '../styles/global.css';
 
 const snakeText = [
@@ -21,7 +21,6 @@ const skills = await getCollection('workSkills');
 ---
 
 <Layout>
-  <!-- Brutalist Header Section -->
   <header
     class="bg-brand-red dark:bg-brand-red/20 relative z-0 overflow-hidden pt-24"
   >
