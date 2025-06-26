@@ -6,7 +6,7 @@ import keystatic from '@keystatic/astro';
 import markdoc from '@astrojs/markdoc';
 import svgr from 'vite-plugin-svgr';
 
-const bracketbearCss = '/packages/ui-kit/dist/styles/bracketbear.tailwind.css' as const;
+const bracketbearCss = '/packages/ui-kit/dist/styles/bracketbear.tailwind.css';
 
 // https://astro.build/config
 export default defineConfig({
