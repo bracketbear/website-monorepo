@@ -10,10 +10,10 @@
     "update-job-skills": "node scripts/update-job-skills.js"
   },
   "dependencies": {
-    "@bracketbear/portfolio-content": "file:../../packages/portfolio-content",
-    "@bracketbear/ui-kit": "file:../../packages/ui-kit",
     "@astrojs/markdoc": "^0.13.3",
     "@astrojs/react": "^4.2.3",
+    "@bracketbear/portfolio-content": "file:../../packages/portfolio-content",
+    "@bracketbear/ui-kit": "file:../../packages/ui-kit",
     "@fontsource-variable/oswald": "^5.2.5",
     "@fontsource/fontdiner-swanky": "^5.2.5",
     "@keystatic/astro": "^5.0.6",

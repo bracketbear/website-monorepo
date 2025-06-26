@@ -1,8 +1,8 @@
 ---
-import NavBar from '@/components/NavBar.astro';
-import Footer from '@/components/Footer.astro';
-import ContactForm from '@/components/ContactForm.astro';
-import '../styles/global.css';
+import NavBar from "@/components/NavBar.astro";
+import Footer from "@/components/Footer.astro";
+import ContactForm from "@/components/ContactForm.astro";
+import "../styles/global.css";
 
 interface Props {
   title?: string;
@@ -12,11 +12,12 @@ interface Props {
 const { hideContactForm = false } = Astro.props;
 
 // Get initial theme from Astro.cookies if available, otherwise default to system preference
-const theme = Astro.cookies.get('theme')?.value ?? 'system';
-const isDark =
-  theme === 'dark' ||
+const theme = Astro.cookies.get("theme")?.value ?? "system";
+const isDark = theme === "dark";
+
+/** ||
   (theme === 'system' &&
-    Astro.request.headers.get('sec-ch-prefers-color-scheme') === 'dark');
+    Astro.request.headers.get('sec-ch-prefers-color-scheme') === 'dark'); */
 ---
 
 <!doctype html>
@@ -31,14 +32,14 @@ const isDark =
       function initializeTheme() {
         const getThemePreference = () => {
           // Check localStorage first
-          if (localStorage.theme === 'dark') return 'dark';
-          if (localStorage.theme === 'light') return 'light';
+          if (localStorage.theme === "dark") return "dark";
+          if (localStorage.theme === "light") return "light";
 
           // If no localStorage value, check system preference
-          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            return 'dark';
+          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            return "dark";
           }
-          return 'light';
+          return "light";
         };
 
         // Set theme based on preference
@@ -47,11 +48,11 @@ const isDark =
 
         // Watch for system theme changes if no manual preference is set
         if (!localStorage.theme) {
-          const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-          mediaQuery.addEventListener('change', (e) => {
+          const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+          mediaQuery.addEventListener("change", (e) => {
             document.documentElement.dataset.theme = e.matches
-              ? 'dark'
-              : 'light';
+              ? "dark"
+              : "light";
           });
         }
       }

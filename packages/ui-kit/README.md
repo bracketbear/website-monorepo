@@ -1,4 +1,4 @@
-****# @bracketbear/ui-kit
+# @bracketbear/ui-kit
 
 Shared UI components for BracketBear applications.
 
@@ -7,6 +7,16 @@ Shared UI components for BracketBear applications.
 - `astro/` - Astro-specific components (AboutSection, ServicesSection, ChooseUsSection)
 - `react/` - React components (SkillsTicker, WorkHistory)
 - `styles/` - Shared styles and utilities (TODO: nothing in here)
+
+## Prerequisites
+
+This UI Kit requires **Tailwind CSS 4.0+** as a peer dependency. Make sure your consuming application has Tailwind CSS installed:
+
+```bash
+npm install tailwindcss@^4.0.0
+# or
+yarn add tailwindcss@^4.0.0
+```
 
 ## Usage
 
@@ -57,4 +67,4 @@ yarn clean
 1. Add the component to the appropriate directory (`atoms/`, `astro/`, or `react/`)
 2. Export it from the corresponding `index.ts` file
 3. Update this README with usage examples
-4. Build the package and test in consuming applications 
+4. Build the package and test in consuming applications

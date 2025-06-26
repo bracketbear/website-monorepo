@@ -11,34 +11,35 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./astro": "./src/astro/index.ts",
+    "./astro": {
+      "import": "./dist/astro/index.js",
+      "types": "./dist/astro/index.d.ts"
+    },
     "./react": {
       "import": "./dist/react/index.js",
       "types": "./dist/react/index.d.ts"
     },
-    "./styles": {
-      "import": "./dist/styles/index.js",
-      "types": "./dist/styles/index.d.ts"
-    }
+    "./styles": "./dist/styles/bracketbear.tailwind.css",
+    "./styles/*": "./dist/styles/*"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "concurrently \"tsc --watch\" \"npm run copy:astro:watch\"",
+    "build": "tsc && cpx \"src/styles/**/*\" dist/styles",
+    "dev": "concurrently \"tsc --watch\" \"npm run copy:astro:watch\" \"npm run copy:styles:watch\"",
     "clean": "rm -rf dist",
-    "copy:astro:watch": "cpx \"src/astro/**/*\" dist/astro --watch"
+    "copy:astro:watch": "cpx \"src/astro/**/*\" dist/astro --watch",
+    "copy:styles:watch": "cpx \"src/styles/**/*\" dist/styles --watch"
   },
   "dependencies": {
     "astro": "^5.6.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "clsx": "^2.1.1"
+    "react": "^19.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "clsx": "^2.1.1",
     "concurrently": "^8.2.0",
     "cpx": "^1.5.0",
     "typescript": "^5.0.0"
@@ -48,4 +49,4 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   }
-} 
+}

@@ -6,8 +6,8 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace=@bracketbear/ui-kit\" \"npm run build:watch --workspace=flateralus\" \"npm run dev --workspace=@bracketbear/astro\" \"npm run dev --workspace=@bracketbear/portfolio\"",
-    "build": "concurrently --kill-others-on-fail  \"npm run build --workspace=@bracketbear/ui-kit\" \"npm run build --workspace=flateralus\" \"npm run build --workspace=@bracketbear/astro\" \"npm run build --workspace=@bracketbear/portfolio\""
+    "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace=@bracketbear/ui-kit\" \"npm run dev --workspace=@bracketbear/astro\" \"npm run dev --workspace=@bracketbear/portfolio\"",
+    "build": "npm run build --workspace=@bracketbear/ui-kit --workspace=@bracketbear/astro --workspace=@bracketbear/portfolio"
   },
   "dependencies": {
     "18": "^0.0.0",
