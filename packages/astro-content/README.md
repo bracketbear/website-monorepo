@@ -1,11 +1,11 @@
-# Portfolio Content Package
+# Astro Content Package
 
 This package provides shared content configuration for Bracket Bear websites. It imports content from the CMS app and provides a unified interface for Astro applications.
 
 ## Structure
 
 ```
-packages/portfolio-content/
+packages/astro-content/
 ├── index.ts          # Exports content collections
 └── README.md         # This file
 
@@ -17,7 +17,7 @@ apps/cms/
 └── keystatic.config.tsx  # CMS configuration
 
 apps/astro/ & apps/portfolio/
-├── src/content.config.ts  # Imports from @bracketbear/portfolio-content
+├── src/content.config.ts  # Imports from @bracketbear/astro-content
 └── src/content/          # Site-specific content (if any)
 ```
 
@@ -42,7 +42,7 @@ In Astro apps, import the shared collections:
 
 ```ts
 // src/content.config.ts
-import { collections as sharedCollections } from '@bracketbear/portfolio-content';
+import { collections as sharedCollections } from '@bracketbear/astro-content';
 
 export const collections = {
   ...sharedCollections,

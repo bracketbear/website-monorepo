@@ -12,7 +12,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@bracketbear/portfolio-content": "file:../../packages/portfolio-content",
+    "@bracketbear/astro-content": "file:../../packages/astro-content",
     "@keystatic/next": "^5.0.4",
     "next": "^14.0.0",
     "react": "^18.0.0",

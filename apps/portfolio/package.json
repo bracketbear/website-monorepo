@@ -10,7 +10,7 @@
     "update-job-skills": "node scripts/update-job-skills.js"
   },
   "dependencies": {
-    "@bracketbear/portfolio-content": "file:../../packages/portfolio-content",
+    "@bracketbear/astro-content": "file:../../packages/astro-content",
     "@bracketbear/ui-kit": "file:../../packages/ui-kit",
     "@astrojs/markdoc": "^0.13.3",
     "@astrojs/react": "^4.2.3",

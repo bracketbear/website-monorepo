@@ -12,7 +12,7 @@
   "dependencies": {
     "@astrojs/markdoc": "^0.13.3",
     "@astrojs/react": "^4.2.3",
-    "@bracketbear/portfolio-content": "file:../../packages/portfolio-content",
+    "@bracketbear/astro-content": "file:../../packages/astro-content",
     "@bracketbear/ui-kit": "file:../../packages/ui-kit",
     "@fontsource-variable/oswald": "^5.2.5",
     "@fontsource/fontdiner-swanky": "^5.2.5",

@@ -1,5 +1,5 @@
 {
-  "name": "@bracketbear/portfolio-content",
+  "name": "@bracketbear/astro-content",
   "type": "module",
   "version": "0.0.1",
   "main": "index.ts",
