@@ -2,34 +2,34 @@
   "name": "@bracketbear/cms",
   "private": true,
   "version": "0.1.0",
-  "description": "The Backend CMS for Bracket Bear",
+  "description": "Keystatic CMS for Bracket Bear",
   "author": {
     "name": "Harrison Callahan"
   },
   "scripts": {
-    "dev": "strapi develop",
-    "start": "strapi start",
-    "build": "strapi build",
-    "strapi": "strapi"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   },
   "dependencies": {
-    "@strapi/plugin-users-permissions": "^5.6.0",
-    "@strapi/provider-upload-aws-s3": "^5.6.0",
-    "@strapi/strapi": "^5.6.0",
-    "better-sqlite3": "^8.0.1",
-    "mysql": "^2.18.1",
-    "mysql2": "^3.12.0",
+    "@bracketbear/portfolio-content": "file:../../packages/portfolio-content",
+    "@keystatic/next": "^5.0.4",
+    "next": "^14.0.0",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-router-dom": "^6.0.0",
-    "styled-components": "^6.0.0"
+    "react-dom": "^18.0.0"
   },
-  "strapi": {
-    "uuid": "99b831bc-e78a-4f20-bade-e5002cce5180"
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "autoprefixer": "^10.0.0",
+    "postcss": "^8.0.0",
+    "tailwindcss": "^3.0.0",
+    "typescript": "^5.0.0"
   },
   "engines": {
-    "node": ">=14.19.1 <=20.x.x",
-    "npm": ">=6.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "license": "MIT"
 }

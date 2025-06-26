@@ -8,7 +8,8 @@ interface CreateJsonCollectionArgs<T> {
   schema: ZodSchema<T>;
 }
 
-const contentPath = join(dirname(import.meta.url), 'content');
+// Point to the CMS content directory
+const contentPath = join(dirname(import.meta.url), '../../apps/cms/content');
 
 const workPath = (...paths: string[]) => join(contentPath, 'work', ...paths);
 
@@ -100,6 +101,30 @@ const workProjects = createJsonCollection({
   }),
 });
 
+// Shared content collections from CMS
+const blog = createJsonCollection({
+  base: join(contentPath, 'blog'),
+  schema: z.object({
+    title: z.string(),
+    excerpt: z.string().optional(),
+    content: z.string(), // This will be the rich text content
+    publishedAt: z.coerce.date().optional(),
+    isPublished: z.boolean().default(false),
+    tags: z.array(z.string()).optional(),
+    featuredImage: z.string().optional(),
+  }),
+});
+
+const pages = createJsonCollection({
+  base: join(contentPath, 'pages'),
+  schema: z.object({
+    title: z.string(),
+    content: z.string(), // This will be the rich text content
+    metaDescription: z.string().optional(),
+    isPublished: z.boolean().default(true),
+  }),
+});
+
 console.log({ workPath: workPath('companies') });
 
 export const collections = {
@@ -109,4 +134,6 @@ export const collections = {
   workSkillCategory: workSkillCategories,
   workProjectCategory: workProjectCategories,
   workProject: workProjects,
+  blog,
+  pages,
 }; 

@@ -102,17 +102,13 @@ node_modules
 testApp
 coverage
 
-############################
-# Strapi
-############################
-
-.env
-license.txt
-exports
-*.cache
-dist
-build
-.strapi-updater.json
+# Next.js
+.next
+.next/
+.next/cache
+.next/cache/
+.next/cache/images
+.next/cache/images/
 
 # Local Netlify folder
 .netlify

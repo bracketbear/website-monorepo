@@ -1,6 +1,10 @@
 import { collection, config, fields, singleton } from "@keystatic/core";
+import { pathToFileURL } from "node:url";
+import { dirname, join } from "node:path";
+import path from "path";
 
-const CONTENT_PATH = 'src/content' as const;
+// Point to the local content directory
+const CONTENT_PATH = 'content' as const;
 const WORK_PATH = 'work' as const;
 
 const collectionPath = <T extends string>(slug: T) => {
@@ -15,6 +19,8 @@ const workPath = <T extends string>(slug: T) => {
 
 const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+console.log('CONTENT_PATH', CONTENT_PATH);
+
 export default config({
   storage: {
     kind: 'local',
@@ -22,14 +28,11 @@ export default config({
   locale: 'en-US',
   ui: {
     brand: {
-      name: 'Bracket Bear',
-      // TODO: add a dark mode logo
+      name: 'Bracket Bear CMS',
       mark: ({ colorScheme }) => {
-        let path = '/src/assets/bracket-bear-logo.svg';
-
+        let path = '/bracket-bear-logo.svg';
         return <img src={path} width={24} />
       },
-
     },
   },
   collections: {
@@ -92,12 +95,10 @@ export default config({
         title: fields.slug({ name: { label: 'Title' } }),
         description: fields.text({ label: 'Description' }),
         isFeatured: fields.checkbox({ label: 'Is Featured?', defaultValue: false }),
-        categories: fields.child({
-          kind: 'block',
-          label: 'Categories',
-          editIn: 'both',
-          placeholder: 'Select the categories that belong to this skill',
-        })
+        categories: fields.array(
+          fields.text({ label: 'Category' }),
+          { label: 'Categories', itemLabel: (props) => props.value || 'New Category' }
+        ),
       },
       format: 'json',
     }),
@@ -166,8 +167,8 @@ export default config({
           fields.object({
             image: fields.image({
               label: 'Image',
-              directory: 'src/assets/images/projects',
-              publicPath: '/src/assets/images/projects/'
+              directory: path.resolve(process.cwd(), "content/work/projects"),
+              publicPath: '/work/projects/'
             }),
             caption: fields.text({ label: 'Caption' })
           }),
@@ -193,6 +194,45 @@ export default config({
         }),
       }
     }),
+    // New shared content types for both websites
+    blog: collection({
+      label: 'Blog Posts',
+      slugField: 'title',
+      format: 'json',
+      path: collectionPath('blog'),
+      schema: {
+        title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } }),
+        excerpt: fields.text({ label: 'Excerpt', multiline: true }),
+        content: fields.text({ 
+          label: 'Content', 
+          multiline: true,
+          description: 'Blog content (markdown supported)'
+        }),
+        publishedAt: fields.date({ label: 'Published Date' }),
+        isPublished: fields.checkbox({ label: 'Is Published?', defaultValue: false }),
+        tags: fields.array(
+          fields.text({ label: 'Tag' }),
+          { label: 'Tags', itemLabel: (props) => props.value || 'New Tag' }
+        ),
+        featuredImage: fields.image({ label: 'Featured Image' }),
+      }
+    }),
+    pages: collection({
+      label: 'Pages',
+      slugField: 'title',
+      format: 'json',
+      path: collectionPath('pages'),
+      schema: {
+        title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } }),
+        content: fields.text({ 
+          label: 'Content', 
+          multiline: true,
+          description: 'Page content (markdown supported)'
+        }),
+        metaDescription: fields.text({ label: 'Meta Description' }),
+        isPublished: fields.checkbox({ label: 'Is Published?', defaultValue: true }),
+      }
+    }),
   },
   singletons: {
     contactInfo: singleton({
@@ -205,5 +245,16 @@ export default config({
       format: 'json',
       path: singletonPath('contact-info'),
     }),
+    siteSettings: singleton({
+      label: 'Site Settings',
+      schema: {
+        siteName: fields.text({ label: 'Site Name', validation: { isRequired: true } }),
+        siteDescription: fields.text({ label: 'Site Description' }),
+        logo: fields.image({ label: 'Logo' }),
+        favicon: fields.image({ label: 'Favicon' }),
+      },
+      format: 'json',
+      path: singletonPath('site-settings'),
+    }),
   }
-});
+}); 
