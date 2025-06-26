@@ -32,16 +32,15 @@
     "copy:astro:watch": "cpx \"src/astro/**/*\" dist/astro --watch",
     "copy:styles:watch": "cpx \"src/styles/**/*\" dist/styles --watch"
   },
-  "dependencies": {
-    "astro": "^5.6.0",
-    "react": "^19.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "astro": "^5.6.0",
     "clsx": "^2.1.1",
     "concurrently": "^8.2.0",
     "cpx": "^1.5.0",
+    "react": "^19.0.0",
     "typescript": "^5.0.0"
   },
   "peerDependencies": {

@@ -18,15 +18,15 @@
     "@fontsource/fontdiner-swanky": "^5.2.5",
     "@keystatic/astro": "^5.0.6",
     "@keystatic/core": "^0.5.46",
-    "@tailwindcss/vite": "^4.0.14",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
     "astro": "^5.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.0.14"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.0.14",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
     "@typescript-eslint/parser": "^8.26.1",
     "clsx": "^2.1.1",
     "daisyui": "^5.0.9",
