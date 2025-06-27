@@ -46,8 +46,4 @@ export default defineConfig({
     ],
   },
   output: 'static',
-  experimental: {
-    // Enable experimental support for SVG images as components
-    svg: true,
-  },
 });
