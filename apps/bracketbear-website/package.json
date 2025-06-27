@@ -6,8 +6,7 @@
     "dev": "astro dev --host --port 4321",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "update-job-skills": "node scripts/update-job-skills.js"
+    "astro": "astro" 
   },
   "dependencies": {
     "@astrojs/markdoc": "^0.13.3",

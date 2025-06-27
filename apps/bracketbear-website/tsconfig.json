@@ -3,7 +3,7 @@
   "include": [
     ".astro/types.d.ts",
     "**/*"
-, "../../packages/portfolio-content/scripts"  ],
+, "../../packages/portfolio-content/scripts", "../../eslint.config.js"  ],
   "exclude": [
     "dist"
   ],
