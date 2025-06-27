@@ -1,6 +1,5 @@
 import { defineConfig } from 'eslint/config';
 import love from 'eslint-config-love';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 import prettierPlugin from 'eslint-plugin-prettier';
