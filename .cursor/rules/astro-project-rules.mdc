@@ -1,13 +1,13 @@
 ---
 description: 
-globs: apps/astro/**
+globs: apps/bracketbear-website
 alwaysApply: false
 ---
 
 # Your rule content
 - This is an Astro 5 app so make sure you're always trying to build Astro components first. We use React component islands when we need more complex reactivity. 
-- Always keep SVG files separate and stored in apps/astro/src/assets/svg and import them into the templates.
-- We use Tailwind 4 for styling as much as possible. We also build utility classes in apps/astro/src/styles/global.css when we repeat common patterns. If needed, we should make the css more modular and group common utility classes together.
-- Components are stored at apps/astro/src/components
-- Atoms, which ideally are just replacements for HTML tags, are stored in apps/astro/src/components/atoms. Use them as much as possible. If we'll need to store common classes across React and Astro, create a component class in the styles directory where it makes sense.
-- We use Keystatic for content managegment. The keystatic configuration is at [keystatic.config.tsx](mdc:apps/astro/keystatic.config.tsx). Since we're using Astro 5's Content Layer, [content.config.ts](mdc:apps/astro/src/content.config.ts) is the source of truth for the Astro app. If you are asked to modify a content type, we'll need to edit both of those files to match each other's schema.
+- Always keep SVG files separate and stored in apps/bracketbear-website/src/assets/svg and import them into the templates.
+- We use Tailwind 4 for styling as much as possible. We also build utility classes in apps/bracketbear-website/src/styles/global.css when we repeat common patterns. If needed, we should make the css more modular and group common utility classes together.
+- Components are stored at apps/bracketbear-website/src/components
+- Atoms, which ideally are just replacements for HTML tags, are stored in apps/bracketbear-website/src/components/atoms. Use them as much as possible. If we'll need to store common classes across React and Astro, create a component class in the styles directory where it makes sense.
+- We use Keystatic for content managegment. The keystatic configuration is at [keystatic.config.tsx](mdc:apps/bracketbear-website/keystatic.config.tsx). Since we're using Astro 5's Content Layer, [content.config.ts](mdc:apps/bracketbear-website/src/content.config.ts) is the source of truth for the Astro app. If you are asked to modify a content type, we'll need to edit both of those files to match each other's schema.

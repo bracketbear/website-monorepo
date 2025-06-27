@@ -2,7 +2,6 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
-import keystatic from '@keystatic/astro';
 import markdoc from '@astrojs/markdoc';
 import svgr from 'vite-plugin-svgr';
 
@@ -10,12 +9,7 @@ const bracketbearCss = '/packages/ui-kit/dist/styles/bracketbear.tailwind.css';
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [
-    react(),
-    markdoc(),
-    // Bug when trying to statically render website. This disabless Keystatic when building.
-    !import.meta.env.PROD ? keystatic() : null,
-  ],
+  integrations: [react(), markdoc()],
   vite: {
     fs: {
       allow: ['..', '../..'],

@@ -16,7 +16,7 @@ apps/cms/
 │   └── pages/        # Shared pages
 └── keystatic.config.tsx  # CMS configuration
 
-apps/astro/ & apps/portfolio/
+apps/bracketbear-website/ & apps/portfolio/
 ├── src/content.config.ts  # Imports from @bracketbear/astro-content
 └── src/content/          # Site-specific content (if any)
 ```

@@ -61,7 +61,7 @@ content/
 
 ## Integration
 
-Both Astro apps (`apps/astro` and `apps/portfolio`) consume content through the `@bracketbear/astro-content` package, which imports from this CMS's content directory.
+Both Astro apps (`apps/bracketbear-website` and `apps/portfolio`) consume content through the `@bracketbear/astro-content` package, which imports from this CMS's content directory.
 
 ## Architecture
 
@@ -74,7 +74,7 @@ apps/cms/ (This app)
 packages/portfolio-content/
 └── index.ts          # Exports content collections for Astro apps
 
-apps/astro/ & apps/portfolio/
+apps/bracketbear-website/ & apps/portfolio/
 └── src/content.config.ts  # Imports from portfolio-content package
 ```
 
