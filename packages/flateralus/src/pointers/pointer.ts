@@ -1,4 +1,4 @@
-import { Vec2D } from "..";
+import { Vec2D } from '..';
 
 export abstract class Pointer {
   position: Vec2D;
@@ -7,44 +7,44 @@ export abstract class Pointer {
   diameter: number;
 
   constructor(element: HTMLElement, diameter: number = 1) {
-      this.position = { x: -1000, y: -1000 };
-      this.active = false;
-      this.element = element;
-      this.diameter = diameter > 0 ? diameter : 1;
-      this.setupPointerEvents()
+    this.position = { x: -1000, y: -1000 };
+    this.active = false;
+    this.element = element;
+    this.diameter = diameter > 0 ? diameter : 1;
+    this.setupPointerEvents();
   }
 
   abstract updatePosition(event: MouseEvent | TouchEvent): void;
 
   setupPointerEvents(): void {
-      this.element.addEventListener('mousemove', (e) => {
-          if (e instanceof MouseEvent) {
-              this.updatePosition(e);
-          }
-      });
-      
-      this.element.addEventListener('mouseleave', (e) => {
-        if (e instanceof MouseEvent) {
-            this.resetPosition();
-        }
-      });
+    this.element.addEventListener('mousemove', (e) => {
+      if (e instanceof MouseEvent) {
+        this.updatePosition(e);
+      }
+    });
 
-      this.element.addEventListener('touchmove', (e) => {
-          if (e instanceof TouchEvent) {
-              this.updatePosition(e);
-          }
-      });
+    this.element.addEventListener('mouseleave', (e) => {
+      if (e instanceof MouseEvent) {
+        this.resetPosition();
+      }
+    });
+
+    this.element.addEventListener('touchmove', (e) => {
+      if (e instanceof TouchEvent) {
+        this.updatePosition(e);
+      }
+    });
   }
-  
-  getBoundingBox(): { x: number, y: number, width: number, height: number } {
+
+  getBoundingBox(): { x: number; y: number; width: number; height: number } {
     return {
-        x: this.position.x - this.diameter / 2,
-        y: this.position.y - this.diameter / 2,
-        width: this.diameter,
-        height: this.diameter
+      x: this.position.x - this.diameter / 2,
+      y: this.position.y - this.diameter / 2,
+      width: this.diameter,
+      height: this.diameter,
     };
   }
-  
+
   resetPosition(): void {
     this.position = { x: -1000, y: -1000 };
   }

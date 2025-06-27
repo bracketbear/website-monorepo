@@ -25,7 +25,7 @@ export default defineConfig([
       '**/public/**',
     ],
   },
-  
+
   // JavaScript/TypeScript files
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
@@ -68,7 +68,7 @@ export default defineConfig([
       ],
     },
   },
-  
+
   // // Astro files
   // {
   //   files: ['**/*.astro'],
@@ -100,7 +100,7 @@ export default defineConfig([
   //     ],
   //   },
   // },
-  
+
   // JSON files
   // {
   //   files: ['**/*.json'],

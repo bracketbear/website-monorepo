@@ -1,12 +1,12 @@
-import { BaseGenerator, BaseGeneratorConfig, GeneratorGetSprite } from ".";
-import { Sprite } from "..";
+import { BaseGenerator, BaseGeneratorConfig, GeneratorGetSprite } from '.';
+import { Sprite } from '..';
 
 /**
  * Configuration options for the GridGenerator.
  */
 export interface GridGeneratorConfig extends BaseGeneratorConfig {
   /** If true, width and height are ignored. */
-  fillContainer: boolean
+  fillContainer: boolean;
   /** Width of the area to fill. */
   width: number;
   /** Height of the area to fill. */
@@ -26,20 +26,27 @@ const defaultConfig: GridGeneratorConfig = {
   spriteWidth: 100,
   spriteHeight: 100,
   gap: 10,
-}
-
+};
 
 export class GridGenerator extends BaseGenerator<GridGeneratorConfig> {
-  constructor(context: CanvasRenderingContext2D, config: Partial<GridGeneratorConfig> = {}) {
+  constructor(
+    context: CanvasRenderingContext2D,
+    config: Partial<GridGeneratorConfig> = {}
+  ) {
     const configWithDefaults = { ...defaultConfig, ...config };
     super(context, configWithDefaults);
   }
 
   generate(getSprite: GeneratorGetSprite): Sprite[] {
     const sprites: Sprite[] = [];
-    const { width, height, spriteWidth, spriteHeight, gap, fillContainer } = this.config;
-    const computedWidth = fillContainer ? this.canvasContext.canvas.width : width
-    const computedHeight = fillContainer ? this.canvasContext.canvas.height : height
+    const { width, height, spriteWidth, spriteHeight, gap, fillContainer } =
+      this.config;
+    const computedWidth = fillContainer
+      ? this.canvasContext.canvas.width
+      : width;
+    const computedHeight = fillContainer
+      ? this.canvasContext.canvas.height
+      : height;
 
     // Calculate the number of columns and rows based on the provided dimensions, sprite size and gap.
     const columns = Math.floor((computedWidth + gap) / (spriteWidth + gap));
@@ -51,7 +58,7 @@ export class GridGenerator extends BaseGenerator<GridGeneratorConfig> {
         const posY = y * (spriteHeight + gap);
         const sprite = getSprite(this.canvasContext);
         sprite.setPosition(posX, posY);
-        
+
         sprites.push(sprite);
       }
     }

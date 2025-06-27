@@ -10,16 +10,16 @@ interface NavItem {
 }
 
 export const navItems: NavItem[] = [
-  { name: "Home", href: "/" },
-  { name: "Work History", href: "/work" },
+  { name: 'Home', href: '/' },
+  { name: 'Work History', href: '/work' },
   {
-    name: "Learn About",
-    href: "/about",
+    name: 'Learn About',
+    href: '/about',
     children: [
-      { name: "About Me", href: "/about/me" },
-      { name: "About Bracket Bear", href: "/about/bracket-bear" },
-      { name: "About This App", href: "/about/site" }
-    ]
+      { name: 'About Me', href: '/about/me' },
+      { name: 'About Bracket Bear', href: '/about/bracket-bear' },
+      { name: 'About This App', href: '/about/site' },
+    ],
   },
-  { name: "Reach Out", href: "/contact" },
+  { name: 'Reach Out', href: '/contact' },
 ] as const;

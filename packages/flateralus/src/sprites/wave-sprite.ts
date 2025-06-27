@@ -1,4 +1,4 @@
-import { Sprite } from '.'
+import { Sprite } from '.';
 
 export interface WaveSpriteConfig {
   amplitude: number; // The height of the wave
@@ -10,7 +10,10 @@ export interface WaveSpriteConfig {
 export class WaveSprite extends Sprite {
   config: WaveSpriteConfig;
 
-  constructor(context: CanvasRenderingContext2D, config: Partial<WaveSpriteConfig> = {}) {
+  constructor(
+    context: CanvasRenderingContext2D,
+    config: Partial<WaveSpriteConfig> = {}
+  ) {
     super(context);
     this.config = {
       amplitude: 100,
@@ -26,7 +29,7 @@ export class WaveSprite extends Sprite {
 
     this.canvasContext.beginPath();
     for (let x = 0; x < this.canvasContext.canvas.width; x++) {
-      const y = amplitude * Math.sin((frequency * x + phase) * Math.PI / 180);
+      const y = amplitude * Math.sin(((frequency * x + phase) * Math.PI) / 180);
       this.canvasContext.lineTo(x, y);
     }
     this.canvasContext.stroke();

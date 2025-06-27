@@ -1,6 +1,6 @@
-import { Behavior } from ".";
-import { Sprite } from "..";
-import type { DrawContext } from "../types";
+import { Behavior } from '.';
+import { Sprite } from '..';
+import type { DrawContext } from '../types';
 
 /**
  * Represents a behavior condition that can be used to execute a behavior based on a certain condition.
@@ -25,7 +25,9 @@ export class BehaviorCondition<T> {
    * @param condition - The condition to check.
    * @returns The current instance of the `BehaviorCondition` class.
    */
-  when(condition: (sprite: Sprite, ctx: DrawContext) => boolean): BehaviorCondition<T> {
+  when(
+    condition: (sprite: Sprite, ctx: DrawContext) => boolean
+  ): BehaviorCondition<T> {
     this.condition = condition;
     return this;
   }
@@ -39,7 +41,7 @@ export class BehaviorCondition<T> {
   checkCondition(sprite: Sprite, ctx: DrawContext): boolean {
     return this.condition(sprite, ctx);
   }
-  
+
   /**
    * Checks if the condition is met and executes the behavior if it is.
    * @param sprite - The sprite to check the condition against.

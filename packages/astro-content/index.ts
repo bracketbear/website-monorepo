@@ -91,10 +91,14 @@ const workProjects = createJsonCollection({
     challengesAndSolutions: z.string().optional(),
     resultsAchieved: z.string().optional(),
     mediaDescription: z.string().optional(),
-    media: z.array(z.object({
-      image: z.string(),
-      caption: z.string().optional()
-    })).optional(),
+    media: z
+      .array(
+        z.object({
+          image: z.string(),
+          caption: z.string().optional(),
+        })
+      )
+      .optional(),
     isFeatured: z.boolean().default(false),
     category: z.string().optional(), // references "workProjectCategory"
     skills: z.array(z.string()).optional(), // references "workSkills"
@@ -136,4 +140,4 @@ export const collections = {
   workProject: workProjects,
   blog,
   pages,
-}; 
+};

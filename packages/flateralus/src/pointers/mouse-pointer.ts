@@ -1,4 +1,4 @@
-import { Pointer } from ".";
+import { Pointer } from '.';
 
 export class MousePointer extends Pointer {
   updatePosition(event: MouseEvent): void {

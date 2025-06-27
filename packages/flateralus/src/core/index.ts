@@ -1,1 +1,1 @@
-export * from './flateralus-canvas'
+export * from './flateralus-canvas';

@@ -1,7 +1,7 @@
-import { collection, config, fields, singleton } from "@keystatic/core";
-import { pathToFileURL } from "node:url";
-import { dirname, join } from "node:path";
-import path from "path";
+import { collection, config, fields, singleton } from '@keystatic/core';
+import { pathToFileURL } from 'node:url';
+import { dirname, join } from 'node:path';
+import path from 'path';
 
 // Point to the local content directory
 const CONTENT_PATH = 'content' as const;
@@ -9,13 +9,13 @@ const WORK_PATH = 'work' as const;
 
 const collectionPath = <T extends string>(slug: T) => {
   return `${CONTENT_PATH}/${slug}/*` as const;
-}
+};
 const singletonPath = <T extends string>(slug: T) => {
   return `${CONTENT_PATH}/${slug}` as const;
-}
+};
 const workPath = <T extends string>(slug: T) => {
   return collectionPath(`${WORK_PATH}/${slug}`);
-}
+};
 
 const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -31,7 +31,7 @@ export default config({
       name: 'Bracket Bear CMS',
       mark: ({ colorScheme }) => {
         let path = '/bracket-bear-logo.svg';
-        return <img src={path} width={24} />
+        return <img src={path} width={24} />;
       },
     },
   },
@@ -42,31 +42,30 @@ export default config({
       path: workPath('companies'),
       format: 'json',
       schema: {
-        title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } }),
+        title: fields.slug({
+          name: { label: 'Title', validation: { isRequired: true } },
+        }),
         logo: fields.image({ label: 'Logo' }),
         website: fields.url({ label: 'Website' }),
         location: fields.text({ label: 'Location' }),
-      }
+      },
     }),
     workJobs: collection({
       label: 'Jobs',
       slugField: 'title',
       format: 'json',
       path: workPath('jobs'),
-      columns: [
-        'title',
-        'company',
-        'startDate',
-        'endDate',
-      ],
+      columns: ['title', 'company', 'startDate', 'endDate'],
       entryLayout: 'content',
       schema: {
-        title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } }),
+        title: fields.slug({
+          name: { label: 'Title', validation: { isRequired: true } },
+        }),
         company: fields.relationship({
           label: 'Company',
           description: 'Select the company that this job belongs to',
           collection: 'workCompany',
-          validation: { isRequired: true }
+          validation: { isRequired: true },
         }),
         description: fields.text({ label: 'Description', multiline: true }),
         highlights: fields.array(
@@ -74,17 +73,23 @@ export default config({
           {
             label: 'Job Highlights',
             description: 'Emphasize standout moments or successes in the job',
-            itemLabel: (props) => props.value || 'New Highlight'
+            itemLabel: (props) => props.value || 'New Highlight',
           }
         ),
-        startDate: fields.date({ label: 'Start Date', validation: { isRequired: true } }),
+        startDate: fields.date({
+          label: 'Start Date',
+          validation: { isRequired: true },
+        }),
         endDate: fields.date({ label: 'End Date' }),
         workSkills: fields.multiRelationship({
           label: 'Skills',
           description: 'Select the skills that belong to this job',
           collection: 'workSkills',
         }),
-        isCurrentJob: fields.checkbox({ label: 'Is Current Job?', defaultValue: false }),
+        isCurrentJob: fields.checkbox({
+          label: 'Is Current Job?',
+          defaultValue: false,
+        }),
       },
     }),
     workSkills: collection({
@@ -94,11 +99,14 @@ export default config({
       schema: {
         title: fields.slug({ name: { label: 'Title' } }),
         description: fields.text({ label: 'Description' }),
-        isFeatured: fields.checkbox({ label: 'Is Featured?', defaultValue: false }),
-        categories: fields.array(
-          fields.text({ label: 'Category' }),
-          { label: 'Categories', itemLabel: (props) => props.value || 'New Category' }
-        ),
+        isFeatured: fields.checkbox({
+          label: 'Is Featured?',
+          defaultValue: false,
+        }),
+        categories: fields.array(fields.text({ label: 'Category' }), {
+          label: 'Categories',
+          itemLabel: (props) => props.value || 'New Category',
+        }),
       },
       format: 'json',
     }),
@@ -115,7 +123,7 @@ export default config({
           description: 'Select the skills that belong to this category',
           collection: 'workSkills',
         }),
-      }
+      },
     }),
     workProjectCategory: collection({
       label: 'Work Project Category',
@@ -124,75 +132,74 @@ export default config({
       path: workPath('project-categories'),
       schema: {
         title: fields.slug({ name: { label: 'Title' } }),
-      }
+      },
     }),
     workProject: collection({
       label: 'Work Projects',
       slugField: 'title',
       format: 'json',
       path: workPath('projects'),
-      columns: [
-        'title',
-        'job',
-      ],
+      columns: ['title', 'job'],
       schema: {
-        title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } }),
+        title: fields.slug({
+          name: { label: 'Title', validation: { isRequired: true } },
+        }),
         job: fields.relationship({
           label: 'Job',
           description: 'Select the job that this project belongs to',
           collection: 'workJobs',
-          validation: { isRequired: true }
+          validation: { isRequired: true },
         }),
         duration: fields.text({
           label: 'Duration',
-          validation: { isRequired: true }
+          validation: { isRequired: true },
         }),
         description: fields.text({
           label: 'Description',
-          multiline: true
+          multiline: true,
         }),
         challengesAndSolutions: fields.text({
           label: 'Challenges and Solutions',
-          multiline: true
+          multiline: true,
         }),
         resultsAchieved: fields.text({
           label: 'Results Achieved',
-          multiline: true
+          multiline: true,
         }),
         mediaDescription: fields.text({
           label: 'Media Description',
-          multiline: true
+          multiline: true,
         }),
         media: fields.array(
           fields.object({
             image: fields.image({
               label: 'Image',
-              directory: path.resolve(process.cwd(), "content/work/projects"),
-              publicPath: '/work/projects/'
+              directory: path.resolve(process.cwd(), 'content/work/projects'),
+              publicPath: '/work/projects/',
             }),
-            caption: fields.text({ label: 'Caption' })
+            caption: fields.text({ label: 'Caption' }),
           }),
           {
             label: 'Media',
             description: 'Project images and their captions',
-            itemLabel: (props) => props.fields.caption.value || 'New Media'
+            itemLabel: (props) => props.fields.caption.value || 'New Media',
           }
         ),
         isFeatured: fields.checkbox({
           label: 'Is Featured?',
-          defaultValue: false
+          defaultValue: false,
         }),
         category: fields.relationship({
           label: 'Category',
           description: 'Select the category that this project belongs to',
-          collection: 'workProjectCategory'
+          collection: 'workProjectCategory',
         }),
         skills: fields.multiRelationship({
           label: 'Skills',
           description: 'Select the skills that belong to this project',
-          collection: 'workSkills'
+          collection: 'workSkills',
         }),
-      }
+      },
     }),
     // New shared content types for both websites
     blog: collection({
@@ -201,21 +208,26 @@ export default config({
       format: 'json',
       path: collectionPath('blog'),
       schema: {
-        title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } }),
+        title: fields.slug({
+          name: { label: 'Title', validation: { isRequired: true } },
+        }),
         excerpt: fields.text({ label: 'Excerpt', multiline: true }),
-        content: fields.text({ 
-          label: 'Content', 
+        content: fields.text({
+          label: 'Content',
           multiline: true,
-          description: 'Blog content (markdown supported)'
+          description: 'Blog content (markdown supported)',
         }),
         publishedAt: fields.date({ label: 'Published Date' }),
-        isPublished: fields.checkbox({ label: 'Is Published?', defaultValue: false }),
-        tags: fields.array(
-          fields.text({ label: 'Tag' }),
-          { label: 'Tags', itemLabel: (props) => props.value || 'New Tag' }
-        ),
+        isPublished: fields.checkbox({
+          label: 'Is Published?',
+          defaultValue: false,
+        }),
+        tags: fields.array(fields.text({ label: 'Tag' }), {
+          label: 'Tags',
+          itemLabel: (props) => props.value || 'New Tag',
+        }),
         featuredImage: fields.image({ label: 'Featured Image' }),
-      }
+      },
     }),
     pages: collection({
       label: 'Pages',
@@ -223,22 +235,33 @@ export default config({
       format: 'json',
       path: collectionPath('pages'),
       schema: {
-        title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } }),
-        content: fields.text({ 
-          label: 'Content', 
+        title: fields.slug({
+          name: { label: 'Title', validation: { isRequired: true } },
+        }),
+        content: fields.text({
+          label: 'Content',
           multiline: true,
-          description: 'Page content (markdown supported)'
+          description: 'Page content (markdown supported)',
         }),
         metaDescription: fields.text({ label: 'Meta Description' }),
-        isPublished: fields.checkbox({ label: 'Is Published?', defaultValue: true }),
-      }
+        isPublished: fields.checkbox({
+          label: 'Is Published?',
+          defaultValue: true,
+        }),
+      },
     }),
   },
   singletons: {
     contactInfo: singleton({
       label: 'Contact Info',
       schema: {
-        email: fields.text({ label: 'Email', validation: { isRequired: true, pattern: { regex: emailRegex, message: 'Invalid email' } } }),
+        email: fields.text({
+          label: 'Email',
+          validation: {
+            isRequired: true,
+            pattern: { regex: emailRegex, message: 'Invalid email' },
+          },
+        }),
         linkedin: fields.url({ label: 'LinkedIn' }),
         github: fields.url({ label: 'GitHub' }),
       },
@@ -248,7 +271,10 @@ export default config({
     siteSettings: singleton({
       label: 'Site Settings',
       schema: {
-        siteName: fields.text({ label: 'Site Name', validation: { isRequired: true } }),
+        siteName: fields.text({
+          label: 'Site Name',
+          validation: { isRequired: true },
+        }),
         siteDescription: fields.text({ label: 'Site Description' }),
         logo: fields.image({ label: 'Logo' }),
         favicon: fields.image({ label: 'Favicon' }),
@@ -256,5 +282,5 @@ export default config({
       format: 'json',
       path: singletonPath('site-settings'),
     }),
-  }
-}); 
+  },
+});

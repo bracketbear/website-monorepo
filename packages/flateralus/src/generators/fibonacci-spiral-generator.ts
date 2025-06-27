@@ -1,5 +1,5 @@
-import { BaseGenerator, BaseGeneratorConfig, GeneratorGetSprite } from ".";
-import { Sprite } from "..";
+import { BaseGenerator, BaseGeneratorConfig, GeneratorGetSprite } from '.';
+import { Sprite } from '..';
 
 export interface FibonacciSpiralGeneratorConfig extends BaseGeneratorConfig {
   totalSprites: number; // Total number of sprites to generate
@@ -14,7 +14,10 @@ const defaultConfig: FibonacciSpiralGeneratorConfig = {
 };
 
 export class FibonacciSpiralGenerator extends BaseGenerator<FibonacciSpiralGeneratorConfig> {
-  constructor(context: CanvasRenderingContext2D, config: Partial<FibonacciSpiralGeneratorConfig> = {}) {
+  constructor(
+    context: CanvasRenderingContext2D,
+    config: Partial<FibonacciSpiralGeneratorConfig> = {}
+  ) {
     const configWithDefaults = { ...defaultConfig, ...config };
     super(context, configWithDefaults);
   }
