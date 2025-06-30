@@ -1,13 +1,5 @@
-interface NavItem {
-  name: string;
-  href: string;
-  icon?: string;
-  children?: NavItem[];
-  /** Optional property for link target (_blank, _self, etc.) */
-  target?: string;
-  /** Optional property for link relationship (noopener, noreferrer, etc.) */
-  rel?: string;
-}
+import type { NavigationConfig, NavItem } from '@bracketbear/core/astro';
+import Logo from '@/assets/bracket-bear-logo.svg?url';
 
 export const navItems: NavItem[] = [
   { name: 'Home', href: '/' },
@@ -23,3 +15,17 @@ export const navItems: NavItem[] = [
   },
   { name: 'Reach Out', href: '/contact' },
 ] as const;
+
+export const navigationConfig: NavigationConfig = {
+  items: navItems,
+  branding: {
+    logo: Logo,
+    name: 'Bracket Bear',
+    href: '/',
+  },
+  socialLinks: {
+    linkedin: 'https://www.linkedin.com/in/bracketbear/',
+    github: 'https://github.com/bracketbear',
+    twitter: 'https://twitter.com/bracketbear',
+  },
+};

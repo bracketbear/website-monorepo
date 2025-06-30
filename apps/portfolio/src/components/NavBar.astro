@@ -1,6 +1,6 @@
 ---
 import { navItems } from "@/config/navigation";
-import ThemeSwitch from "./ThemeSwitch.astro";
+import { ThemeSwitch } from "@bracketbear/core/astro";
 
 interface Props {
   class?: string;
@@ -10,7 +10,6 @@ const UNDERLINE =
   "bg-foreground absolute -bottom-1 left-0 h-1 w-0 transition-all duration-300 group-hover:w-full" as const;
 
 const BACKGROUND_COLOR = "bg-brand-orange dark:bg-dark" as const;
-const TEXT_COLOR = "text-foreground" as const;
 ---
 
 <nav

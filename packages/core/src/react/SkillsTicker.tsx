@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { CollectionEntry } from 'astro:content';
 
-const SCROLL_SPEED = 20 as const;
+const SCROLL_SPEED = 1 as const;
 const REFRESH_INTERVAL = 20 as const;
 
 interface SkillsTickerProps {

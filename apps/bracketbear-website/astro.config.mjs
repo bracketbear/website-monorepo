@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import markdoc from '@astrojs/markdoc';
 import svgr from 'vite-plugin-svgr';
 
-const bracketbearCss = '/packages/ui-kit/dist/styles/bracketbear.tailwind.css';
+const bracketbearCss = '/packages/core/dist/styles/bracketbear.tailwind.css';
 
 // https://astro.build/config
 export default defineConfig({
@@ -15,14 +15,14 @@ export default defineConfig({
       allow: ['..', '../..'],
       watch: {
         ignored: [
-          // Ignore everything under node_modules except ui-kit so we react to changes to the ui-kit styles
+          // Ignore everything under node_modules except core so we react to changes to the core styles
           '**/node_modules/**',
-          '!**/node_modules/@bracketbear/ui-kit/dist/**',
+          '!**/node_modules/@bracketbear/core/dist/**',
         ],
       },
       optimizeDeps: {
-        // ensure Vite pre-bundles your ui-kit so HMR works
-        include: ['@bracketbear/ui-kit'],
+        // ensure Vite pre-bundles your core package so HMR works
+        include: ['@bracketbear/core'],
       },
     },
     plugins: [

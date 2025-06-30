@@ -1,13 +1,4 @@
-interface NavItem {
-  name: string;
-  href: string;
-  icon?: string;
-  children?: NavItem[];
-  /** Optional property for link target (_blank, _self, etc.) */
-  target?: string;
-  /** Optional property for link relationship (noopener, noreferrer, etc.) */
-  rel?: string;
-}
+import type { NavigationConfig, NavItem } from '@bracketbear/core/astro';
 
 export const navItems: NavItem[] = [
   { name: 'Home', href: '/' },
@@ -15,3 +6,11 @@ export const navItems: NavItem[] = [
   { name: 'Work History', href: '/work' },
   { name: 'Reach Out', href: '/contact' },
 ] as const;
+
+export const navigationConfig: NavigationConfig = {
+  items: navItems,
+  branding: {
+    name: 'Harrison Callahan',
+    href: '/',
+  },
+};

@@ -10,7 +10,6 @@
   ],
   "startDate": "2024-01-01",
   "endDate": "2025-03-01",
-  "isCurrentJob": false,
   "workSkills": [
     "react",
     "postgresql",
@@ -23,5 +22,6 @@
     "storybook",
     "express",
     "sequelize"
-  ]
+  ],
+  "isCurrentJob": false
 }

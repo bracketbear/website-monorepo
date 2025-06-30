@@ -1,5 +1,6 @@
 @import 'tailwindcss';
-@import '@bracketbear/ui-kit/styles/bracketbear.tailwind.css';
+@import '@bracketbear/core/styles';
+@source '../../../../node_modules/@bracketbear/core/dist';
 
 /* Utility Classes */
 @layer utilities {

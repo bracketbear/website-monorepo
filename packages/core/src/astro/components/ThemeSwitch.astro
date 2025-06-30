@@ -1,3 +1,7 @@
+---
+import { THEME_CONSTANTS } from "../../utils/constants.js";
+---
+
 <button
   id="theme-switch"
   type="button"
@@ -136,60 +140,52 @@
 </style>
 
 <script>
-  const switchTranslateX = 'translate-x-[2.5rem]';
+  const switchTranslateX = "translate-x-[2.5rem]";
 
   function setupThemeSwitch() {
-    const themeSwitch = document.getElementById('theme-switch');
-    const themeSwitchSlider = document.getElementById('theme-switch-slider');
-    const selectedSunIcon = document.querySelector('.selected-sun-icon');
-    const selectedMoonIcon = document.querySelector('.selected-moon-icon');
+    const themeSwitch = document.getElementById("theme-switch");
+    const themeSwitchSlider = document.getElementById("theme-switch-slider");
+    const selectedSunIcon = document.querySelector(".selected-sun-icon");
+    const selectedMoonIcon = document.querySelector(".selected-moon-icon");
 
     // Set initial state
-    if (document.documentElement.dataset.theme === 'dark') {
-      selectedSunIcon?.classList.add('hidden');
-      selectedMoonIcon?.classList.remove('hidden');
+    if (document.documentElement.dataset.theme === "dark") {
+      selectedSunIcon?.classList.add("hidden");
+      selectedMoonIcon?.classList.remove("hidden");
     } else {
       themeSwitchSlider?.classList.add(switchTranslateX);
-      selectedSunIcon?.classList.remove('hidden');
-      selectedMoonIcon?.classList.add('hidden');
+      selectedSunIcon?.classList.remove("hidden");
+      selectedMoonIcon?.classList.add("hidden");
     }
 
-    themeSwitch?.addEventListener('click', function () {
+    themeSwitch?.addEventListener("click", function () {
       // Toggle theme
-      const isBecomingDark = document.documentElement.dataset.theme !== 'dark';
-      console.log({
-        isDark: isBecomingDark,
-        documentElement: document.documentElement.dataset.theme,
-      });
+      const isBecomingDark = document.documentElement.dataset.theme !== "dark";
 
-      console.log({
-        themeSwitchSlider,
-        selectedSunIcon,
-        selectedMoonIcon,
-      });
       // Toggle selected icons
       if (isBecomingDark) {
         themeSwitchSlider?.classList.remove(switchTranslateX);
-        selectedSunIcon?.classList.add('hidden');
-        selectedMoonIcon?.classList.remove('hidden');
+        selectedSunIcon?.classList.add("hidden");
+        selectedMoonIcon?.classList.remove("hidden");
       } else {
         themeSwitchSlider?.classList.add(switchTranslateX);
-        selectedSunIcon?.classList.remove('hidden');
-        selectedMoonIcon?.classList.add('hidden');
+        selectedSunIcon?.classList.remove("hidden");
+        selectedMoonIcon?.classList.add("hidden");
       }
 
       // Update localStorage
-      localStorage.theme = isBecomingDark ? 'dark' : 'light';
+      localStorage.theme = isBecomingDark ? "dark" : "light";
       document.documentElement.dataset.theme = isBecomingDark
-        ? 'dark'
-        : 'light';
+        ? "dark"
+        : "light";
     });
   }
 
   // Run setup when the DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupThemeSwitch);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupThemeSwitch);
   } else {
     setupThemeSwitch();
   }
 </script>
+

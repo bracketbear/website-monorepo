@@ -13,7 +13,7 @@
     "@astrojs/markdoc": "^0.15.0",
     "@astrojs/react": "^4.3.0",
     "@bracketbear/astro-content": "file:../../packages/astro-content",
-    "@bracketbear/ui-kit": "file:../../packages/ui-kit",
+    "@bracketbear/core": "file:../../packages/core",
     "@fontsource-variable/oswald": "^5.2.5",
     "astro": "^5.10.1",
     "react": "^19.0.0",

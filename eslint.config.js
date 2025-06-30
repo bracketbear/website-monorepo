@@ -3,6 +3,7 @@ import love from 'eslint-config-love';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 import prettierPlugin from 'eslint-plugin-prettier';
+import eslintPluginAstro from 'eslint-plugin-astro';
 
 export default defineConfig([
   // Base configuration for all files
@@ -65,5 +66,12 @@ export default defineConfig([
         },
       ],
     },
+  },
+
+  // Astro files
+  {
+    files: ['**/*.astro'],
+    ...eslintPluginAstro.configs.recommended,
+    ...love,
   },
 ]);
