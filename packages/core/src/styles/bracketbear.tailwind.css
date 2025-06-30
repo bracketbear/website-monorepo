@@ -1,3 +1,5 @@
+@import './forms.css';
+
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 /* Theme Variables */
@@ -8,7 +10,6 @@
   /* Brand Colors */
   --color-brand-dark: #231f20;
   --color-brand-red: #bb4430;
-  --color-brand-orange: white;
   --color-brand-orange: #ffc15e;
   --color-brand-blue: #7ebdc2;
   --color-brand-green: #98CE00;
