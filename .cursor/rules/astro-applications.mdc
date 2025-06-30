@@ -1,0 +1,128 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Astro Applications Guide
+
+## Overview
+
+This monorepo contains two Astro applications that share common components and content:
+
+1. **Bracket Bear Website** (`apps/bracketbear-website/`) - Company website
+2. **Portfolio** (`apps/portfolio/`) - Personal portfolio
+
+## Common Architecture
+
+Both Astro apps follow the same structure and patterns:
+
+### Dependencies
+- **Framework**: Astro with React integration via `@astrojs/react`
+- **Styling**: Tailwind CSS v4
+- **Content**: Shared content via `@bracketbear/astro-content`
+- **Components**: Shared design system via `@bracketbear/core`
+- **Fonts**: Oswald variable font via `@fontsource-variable/oswald`
+
+### Project Structure
+```
+src/
+├── components/          # Site-specific components
+├── layouts/            # Page layouts
+├── pages/              # Astro pages (file-based routing)
+├── styles/             # Global styles
+├── utils/              # Utility functions
+├── types/              # TypeScript type definitions
+├── content.config.ts   # Content collections configuration
+└── assets/             # Static assets
+```
+
+### Key Files
+- [apps/bracketbear-website/package.json](mdc:apps/bracketbear-website/package.json) - Dependencies and scripts
+- [apps/portfolio/package.json](mdc:apps/portfolio/package.json) - Dependencies and scripts
+
+## Development Commands
+
+### Bracket Bear Website
+```bash
+cd apps/bracketbear-website
+npm run dev      # Start dev server on port 4321
+npm run build    # Build for production
+npm run preview  # Preview production build
+```
+
+### Portfolio
+```bash
+cd apps/portfolio
+npm run dev      # Start dev server on port 4322
+npm run build    # Build for production
+npm run preview  # Preview production build
+```
+
+## Content Integration
+
+Both apps use the same content configuration pattern:
+
+```typescript
+// src/content.config.ts
+import { collections as sharedCollections } from '@bracketbear/astro-content';
+
+export const collections = {
+  ...sharedCollections,
+  // Add site-specific collections here
+};
+```
+
+## Component Usage
+
+### Layout Components
+```astro
+---
+import { Layout } from '@bracketbear/core/astro';
+import { portfolioNavigation } from '@bracketbear/core/config';
+---
+
+<Layout 
+  title="Page Title"
+  navigation={portfolioNavigation}
+>
+  <main>
+    <!-- Page content -->
+  </main>
+</Layout>
+```
+
+### Navigation
+```astro
+---
+import { NavBar } from '@bracketbear/core/astro';
+import { portfolioNavigation } from '@bracketbear/core/config';
+---
+
+<NavBar config={portfolioNavigation} />
+```
+
+## Styling
+
+Both apps use the shared design system from `@bracketbear/core`:
+
+```css
+/* Import shared styles */
+@import '@bracketbear/core/styles/bracketbear.tailwind.css';
+```
+
+## Documentation Resources
+
+- [Astro Documentation](https://docs.astro.build) - Official Astro docs
+- [Astro React Integration](https://docs.astro.build/en/guides/integrations-guide/react/) - React integration guide
+- [Tailwind CSS v4](https://tailwindcss.com/docs) - Styling framework
+- [Keystatic CMS](https://keystatic.com/docs) - Content management
+
+## Port Configuration
+
+- **Bracket Bear Website**: `http://localhost:4321`
+- **Portfolio**: `http://localhost:4322`
+- **CMS**: `http://localhost:3000`
+
+## Build Output
+
+Both apps build to their respective `dist/` directories and can be deployed as static sites.

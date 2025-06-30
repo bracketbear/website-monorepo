@@ -1,0 +1,202 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Astro Content Package Guide
+
+## Overview
+
+The `@bracketbear/astro-content` package provides shared content configuration for Bracket Bear websites. It imports content from the CMS app and provides a unified interface for Astro applications.
+
+## Package Structure
+
+### Key Files
+- [packages/astro-content/package.json](mdc:packages/astro-content/package.json) - Package configuration
+- [packages/astro-content/README.md](mdc:packages/astro-content/README.md) - Detailed documentation
+
+### Dependencies
+- **Astro**: Content collections framework
+- **Zod**: Schema validation for content types
+
+## Content Architecture
+
+### Content Flow
+```
+apps/cms/
+├── content/          # Content files (managed by Keystatic)
+    ↓
+@bracketbear/astro-content (imports content)
+    ↓
+Astro Apps (consume via getCollection)
+```
+
+### Content Structure
+```
+content/
+├── work/
+│   ├── companies/          # Company information and logos
+│   ├── jobs/              # Work experience and job details
+│   ├── skills/            # Technical skills and expertise
+│   ├── skill-categories/  # Organization of skills into categories
+│   ├── project-categories/ # Categories for organizing projects
+│   └── projects/          # Detailed project information with media
+├── blog/                  # Blog posts shared across sites
+├── pages/                 # General pages for either site
+├── contact-info.json      # Contact information singleton
+└── site-settings.json     # Global site configuration
+```
+
+## Usage in Astro Apps
+
+### Content Configuration
+```typescript
+// src/content.config.ts
+import { collections as sharedCollections } from '@bracketbear/astro-content';
+
+export const collections = {
+  ...sharedCollections,
+  // Add site-specific collections here
+};
+```
+
+### Content Access
+```typescript
+// In Astro pages
+import { getCollection } from 'astro:content';
+
+// Get work projects
+const projects = await getCollection('workProject');
+
+// Get skills
+const skills = await getCollection('workSkills');
+
+// Get jobs
+const jobs = await getCollection('workJobs');
+
+// Get companies
+const companies = await getCollection('workCompany');
+```
+
+## Content Types
+
+### Work Companies
+- Company name, description, logo
+- Used for job listings and project associations
+- Collection: `workCompany`
+
+### Work Jobs
+- Job title, company, dates, description
+- Highlights and achievements
+- Skills used in the role
+- Collection: `workJobs`
+
+### Work Skills
+- Skill name, description, category
+- Featured flag for homepage display
+- Associated with jobs and projects
+- Collection: `workSkills`
+
+### Work Projects
+- Project title, description, duration
+- Media files and screenshots
+- Associated skills and company
+- Featured flag for homepage display
+- Collection: `workProject`
+
+### Skill Categories
+- Organization of skills into logical groups
+- Collection: `workSkillCategory`
+
+### Project Categories
+- Categories for organizing projects
+- Collection: `workProjectCategory`
+
+### Blog Posts
+- Shared blog content across sites
+- Collection: `blog`
+
+### Pages
+- General pages that can be used on either site
+- Collection: `pages`
+
+## Content Management
+
+### CMS Integration
+All shared content is managed through the Keystatic CMS at `apps/cms`:
+1. **Edit content**: Use the CMS at `http://localhost:3000/keystatic`
+2. **Content is automatically available**: Both Astro apps will see changes immediately
+3. **Site-specific content**: Add to each app's `src/content/` directory
+
+### Content Validation
+The package uses Zod schemas to validate content structure and ensure type safety across all applications.
+
+## Development Workflow
+
+1. **Start CMS**: `npm run dev` in `apps/cms/`
+2. **Edit Content**: Use Keystatic admin interface
+3. **Content Sync**: Changes automatically available to Astro apps
+4. **Build**: Content is included in Astro builds
+
+## Site-Specific Content
+
+Each Astro app can have its own `src/content/` directory for site-specific content that doesn't need to be shared:
+
+```typescript
+// src/content.config.ts
+import { collections as sharedCollections } from '@bracketbear/astro-content';
+
+export const collections = {
+  ...sharedCollections,
+  // Site-specific collections
+  siteSpecific: defineCollection({
+    type: 'content',
+    schema: z.object({
+      title: z.string(),
+      description: z.string(),
+    }),
+  }),
+};
+```
+
+## Type Safety
+
+The package provides full TypeScript support:
+- Generated types for all content collections
+- Schema validation with Zod
+- Type-safe content access in Astro apps
+
+## Documentation Resources
+
+- [Astro Content Collections](https://docs.astro.build/en/guides/content-collections/) - Official Astro content docs
+- [Keystatic Documentation](https://keystatic.com/docs) - CMS documentation
+- [Zod Documentation](https://zod.dev) - Schema validation library
+
+## Integration Example
+
+```astro
+---
+// In an Astro page
+import { getCollection } from 'astro:content';
+
+// Get featured projects
+const featuredProjects = await getCollection('workProject', ({ data }) => {
+  return data.isFeatured;
+});
+
+// Get current job
+const jobs = await getCollection('workJobs');
+const currentJob = jobs.find(job => job.data.isCurrentJob);
+---
+
+<Layout title="Portfolio">
+  <main>
+    <h1>Featured Projects</h1>
+    {featuredProjects.map(project => (
+      <div>
+        <h2>{project.data.title}</h2>
+        <p>{project.data.description}</p>
+      </div>
+    ))}
+  </main>
+</Layout>

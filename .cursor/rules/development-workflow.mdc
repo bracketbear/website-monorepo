@@ -1,0 +1,205 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Development Workflow Guide
+
+## Quick Start
+
+### Prerequisites
+- **Node.js**: Version 18 or higher
+- **npm**: Required package manager
+- **Git**: Version control
+
+### Initial Setup
+```bash
+# Clone repository
+git clone <repository-url>
+cd bracketbear
+
+# Install dependencies
+npm install
+
+# Start all applications
+npm run dev
+```
+
+## Development Commands
+
+### Root Level Commands
+```bash
+# Start all applications concurrently
+npm run dev
+
+# Build all workspace packages
+npm run build
+
+# Lint all code
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+
+# Check linting with zero warnings
+npm run lint:check
+```
+
+### Individual Application Commands
+
+#### Bracket Bear Website
+```bash
+cd apps/bracketbear-website
+npm run dev      # Start on port 4321
+npm run build    # Build for production
+npm run preview  # Preview production build
+```
+
+#### Portfolio
+```bash
+cd apps/portfolio
+npm run dev      # Start on port 4322
+npm run build    # Build for production
+npm run preview  # Preview production build
+```
+
+#### CMS
+```bash
+cd apps/cms
+npm run dev      # Start on port 3000
+npm run build    # Build for production
+npm start        # Start production server
+```
+
+#### Core Package
+```bash
+cd packages/core
+npm run build    # Build all exports
+npm run dev      # Watch mode for development
+npm run clean    # Clean build artifacts
+```
+
+## Development URLs
+
+- **Bracket Bear Website**: `http://localhost:4321`
+- **Portfolio**: `http://localhost:4322`
+- **CMS Admin**: `http://localhost:3000/keystatic`
+- **CMS App**: `http://localhost:3000`
+
+## Content Management Workflow
+
+### 1. Start CMS
+```bash
+cd apps/cms
+npm run dev
+```
+
+### 2. Access Admin Interface
+Navigate to `http://localhost:3000/keystatic` in your browser.
+
+### 3. Edit Content
+Use the visual interface to:
+- Add/edit companies, jobs, skills, projects
+- Manage blog posts and pages
+- Upload images and media
+- Configure site settings
+
+### 4. Content Sync
+Changes are automatically available to both Astro applications.
+
+## Code Organization
+
+### Monorepo Structure
+```
+bracketbear/
+├── apps/                    # Applications
+│   ├── bracketbear-website/ # Company website (Astro)
+│   ├── portfolio/           # Portfolio website (Astro)
+│   └── cms/                # Content management (Next.js)
+├── packages/                # Shared packages
+│   ├── core/               # Design system & components
+│   ├── astro-content/      # Shared content configuration
+│   └── flateralus/         # Web animation library
+├── package.json            # Root configuration
+└── README.md              # Project overview
+```
+
+### Key Configuration Files
+- [package.json](mdc:package.json) - Root workspace configuration
+- [eslint.config.js](mdc:eslint.config.js) - Linting configuration
+- [README.md](mdc:README.md) - Project documentation
+
+## Common Development Tasks
+
+### Adding New Content
+1. Start CMS: `cd apps/cms && npm run dev`
+2. Access admin: `http://localhost:3000/keystatic`
+3. Add content through the interface
+4. Content is automatically available in Astro apps
+
+### Modifying Components
+1. Edit components in `packages/core/src/`
+2. Run `npm run dev` in `packages/core/` for watch mode
+3. Changes are automatically reflected in consuming apps
+
+### Adding New Pages
+1. Create new `.astro` files in `apps/*/src/pages/`
+2. Use the shared Layout component
+3. Import content collections as needed
+
+### Styling Changes
+1. Modify styles in `packages/core/src/styles/`
+2. Use Tailwind CSS with custom design tokens
+3. Import shared styles in Astro apps
+
+## Debugging
+
+### Common Issues
+
+#### Port Conflicts
+If ports are already in use:
+- Bracket Bear Website: Change port in `apps/bracketbear-website/package.json`
+- Portfolio: Change port in `apps/portfolio/package.json`
+- CMS: Change port in `apps/cms/package.json`
+
+#### Content Not Updating
+1. Ensure CMS is running: `cd apps/cms && npm run dev`
+2. Check admin interface: `http://localhost:3000/keystatic`
+3. Verify content files in `apps/cms/content/`
+
+#### Build Errors
+1. Clean builds: `npm run clean` (if available)
+2. Reinstall dependencies: `rm -rf node_modules && npm install`
+3. Check TypeScript errors: `npm run lint:check`
+
+### Logs and Monitoring
+- All application logs are combined when running `yarn dev`
+- Individual app logs available when running apps separately
+- Browser dev tools for frontend debugging
+
+## Deployment
+
+### Build Process
+```bash
+# Build all applications
+npm run build
+
+# Build outputs:
+# - apps/bracketbear-website/dist/
+# - apps/portfolio/dist/
+# - apps/cms/.next/
+```
+
+### Deployment Options
+- **Static Sites**: Deploy Astro apps to Vercel, Netlify, etc.
+- **CMS**: Deploy Next.js app to Vercel, Railway, etc.
+- **Content**: Store in repository or external storage
+
+## Documentation Resources
+
+- [Astro Documentation](https://docs.astro.build) - Astro framework
+- [Next.js Documentation](https://nextjs.org/docs) - Next.js framework
+- [Keystatic Documentation](https://keystatic.com/docs) - CMS system
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs) - Styling
+- [TypeScript Documentation](https://www.typescriptlang.org/docs) - Type safety
+- [npm Workspaces](https://docs.npmjs.com/cli/v7/using-npm/workspaces) - Monorepo management

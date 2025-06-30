@@ -1,0 +1,136 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# CMS (Keystatic) Guide
+
+## Overview
+
+The CMS application (`apps/cms/`) is built with Next.js and Keystatic, providing a content management system for shared content across all Bracket Bear websites.
+
+## Architecture
+
+### Framework
+- **Next.js**: React framework for the admin interface
+- **Keystatic**: Headless CMS with local file storage
+- **Content Storage**: JSON files in `content/` directory
+
+### Key Files
+- [apps/cms/package.json](mdc:apps/cms/package.json) - Dependencies and scripts
+- [apps/cms/README.md](mdc:apps/cms/README.md) - Detailed documentation
+- `keystatic.config.tsx` - CMS configuration
+- `content/` - All content files (managed by Keystatic)
+
+## Content Structure
+
+The CMS manages the following content types:
+
+### Work Content
+```
+content/work/
+├── companies/          # Company information and logos
+├── jobs/              # Work experience and job details
+├── skills/            # Technical skills and expertise
+├── skill-categories/  # Organization of skills into categories
+├── project-categories/ # Categories for organizing projects
+└── projects/          # Detailed project information with media
+```
+
+### Shared Content
+```
+content/
+├── blog/              # Blog posts shared across sites
+├── pages/             # General pages for either site
+├── contact-info.json  # Contact information singleton
+└── site-settings.json # Global site configuration
+```
+
+## Development
+
+### Commands
+```bash
+cd apps/cms
+npm run dev    # Start development server
+npm run build  # Build for production
+npm start      # Start production server
+```
+
+### Admin Interface
+- **URL**: `http://localhost:3000/keystatic`
+- **Purpose**: Visual content management interface
+- **Features**: Rich text editing, image management, content relationships
+
+## Content Management Workflow
+
+1. **Start CMS**: `npm run dev` in `apps/cms/`
+2. **Access Admin**: Navigate to `http://localhost:3000/keystatic`
+3. **Edit Content**: Use the visual interface to manage content
+4. **Content Sync**: Changes are automatically available to Astro apps
+
+## Integration with Astro Apps
+
+Both Astro applications consume CMS content through the `@bracketbear/astro-content` package:
+
+```typescript
+// In Astro apps
+import { getCollection } from 'astro:content';
+
+// Get work projects
+const projects = await getCollection('workProject');
+
+// Get skills
+const skills = await getCollection('workSkills');
+```
+
+## Content Types
+
+### Companies
+- Company name, description, logo
+- Used for job listings and project associations
+
+### Jobs
+- Job title, company, dates, description
+- Highlights and achievements
+- Skills used in the role
+
+### Skills
+- Skill name, description, category
+- Featured flag for homepage display
+- Associated with jobs and projects
+
+### Projects
+- Project title, description, duration
+- Media files and screenshots
+- Associated skills and company
+- Featured flag for homepage display
+
+## Features
+
+- **Local Storage**: Content stored as JSON files in repository
+- **Type Safety**: Full TypeScript support with generated types
+- **Rich Text Editing**: Markdown support in text fields
+- **Image Management**: Built-in image upload and management
+- **Relationships**: Link content between collections
+- **Validation**: Required fields and pattern validation
+
+## Documentation Resources
+
+- [Keystatic Documentation](https://keystatic.com/docs) - Official Keystatic docs
+- [Next.js Documentation](https://nextjs.org/docs) - Next.js framework docs
+- [Keystatic GitHub](https://github.com/thinkmill/keystatic) - Source code and issues
+
+## Content Flow
+
+```
+CMS (apps/cms/)
+├── content/ (JSON files)
+    ↓
+@bracketbear/astro-content (imports content)
+    ↓
+Astro Apps (consume via getCollection)
+```
+
+## Deployment
+
+The CMS can be deployed as a Next.js application, with content files stored in the repository or external storage.

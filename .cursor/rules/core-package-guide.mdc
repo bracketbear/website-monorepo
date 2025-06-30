@@ -1,0 +1,255 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Core Package Guide
+
+## Overview
+
+The `@bracketbear/core` package provides shared components, design system, and utilities for all Bracket Bear applications.
+
+## Package Structure
+
+### Key Files
+- [packages/core/package.json](mdc:packages/core/package.json) - Package configuration and exports
+- [packages/core/README.md](mdc:packages/core/README.md) - Detailed documentation
+
+### Exports
+```typescript
+// Main exports
+import { ... } from '@bracketbear/core';
+
+// Astro components
+import { Layout, NavBar, Footer, ThemeSwitch } from '@bracketbear/core/astro';
+
+// React components  
+import { ... } from '@bracketbear/core/react';
+
+// Types
+import type { NavigationConfig, LayoutProps } from '@bracketbear/core/types';
+
+// Configuration
+import { portfolioNavigation, bracketBearNavigation } from '@bracketbear/core/config';
+
+// Utilities
+import { ... } from '@bracketbear/core/utils';
+
+// Styles
+import '@bracketbear/core/styles/bracketbear.tailwind.css';
+```
+
+## Features
+
+### Design System
+- **Atoms**: Button, Input, Switch, Textarea components
+- **Tokens**: Color system, typography, spacing
+- **Styling**: Tailwind CSS with custom design tokens
+
+### Layout Components
+- **Layout**: Main layout wrapper with theme, navigation, footer
+- **NavBar**: Configurable navigation with responsive design
+- **Footer**: Configurable footer with branding and links
+- **ThemeSwitch**: Standalone theme switching component
+
+### Theme System
+- **Dark/Light Mode**: System preference support
+- **Custom Themes**: Configurable color schemes
+- **CSS Variables**: Theme-aware styling
+
+### Type Safety
+- **TypeScript**: Full type definitions
+- **Shared Types**: Navigation, layout, and component props
+- **Framework Agnostic**: Support for both Astro and React
+
+## Usage Examples
+
+### Basic Layout
+```astro
+---
+import { Layout, portfolioNavigation } from '@bracketbear/core/astro';
+import ContactForm from '@/components/ContactForm.astro';
+---
+
+<Layout 
+  title="My Page"
+  navigation={portfolioNavigation}
+  contactForm={ContactForm}
+>
+  <main>
+    <h1>Hello World!</h1>
+  </main>
+</Layout>
+```
+
+### Navigation Configuration
+```typescript
+import type { NavigationConfig } from '@bracketbear/core/types';
+
+const navigation: NavigationConfig = {
+  items: [
+    { name: 'Home', href: '/' },
+    { 
+      name: 'About', 
+      href: '/about',
+      children: [
+        { name: 'About Me', href: '/about/me' },
+        { name: 'About Company', href: '/about/company' }
+      ]
+    },
+    { name: 'Contact', href: '/contact' }
+  ],
+  branding: {
+    name: 'My Brand',
+    href: '/',
+    logo: '/logo.svg' // Optional
+  },
+  socialLinks: {
+    linkedin: 'https://linkedin.com/in/username',
+    github: 'https://github.com/username',
+    twitter: 'https://twitter.com/username'
+  }
+};
+```
+
+### Pre-built Configurations
+```typescript
+import { 
+  defaultNavigation,
+  portfolioNavigation, 
+  bracketBearNavigation 
+} from '@bracketbear/core/config';
+```
+
+## Development
+
+### Build Commands
+```bash
+cd packages/core
+npm run build    # Build all exports
+npm run dev      # Watch mode for development
+npm run clean    # Clean build artifacts
+```
+
+### File Structure
+```
+src/
+├── astro/              # Astro components
+│   ├── Layout.astro
+│   ├── NavBar.astro
+│   ├── Footer.astro
+│   ├── ThemeSwitch.astro
+│   └── atoms/          # Atomic components
+├── react/              # React components
+├── config/             # Navigation configurations
+├── types/              # TypeScript type definitions
+├── utils/              # Utility functions
+└── styles/             # CSS and Tailwind configuration
+```
+
+## Styling System
+
+### Tailwind Configuration
+The package provides a custom Tailwind configuration with:
+- Brand colors and design tokens
+- Custom components and utilities
+- Theme-aware styling
+- Brutalist design system classes
+
+### CSS Variables
+```css
+/* Theme variables */
+--color-brand-dark: #231f20;
+--color-brand-red: #bb4430;
+--color-brand-orange: #ffc15e;
+--color-brand-blue: #7ebdc2;
+--color-brand-green: #98CE00;
+```
+
+### Utility Classes
+```css
+.brutalist-border {
+  border: 2px solid var(--color-border);
+  box-shadow: var(--shadow-md) var(--color-shadow);
+}
+
+.brutalist-border:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-lg) var(--color-shadow);
+}
+```
+
+## Type Definitions
+
+### Navigation Types
+```typescript
+interface NavItem {
+  name: string;
+  href: string;
+  icon?: string;
+  children?: NavItem[];
+  target?: string;
+  rel?: string;
+}
+
+interface NavigationConfig {
+  items: NavItem[];
+  branding?: {
+    logo?: string;
+    name: string;
+    href: string;
+  };
+  socialLinks?: {
+    linkedin?: string;
+    github?: string;
+    twitter?: string;
+  };
+}
+```
+
+### Layout Types
+```typescript
+interface LayoutProps {
+  title?: string;
+  hideContactForm?: boolean;
+  hideFooter?: boolean;
+  hideNavigation?: boolean;
+}
+```
+
+## Integration
+
+### In Astro Apps
+```typescript
+// content.config.ts
+import { collections as sharedCollections } from '@bracketbear/astro-content';
+
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import react from '@astrojs/react';
+
+export default defineConfig({
+  integrations: [react()],
+  vite: {
+    ssr: {
+      external: ['@bracketbear/core']
+    }
+  }
+});
+```
+
+### In React Apps
+```typescript
+// Import React components
+import { Button, Input } from '@bracketbear/core/react';
+
+// Import styles
+import '@bracketbear/core/styles/bracketbear.tailwind.css';
+```
+
+## Documentation Resources
+
+- [Astro Documentation](https://docs.astro.build) - Astro framework docs
+- [React Documentation](https://react.dev) - React framework docs
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs) - Styling framework
+- [TypeScript Documentation](https://www.typescriptlang.org/docs) - Type safety

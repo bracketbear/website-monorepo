@@ -1,0 +1,82 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Bracket Bear Monorepo Overview
+
+## Project Structure
+
+This is a monorepo containing multiple applications and shared packages for the Bracket Bear website ecosystem. The project uses npm workspaces and follows a modular architecture.
+
+### Root Configuration
+- **Package Manager**: npm (required)
+- **Workspaces**: Configured in [package.json](mdc:package.json) to include `packages/*` and `apps/*`
+- **Development**: Run `npm run dev` to start all applications concurrently
+- **Build**: Run `npm run build` to build all workspace packages
+
+### Applications (`apps/`)
+
+#### 1. Bracket Bear Website (`apps/bracketbear-website/`)
+- **Framework**: Astro with React integration
+- **Port**: 4321
+- **Purpose**: Main company website
+- **Dependencies**: Uses `@bracketbear/core` and `@bracketbear/astro-content`
+- **Documentation**: [Astro Documentation](https://docs.astro.build)
+
+#### 2. Portfolio (`apps/portfolio/`)
+- **Framework**: Astro with React integration  
+- **Port**: 4322
+- **Purpose**: Personal portfolio website
+- **Dependencies**: Uses `@bracketbear/core` and `@bracketbear/astro-content`
+- **Documentation**: [Astro Documentation](https://docs.astro.build)
+
+#### 3. CMS (`apps/cms/`)
+- **Framework**: Next.js with Keystatic CMS
+- **Purpose**: Content management system for shared content
+- **Content Storage**: All content stored in `content/` directory as JSON files
+- **Admin UI**: Available at `/keystatic` route
+- **Documentation**: [Keystatic Documentation](https://keystatic.com/docs)
+
+### Packages (`packages/`)
+
+#### 1. Core (`packages/core/`)
+- **Purpose**: Shared design system and components
+- **Features**: Layout components, theme system, navigation, TypeScript types
+- **Exports**: Astro components, React components, configuration, utilities
+- **Documentation**: See [packages/core/README.md](mdc:packages/core/README.md)
+
+#### 2. Astro Content (`packages/astro-content/`)
+- **Purpose**: Shared content configuration for Astro apps
+- **Content Source**: Imports from CMS content directory
+- **Usage**: Provides unified content interface for both Astro applications
+
+#### 3. Flateralus (`packages/flateralus/`)
+- **Purpose**: Library for adding character to the web
+- **Status**: Private package, minimal documentation
+
+## Development Workflow
+
+1. **Install Dependencies**: `npm install` (from root)
+2. **Start Development**: `npm run dev` (starts all apps concurrently)
+3. **Content Management**: Use CMS at `http://localhost:3000/keystatic`
+4. **Build**: `npm run build` (builds all workspace packages)
+
+## Key Technologies
+
+- **Astro**: Static site generation with React integration
+- **Next.js**: CMS admin interface
+- **Keystatic**: Headless CMS with local file storage
+- **TypeScript**: Type safety across all packages
+- **Tailwind CSS**: Styling system
+- **React**: Component framework for interactive elements
+
+## Content Architecture
+
+The CMS serves as the single source of truth for shared content:
+- Work experience (companies, jobs, skills, projects)
+- Blog posts
+- Pages
+- Site settings
+
+Both Astro applications consume this content through the `@bracketbear/astro-content` package.

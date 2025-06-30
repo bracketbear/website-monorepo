@@ -5,18 +5,18 @@ This is a monorepo for the website.
 The app is essentially a Nuxt front-end with a Strapi CMS.
 
 ## Requirements
-This app requires Yarn.
+This app requires Node.js and npm.
 
 ## Installation
 To install, run the following command:
 ```bash
-yarn
+npm install
 ```
 
 ## To develop
 To develop, run the following command:
 ```bash
-yarn dev
+npm run dev
 ```
 This will run the front-end and the back-end at the same time and output all messages in one terminal window. If this doesn't work for you, it's also possible to run the individual apps by running their dev commands.
 
