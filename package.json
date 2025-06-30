@@ -7,7 +7,7 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace=@bracketbear/ui-kit\" \"npm run dev --workspace=@bracketbear/bracketbear-website\" \"npm run dev --workspace=@bracketbear/portfolio\"",
+    "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace=@bracketbear/ui-kit\" \"npm run dev --workspace=@bracketbear/cms\"  \"npm run dev --workspace=@bracketbear/bracketbear-website\" \"npm run dev --workspace=@bracketbear/portfolio\"",
     "build": "npm run build --workspace=@bracketbear/ui-kit --workspace=@bracketbear/bracketbear-website --workspace=@bracketbear/portfolio",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
