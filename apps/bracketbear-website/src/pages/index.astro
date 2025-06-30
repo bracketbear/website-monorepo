@@ -6,7 +6,7 @@ import AboutSection from '@/components/AboutSection.astro';
 import ChooseUsSection from '@/components/ChooseUsSection.astro';
 import ServicesSection from '@/components/ServicesSection.astro';
 import WorkHistory from '@/components/WorkHistory';
-import { SkillsTicker } from '@bracketbear/core/react';
+import ServiceTicker from '@/components/ServiceTicker';
 
 const snakeText = [
   'Software Engineer.',
@@ -17,6 +17,7 @@ const snakeText = [
 const jobs = await getCollection('workJobs');
 const companies = await getCollection('workCompany');
 const skills = await getCollection('workSkills');
+const services = await getCollection('services');
 ---
 
 <Layout>
@@ -78,8 +79,8 @@ const skills = await getCollection('workSkills');
         </div>
       </div>
     </div>
-    <!-- Skills Ticker -->
-    <SkillsTicker skills={skills} client:load />
+    <!-- Service Ticker -->
+    <ServiceTicker services={services} client:load />
   </header>
 
   <main class="bg-background">

@@ -21,4 +21,4 @@ export interface NavigationConfig {
     github?: string;
     twitter?: string;
   };
-} 
+}

@@ -1,0 +1,51 @@
+# Keystatic CMS Setup Rule
+
+To add new content types to Keystatic CMS, follow this pattern established in [apps/cms/keystatic.config.tsx](mdc:apps/cms/keystatic.config.tsx):
+
+## 1. Define Collection Schema
+Add a new collection to the `collections` object in the Keystatic config:
+
+```typescript
+newCollection: collection({
+  label: 'New Collection',
+  slugField: 'title',
+  format: 'json',
+  path: collectionPath('new-collection'),
+  schema: {
+    title: fields.slug({
+      name: { label: 'Title', validation: { isRequired: true } },
+    }),
+    description: fields.text({ 
+      label: 'Description', 
+      multiline: true 
+    }),
+    isPublished: fields.checkbox({
+      label: 'Is Published?',
+      defaultValue: false,
+    }),
+  },
+}),
+```
+
+## 2. Create Content Directory
+Create the corresponding directory in [apps/cms/content/](mdc:apps/cms/content/) to store the JSON files.
+
+## 3. Add Sample Content
+Create sample JSON files in the new directory following the schema structure.
+
+## 4. Update Astro Content Layer
+After adding to Keystatic, update the corresponding collection in [packages/astro-content/index.ts](mdc:packages/astro-content/index.ts) to match the schema.
+
+## Field Types Available
+- `fields.text()` - Single line text
+- `fields.text({ multiline: true })` - Multi-line text
+- `fields.slug()` - URL-friendly identifier
+- `fields.checkbox()` - Boolean values
+- `fields.date()` - Date picker
+- `fields.image()` - Image upload
+- `fields.url()` - URL validation
+- `fields.array()` - Arrays of values
+- `fields.object()` - Nested objects
+- `fields.relationship()` - References to other collections
+
+Reference: [Keystatic Documentation](https://keystatic.com/docs/introduction)

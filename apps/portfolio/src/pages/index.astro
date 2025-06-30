@@ -1,7 +1,8 @@
 ---
 import { getCollection } from "astro:content";
-import { Button } from "@bracketbear/core/astro";
+import { Button, BracketBearLogo } from "@bracketbear/core";
 import Layout from "@/layouts/Layout.astro";
+import SkillsTicker from "@/components/SkillsTicker";
 
 const snakeText = [
   "Software Engineer.",
@@ -92,6 +93,11 @@ const currentJob = sortedJobs.find((job) => job.data.isCurrentJob);
         </div>
       </div>
     </div>
+    <SkillsTicker
+      skills={featuredSkills}
+      LogoComponent={BracketBearLogo}
+      client:load
+    />
   </section>
 
   <main class="bg-background">

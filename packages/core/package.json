@@ -11,6 +11,11 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./assets": {
+      "import": "./dist/assets/index.js",
+      "types": "./dist/assets/index.d.ts"
+    },
+    "./assets/*": "./dist/assets/*",
     "./astro": {
       "import": "./dist/astro/index.js",
       "types": "./dist/astro/index.d.ts"
@@ -32,13 +37,14 @@
       "types": "./dist/utils/index.d.ts"
     },
     "./styles": "./dist/styles/bracketbear.tailwind.css",
-    "./styles/*": "./dist/styles/*"
+    "./styles/*": "./dist/styles/*",
+    "./public/*": "./public/*"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc && cpx \"src/styles/**/*\" dist/styles && cpx \"src/types/**/*\" dist/types && cpx \"src/config/**/*\" dist/config && cpx \"src/utils/**/*\" dist/utils",
+    "build": "tsc && cpx \"src/styles/**/*\" dist/styles && cpx \"src/types/**/*\" dist/types && cpx \"src/config/**/*\" dist/config && cpx \"src/utils/**/*\" dist/utils && cpx \"src/assets/**/*\" dist/assets",
     "dev": "concurrently \"tsc --watch\" \"npm run copy:astro:watch\" \"npm run copy:styles:watch\" \"npm run copy:types:watch\" \"npm run copy:config:watch\" \"npm run copy:utils:watch\"",
     "clean": "rm -rf dist",
     "copy:astro:watch": "cpx \"src/astro/**/*\" dist/astro --watch",

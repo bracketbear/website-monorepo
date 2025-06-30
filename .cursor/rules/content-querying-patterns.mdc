@@ -1,0 +1,74 @@
+# Content Querying Patterns Rule
+
+Use these patterns for querying content collections in Astro components and pages:
+
+## Basic Collection Query
+```typescript
+import { getCollection } from 'astro:content';
+
+// Get all entries
+const items = await getCollection('collectionName');
+
+// Get filtered entries
+const publishedItems = await getCollection('collectionName', ({ data }) => {
+  return data.isPublished === true;
+});
+```
+
+## Single Entry Query
+```typescript
+import { getEntry } from 'astro:content';
+
+// Get specific entry by ID
+const item = await getEntry('collectionName', 'entry-id');
+```
+
+## Dynamic Routes with getStaticPaths
+For generating pages from collections, use `getStaticPaths()`:
+
+```typescript
+// src/pages/[slug].astro
+export async function getStaticPaths() {
+  const items = await getCollection('collectionName');
+  return items.map(item => ({
+    params: { slug: item.id },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+```
+
+## Relationship Queries
+When collections reference each other, query related data:
+
+```typescript
+const projects = await getCollection('workProject');
+const skills = await getCollection('workSkills');
+
+// Map relationships
+const projectsWithSkills = projects.map(project => ({
+  ...project,
+  skillData: project.data.skills?.map(skillId => 
+    skills.find(skill => skill.id === skillId)
+  ).filter(Boolean)
+}));
+```
+
+## Content Rendering
+For markdown content, use the render function:
+
+```typescript
+import { render } from 'astro:content';
+
+const { Content } = await render(item);
+```
+
+## Type Safety
+Use the generated types for full type safety:
+
+```typescript
+import type { CollectionEntry } from 'astro:content';
+
+const items: CollectionEntry<'collectionName'>[] = await getCollection('collectionName');
+```

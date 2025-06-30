@@ -1,0 +1,45 @@
+# Logo Assets Rule
+
+The Bracket Bear logo is centralized in the core library for consistent usage across all apps.
+
+## Asset Location
+- **SVG File**: [packages/core/src/assets/bracket-bear-logo.svg](mdc:packages/core/src/assets/bracket-bear-logo.svg)
+- **React Component**: [packages/core/src/react/BracketBearLogo.tsx](mdc:packages/core/src/react/BracketBearLogo.tsx)
+
+## Import Options
+
+### 1. Direct SVG Import (Recommended for Astro)
+```typescript
+import BracketBearLogoSvg from '@bracketbear/core/assets/bracket-bear-logo.svg?url';
+```
+
+### 2. React Component Import
+```typescript
+import { BracketBearLogo } from '@bracketbear/core';
+```
+
+## Usage in Components
+Import the logo component from the core library:
+```typescript
+import { BracketBearLogo } from '@bracketbear/core';
+```
+
+## Ticker Separators
+Both ticker components now use the Bracket Bear logo as separators:
+- **SkillsTicker**: [apps/portfolio/src/components/SkillsTicker.tsx](mdc:apps/portfolio/src/components/SkillsTicker.tsx)
+- **ServiceTicker**: [apps/bracketbear-website/src/components/ServiceTicker.tsx](mdc:apps/bracketbear-website/src/components/ServiceTicker.tsx)
+
+The logo appears as a small red circular icon between each ticker item, rotated -12 degrees for visual interest.
+
+## Logo Properties
+- Uses `currentColor` for fill, making it adaptable to different color schemes
+- Responsive viewBox (400.89 x 249.73)
+- Accepts className prop for custom styling
+- Available as both SVG file and React component
+
+## Migration from App Assets
+The logo was previously duplicated in both Astro apps:
+- `apps/bracketbear-website/src/assets/bracket-bear-logo.svg`
+- `apps/portfolio/src/assets/bracket-bear-logo.svg`
+
+These can now be removed since the core library version is used instead.

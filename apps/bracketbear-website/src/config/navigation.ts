@@ -1,5 +1,5 @@
 import type { NavigationConfig, NavItem } from '@bracketbear/core/astro';
-import Logo from '@/assets/bracket-bear-logo.svg?url';
+import BracketBearLogoSvg from '@bracketbear/core/assets/bracket-bear-logo.svg?url';
 
 export const navItems: NavItem[] = [
   { name: 'Home', href: '/' },
@@ -19,7 +19,7 @@ export const navItems: NavItem[] = [
 export const navigationConfig: NavigationConfig = {
   items: navItems,
   branding: {
-    logo: Logo,
+    logo: BracketBearLogoSvg,
     name: 'Bracket Bear',
     href: '/',
   },

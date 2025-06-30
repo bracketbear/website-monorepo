@@ -248,6 +248,29 @@ export default config({
         }),
       },
     }),
+    services: collection({
+      label: 'Services',
+      slugField: 'title',
+      format: 'json',
+      path: collectionPath('services'),
+      schema: {
+        title: fields.slug({
+          name: { label: 'Title', validation: { isRequired: true } },
+        }),
+        description: fields.text({
+          label: 'Description',
+          multiline: true,
+        }),
+        icon: fields.text({
+          label: 'Icon',
+          description: 'Icon name or identifier',
+        }),
+        isFeatured: fields.checkbox({
+          label: 'Is Featured?',
+          defaultValue: false,
+        }),
+      },
+    }),
   },
   singletons: {
     contactInfo: singleton({

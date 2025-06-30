@@ -129,6 +129,16 @@ const pages = createJsonCollection({
   }),
 });
 
+const services = createJsonCollection({
+  base: join(contentPath, 'services'),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    icon: z.string().optional(),
+    isFeatured: z.boolean().default(false),
+  }),
+});
+
 console.log({ workPath: workPath('companies') });
 
 export const collections = {
@@ -140,4 +150,5 @@ export const collections = {
   workProject: workProjects,
   blog,
   pages,
+  services,
 };

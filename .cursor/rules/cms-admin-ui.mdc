@@ -1,0 +1,38 @@
+# CMS Admin UI Rule
+
+The Keystatic admin UI is available at `/keystatic` route in the CMS app.
+
+## Accessing the Admin UI
+1. Start the CMS development server: `cd apps/cms && npm run dev`
+2. Navigate to `http://localhost:3000/keystatic`
+3. The admin UI will show all configured collections and singletons
+
+## Content Management Workflow
+1. **Create New Entries**: Click "New Entry" in any collection
+2. **Edit Existing Entries**: Click on any entry to edit its fields
+3. **Delete Entries**: Use the delete button in the entry editor
+4. **Bulk Operations**: Use the checkboxes for bulk actions
+
+## Collection Features
+- **Slug Generation**: Automatic slug generation from title fields
+- **Validation**: Real-time validation based on schema
+- **Relationships**: Dropdown selectors for relationship fields
+- **Image Upload**: Drag-and-drop image uploads
+- **Rich Text**: Markdown editor for multiline text fields
+
+## File Storage
+- Content is stored as JSON files in [apps/cms/content/](mdc:apps/cms/content/)
+- Images are stored in the same directory structure
+- Changes are saved immediately to the file system
+
+## Production Considerations
+- The admin UI should be disabled in production builds
+- Use environment variables to control access
+- Consider using Keystatic Cloud for production deployments
+
+## Schema Validation
+- All fields are validated against the schema defined in [keystatic.config.tsx](mdc:apps/cms/keystatic.config.tsx)
+- Invalid data will show error messages in the UI
+- Required fields must be filled before saving
+
+Reference: [Keystatic Documentation](https://keystatic.com/docs/introduction)

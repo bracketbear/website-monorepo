@@ -9,4 +9,4 @@ export interface ThemeConfig {
   enableSystemPreference?: boolean;
   defaultTheme?: 'light' | 'dark' | 'system';
   storageKey?: string;
-} 
+}

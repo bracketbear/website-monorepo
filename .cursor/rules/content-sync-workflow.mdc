@@ -1,0 +1,40 @@
+# Content Sync Workflow Rule
+
+When adding new content types, follow this workflow to keep Keystatic CMS and Astro content layer in sync:
+
+## 1. Start with Keystatic Schema
+Always define the schema in [apps/cms/keystatic.config.tsx](mdc:apps/cms/keystatic.config.tsx) first, as this is the source of truth for content structure.
+
+## 2. Create Content Directory
+Create the corresponding directory in [apps/cms/content/](mdc:apps/cms/content/) and add sample JSON files.
+
+## 3. Update Astro Content Layer
+Mirror the Keystatic schema in [packages/astro-content/index.ts](mdc:packages/astro-content/index.ts) using Zod schemas:
+
+```typescript
+// Keystatic schema
+title: fields.slug({ name: { label: 'Title', validation: { isRequired: true } } })
+
+// Corresponding Zod schema
+title: z.string()
+```
+
+## 4. Build and Test
+- Build the core package: `cd packages/core && npm run build`
+- Build the CMS: `cd apps/cms && npm run build`
+- Test in apps: `cd apps/bracketbear-website && npm run build`
+
+## 5. Schema Validation
+Ensure both schemas validate the same data structure:
+- Keystatic validates at CMS level
+- Zod validates at build time in Astro apps
+
+## 6. Type Safety
+The TypeScript types generated from Zod schemas should match the Keystatic field types for full type safety across the stack.
+
+## Common Field Mappings
+- `fields.slug()` → `z.string()`
+- `fields.text({ multiline: true })` → `z.string().optional()`
+- `fields.checkbox()` → `z.boolean().default(false)`
+- `fields.date()` → `z.coerce.date()`
+- `fields.array()` → `z.array(z.string()).optional()`

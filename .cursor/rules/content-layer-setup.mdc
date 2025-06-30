@@ -1,0 +1,40 @@
+# Content Layer Setup Rule
+
+To add new content types to Astro's content layer via the core package, follow this pattern established in [packages/astro-content/index.ts](mdc:packages/astro-content/index.ts):
+
+## 1. Define the Collection Schema
+Create a new collection using `createJsonCollection()` with:
+- `base`: Path to the CMS content directory
+- `schema`: Zod schema defining the data structure
+
+Example:
+```typescript
+const newCollection = createJsonCollection({
+  base: join(contentPath, 'new-collection'),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    isPublished: z.boolean().default(false),
+  }),
+});
+```
+
+## 2. Add to Collections Export
+Add the new collection to the `collections` export object:
+```typescript
+export const collections = {
+  // ... existing collections
+  newCollection,
+};
+```
+
+## 3. Update App Content Config
+In each app's [content.config.ts](mdc:apps/bracketbear-website/src/content.config.ts), the collections are automatically available via the re-export from `@bracketbear/astro-content`.
+
+## 4. Use in Components
+Query the collection using `getCollection()` from `astro:content`:
+```typescript
+const items = await getCollection('newCollection');
+```
+
+Reference: [Astro Content Collections Documentation](https://docs.astro.build/en/guides/content-collections/)
