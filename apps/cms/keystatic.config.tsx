@@ -1,6 +1,4 @@
 import { collection, config, fields, singleton } from '@keystatic/core';
-import { pathToFileURL } from 'node:url';
-import { dirname, join } from 'node:path';
 import path from 'path';
 
 // Point to the local content directory
@@ -29,7 +27,7 @@ export default config({
   ui: {
     brand: {
       name: 'Bracket Bear CMS',
-      mark: ({ colorScheme }) => {
+      mark: () => {
         let path = '/bracket-bear-logo.svg';
         return <img src={path} width={24} />;
       },

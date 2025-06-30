@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { CollectionEntry } from 'astro:content';
 
+const SCROLL_SPEED = 20 as const;
+const REFRESH_INTERVAL = 20 as const;
+
 interface SkillsTickerProps {
   skills: CollectionEntry<'workSkills'>[];
   LogoComponent?: React.ComponentType<{ className?: string }>;
@@ -74,12 +77,12 @@ export default function SkillsTicker({
         console.log('Resetting scroll position');
         ticker.scrollLeft = 0;
       } else {
-        ticker.scrollLeft += 1;
+        ticker.scrollLeft += SCROLL_SPEED;
         console.log('Scrolling to:', ticker.scrollLeft);
       }
     };
 
-    const interval = setInterval(scrollTicker, 20);
+    const interval = setInterval(scrollTicker, REFRESH_INTERVAL);
     return () => clearInterval(interval);
   }, [isFocused]); // Add isFocused as dependency
 

@@ -68,44 +68,4 @@ export default defineConfig([
       ],
     },
   },
-
-  // // Astro files
-  // {
-  //   files: ['**/*.astro'],
-  //   ...eslintPluginAstro.configs.recommended,
-  //   rules: {
-  //     'comma-dangle': 'off',
-  //     'prefer-destructuring': 'off',
-  //     '@typescript-eslint/no-magic-numbers': [
-  //       'error',
-  //       {
-  //         detectObjects: false,
-  //         ignoreArrayIndexes: true,
-  //         ignoreDefaultValues: true,
-  //         ignore: [-1, 0, 1, 2],
-  //       },
-  //     ],
-  //     '@typescript-eslint/no-unused-vars': ['error'],
-  //     'prettier/prettier': [
-  //       'error',
-  //       {
-  //         trailingComma: 'es5',
-  //         tabWidth: 2,
-  //         semi: true,
-  //         singleQuote: true,
-  //         printWidth: 80,
-  //         endOfLine: 'lf',
-  //         bracketSpacing: true,
-  //       },
-  //     ],
-  //   },
-  // },
-
-  // JSON files
-  // {
-  //   files: ['**/*.json'],
-  //   languageOptions: {
-  //     parser: 'jsonc-eslint-parser',
-  //   },
-  // },
 ]);

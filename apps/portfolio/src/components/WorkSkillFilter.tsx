@@ -35,24 +35,6 @@ export default function WorkSkillFilter({
     );
   }, [skillCategories]);
 
-  // Create a map of skill to its categories
-  const skillCategoriesMap = useMemo(() => {
-    return skills.reduce(
-      (acc, skill) => {
-        if (skill.data.categories) {
-          skill.data.categories.forEach((category) => {
-            if (!acc[skill.id]) {
-              acc[skill.id] = [];
-            }
-            acc[skill.id].push(category);
-          });
-        }
-        return acc;
-      },
-      {} as Record<string, string[]>
-    );
-  }, [skills]);
-
   const setSelectedCategory = (category: string) => {
     const isAlreadySelected = selectedCategories.includes(category);
     if (isAlreadySelected) {
