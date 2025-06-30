@@ -44,16 +44,14 @@ export default defineConfig([
     rules: {
       'comma-dangle': 'off',
       'prefer-destructuring': 'off',
-      '@typescript-eslint/no-magic-numbers': [
+      '@typescript-eslint/no-magic-numbers': 'off',
+      '@typescript-eslint/no-unused-vars': [
         'error',
         {
-          detectObjects: false,
-          ignoreArrayIndexes: true,
-          ignoreDefaultValues: true,
-          ignore: [-1, 0, 1, 2],
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
         },
       ],
-      '@typescript-eslint/no-unused-vars': ['error'],
       'prettier/prettier': [
         'error',
         {
