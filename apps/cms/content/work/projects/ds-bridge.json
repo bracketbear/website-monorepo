@@ -12,8 +12,8 @@
       "caption": "A screenshot of the Bridge setup wizard."
     }
   ],
-  "isFeatured": false,
-  "category": "full-stack-engineering",
+  "isFeatured": true,
+  "category": "experiential-content-management-systems",
   "skills": [
     "vue",
     "vite",

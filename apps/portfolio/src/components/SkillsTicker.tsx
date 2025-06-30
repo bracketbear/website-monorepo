@@ -14,7 +14,14 @@ export default function SkillsTicker({
     id: skill.id,
     title: skill.data.title,
     icon: LogoComponent || BracketBearLogo,
+    link: `/work?skill=${skill.id}`,
   }));
 
-  return <Ticker items={tickerItems} />;
+  const handleItemClick = (item: TickerItem) => {
+    if (item.link) {
+      window.location.href = item.link;
+    }
+  };
+
+  return <Ticker items={tickerItems} onItemClick={handleItemClick} />;
 }

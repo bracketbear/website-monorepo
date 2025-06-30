@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { clsx } from 'clsx';
 import WorkHistory from './WorkHistory';
 import ProjectCard from './ProjectCard';
@@ -10,6 +10,8 @@ interface WorkSkillFilterProps {
   jobs: CollectionEntry<'workJobs'>[];
   projects: CollectionEntry<'workProject'>[];
   companies: CollectionEntry<'workCompany'>[];
+  initialSkills?: string;
+  intialCategories?: string;
 }
 
 export default function WorkSkillFilter({
@@ -18,9 +20,50 @@ export default function WorkSkillFilter({
   jobs,
   projects,
   companies,
+  initialSkills,
+  intialCategories,
 }: WorkSkillFilterProps) {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  console.log('initialSkills', initialSkills);
+  console.log('intialCategories', intialCategories);
+  // Parse initial state from data attributes
+  const parseInitialState = () => {
+    try {
+      const parsedInitialSkills = initialSkills
+        ? JSON.parse(initialSkills)
+        : [];
+      const parsedInitialCategories = intialCategories
+        ? JSON.parse(intialCategories)
+        : [];
+      return {
+        initialSkills: parsedInitialSkills,
+        initialCategories: parsedInitialCategories,
+      };
+    } catch (error) {
+      console.warn('Failed to parse initial filter state:', error);
+      return { initialSkills: [], initialCategories: [] };
+    }
+  };
+
+  const {
+    initialSkills: parsedInitialSkills,
+    initialCategories: parsedInitialCategories,
+  } = parseInitialState();
+
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    parsedInitialCategories
+  );
+  const [selectedSkills, setSelectedSkills] =
+    useState<string[]>(parsedInitialSkills);
+
+  // Initialize filters from URL parameters
+  useEffect(() => {
+    if (parsedInitialSkills.length > 0 || parsedInitialCategories.length > 0) {
+      setSelectedSkills(parsedInitialSkills);
+      setSelectedCategories(parsedInitialCategories);
+    }
+  }, [parsedInitialSkills, parsedInitialCategories]);
 
   // Create a map of category to its skills
   const categorySkillsMap = useMemo(() => {
@@ -86,18 +129,30 @@ export default function WorkSkillFilter({
     );
   });
 
-  const filteredJobs = jobs.filter((job) => {
-    if (selectedSkills.length === 0) return true;
-    return job.data.workSkills?.some((skill) => selectedSkills.includes(skill));
+  // Instead of filtering out items, we'll mark them as hidden
+  const jobsWithHiddenState = jobs.map((job) => {
+    const isHidden =
+      selectedSkills.length > 0 &&
+      !job.data.workSkills?.some((skill) => selectedSkills.includes(skill));
+    return { ...job, isHidden };
   });
 
-  const filteredProjects = projects.filter((project) => {
-    if (selectedSkills.length === 0) return true;
-    return project.data.skills?.some((skill) => selectedSkills.includes(skill));
+  const projectsWithHiddenState = projects.map((project) => {
+    const isHidden =
+      selectedSkills.length > 0 &&
+      !project.data.skills?.some((skill) => selectedSkills.includes(skill));
+    return { ...project, isHidden };
   });
 
   const hasActiveFilters =
     selectedCategories.length > 0 || selectedSkills.length > 0;
+
+  const hiddenJobsCount = jobsWithHiddenState.filter(
+    (job) => job.isHidden
+  ).length;
+  const hiddenProjectsCount = projectsWithHiddenState.filter(
+    (project) => project.isHidden
+  ).length;
 
   const renderSection = (title: string, children: React.ReactNode) => (
     <div className="space-y-4">
@@ -124,7 +179,34 @@ export default function WorkSkillFilter({
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" ref={containerRef}>
+      {/* Floating Clear Filters Button */}
+      {hasActiveFilters && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <button
+            onClick={clearFilters}
+            className="brutalist-border bg-background text-foreground px-6 py-3 text-lg font-black uppercase shadow-lg hover:scale-105 transition-transform"
+          >
+            Clear All Filters
+          </button>
+        </div>
+      )}
+
+      {/* Filter Status Message */}
+      {hasActiveFilters && (
+        <div className="brutalist-border bg-background p-4">
+          <div className="text-foreground text-center">
+            <p className="text-lg font-bold mb-2">Showing filtered results</p>
+            <p className="text-sm">
+              {hiddenJobsCount} job{hiddenJobsCount !== 1 ? 's' : ''} and{' '}
+              {hiddenProjectsCount} project
+              {hiddenProjectsCount !== 1 ? 's' : ''} are hidden because they
+              don't match your selected skills
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Categories */}
       {renderSection(
         'Categories',
@@ -174,9 +256,9 @@ export default function WorkSkillFilter({
       {renderSection(
         'Jobs',
         <WorkHistory
-          jobs={filteredJobs}
+          jobs={jobsWithHiddenState}
           companies={companies}
-          showFilteredPlaceholder={true}
+          showFilteredPlaceholder={false}
           selectedSkills={selectedSkills}
           skills={skills}
         />
@@ -186,7 +268,7 @@ export default function WorkSkillFilter({
       {renderSection(
         'Projects',
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {filteredProjects.map((project) => (
+          {projectsWithHiddenState.map((project) => (
             <ProjectCard
               key={project.id}
               project={project}
@@ -194,18 +276,6 @@ export default function WorkSkillFilter({
               selectedSkills={selectedSkills}
             />
           ))}
-          {filteredProjects.length === 0 && (
-            <div className="brutalist-border bg-background p-6 col-span-2">
-              <div className="text-foreground text-center py-8">
-                <p className="text-lg font-bold">
-                  No projects match the selected filters
-                </p>
-                <p className="mt-2">
-                  Try selecting different skills or categories
-                </p>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>

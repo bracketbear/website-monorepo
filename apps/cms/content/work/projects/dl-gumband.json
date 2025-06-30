@@ -6,8 +6,8 @@
   "challengesAndSolutions": "The toughest part was navigating the inherent complexity of experiential content management. Every agency has its own set of unique requirements, so creating a one-size-fits-all solution was a serious challenge. Leveraging lessons from my previous roles, I tackled this head-on—even though content management isn’t the most glamorous side of immersive tech, I knew a robust solution was essential. It took a lot of creative problem solving and determination to convince stakeholders that investing in a scalable, productized CMS was the right move.",
   "resultsAchieved": "In the end, we delivered a kickass, service-based CMS that set a new benchmark in the industry. The project not only showcased significant technical achievements but also integrated hard-won lessons from my past experiences. Unfortunately, due to corporate restructuring and team layoffs, the future of the project remains uncertain.",
   "mediaDescription": "Screenshots showcasing the Gumband dashboard and CMS interface.",
-  "isFeatured": false,
-  "category": "full-stack-engineering",
+  "isFeatured": true,
+  "category": "experiential-content-management-systems",
   "skills": [
     "react",
     "postgresql",

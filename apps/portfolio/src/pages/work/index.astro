@@ -8,6 +8,15 @@ const workSkills = await getCollection("workSkills");
 const workJobs = await getCollection("workJobs");
 const workCompanies = await getCollection("workCompany");
 const workSkillCategories = await getCollection("workSkillCategory");
+
+// Extract URL parameters for automatic filtering
+const url = new URL(Astro.request.url);
+const skillParam = url.searchParams.get("skill");
+const categoryParam = url.searchParams.get("category");
+
+// Convert URL parameters to initial filter state
+const initialSelectedSkills = skillParam ? [skillParam] : [];
+const initialSelectedCategories = categoryParam ? [categoryParam] : [];
 ---
 
 <Layout>
@@ -46,6 +55,8 @@ const workSkillCategories = await getCollection("workSkillCategory");
         jobs={workJobs}
         projects={workProjects}
         companies={workCompanies}
+        initialSkills={JSON.stringify(initialSelectedSkills)}
+        intialCategories={JSON.stringify(initialSelectedCategories)}
         client:load
       />
     </div>

@@ -8,6 +8,7 @@ export interface TickerItem {
   id: string;
   title: string;
   icon?: React.ComponentType<{ className?: string }>;
+  link?: string;
 }
 
 interface TickerProps {
@@ -17,6 +18,7 @@ interface TickerProps {
   iconClassName?: string;
   speed?: number;
   refreshInterval?: number;
+  onItemClick?: (item: TickerItem) => void;
 }
 
 export default function Ticker({
@@ -26,6 +28,7 @@ export default function Ticker({
   iconClassName = '',
   speed = DEFAULT_SCROLL_SPEED,
   refreshInterval = DEFAULT_REFRESH_INTERVAL,
+  onItemClick,
 }: TickerProps) {
   const tickerRef = useRef<HTMLDivElement>(null);
   const [tickerItems, setTickerItems] = useState<TickerItem[]>([]);
@@ -67,6 +70,12 @@ export default function Ticker({
     return () => clearInterval(interval);
   }, [isFocused]);
 
+  const handleItemClick = (item: TickerItem) => {
+    if (item.link && onItemClick) {
+      onItemClick(item);
+    }
+  };
+
   return (
     <div className={`bg-gray-900 overflow-hidden w-full ${className}`}>
       <div
@@ -82,7 +91,12 @@ export default function Ticker({
           <div
             key={`${item.id}-${index}`}
             ref={index === tickerItems.length - 1 ? lastItemRef : undefined}
-            className={`flex items-center gap-4 text-white flex-shrink-0 ${itemClassName}`}
+            className={`flex items-center gap-4 text-white flex-shrink-0 ${itemClassName} ${
+              item.link
+                ? 'cursor-pointer hover:opacity-80 transition-opacity'
+                : ''
+            }`}
+            onClick={() => handleItemClick(item)}
           >
             <span className="text-xl font-bold">{item.title}</span>
             {item.icon && (
