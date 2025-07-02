@@ -1,0 +1,177 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Dependency Management
+
+## Overview
+Proper dependency management is crucial for maintaining a clean, efficient monorepo structure. Follow these guidelines to ensure dependencies are installed in the correct locations.
+
+## Dependency Placement Rules
+
+### Core Package Dependencies (`packages/core/`)
+Install in core package when the dependency is:
+- **Shared across multiple apps**
+- **Used for core functionality** (animations, effects, utilities)
+- **Part of the design system**
+- **Required by core components**
+
+**Examples:**
+- `gsap` - Animation library used by core effects ✅ **Moved to core**
+- `pixi.js` - Graphics library for pointer effects ✅ **Moved to core**
+- `clsx` - Utility for conditional classes ✅ **Moved to core**
+- `tailwindcss` - Styling framework
+- `react` - React library for React islands
+- `@types/react` - React TypeScript types
+
+### App-Specific Dependencies (`apps/*/`)
+Install in individual apps when the dependency is:
+- **Only used by that specific app**
+- **App-specific functionality**
+- **Build tools for that app only**
+
+**Examples:**
+- `astro` - Framework for Astro apps
+- `@astrojs/react` - React integration for specific app
+- `@astrojs/tailwind` - Tailwind integration for specific app
+- `@fontsource-variable/oswald` - App-specific fonts
+- `vite-plugin-svgr` - App-specific build tools
+
+### Root Dependencies (`/`)
+Install at root when the dependency is:
+- **Build tooling for the entire monorepo**
+- **Development dependencies used across packages**
+- **Linting and formatting tools**
+
+**Examples:**
+- `typescript` - Type checking across packages
+- `eslint` - Linting configuration
+- `prettier` - Code formatting
+- `npm` - Package management
+
+## Installation Commands
+
+### Adding to Core Package
+```bash
+cd packages/core
+npm install <package-name>
+```
+
+### Adding to Specific App
+```bash
+cd apps/bracketbear-website
+npm install <package-name>
+```
+
+### Adding to Root
+```bash
+# From project root
+npm install <package-name>
+```
+
+## Migration Process
+
+### Moving Dependencies to Core Package
+1. **Remove from root/apps**: `npm uninstall <package-name>`
+2. **Add to core**: `cd packages/core && npm install <package-name>`
+3. **Update exports**: Add to appropriate index.ts file
+4. **Update imports**: Ensure all imports use `@bracketbear/core`
+5. **Test builds**: Verify all apps build successfully
+
+### Moving Dependencies to Apps
+1. **Remove from core**: `cd packages/core && npm uninstall <package-name>`
+2. **Add to app**: `cd apps/<app-name> && npm install <package-name>`
+3. **Update imports**: Use direct imports in the app
+4. **Test builds**: Verify the app builds successfully
+
+## Completed Migrations
+
+### ✅ Successfully Moved to Core Package
+- **GSAP** (`gsap@3.13.0`) - Animation library for effects
+- **PixiJS** (`pixi.js@8.10.2`) - Graphics library for pointer effects
+- **clsx** (`clsx@2.1.1`) - Conditional class utility
+
+### 📋 Migration Checklist
+- [x] Determine correct package for dependency
+- [x] Install in correct location
+- [x] Update all imports
+- [x] Test builds in all affected packages/apps
+- [x] Test functionality in development
+- [x] Update documentation if needed
+- [x] Commit changes with clear message
+
+## Common Dependencies
+
+### Core Package Dependencies
+- `gsap` - Animation library ✅
+- `pixi.js` - Graphics library ✅
+- `clsx` - Conditional classes ✅
+- `tailwindcss` - Styling framework
+- `react` - React library
+- `@types/react` - React types
+
+### App Dependencies
+- `astro` - Framework
+- `@astrojs/*` - Astro integrations
+- `@fontsource-variable/oswald` - Fonts
+- `vite-plugin-svgr` - Build tools
+
+### Root Dependencies
+- `typescript` - Type checking
+- `eslint` - Linting
+- `prettier` - Formatting
+- `npm` - Package management
+
+## Best Practices
+
+### 1. Dependency Analysis
+- **Before installing**: Determine where the dependency should live
+- **Check usage**: Verify if it's used across multiple apps
+- **Consider future**: Think about where it might be used in the future
+
+### 2. Import Patterns
+```typescript
+// ✅ Core package imports
+import { Component, clsx } from '@bracketbear/core';
+
+// ✅ App-specific imports
+import { Component } from 'app-specific-package';
+
+// ❌ Avoid - Direct file imports
+import { Component } from '@bracketbear/core/src/components/Component';
+```
+
+### 3. Version Management
+- **Core package**: Use exact versions for stability
+- **Apps**: Use compatible versions
+- **Root**: Use latest stable versions for tooling
+
+### 4. Testing
+- **After changes**: Test builds in all apps
+- **Import verification**: Ensure imports work correctly
+- **Runtime testing**: Test functionality in development
+
+## Troubleshooting
+
+### Common Issues
+1. **Import errors**: Check if dependency is in correct package
+2. **Build failures**: Verify dependency is installed where needed
+3. **Version conflicts**: Use compatible versions across packages
+4. **Type errors**: Ensure TypeScript types are available
+
+### Resolution Steps
+1. **Check installation**: Verify dependency is installed in correct location
+2. **Check imports**: Ensure imports use correct paths
+3. **Check versions**: Verify version compatibility
+4. **Test builds**: Build all affected packages/apps
+5. **Test runtime**: Test functionality in development mode
+
+## Migration Checklist
+- [ ] Determine correct package for dependency
+- [ ] Install in correct location
+- [ ] Update all imports
+- [ ] Test builds in all affected packages/apps
+- [ ] Test functionality in development
+- [ ] Update documentation if needed
+- [ ] Commit changes with clear message

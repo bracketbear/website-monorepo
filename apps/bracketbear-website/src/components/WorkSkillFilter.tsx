@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 import { useState, useMemo } from 'react';
-import { clsx } from 'clsx';
+import { clsx } from '@bracketbear/core';
 import WorkHistory from './WorkHistory';
 import ProjectCard from './ProjectCard';
 

@@ -13,6 +13,9 @@ type CollectionName = GetCollectionParams<
   CollectionEntry<keyof AnyEntryMap>
 >[0];
 
+/**
+ * Get a collection and return it as a keyed object for efficient lookups.
+ */
 export async function getKeyedCollection<T extends CollectionName>(
   key: T
 ): Promise<Record<string, CollectionEntry<T>>> {
@@ -23,4 +26,4 @@ export async function getKeyedCollection<T extends CollectionName>(
     keyedCollection[entryKey] = entry;
   });
   return keyedCollection;
-}
+} 

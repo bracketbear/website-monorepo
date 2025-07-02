@@ -1,6 +1,7 @@
 // Navigation styling constants
 export const NAVIGATION_CONSTANTS = {
-  UNDERLINE: 'bg-foreground absolute -bottom-1 left-0 h-1 w-0 transition-all duration-300 group-hover:w-full',
+  UNDERLINE:
+    'bg-foreground absolute -bottom-1 left-0 h-1 w-0 transition-all duration-300 group-hover:w-full',
   BACKGROUND_COLOR: 'bg-brand-orange dark:bg-dark',
   TEXT_COLOR: 'text-foreground',
   MOBILE_MENU_TRANSITION: 'translate-x-full',
@@ -16,4 +17,4 @@ export const THEME_CONSTANTS = {
 export const LAYOUT_CONSTANTS = {
   CONTAINER_CLASS: 'container mx-auto px-6 py-4',
   BRUTALIST_BORDER: 'brutalist-border',
-} as const; 
+} as const;

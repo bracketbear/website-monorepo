@@ -21,12 +21,7 @@ const services = await getCollection('services');
 ---
 
 <Layout>
-  <header
-    class="bg-brand-red dark:bg-brand-red/20 relative z-0 overflow-hidden pt-24"
-  >
-    <canvas
-      id="particle-canvas"
-      class="fixed top-0 left-0 -z-10 h-screen w-screen"></canvas>
+  <header class="bg-brand-red relative z-0 overflow-hidden pt-24">
     <div class="relative z-10 container mx-auto px-6">
       <div class="mb-16 max-w-4xl">
         <div class="inline-block">
@@ -159,225 +154,31 @@ const services = await getCollection('services');
 </style>
 
 <script>
-  interface Particle {
-    x: number;
-    y: number;
-    size: number;
-    speedX: number;
-    speedY: number;
-    rotation: number;
-    rotationSpeed: number;
-    type: 'plus' | 'logo' | 'dot';
-  }
-
-  class ParticleAnimation {
-    private canvas: HTMLCanvasElement;
-    private ctx: CanvasRenderingContext2D;
-    private particles: Particle[];
-    private particleCount: number;
-    private logoImage: HTMLImageElement;
-    private announcementBox: HTMLElement | null;
-
-    constructor() {
-      this.canvas = document.getElementById(
-        'particle-canvas'
-      ) as HTMLCanvasElement;
-      this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
-      this.particles = [];
-      this.particleCount = 50;
-      this.logoImage = new Image();
-      this.logoImage.src = '/favicon.svg';
-      this.announcementBox = document.querySelector('.availability-box');
-
-      this.init();
-      this.animate();
-      this.startShakeAnimation();
-    }
-
-    private startShakeAnimation(): void {
-      if (!this.announcementBox) return;
-
-      const shakeInterval = () => {
-        this.announcementBox?.classList.add('shake-animation');
-        setTimeout(() => {
-          this.announcementBox?.classList.remove('shake-animation');
-        }, 500);
-      };
-
-      // Initial shake
-      setTimeout(shakeInterval, 2000);
-
-      // Repeat every 8-12 seconds
-      const repeatShake = () => {
-        const randomDelay = Math.floor(Math.random() * 4000) + 8000; // 8-12 seconds
-        setTimeout(() => {
-          shakeInterval();
-          repeatShake();
-        }, randomDelay);
-      };
-
-      repeatShake();
-    }
-
-    private init(): void {
-      // Set canvas size
-      const resize = (): void => {
-        const dpr = window.devicePixelRatio || 1;
-        this.canvas.width = this.canvas.offsetWidth * dpr;
-        this.canvas.height = this.canvas.offsetHeight * dpr;
-        this.ctx.scale(dpr, dpr);
-      };
-
-      window.addEventListener('resize', resize);
-      resize();
-
-      // Create initial particles
-      for (let i = 0; i < this.particleCount; i++) {
-        this.particles.push(this.createParticle());
-      }
-    }
-
-    private createParticle(): Particle {
-      return {
-        x: Math.random() * this.canvas.width,
-        y: Math.random() * this.canvas.height,
-        size: Math.random() * 20 + 10,
-        speedX: Math.random() * 2 - 1,
-        speedY: Math.random() * 2 - 1,
-        rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: (Math.random() - 0.5) * 0.02,
-        type:
-          Math.random() < 0.2 ? 'logo' : Math.random() < 0.5 ? 'plus' : 'dot',
-      };
-    }
-
-    private drawPlus(
-      x: number,
-      y: number,
-      size: number,
-      rotation: number
-    ): void {
-      this.ctx.save();
-      this.ctx.translate(x, y);
-      this.ctx.rotate(rotation);
-
-      this.ctx.strokeStyle = 'rgba(191, 87, 0, 0.3)';
-      this.ctx.lineWidth = 2;
-      this.ctx.beginPath();
-
-      // Horizontal line
-      this.ctx.moveTo(-size / 2, 0);
-      this.ctx.lineTo(size / 2, 0);
-
-      // Vertical line
-      this.ctx.moveTo(0, -size / 2);
-      this.ctx.lineTo(0, size / 2);
-
-      this.ctx.stroke();
-      this.ctx.restore();
-    }
-
-    private drawLogo(
-      x: number,
-      y: number,
-      size: number,
-      rotation: number
-    ): void {
-      this.ctx.save();
-      this.ctx.translate(x, y);
-      this.ctx.rotate(rotation);
-
-      // Apply the dark orange tint to the logo
-      this.ctx.globalAlpha = 0.3;
-      this.ctx.filter =
-        'sepia(100%) hue-rotate(-15deg) saturate(400%) brightness(50%)';
-
-      // Draw the logo
-      if (this.logoImage.complete) {
-        const aspectRatio = this.logoImage.width / this.logoImage.height;
-        const width = size;
-        const height = size / aspectRatio;
-
-        this.ctx.drawImage(
-          this.logoImage,
-          -width / 2,
-          -height / 2,
-          width,
-          height
-        );
-      }
-
-      this.ctx.restore();
-    }
-
-    private drawDot(
-      x: number,
-      y: number,
-      size: number,
-      rotation: number
-    ): void {
-      this.ctx.save();
-      this.ctx.translate(x, y);
-
-      const color = 'rgba(191, 87, 0, 0.3)';
-      this.ctx.strokeStyle = color;
-      this.ctx.fillStyle = color;
-      this.ctx.lineWidth = 2;
-      this.ctx.beginPath();
-
-      this.ctx.arc(0, 0, size / 6, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      this.ctx.restore();
-    }
-
-    private animate(): void {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-      this.particles.forEach((particle: Particle) => {
-        // Update position
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
-        particle.rotation += particle.rotationSpeed;
-
-        // Wrap around edges
-        if (particle.x < 0) particle.x = this.canvas.width;
-        if (particle.x > this.canvas.width) particle.x = 0;
-        if (particle.y < 0) particle.y = this.canvas.height;
-        if (particle.y > this.canvas.height) particle.y = 0;
-
-        // Draw particle based on type
-        if (particle.type === 'logo') {
-          this.drawLogo(
-            particle.x,
-            particle.y,
-            particle.size,
-            particle.rotation
-          );
-        } else if (particle.type === 'plus') {
-          this.drawPlus(
-            particle.x,
-            particle.y,
-            particle.size,
-            particle.rotation
-          );
-        } else {
-          // dot
-          this.drawDot(
-            particle.x,
-            particle.y,
-            particle.size,
-            particle.rotation
-          );
-        }
-      });
-
-      requestAnimationFrame(() => this.animate());
-    }
-  }
-
-  // Initialize animation when page loads
+  // Shake animation for the availability box
   document.addEventListener('DOMContentLoaded', () => {
-    new ParticleAnimation();
+    const announcementBox = document.querySelector('.availability-box');
+
+    if (!announcementBox) return;
+
+    const shakeInterval = () => {
+      announcementBox.classList.add('shake-animation');
+      setTimeout(() => {
+        announcementBox.classList.remove('shake-animation');
+      }, 500);
+    };
+
+    // Initial shake
+    setTimeout(shakeInterval, 2000);
+
+    // Repeat every 8-12 seconds
+    const repeatShake = () => {
+      const randomDelay = Math.floor(Math.random() * 4000) + 8000; // 8-12 seconds
+      setTimeout(() => {
+        shakeInterval();
+        repeatShake();
+      }, randomDelay);
+    };
+
+    repeatShake();
   });
 </script>

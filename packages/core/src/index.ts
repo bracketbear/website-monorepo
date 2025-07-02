@@ -1,5 +1,11 @@
-// Export everything from Astro package
+// Astro components
 export * from './astro';
 
-// Export React components
+// React components
 export * from './react';
+
+// Types
+export * from './types';
+
+// Utils
+export * from './utils';

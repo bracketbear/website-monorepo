@@ -1,0 +1,104 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Astro App Integration
+
+## Overview
+Astro apps should use the core package components and follow consistent patterns for layout and component integration.
+
+## App Structure
+- **BracketBear Website**: [apps/bracketbear-website/](mdc:apps/bracketbear-website/)
+- **Portfolio**: [apps/portfolio/](mdc:apps/portfolio/)
+- **CMS**: [apps/cms/](mdc:apps/cms/)
+
+## Layout Integration
+- **Main Layout**: Use `LayeredLayout` from `@bracketbear/core`
+- **Layout File**: [apps/bracketbear-website/src/layouts/Layout.astro](mdc:apps/bracketbear-website/src/layouts/Layout.astro)
+- **Navigation**: Import from local config, pass to layout
+
+## Layout Pattern
+```astro
+---
+import { LayeredLayout, PointerFX } from '@bracketbear/core';
+import { navigationConfig } from '@/config/navigation';
+
+interface Props {
+  title?: string;
+  hideContactForm?: boolean;
+  hideFooter?: boolean;
+  hideNavigation?: boolean;
+}
+
+const { title, hideContactForm, hideFooter, hideNavigation } = Astro.props;
+---
+
+<LayeredLayout 
+  title={title}
+  hideContactForm={hideContactForm}
+  hideFooter={hideFooter}
+  hideNavigation={hideNavigation}
+  navigation={navigationConfig}
+>
+  <div slot="background">
+    <!-- Background effects -->
+  </div>
+  
+  <slot />
+  
+  <div slot="foreground">
+    <PointerFX client:load />
+  </div>
+</LayeredLayout>
+```
+
+## Component Integration Rules
+- **Core Components**: Always import from `@bracketbear/core`
+- **Local Components**: Place in `src/components/`
+- **Page Content**: Use default slot in layout
+- **Effects**: Place in appropriate layer slots
+- **React Islands**: Use `client:load` directive
+
+## Navigation Configuration
+- **Config File**: [apps/bracketbear-website/src/config/navigation.ts](mdc:apps/bracketbear-website/src/config/navigation.ts)
+- **Import Pattern**: `import { navigationConfig } from '@/config/navigation'`
+- **Type Safety**: Use `NavigationConfig` type from core package
+
+## Common Patterns
+- **Page Props**: Extend layout props interface
+- **Content Slots**: Use default slot for main content
+- **Effect Slots**: Use named slots for background/foreground effects
+- **Client Components**: Always use `client:load` for React islands
+
+## Build Process
+- **Development**: `npm run dev` for local development
+- **Build**: `npm run build` for production build
+- **Type Checking**: Ensure TypeScript compilation passes
+- **Linting**: Fix any ESLint errors before committing
+
+## File Organization
+```
+src/
+├── layouts/          # Layout components
+├── components/       # Local components
+├── pages/           # Astro pages
+├── config/          # App configuration
+├── styles/          # Global styles
+└── types/           # Local types
+```
+
+## Migration Checklist
+- [ ] Update layout to use `LayeredLayout`
+- [ ] Import `PointerFX` in foreground slot
+- [ ] Update navigation config imports
+- [ ] Test build process
+- [ ] Verify pointer effects work
+- [ ] Check TypeScript compilation
+- [ ] Test in development mode
+
+## Troubleshooting
+- **Import Errors**: Check core package exports
+- **Build Failures**: Verify all dependencies are installed
+- **Type Errors**: Ensure proper type imports
+- **Runtime Issues**: Check client directive usage

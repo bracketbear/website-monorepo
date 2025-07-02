@@ -53,7 +53,10 @@
     "copy:config:watch": "cpx \"src/config/**/*\" dist/config --watch",
     "copy:utils:watch": "cpx \"src/utils/**/*\" dist/utils --watch"
   },
-  "dependencies": {},
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "pixi.js": "^8.10.2"
+  },
   "devDependencies": {
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

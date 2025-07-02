@@ -1,0 +1,102 @@
+---
+import {
+  type LayoutProps,
+  type ThemeConfig,
+  type NavigationConfig,
+  NavBar,
+  Footer,
+  LAYERS,
+} from "@bracketbear/core";
+
+interface Props extends LayoutProps {
+  navigation: NavigationConfig;
+  theme?: ThemeConfig;
+  contactForm?: any;
+}
+
+const {
+  title,
+  hideContactForm = false,
+  hideFooter = false,
+  hideNavigation = false,
+  navigation,
+  theme = {},
+  contactForm: ContactFormComponent,
+} = Astro.props;
+
+const themeValue =
+  Astro.cookies.get("theme")?.value ?? theme.defaultTheme ?? "system";
+const isDark = themeValue === "dark";
+---
+
+<!doctype html>
+<html lang="en" class:list={[{ dark: isDark }]}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    {title && <title>{title}</title>}
+    <script is:inline>
+      // Theme initialization
+      function initializeTheme() {
+        const getThemePreference = () => {
+          if (localStorage.theme === "dark") return "dark";
+          if (localStorage.theme === "light") return "light";
+          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            return "dark";
+          }
+          return "light";
+        };
+        const theme = getThemePreference();
+        document.documentElement.dataset.theme = theme;
+        if (!localStorage.theme) {
+          const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+          mediaQuery.addEventListener("change", (e) => {
+            document.documentElement.dataset.theme = e.matches
+              ? "dark"
+              : "light";
+          });
+        }
+      }
+      initializeTheme();
+    </script>
+  </head>
+  <body
+    class="bg-background text-foreground min-h-screen transition-colors duration-300"
+  >
+    <!-- Background Layer -->
+    <div
+      style={`z-index: ${LAYERS.background}; position: fixed; inset: 0; pointer-events: none;`}
+    >
+      <slot name="background" />
+    </div>
+
+    <!-- Content Layer (default slot) -->
+    <div style={`z-index: ${LAYERS.content}; position: relative;`}>
+      {!hideNavigation && <NavBar config={navigation} class="relative z-10" />}
+      <slot />
+      {
+        !hideContactForm && ContactFormComponent && (
+          <ContactFormComponent class="bg-primary relative z-10 py-36" />
+        )
+      }
+      {!hideFooter && <Footer config={navigation} />}
+    </div>
+
+    <!-- Foreground Layer (mouse effects, overlays) -->
+    <div
+      style={`z-index: ${LAYERS.foreground}; position: fixed; inset: 0; pointer-events: none;`}
+    >
+      <slot name="foreground" />
+    </div>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+      }
+    </style>
+  </body>
+</html>

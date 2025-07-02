@@ -6,7 +6,7 @@
     "dev": "astro dev --host --port 4321",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro" 
+    "astro": "astro"
   },
   "dependencies": {
     "@astrojs/markdoc": "^0.13.3",
@@ -23,7 +23,6 @@
     "@tailwindcss/vite": "^4.0.14",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
-    "clsx": "^2.1.1",
     "prettier": "3.5.3",
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-tailwindcss": "^0.6.11",

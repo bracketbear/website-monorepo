@@ -1,22 +1,22 @@
 ---
-import { getCollection } from 'astro:content';
-import type { GetStaticPaths } from 'astro';
-import Layout from '@/layouts/Layout.astro';
-import { getKeyedCollection } from '@/utils/content';
-import { getImage, Image } from 'astro:assets';
+import { getCollection } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import Layout from "@/layouts/Layout.astro";
+import { getKeyedCollection } from "@/utils/content";
+import { getImage, Image } from "astro:assets";
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const workProjects = await getCollection('workProject');
+  const workProjects = await getCollection("workProject");
   return workProjects.map((project) => ({
     params: { workProject: project.id },
   }));
 };
 
-const workJobs = await getCollection('workJobs');
-const workSkills = await getCollection('workSkills');
-const workProjects = await getCollection('workProject');
-const workCompanies = await getKeyedCollection('workCompany');
-const projectCategories = await getCollection('workProjectCategory');
+const workJobs = await getCollection("workJobs");
+const workSkills = await getCollection("workSkills");
+const workProjects = await getCollection("workProject");
+const workCompanies = await getKeyedCollection("workCompany");
+const projectCategories = await getCollection("workProjectCategory");
 
 const workProject = workProjects.find(
   (project) => project.id === Astro.params.workProject
@@ -35,7 +35,7 @@ const projectSkills = workSkills.filter((skill) =>
   (workProject.data.skills ?? []).includes(skill.id)
 );
 const companyTitle =
-  job !== undefined ? workCompanies[job.data.company].data.title : 'Unknown';
+  job !== undefined ? workCompanies[job.data.company].data.title : "Unknown";
 ---
 
 <Layout>
@@ -105,7 +105,7 @@ const companyTitle =
         <div class="space-y-16 md:col-span-2">
           <!-- Description -->
           {
-            workProject.data.description?.trim() !== '' && (
+            workProject.data.description?.trim() !== "" && (
               <section class="brutalist-border bg-background p-8">
                 <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Overview
@@ -119,7 +119,7 @@ const companyTitle =
 
           <!-- Challenges & Solutions -->
           {
-            workProject.data.challengesAndSolutions?.trim() !== '' && (
+            workProject.data.challengesAndSolutions?.trim() !== "" && (
               <section class="brutalist-border bg-background p-8">
                 <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Challenges & Solutions
@@ -133,7 +133,7 @@ const companyTitle =
 
           <!-- Results -->
           {
-            workProject.data.resultsAchieved?.trim() !== '' && (
+            workProject.data.resultsAchieved?.trim() !== "" && (
               <section class="brutalist-border bg-background p-8">
                 <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Results Achieved
@@ -183,7 +183,7 @@ const companyTitle =
                 <p class="text-foreground mb-4 font-bold">
                   {job.data.title} at {companyTitle}
                 </p>
-                {job.data.description?.trim() !== '' && (
+                {job.data.description?.trim() !== "" && (
                   <p class="text-foreground font-bold">
                     {job.data.description}
                   </p>

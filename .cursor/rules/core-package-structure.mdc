@@ -1,0 +1,76 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Core Package Structure
+
+## Overview
+The core package (`packages/core`) contains shared components, types, and utilities used across all Astro apps.
+
+## Package Structure
+```
+packages/core/
+├── src/
+│   ├── astro/           # Astro components
+│   │   ├── layout/      # Layout components
+│   │   ├── components/  # UI components
+│   │   └── index.ts     # Astro exports
+│   ├── react/           # React components
+│   │   ├── hooks/       # Custom hooks
+│   │   └── index.ts     # React exports
+│   ├── types/           # TypeScript types
+│   ├── config/          # Configuration files
+│   ├── utils/           # Utility functions
+│   └── index.ts         # Main package exports
+```
+
+## Export Rules
+- **Astro Components**: Export from [packages/core/src/astro/index.ts](mdc:packages/core/src/astro/index.ts)
+- **React Components**: Export from [packages/core/src/react/index.ts](mdc:packages/core/src/react/index.ts)
+- **Types**: Export from [packages/core/src/types/index.ts](mdc:packages/core/src/types/index.ts)
+- **Main Package**: Re-export everything from [packages/core/src/index.ts](mdc:packages/core/src/index.ts)
+
+## Import Patterns
+```typescript
+// ✅ Correct - Import from main package
+import { LayeredLayout, PointerFX, LAYERS } from '@bracketbear/core';
+
+// ✅ Correct - Import specific types
+import type { LayerKey, NavigationConfig } from '@bracketbear/core';
+
+// ❌ Avoid - Direct file imports
+import { LayeredLayout } from '@bracketbear/core/astro/layout/LayeredLayout.astro';
+```
+
+## Component Organization
+- **Layout Components**: Place in `src/astro/layout/`
+- **UI Components**: Place in `src/astro/components/`
+- **React Islands**: Place in `src/react/`
+- **Shared Types**: Place in `src/types/`
+- **Configuration**: Place in `src/config/`
+
+## Naming Conventions
+- **Astro Components**: PascalCase with `.astro` extension
+- **React Components**: PascalCase with `.tsx` extension
+- **Types**: PascalCase with descriptive names
+- **Constants**: UPPER_SNAKE_CASE
+- **Files**: kebab-case for multi-word names
+
+## Common Patterns
+- **Layout Props**: Extend `LayoutProps` interface
+- **Navigation**: Use `NavigationConfig` type
+- **Theme**: Use `ThemeConfig` type
+- **Layers**: Use `LAYERS` constant and `LayerKey` type
+
+## Migration Rules
+- **New Components**: Always add to core package first
+- **Updates**: Update core package, then update apps
+- **Removals**: Remove from core package, then update apps
+- **Breaking Changes**: Update all apps simultaneously
+
+## Testing
+- **Core Package**: Test builds and exports
+- **Astro Apps**: Test imports and functionality
+- **Type Safety**: Ensure TypeScript compilation passes
+- **Build Process**: Verify both apps build successfully

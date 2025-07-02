@@ -1,0 +1,88 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# PixiJS Integration Guidelines
+
+## Overview
+This project uses PixiJS v8 for interactive graphics and effects. Follow these guidelines to avoid common issues.
+
+## Core Files
+- **PointerFX**: Main PixiJS implementation in [packages/core/src/react/PointerFX.tsx](mdc:packages/core/src/react/PointerFX.tsx)
+- **Effect Classes**: Modular effect system with SpinningRingEffect, ParticleEffect, and Particle classes
+
+## PixiJS v8 API Rules
+- **Application Creation**: Use `new PIXI.Application()` then `await app.init(options)`
+- **Canvas Access**: Use `app.canvas` instead of `app.view`
+- **Event System**: Use PixiJS's built-in event system for proper coordinate handling
+- **Resolution**: Set `app.renderer.resolution = 1` for consistent rendering
+
+## Coordinate System
+- **Always use PixiJS events**: `event.global.x` and `event.global.y` for accurate coordinates
+- **Avoid window events**: Don't use `window.addEventListener` for mouse events
+- **Canvas positioning**: Ensure canvas is properly positioned with `pointer-events-auto`
+- **Container positioning**: Use `pointer-events-none` on container div
+
+## Event Handling Pattern
+```typescript
+// ✅ Correct - Use PixiJS events
+app.stage.eventMode = 'static';
+app.stage.hitArea = app.screen;
+
+const handlePointerMove = (event: PIXI.FederatedPointerEvent) => {
+  const x = event.global.x;
+  const y = event.global.y;
+  // Handle coordinates
+};
+
+app.stage.on('pointermove', handlePointerMove);
+
+// ❌ Avoid - Window events cause coordinate issues
+window.addEventListener('mousemove', (e) => {
+  const x = e.clientX; // Wrong coordinate system
+});
+```
+
+## Effect Architecture
+- **Modular Design**: Each effect should be a separate class
+- **Lifecycle Management**: Implement proper destroy methods
+- **Performance**: Use object pooling for frequently created objects
+- **Memory Management**: Always clean up event listeners and destroy containers
+
+## Common Issues & Solutions
+1. **Effects not visible**: Check canvas pointer-events and container positioning
+2. **Wrong coordinates**: Use PixiJS events instead of window events
+3. **Memory leaks**: Implement proper cleanup in destroy methods
+4. **Performance issues**: Limit particle count and use object pooling
+
+## Container Setup Pattern
+```typescript
+return (
+  <div
+    ref={containerRef}
+    className="fixed inset-0 z-20 pointer-events-none"
+    style={{ width: '100vw', height: '100vh' }}
+  />
+);
+```
+
+## Effect Class Pattern
+```typescript
+class MyEffect {
+  private container: PIXI.Container;
+  
+  constructor(parent: PIXI.Container) {
+    this.container = new PIXI.Container();
+    parent.addChild(this.container);
+  }
+  
+  update(): void {
+    // Update logic
+  }
+  
+  destroy(): void {
+    this.container.destroy({ children: true });
+  }
+}
+```

@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
-import { clsx } from 'clsx';
-import { getProjectUrl } from '@/utils/navigation';
+import { clsx } from '@bracketbear/core';
+import { getProjectUrl } from '@bracketbear/core';
 
 export interface ProjectCardProps {
   project: CollectionEntry<'workProject'>;

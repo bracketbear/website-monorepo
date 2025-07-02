@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
-import { clsx } from 'clsx';
+import { clsx } from '@bracketbear/core';
 
 interface WorkHistoryProps {
   jobs: (CollectionEntry<'workJobs'> & { isHidden?: boolean })[];

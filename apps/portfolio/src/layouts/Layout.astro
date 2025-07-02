@@ -1,9 +1,32 @@
 ---
-import { Layout as CoreLayout } from "@bracketbear/core/astro";
-import { navigationConfig } from "../config/navigation";
+import { LayeredLayout, PointerFX } from "@bracketbear/core";
+import { navigationConfig } from "@/config/navigation";
 import "@/styles/global.css";
+
+interface Props {
+  title?: string;
+  hideContactForm?: boolean;
+  hideFooter?: boolean;
+  hideNavigation?: boolean;
+}
+
+const { title, hideContactForm, hideFooter, hideNavigation } = Astro.props;
 ---
 
-<CoreLayout navigation={navigationConfig}>
+<LayeredLayout
+  title={title}
+  hideContactForm={hideContactForm}
+  hideFooter={hideFooter}
+  hideNavigation={hideNavigation}
+  navigation={navigationConfig}
+>
+  <div slot="background">
+    <!-- Background effects can go here -->
+  </div>
+
   <slot />
-</CoreLayout>
+
+  <div slot="foreground">
+    <PointerFX client:load />
+  </div>
+</LayeredLayout>

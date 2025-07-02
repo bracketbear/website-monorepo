@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { getKeyedCollection } from '@/utils/content';
-import { getProjectUrl } from '@/utils/navigation';
+import { getProjectUrl, objectEntries } from '@bracketbear/core';
 import ProjectCard, { type ProjectCardProps } from './ProjectCard';
 
 interface Props {
@@ -36,7 +36,7 @@ const workProjectsByType = workProjects.reduce<
 
 <div class="relative z-10 space-y-16">
   {
-    Object.entries(workProjectsByType).map(([type, projects]) => (
+    objectEntries(workProjectsByType).map(([type, projects]) => (
       <div>
         <h2 class="brutalist-border bg-background text-foreground mb-8 inline-block p-4 text-2xl font-black uppercase">
           {workProjectCatergoriesById[type].data.title}

@@ -2,6 +2,19 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/* Three-Layer System Utilities */
+@utility z-layer-background {
+  z-index: 0;
+}
+
+@utility z-layer-content {
+  z-index: 10;
+}
+
+@utility z-layer-foreground {
+  z-index: 20;
+}
+
 /* Theme Variables */
 @theme {
   --default-font-family: 'Oswald', 'sans-serif';

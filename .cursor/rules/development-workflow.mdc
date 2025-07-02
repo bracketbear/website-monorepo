@@ -203,3 +203,143 @@ npm run build
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs) - Styling
 - [TypeScript Documentation](https://www.typescriptlang.org/docs) - Type safety
 - [npm Workspaces](https://docs.npmjs.com/cli/v7/using-npm/workspaces) - Monorepo management
+
+## Overview
+Follow these guidelines for efficient development and to avoid common issues encountered during the layered layout system implementation.
+
+## Project Structure
+- **Monorepo**: Root at [bracketbear/](mdc:bracketbear/)
+- **Core Package**: [packages/core/](mdc:packages/core/)
+- **Astro Apps**: [apps/](mdc:apps/)
+
+## Development Commands
+```bash
+# Core package development
+cd packages/core
+npm run build
+
+# Astro app development
+cd apps/bracketbear-website
+npm run dev
+npm run build
+
+# Portfolio app development
+cd apps/portfolio
+npm run dev
+npm run build
+```
+
+## Common Issues & Solutions
+
+### 1. Import/Export Issues
+- **Problem**: Components not found when importing from `@bracketbear/core`
+- **Solution**: Check exports in [packages/core/src/index.ts](mdc:packages/core/src/index.ts)
+- **Prevention**: Always update exports when adding new components
+
+### 2. PixiJS Coordinate Issues
+- **Problem**: Effects not following mouse cursor correctly
+- **Solution**: Use PixiJS events instead of window events
+- **Prevention**: Follow [PixiJS Integration Guidelines](mdc:.cursor/rules/pixijs-integration.mdc)
+
+### 3. Layer Z-Index Issues
+- **Problem**: Elements not appearing in correct layers
+- **Solution**: Use `LAYERS` constant, never manual z-index
+- **Prevention**: Follow [Layered Layout System](mdc:.cursor/rules/layered-layout-system.mdc)
+
+### 4. Build Failures
+- **Problem**: TypeScript compilation errors
+- **Solution**: Check type imports and exports
+- **Prevention**: Test builds after any core package changes
+
+## Development Process
+
+### 1. Adding New Components
+```bash
+# 1. Add to core package
+cd packages/core
+# Create component in appropriate directory
+# Update exports in index.ts
+
+# 2. Test core package
+npm run build
+
+# 3. Update Astro apps
+cd ../../apps/bracketbear-website
+# Import and use new component
+npm run build
+
+cd ../portfolio
+# Import and use new component
+npm run build
+```
+
+### 2. Updating Existing Components
+```bash
+# 1. Update core package
+cd packages/core
+# Make changes to component
+npm run build
+
+# 2. Test in apps
+cd ../../apps/bracketbear-website
+npm run dev  # Test in development
+npm run build  # Test build process
+```
+
+### 3. Debugging Process
+1. **Check Console**: Look for JavaScript errors
+2. **Check Build**: Ensure TypeScript compilation passes
+3. **Check Imports**: Verify all imports are correct
+4. **Check Exports**: Ensure components are properly exported
+5. **Test Isolation**: Test component in isolation if possible
+
+## File Management
+
+### 1. Moving Components to Core
+- **Source**: Remove from Astro app
+- **Destination**: Add to core package
+- **Update**: Update imports in all apps
+- **Test**: Build all apps to verify
+
+### 2. Renaming Components
+- **Core Package**: Update component name and exports
+- **Astro Apps**: Update all imports
+- **Test**: Build all apps to verify
+
+### 3. Removing Components
+- **Core Package**: Remove component and exports
+- **Astro Apps**: Remove all imports and usage
+- **Test**: Build all apps to verify
+
+## Best Practices
+
+### 1. Type Safety
+- Always use TypeScript interfaces
+- Extend existing types when possible
+- Use proper type imports/exports
+
+### 2. Performance
+- Use object pooling for frequently created objects
+- Implement proper cleanup methods
+- Limit particle counts and effect complexity
+
+### 3. Code Organization
+- Keep components modular and focused
+- Use consistent naming conventions
+- Document complex logic with comments
+
+### 4. Testing
+- Test builds after any changes
+- Test in development mode
+- Test pointer effects functionality
+- Test layer positioning
+
+## Troubleshooting Checklist
+- [ ] Check TypeScript compilation
+- [ ] Verify all imports are correct
+- [ ] Test build process
+- [ ] Check console for errors
+- [ ] Verify pointer effects work
+- [ ] Test layer positioning
+- [ ] Check memory usage
+- [ ] Test in different browsers

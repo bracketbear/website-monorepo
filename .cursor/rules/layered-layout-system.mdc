@@ -1,0 +1,52 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Layered Layout System
+
+## Overview
+This project uses a three-layer layout system implemented in the core package with strict z-index management and type safety.
+
+## Core Components
+- **LayeredLayout**: Main layout component in [packages/core/src/astro/layout/LayeredLayout.astro](mdc:packages/core/src/astro/layout/LayeredLayout.astro)
+- **PointerFX**: Pointer effects component in [packages/core/src/react/PointerFX.tsx](mdc:packages/core/src/react/PointerFX.tsx)
+- **Layer Types**: Defined in [packages/core/src/types/layers.ts](mdc:packages/core/src/types/layers.ts)
+
+## Layer Structure
+1. **Background Layer** (`LAYERS.background`): Fixed positioning, pointer-events: none
+2. **Content Layer** (`LAYERS.content`): Relative positioning, main page content
+3. **Foreground Layer** (`LAYERS.foreground`): Fixed positioning, pointer-events: none, overlays and effects
+
+## Implementation Rules
+- Always use `LayeredLayout` from `@bracketbear/core` in Astro apps
+- Place main content in the default slot (content layer)
+- Place background effects in the `background` slot
+- Place overlays and pointer effects in the `foreground` slot
+- Never manually set z-index values - use the `LAYERS` constant
+- Ensure pointer effects use `pointer-events-none` on container and `pointer-events-auto` on canvas
+
+## Common Pitfalls
+- Don't use absolute/fixed positioning outside the layered system
+- Don't manually override z-index values
+- Don't place interactive elements in background/foreground layers without proper pointer-events handling
+- Don't create custom layout components that bypass the layered system
+
+## Integration Pattern
+```astro
+---
+import { LayeredLayout, PointerFX } from '@bracketbear/core';
+---
+
+<LayeredLayout navigation={navigationConfig}>
+  <div slot="background">
+    <!-- Background effects -->
+  </div>
+  
+  <slot />
+  
+  <div slot="foreground">
+    <PointerFX client:load />
+  </div>
+</LayeredLayout>
+```
