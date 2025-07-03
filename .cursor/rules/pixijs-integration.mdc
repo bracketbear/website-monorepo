@@ -10,7 +10,14 @@ This project uses PixiJS v8 for interactive graphics and effects. Follow these g
 
 ## Core Files
 - **PointerFX**: Main PixiJS implementation in [packages/core/src/react/PointerFX.tsx](mdc:packages/core/src/react/PointerFX.tsx)
+- **InverseBlendFilter**: Custom inverse blend mode filters in [packages/core/src/react/InverseBlendFilter.ts](mdc:packages/core/src/react/InverseBlendFilter.ts)
 - **Effect Classes**: Modular effect system with SpinningRingEffect, ParticleEffect, and Particle classes
+
+## Blend Modes & Filters
+- **Difference Blend**: Default inverse-like effect using `graphics.blendMode = 'difference'`
+- **Advanced Inverse Filter**: Custom shader-based inverse effect with controllable intensity
+- **Custom Inverse Filter**: Complex filter for background texture sampling
+- **Performance**: Difference blend is fastest, custom filters have higher GPU cost
 
 ## PixiJS v8 API Rules
 - **Application Creation**: Use `new PIXI.Application()` then `await app.init(options)`
@@ -86,3 +93,26 @@ class MyEffect {
   }
 }
 ```
+
+## Inverse Blend Usage
+```typescript
+// Simple difference blend (fastest)
+graphics.blendMode = 'difference';
+
+// Advanced inverse filter with intensity control
+const inverseFilter = new AdvancedInverseBlendFilter(0.8);
+graphics.filters = [inverseFilter];
+
+// Animate intensity
+app.ticker.add(() => {
+  const intensity = 0.5 + 0.5 * Math.sin(Date.now() * 0.001);
+  inverseFilter.setIntensity(intensity);
+});
+
+// Use in PointerFX component
+<PointerFX useInverseBlend={true} inverseIntensity={0.8} />
+```
+
+## Reference Documentation
+- **Full PixiJS v8 Reference**: [docs/pixijs/pixijs-v8-reference.md](mdc:docs/pixijs/pixijs-v8-reference.md)
+- **Inverse Blend Examples**: [packages/core/src/react/InverseBlendExample.tsx](mdc:packages/core/src/react/InverseBlendExample.tsx)

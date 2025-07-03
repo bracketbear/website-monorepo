@@ -20,13 +20,8 @@ const { title, hideContactForm, hideFooter, hideNavigation } = Astro.props;
   hideNavigation={hideNavigation}
   navigation={navigationConfig}
 >
-  <div slot="background">
-    <!-- Background effects can go here -->
-  </div>
-
   <slot />
-
   <div slot="foreground">
-    <PointerFX client:load />
+    <PointerFX useInverseBlend client:load />
   </div>
 </LayeredLayout>

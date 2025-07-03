@@ -1,6 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import { Button, BracketBearLogo } from "@bracketbear/core";
+import { Button, BracketBearLogo, getProjectUrl } from "@bracketbear/core";
 import Layout from "@/layouts/Layout.astro";
 import SkillsTicker from "@/components/SkillsTicker";
 import ContactForm from "@/components/ContactForm.astro";
@@ -134,7 +134,7 @@ function getCompanyName(companyKey: string, companies: any[]): string {
             <p class="text-foreground text-xl font-bold leading-relaxed">
               I'm a full-stack developer and creative technologist with a
               passion for building innovative solutions that bridge the gap
-              between technology and human experience. With expertise in both
+              between tecurlhnology and human experience. With expertise in both
               traditional web development and cutting-edge experiential
               technologies, I specialize in creating robust content management
               systems, interactive installations, and scalable SaaS platforms.
@@ -229,33 +229,37 @@ function getCompanyName(companyKey: string, companies: any[]): string {
         <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {
             featuredProjects.map((project) => (
-              <div class="brutalist-border bg-background p-6 transition-transform hover:scale-105">
-                <h3 class="text-2xl font-black uppercase mb-4">
-                  {project.data.title}
-                </h3>
-                <p class="text-foreground/80 mb-4">{project.data.duration}</p>
-                {project.data.description && (
-                  <p class="text-foreground mb-4">{project.data.description}</p>
-                )}
-                {project.data.skills && project.data.skills.length > 0 && (
-                  <div class="flex flex-wrap gap-2">
-                    {project.data.skills.slice(0, 3).map((skillKey) => {
-                      const skill = workSkills.find((s) => s.id === skillKey);
-                      return skill ? (
-                        <span class="bg-primary text-primary-foreground px-2 py-1 text-sm font-bold uppercase">
-                          {skill.data.title}
-                        </span>
-                      ) : null;
-                    })}
-                  </div>
-                )}
-              </div>
+              <a href={getProjectUrl(project.id)}>
+                <div class="brutalist-border bg-background p-6 transition-transform hover:scale-105">
+                  <h3 class="text-2xl font-black uppercase mb-4">
+                    {project.data.title}
+                  </h3>
+                  <p class="text-foreground/80 mb-4">{project.data.duration}</p>
+                  {project.data.description && (
+                    <p class="text-foreground mb-4">
+                      {project.data.description}
+                    </p>
+                  )}
+                  {project.data.skills && project.data.skills.length > 0 && (
+                    <div class="flex flex-wrap gap-2">
+                      {project.data.skills.slice(0, 3).map((skillKey) => {
+                        const skill = workSkills.find((s) => s.id === skillKey);
+                        return skill ? (
+                          <span class="bg-primary text-primary-foreground px-2 py-1 text-sm font-bold uppercase">
+                            {skill.data.title}
+                          </span>
+                        ) : null;
+                      })}
+                    </div>
+                  )}
+                </div>
+              </a>
             ))
           }
         </div>
         <div class="mt-12 text-center">
           <a href="/work">
-            <Button type="button">View All Projects →</Button>
+            <Button type="button" data-interactive>View All Projects →</Button>
           </a>
         </div>
       </div>
@@ -331,7 +335,13 @@ function getCompanyName(companyKey: string, companies: any[]): string {
       this.canvas = document.getElementById(
         "particle-canvas"
       ) as HTMLCanvasElement;
+      if (!this.canvas) {
+        throw new Error("Canvas element with id 'particle-canvas' not found.");
+      }
       this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
+      if (!this.ctx) {
+        throw new Error("Could not get 2D context from canvas.");
+      }
       this.particles = [];
       this.particleCount = 50;
       this.logoImage = new Image();
@@ -525,8 +535,13 @@ function getCompanyName(companyKey: string, companies: any[]): string {
     }
   }
 
-  // Initialize animation when page loads
-  document.addEventListener("DOMContentLoaded", () => {
-    new ParticleAnimation();
-  });
+  function tryInitParticleAnimation() {
+    const canvas = document.getElementById("particle-canvas");
+    if (canvas) {
+      new ParticleAnimation();
+    } else {
+      setTimeout(tryInitParticleAnimation, 100);
+    }
+  }
+  document.addEventListener("DOMContentLoaded", tryInitParticleAnimation);
 </script>

@@ -159,7 +159,13 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
       this.canvas = document.getElementById(
         "particle-canvas"
       ) as HTMLCanvasElement;
+      if (!this.canvas) {
+        throw new Error("Canvas element with id 'particle-canvas' not found.");
+      }
       this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
+      if (!this.ctx) {
+        throw new Error("Could not get 2D context from canvas.");
+      }
       this.particles = [];
       this.particleCount = 50;
       this.logoImage = new Image();
@@ -304,7 +310,13 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
     }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  function tryInitParticleAnimation() {
+    const canvas = document.getElementById("particle-canvas");
+    if (canvas) {
     new ParticleAnimation();
-  });
+    } else {
+      setTimeout(tryInitParticleAnimation, 100);
+    }
+  }
+  document.addEventListener("DOMContentLoaded", tryInitParticleAnimation);
 </script>
