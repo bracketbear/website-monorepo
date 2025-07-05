@@ -1,0 +1,43 @@
+---
+import type { Breadcrumb } from "../../types/breadcrumb";
+
+interface Props {
+  breadcrumbs: Breadcrumb[];
+}
+
+const { breadcrumbs } = Astro.props;
+---
+
+{
+  breadcrumbs.length > 0 && (
+    <div class="bg-brand-dark">
+      <div class="container mx-auto px-6 py-4">
+        <nav class="anton text-sm">
+          <ol class="flex items-center space-x-2">
+            {breadcrumbs.map((crumb, idx) => (
+              <>
+                <li>
+                  {crumb.href ? (
+                    <a
+                      href={crumb.href}
+                      class="text-brand-yellow hover:text-brand-yellow/80 transition-colors"
+                    >
+                      {crumb.label}
+                    </a>
+                  ) : (
+                    <span class="text-brand-dark font-medium">
+                      {crumb.label}
+                    </span>
+                  )}
+                </li>
+                {idx < breadcrumbs.length - 1 && (
+                  <li class="text-brand-red">/</li>
+                )}
+              </>
+            ))}
+          </ol>
+        </nav>
+      </div>
+    </div>
+  )
+}

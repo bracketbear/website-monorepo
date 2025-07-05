@@ -1,17 +1,17 @@
 ---
-import {
-  type LayoutProps,
-  type ThemeConfig,
-  type NavigationConfig,
-  NavBar,
-  Footer,
-  LAYERS,
-} from "@bracketbear/core";
+import type { LayoutProps, ThemeConfig } from "../../types/layout";
+import type { NavigationConfig } from "../../types/navigation";
+import { LAYERS } from "../../types/layers";
+import NavBar from "../components/NavBar.astro";
+import Footer from "../components/Footer.astro";
+import type { Breadcrumb } from "../../types/breadcrumb";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
 
 interface Props extends LayoutProps {
   navigation: NavigationConfig;
   theme?: ThemeConfig;
   contactForm?: any;
+  breadcrumbs?: Breadcrumb[];
 }
 
 const {
@@ -22,6 +22,7 @@ const {
   navigation,
   theme = {},
   contactForm: ContactFormComponent,
+  breadcrumbs,
 } = Astro.props;
 
 const themeValue =
@@ -75,6 +76,11 @@ const isDark = themeValue === "dark";
     <!-- Content Layer (default slot) -->
     <div style={`z-index: ${LAYERS.content}; position: relative;`}>
       {!hideNavigation && <NavBar config={navigation} class="relative z-10" />}
+      {
+        breadcrumbs && breadcrumbs.length > 0 && (
+          <Breadcrumbs breadcrumbs={breadcrumbs} />
+        )
+      }
       <slot />
       {
         !hideContactForm && ContactFormComponent && (

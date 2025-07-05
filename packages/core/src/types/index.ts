@@ -1,2 +1,3 @@
-export * from './navigation.js';
-export * from './layout.js';
+export * from './navigation';
+export * from './layout';
+export * from './breadcrumb';
