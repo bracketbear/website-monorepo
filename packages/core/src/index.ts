@@ -8,7 +8,6 @@ export { default as Ticker, type TickerItem } from './react/Ticker';
 export { SkillPill, type SkillPillProps } from './react/SkillPill';
 export { Button as ReactButton, type ButtonProps } from './react/Button';
 export * from './react/hooks';
-export { GradientFadeScroll } from './react/GradientFadeScroll';
 
 // Types
 export * from './types';

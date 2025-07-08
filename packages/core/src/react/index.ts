@@ -4,4 +4,3 @@ export { default as Ticker, type TickerItem } from './Ticker';
 export { SkillPill, type SkillPillProps } from './SkillPill';
 export { Button, type ButtonProps } from './Button';
 export * from './hooks';
-export { GradientFadeScroll } from './GradientFadeScroll';
