@@ -73,12 +73,12 @@ export default function WorkSkillFilter({
   // Responsive grid: sidebar (filters) and main (results)
   return (
     <div
-      className="flex flex-col gap-8 md:flex-row md:gap-0"
+      className="flex flex-col gap-8 lg:flex-row lg:gap-0"
       ref={containerRef}
     >
       {/* Sidebar: Filters */}
-      <aside className="w-full flex-shrink-0 py-4 md:sticky md:top-0 md:mr-6 md:w-1/3 md:self-start">
-        <div className="border-default min-h-[400px] overflow-y-auto bg-white p-8 md:flex md:max-h-[calc(100vh-2rem)] md:flex-col">
+      <aside className="w-full flex-shrink-0 py-4 lg:sticky lg:top-0 lg:mr-6 lg:w-1/3 lg:self-start">
+        <div className="border-default min-h-[400px] overflow-y-auto bg-white p-8 lg:flex lg:max-h-[calc(100vh-2rem)] lg:flex-col">
           {/* Skills by Category */}
           <>
             {/* Filter Status Message */}
@@ -130,7 +130,7 @@ export default function WorkSkillFilter({
         </div>
       </aside>
       {/* Main Content: Jobs/Projects - no container */}
-      <main className="min-w-0 flex-1 space-y-12 pt-4">
+      <main className="min-w-0 flex-1 space-y-12 py-4">
         {/* Jobs */}
         <section>
           <div className={sectionHeaderClassName}>Jobs</div>
