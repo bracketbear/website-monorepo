@@ -38,10 +38,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         type={type}
         disabled={disabled}
         className={clsx(
-          'border-default transform font-black uppercase transition-all halftone-shadow',
+          'border-default halftone-shadow transform font-black uppercase transition-all',
           // Disabled state overrides hover effects
           disabled
-            ? 'opacity-50 cursor-not-allowed hover:scale-100 hover:rotate-0 active:scale-100'
+            ? 'cursor-not-allowed opacity-50 hover:scale-100 hover:rotate-0 active:scale-100'
             : 'hover:scale-105 hover:rotate-1 active:scale-95',
           variantClasses[variant],
           sizeClasses[size],

@@ -64,18 +64,6 @@ export default function WorkHistory({
 }: WorkHistoryProps) {
   const groupedJobs = groupJobsByCompany(jobs, companies);
 
-  const renderSkillPill = (skillId: string) => {
-    return (
-      <SkillPill
-        key={skillId}
-        variant={selectedSkills.includes(skillId) ? 'selected' : 'default'}
-        size="sm"
-      >
-        {skills.find((s) => s.id === skillId)?.data.title || skillId}
-      </SkillPill>
-    );
-  };
-
   return (
     <div className="space-y-8">
       {groupedJobs.map((group) => (
@@ -133,7 +121,20 @@ export default function WorkHistory({
                   {/* Skills row: consistent with ProjectCard styling */}
                   {job.data.workSkills && job.data.workSkills.length > 0 && (
                     <div className="flex flex-wrap gap-2 border-t-2 border-[var(--color-brand-orange)] pt-3">
-                      {job.data.workSkills?.map(renderSkillPill)}
+                      {job.data.workSkills?.map((skillId) => (
+                        <SkillPill
+                          key={skillId}
+                          variant={
+                            selectedSkills.includes(skillId)
+                              ? 'selected'
+                              : 'default'
+                          }
+                          size="sm"
+                        >
+                          {skills.find((s) => s.id === skillId)?.data.title ||
+                            skillId}
+                        </SkillPill>
+                      ))}
                     </div>
                   )}
                 </div>
