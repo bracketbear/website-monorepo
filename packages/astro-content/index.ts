@@ -61,7 +61,7 @@ const workSkills = createJsonCollection({
     title: z.string(),
     description: z.string().optional(),
     isFeatured: z.boolean().default(false),
-    categories: z.array(z.string()).optional(),
+    category: z.string(),
   }),
 });
 
@@ -70,7 +70,6 @@ const workSkillCategories = createJsonCollection({
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
-    skills: z.array(z.string()).optional(),
   }),
 });
 
@@ -87,6 +86,7 @@ const workProjects = createJsonCollection({
     title: z.string(),
     job: z.string(), // references "workJobs"
     duration: z.string(),
+    summary: z.string().optional(), // Brief project overview
     description: z.string().optional(),
     challengesAndSolutions: z.string().optional(),
     resultsAchieved: z.string().optional(),

@@ -1,7 +1,7 @@
 ---
-import type { NavigationConfig } from "../../types/navigation.js";
-import { NAVIGATION_CONSTANTS } from "../../utils/constants.js";
-import ThemeSwitch from "./ThemeSwitch.astro";
+import type { NavigationConfig } from '../../types/navigation.js';
+import { NAVIGATION_CONSTANTS } from '../../utils/constants.js';
+import ThemeSwitch from './ThemeSwitch.astro';
 
 interface Props {
   class?: string;
@@ -32,10 +32,10 @@ const TEXT_COLOR = NAVIGATION_CONSTANTS.TEXT_COLOR;
       }
       <div class="text-lg leading-5.5 font-black tracking-normal uppercase">
         <a
-          href={branding?.href || "/"}
+          href={branding?.href || '/'}
           class="text-foreground hover:opacity-80"
         >
-          {branding?.name || "Brand"}
+          {branding?.name || 'Brand'}
         </a>
       </div>
     </div>
@@ -69,7 +69,7 @@ const TEXT_COLOR = NAVIGATION_CONSTANTS.TEXT_COLOR;
                   </button>
                   <div class="invisible absolute left-0 z-50 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100">
                     <div
-                      class="brutalist-border py-4 shadow-[8px_8px_0_0_#111111]"
+                      class="border-default py-4 shadow-[8px_8px_0_0_#111111]"
                       class:list={[BACKGROUND_COLOR]}
                     >
                       {item.children.map((child) => (
@@ -125,7 +125,7 @@ const TEXT_COLOR = NAVIGATION_CONSTANTS.TEXT_COLOR;
     <!-- Mobile Menu Button -->
     <button
       id="mobile-menu-button"
-      class="brutalist-border p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111] md:hidden"
+      class="border-default p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111] md:hidden"
     >
       <svg
         class="text-foreground h-6 w-6"
@@ -145,12 +145,12 @@ const TEXT_COLOR = NAVIGATION_CONSTANTS.TEXT_COLOR;
   <!-- Mobile Menu -->
   <div
     id="mobile-menu"
-    class="brutalist-border bg-background fixed top-0 right-0 z-50 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
+    class="border-default bg-background fixed top-0 right-0 z-50 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
   >
     <div class="p-6">
       <button
         id="close-menu-button"
-        class="brutalist-border absolute top-4 right-4 p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111]"
+        class="border-default absolute top-4 right-4 p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111]"
       >
         <svg
           class="text-foreground h-6 w-6"
@@ -240,38 +240,38 @@ const TEXT_COLOR = NAVIGATION_CONSTANTS.TEXT_COLOR;
 
 <script>
   function setupMobileMenu() {
-    const mobileMenu = document.getElementById("mobile-menu");
-    const mobileMenuButton = document.getElementById("mobile-menu-button");
-    const closeMenuButton = document.getElementById("close-menu-button");
-    const mobileMenuOverlay = document.getElementById("mobile-menu-overlay");
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const closeMenuButton = document.getElementById('close-menu-button');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
 
     const openMenu = () => {
-      mobileMenu?.classList.remove("translate-x-full");
-      mobileMenuOverlay?.classList.remove("hidden");
+      mobileMenu?.classList.remove('translate-x-full');
+      mobileMenuOverlay?.classList.remove('hidden');
       setTimeout(() => {
-        mobileMenuOverlay?.classList.add("opacity-50");
+        mobileMenuOverlay?.classList.add('opacity-50');
       }, 10);
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
     };
 
     const closeMenu = () => {
-      mobileMenu?.classList.add("translate-x-full");
-      mobileMenuOverlay?.classList.remove("opacity-50");
+      mobileMenu?.classList.add('translate-x-full');
+      mobileMenuOverlay?.classList.remove('opacity-50');
       setTimeout(() => {
-        mobileMenuOverlay?.classList.add("hidden");
+        mobileMenuOverlay?.classList.add('hidden');
       }, 300);
-      document.body.style.overflow = "";
+      document.body.style.overflow = '';
     };
 
-    mobileMenuButton?.addEventListener("click", openMenu);
-    closeMenuButton?.addEventListener("click", closeMenu);
-    mobileMenuOverlay?.addEventListener("click", closeMenu);
+    mobileMenuButton?.addEventListener('click', openMenu);
+    closeMenuButton?.addEventListener('click', closeMenu);
+    mobileMenuOverlay?.addEventListener('click', closeMenu);
 
-    document.addEventListener("click", (e) => {
+    document.addEventListener('click', (e) => {
       if (
         !mobileMenu?.contains(e.target as Node) &&
         !mobileMenuButton?.contains(e.target as Node) &&
-        !mobileMenu?.classList.contains("translate-x-full")
+        !mobileMenu?.classList.contains('translate-x-full')
       ) {
         closeMenu();
       }
@@ -279,10 +279,9 @@ const TEXT_COLOR = NAVIGATION_CONSTANTS.TEXT_COLOR;
   }
 
   // Run setup when the DOM is ready
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", setupMobileMenu);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupMobileMenu);
   } else {
     setupMobileMenu();
   }
 </script>
-

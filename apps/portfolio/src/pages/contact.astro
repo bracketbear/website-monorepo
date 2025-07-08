@@ -1,6 +1,6 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import { Input, Textarea, Button } from "@bracketbear/core/astro";
+import Layout from '../layouts/Layout.astro';
+import { Input, Textarea, Button } from '@bracketbear/core/astro';
 ---
 
 <Layout title="Contact Me" hideContactForm={true}>
@@ -14,7 +14,7 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
         <!-- Brutalist Header -->
         <div class="mb-16">
           <div
-            class="brutalist-border bg-background inline-block transform p-8 transition-transform hover:rotate-1"
+            class="border-default bg-background inline-block transform p-8 transition-transform hover:rotate-1"
           >
             <h1
               class="text-foreground text-7xl font-black tracking-tighter uppercase"
@@ -36,7 +36,7 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
           <!-- Info Box -->
           <div class="md:col-span-4">
             <div
-              class="brutalist-border bg-foreground text-background -rotate-2 transform p-6 transition-transform hover:rotate-0"
+              class="border-default bg-foreground text-background -rotate-2 transform p-6 transition-transform hover:rotate-0"
             >
               <h2 class="mb-4 text-2xl font-black tracking-tight uppercase">
                 Quick Links
@@ -72,7 +72,7 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
 
           <!-- Contact Form -->
           <div class="md:col-span-8">
-            <div class="brutalist-border bg-background p-8">
+            <div class="border-default bg-background p-8">
               <form
                 name="contact-form"
                 method="POST"
@@ -145,7 +145,7 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
     speedY: number;
     rotation: number;
     rotationSpeed: number;
-    type: "plus" | "logo" | "dot";
+    type: 'plus' | 'logo' | 'dot';
   }
 
   class ParticleAnimation {
@@ -157,19 +157,19 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
 
     constructor() {
       this.canvas = document.getElementById(
-        "particle-canvas"
+        'particle-canvas'
       ) as HTMLCanvasElement;
       if (!this.canvas) {
         throw new Error("Canvas element with id 'particle-canvas' not found.");
       }
-      this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
+      this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
       if (!this.ctx) {
-        throw new Error("Could not get 2D context from canvas.");
+        throw new Error('Could not get 2D context from canvas.');
       }
       this.particles = [];
       this.particleCount = 50;
       this.logoImage = new Image();
-      this.logoImage.src = "/favicon.svg";
+      this.logoImage.src = '/favicon.svg';
 
       this.init();
       this.animate();
@@ -183,7 +183,7 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
         this.ctx.scale(dpr, dpr);
       };
 
-      window.addEventListener("resize", resize);
+      window.addEventListener('resize', resize);
       resize();
 
       for (let i = 0; i < this.particleCount; i++) {
@@ -201,7 +201,7 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
         rotation: Math.random() * Math.PI * 2,
         rotationSpeed: (Math.random() - 0.5) * 0.02,
         type:
-          Math.random() < 0.2 ? "logo" : Math.random() < 0.5 ? "plus" : "dot",
+          Math.random() < 0.2 ? 'logo' : Math.random() < 0.5 ? 'plus' : 'dot',
       };
     }
 
@@ -215,7 +215,7 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
       this.ctx.translate(x, y);
       this.ctx.rotate(rotation);
 
-      this.ctx.strokeStyle = "rgba(191, 87, 0, 0.3)";
+      this.ctx.strokeStyle = 'rgba(191, 87, 0, 0.3)';
       this.ctx.lineWidth = 2;
       this.ctx.beginPath();
 
@@ -240,7 +240,7 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
 
       this.ctx.globalAlpha = 0.3;
       this.ctx.filter =
-        "sepia(100%) hue-rotate(-15deg) saturate(400%) brightness(50%)";
+        'sepia(100%) hue-rotate(-15deg) saturate(400%) brightness(50%)';
 
       if (this.logoImage.complete) {
         const aspectRatio = this.logoImage.width / this.logoImage.height;
@@ -262,7 +262,7 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
       this.ctx.save();
       this.ctx.translate(x, y);
 
-      const color = "rgba(191, 87, 0, 0.3)";
+      const color = 'rgba(191, 87, 0, 0.3)';
       this.ctx.strokeStyle = color;
       this.ctx.fillStyle = color;
       this.ctx.lineWidth = 2;
@@ -287,14 +287,14 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
         if (particle.y < 0) particle.y = this.canvas.height;
         if (particle.y > this.canvas.height) particle.y = 0;
 
-        if (particle.type === "logo") {
+        if (particle.type === 'logo') {
           this.drawLogo(
             particle.x,
             particle.y,
             particle.size,
             particle.rotation
           );
-        } else if (particle.type === "plus") {
+        } else if (particle.type === 'plus') {
           this.drawPlus(
             particle.x,
             particle.y,
@@ -311,12 +311,12 @@ import { Input, Textarea, Button } from "@bracketbear/core/astro";
   }
 
   function tryInitParticleAnimation() {
-    const canvas = document.getElementById("particle-canvas");
+    const canvas = document.getElementById('particle-canvas');
     if (canvas) {
-    new ParticleAnimation();
+      new ParticleAnimation();
     } else {
       setTimeout(tryInitParticleAnimation, 100);
     }
   }
-  document.addEventListener("DOMContentLoaded", tryInitParticleAnimation);
+  document.addEventListener('DOMContentLoaded', tryInitParticleAnimation);
 </script>

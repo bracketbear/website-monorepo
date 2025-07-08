@@ -1,4 +1,5 @@
 {
   "title": "Vite",
-  "isFeatured": true
+  "isFeatured": true,
+  "category": "tools"
 }

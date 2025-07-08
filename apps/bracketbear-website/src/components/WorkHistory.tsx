@@ -77,7 +77,7 @@ export default function WorkHistory({
       {groupedJobs.map((group) => (
         <div
           key={group.company.id}
-          className="brutalist-border bg-background p-4"
+          className="border-default bg-background p-4"
         >
           <h3 className="text-foreground text-xl font-bold">
             {group.company.data.title}
@@ -102,7 +102,7 @@ export default function WorkHistory({
         </div>
       ))}
       {showFilteredPlaceholder && jobs.length === 0 && (
-        <div className="brutalist-border bg-background p-4">
+        <div className="border-default bg-background p-4">
           <div className="text-foreground py-8 text-center">
             <p className="text-lg font-bold">
               No jobs match the selected filters

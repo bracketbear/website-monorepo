@@ -1,4 +1,5 @@
 {
   "title": "Astro",
-  "isFeatured": false
+  "isFeatured": false,
+  "category": "full-stack-frameworks"
 }

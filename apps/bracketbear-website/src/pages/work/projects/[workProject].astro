@@ -44,7 +44,7 @@ const companyTitle =
   <!-- Hero Section -->
   <div class="bg-background py-24">
     <div class="container mx-auto px-6">
-      <div class="brutalist-border bg-background mb-8 inline-block p-8">
+      <div class="border-default bg-background mb-8 inline-block p-8">
         <h1 class="text-foreground text-5xl font-black uppercase">
           {workProject.data.title}
         </h1>
@@ -52,7 +52,7 @@ const companyTitle =
 
       {
         category !== undefined && (
-          <span class="brutalist-border bg-coral text-foreground px-4 py-2 text-lg font-black">
+          <span class="border-default bg-coral text-foreground px-4 py-2 text-lg font-black">
             {category.data.title}
           </span>
         )
@@ -67,7 +67,7 @@ const companyTitle =
   <!-- Project Info Bar -->
   <div class="bg-background border-y-2 border-black py-8">
     <div class="container mx-auto px-6">
-      <div class="brutalist-border bg-background flex flex-wrap gap-8 p-8">
+      <div class="border-default bg-background flex flex-wrap gap-8 p-8">
         {
           job !== undefined && (
             <div>
@@ -87,7 +87,7 @@ const companyTitle =
         {
           workProject.data.isFeatured === true && (
             <div class="ml-auto self-center">
-              <span class="brutalist-border bg-coral text-foreground px-4 py-2 text-sm font-black">
+              <span class="border-default bg-coral text-foreground px-4 py-2 text-sm font-black">
                 Featured Project
               </span>
             </div>
@@ -106,7 +106,7 @@ const companyTitle =
           <!-- Description -->
           {
             workProject.data.description?.trim() !== '' && (
-              <section class="brutalist-border bg-background p-8">
+              <section class="border-default bg-background p-8">
                 <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Overview
                 </h2>
@@ -120,7 +120,7 @@ const companyTitle =
           <!-- Challenges & Solutions -->
           {
             workProject.data.challengesAndSolutions?.trim() !== '' && (
-              <section class="brutalist-border bg-background p-8">
+              <section class="border-default bg-background p-8">
                 <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Challenges & Solutions
                 </h2>
@@ -134,7 +134,7 @@ const companyTitle =
           <!-- Results -->
           {
             workProject.data.resultsAchieved?.trim() !== '' && (
-              <section class="brutalist-border bg-background p-8">
+              <section class="border-default bg-background p-8">
                 <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Results Achieved
                 </h2>
@@ -148,7 +148,7 @@ const companyTitle =
           <!-- Media Gallery -->
           {
             (workProject.data.media ?? []).length > 0 && (
-              <section class="brutalist-border bg-background p-8">
+              <section class="border-default bg-background p-8">
                 <h2 class="text-foreground mb-6 text-2xl font-black uppercase">
                   Project Gallery
                 </h2>
@@ -160,7 +160,7 @@ const companyTitle =
                 <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
                   {(workProject.data.media ?? []).map(async (imageUrl) => {
                     return (
-                      <div class="brutalist-border bg-background aspect-video overflow-hidden">
+                      <div class="border-default bg-background aspect-video overflow-hidden">
                         TODO: Add image
                       </div>
                     );
@@ -176,7 +176,7 @@ const companyTitle =
           <!-- Job Info -->
           {
             job !== undefined && (
-              <div class="brutalist-border bg-background p-8">
+              <div class="border-default bg-background p-8">
                 <h3 class="text-foreground mb-4 text-xl font-black uppercase">
                   Role Info
                 </h3>
@@ -195,7 +195,7 @@ const companyTitle =
           <!-- Skills -->
           {
             projectSkills.length > 0 && (
-              <div class="brutalist-border bg-background p-8">
+              <div class="border-default bg-background p-8">
                 <h3 class="text-foreground mb-4 text-xl font-black uppercase">
                   Technologies Used
                 </h3>
@@ -211,7 +211,7 @@ const companyTitle =
           }
 
           <!-- Call to Action -->
-          <div class="brutalist-border bg-coral p-8">
+          <div class="border-default bg-coral p-8">
             <h3 class="text-foreground mb-4 text-xl font-black uppercase">
               Interested in similar work?
             </h3>
@@ -220,7 +220,7 @@ const companyTitle =
             </p>
             <a
               href="/contact"
-              class="brutalist-border bg-background text-foreground block py-3 text-center text-lg font-black uppercase transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
+              class="border-default bg-background text-foreground block py-3 text-center text-lg font-black uppercase transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#111111]"
             >
               Get in Touch
             </a>

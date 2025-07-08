@@ -1,4 +1,5 @@
 {
   "title": "Express",
-  "isFeatured": true
+  "isFeatured": true,
+  "category": "back-end"
 }

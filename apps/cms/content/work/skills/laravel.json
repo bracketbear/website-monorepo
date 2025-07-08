@@ -1,4 +1,5 @@
 {
   "title": "Laravel",
-  "description": "Laravel is a web application framework with expressive, elegant syntax."
+  "description": "Laravel is a web application framework with expressive, elegant syntax.",
+  "category": "full-stack-frameworks"
 }

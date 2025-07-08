@@ -1,0 +1,16 @@
+# Tailwind v4 Customization Rule
+
+Whenever you are working with Tailwind CSS in this project, you must:
+
+- **Check the Tailwind version first.**
+- If the project is using **Tailwind v4**, do **not** use a `tailwind.config.js` file for configuration or custom utilities.
+- For Tailwind v4, use **pure CSS/PostCSS** to add custom styles, theme variables, and utilities.
+- Always reference the official documentation for Tailwind 4 custom styles: [Tailwind v4: Adding Custom Styles](https://tailwindcss.com/docs/adding-custom-styles)
+- Use the `@theme`, `@utility`, and `@layer` directives in your CSS as described in the docs for any customizations.
+- Use arbitrary value syntax (e.g., `bg-[#fdf0d5]`) for one-off custom values, ensuring the class is present in your code so Tailwind generates the CSS.
+
+**Never** assume a `tailwind.config.js` file is present or used in Tailwind v4 projects.
+description:
+globs:
+alwaysApply: false
+---

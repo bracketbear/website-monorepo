@@ -95,15 +95,22 @@ export default config({
       slugField: 'title',
       path: workPath('skills'),
       schema: {
-        title: fields.slug({ name: { label: 'Title' } }),
+        title: fields.slug({
+          name: {
+            label: 'Title',
+            validation: { isRequired: true, length: { max: 20 } },
+          },
+        }),
         description: fields.text({ label: 'Description' }),
         isFeatured: fields.checkbox({
           label: 'Is Featured?',
           defaultValue: false,
         }),
-        categories: fields.array(fields.text({ label: 'Category' }), {
-          label: 'Categories',
-          itemLabel: (props) => props.value || 'New Category',
+        category: fields.relationship({
+          label: 'Category',
+          description: 'Select the category this skill belongs to',
+          collection: 'workSkillCategory',
+          validation: { isRequired: true },
         }),
       },
       format: 'json',
@@ -116,11 +123,6 @@ export default config({
       schema: {
         title: fields.slug({ name: { label: 'Title' } }),
         description: fields.text({ label: 'Description' }),
-        skills: fields.multiRelationship({
-          label: 'Skills',
-          description: 'Select the skills that belong to this category',
-          collection: 'workSkills',
-        }),
       },
     }),
     workProjectCategory: collection({
@@ -151,6 +153,11 @@ export default config({
         duration: fields.text({
           label: 'Duration',
           validation: { isRequired: true },
+        }),
+        summary: fields.text({
+          label: 'Summary',
+          description: 'Brief project overview (displayed in hero section)',
+          multiline: true,
         }),
         description: fields.text({
           label: 'Description',

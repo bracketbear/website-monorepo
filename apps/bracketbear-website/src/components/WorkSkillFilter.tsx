@@ -110,7 +110,7 @@ export default function WorkSkillFilter({
             onClick={clearFilters}
             disabled={!hasActiveFilters}
             className={clsx(
-              'brutalist-border bg-background px-4 py-2',
+              'border-default bg-background px-4 py-2',
               'disabled:cursor-not-allowed disabled:opacity-50',
               hasActiveFilters ? 'transition-transform hover:scale-105' : ''
             )}
@@ -195,7 +195,7 @@ export default function WorkSkillFilter({
             />
           ))}
           {filteredProjects.length === 0 && (
-            <div className="brutalist-border bg-background col-span-2 p-6">
+            <div className="border-default bg-background col-span-2 p-6">
               <div className="text-foreground py-8 text-center">
                 <p className="text-lg font-bold">
                   No projects match the selected filters

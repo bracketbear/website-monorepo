@@ -8,9 +8,11 @@ interface Props {
   hideContactForm?: boolean;
   hideFooter?: boolean;
   hideNavigation?: boolean;
+  breadcrumbs?: any;
 }
 
-const { title, hideContactForm, hideFooter, hideNavigation } = Astro.props;
+const { title, hideContactForm, hideFooter, hideNavigation, breadcrumbs } =
+  Astro.props;
 ---
 
 <LayeredLayout
@@ -19,6 +21,7 @@ const { title, hideContactForm, hideFooter, hideNavigation } = Astro.props;
   hideFooter={hideFooter}
   hideNavigation={hideNavigation}
   navigation={navigationConfig}
+  breadcrumbs={breadcrumbs}
 >
   <div slot="background">
     <!-- Background effects can go here -->
@@ -27,6 +30,8 @@ const { title, hideContactForm, hideFooter, hideNavigation } = Astro.props;
   <slot />
 
   <div slot="foreground">
-    <PointerFX useInverseBlend client:load />
+    <!-- <PointerFX client:load /> -->
   </div>
+
+  {breadcrumbs && <div slot="breadcrumbs">{breadcrumbs}</div>}
 </LayeredLayout>

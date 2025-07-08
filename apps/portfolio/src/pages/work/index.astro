@@ -1,64 +1,84 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import { getCollection } from "astro:content";
-import WorkSkillFilter from "@/components/WorkSkillFilter";
+import Layout from '@/layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import WorkSkillFilter from '@/components/WorkSkillFilter';
+import ContactForm from '@/components/ContactForm.astro';
+import { getWorkBreadcrumbs } from '@/config/breadcrumbs';
 
-const workProjects = await getCollection("workProject");
-const workSkills = await getCollection("workSkills");
-const workJobs = await getCollection("workJobs");
-const workCompanies = await getCollection("workCompany");
-const workSkillCategories = await getCollection("workSkillCategory");
+const workProjects = await getCollection('workProject');
+const workSkills = await getCollection('workSkills');
+const workJobs = await getCollection('workJobs');
+const workCompanies = await getCollection('workCompany');
+const workSkillCategories = await getCollection('workSkillCategory');
 
 // Extract URL parameters for automatic filtering
 const url = new URL(Astro.request.url);
-const skillParam = url.searchParams.get("skill");
-const categoryParam = url.searchParams.get("category");
+const skillParam = url.searchParams.get('skill');
+const categoryParam = url.searchParams.get('category');
 
 // Convert URL parameters to initial filter state
 const initialSelectedSkills = skillParam ? [skillParam] : [];
 const initialSelectedCategories = categoryParam ? [categoryParam] : [];
+
+const breadcrumbs = getWorkBreadcrumbs();
 ---
 
-<Layout>
+<Layout
+  title="Harrison Callahan - Portfolio"
+  hideContactForm={true}
+  breadcrumbs={breadcrumbs}
+>
   <title>Work | Harrison Callahan</title>
-  <div class="bg-primary/50 py-24">
+  <div class="bg-primary/50 min-h-screen py-24">
     <div class="container mx-auto px-6">
-      <div class="brutalist-border bg-background mb-8 inline-block p-8">
-        <h1 class="text-foreground text-5xl font-black uppercase">Work</h1>
-      </div>
-      <!-- Introduction -->
-      <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
-        <div class="p-8">
-          <p class="text-foreground space-y-4 pb-5 text-2xl font-medium">
-            I've been working as a software engineer for over 10 years. I've
-            worked in a variety of roles, from a solo developer to a team of 12+
-            engineers. I've worked in a variety of industries, from startups to
-            large corporations.
-          </p>
-          <p class="text-foreground space-y-4 text-2xl font-medium">
-            The tool below is to help you understand my skills and experience.
-            <span
-              class="skill-pill skill-pill-selected brutalist-border mr-1 rounded-none !text-lg"
-              >Select</span
-            > a skill to see projects I've worked on that use that skill, or a category
-            to choose multiple skills at once. We'll filter the list of jobs and
-            projects and show you the ones that match your selection.
-          </p>
+      <div class="mb-12">
+        <h1
+          class="halftone-text-shadow-middle-brand-red halftone-text-shadow-foreground-brand-dark heading mb-8 text-9xl uppercase"
+        >
+          Work History
+        </h1>
+        <!-- Introduction -->
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div class="p-8">
+            <div
+              class="border-foreground/20 mb-5 rounded-sm border bg-[#fdf0d5] px-6 py-5 text-xl leading-relaxed font-medium text-[#222] shadow-[2px_2px_0_#111]"
+              style="font-family: 'Inter', 'Arial', sans-serif;"
+            >
+              I've been working as a software engineer for over 10 years. I've
+              worked in a variety of roles, from a solo developer to a team of
+              12+ engineers. I've worked in a variety of industries, from
+              startups to large corporations.
+            </div>
+            <div
+              class="border-foreground/20 rounded-sm border bg-[#fdf0d5] px-6 py-5 text-xl leading-relaxed font-medium text-[#222] shadow-[2px_2px_0_#111]"
+              style="font-family: 'Inter', 'Arial', sans-serif;"
+            >
+              The tool below is to help you understand my skills and experience.
+              <span
+                class="skill-pill skill-pill-selected border-default mr-1 rounded-none !text-lg"
+                >Select</span
+              > a skill to see projects I've worked on that use that skill, or a
+              category to choose multiple skills at once. We'll filter the list of
+              jobs and projects and show you the ones that match your selection.
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="container mx-auto px-6 py-16">
-      <WorkSkillFilter
-        skills={workSkills}
-        skillCategories={workSkillCategories}
-        jobs={workJobs}
-        projects={workProjects}
-        companies={workCompanies}
-        initialSkills={JSON.stringify(initialSelectedSkills)}
-        intialCategories={JSON.stringify(initialSelectedCategories)}
-        client:load
-      />
+      <div class="container mx-auto px-6 py-16">
+        <WorkSkillFilter
+          skills={workSkills}
+          skillCategories={workSkillCategories}
+          jobs={workJobs}
+          projects={workProjects}
+          companies={workCompanies}
+          initialSkills={JSON.stringify(initialSelectedSkills)}
+          client:load
+        />
+      </div>
     </div>
   </div>
+
+  <!-- Contact Form Section -->
+  <ContactForm class="bg-primary relative z-10 py-36" />
 </Layout>

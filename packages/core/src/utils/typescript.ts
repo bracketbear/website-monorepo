@@ -35,3 +35,8 @@ export function hasObjectKey<T extends Record<string, any>, K extends string>(
 ): obj is T & Record<K, any> {
   return key in obj;
 } 
+
+// Class name utility (similar to clsx/cn)
+export function cn(...classes: (string | undefined | null | false)[]): string {
+  return classes.filter(Boolean).join(' ');
+} 

@@ -1,19 +1,4 @@
 {
   "title": "Front-End Development",
-  "description": "Front-End Development",
-  "skills": [
-    "react",
-    "vue",
-    "typescript",
-    "tailwind-css",
-    "nuxt",
-    "bootstrap",
-    "figma",
-    "html",
-    "mui",
-    "redux",
-    "storybook",
-    "javascript",
-    "css"
-  ]
+  "description": "Front-End Development"
 }

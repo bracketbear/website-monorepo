@@ -1,7 +1,8 @@
+import { SkillPill } from '@bracketbear/core';
 import type { CollectionEntry } from 'astro:content';
-import { clsx } from '@bracketbear/core';
+import clsx from 'clsx';
 
-interface WorkHistoryProps {
+export interface WorkHistoryProps {
   jobs: (CollectionEntry<'workJobs'> & { isHidden?: boolean })[];
   companies: CollectionEntry<'workCompany'>[];
   showFilteredPlaceholder?: boolean;
@@ -9,47 +10,50 @@ interface WorkHistoryProps {
   skills: CollectionEntry<'workSkills'>[];
 }
 
-interface GroupedJob {
+interface JobGroup {
   company: CollectionEntry<'workCompany'>;
   jobs: (CollectionEntry<'workJobs'> & { isHidden?: boolean })[];
 }
 
-const groupJobsByCompany = (
+function groupJobsByCompany(
   jobs: (CollectionEntry<'workJobs'> & { isHidden?: boolean })[],
   companies: CollectionEntry<'workCompany'>[]
-): GroupedJob[] => {
-  const sortedJobs = [...jobs].sort(
-    (a, b) => b.data.startDate.getTime() - a.data.startDate.getTime()
-  );
-
-  const groupedJobs = sortedJobs.reduce((acc, job) => {
+): JobGroup[] {
+  const grouped = jobs.reduce((acc, job) => {
     const company = companies.find((c) => c.id === job.data.company);
     if (!company) return acc;
 
-    const existingGroup = acc.find(
-      (g: GroupedJob) => g.company.id === company.id
-    );
+    const existingGroup = acc.find((group) => group.company.id === company.id);
     if (existingGroup) {
       existingGroup.jobs.push(job);
     } else {
       acc.push({ company, jobs: [job] });
     }
     return acc;
-  }, [] as GroupedJob[]);
+  }, [] as JobGroup[]);
 
-  return groupedJobs;
-};
+  return grouped.sort((a, b) => {
+    const aLatestJob = a.jobs.sort(
+      (x, y) => y.data.startDate.getTime() - x.data.startDate.getTime()
+    )[0];
+    const bLatestJob = b.jobs.sort(
+      (x, y) => y.data.startDate.getTime() - x.data.startDate.getTime()
+    )[0];
+    return (
+      bLatestJob.data.startDate.getTime() - aLatestJob.data.startDate.getTime()
+    );
+  });
+}
 
-const formatDate = (date: Date) => {
-  // Add one month to fix the display issue
+function formatDate(date: Date): string {
   const adjustedDate = new Date(date);
   adjustedDate.setMonth(adjustedDate.getMonth() + 1);
 
   return adjustedDate.toLocaleDateString('en-US', {
-    year: 'numeric',
     month: 'short',
+    year: 'numeric',
   });
-};
+}
 
 export default function WorkHistory({
   jobs,
@@ -62,35 +66,14 @@ export default function WorkHistory({
 
   const renderSkillPill = (skillId: string) => {
     return (
-      <span
+      <SkillPill
         key={skillId}
-        className={clsx(
-          'skill-pill',
-          selectedSkills.includes(skillId)
-            ? 'skill-pill-selected'
-            : 'skill-pill-default'
-        )}
+        variant={selectedSkills.includes(skillId) ? 'selected' : 'default'}
+        size="sm"
       >
         {skills.find((s) => s.id === skillId)?.data.title || skillId}
-      </span>
+      </SkillPill>
     );
-  };
-
-  const getHiddenMessage = (
-    job: CollectionEntry<'workJobs'> & { isHidden?: boolean }
-  ) => {
-    if (!job.isHidden || selectedSkills.length === 0) return null;
-
-    const jobSkills = job.data.workSkills || [];
-    const selectedSkillNames = selectedSkills.map(
-      (skillId) => skills.find((s) => s.id === skillId)?.data.title || skillId
-    );
-
-    if (jobSkills.length === 0) {
-      return `No skills listed for this role`;
-    }
-
-    return `Doesn't use: ${selectedSkillNames.join(', ')}`;
   };
 
   return (
@@ -98,56 +81,61 @@ export default function WorkHistory({
       {groupedJobs.map((group) => (
         <div
           key={group.company.id}
-          className="brutalist-border bg-background p-4"
+          className="bg-background border-default p-6"
         >
-          <h3 className="text-foreground text-xl font-bold">
-            {group.company.data.title}
-          </h3>
-          <div className="space-y-4 mt-4">
+          {/* Company header with halftone text shadow */}
+          <h3 className="heading mb-6 text-3xl">{group.company.data.title}</h3>
+          {/* Company Jobs */}
+          <div className="space-y-8">
             {group.jobs.map((job) => {
-              const hiddenMessage = getHiddenMessage(job);
-
               return (
                 <div
                   key={job.id}
                   className={clsx(
-                    'pl-4 border-l-4 border-foreground',
-                    job.isHidden && 'opacity-50 grayscale'
+                    'border-brand-orange border-l-4 pl-6 transition-all duration-300',
+                    job.isHidden
+                      ? 'opacity-50 grayscale'
+                      : 'hover:border-[var(--color-brand-red)]'
                   )}
+                  style={
+                    {
+                      '--color-brand-orange': 'var(--color-brand-orange)',
+                      '--color-brand-red': 'var(--color-brand-red)',
+                    } as React.CSSProperties
+                  }
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <h4 className="text-foreground text-lg font-bold">
+                  <div className="mb-2 flex items-center gap-2">
+                    <h4 className="font-heading text-xl uppercase">
                       {job.data.title}
                     </h4>
-                    {job.isHidden && hiddenMessage && (
-                      <span
-                        className="text-xs bg-gray-300 text-gray-600 px-2 py-1 font-bold uppercase"
-                        title={hiddenMessage}
-                      >
-                        Filtered Out
-                      </span>
-                    )}
                   </div>
-                  <div className="text-foreground text-sm">
+                  <div className="font-heading text-foreground/80 mb-3 text-sm font-black tracking-wide uppercase">
                     {formatDate(job.data.startDate)} -{' '}
                     {job.data.endDate
                       ? formatDate(job.data.endDate)
                       : 'Present'}
                   </div>
-                  <p className="text-foreground mt-2">{job.data.description}</p>
-                  <ul className="list-disc list-inside">
-                    {job.data.highlights?.map((highlight) => (
-                      <li key={highlight}>{highlight}</li>
-                    ))}
-                  </ul>
-                  {job.isHidden && hiddenMessage && (
-                    <p className="text-gray-500 text-sm mt-2 italic">
-                      {hiddenMessage}
-                    </p>
+                  <p className="text-foreground mb-3 leading-relaxed font-medium">
+                    {job.data.description}
+                  </p>
+                  {job.data.highlights && job.data.highlights.length > 0 && (
+                    <ul className="mb-4 list-outside list-disc space-y-1 pl-4">
+                      {job.data.highlights?.map((highlight) => (
+                        <li
+                          key={highlight}
+                          className="text-foreground font-medium"
+                        >
+                          {highlight}
+                        </li>
+                      ))}
+                    </ul>
                   )}
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {job.data.workSkills?.map(renderSkillPill)}
-                  </div>
+                  {/* Skills row: consistent with ProjectCard styling */}
+                  {job.data.workSkills && job.data.workSkills.length > 0 && (
+                    <div className="flex flex-wrap gap-2 border-t-2 border-[var(--color-brand-orange)] pt-3">
+                      {job.data.workSkills?.map(renderSkillPill)}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -155,8 +143,23 @@ export default function WorkHistory({
         </div>
       ))}
       {showFilteredPlaceholder && jobs.length === 0 && (
-        <div className="brutalist-border bg-background p-4">
-          <div className="text-foreground text-center py-8">
+        <div
+          className={clsx(
+            'relative transition-transform duration-300',
+            'bg-[var(--color-background)]',
+            'border-2 border-[var(--color-brand-orange)]',
+            'shadow-[4px_4px_0_0_var(--color-brand-red)]',
+            'p-6'
+          )}
+          style={
+            {
+              '--color-background': 'var(--color-brand-light)',
+              '--color-brand-orange': 'var(--color-brand-orange)',
+              '--color-brand-red': 'var(--color-brand-red)',
+            } as React.CSSProperties
+          }
+        >
+          <div className="text-foreground py-8 text-center">
             <p className="text-lg font-bold">
               No jobs match the selected filters
             </p>

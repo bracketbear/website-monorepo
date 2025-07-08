@@ -1,5 +1,6 @@
 {
   "title": "Nuxt 3",
   "description": "Nuxt 3 is a modern framework built on Vue.js that enables server-side rendering, static site generation, and more for building scalable web applications.",
-  "isFeatured": false
+  "isFeatured": false,
+  "category": "full-stack-frameworks"
 }

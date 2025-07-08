@@ -54,6 +54,8 @@
     "copy:utils:watch": "cpx \"src/utils/**/*\" dist/utils --watch"
   },
   "dependencies": {
+    "@fontsource/anton": "^5.2.6",
+    "@fontsource/fira-sans": "^5.2.6",
     "gsap": "^3.13.0",
     "pixi.js": "^8.10.2"
   },

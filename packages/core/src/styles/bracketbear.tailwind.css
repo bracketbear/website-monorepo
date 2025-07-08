@@ -1,23 +1,14 @@
+@import '@fontsource/anton';
+@import '@fontsource/fira-sans/400.css';
+@import '@fontsource/fira-sans/700.css';
 @import './forms.css';
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-/* Three-Layer System Utilities */
-@utility z-layer-background {
-  z-index: 0;
-}
-
-@utility z-layer-content {
-  z-index: 10;
-}
-
-@utility z-layer-foreground {
-  z-index: 20;
-}
 
 /* Theme Variables */
 @theme {
-  --default-font-family: 'Oswald', 'sans-serif';
+  --default-font-family: 'Fira Sans', 'sans-serif';
 
   /* Base Theme Colors */
   /* Brand Colors */
@@ -53,6 +44,55 @@
   );
 }
 
+/* Three-Layer System Utilities */
+@utility z-layer-background {
+  z-index: 0;
+}
+
+@utility z-layer-content {
+  z-index: 10;
+}
+
+@utility z-layer-foreground {
+  z-index: 20;
+}
+
+@utility font-heading {
+  font-family: 'Anton', 'sans-serif';
+}
+
+@utility heading {
+  @apply tracking-wide font-black font-heading halftone-text-shadow;
+}
+
+/* Halftone pattern text with double shadow for headings */
+@utility halftone-text-shadow {
+  --halftone-foreground-color: var(--color-brand-dark);
+  --halftone-middle-color: var(--color-brand-orange);
+  --halftone-background-size: 0.067em;
+  --halftone-layer-spacing: -0.0625em;
+  
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 8 8' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='4' cy='4' r='2' fill='%23000000' fill-opacity='0.7'/%3E%3C/svg%3E");
+  background-size: var(--halftone-background-size) var(--halftone-background-size);
+  background-repeat: repeat;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  margin: calc(var(--halftone-layer-spacing) * -2) 0 0 calc(var(--halftone-layer-spacing) * -2);
+  text-shadow:
+    calc(var(--halftone-layer-spacing) * 2) calc(var(--halftone-layer-spacing) * 2) 0 var(--halftone-foreground-color),
+    var(--halftone-layer-spacing) var(--halftone-layer-spacing) 0 var(--halftone-middle-color);
+}
+
+@utility halftone-text-shadow-middle-* {
+  --halftone-middle-color: --value(--color-*);
+}
+
+@utility halftone-text-shadow-foreground-* {
+  --halftone-foreground-color: --value(--color-*);
+}
+
+
 /* Dark Theme Overrides */
 :root[class~='dark'] {
   --color-primary: var(--color-brand-red);
@@ -62,20 +102,51 @@
   --color-dark: var(--color-brand-light);
 }
 
+/* TODO: We need this? */
+@utility comic-book-shadow {
+  box-shadow: 4px 4px 0 0 var(--color-shadow);
+}
+
 @layer components {
   /* Brutalist Utility Classes */
-  .brutalist-border {
+  .border-default {
     border: 2px solid var(--color-border);
     box-shadow: var(--shadow-md) var(--color-shadow);
   }
 
-  .brutalist-border:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: var(--shadow-lg) var(--color-shadow);
-  }
-
-  .brutalist-border-light {
+  .border-default-light {
     border: 1px solid var(--color-border);
     transition: border-color var(--transition-normal);
+  }
+
+  /* Halftone Background Classes */
+  .halftone-bg {
+    background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='2' fill='black' opacity='0.15'/%3E%3Ccircle cx='0' cy='0' r='2' fill='black' opacity='0.15'/%3E%3Ccircle cx='0' cy='24' r='2' fill='black' opacity='0.15'/%3E%3Ccircle cx='24' cy='0' r='2' fill='black' opacity='0.15'/%3E%3Ccircle cx='24' cy='24' r='2' fill='black' opacity='0.15'/%3E%3C/svg%3E");
+  }
+
+  .halftone-bg-dark {
+    background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='2' fill='white' opacity='0.15'/%3E%3Ccircle cx='0' cy='0' r='2' fill='white' opacity='0.15'/%3E%3Ccircle cx='0' cy='24' r='2' fill='white' opacity='0.15'/%3E%3Ccircle cx='24' cy='0' r='2' fill='white' opacity='0.15'/%3E%3Ccircle cx='24' cy='24' r='2' fill='white' opacity='0.15'/%3E%3C/svg%3E");
+  }
+
+  /* Comic Book Panel Styles */
+  .comic-panel {
+    @apply comic-book-shadow bg-background border-2 border-foreground p-6;
+    position: relative;
+  }
+
+  .comic-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='2' fill='black' opacity='0.05'/%3E%3Ccircle cx='0' cy='0' r='2' fill='black' opacity='0.05'/%3E%3Ccircle cx='0' cy='24' r='2' fill='black' opacity='0.05'/%3E%3Ccircle cx='24' cy='0' r='2' fill='black' opacity='0.05'/%3E%3Ccircle cx='24' cy='24' r='2' fill='black' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .comic-panel-dark::before {
+    background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='2' fill='white' opacity='0.05'/%3E%3Ccircle cx='0' cy='0' r='2' fill='white' opacity='0.05'/%3E%3Ccircle cx='0' cy='24' r='2' fill='white' opacity='0.05'/%3E%3Ccircle cx='24' cy='0' r='2' fill='white' opacity='0.05'/%3E%3Ccircle cx='24' cy='24' r='2' fill='white' opacity='0.05'/%3E%3C/svg%3E");
   }
 }

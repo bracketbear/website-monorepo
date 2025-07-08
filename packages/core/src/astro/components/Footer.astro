@@ -1,5 +1,5 @@
 ---
-import type { NavigationConfig } from "../../types/navigation.js";
+import type { NavigationConfig } from '../../types/navigation.js';
 
 interface Props {
   class?: string;
@@ -29,8 +29,8 @@ const thisYear = new Date().getFullYear();
             />
           </div>
         ) : (
-          <div class="text-3xl font-black uppercase tracking-wide">
-            <span class="text-background">{branding?.name || "Brand"}</span>
+          <div class="text-3xl font-black tracking-wide uppercase">
+            <span class="text-background">{branding?.name || 'Brand'}</span>
           </div>
         )
       }
@@ -62,7 +62,7 @@ const thisYear = new Date().getFullYear();
                 href={socialLinks.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="brutalist-border flex h-12 w-12 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#F5F5DC]"
+                class="border-default flex h-12 w-12 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#F5F5DC]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -81,7 +81,7 @@ const thisYear = new Date().getFullYear();
                 href={socialLinks.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="brutalist-border flex h-12 w-12 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#F5F5DC]"
+                class="border-default flex h-12 w-12 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#F5F5DC]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -105,10 +105,9 @@ const thisYear = new Date().getFullYear();
       >
         {
           copyrightText ||
-            `Copyright ©2018-${thisYear} ${branding?.name || "Brand"}. All rights reserved.`
+            `Copyright ©2018-${thisYear} ${branding?.name || 'Brand'}. All rights reserved.`
         }
       </div>
     </div>
   </div>
 </footer>
-

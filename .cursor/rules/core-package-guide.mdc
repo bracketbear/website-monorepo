@@ -168,12 +168,12 @@ The package provides a custom Tailwind configuration with:
 
 ### Utility Classes
 ```css
-.brutalist-border {
+.border-default {
   border: 2px solid var(--color-border);
   box-shadow: var(--shadow-md) var(--color-shadow);
 }
 
-.brutalist-border:hover {
+.border-default:hover {
   transform: translate(-2px, -2px);
   box-shadow: var(--shadow-lg) var(--color-shadow);
 }

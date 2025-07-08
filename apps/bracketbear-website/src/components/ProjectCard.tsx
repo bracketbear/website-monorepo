@@ -36,7 +36,7 @@ export default function ProjectCard({
 
   return (
     <a href={getProjectUrl(project.id)} className="block hover:no-underline">
-      <div className="brutalist-border bg-background p-6 transition-transform duration-300 hover:scale-[1.02]">
+      <div className="border-default bg-background p-6 transition-transform duration-300">
         <div className="flex h-full flex-col">
           <div className="flex-1">
             <h3 className="text-foreground mb-2 text-2xl font-black uppercase">
@@ -71,7 +71,7 @@ export default function ProjectCard({
           </div>
 
           {project.data.skills && project.data.skills.length > 0 && (
-            <div className="border-foreground mt-4 flex flex-wrap gap-2 border-t-2 pt-4">
+            <div className="border-foreground mt-4 flex flex-wrap gap-2 pt-4">
               {project.data.skills.map(renderSkillPill)}
             </div>
           )}

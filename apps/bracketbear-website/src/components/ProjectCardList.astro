@@ -38,7 +38,7 @@ const workProjectsByType = workProjects.reduce<
   {
     objectEntries(workProjectsByType).map(([type, projects]) => (
       <div>
-        <h2 class="brutalist-border bg-background text-foreground mb-8 inline-block p-4 text-2xl font-black uppercase">
+        <h2 class="border-default bg-background text-foreground mb-8 inline-block p-4 text-2xl font-black uppercase">
           {workProjectCatergoriesById[type].data.title}
         </h2>
         <div class="grid gap-8 md:grid-cols-2">

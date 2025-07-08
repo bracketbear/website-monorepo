@@ -1,5 +1,5 @@
 ---
-import type { Breadcrumb } from "../../types/breadcrumb";
+import type { Breadcrumb } from '../../types/breadcrumb';
 
 interface Props {
   breadcrumbs: Breadcrumb[];
@@ -20,12 +20,12 @@ const { breadcrumbs } = Astro.props;
                   {crumb.href ? (
                     <a
                       href={crumb.href}
-                      class="text-brand-yellow hover:text-brand-yellow/80 transition-colors"
+                      class="text-brand-yellow hover:text-brand-yellow/80 font-bold tracking-wide transition-colors"
                     >
                       {crumb.label}
                     </a>
                   ) : (
-                    <span class="text-brand-dark font-medium">
+                    <span class="text-brand-dark font-bold tracking-wide">
                       {crumb.label}
                     </span>
                   )}

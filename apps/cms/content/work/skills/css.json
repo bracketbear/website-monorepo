@@ -1,4 +1,5 @@
 {
   "title": "CSS",
-  "isFeatured": true
+  "isFeatured": true,
+  "category": "front-end"
 }

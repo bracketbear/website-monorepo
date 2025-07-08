@@ -1,12 +1,4 @@
 {
   "title": "Programming Languages",
-  "description": "Programming Languages",
-  "skills": [
-    "javascript",
-    "typescript",
-    "python",
-    "rust",
-    "php",
-    "c-plus-plus"
-  ]
+  "description": "Programming Languages"
 }

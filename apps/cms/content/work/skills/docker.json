@@ -1,4 +1,5 @@
 {
   "title": "Docker",
-  "description": "Docker is a tool designed to make it easier to create, deploy, and run applications by using containers."
+  "description": "Docker is a tool designed to make it easier to create, deploy, and run applications by using containers.",
+  "category": "tools"
 }

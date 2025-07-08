@@ -1,4 +1,5 @@
 {
   "title": "HTML",
-  "isFeatured": true
+  "isFeatured": true,
+  "category": "front-end"
 }

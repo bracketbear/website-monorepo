@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 import { clsx } from '@bracketbear/core';
-import { getProjectUrl } from '@bracketbear/core';
+import { getProjectUrl, SkillPill } from '@bracketbear/core';
 
 export interface ProjectCardProps {
   project: CollectionEntry<'workProject'> & { isHidden?: boolean };
@@ -20,17 +20,13 @@ export default function ProjectCard({
   const renderSkillPill = (skillId: string) => {
     const skill = skills.find((s) => s.id === skillId);
     return (
-      <span
+      <SkillPill
         key={skillId}
-        className={clsx(
-          'skill-pill',
-          selectedSkills.includes(skillId)
-            ? 'skill-pill-selected'
-            : 'skill-pill-default'
-        )}
+        variant={selectedSkills.includes(skillId) ? 'selected' : 'default'}
+        size="sm"
       >
         {skill?.data.title || skillId}
-      </span>
+      </SkillPill>
     );
   };
 
@@ -55,14 +51,39 @@ export default function ProjectCard({
     <a href={getProjectUrl(project.id)} className="block hover:no-underline">
       <div
         className={clsx(
-          'brutalist-border bg-background p-6 transition-transform duration-300',
-          project.isHidden ? 'opacity-50 grayscale' : 'hover:scale-[1.02]'
+          'transition-all duration-300 relative',
+          'bg-[var(--color-background)]',
+          'border-2 border-[var(--color-brand-orange)]',
+          'shadow-[4px_4px_0_0_var(--color-brand-red)]',
+          'p-6',
+          project.isHidden ? 'opacity-50 grayscale' : 'hover:scale-[1.02] hover:shadow-[6px_6px_0_0_var(--color-brand-red)]'
         )}
+        style={
+          {
+            '--color-background': 'var(--color-brand-light)',
+            '--color-brand-orange': 'var(--color-brand-orange)',
+            '--color-brand-red': 'var(--color-brand-red)',
+          } as React.CSSProperties
+        }
       >
+        {/* Angled project category tag */}
+        {project.data.category && (
+          <div className="absolute -top-3 -left-3 z-20">
+            <span
+              className="inline-block bg-black text-white font-black uppercase text-xs tracking-widest px-4 py-1 shadow-md"
+              style={{
+                clipPath: 'polygon(0 0, 100% 0, 95% 100%, 0% 100%)',
+                letterSpacing: '0.12em',
+              }}
+            >
+              {project.data.category}
+            </span>
+          </div>
+        )}
         <div className="flex flex-col h-full">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-foreground text-2xl font-black uppercase">
+            <div className="flex items-center gap-2 mb-3">
+              <h3 className="halftone-text-shadow-middle-brand-red halftone-text-shadow-foreground-brand-dark text-2xl font-black uppercase">
                 {project.data.title}
               </h3>
               {project.isHidden && hiddenMessage && (
@@ -74,17 +95,17 @@ export default function ProjectCard({
                 </span>
               )}
             </div>
-
-            {project.data.description && (
-              <p className="text-foreground mb-4">{project.data.description}</p>
+            {/* Blurb/summary integrated into card, not a separate box */}
+            {(project.data.summary || project.data.description) && (
+              <div className="text-lg text-[var(--color-brand-dark)] leading-relaxed font-medium mb-4">
+                {project.data.summary || project.data.description}
+              </div>
             )}
-
             {project.isHidden && hiddenMessage && (
               <p className="text-gray-500 text-sm mb-4 italic">
                 {hiddenMessage}
               </p>
             )}
-
             {project.data.challengesAndSolutions && isDefaultVariant && (
               <div className="mb-4">
                 <h4 className="text-foreground text-lg font-bold mb-2">
@@ -95,7 +116,6 @@ export default function ProjectCard({
                 </p>
               </div>
             )}
-
             {project.data.resultsAchieved && isDefaultVariant && (
               <div className="mb-4">
                 <h4 className="text-foreground text-lg font-bold mb-2">
@@ -107,9 +127,9 @@ export default function ProjectCard({
               </div>
             )}
           </div>
-
+          {/* Skills row: consistent with WorkHistory styling */}
           {project.data.skills && project.data.skills.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t-2 border-foreground">
+            <div className="flex flex-wrap gap-2 pt-3 border-t-2 border-[var(--color-brand-orange)]">
               {project.data.skills.map(renderSkillPill)}
             </div>
           )}

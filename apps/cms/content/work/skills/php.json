@@ -2,5 +2,5 @@
   "title": "PHP",
   "description": "PHP is a popular server-side scripting language for web development.",
   "isFeatured": false,
-  "categories": []
+  "category": "programming-languages"
 }

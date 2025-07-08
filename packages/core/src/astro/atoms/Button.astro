@@ -1,37 +1,41 @@
 ---
 interface Props {
-  type?: "button" | "submit" | "reset";
-  variant?: "primary" | "secondary" | "ghost";
-  size?: "sm" | "md" | "lg";
+  type?: 'button' | 'submit' | 'reset';
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
   class?: string;
   disabled?: boolean;
 }
 
 const {
-  type = "button",
-  variant = "primary",
-  size = "md",
+  type = 'button',
+  variant = 'primary',
+  size = 'md',
   class: className,
   disabled = false,
 } = Astro.props;
 
 const variantClasses = {
-  primary: "bg-foreground text-background",
-  secondary: "bg-background text-foreground border-foreground",
-  ghost: "bg-transparent text-foreground",
+  primary: 'bg-foreground text-background',
+  secondary: 'bg-background text-foreground border-foreground',
+  ghost: 'bg-transparent text-foreground',
 };
 
 const sizeClasses = {
-  sm: "px-4 py-2 text-sm",
-  md: "px-6 py-3 text-base",
-  lg: "px-8 py-4 text-xl",
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-6 py-3 text-base',
+  lg: 'px-8 py-4 text-xl',
 };
 ---
 
 <button
   type={type}
   class:list={[
-    "brutalist-border transform font-black uppercase transition-all hover:scale-105 hover:rotate-1 active:scale-95",
+    'border-default transform font-black uppercase transition-all',
+    // Disabled state overrides hover effects
+    disabled
+      ? 'cursor-not-allowed opacity-50 hover:scale-100 hover:rotate-0 active:scale-100'
+      : 'hover:scale-105 hover:rotate-1 active:scale-95',
     variantClasses[variant],
     sizeClasses[size],
     className,
