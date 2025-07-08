@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace=@bracketbear/core\" \"npm run dev --workspace=@bracketbear/cms\"  \"npm run dev --workspace=@bracketbear/bracketbear-website\" \"npm run dev --workspace=@bracketbear/portfolio\"",
     "build": "npm run build --workspace=@bracketbear/core --workspace=@bracketbear/bracketbear-website --workspace=@bracketbear/portfolio",
+    "preview:bracketbear": "npm run preview --workspace=@bracketbear/bracketbear-website",
+    "preview:portfolio": "npm run preview --workspace=@bracketbear/portfolio",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:check": "eslint . --max-warnings 0"
