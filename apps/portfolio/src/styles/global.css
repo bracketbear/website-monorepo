@@ -1,6 +1,4 @@
-@import 'tailwindcss';
 @import '@bracketbear/core/styles';
-@source '../../../../node_modules/@bracketbear/core/dist';
 
 @utility halftone-shadow {
   background-image: url("data:image/svg+xml,%3Csvg width='8' height='8' viewBox='0 0 8 8' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='4' cy='4' r='1' fill='black' opacity='0.3'/%3E%3C/svg%3E");
@@ -11,33 +9,4 @@
 @utility halftone-shadow-dark {
   @apply halftone-shadow;
   background-image: url("data:image/svg+xml,%3Csvg width='8' height='8' viewBox='0 0 8 8' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='4' cy='4' r='1' fill='white' opacity='0.3'/%3E%3C/svg%3E");
-}
-
-.custom-scrollbar-hide {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
-.custom-scrollbar-hide:hover,
-.custom-scrollbar-hide:focus,
-.custom-scrollbar-hide:active {
-  scrollbar-color: #888 #fff;
-}
-.custom-scrollbar-hide::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-  background: transparent;
-}
-.custom-scrollbar-hide:hover::-webkit-scrollbar,
-.custom-scrollbar-hide:focus::-webkit-scrollbar,
-.custom-scrollbar-hide:active::-webkit-scrollbar {
-  background: #fff;
-}
-.custom-scrollbar-hide::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 8px;
-}
-.custom-scrollbar-hide:hover::-webkit-scrollbar-thumb,
-.custom-scrollbar-hide:focus::-webkit-scrollbar-thumb,
-.custom-scrollbar-hide:active::-webkit-scrollbar-thumb {
-  background: #888;
 }

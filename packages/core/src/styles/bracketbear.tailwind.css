@@ -1,3 +1,4 @@
+@import 'tailwindcss';
 @import '@fontsource/anton';
 @import '@fontsource/fira-sans/400.css';
 @import '@fontsource/fira-sans/700.css';
@@ -22,7 +23,6 @@
   --color-brand-light: #efe6dd;
 
   /* Theme Tokens - Light Mode Defaults */
-  --color-dark: var(--color-brand-dark);
   --color-primary: var(--color-brand-orange);
   --color-secondary: var(--color-brand-red);
   --color-tertiary: var(--color-brand-green);

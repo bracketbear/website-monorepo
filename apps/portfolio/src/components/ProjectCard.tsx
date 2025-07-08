@@ -51,12 +51,14 @@ export default function ProjectCard({
     <a href={getProjectUrl(project.id)} className="block hover:no-underline">
       <div
         className={clsx(
-          'transition-all duration-300 relative',
+          'relative transition-all duration-300',
           'bg-[var(--color-background)]',
           'border-2 border-[var(--color-brand-orange)]',
           'shadow-[4px_4px_0_0_var(--color-brand-red)]',
           'p-6',
-          project.isHidden ? 'opacity-50 grayscale' : 'hover:scale-[1.02] hover:shadow-[6px_6px_0_0_var(--color-brand-red)]'
+          project.isHidden
+            ? 'opacity-50 grayscale'
+            : 'hover:scale-[1.02] hover:shadow-[6px_6px_0_0_var(--color-brand-red)]'
         )}
         style={
           {
@@ -70,7 +72,7 @@ export default function ProjectCard({
         {project.data.category && (
           <div className="absolute -top-3 -left-3 z-20">
             <span
-              className="inline-block bg-black text-white font-black uppercase text-xs tracking-widest px-4 py-1 shadow-md"
+              className="inline-block bg-black px-4 py-1 text-xs font-black tracking-widest text-white uppercase shadow-md"
               style={{
                 clipPath: 'polygon(0 0, 100% 0, 95% 100%, 0% 100%)',
                 letterSpacing: '0.12em',
@@ -80,15 +82,15 @@ export default function ProjectCard({
             </span>
           </div>
         )}
-        <div className="flex flex-col h-full">
+        <div className="flex h-full flex-col">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-3">
-              <h3 className="halftone-text-shadow-middle-brand-red halftone-text-shadow-foreground-brand-dark text-2xl font-black uppercase">
+            <div className="mb-3 flex items-center gap-2">
+              <h3 className="heading text-2xl uppercase">
                 {project.data.title}
               </h3>
               {project.isHidden && hiddenMessage && (
                 <span
-                  className="text-xs bg-gray-300 text-gray-600 px-2 py-1 font-bold uppercase"
+                  className="bg-gray-300 px-2 py-1 text-xs font-bold text-gray-600 uppercase"
                   title={hiddenMessage}
                 >
                   Filtered Out
@@ -97,18 +99,18 @@ export default function ProjectCard({
             </div>
             {/* Blurb/summary integrated into card, not a separate box */}
             {(project.data.summary || project.data.description) && (
-              <div className="text-lg text-[var(--color-brand-dark)] leading-relaxed font-medium mb-4">
+              <div className="mb-4 text-lg leading-relaxed font-medium text-[var(--color-brand-dark)]">
                 {project.data.summary || project.data.description}
               </div>
             )}
             {project.isHidden && hiddenMessage && (
-              <p className="text-gray-500 text-sm mb-4 italic">
+              <p className="mb-4 text-sm text-gray-500 italic">
                 {hiddenMessage}
               </p>
             )}
             {project.data.challengesAndSolutions && isDefaultVariant && (
               <div className="mb-4">
-                <h4 className="text-foreground text-lg font-bold mb-2">
+                <h4 className="text-foreground mb-2 text-lg font-bold">
                   Challenges & Solutions
                 </h4>
                 <p className="text-foreground">
@@ -118,7 +120,7 @@ export default function ProjectCard({
             )}
             {project.data.resultsAchieved && isDefaultVariant && (
               <div className="mb-4">
-                <h4 className="text-foreground text-lg font-bold mb-2">
+                <h4 className="text-foreground mb-2 text-lg font-bold">
                   Results
                 </h4>
                 <p className="text-foreground">
@@ -129,7 +131,7 @@ export default function ProjectCard({
           </div>
           {/* Skills row: consistent with WorkHistory styling */}
           {project.data.skills && project.data.skills.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-3 border-t-2 border-[var(--color-brand-orange)]">
+            <div className="flex flex-wrap gap-2 border-t-2 border-[var(--color-brand-orange)] pt-3">
               {project.data.skills.map(renderSkillPill)}
             </div>
           )}
