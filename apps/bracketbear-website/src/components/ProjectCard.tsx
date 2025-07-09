@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
-import { clsx } from '@bracketbear/core';
+import { clsx, SkillPill } from '@bracketbear/core';
 import { getProjectUrl } from '@bracketbear/core';
 
 export interface ProjectCardProps {
@@ -16,23 +16,6 @@ export default function ProjectCard({
   variant = 'default',
 }: ProjectCardProps) {
   const isDefaultVariant = variant === 'default';
-
-  const renderSkillPill = (skillId: string) => {
-    const skill = skills.find((s) => s.id === skillId);
-    return (
-      <span
-        key={skillId}
-        className={clsx(
-          'skill-pill',
-          selectedSkills.includes(skillId)
-            ? 'skill-pill-selected'
-            : 'skill-pill-default'
-        )}
-      >
-        {skill?.data.title || skillId}
-      </span>
-    );
-  };
 
   return (
     <a href={getProjectUrl(project.id)} className="block hover:no-underline">
@@ -72,7 +55,20 @@ export default function ProjectCard({
 
           {project.data.skills && project.data.skills.length > 0 && (
             <div className="border-foreground mt-4 flex flex-wrap gap-2 pt-4">
-              {project.data.skills.map(renderSkillPill)}
+              {project.data.skills.map((skillId) => {
+                return (
+                  <SkillPill
+                    key={skillId}
+                    variant={
+                      selectedSkills.includes(skillId) ? 'selected' : 'default'
+                    }
+                    size="sm"
+                  >
+                    {skills.find((s) => s.id === skillId)?.data.title ||
+                      skillId}
+                  </SkillPill>
+                );
+              })}
             </div>
           )}
         </div>

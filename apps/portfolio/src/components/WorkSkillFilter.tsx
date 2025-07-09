@@ -10,7 +10,6 @@ export interface WorkSkillFilterProps {
   jobs: CollectionEntry<'workJobs'>[];
   projects: CollectionEntry<'workProject'>[];
   companies: CollectionEntry<'workCompany'>[];
-  initialSkills: string;
 }
 
 const sectionHeaderClassName =
@@ -22,11 +21,8 @@ export default function WorkSkillFilter({
   jobs,
   projects,
   companies,
-  initialSkills,
 }: WorkSkillFilterProps) {
-  const [selectedSkills, setSelectedSkills] = useState<string[]>(
-    JSON.parse(initialSkills || '[]')
-  );
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const toggleSkill = (skillId: string) => {

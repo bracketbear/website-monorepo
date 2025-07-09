@@ -2,10 +2,6 @@
 @import '@bracketbear/core/styles';
 @source '../../../../node_modules/@bracketbear/core/dist';
 
-@theme {
-  --default-font-family: 'Oswald', 'sans-serif';
-}
-
 /* Utility Classes */
 @layer components {
   /* TODO: Skill Pill should be a component */
