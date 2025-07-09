@@ -1,7 +1,8 @@
 ---
-import { LayeredLayout, PointerFX } from "@bracketbear/core";
-import { navigationConfig } from "@/config/navigation";
-import "@/styles/global.css";
+import { LayeredLayout } from '@bracketbear/core';
+import { navigationConfig } from '@/config/navigation';
+import { makeTitle } from '@/config/page-meta';
+import '@/styles/global.css';
 
 interface Props {
   title?: string;
@@ -13,10 +14,12 @@ interface Props {
 
 const { title, hideContactForm, hideFooter, hideNavigation, breadcrumbs } =
   Astro.props;
+
+const pageTitle = makeTitle(title);
 ---
 
 <LayeredLayout
-  title={title}
+  title={pageTitle}
   hideContactForm={hideContactForm}
   hideFooter={hideFooter}
   hideNavigation={hideNavigation}

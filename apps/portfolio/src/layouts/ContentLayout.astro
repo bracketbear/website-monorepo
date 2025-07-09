@@ -1,0 +1,16 @@
+---
+import { navigationConfig } from '@/config/navigation';
+import {
+  ContentLayout as CoreContentLayout,
+  type LayoutProps,
+} from '@bracketbear/core/astro';
+import '@/styles/global.css';
+
+interface Props extends Omit<LayoutProps, 'navigation'> {}
+
+const props = Astro.props;
+---
+
+<CoreContentLayout navigation={navigationConfig} {...props}>
+  <slot />
+</CoreContentLayout>

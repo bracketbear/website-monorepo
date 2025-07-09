@@ -1,0 +1,23 @@
+---
+import type { LayoutProps } from '../../types/layout';
+import Layout from './Layout.astro';
+
+interface Props extends LayoutProps {}
+
+const { title, ...rest } = Astro.props;
+---
+
+<Layout title={title} {...rest}>
+  <div class="bg-primary/50 min-h-screen py-24">
+    <div class="container mx-auto px-6">
+      <div class="mb-12">
+        <h1
+          class="halftone-text-shadow-middle-brand-red halftone-text-shadow-foreground-brand-dark heading mb-8 text-9xl uppercase"
+        >
+          {title}
+        </h1>
+      </div>
+      <slot />
+    </div>
+  </div>
+</Layout>
