@@ -26,15 +26,5 @@ const pageTitle = makeTitle(title);
   navigation={navigationConfig}
   breadcrumbs={breadcrumbs}
 >
-  <div slot="background">
-    <!-- Background effects can go here -->
-  </div>
-
   <slot />
-
-  <div slot="foreground">
-    <!-- <PointerFX client:load /> -->
-  </div>
-
-  {breadcrumbs && <div slot="breadcrumbs">{breadcrumbs}</div>}
 </LayeredLayout>
