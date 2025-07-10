@@ -4,12 +4,10 @@
 @import '@fontsource/fira-sans/700.css';
 @import './forms.css';
 
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
-
-
 /* Theme Variables */
 @theme {
   --default-font-family: 'Fira Sans', 'sans-serif';
+  --heading-font-family: 'Anton', 'sans-serif';
 
   /* Base Theme Colors */
   /* Brand Colors */
@@ -44,21 +42,8 @@
   );
 }
 
-/* Three-Layer System Utilities */
-@utility z-layer-background {
-  z-index: 0;
-}
-
-@utility z-layer-content {
-  z-index: 10;
-}
-
-@utility z-layer-foreground {
-  z-index: 20;
-}
-
 @utility font-heading {
-  font-family: 'Anton', 'sans-serif';
+  font-family: var(--heading-font-family);
 }
 
 @utility heading {
@@ -68,6 +53,7 @@
 /* Halftone pattern text with double shadow for headings */
 @utility halftone-text-shadow {
   --halftone-foreground-color: var(--color-brand-dark);
+  /* Making the middle color transparent so you can add a color to the middle if you want. See halftone-text-shadow-middle-* below. */
   --halftone-middle-color: rgb(0, 0, 0, 0);
   --halftone-background-size: 0.067em;
   --halftone-layer-spacing: -0.0625em;
@@ -81,13 +67,16 @@
   margin: calc(var(--halftone-layer-spacing) * -2) 0 0 calc(var(--halftone-layer-spacing) * -2);
   text-shadow:
     calc(var(--halftone-layer-spacing) * 2) calc(var(--halftone-layer-spacing) * 2) 0 var(--halftone-foreground-color),
-    var(--halftone-layer-spacing) var(--halftone-layer-spacing) 0 var(--halftone-middle-color);
+    var(--halftone-layer-spacing) var(--halftone-layer-spacing) 0 var(--halftone-middle-color)
+  ;
 }
 
+/* A utility to set the middle color of the halftone text shadow. */
 @utility halftone-text-shadow-middle-* {
   --halftone-middle-color: --value(--color-*);
 }
 
+/* A utility to set the foreground color of the halftone text shadow. */
 @utility halftone-text-shadow-foreground-* {
   --halftone-foreground-color: --value(--color-*);
 }
@@ -143,6 +132,7 @@
   .link-underline {
     position: relative;
   }
+  
   .link-underline::after {
     content: '';
     position: absolute;
@@ -154,6 +144,7 @@
     transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
     z-index: 1;
   }
+  
   .link-underline:hover::after,
   .link-underline:focus-visible::after {
     width: 100%;
