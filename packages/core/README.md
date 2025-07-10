@@ -105,18 +105,6 @@ import { portfolioNavigation } from '@bracketbear/core/config';
 />
 ```
 
-### ThemeSwitch
-
-Standalone theme switching component:
-
-```astro
----
-import { ThemeSwitch } from '@bracketbear/core/astro';
----
-
-<ThemeSwitch />
-```
-
 ## Configuration
 
 ### Navigation Configuration

@@ -13,7 +13,7 @@ const thisYear = new Date().getFullYear();
 ---
 
 <footer
-  class="bg-foreground text-background relative z-10 py-24 transition-colors duration-300"
+  class="bg-brand-dark text-background relative z-10 py-40 transition-colors duration-300"
   class:list={[className]}
 >
   <div class="container mx-auto px-4">
@@ -29,7 +29,7 @@ const thisYear = new Date().getFullYear();
             />
           </div>
         ) : (
-          <div class="text-3xl font-black tracking-wide uppercase">
+          <div class="font-heading text-6xl font-black tracking-wide uppercase">
             <span class="text-background">{branding?.name || 'Brand'}</span>
           </div>
         )
@@ -37,13 +37,15 @@ const thisYear = new Date().getFullYear();
 
       <!-- Navigation -->
       <nav class="mt-16 w-full max-w-4xl">
-        <ul class="flex flex-wrap justify-center gap-x-16 gap-y-8">
+        <ul
+          class="flex flex-col flex-wrap items-center justify-center gap-x-16 gap-y-8 md:flex-row"
+        >
           {
             navItems.map((item) => (
               <li>
                 <a
                   href={item.href}
-                  class="text-background hover:text-background/80 text-xl font-black uppercase transition-colors duration-300"
+                  class="group text-background link-underline relative text-xl font-black uppercase transition-colors duration-300"
                 >
                   {item.name}
                 </a>

@@ -1,0 +1,73 @@
+# Link Underline Consistency Rule
+
+## Overview
+Always apply the `link-underline` utility class to non-button `<a>` elements to maintain consistent animated underline behavior throughout the project.
+
+## When to Apply
+- **Apply to**: All `<a>` elements that are navigation links, content links, or interactive text links
+- **Do NOT apply to**: Button elements, social media icons, or decorative links that shouldn't have underlines
+
+## Implementation
+```html
+<!-- ✅ Correct: Navigation and content links -->
+<a href="/about" class="link-underline">About Us</a>
+<a href="/contact" class="link-underline font-black uppercase">Contact</a>
+<a href="/blog" class="link-underline text-brand-red">Read More</a>
+
+<!-- ✅ Correct: Links with other hover effects -->
+<a href="/work" class="link-underline transition-all hover:translate-x-[-2px] hover:translate-y-[-2px]">
+  View Work
+</a>
+
+<!-- ❌ Don't apply to: Button-style elements -->
+<button class="btn-primary">Submit</button>
+
+<!-- ❌ Don't apply to: Social media icons -->
+<a href="https://linkedin.com" class="social-icon">
+  <svg>...</svg>
+</a>
+```
+
+## CSS Implementation
+The `link-underline` utility is defined in `packages/core/src/styles/bracketbear.tailwind.css`:
+
+```css
+@layer components {
+  .link-underline {
+    position: relative;
+  }
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.25em;
+    width: 0;
+    height: 0.2em;
+    background-color: currentColor;
+    transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+    z-index: 1;
+  }
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    width: 100%;
+  }
+}
+```
+
+## Guidelines
+1. **Always add `link-underline`** when creating new navigation or content links
+2. **Preserve existing styling** - the utility works alongside other classes
+3. **Use semantic judgment** - if it's a clickable text link, it should probably have the underline
+4. **Test on hover** - ensure the animation feels smooth and appropriate for the context
+
+## Examples by Context
+- **Navigation menus**: Always apply
+- **Footer links**: Always apply  
+- **Content links** (blog posts, articles): Always apply
+- **Call-to-action links**: Usually apply (unless they're button-styled)
+- **Social media links**: Usually don't apply (they're icon-based)
+- **Logo/brand links**: Usually don't apply (they're branding elements)
+description:
+globs:
+alwaysApply: false
+---
