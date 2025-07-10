@@ -1,6 +1,8 @@
 ---
 import type { Breadcrumb } from '../../types/breadcrumb';
 
+const SEPARATOR = '/' as const;
+
 interface Props {
   breadcrumbs: Breadcrumb[];
 }
@@ -20,6 +22,8 @@ const { breadcrumbs } = Astro.props;
                   {crumb.href ? (
                     <a
                       href={crumb.href}
+                      aria-label={crumb.label}
+                      title={crumb.label}
                       class="text-brand-yellow hover:text-brand-yellow/80 font-bold tracking-wide transition-colors"
                     >
                       {crumb.label}
@@ -31,7 +35,7 @@ const { breadcrumbs } = Astro.props;
                   )}
                 </li>
                 {idx < breadcrumbs.length - 1 && (
-                  <li class="text-brand-red">/</li>
+                  <li class="text-brand-red font-black">{SEPARATOR}</li>
                 )}
               </>
             ))}

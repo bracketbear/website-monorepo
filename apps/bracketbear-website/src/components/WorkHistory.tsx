@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
-import { clsx } from '@bracketbear/core';
+import { SkillPill } from '@bracketbear/core';
 
 interface WorkHistoryProps {
   jobs: CollectionEntry<'workJobs'>[];
@@ -56,22 +56,6 @@ export default function WorkHistory({
 }: WorkHistoryProps) {
   const groupedJobs = groupJobsByCompany(jobs, companies);
 
-  const renderSkillPill = (skillId: string) => {
-    return (
-      <span
-        key={skillId}
-        className={clsx(
-          'skill-pill',
-          selectedSkills.includes(skillId)
-            ? 'skill-pill-selected'
-            : 'skill-pill-default'
-        )}
-      >
-        {skills.find((s) => s.id === skillId)?.data.title || skillId}
-      </span>
-    );
-  };
-
   return (
     <div className="space-y-8">
       {groupedJobs.map((group) => (
@@ -94,7 +78,22 @@ export default function WorkHistory({
                 </div>
                 <p className="text-foreground mt-2">{job.data.description}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {job.data.workSkills?.map(renderSkillPill)}
+                  {job.data.workSkills?.map((skillId) => {
+                    return (
+                      <SkillPill
+                        key={skillId}
+                        variant={
+                          selectedSkills.includes(skillId)
+                            ? 'selected'
+                            : 'default'
+                        }
+                        size="sm"
+                      >
+                        {skills.find((s) => s.id === skillId)?.data.title ||
+                          skillId}
+                      </SkillPill>
+                    );
+                  })}
                 </div>
               </div>
             ))}

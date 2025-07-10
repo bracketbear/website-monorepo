@@ -1,13 +1,13 @@
 ---
-import type { LayoutProps, ThemeConfig } from "../../types/layout";
-import type { NavigationConfig } from "../../types/navigation";
-import { LAYERS } from "../../types/layers";
-import NavBar from "../components/NavBar.astro";
-import Footer from "../components/Footer.astro";
-import type { Breadcrumb } from "../../types/breadcrumb";
-import Breadcrumbs from "../components/Breadcrumbs.astro";
+import type { LayoutProps, ThemeConfig } from '../../types/layout';
+import type { NavigationConfig } from '../../types/navigation';
+import { LAYERS } from '../../types/layers';
+import NavBar from '../components/NavBar.astro';
+import Footer from '../components/Footer.astro';
+import type { Breadcrumb } from '../../types/breadcrumb';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 
-interface Props extends LayoutProps {
+export interface Props extends LayoutProps {
   navigation: NavigationConfig;
   theme?: ThemeConfig;
   contactForm?: any;
@@ -26,8 +26,8 @@ const {
 } = Astro.props;
 
 const themeValue =
-  Astro.cookies.get("theme")?.value ?? theme.defaultTheme ?? "system";
-const isDark = themeValue === "dark";
+  Astro.cookies.get('theme')?.value ?? theme.defaultTheme ?? 'system';
+const isDark = themeValue === 'dark';
 ---
 
 <!doctype html>
@@ -42,21 +42,21 @@ const isDark = themeValue === "dark";
       // Theme initialization
       function initializeTheme() {
         const getThemePreference = () => {
-          if (localStorage.theme === "dark") return "dark";
-          if (localStorage.theme === "light") return "light";
-          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-            return "dark";
+          if (localStorage.theme === 'dark') return 'dark';
+          if (localStorage.theme === 'light') return 'light';
+          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
           }
-          return "light";
+          return 'light';
         };
         const theme = getThemePreference();
         document.documentElement.dataset.theme = theme;
         if (!localStorage.theme) {
-          const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-          mediaQuery.addEventListener("change", (e) => {
+          const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+          mediaQuery.addEventListener('change', (e) => {
             document.documentElement.dataset.theme = e.matches
-              ? "dark"
-              : "light";
+              ? 'dark'
+              : 'light';
           });
         }
       }

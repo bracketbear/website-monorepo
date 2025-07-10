@@ -6404,7 +6404,7 @@ Sprites inherit `scale` from `Container`, allowing for percentage-based resizing
 sprite.scale.set(2); // Double the size
 ```
 
-Sprites also have `width` and `height` properties that act as _convenience setters_ for `scale`, based on the texture’s dimensions:
+Sprites also have `width` and `height` properties that act as _convenience setters_ for `scale`, based on the texture's dimensions:
 
 ```ts
 sprite.width = 100; // Automatically updates scale.x
@@ -6531,7 +6531,7 @@ Bitmap fonts are limited by texture size. CJK or emoji-rich sets may require too
 
 # Text (Canvas)
 
-The `Text` class in PixiJS allows you to render styled, dynamic strings as display objects in your scene. Under the hood, PixiJS rasterizes the text using the browser’s canvas text API, then converts that into a texture. This makes `Text` objects behave like sprites: they can be moved, rotated, scaled, masked, and rendered efficiently.
+The `Text` class in PixiJS allows you to render styled, dynamic strings as display objects in your scene. Under the hood, PixiJS rasterizes the text using the browser's canvas text API, then converts that into a texture. This makes `Text` objects behave like sprites: they can be moved, rotated, scaled, masked, and rendered efficiently.
 
 ```ts
 import { Text, TextStyle, Assets } from 'pixi.js';
@@ -6727,7 +6727,7 @@ Text is essential in games and applications, and PixiJS provides three different
 - **`BitmapText`**: Ultra-fast, GPU-optimized bitmap fonts
 - **`HTMLText`**: Richly formatted HTML inside the Pixi scene
 
-Each approach has tradeoffs in fidelity, speed, and flexibility. Let’s look at when and how to use each one.
+Each approach has tradeoffs in fidelity, speed, and flexibility. Let's look at when and how to use each one.
 
 ## `Text`: Rich Dynamic Text with Styles
 
@@ -7029,7 +7029,7 @@ You can sponsor PixiJS through [GitHub Sponsors](https://github.com/sponsors/pix
 
 ## Sponsoring PixiJS as a Business
 
-Supporting PixiJS isn’t just good for open source—it’s good business. Whether you're building games, creative tools, or data visualizations, sponsoring PixiJS gives you:
+Supporting PixiJS isn't just good for open source—it's good business. Whether you're building games, creative tools, or data visualizations, sponsoring PixiJS gives you:
 
 - **Visibility and brand recognition** across our website, documentation, showcase, and release posts.
 - **Direct investment in the tools you rely on**, helping ensure continued updates and a healthy, well-maintained codebase.
@@ -7043,7 +7043,7 @@ If your product or service depends on PixiJS, sponsoring helps ensure its long-t
 
 ## Sponsoring PixiJS as an Individual
 
-If you’ve enjoyed using PixiJS in your personal projects, consider donating as a way to give back. Even small contributions help and are a meaningful sign of support!
+If you've enjoyed using PixiJS in your personal projects, consider donating as a way to give back. Even small contributions help and are a meaningful sign of support!
 
 Even better, encourage your employer to become a business sponsor. This has a far greater impact and helps ensure PixiJS continues to grow in ways that benefit everyone.
 

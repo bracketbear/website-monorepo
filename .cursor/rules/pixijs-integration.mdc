@@ -62,6 +62,7 @@ window.addEventListener('mousemove', (e) => {
 2. **Wrong coordinates**: Use PixiJS events instead of window events
 3. **Memory leaks**: Implement proper cleanup in destroy methods
 4. **Performance issues**: Limit particle count and use object pooling
+5. **Vite HMR crashes**: WebGL contexts must be properly cleaned up on hot reloads
 
 ## Container Setup Pattern
 ```typescript
@@ -93,6 +94,29 @@ class MyEffect {
   }
 }
 ```
+
+## Vite HMR Fix for WebGL Contexts
+**CRITICAL**: PixiJS WebGL contexts don't play nicely with Vite hot module replacement. Always include this fix in React components that use PixiJS:
+
+```typescript
+// Vite HMR fix - prevent crashes during hot reloads
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    // Clean up any remaining PixiJS instances
+    const canvases = document.querySelectorAll('canvas');
+    canvases.forEach((canvas) => {
+      if (canvas.getContext('webgl')) {
+        const gl = canvas.getContext('webgl');
+        if (gl) {
+          gl.getExtension('WEBGL_lose_context')?.loseContext();
+        }
+      }
+    });
+  });
+}
+```
+
+**Why this is needed**: Without this fix, Vite HMR will cause browser tab crashes because WebGL contexts aren't properly released when components are hot-reloaded. The `WEBGL_lose_context` extension forces the GPU to release the context, preventing crashes.
 
 ## Inverse Blend Usage
 ```typescript
