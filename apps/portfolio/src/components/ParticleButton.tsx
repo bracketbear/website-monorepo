@@ -9,6 +9,8 @@ interface ParticleButtonProps {
   particleCount?: number;
   particleSize?: number;
   particleSpeed?: number;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
 }
 
 interface Particle {
@@ -33,8 +35,6 @@ class ButtonParticleBackground {
   private emissionRate: number = 2;
   private animationId: number | null = null;
   private isDestroyed: boolean = false;
-  private width: number = 0;
-  private height: number = 0;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -47,8 +47,6 @@ class ButtonParticleBackground {
     this.particleCount = options.particleCount;
     this.particleSize = options.particleSize;
     this.particleSpeed = options.particleSpeed;
-    this.width = canvas.width;
-    this.height = canvas.height;
 
     this.initPixi(canvas);
   }
@@ -82,8 +80,8 @@ class ButtonParticleBackground {
     // Brand colors: dark (#111) and brand red (#bb4430)
     const colors = [0x111111, 0xbb4430];
     return {
-      x: Math.random() * this.width,
-      y: Math.random() * this.height,
+      x: Math.random() * (this.app?.screen.width || 300),
+      y: Math.random() * (this.app?.screen.height || 60),
       vx: (Math.random() - 0.5) * this.particleSpeed,
       vy: (Math.random() - 0.5) * this.particleSpeed,
       life: 0,
@@ -118,11 +116,11 @@ class ButtonParticleBackground {
       particle.y += particle.vy;
       particle.life++;
 
-      // Wrap around edges using stored dimensions
-      if (particle.x < 0) particle.x = this.width;
-      if (particle.x > this.width) particle.x = 0;
-      if (particle.y < 0) particle.y = this.height;
-      if (particle.y > this.height) particle.y = 0;
+      // Wrap around edges
+      if (particle.x < 0) particle.x = this.app!.screen.width;
+      if (particle.x > this.app!.screen.width) particle.x = 0;
+      if (particle.y < 0) particle.y = this.app!.screen.height;
+      if (particle.y > this.app!.screen.height) particle.y = 0;
 
       // Remove dead particles
       if (particle.life >= particle.maxLife) {
@@ -153,8 +151,6 @@ class ButtonParticleBackground {
   };
 
   resize(width: number, height: number): void {
-    this.width = width;
-    this.height = height;
     if (this.app && this.app.renderer && !this.isDestroyed) {
       this.app.renderer.resize(width, height);
     }
@@ -193,6 +189,8 @@ export const ParticleButton = forwardRef<
       particleCount = 50,
       particleSize = 6,
       particleSpeed = 2,
+      type = 'button',
+      disabled = false,
     },
     ref
   ) => {
@@ -273,6 +271,8 @@ export const ParticleButton = forwardRef<
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={onClick}
+        type={type}
+        disabled={disabled}
       >
         <canvas
           ref={canvasRef}

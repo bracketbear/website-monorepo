@@ -1,18 +1,19 @@
 ---
-import type { LayoutProps } from '../../types/layout';
-import Layout from './Layout.astro';
+import LayeredLayout, {
+  Props as LayeredLayoutProps,
+} from './LayeredLayout.astro';
 
-interface Props extends LayoutProps {}
+interface Props extends LayeredLayoutProps {}
 
 const { title, ...rest } = Astro.props;
 ---
 
-<Layout title={title} {...rest}>
+<LayeredLayout title={title} {...rest}>
   <div class="bg-primary/50 min-h-screen py-24">
     <div class="container mx-auto px-6">
       <div class="mb-12">
         <h1
-          class="halftone-text-shadow-middle-brand-red halftone-text-shadow-foreground-brand-dark heading mb-8 text-9xl uppercase"
+          class="halftone-text-shadow-middle-brand-red halftone-text-shadow-foreground-brand-dark heading mb-8 -rotate-1 text-9xl uppercase"
         >
           {title}
         </h1>
@@ -20,4 +21,4 @@ const { title, ...rest } = Astro.props;
       <slot />
     </div>
   </div>
-</Layout>
+</LayeredLayout>
