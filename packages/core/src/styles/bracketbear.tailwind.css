@@ -110,13 +110,7 @@
 @layer components {
   /* Brutalist Utility Classes */
   .border-default {
-    border: 2px solid var(--color-border);
-    box-shadow: var(--shadow-md) var(--color-shadow);
-  }
-
-  .border-default-light {
-    border: 1px solid var(--color-border);
-    transition: border-color var(--transition-normal);
+    @apply border-brand-dark border-2 shadow-md;
   }
 
   /* Halftone Background Classes */
@@ -144,9 +138,5 @@
     background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='2' fill='black' opacity='0.05'/%3E%3Ccircle cx='0' cy='0' r='2' fill='black' opacity='0.05'/%3E%3Ccircle cx='0' cy='24' r='2' fill='black' opacity='0.05'/%3E%3Ccircle cx='24' cy='0' r='2' fill='black' opacity='0.05'/%3E%3Ccircle cx='24' cy='24' r='2' fill='black' opacity='0.05'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: -1;
-  }
-
-  .comic-panel-dark::before {
-    background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='2' fill='white' opacity='0.05'/%3E%3Ccircle cx='0' cy='0' r='2' fill='white' opacity='0.05'/%3E%3Ccircle cx='0' cy='24' r='2' fill='white' opacity='0.05'/%3E%3Ccircle cx='24' cy='0' r='2' fill='white' opacity='0.05'/%3E%3Ccircle cx='24' cy='24' r='2' fill='white' opacity='0.05'/%3E%3C/svg%3E");
   }
 }
