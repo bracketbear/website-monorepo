@@ -4,7 +4,7 @@
   "duration": "Three months",
   "description": "Worked on the development of a custom CMS for Stoller Family Estates. The CMS stored data for the winery that was used by our front-end OpenGL applications to enhance the customer experience. Two front-end apps consumed the data: a \"Tasting Table\" app that provided customers with information about the wine, a 3D map of the winery, newsletter signup, and wine ordering capabilities, and a \"Barback\" app that displayed images of the estate, upcoming events, and real-time weather and live feeds.",
   "challengesAndSolutions": "Striking the balance between making the CMS robust enough to handle a variety of data types and making it intuitive enough for content administrators to use was difficult. Solution: We successfully achieved this by using a user-centric design approach, prioritizing ease of use without compromising on the versatility of the CMS.",
-  "resultsAchieved": "The project's success was underscored by the fact that Stoller Family Estates was named Oregon’s Most Admired Winery multiple times and was listed in the 10 Best Tasting Rooms by USA Today 10 Best Reader’s Choice poll multiple times. Thus, we got to see the tables highlighted in articles and news real. It was a first project at Downstream!",
+  "resultsAchieved": "The project's success was underscored by the fact that Stoller Family Estates was named Oregon's Most Admired Winery multiple times and was listed in the 10 Best Tasting Rooms by USA Today 10 Best Reader's Choice poll multiple times. Thus, we got to see the tables highlighted in articles and news real. It was a first project at Downstream!",
   "mediaDescription": "Photo of the Stoller Winery Tasting Room",
   "isFeatured": false,
   "category": "experiential-engineering",
