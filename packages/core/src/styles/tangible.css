@@ -1,0 +1,93 @@
+/* Tangible Design System - Layered 3D Effects */
+
+/* 
+  DEPTH HIERARCHY STANDARDS:
+  
+  The depth values follow a consistent scale to maintain visual hierarchy:
+  
+  0rem      - Text, inline elements (no depth)
+  0.125rem  - Pills, badges, small interactive elements
+  0.25rem   - Buttons, form controls
+  0.5rem    - Cards, sections, content containers
+  0.75rem   - Modals, dropdowns, floating content
+  1rem      - Tooltips, highest priority content
+  
+  This ensures users can quickly understand:
+  - What's clickable vs. what's content
+  - The importance/priority of different elements
+  - Consistent interaction patterns
+*/
+
+/* Core tangible utility - subtler by default */
+@utility tangible {
+  --tangible-shadow-depth: 0.25rem;
+  --tangible-inset-depth: 0.125rem;
+  --tangible-highlight-alpha: 10%;
+  --tangible-highlight-color: --alpha(var(--color-brand-light) / var(--tangible-highlight-alpha));
+  --tangible-shadow-color: --alpha(var(--color-brand-dark) / 12%);
+  --tangible-inset-color: --alpha(var(--color-brand-dark) / 10%);
+  box-shadow:
+    /* Box shadow */
+    0.15rem 0.15rem 0.5rem 0.12rem var(--tangible-shadow-color),
+    /* Inset shadow */
+    inset calc(var(--tangible-inset-depth) * -1) calc(var(--tangible-inset-depth) * -1) calc(var(--tangible-inset-depth) * 2) 0 var(--tangible-inset-color),
+    /* Highlight shadow */
+    inset var(--tangible-inset-depth) var(--tangible-inset-depth) 0.5rem 0 var(--tangible-highlight-color);
+}
+
+/* Depth variants - using standardized depth scale */
+@utility tangible-elevated-* {
+  --tangible-shadow-depth: --value(--text-*);
+  --tangible-inset-depth: calc(--value(--text-*) * 4);
+}
+
+/* Specific depth presets for different UI elements - following depth hierarchy */
+@utility tangible-pill {
+  --tangible-shadow-depth: 0.13rem;
+  --tangible-inset-depth: 0.07rem;
+}
+
+@utility tangible-button {
+  --tangible-shadow-depth: 0.25rem;
+  --tangible-inset-depth: 0.125rem;
+}
+
+@utility tangible-card {
+  --tangible-shadow-depth: 0.5rem;
+  --tangible-inset-depth: 0;
+}
+
+@utility tangible-modal {
+  --tangible-shadow-depth: 0.75rem;
+  --tangible-inset-depth: 0.375rem;
+}
+
+@utility tangible-tooltip {
+  --tangible-shadow-depth: 1rem;
+  --tangible-inset-depth: 0.5rem;
+}
+
+/* Interactive states */
+@utility tangible-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    --tangible-shadow-depth: calc(var(--tangible-shadow-depth) + 0.125rem);
+    transform: translateY(-0.125rem);
+  }
+}
+
+@utility tangible-pressed {
+  --tangible-shadow-depth: 0.125rem;
+  --tangible-inset-depth: calc(var(--tangible-inset-depth) * 1.5);
+  transform: translateY(0.125rem);
+}
+
+/* Alternative styles */
+@utility tangible-flat {
+  --tangible-shadow-depth: 0;
+  --tangible-inset-depth: 0.125rem;
+  box-shadow: 
+    inset calc(var(--tangible-inset-depth) * -1) calc(var(--tangible-inset-depth) * -1) calc(var(--tangible-inset-depth) * 4) 0 var(--tangible-inset-color),
+    inset var(--tangible-inset-depth) var(--tangible-inset-depth) calc(var(--tangible-inset-depth) / 4) 0 var(--tangible-highlight-color);
+}

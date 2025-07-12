@@ -1,0 +1,4 @@
+@utility inset-shadow-default-* {
+  --inset-shadow-color: --alpha(var(--color-brand-orange) / 25%);
+  box-shadow: inset -0.5rem -0.5rem --value(--text-*) 0 var(--inset-shadow-color);
+}

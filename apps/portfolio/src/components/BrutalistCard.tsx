@@ -14,16 +14,16 @@ export const BrutalistCard: React.FC<BrutalistCardProps> = ({
   hoverEffect = false, // Changed default to false
 }) => {
   const baseClasses =
-    'border-2 border-[#111] p-6 shadow-[3px_3px_0_#111] transition-all duration-200';
+    'border-2 border-brand-dark p-6 shadow-[3px_3px_0_var(--color-brand-dark)] transition-all duration-200';
 
   const variantClasses = {
-    default: 'bg-[#fdf0d5]',
-    gradient: 'bg-gradient-to-br from-[#fdf0d5] to-[#ffe8b3]',
-    dark: 'bg-[#111] text-[#fdf0d5]',
+    default: 'bg-brand-light',
+    gradient: 'bg-gradient-to-br from-brand-light to-brand-yellow',
+    dark: 'bg-brand-dark text-brand-light',
   };
 
   const hoverClasses = hoverEffect
-    ? 'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_#111]'
+    ? 'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_var(--color-brand-dark)]'
     : '';
 
   return (

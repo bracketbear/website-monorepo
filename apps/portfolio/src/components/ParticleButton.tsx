@@ -265,7 +265,7 @@ export const ParticleButton = forwardRef<
       <button
         ref={buttonRef}
         className={clsx(
-          'font-heading bg-dark relative z-10 overflow-hidden border-2 border-[#111] bg-gradient-to-r from-[#ff6b35] to-[#ff8c42] font-bold text-white uppercase shadow-[3px_3px_0_#111] transition-all duration-200 text-shadow-lg not-[disabled]:cursor-pointer hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-gradient-to-l hover:shadow-[1px_1px_0_#111]',
+          'font-heading bg-dark relative z-10 overflow-hidden border-2 border-brand-dark bg-gradient-to-r from-brand-red to-brand-orange font-bold text-white uppercase shadow-[3px_3px_0_var(--color-brand-dark)] transition-all duration-200 text-shadow-lg not-[disabled]:cursor-pointer hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-gradient-to-l hover:shadow-[1px_1px_0_var(--color-brand-dark)]',
           className
         )}
         onMouseEnter={handleMouseEnter}

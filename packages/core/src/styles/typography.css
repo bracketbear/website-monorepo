@@ -1,0 +1,8 @@
+@utility font-heading {
+  --heading-font-family: 'Oswald', 'sans-serif';
+  font-family: var(--heading-font-family);
+}
+
+@utility heading {
+  @apply tracking-tighter font-bold font-heading;
+}

@@ -1,0 +1,108 @@
+---
+import { getCollection } from 'astro:content';
+import { getBreadcrumbs } from '@/config/breadcrumbs';
+import ContentLayout from '@/layouts/ContentLayout.astro';
+import { getProjectUrl } from '@bracketbear/core';
+
+const workProjects = await getCollection('workProject');
+const workSkills = await getCollection('workSkills');
+const workProjectCategories = await getCollection('workProjectCategory');
+const breadcrumbs = getBreadcrumbs({
+  label: 'Projects',
+  href: '/projects',
+});
+
+// Group projects by category
+const projectsByCategory = workProjectCategories
+  .map((category) => {
+    const categoryProjects = workProjects.filter(
+      (project) => project.data.category === category.id
+    );
+
+    return {
+      category,
+      projects: categoryProjects,
+    };
+  })
+  .filter((group) => group.projects.length > 0);
+---
+
+<ContentLayout title="Projects" breadcrumbs={breadcrumbs}>
+  <div class="styled-section mb-8">
+    <p class="text-foreground text-xl leading-relaxed font-medium">
+      Here are the projects I've worked on, organized by category. Each project
+      represents a unique challenge and solution that showcases different
+      aspects of my skills and experience.
+    </p>
+  </div>
+
+  <div class="space-y-16">
+    {
+      projectsByCategory.map(({ category, projects }) => (
+        <section>
+          <div class="mb-8">
+            <h2 class="font-heading text-brand-red text-4xl font-black tracking-tight uppercase">
+              {category.data.title}
+            </h2>
+          </div>
+
+          <div class="grid gap-8 lg:grid-cols-2">
+            {projects.map((project) => {
+              const projectSkills = workSkills.filter((skill) =>
+                (project.data.skills ?? []).includes(skill.id)
+              );
+
+              return (
+                <a
+                  href={getProjectUrl(project.id)}
+                  class="block hover:no-underline"
+                >
+                  <div class="card">
+                    {/* Project category and featured badges */}
+                    <div class="mb-4 flex items-center gap-4">
+                      {project.data.category && (
+                        <span class="pill pill-category">
+                          {project.data.category}
+                        </span>
+                      )}
+                      {project.data.isFeatured && (
+                        <span class="pill pill-featured">Featured</span>
+                      )}
+                    </div>
+
+                    <div class="flex h-full flex-col">
+                      <div class="flex-1">
+                        <h3 class="font-heading mb-3 text-2xl font-black tracking-tight uppercase">
+                          {project.data.title}
+                        </h3>
+
+                        {/* Project summary */}
+                        {(project.data.summary || project.data.description) && (
+                          <div class="text-foreground mb-4 text-lg leading-relaxed font-medium">
+                            {project.data.summary || project.data.description}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Skills row */}
+                      {project.data.skills &&
+                        project.data.skills.length > 0 && (
+                          <div class="border-brand-dark flex flex-wrap gap-2 border-t-2 pt-3">
+                            {projectSkills.map((skill) => (
+                              <span class="pill pill-skill">
+                                {skill.data.title}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</ContentLayout>

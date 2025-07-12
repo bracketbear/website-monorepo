@@ -1,0 +1,3 @@
+@utility border-default {
+  @apply border-brand-dark border-2 shadow-brand-dark/20;
+}

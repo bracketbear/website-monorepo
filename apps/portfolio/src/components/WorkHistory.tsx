@@ -1,10 +1,11 @@
-import { SkillPill } from '@bracketbear/core';
+import { getProjectUrl } from '@bracketbear/core';
 import type { CollectionEntry } from 'astro:content';
 import clsx from 'clsx';
 
 export interface WorkHistoryProps {
   jobs: (CollectionEntry<'workJobs'> & { isHidden?: boolean })[];
   companies: CollectionEntry<'workCompany'>[];
+  projects: CollectionEntry<'workProject'>[];
   showFilteredPlaceholder?: boolean;
   selectedSkills?: string[];
   skills: CollectionEntry<'workSkills'>[];
@@ -58,6 +59,7 @@ function formatDate(date: Date): string {
 export default function WorkHistory({
   jobs,
   companies,
+  projects,
   showFilteredPlaceholder = false,
   selectedSkills = [],
   skills,
@@ -118,25 +120,50 @@ export default function WorkHistory({
                       ))}
                     </ul>
                   )}
-                  {/* Skills row: consistent with ProjectCard styling */}
+                  {/* Skills row */}
                   {job.data.workSkills && job.data.workSkills.length > 0 && (
-                    <div className="flex flex-wrap gap-2 border-t-2 border-[var(--color-brand-orange)] pt-3">
-                      {job.data.workSkills?.map((skillId) => (
-                        <SkillPill
-                          key={skillId}
-                          variant={
-                            selectedSkills.includes(skillId)
-                              ? 'selected'
-                              : 'default'
-                          }
-                          size="sm"
-                        >
-                          {skills.find((s) => s.id === skillId)?.data.title ||
-                            skillId}
-                        </SkillPill>
-                      ))}
+                    <div className="flex flex-wrap gap-2 border-t-2 border-[var(--color-brand-dark)] pt-3">
+                      {job.data.workSkills?.map((skillId) => {
+                        const isSelected = selectedSkills.includes(skillId);
+                        return (
+                          <span
+                            key={skillId}
+                            className={`pill pill-skill pill-hover${isSelected ? ' pill-selected' : ''}`}
+                          >
+                            {skills.find((s) => s.id === skillId)?.data.title || skillId}
+                          </span>
+                        );
+                      })}
                     </div>
                   )}
+                  
+                  {/* Projects section */}
+                  {(() => {
+                    const jobProjects = projects.filter(
+                      (project) => project.data.job === job.id
+                    );
+                    
+                    if (jobProjects.length === 0) return null;
+                    
+                    return (
+                      <div className="border-t-2 border-[var(--color-brand-dark)] pt-3 mt-3">
+                        <h5 className="font-heading text-sm font-black tracking-wide uppercase text-foreground/80 mb-2">
+                          Projects
+                        </h5>
+                        <div className="flex flex-wrap gap-2">
+                          {jobProjects.map((project) => (
+                            <a
+                              key={project.id}
+                              href={getProjectUrl(project.id)}
+                              className="pill pill-brand-orange pill-hover"
+                            >
+                              {project.data.title}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               );
             })}

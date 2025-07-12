@@ -1,0 +1,3 @@
+@utility styled-section {
+  @apply p-8 card;
+}

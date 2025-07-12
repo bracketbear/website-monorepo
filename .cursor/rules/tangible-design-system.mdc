@@ -1,0 +1,82 @@
+# Tangible Design System & Style-First Approach
+
+## Style-First Mindset
+
+This project follows a **style-first approach** where we:
+- Create reusable CSS utilities in dedicated stylesheets
+- Use `@apply` to compose existing utilities when possible
+- Avoid inline Tailwind classes for complex patterns
+- Build utilities that work across both Astro and React components
+- Use CSS variables that integrate with Tailwind's color system
+
+## Tangible Design System
+
+The tangible design system creates 3D, tactile effects using layered shadows and borders. All utilities are defined in [packages/core/src/styles/tangible.css](mdc:packages/core/src/styles/tangible.css).
+
+### Base Utility
+- `tangible` - Base 3D effect with customizable depth and colors
+
+### Element-Specific Utilities
+- `tangible-pill` - Small interactive elements (0.125rem depth)
+- `tangible-button` - Buttons and form controls (0.25rem depth)
+- `tangible-section` - Content areas (0.5rem depth)
+- `tangible-card` - Content containers (0.5rem depth)
+- `tangible-modal` - Floating content (0.75rem depth)
+- `tangible-tooltip` - Highest priority content (1rem depth)
+
+### Color Variants
+The tangible system no longer includes color-specific utilities. Instead, use the base `tangible` utility with element-specific depth utilities and apply colors through other means (background colors, borders, etc.).
+
+### Depth Variants
+- `tangible-elevated-*` - Uses text size values for dynamic depth scaling
+- Element-specific utilities automatically set appropriate depths
+
+### Interactive States
+- `tangible-hover` - Adds hover animation with depth increase
+- `tangible-pressed` - Pressed state effect
+
+## Usage Guidelines
+
+### When to Use Tangible
+- Interactive elements (buttons, pills, form controls)
+- Content containers that need visual separation
+- Elements that should feel "clickable" or "tactile"
+
+### When NOT to Use Tangible
+- Text content (no depth needed)
+- Background elements
+- Elements that should feel "flat" or "subtle"
+
+### Composing with @apply
+```css
+@utility my-custom-component {
+  @apply tangible tangible-button tangible-hover;
+}
+```
+
+### Depth Hierarchy
+Always consider visual hierarchy:
+- Higher depth = higher priority/importance
+- Maintain consistent depth within similar element types
+- Don't mix depths randomly - follow the established scale
+
+## Integration with Existing Styles
+
+The tangible system integrates with:
+- [packages/core/src/styles/bracketbear.tailwind.css](mdc:packages/core/src/styles/bracketbear.tailwind.css) - Main stylesheet
+- [packages/core/src/styles/section.css](mdc:packages/core/src/styles/section.css) - Section utilities
+- [packages/core/src/styles/box-shadow.css](mdc:packages/core/src/styles/box-shadow.css) - Shadow utilities
+- [packages/core/src/styles/border.css](mdc:packages/core/src/styles/border.css) - Border utilities
+
+## Brand Colors Integration
+
+All tangible utilities use CSS variables that integrate with the brand color system:
+- `--color-brand-dark`, `--color-brand-red`, `--color-brand-orange`, etc.
+- Use `--alpha()` function for transparency
+- Use `--value()` function for dynamic color assignment
+
+This ensures consistency across the entire design system while maintaining flexibility.
+description:
+globs:
+alwaysApply: false
+---

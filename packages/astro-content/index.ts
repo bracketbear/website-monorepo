@@ -139,8 +139,6 @@ const services = createJsonCollection({
   }),
 });
 
-console.log({ workPath: workPath('companies') });
-
 export const collections = {
   workCompany: workCompanies,
   workJobs,

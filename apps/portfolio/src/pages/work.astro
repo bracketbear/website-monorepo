@@ -14,20 +14,21 @@ const breadcrumbs = getWorkBreadcrumbs();
 
 <ContentLayout title="Work History" breadcrumbs={breadcrumbs}>
   <div class="py-8">
-    <div
-      class="border-foreground/20 mb-5 rounded-sm border bg-[#fdf0d5] px-6 py-5 text-xl leading-relaxed font-medium text-[#222] shadow-[2px_2px_0_#111]"
-    >
-      I've been working as a software engineer for over 10 years. I've worked in
-      a variety of roles, from a solo developer to a team of 12+ engineers. I've
-      worked in a variety of industries, from startups to large corporations.
+    <div class="styled-section">
+      <p class="text-foreground text-xl leading-relaxed font-medium">
+        I've been working as a software engineer for over 10 years. I've worked
+        in a variety of roles, from a solo developer to a team of 12+ engineers.
+        I've worked in a variety of industries, from startups to large
+        corporations.
+      </p>
     </div>
-    <div
-      class="border-foreground/20 rounded-sm border bg-[#fdf0d5] px-6 py-5 text-xl leading-relaxed font-medium text-[#222] shadow-[2px_2px_0_#111]"
-    >
-      The tool below is to help you understand my skills and experience. Select
-      a skill to see projects I've worked on that use that skill, or a category
-      to choose multiple skills at once. We'll filter the list of jobs and
-      projects and show you the ones that match your selection.
+    <div class="styled-section mt-6">
+      <p class="text-foreground text-xl leading-relaxed font-medium">
+        The tool below is to help you understand my skills and experience.
+        Select a skill to see projects I've worked on that use that skill, or a
+        category to choose multiple skills at once. We'll filter the list of
+        jobs and projects and show you the ones that match your selection.
+      </p>
     </div>
   </div>
   <div class="py-16">
@@ -41,3 +42,4 @@ const breadcrumbs = getWorkBreadcrumbs();
     />
   </div>
 </ContentLayout>
+

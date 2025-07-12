@@ -5,7 +5,6 @@ export * from './astro';
 export { default as BracketBearLogo } from './react/BracketBearLogo';
 export { default as PointerFX } from './react/PointerFX';
 export { default as Ticker, type TickerItem } from './react/Ticker';
-export { SkillPill, type SkillPillProps } from './react/SkillPill';
 export { Button as ReactButton, type ButtonProps } from './react/Button';
 export * from './react/hooks';
 

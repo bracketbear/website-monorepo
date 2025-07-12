@@ -1,8 +1,6 @@
-import { SkillPill } from '@bracketbear/core';
 import type { CollectionEntry } from 'astro:content';
 import { useRef, useState } from 'react';
 import WorkHistory from './WorkHistory';
-import ProjectCard from './ProjectCard';
 
 export interface WorkSkillFilterProps {
   skills: CollectionEntry<'workSkills'>[];
@@ -104,20 +102,19 @@ export default function WorkSkillFilter({
                     {category.data.title}
                   </h2>
                   <div className="flex flex-wrap gap-2 pr-4">
-                    {categorySkills.map((skill) => (
-                      <SkillPill
-                        key={skill.id}
-                        variant={
-                          selectedSkills.includes(skill.id)
-                            ? 'selected'
-                            : 'interactive'
-                        }
-                        size="sm"
-                        onClick={() => toggleSkill(skill.id)}
-                      >
-                        {skill.data.title}
-                      </SkillPill>
-                    ))}
+                    {categorySkills.map((skill) => {
+                      const isSelected = selectedSkills.includes(skill.id);
+                      return (
+                        <button
+                          key={skill.id}
+                          className={`pill pill-skill pill-hover${isSelected ? 'pill-selected' : ''}`}
+                          onClick={() => toggleSkill(skill.id)}
+                          type="button"
+                        >
+                          {skill.data.title}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -133,6 +130,7 @@ export default function WorkSkillFilter({
           <WorkHistory
             jobs={filteredJobs}
             companies={companies}
+            projects={projects}
             showFilteredPlaceholder={false}
             selectedSkills={selectedSkills}
             skills={skills}
@@ -141,18 +139,17 @@ export default function WorkSkillFilter({
         {/* Projects */}
         <section>
           <div className={sectionHeaderClassName}>Projects</div>
-          <div className="flex w-full flex-col gap-8">
-            {filteredProjects.map((project) => {
-              return (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  skills={skills}
-                  selectedSkills={selectedSkills}
-                  variant="simple"
-                />
-              );
-            })}
+          <div className="py-8 text-center">
+            <p className="text-foreground text-lg">
+              Projects are now displayed on the{' '}
+              <a
+                href="/projects"
+                className="link-underline text-brand-red font-medium"
+              >
+                Projects page
+              </a>
+              .
+            </p>
           </div>
         </section>
       </main>

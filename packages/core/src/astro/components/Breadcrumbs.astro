@@ -1,7 +1,9 @@
 ---
+import clsx from 'clsx';
 import type { Breadcrumb } from '../../types/breadcrumb';
 
 const SEPARATOR = '/' as const;
+const BREADCRUMB_CLASS = 'text-brand-yellow font-bold tracking-wide' as const;
 
 interface Props {
   breadcrumbs: Breadcrumb[];
@@ -24,14 +26,15 @@ const { breadcrumbs } = Astro.props;
                       href={crumb.href}
                       aria-label={crumb.label}
                       title={crumb.label}
-                      class="text-brand-yellow hover:text-brand-yellow/80 font-bold tracking-wide transition-colors"
+                      class={clsx(
+                        'hover:text-brand-yellow/80 link-underline transition-colors',
+                        BREADCRUMB_CLASS
+                      )}
                     >
                       {crumb.label}
                     </a>
                   ) : (
-                    <span class="text-brand-dark font-bold tracking-wide">
-                      {crumb.label}
-                    </span>
+                    <span class={BREADCRUMB_CLASS}>{crumb.label}</span>
                   )}
                 </li>
                 {idx < breadcrumbs.length - 1 && (

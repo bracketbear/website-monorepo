@@ -1,0 +1,3 @@
+@utility card {
+  @apply tangible tangible-card rounded-3xl border border-solid border-brand-dark-muted bg-brand-light p-6;
+} 

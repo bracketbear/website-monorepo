@@ -1,0 +1,111 @@
+/* Pill Design System */
+
+/* Base pill utility */
+@utility pill {
+  @apply tangible border-2 border-solid rounded-md font-bold uppercase tracking-wide py-2 px-4 text-sm min-h-9 min-w-10 transition-all duration-150 ease-in-out;
+}
+
+/* Color variants */
+@utility pill-brand-orange {
+  background-color: var(--color-brand-orange);
+  color: var(--color-brand-dark);
+  border-color: var(--color-brand-orange);
+}
+
+@utility pill-brand-red {
+  background-color: var(--color-brand-red);
+  color: var(--color-brand-light);
+  border-color: var(--color-brand-red);
+}
+
+@utility pill-brand-green {
+  background-color: var(--color-brand-green);
+  border-color: #4b6e00; /* deeper green */
+  color: var(--color-brand-dark);
+}
+
+@utility pill-brand-blue {
+  background-color: var(--color-brand-blue);
+  border-color: #1e4e5f; /* deeper blue */
+  color: var(--color-brand-dark);
+}
+
+@utility pill-brand-purple {
+  background-color: var(--color-brand-purple);
+  border-color: #6d3a6d; /* deeper purple */
+  color: var(--color-brand-light);
+}
+
+/* Size variants */
+@utility pill-sm {
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  min-height: 2rem;
+  border-radius: 9999px;
+}
+
+@utility pill-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.125rem;
+  min-height: 2.5rem;
+  border-radius: 9999px;
+}
+
+/* Interactive states */
+@utility pill-hover {
+  @apply tangible-hover;
+  cursor: pointer;
+  &:hover {
+    filter: brightness(0.95) saturate(1.2);
+  }
+}
+
+@utility pill-selected {
+  border-color: #b91c1c;
+  background-color: #fff0f0;
+  color: #b91c1c;
+  box-shadow: 0 0 0 0.2rem #b91c1c33;
+  z-index: 1;
+}
+
+@utility pill-pressed {
+  @apply tangible-pressed;
+}
+
+/* Status variants */
+@utility pill-featured {
+  @apply pill-brand-red;
+  font-weight: 900;
+}
+
+@utility pill-category {
+  @apply pill-brand-orange;
+}
+
+@utility pill-skill {
+  @apply pill-brand-red;
+}
+
+/* Alternative styles */
+@utility pill-flat {
+  @apply tangible-flat;
+  border-width: 1.5px;
+}
+
+@utility pill-outline {
+  background-color: transparent;
+  border-width: 2px;
+}
+
+/* Composed utilities for common use cases */
+@utility pill-category-interactive {
+  @apply pill pill-category pill-hover;
+}
+
+@utility pill-featured-interactive {
+  @apply pill pill-featured pill-hover;
+}
+
+@utility pill-skill-interactive {
+  @apply pill pill-skill pill-hover;
+} 
