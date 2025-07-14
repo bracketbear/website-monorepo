@@ -1,0 +1,80 @@
+---
+title: README Organization Standards
+---
+
+# README Organization Standards
+
+## Overview
+This monorepo uses a hierarchical README structure to provide cohesive documentation across all projects and packages.
+
+## README Structure Requirements
+
+### Root README
+The main [README.md](mdc:README.md) should include:
+- Project overview and introduction
+- Installation and development instructions
+- **Table of Contents** linking to all project READMEs
+- Quick navigation to key documentation
+
+### Project READMEs
+Each project in `apps/` and `packages/` should have a README.md that includes:
+- Project-specific overview and purpose
+- Installation and usage instructions
+- **Table of Contents** linking to any sub-READMEs in that project
+- Links back to the main monorepo README
+
+### Sub-READMEs
+When creating READMEs in subdirectories (like components, layouts, etc.), ensure they:
+- Link back to their parent project README
+- Are referenced in the parent project's README table of contents
+- Follow consistent formatting and structure
+
+## README Table of Contents Format
+
+### Root README TOC Example:
+```markdown
+## Table of Contents
+
+### Applications
+- [Portfolio](/apps/portfolio/README.md) - Personal portfolio website
+- [Bracket Bear Website](/apps/bracketbear-website/README.md) - Main company website
+- [CMS](/apps/cms/README.md) - Content management system
+
+### Packages
+- [Core](/packages/core/README.md) - Shared components and utilities
+- [Astro Content](/packages/astro-content/README.md) - Content management utilities
+- [Flateralus](/packages/flateralus/README.md) - Interactive graphics library
+```
+
+### Project README TOC Example:
+```markdown
+## Table of Contents
+
+- [Overview](#overview)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Documentation](#documentation)
+  - [Components](/src/components/README.md)
+  - [Layouts](/src/layouts/README.md)
+- [Back to Monorepo](../../README.md)
+```
+
+## When Creating New READMEs
+
+1. **Always** add a table of contents when creating a README in a project root
+2. **Always** link back to the parent README
+3. **Always** update the parent README's table of contents to include the new README
+4. **Always** use relative paths for internal links
+5. **Always** include a brief description of what the README covers
+
+## File Naming
+- Use `README.md` for main project documentation
+- Use descriptive names for sub-READMEs (e.g., `components.md`, `api.md`)
+- Place READMEs in the root of the directory they document
+
+## Cross-References
+- Link from monorepo README to all project READMEs
+- Link from project READMEs to their sub-READMEs
+- Link from sub-READMEs back to their project README
+- Use relative paths for all internal links
+- Include brief descriptions for each link

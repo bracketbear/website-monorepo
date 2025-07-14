@@ -51,7 +51,8 @@ export function ValidatedForm<TSchema extends ZodTypeAny>({
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, type, checked, value } = e.target;
+    const { name, type, value } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
     setValues((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,

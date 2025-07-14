@@ -2,15 +2,22 @@
 import { navigationConfig } from '@/config/navigation';
 import {
   ContentLayout as CoreContentLayout,
-  type LayoutProps,
+  type ContentLayoutProps,
 } from '@bracketbear/core/astro';
 import '@/styles/global.css';
 
-interface Props extends Omit<LayoutProps, 'navigation'> {}
+interface Props extends Omit<ContentLayoutProps, 'navigation'> {}
 
 const props = Astro.props;
 ---
 
-<CoreContentLayout navigation={navigationConfig} {...props}>
+<CoreContentLayout
+  navigation={navigationConfig}
+  contentWidth={props.contentWidth}
+  {...props}
+>
   <slot />
+  <!-- Detail Blocks - we're passing it down to the core component -->
+  <slot name="detail-blocks" slot="detail-blocks" />
+  <slot name="cover-image" slot="cover-image" />
 </CoreContentLayout>

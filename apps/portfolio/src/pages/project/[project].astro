@@ -1,10 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
+import { DetailBlock, SummaryBlock } from '@bracketbear/core';
 import type { LabelValue } from '@bracketbear/core';
+import { getProjectImageUrl } from '@bracketbear/astro-content';
 import { getKeyedCollection } from '@/utils/content';
 import { getBreadcrumbs, getWorkBreadcrumbs } from '@/config/breadcrumbs';
-import Layout from '@/layouts/Layout.astro';
+import ContentLayout from '../../layouts/ContentLayout.astro';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const workProjects = await getCollection('workProject');
@@ -15,26 +17,28 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 const workJobs = await getCollection('workJobs');
 const workSkills = await getCollection('workSkills');
-const workProjects = await getCollection('workProject');
+const workProject = await getCollection('workProject');
 const workCompanies = await getKeyedCollection('workCompany');
 const projectCategories = await getCollection('workProjectCategory');
 
-const workProject = workProjects.find(
+const workProjectItem = workProject.find(
   (project) => project.id === Astro.params.project
 );
 
-if (workProject === undefined) {
+if (workProjectItem === undefined) {
   throw new Error(`Project not found: ${Astro.params.project}`);
 }
 
 // Get related data
-const job = workJobs.find((job) => job.id === workProject.data.job);
+const job = workJobs.find((job) => job.id === workProjectItem.data.job);
 const category = projectCategories.find(
-  (category) => category.id === workProject.data.category
+  (category) => category.id === workProjectItem.data.category
 );
-const projectSkills = workSkills.filter((skill) =>
-  (workProject.data.skills ?? []).includes(skill.id)
-);
+// Get skills in the order set in Keystatic
+const projectSkills = (workProjectItem.data.skills ?? [])
+  .map((skillId) => workSkills.find((s) => s.id === skillId))
+  .filter(Boolean);
+
 const companyTitle =
   job !== undefined ? workCompanies[job.data.company].data.title : 'Unknown';
 
@@ -49,7 +53,10 @@ const detailBlockContent: Partial<LabelValue>[] = [
   },
   {
     label: 'Technologies Used',
-    value: projectSkills.map((skill) => skill.data.title).join(', '),
+    value: projectSkills
+      .map((skill) => skill?.data.title)
+      .filter(Boolean)
+      .join(', '),
   },
 ];
 
@@ -59,129 +66,126 @@ const breadcrumbs = getBreadcrumbs(
     href: '/projects',
   },
   {
-    label: workProject.data.title,
-    href: `/project/${workProject.id}`,
+    label: workProjectItem.data.title,
+    href: `/project/${workProjectItem.id}`,
   }
 );
+
+// Get cover image using the new getProjectImageUrl function
+let coverImage: string | undefined;
+if (workProjectItem.data.coverImage) {
+  try {
+    coverImage = getProjectImageUrl(
+      workProjectItem.id,
+      workProjectItem.data.coverImage
+    );
+  } catch (error) {
+    console.warn(
+      `Failed to load cover image for project ${workProjectItem.id}:`,
+      error
+    );
+  }
+}
 ---
 
-<Layout title={workProject.data.title} breadcrumbs={breadcrumbs}>
-  <!-- Poster-Inspired Hero Section (Makima style, dark) -->
-  <div class="bg-brand-dark relative mb-12 pb-8">
-    <div class="mx-auto max-w-6xl px-6 py-12">
-      <div
-        class="flex flex-col gap-8 md:flex-row md:items-end md:justify-between"
-      >
-        <div class="flex-1">
-          <div class="mb-4 flex items-center gap-4">
-            {
-              category && (
-                <span class="pill pill-category">{category.data.title}</span>
-              )
-            }
-            {
-              workProject.data.isFeatured && (
-                <span class="pill pill-featured">Featured Project</span>
-              )
-            }
-          </div>
-          <h1
-            class="font-heading text-brand-orange mb-2 text-4xl leading-none uppercase md:text-6xl"
-          >
-            {workProject.data.title}
-          </h1>
-          <div class="mt-8 flex items-center gap-12">
-            {
-              detailBlockContent.map((detail) => (
-                <div class="flex flex-col gap-0.5">
-                  <div class="text-brand-yellow/80 font-medium uppercase">
-                    {detail.label}:
-                  </div>
-                  <div class="text-brand-yellow text-lg font-bold">
-                    {detail.value}
-                  </div>
-                </div>
-              ))
-            }
-          </div>
-        </div>
-        <div class="flex flex-shrink-0 flex-col items-end gap-2">
-          <!-- Interactive Pixi Art Placeholder -->
-          <div
-            class="border-brand-orange flex h-48 w-48 items-center justify-center border-2 bg-black"
-          >
-            {/* TODO: Insert PixiJS interactive art here */}
-            <span class="text-brand-orange font-mono text-xs opacity-60"
-              >[Interactive Art]</span
-            >
-          </div>
-        </div>
-      </div>
-      <!-- Summary -->
-      {
-        workProject.data.summary && (
-          <div class="border-brand-orange bg-brand-dark mt-8 border-2 p-6 shadow-[8px_8px_0_#000]">
-            <p class="text-brand-yellow text-xl leading-relaxed font-medium">
-              {workProject.data.summary || workProject.data.description}
-            </p>
-          </div>
-        )
-      }
-      <div
-        class="pointer-events-none absolute bottom-0 left-0 flex w-full justify-center select-none"
-      >
-        <div
-          class="h-4 w-2/3 bg-repeat-x"
-          style="background-image: url('/patterns/halftone.svg'); opacity: 0.12;"
-        >
-        </div>
-      </div>
-    </div>
+<ContentLayout
+  title={workProjectItem.data.title}
+  breadcrumbs={breadcrumbs}
+  contentWidth="narrow"
+>
+  <!-- Title Pills -->
+  <span slot="title-pills" class="pill pill-category">
+    {category?.data.title}
+  </span>
+  {
+    workProjectItem.data.isFeatured && (
+      <span slot="title-pills" class="pill pill-featured">
+        Featured Project
+      </span>
+    )
+  }
+
+  <!-- Cover Image -->
+  <div
+    slot="cover-image"
+    class="bg-brand-red border-brand-orange flex aspect-[4/3] w-80 max-w-2xl items-center justify-center overflow-hidden rounded-xl border-2"
+  >
+    {
+      coverImage ? (
+        <img
+          src={coverImage}
+          alt={workProjectItem.data.title + ' cover'}
+          class="h-full w-full object-cover"
+        />
+      ) : (
+        <span class="text-brand-yellow font-mono text-xs opacity-60">
+          [No Cover Image]
+        </span>
+      )
+    }
   </div>
 
+  <!-- Summary -->
+  {
+    workProjectItem.data.summary && (
+      <SummaryBlock slot="summary" content={workProjectItem.data.summary} />
+    )
+  }
+
+  <!-- Detail Blocks -->
+  {
+    detailBlockContent.map((detail) => (
+      <DetailBlock
+        slot="detail-blocks"
+        label={detail.label || ''}
+        value={detail.value || ''}
+      />
+    ))
+  }
+
   <!-- Main Content Grid -->
-  <div class="mx-auto max-w-6xl gap-12 px-6">
+  <div class="w-full gap-12">
     <!-- Main Content -->
     <div class="mb-12 flex flex-col gap-12">
       <!-- About This Project -->
       {
-        workProject.data.description?.trim() !== '' && (
+        workProjectItem.data.description?.trim() !== '' && (
           <div class="styled-section">
             <h2 class="font-heading mb-4 text-3xl font-black tracking-tight uppercase">
               About This Project
             </h2>
             <p class="text-foreground text-lg leading-relaxed font-medium">
-              {workProject.data.description}
+              {workProjectItem.data.description}
             </p>
           </div>
         )
       }
       <!-- Challenges & Solutions -->
       {
-        workProject.data.challengesAndSolutions?.trim() !== '' && (
+        workProjectItem.data.challengesAndSolutions?.trim() !== '' && (
           <div class="styled-section">
             <h2 class="font-heading mb-4 text-3xl font-black tracking-tight uppercase">
               Challenges & Solutions
             </h2>
             <p class="text-lg leading-relaxed font-medium text-black">
-              {workProject.data.challengesAndSolutions}
+              {workProjectItem.data.challengesAndSolutions}
             </p>
           </div>
         )
       }
       <!-- Results -->
       {
-        workProject.data.resultsAchieved?.trim() !== '' && (
+        workProjectItem.data.resultsAchieved?.trim() !== '' && (
           <div class="styled-section">
             <h2 class="font-heading mb-4 text-3xl font-black tracking-tight uppercase">
               Results Achieved
             </h2>
             <p class="text-lg leading-relaxed font-medium text-black">
-              {workProject.data.resultsAchieved}
+              {workProjectItem.data.resultsAchieved}
             </p>
           </div>
         )
       }
     </div>
   </div>
-</Layout>
+</ContentLayout>

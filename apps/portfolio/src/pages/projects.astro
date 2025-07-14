@@ -1,10 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
+import { DetailBlock, SummaryBlock, getProjectUrl } from '@bracketbear/core';
 import { getBreadcrumbs } from '@/config/breadcrumbs';
 import ContentLayout from '@/layouts/ContentLayout.astro';
-import { getProjectUrl } from '@bracketbear/core';
+import { getProjectImageUrl } from '@bracketbear/astro-content';
+import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 
-const workProjects = await getCollection('workProject');
+const workProject = await getCollection('workProject');
 const workSkills = await getCollection('workSkills');
 const workProjectCategories = await getCollection('workProjectCategory');
 const breadcrumbs = getBreadcrumbs({
@@ -15,7 +18,7 @@ const breadcrumbs = getBreadcrumbs({
 // Group projects by category
 const projectsByCategory = workProjectCategories
   .map((category) => {
-    const categoryProjects = workProjects.filter(
+    const categoryProjects = workProject.filter(
       (project) => project.data.category === category.id
     );
 
@@ -25,16 +28,47 @@ const projectsByCategory = workProjectCategories
     };
   })
   .filter((group) => group.projects.length > 0);
+
+// Calculate some stats for detail blocks
+const totalProjects = workProject.length;
+const featuredProjects = workProject.filter((p) => p.data.isFeatured).length;
+const totalSkills = workSkills.length;
+
+// Get cover image URLs for all projects
+const coverImageMap: Record<string, string | undefined> = {};
+for (const project of workProject) {
+  if (project.data.coverImage) {
+    const imageUrl = getProjectImageUrl(project.id, project.data.coverImage);
+    coverImageMap[project.id] = imageUrl;
+  } else {
+    coverImageMap[project.id] = undefined;
+  }
+}
 ---
 
-<ContentLayout title="Projects" breadcrumbs={breadcrumbs}>
-  <div class="styled-section mb-8">
-    <p class="text-foreground text-xl leading-relaxed font-medium">
-      Here are the projects I've worked on, organized by category. Each project
-      represents a unique challenge and solution that showcases different
-      aspects of my skills and experience.
-    </p>
-  </div>
+<ContentLayout title="Projects" breadcrumbs={breadcrumbs} showHero={true}>
+  <!-- Detail Blocks -->
+  <DetailBlock
+    slot="detail-blocks"
+    label="Total Projects"
+    value={totalProjects.toString()}
+  />
+  <DetailBlock
+    slot="detail-blocks"
+    label="Featured Projects"
+    value={featuredProjects.toString()}
+  />
+  <DetailBlock
+    slot="detail-blocks"
+    label="Technologies"
+    value={totalSkills.toString()}
+  />
+
+  <!-- Summary -->
+  <SummaryBlock
+    slot="summary"
+    content="Here are the projects I've worked on, organized by category. Each project represents a unique challenge and solution that showcases different aspects of my skills and experience."
+  />
 
   <div class="space-y-16">
     {
@@ -48,16 +82,38 @@ const projectsByCategory = workProjectCategories
 
           <div class="grid gap-8 lg:grid-cols-2">
             {projects.map((project) => {
-              const projectSkills = workSkills.filter((skill) =>
-                (project.data.skills ?? []).includes(skill.id)
-              );
-
+              // Get skills in the order they appear in the array, limit to top 3
+              const projectSkills = (project.data.skills ?? [])
+                .map((skillId: string) =>
+                  workSkills.find((s) => s.id === skillId)
+                )
+                .filter(Boolean)
+                .slice(0, 3);
+              const coverImage = coverImageMap[project.id];
               return (
                 <a
                   href={getProjectUrl(project.id)}
                   class="block hover:no-underline"
                 >
-                  <div class="card">
+                  <div class="card flex h-full flex-col">
+                    {/* Cover Image */}
+                    <div class="bg-brand-blue mb-4 flex w-full items-center justify-center overflow-hidden rounded-xl border-2 border-black">
+                      {coverImage ? (
+                        <Picture
+                          src={coverImage}
+                          alt={project.data.title + ' cover'}
+                          formats={['webp', 'avif']}
+                          width={800}
+                          height={800}
+                          layout="constrained"
+                          fit="cover"
+                        />
+                      ) : (
+                        <span class="text-brand-yellow font-mono text-xs opacity-60">
+                          [No Cover Image]
+                        </span>
+                      )}
+                    </div>
                     {/* Project category and featured badges */}
                     <div class="mb-4 flex items-center gap-4">
                       {project.data.category && (
@@ -70,32 +126,29 @@ const projectsByCategory = workProjectCategories
                       )}
                     </div>
 
-                    <div class="flex h-full flex-col">
-                      <div class="flex-1">
-                        <h3 class="font-heading mb-3 text-2xl font-black tracking-tight uppercase">
-                          {project.data.title}
-                        </h3>
+                    <div class="flex flex-1 flex-col">
+                      <h3 class="font-heading mb-3 text-2xl font-black tracking-tight uppercase">
+                        {project.data.title}
+                      </h3>
 
-                        {/* Project summary */}
-                        {(project.data.summary || project.data.description) && (
-                          <div class="text-foreground mb-4 text-lg leading-relaxed font-medium">
-                            {project.data.summary || project.data.description}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Skills row */}
-                      {project.data.skills &&
-                        project.data.skills.length > 0 && (
-                          <div class="border-brand-dark flex flex-wrap gap-2 border-t-2 pt-3">
-                            {projectSkills.map((skill) => (
-                              <span class="pill pill-skill">
-                                {skill.data.title}
-                              </span>
-                            ))}
-                          </div>
-                        )}
+                      {/* Project summary */}
+                      {project.data.summary && (
+                        <div class="text-foreground mb-4 line-clamp-3 text-lg leading-relaxed font-medium">
+                          {project.data.summary}
+                        </div>
+                      )}
                     </div>
+
+                    {/* Skills row */}
+                    {projectSkills.length > 0 && (
+                      <div class="border-brand-dark mt-auto flex flex-wrap gap-2 border-t-2 pt-3">
+                        {projectSkills.map((skill: any) => (
+                          <span class="pill pill-skill">
+                            {skill?.data.title}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </a>
               );

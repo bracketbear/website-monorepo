@@ -6,3 +6,12 @@
 @utility heading {
   @apply tracking-tighter font-bold font-heading;
 }
+
+/* A useful utility for limiting the width of prose text. */
+@utility max-w-prose {
+  max-width: 65ch;
+  
+  @variant xl {
+    max-width: 75ch;
+  }
+}

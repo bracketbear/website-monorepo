@@ -1,0 +1,25 @@
+# Layout Slot Replication Rule
+
+## Rule
+When wrapping a core layout (e.g., ContentLayout) in a local layout component, always replicate any named slots that the core layout expects. This ensures that slot content from pages is passed through to the core layout correctly.
+
+- Use the efficient syntax:
+  ```astro
+  <slot name="detail-blocks" slot="detail-blocks" />
+  ```
+  to forward named slots from the local layout to the core layout.
+
+- Do this for all named slots used by the core layout (e.g., `title-pills`, `detail-blocks`, `cover-image`, `summary`, etc.).
+
+## Why?
+- Ensures that slot content provided by pages/components is rendered as intended.
+- Prevents slot content from being dropped or ignored when using local layout wrappers.
+- Keeps the slot API consistent across the app and core packages.
+
+## Applies To
+- All local layout wrappers in `apps/` that wrap core layouts from `@bracketbear/core`.
+- Any new layouts or slot-based components added in the future.
+description:
+globs:
+alwaysApply: false
+---

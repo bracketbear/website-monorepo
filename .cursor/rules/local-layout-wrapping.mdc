@@ -1,0 +1,35 @@
+# Local Layout Wrapping for App Navigation
+
+## Rule
+Each app (in `apps/`) must wrap its pages in a local layout component (e.g., `@/layouts/Layout.astro` or `ContentLayout.astro`).
+
+- **Purpose:** This ensures that navigation, theming, and other configuration are controlled per app, allowing for app-specific branding and navigation structures.
+- **How:**
+  - Do **not** import layouts directly from `@bracketbear/core` in app pages.
+  - Instead, create a local layout in each app that imports the core layout and configures it with the app's navigation and settings.
+  - All pages in the app should use this local layout as their wrapper.
+
+## Example
+```astro
+---
+import ContentLayout from '@/layouts/ContentLayout.astro';
+import { navigationConfig } from '@/config/navigation';
+---
+
+<ContentLayout navigation={navigationConfig} title="Page Title">
+  <slot />
+</ContentLayout>
+```
+
+## Why?
+- Allows each app to have its own navigation, branding, and layout configuration.
+- Supports future changes to navigation or theming without affecting other apps.
+- Keeps the codebase modular and maintainable.
+
+## Applies To
+- All pages in `apps/portfolio`, `apps/bracketbear-website`, `apps/cms`, etc.
+- Any new app added to the monorepo.
+description:
+globs:
+alwaysApply: false
+---

@@ -1,0 +1,16 @@
+---
+interface Props {
+  content: string;
+}
+
+const { content } = Astro.props;
+---
+
+<div
+  class="border-brand-orange bg-brand-dark mt-8 border-2 p-6 shadow-[8px_8px_0_#000]"
+>
+  <p class="text-brand-yellow text-xl leading-relaxed font-medium">
+    {content}
+  </p>
+</div>
+

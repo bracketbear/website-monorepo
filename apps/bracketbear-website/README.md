@@ -1,48 +1,96 @@
-# Astro Starter Kit: Basics
+# Bracket Bear Website
 
-```sh
-npm create astro@latest -- --template basics
+## Overview
+Main company website for Bracket Bear, built with Astro. Showcases services, company information, and client work with a modern, brutalist design aesthetic.
+
+## Table of Contents
+
+- [Bracket Bear Website](#bracket-bear-website)
+  - [Overview](#overview)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Installation](#installation)
+  - [Development](#development)
+  - [Build](#build)
+  - [Project Structure](#project-structure)
+  - [Technologies Used](#technologies-used)
+  - [Design System](#design-system)
+
+## Features
+
+- **Company Showcase**: Services, about, and contact information
+- **Brutalist Design**: Bold, high-contrast design with comic-book style colors
+- **Interactive Elements**: Dynamic components and animations
+- **Responsive Design**: Mobile-first approach with responsive layouts
+- **Performance Optimized**: Static site generation with Astro
+- **TypeScript**: Full type safety across the application
+
+## Installation
+
+The Bracket Bear website is part of the Bracket Bear monorepo. To install dependencies:
+
+```bash
+# From monorepo root
+npm install
+
+# Or from website directory
+cd apps/bracketbear-website && npm install
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+## Development
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+To start the development server:
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
+```bash
+# From monorepo root
+npm run dev --workspace=apps/bracketbear-website
 
-## 🚀 Project Structure
+# Or from website directory
+cd apps/bracketbear-website && npm run dev
+```
 
-Inside of your Astro project, you'll see the following folders and files:
+The development server will start on `http://localhost:4321` (or the next available port).
 
-```text
-/
-├── public/
-│   └── favicon.svg
+## Build
+
+To build the website for production:
+
+```bash
+# From monorepo root
+npm run build --workspace=apps/bracketbear-website
+
+# Or from website directory
+cd apps/bracketbear-website && npm run build
+```
+
+The built site will be output to `dist/`.
+
+## Project Structure
+
+```
+apps/bracketbear-website/
 ├── src/
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
+│   ├── components/        # Astro and React components
+│   ├── layouts/           # Page layouts
+│   ├── pages/             # Astro pages
+│   ├── styles/            # Global styles
+│   └── utils/             # Utility functions
+├── public/                # Static assets
+└── content/               # Content collections
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Technologies Used
 
-## 🧞 Commands
+- **Astro**: Static site generator
+- **React**: Interactive components
+- **TypeScript**: Type safety
+- **Tailwind CSS**: Styling
+- **@bracketbear/core**: Shared components and utilities
 
-All commands are run from the root of the project, from a terminal:
+## Design System
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+The website uses the shared design system from `@bracketbear/core`, including:
+- Brutalist card components
+- Custom Tailwind utilities
+- Tangible design effects
+- Halftone patterns and shadows

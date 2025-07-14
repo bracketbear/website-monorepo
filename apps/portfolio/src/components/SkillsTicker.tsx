@@ -1,5 +1,9 @@
 import type { CollectionEntry } from 'astro:content';
-import { Ticker, type TickerItem, BracketBearLogo } from '@bracketbear/core';
+import {
+  Ticker,
+  type TickerItem,
+  BracketBearLogo,
+} from '@bracketbear/core/react';
 
 interface SkillsTickerProps {
   skills: CollectionEntry<'workSkills'>[];

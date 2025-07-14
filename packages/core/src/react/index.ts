@@ -8,4 +8,5 @@ export { TextareaInput } from './TextareaInput';
 export { CheckboxInput } from './CheckboxInput';
 export { Field } from './Field';
 export { CheckboxField } from './CheckboxField';
+export { default as SkillPill } from './SkillPill';
 export * from './hooks';

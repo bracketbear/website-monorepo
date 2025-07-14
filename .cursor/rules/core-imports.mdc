@@ -1,0 +1,38 @@
+# Core Package Import Rules
+
+When importing React components from the `@bracketbear/core` package, always import from the `/react` subpath:
+
+```typescript
+// ✅ Correct - import from /react subpath
+import { Ticker, BracketBearLogo } from '@bracketbear/core/react';
+
+// ❌ Incorrect - import from root
+import { Ticker, BracketBearLogo } from '@bracketbear/core';
+```
+
+This ensures proper tree-shaking and avoids importing unnecessary Astro-specific components when working with React components.
+
+## Examples of React components that should use /react path:
+- Ticker
+- BracketBearLogo  
+- Button
+- ValidatedForm
+- TextInput
+- TextareaInput
+- CheckboxInput
+- CheckboxField
+- Field
+- PointerFX
+- SkillPill
+
+## Astro components should use root import:
+- Layout
+- ContentLayout
+- NavBar
+- Footer
+- DetailBlock
+- SummaryBlock
+description:
+globs:
+alwaysApply: false
+---

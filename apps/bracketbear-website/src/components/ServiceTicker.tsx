@@ -1,5 +1,9 @@
 import type { CollectionEntry } from 'astro:content';
-import { Ticker, type TickerItem, BracketBearLogo } from '@bracketbear/core';
+import {
+  Ticker,
+  type TickerItem,
+  BracketBearLogo,
+} from '@bracketbear/core/react';
 
 interface ServiceTickerProps {
   services: CollectionEntry<'services'>[];
@@ -17,4 +21,4 @@ export default function ServiceTicker({
   }));
 
   return <Ticker items={tickerItems} />;
-} 
+}

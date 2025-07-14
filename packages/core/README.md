@@ -1,6 +1,29 @@
 # @bracketbear/core
 
+## Overview
+Shared components, layouts, and utilities for Bracket Bear applications. Provides a consistent design system, layout components, and type definitions across all projects.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Layout Components](#layout-components)
+  - [Layout](#layout)
+  - [NavBar](#navbar)
+  - [Footer](#footer)
+- [Configuration](#configuration)
+  - [Navigation Configuration](#navigation-configuration)
+  - [Pre-built Configurations](#pre-built-configurations)
+- [Types](#types)
+  - [Navigation Types](#navigation-types)
+  - [Layout Types](#layout-types)
+- [Styling](#styling)
+- [Development](#development)
+- [Examples](#examples)
+- [Documentation](#documentation)
+  - [ContentLayout Hero Section](/src/astro/layout/README.md)
+- [Back to Monorepo](../../README.md)
 
 ## Features
 

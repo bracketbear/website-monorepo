@@ -128,26 +128,27 @@ export default function WorkHistory({
                         return (
                           <span
                             key={skillId}
-                            className={`pill pill-skill pill-hover${isSelected ? ' pill-selected' : ''}`}
+                            className={`pill pill-skill pill-hover${isSelected ? 'pill-selected' : ''}`}
                           >
-                            {skills.find((s) => s.id === skillId)?.data.title || skillId}
+                            {skills.find((s) => s.id === skillId)?.data.title ||
+                              skillId}
                           </span>
                         );
                       })}
                     </div>
                   )}
-                  
+
                   {/* Projects section */}
                   {(() => {
                     const jobProjects = projects.filter(
                       (project) => project.data.job === job.id
                     );
-                    
+
                     if (jobProjects.length === 0) return null;
-                    
+
                     return (
-                      <div className="border-t-2 border-[var(--color-brand-dark)] pt-3 mt-3">
-                        <h5 className="font-heading text-sm font-black tracking-wide uppercase text-foreground/80 mb-2">
+                      <div className="border-brand-dark mt-3 border-t-2 pt-3">
+                        <h5 className="font-heading text-foreground/80 mb-2 text-sm font-black tracking-wide uppercase">
                           Projects
                         </h5>
                         <div className="flex flex-wrap gap-2">
