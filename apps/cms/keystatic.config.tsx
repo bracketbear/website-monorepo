@@ -154,10 +154,18 @@ export default config({
           label: 'Duration',
           validation: { isRequired: true },
         }),
+        coverImage: fields.image({
+          label: 'Cover Image',
+          description: 'Main image for the project card and hero',
+          directory: path.resolve(process.cwd(), 'content/work/projects'),
+          publicPath: '/work/projects/',
+        }),
         summary: fields.text({
           label: 'Summary',
-          description: 'Brief project overview (displayed in hero section)',
-          multiline: true,
+          description:
+            'Brief project overview (displayed in hero sections and project page, max 160 chars)',
+          multiline: false,
+          validation: { length: { max: 160 } },
         }),
         description: fields.text({
           label: 'Description',

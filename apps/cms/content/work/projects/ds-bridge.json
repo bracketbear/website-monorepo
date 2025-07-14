@@ -2,13 +2,14 @@
   "title": "Bridge UI",
   "job": "ds-lead-front-end-developer",
   "duration": "18 Months",
+  "coverImage": "coverImage.jpg",
   "description": "I led the front-end development of a new CMS called Bridge UI. The CMS utilized a Rust backend with a Vue 3 front-end.\n\nResponsibilities included converting existing components from Vue 2 to Vue 3 while Vue 3 was still in beta, converting the entire app to use TypeScript, switching the build tool from Webpack to Vite, and using service workers to communicate between open tabs and to poll the backend for deltas. I was also responsible for reading the backend Rust code to understand the shape of the data being received.",
   "challengesAndSolutions": "The project involved several complex aspects, such as adapting to Vue 3 during its beta, understanding the Rust back-end, and using service workers.\n\nThese challenges were tackled through a mixture of dedication, continuous learning, and effective problem-solving strategies.",
   "resultsAchieved": "Successful development of a new CMS, Bridge UI, with improved functionality and efficiency.",
   "mediaDescription": "Blue Bridge UI logo.",
   "media": [
     {
-      "image": "src/assets/images/projects/ds-bridge/media/0/image.png",
+      "image": "/work/projects/ds-bridge/media/0/image.png",
       "caption": "A screenshot of the Bridge setup wizard."
     }
   ],

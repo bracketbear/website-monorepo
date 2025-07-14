@@ -2,6 +2,7 @@
   "title": "Elekta Executive Boardroom CMS",
   "job": "ds-experience-developer",
   "duration": "3 Months",
+  "coverImage": "coverImage.jpg",
   "description": "This was an update to an app for an existing client. We were tasked with adding a bunch of additional features that would allow the client to customize their Boardroom presentations on a per-platform basis. The client also wanted to add functionality to create custom \"context\" menu buttons. Finally, we wanted to be able to make the apps work on Surface 3 tablets so their sales people could take the experience with them on trips and to conferences.",
   "challengesAndSolutions": "The custom context menu buttons were a real head scratcher. As a company, we hadn't really done this before so it was up to myself and the Experience Developer I was working with to figure out how to get it done. I designed the database schema and joined these new menu items to existing items that were already in the database. I also wanted to create a cool and intuitive way to manage the menu items, so I created a Vue 2 widget that could be used to drag-and-drop the menu items. This was my first time using Vue and I was very happy with the result!",
   "resultsAchieved": "A more customizable and user-controlled application that gave sales people and executives a really cool tool to sweep their clients off of their feet.",
@@ -16,5 +17,6 @@
     "javascript",
     "html",
     "css"
-  ]
+  ],
+  "summary": "The project that I thought would change the way we looked at an experiential CMS."
 }
