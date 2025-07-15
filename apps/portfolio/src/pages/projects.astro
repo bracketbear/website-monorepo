@@ -97,18 +97,19 @@ for (const project of workProject) {
                 >
                   <div class="card flex h-full flex-col">
                     {/* Cover Image */}
-                    <div class="bg-brand-blue mb-4 flex w-full items-center justify-center overflow-hidden rounded-xl border-2 border-black">
+                    <div class="relative mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl border-2 border-black">
                       {coverImage ? (
                         <Picture
                           src={coverImage}
-                          alt={project.data.title + ' cover'}
-                          formats={['webp', 'avif']}
+                          alt={`${project.data.title} cover`}
                           width={800}
-                          height={800}
-                          layout="constrained"
+                          height={600}
+                          layout="full-width"
                           fit="cover"
+                          class="absolute inset-0 h-full w-full object-cover"
                         />
                       ) : (
+                        // TODO: Add a placeholder image
                         <span class="text-brand-yellow font-mono text-xs opacity-60">
                           [No Cover Image]
                         </span>
