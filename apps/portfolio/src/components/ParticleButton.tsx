@@ -24,6 +24,8 @@ interface Particle {
   color: number;
 }
 
+const isDev = import.meta.env.DEV;
+
 class ButtonParticleBackground {
   private app: PIXI.Application | null = null;
   private particles: Particle[] = [];
@@ -52,6 +54,12 @@ class ButtonParticleBackground {
   }
 
   private async initPixi(canvas: HTMLCanvasElement): Promise<void> {
+    // Vite HMR fix - prevent crashes during hot reloads.
+    // TODO: Find a solution for HMR/PixiJS compatibility.
+    if (isDev) {
+      return;
+    }
+
     try {
       this.app = new PIXI.Application();
       await this.app.init({
@@ -265,7 +273,7 @@ export const ParticleButton = forwardRef<
       <button
         ref={buttonRef}
         className={clsx(
-          'font-heading bg-dark relative z-10 overflow-hidden border-2 border-brand-dark bg-gradient-to-r from-brand-red to-brand-orange font-bold text-white uppercase shadow-[3px_3px_0_var(--color-brand-dark)] transition-all duration-200 text-shadow-lg not-[disabled]:cursor-pointer hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-gradient-to-l hover:shadow-[1px_1px_0_var(--color-brand-dark)]',
+          'font-heading bg-dark border-brand-dark from-brand-red to-brand-orange relative z-10 overflow-hidden border-2 bg-gradient-to-r font-bold text-white uppercase shadow-[3px_3px_0_var(--color-brand-dark)] transition-all duration-200 text-shadow-lg not-[disabled]:cursor-pointer hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-gradient-to-l hover:shadow-[1px_1px_0_var(--color-brand-dark)]',
           className
         )}
         onMouseEnter={handleMouseEnter}
