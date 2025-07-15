@@ -413,14 +413,18 @@ export function getContentImageUrl(
   contentId: string,
   imagePath: string
 ): string {
+  // Extract just the filename from the imagePath, handling both full paths and filenames
+  const imageName = imagePath.includes('/')
+    ? imagePath.split('/').pop()!
+    : imagePath;
+
   const publicPath = join(
     findPublicDir(),
     'content-images',
     contentType,
     contentId,
-    imagePath
+    imageName
   );
-  let didCopy = false;
   if (!existsSync(publicPath)) {
     // Try to copy from CMS
     const cmsContentPath = join(
@@ -428,7 +432,7 @@ export function getContentImageUrl(
       'apps/cms/content',
       contentType,
       contentId,
-      imagePath
+      imageName
     );
     if (existsSync(cmsContentPath)) {
       try {
@@ -438,7 +442,6 @@ export function getContentImageUrl(
           mkdirSync(publicDir, { recursive: true });
         }
         copyFileSync(cmsContentPath, publicPath);
-        didCopy = true;
       } catch (error) {
         console.error(
           `[content-image-loader] Failed on-demand copy ${cmsContentPath} to ${publicPath}:`,
@@ -448,7 +451,7 @@ export function getContentImageUrl(
     }
   }
 
-  return `/content-images/${contentType}/${contentId}/${imagePath}`;
+  return `/content-images/${contentType}/${contentId}/${imageName}`;
 }
 
 /**
