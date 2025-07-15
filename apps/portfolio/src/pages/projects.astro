@@ -97,7 +97,7 @@ for (const project of workProject) {
                 >
                   <div class="card flex h-full flex-col">
                     {/* Cover Image */}
-                    <div class="border-brand-dark/30 relative mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl border">
+                    <div class="border-brand-dark/30 mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl border">
                       {coverImage ? (
                         <Picture
                           src={coverImage}
@@ -106,7 +106,7 @@ for (const project of workProject) {
                           height={600}
                           layout="full-width"
                           fit="cover"
-                          class="absolute inset-0 h-full w-full object-cover"
+                          class="h-full w-full object-cover"
                         />
                       ) : (
                         // TODO: Add a placeholder image

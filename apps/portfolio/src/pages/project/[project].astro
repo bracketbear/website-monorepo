@@ -7,6 +7,7 @@ import { getProjectImageUrl } from '@bracketbear/astro-content';
 import { getKeyedCollection } from '@/utils/content';
 import { getBreadcrumbs, getWorkBreadcrumbs } from '@/config/breadcrumbs';
 import ContentLayout from '../../layouts/ContentLayout.astro';
+import { Picture } from 'astro:assets';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const workProjects = await getCollection('workProject');
@@ -108,14 +109,19 @@ if (workProjectItem.data.coverImage) {
   <!-- Cover Image -->
   <div
     slot="cover-image"
-    class="bg-brand-red border-brand-orange flex aspect-[4/3] w-80 max-w-2xl items-center justify-center overflow-hidden rounded-xl border-2"
+    class="bg-brand-dark border-brand-orange flex aspect-[4/3] w-80 max-w-2xl overflow-hidden rounded-xl border-2"
   >
     {
       coverImage ? (
-        <img
+        <Picture
           src={coverImage}
           alt={workProjectItem.data.title + ' cover'}
           class="h-full w-full object-cover"
+          width={1000}
+          height={1000}
+          formats={['avif', 'webp']}
+          layout="full-width"
+          fit="cover"
         />
       ) : (
         <span class="text-brand-yellow font-mono text-xs opacity-60">
