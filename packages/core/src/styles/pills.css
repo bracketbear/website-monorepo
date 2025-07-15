@@ -2,7 +2,7 @@
 
 /* Base pill utility */
 @utility pill {
-  @apply tangible border-2 border-solid rounded-md font-bold uppercase tracking-wide py-2 px-4 text-sm min-h-9 min-w-10 transition-all duration-150 ease-in-out;
+  @apply tangible tangible-pill border-2 border-solid rounded-md font-bold uppercase tracking-wide py-2 px-4 text-sm min-h-9 min-w-10 transition-all duration-150 ease-in-out;
 }
 
 /* Color variants */
@@ -10,12 +10,16 @@
   background-color: var(--color-brand-orange);
   color: var(--color-brand-dark);
   border-color: var(--color-brand-orange);
+
+  --tangible-shadow-color: --alpha(var(--color-brand-red) / 10%);
 }
 
 @utility pill-brand-red {
   background-color: var(--color-brand-red);
   color: var(--color-brand-light);
   border-color: var(--color-brand-red);
+  
+  --tangible-shadow-color: --alpha(var(--color-brand-red) / 10%);
 }
 
 @utility pill-brand-green {

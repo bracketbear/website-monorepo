@@ -25,10 +25,11 @@
   --tangible-highlight-alpha: 10%;
   --tangible-highlight-color: --alpha(var(--color-brand-light) / var(--tangible-highlight-alpha));
   --tangible-shadow-color: --alpha(var(--color-brand-dark) / 12%);
+  --tangible-shadow-color: red;
   --tangible-inset-color: --alpha(var(--color-brand-dark) / 10%);
   box-shadow:
     /* Box shadow */
-    0.15rem 0.15rem 0.5rem 0.12rem var(--tangible-shadow-color),
+    var(--tangible-shadow-depth) var(--tangible-shadow-depth) var(--tangible-shadow-depth) var(--tangible-shadow-depth) var(--tangible-shadow-color),
     /* Inset shadow */
     inset calc(var(--tangible-inset-depth) * -1) calc(var(--tangible-inset-depth) * -1) calc(var(--tangible-inset-depth) * 2) 0 var(--tangible-inset-color),
     /* Highlight shadow */
@@ -43,7 +44,7 @@
 
 /* Specific depth presets for different UI elements - following depth hierarchy */
 @utility tangible-pill {
-  --tangible-shadow-depth: 0.13rem;
+  --tangible-shadow-depth: 0.007rem;
   --tangible-inset-depth: 0.07rem;
 }
 

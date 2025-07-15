@@ -1,11 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
+import { Picture } from 'astro:assets';
+import { getProjectImageUrl } from '@bracketbear/astro-content';
 import { DetailBlock, SummaryBlock, getProjectUrl } from '@bracketbear/core';
 import { getBreadcrumbs } from '@/config/breadcrumbs';
 import ContentLayout from '@/layouts/ContentLayout.astro';
-import { getProjectImageUrl } from '@bracketbear/astro-content';
-import { Image } from 'astro:assets';
-import { Picture } from 'astro:assets';
 
 const workProject = await getCollection('workProject');
 const workSkills = await getCollection('workSkills');
@@ -73,9 +72,10 @@ for (const project of workProject) {
   <div class="space-y-16">
     {
       projectsByCategory.map(({ category, projects }) => (
-        <section>
-          <div class="mb-8">
-            <h2 class="font-heading text-brand-red text-4xl font-black tracking-tight uppercase">
+        <section class="bg-brand-dark tangible tangible-card overflow-hidden rounded-4xl p-8">
+          {/* Section Title */}
+          <div class="bg-brand-orange mb-8 inline-block rounded-xl py-8 pr-12 pl-6">
+            <h2 class="font-heading text-brand-dark inline-block text-4xl font-black tracking-tight uppercase">
               {category.data.title}
             </h2>
           </div>
@@ -97,7 +97,7 @@ for (const project of workProject) {
                 >
                   <div class="card flex h-full flex-col">
                     {/* Cover Image */}
-                    <div class="relative mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl border-2 border-black">
+                    <div class="border-brand-dark/30 relative mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl border">
                       {coverImage ? (
                         <Picture
                           src={coverImage}
