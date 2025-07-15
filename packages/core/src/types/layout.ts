@@ -4,7 +4,7 @@ import type { NavigationConfig } from './navigation';
 export interface LayoutProps {
   breadcrumbs?: Breadcrumb[];
   navigation: NavigationConfig;
-  title: string;
+  title?: string;
   hideFooter?: boolean;
   hideContactForm?: boolean;
   hideNavigation?: boolean;
