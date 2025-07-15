@@ -1,4 +1,5 @@
 import { dirname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 /**
  * Path to the CMS content directory
@@ -14,7 +15,10 @@ import { dirname, join, relative } from 'node:path';
  * // Output: /path/to/apps/cms/content
  * ```
  */
-export const contentPath = join(dirname(import.meta.url), '../../../apps/cms/content');
+export const contentPath = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../apps/cms/content'
+);
 
 /**
  * Generate a path within the work content directory
@@ -36,7 +40,8 @@ export const contentPath = join(dirname(import.meta.url), '../../../apps/cms/con
  * // Returns: /path/to/apps/cms/content/work/jobs/dl-full-stack-software-engineer
  * ```
  */
-export const workPath = (...paths: string[]) => join(contentPath, 'work', ...paths);
+export const workPath = (...paths: string[]) =>
+  join(contentPath, 'work', ...paths);
 
 /**
  * Generate a relative path from the current location to an image file
@@ -66,11 +71,6 @@ export const generateRelativeImagePath = (
 ) => {
   const fullPath = join(contentPath, imagePath);
   const relativePath = relative(currentPath, fullPath);
-  console.log({
-    currentPath,
-    imagePath,
-    fullPath,
-    relativePath,
-  });
+
   return relativePath;
-}; 
+};
