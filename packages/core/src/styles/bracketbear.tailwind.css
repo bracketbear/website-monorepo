@@ -1,9 +1,16 @@
+/* Tailwind is our base framework. */
 @import 'tailwindcss';
+
+/* Fonts */
 @import '@fontsource/oswald/700.css';
 @import '@fontsource/fira-sans/400.css';
 @import '@fontsource/fira-sans/500.css';
 @import '@fontsource/fira-sans/700.css';
 
+/* Default theme variables. Source of truth for theming easily. */
+@import './theme.css';
+
+/* Utility classes for the core components. */
 @import './border.css';
 @import './box-shadow.css';
 @import './cards.css';
@@ -12,45 +19,6 @@
 @import './section.css';
 @import './tangible.css';
 @import './typography.css';
-
-/* Theme Variables */
-@theme {
-  --default-font-family: 'Fira Sans', 'sans-serif';
-  --heading-font-family: 'Oswald', 'sans-serif';
-
-  /* Base Theme Colors */
-  /* Brand Colors */
-  --color-brand-dark: hsl(200, 0%, 15%);
-  --color-brand-dark-muted: hsl(200, 0%, 75%);
-  --color-brand-red: #bb4430;
-  --color-brand-orange:	rgb(255, 213, 128);
-  --color-brand-blue: #7ebdc2;
-  --color-brand-green: #98CE00;
-  --color-brand-yellow: #f3dfa2;
-  --color-brand-purple: #B185A7;
-  --color-brand-light: #F2F0EF;
-
-  /* Theme Tokens - Light Mode Defaults */
-  --color-primary: var(--color-brand-orange);
-  --color-secondary: var(--color-brand-red);
-  --color-tertiary: var(--color-brand-green);
-  --color-background: var(--color-brand-light);
-  --color-foreground: var(--color-brand-dark);
-  --color-border: var(--color-dark);
-  --color-shadow: var(--color-dark);
-  --color-text-primary: var(--color-foreground);
-  --color-text-secondary: var(--color-foreground-muted);
-  --color-foreground-muted: color-mix(
-    in srgb,
-    var(--color-foreground) 80%,
-    transparent
-  );
-  --color-background-muted: color-mix(
-    in srgb,
-    var(--color-background) 80%,
-    transparent
-  );
-}
 
 /* Halftone pattern text with double shadow for headings */
 @utility halftone-text-shadow {

@@ -2,7 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 import { useRef, useState } from 'react';
 import WorkHistory from './WorkHistory';
 
-export interface WorkSkillFilterProps {
+export interface FilteredWorkHistoryProps {
   skills: CollectionEntry<'workSkills'>[];
   skillCategories: CollectionEntry<'workSkillCategory'>[];
   jobs: CollectionEntry<'workJobs'>[];
@@ -13,13 +13,13 @@ export interface WorkSkillFilterProps {
 const sectionHeaderClassName =
   'heading halftone-text-shadow-middle-brand-red text-6xl font-black uppercase mb-6' as const;
 
-export default function WorkSkillFilter({
+export default function FilteredWorkHistory({
   skills,
   skillCategories,
   jobs,
   projects,
   companies,
-}: WorkSkillFilterProps) {
+}: FilteredWorkHistoryProps) {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -72,7 +72,7 @@ export default function WorkSkillFilter({
     >
       {/* Sidebar: Filters */}
       <aside className="w-full flex-shrink-0 py-4 lg:sticky lg:top-0 lg:mr-6 lg:w-1/3 lg:self-start">
-        <div className="border-default min-h-[400px] overflow-y-auto bg-white p-8 lg:flex lg:max-h-[calc(100vh-2rem)] lg:flex-col">
+        <div className="card overflow-y-auto lg:flex lg:max-h-[calc(100vh-2rem)] lg:flex-col">
           {/* Skills by Category */}
           <>
             {/* Filter Status Message */}
@@ -107,7 +107,7 @@ export default function WorkSkillFilter({
                       return (
                         <button
                           key={skill.id}
-                          className={`pill pill-skill pill-hover${isSelected ? 'pill-selected' : ''}`}
+                          className={`pill pill-skill pill-hover ${isSelected ? 'pill-selected' : ''}`}
                           onClick={() => toggleSkill(skill.id)}
                           type="button"
                         >
@@ -126,7 +126,6 @@ export default function WorkSkillFilter({
       <main className="min-w-0 flex-1 space-y-12 py-4">
         {/* Jobs */}
         <section>
-          <div className={sectionHeaderClassName}>Jobs</div>
           <WorkHistory
             jobs={filteredJobs}
             companies={companies}

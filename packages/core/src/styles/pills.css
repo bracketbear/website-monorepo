@@ -1,5 +1,3 @@
-/* Pill Design System */
-
 /* Base pill utility */
 @utility pill {
   @apply tangible tangible-pill border-2 border-solid rounded-md font-bold uppercase tracking-wide py-2 px-4 text-sm min-h-9 min-w-10 transition-all duration-150 ease-in-out;
@@ -7,45 +5,38 @@
 
 /* Color variants */
 @utility pill-brand-orange {
-  background-color: var(--color-brand-orange);
-  color: var(--color-brand-dark);
-  border-color: var(--color-brand-orange);
+  @apply bg-brand-orange text-brand-dark border-brand-orange;
 
-  --tangible-shadow-color: --alpha(var(--color-brand-red) / 10%);
+  --tangible-shadow-color: --alpha(var(--color-brand-orange) / 10%);
 }
 
 @utility pill-brand-red {
-  background-color: var(--color-brand-red);
-  color: var(--color-brand-light);
-  border-color: var(--color-brand-red);
-  
+  @apply bg-brand-red text-brand-light border-brand-red;
+
   --tangible-shadow-color: --alpha(var(--color-brand-red) / 10%);
 }
 
 @utility pill-brand-green {
-  background-color: var(--color-brand-green);
-  border-color: #4b6e00; /* deeper green */
-  color: var(--color-brand-dark);
+  @apply bg-brand-green text-brand-dark border-brand-green;
+
+  --tangible-shadow-color: --alpha(var(--color-brand-green) / 10%);
 }
 
 @utility pill-brand-blue {
-  background-color: var(--color-brand-blue);
-  border-color: #1e4e5f; /* deeper blue */
-  color: var(--color-brand-dark);
+  @apply bg-brand-blue text-brand-dark border-brand-blue;
+
+  --tangible-shadow-color: --alpha(var(--color-brand-blue) / 10%);
 }
 
 @utility pill-brand-purple {
-  background-color: var(--color-brand-purple);
-  border-color: #6d3a6d; /* deeper purple */
-  color: var(--color-brand-light);
+  @apply bg-brand-purple text-brand-light border-brand-purple;
+
+  --tangible-shadow-color: --alpha(var(--color-brand-purple) / 10%);
 }
 
 /* Size variants */
 @utility pill-sm {
-  padding: 0.5rem 1.25rem;
-  font-size: 1rem;
-  min-height: 2rem;
-  border-radius: 9999px;
+  @apply py-2 px-5 text-sm min-h-9 min-w-10 rounded-full;
 }
 
 @utility pill-lg {

@@ -69,10 +69,7 @@ export default function WorkHistory({
   return (
     <div className="space-y-8">
       {groupedJobs.map((group) => (
-        <div
-          key={group.company.id}
-          className="bg-background border-default p-6"
-        >
+        <div key={group.company.id} className="card">
           {/* Company header with halftone text shadow */}
           <h3 className="heading mb-6 text-3xl">{group.company.data.title}</h3>
           {/* Company Jobs */}
@@ -85,14 +82,8 @@ export default function WorkHistory({
                     'border-brand-orange border-l-4 pl-6 transition-all duration-300',
                     job.isHidden
                       ? 'opacity-50 grayscale'
-                      : 'hover:border-[var(--color-brand-red)]'
+                      : 'hover:border-brand-red'
                   )}
-                  style={
-                    {
-                      '--color-brand-orange': 'var(--color-brand-orange)',
-                      '--color-brand-red': 'var(--color-brand-red)',
-                    } as React.CSSProperties
-                  }
                 >
                   <div className="mb-2 flex items-center gap-2">
                     <h4 className="font-heading text-xl uppercase">
@@ -110,7 +101,7 @@ export default function WorkHistory({
                   </p>
                   {job.data.highlights && job.data.highlights.length > 0 && (
                     <ul className="mb-4 list-outside list-disc space-y-1 pl-4">
-                      {job.data.highlights?.map((highlight) => (
+                      {job.data.highlights?.map((highlight: string) => (
                         <li
                           key={highlight}
                           className="text-foreground font-medium"
@@ -123,12 +114,12 @@ export default function WorkHistory({
                   {/* Skills row */}
                   {job.data.workSkills && job.data.workSkills.length > 0 && (
                     <div className="flex flex-wrap gap-2 border-t-2 border-[var(--color-brand-dark)] pt-3">
-                      {job.data.workSkills?.map((skillId) => {
+                      {job.data.workSkills?.map((skillId: string) => {
                         const isSelected = selectedSkills.includes(skillId);
                         return (
                           <span
                             key={skillId}
-                            className={`pill pill-skill pill-hover${isSelected ? 'pill-selected' : ''}`}
+                            className={`pill pill-skill pill-hover ${isSelected ? 'pill-selected' : ''}`}
                           >
                             {skills.find((s) => s.id === skillId)?.data.title ||
                               skillId}
