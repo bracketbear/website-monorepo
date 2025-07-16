@@ -13,6 +13,7 @@
 /* Utility classes for the core components. */
 @import './border.css';
 @import './box-shadow.css';
+@import './buttons.css';
 @import './cards.css';
 @import './forms.css';
 @import './pills.css';

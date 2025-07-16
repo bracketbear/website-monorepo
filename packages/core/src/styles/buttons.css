@@ -1,0 +1,41 @@
+/* Button styles for BracketBear applications */
+
+/* Base button utility - applies all common button styles */
+@utility button {
+  @apply border-default transform font-black uppercase transition-all cursor-pointer rounded-lg;
+}
+
+/* Button sizes - only modify padding and text size */
+@utility button-sm {
+  @apply px-4 py-2 text-sm rounded-md;
+}
+
+@utility button-md {
+  @apply px-6 py-3 text-base rounded-lg;
+}
+
+@utility button-lg {
+  @apply px-8 py-4 text-xl rounded-xl;
+}
+
+/* Button variants - only modify colors and backgrounds */
+@utility button-primary {
+  @apply bg-primary text-brand-light;
+}
+
+@utility button-secondary {
+  @apply bg-brand-light text-brand-dark;
+}
+
+@utility button-ghost {
+  @apply bg-transparent text-brand-dark;
+}
+
+/* Interactive states - only modify hover/active effects */
+@utility button-interactive {
+  @apply hover:scale-105 hover:rotate-1 active:scale-95;
+}
+
+@utility button-disabled {
+  @apply cursor-not-allowed opacity-50 hover:scale-100 hover:rotate-0 active:scale-100;
+}

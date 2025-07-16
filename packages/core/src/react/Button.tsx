@@ -1,23 +1,17 @@
 import { forwardRef } from 'react';
 import { clsx } from 'clsx';
+import {
+  buttonVariantClasses,
+  buttonSizeClasses,
+  type ButtonVariant,
+  type ButtonSize,
+} from '../utils/button-classes';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: ButtonVariant;
+  size?: ButtonSize;
 }
-
-const variantClasses = {
-  primary: 'bg-foreground text-background',
-  secondary: 'bg-background text-foreground border-foreground',
-  ghost: 'bg-transparent text-foreground',
-};
-
-const sizeClasses = {
-  sm: 'px-4 py-2 text-sm',
-  md: 'px-6 py-3 text-base',
-  lg: 'px-8 py-4 text-xl',
-};
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -38,13 +32,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         type={type}
         disabled={disabled}
         className={clsx(
-          'border-default halftone-shadow transform font-black uppercase transition-all',
+          'button',
           // Disabled state overrides hover effects
-          disabled
-            ? 'cursor-not-allowed opacity-50 hover:scale-100 hover:rotate-0 active:scale-100'
-            : 'hover:scale-105 hover:rotate-1 active:scale-95',
-          variantClasses[variant],
-          sizeClasses[size],
+          disabled ? 'button-disabled' : 'button-interactive',
+          buttonVariantClasses[variant],
+          buttonSizeClasses[size],
           className
         )}
         {...props}
