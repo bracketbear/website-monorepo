@@ -97,7 +97,7 @@ export function ContactForm() {
               particleCount={50}
               particleSize={6}
               particleSpeed={2}
-              disabled={isSubmitting}
+              disabled={true}
             >
               {isSubmitting ? 'Sending…' : 'Send Message'}
             </ParticleButton>

@@ -2,7 +2,7 @@
 
 /* Base button utility - applies all common button styles */
 @utility button {
-  @apply border-default transform font-black uppercase transition-all cursor-pointer rounded-lg;
+  @apply border-default transform font-black uppercase transition-all cursor-pointer rounded-lg shadow-md hover:shadow-lg active:shadow-sm outline-amber-500 button-interactive;
 }
 
 /* Button sizes - only modify padding and text size */
@@ -20,7 +20,7 @@
 
 /* Button variants - only modify colors and backgrounds */
 @utility button-primary {
-  @apply bg-primary text-brand-light;
+  @apply bg-primary text-brand-dark;
 }
 
 @utility button-secondary {
@@ -33,9 +33,9 @@
 
 /* Interactive states - only modify hover/active effects */
 @utility button-interactive {
-  @apply hover:scale-105 hover:rotate-1 active:scale-95;
+  @apply hover:scale-105 active:scale-95;
 }
 
 @utility button-disabled {
-  @apply cursor-not-allowed opacity-50 hover:scale-100 hover:rotate-0 active:scale-100;
+  @apply cursor-not-allowed opacity-50 hover:scale-100 active:scale-100;
 }

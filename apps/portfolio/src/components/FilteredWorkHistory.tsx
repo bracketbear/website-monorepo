@@ -10,9 +10,6 @@ export interface FilteredWorkHistoryProps {
   companies: CollectionEntry<'workCompany'>[];
 }
 
-const sectionHeaderClassName =
-  'heading halftone-text-shadow-middle-brand-red text-6xl font-black uppercase mb-6' as const;
-
 export default function FilteredWorkHistory({
   skills,
   skillCategories,
@@ -134,22 +131,6 @@ export default function FilteredWorkHistory({
             selectedSkills={selectedSkills}
             skills={skills}
           />
-        </section>
-        {/* Projects */}
-        <section>
-          <div className={sectionHeaderClassName}>Projects</div>
-          <div className="py-8 text-center">
-            <p className="text-foreground text-lg">
-              Projects are now displayed on the{' '}
-              <a
-                href="/projects"
-                className="link-underline text-brand-red font-medium"
-              >
-                Projects page
-              </a>
-              .
-            </p>
-          </div>
         </section>
       </main>
     </div>

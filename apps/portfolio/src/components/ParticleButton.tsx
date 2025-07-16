@@ -1,9 +1,9 @@
-import { forwardRef, useRef, useEffect } from 'react';
+import { forwardRef, useRef, useEffect, type ReactNode } from 'react';
 import * as PIXI from 'pixi.js';
 import { clsx } from '@bracketbear/core';
 
 interface ParticleButtonProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   onClick?: () => void;
   particleCount?: number;
@@ -273,7 +273,10 @@ export const ParticleButton = forwardRef<
       <button
         ref={buttonRef}
         className={clsx(
-          'font-heading bg-dark border-brand-dark from-brand-red to-brand-orange relative z-10 overflow-hidden border-2 bg-gradient-to-r font-bold text-white uppercase shadow-[3px_3px_0_var(--color-brand-dark)] transition-all duration-200 text-shadow-lg not-[disabled]:cursor-pointer hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-gradient-to-l hover:shadow-[1px_1px_0_var(--color-brand-dark)]',
+          'button button-primary',
+          {
+            'button-disabled': disabled,
+          },
           className
         )}
         onMouseEnter={handleMouseEnter}

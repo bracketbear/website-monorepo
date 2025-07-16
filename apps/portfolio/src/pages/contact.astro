@@ -2,28 +2,116 @@
 import ContentLayout from '@/layouts/ContentLayout.astro';
 import ContactForm from '@/components/ContactForm';
 import { getContactBreadcrumbs } from '@/config/breadcrumbs';
+import type { LabelValue } from '@bracketbear/core';
+
+/**
+ * TODO: I hate all of the copy in this page.
+ */
 
 const breadcrumbs = getContactBreadcrumbs();
+
+interface ContactMethod extends LabelValue {
+  icon: string;
+}
+
+const contactMethods: ContactMethod[] = [
+  {
+    label: 'Email',
+    value: 'harrison@harrisoncallahan.com',
+    icon: '📧',
+  },
+  {
+    label: 'LinkedIn',
+    value: 'https://linkedin.com/in/harrison-callahan',
+    icon: '💼',
+  },
+  { label: 'GitHub', value: 'https://github.com/bracketbear', icon: '🐙' },
+];
 ---
 
 <ContentLayout title="Reach Out" breadcrumbs={breadcrumbs}>
-  <div class="border-default lg:grid lg:grid-cols-2">
-    <div class="bg-brand-dark text-brand-light p-8">
-      <h2 class="font-heading mb-2 text-3xl uppercase">
-        Thank you for your interest!
-      </h2>
-      <p>
-        I'm currently available for freelance and full-time work. If you're
-        looking for a software engineer with a passion for building immersive
-        experiences, I'd love to hear from you.
-      </p>
-      <p class="mt-4">
-        Feel free to reach me via this form or via the links below.
-      </p>
-    </div>
-    <div class="bg-brand-light p-8">
-      <h2 class="font-heading mb-4 text-3xl uppercase">Contact Form</h2>
-      <ContactForm client:load />
+  <!-- Hero Section with Contact Form -->
+  <div class="mb-16">
+    <div
+      class="bg-brand-dark text-brand-light relative overflow-hidden rounded-4xl p-12"
+    >
+      <!-- Main Content -->
+      <div class="relative z-10">
+        <div class="grid items-start gap-8 lg:grid-cols-2">
+          <div>
+            <h2
+              class="font-heading text-brand-light mb-6 text-5xl tracking-tight uppercase"
+            >
+              Ready to Ship?
+            </h2>
+            <div class="space-y-4 text-xl leading-relaxed font-medium">
+              <p>
+                I build digital solutions that work. No fancy buzzwords, no
+                over-engineering. Just solid code that solves real problems.
+              </p>
+              <p class="text-brand-orange font-bold">
+                Currently available for new projects.
+              </p>
+            </div>
+
+            <!-- Contact Links -->
+            <div class="mt-8 space-y-4">
+              <h3
+                class="font-heading text-brand-light mb-4 text-2xl tracking-tight"
+              >
+                GET IN TOUCH
+              </h3>
+              <div class="space-y-3 text-lg font-medium">
+                {
+                  contactMethods.map((method) => (
+                    <a
+                      href={method.value}
+                      class="hover:text-brand-orange flex items-center gap-3 transition-colors"
+                    >
+                      <span class="text-2xl">{method.icon}</span>
+                      <span>{method.label}</span>
+                    </a>
+                  ))
+                }
+              </div>
+
+              <!-- Quick Info -->
+              <div class="border-brand-light/20 mt-6 border-t pt-6">
+                <div class="space-y-2 text-lg font-medium">
+                  <div class="flex justify-between">
+                    <span>Response Time:</span>
+                    <span class="text-brand-orange font-bold">24h</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Experience:</span>
+                    <span class="text-brand-orange font-bold">10+ Years</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Location:</span>
+                    <span class="text-brand-orange font-bold">Remote/PGH</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-brand-light text-brand-dark rounded-2xl p-8">
+            <h3 class="font-heading mb-6 text-2xl tracking-tight">
+              SEND ME A MESSAGE
+            </h3>
+            <div
+              class="text-brand-dark mb-6 text-lg leading-relaxed font-medium"
+            >
+              <p>
+                Tell me about your project, timeline, and what you're looking
+                for. I'll get back to you with how I can help bring your vision
+                to life.
+              </p>
+            </div>
+            <ContactForm client:load />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </ContentLayout>
