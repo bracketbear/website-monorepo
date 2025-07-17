@@ -56,6 +56,9 @@ export { generateRelativeImagePath, contentPath, workPath } from './src/utils';
 // Export schemas
 export * from './src/schemas';
 
+// Export types
+export * from './src/types';
+
 // Export collection configurations
 export {
   workCollections,

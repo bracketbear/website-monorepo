@@ -1,10 +1,17 @@
 ---
 import { getCollection } from 'astro:content';
 import { Button } from '@bracketbear/core/astro';
-import { BracketBearLogo, getProjectUrl } from '@bracketbear/core';
+import { getProjectUrl } from '@bracketbear/core';
+import { BracketBearLogo } from '@bracketbear/core/react';
 import Layout from '@/layouts/Layout.astro';
 import SkillsTicker from '@/components/SkillsTicker';
-import ContactForm from '@/components/ContactForm.astro';
+import ContactForm from '@/components/ContactForm';
+import type {
+  WorkJobEntry,
+  WorkSkillEntry,
+  WorkProjectEntry,
+  WorkCompanyEntry,
+} from '@bracketbear/astro-content';
 
 const snakeText = [
   'Software Engineer.',
@@ -12,10 +19,10 @@ const snakeText = [
   'Creative Developer.',
 ] as const;
 
-const workJobs = await getCollection('workJobs');
-const workSkills = await getCollection('workSkills');
-const workProjects = await getCollection('workProject');
-const workCompanies = await getCollection('workCompany');
+const workJobs: WorkJobEntry[] = await getCollection('workJobs');
+const workSkills: WorkSkillEntry[] = await getCollection('workSkills');
+const workProjects: WorkProjectEntry[] = await getCollection('workProject');
+const workCompanies: WorkCompanyEntry[] = await getCollection('workCompany');
 
 // Sort jobs by start date (most recent first)
 const sortedJobs = workJobs.sort(
@@ -48,7 +55,10 @@ function formatDate(date: Date): string {
 }
 
 // Helper function to get company name from company key
-function getCompanyName(companyKey: string, companies: any[]): string {
+function getCompanyName(
+  companyKey: string,
+  companies: WorkCompanyEntry[]
+): string {
   const company = companies.find((c) => c.id === companyKey);
   return company?.data.title || companyKey;
 }
@@ -190,14 +200,16 @@ function getCompanyName(companyKey: string, companies: any[]): string {
                 )}
                 {job.data.highlights && job.data.highlights.length > 0 && (
                   <ul class="mb-4 list-inside list-disc space-y-1">
-                    {job.data.highlights.slice(0, 3).map((highlight) => (
-                      <li class="text-foreground/80">{highlight}</li>
-                    ))}
+                    {job.data.highlights
+                      .slice(0, 3)
+                      .map((highlight: string) => (
+                        <li class="text-foreground/80">{highlight}</li>
+                      ))}
                   </ul>
                 )}
                 {job.data.workSkills && job.data.workSkills.length > 0 && (
                   <div class="flex flex-wrap gap-2">
-                    {job.data.workSkills.map((skillKey) => {
+                    {job.data.workSkills.map((skillKey: string) => {
                       const skill = workSkills.find((s) => s.id === skillKey);
                       return skill ? (
                         <span class="bg-primary text-primary-foreground px-3 py-1 text-sm font-bold uppercase">
@@ -243,14 +255,18 @@ function getCompanyName(companyKey: string, companies: any[]): string {
                   )}
                   {project.data.skills && project.data.skills.length > 0 && (
                     <div class="flex flex-wrap gap-2">
-                      {project.data.skills.slice(0, 3).map((skillKey) => {
-                        const skill = workSkills.find((s) => s.id === skillKey);
-                        return skill ? (
-                          <span class="bg-primary text-primary-foreground px-2 py-1 text-sm font-bold uppercase">
-                            {skill.data.title}
-                          </span>
-                        ) : null;
-                      })}
+                      {project.data.skills
+                        .slice(0, 3)
+                        .map((skillKey: string) => {
+                          const skill = workSkills.find(
+                            (s) => s.id === skillKey
+                          );
+                          return skill ? (
+                            <span class="bg-primary text-primary-foreground px-2 py-1 text-sm font-bold uppercase">
+                              {skill.data.title}
+                            </span>
+                          ) : null;
+                        })}
                     </div>
                   )}
                 </div>
@@ -268,7 +284,7 @@ function getCompanyName(companyKey: string, companies: any[]): string {
   </main>
 
   <!-- Contact Form Section -->
-  <ContactForm class="bg-primary relative z-10 py-36" />
+  <ContactForm client:load />
 </Layout>
 
 <style>

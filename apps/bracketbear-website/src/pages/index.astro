@@ -7,6 +7,12 @@ import ChooseUsSection from '@/components/ChooseUsSection.astro';
 import ServicesSection from '@/components/ServicesSection.astro';
 import WorkHistory from '@/components/WorkHistory';
 import ServiceTicker from '@/components/ServiceTicker';
+import type {
+  WorkJobEntry,
+  WorkCompanyEntry,
+  WorkSkillEntry,
+  ServiceEntry,
+} from '@bracketbear/astro-content';
 
 const snakeText = [
   'Software Engineer.',
@@ -14,10 +20,10 @@ const snakeText = [
   'Creative Developer.',
 ] as const;
 
-const jobs = await getCollection('workJobs');
-const companies = await getCollection('workCompany');
-const skills = await getCollection('workSkills');
-const services = await getCollection('services');
+const jobs: WorkJobEntry[] = await getCollection('workJobs');
+const companies: WorkCompanyEntry[] = await getCollection('workCompany');
+const skills: WorkSkillEntry[] = await getCollection('workSkills');
+const services: ServiceEntry[] = await getCollection('services');
 ---
 
 <Layout>
