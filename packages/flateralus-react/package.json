@@ -1,9 +1,9 @@
 {
-  "name": "@bracketbear/flateralus",
+  "name": "@bracketbear/flateralus-react",
   "version": "1.0.0",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "module",
   "files": [
     "dist"
   ],
@@ -14,11 +14,12 @@
   },
   "dependencies": {
     "@bracketbear/core": "file:../core",
+    "@bracketbear/flateralus": "file:../flateralus",
     "pixi.js": "^8.0.0",
-    "zod": "^3.22.2"
+    "react": "^19.0.0"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "Flateralus animation engine. TypeScript-first, but works in JS."
+  "description": "React bindings for Flateralus animation engine."
 }

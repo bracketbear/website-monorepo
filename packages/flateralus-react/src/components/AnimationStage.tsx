@@ -5,7 +5,7 @@ import type {
   AnimationFactory,
   ControlValues,
   AnimationControlValues,
-} from './animations/types';
+} from '@bracketbear/flateralus';
 import DebugControls from './DebugControls';
 import { clsx } from '@bracketbear/core';
 

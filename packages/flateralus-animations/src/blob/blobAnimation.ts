@@ -1,6 +1,9 @@
+import {
+  type AnimationManifest,
+  type ManifestToControlValues,
+  BaseAnimation,
+} from '@bracketbear/flateralus';
 import * as PIXI from 'pixi.js';
-import type { AnimationManifest, ManifestToControlValues } from './types';
-import { BaseAnimation } from './BaseAnimation';
 
 // ============================================================================
 // ANIMATION CONSTANTS
@@ -232,9 +235,6 @@ type BlobControlValues = ManifestToControlValues<typeof MANIFEST>;
 // ============================================================================
 // ANIMATION IMPLEMENTATION
 // ============================================================================
-
-/** Particle color (brand-gray) */
-const PARTICLE_COLOR = 0x000000;
 
 /**
  * Create a particle texture with glow effect

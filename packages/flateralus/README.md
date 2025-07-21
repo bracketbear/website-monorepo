@@ -1,89 +1,23 @@
-# Flateralus
+# Flateralus Package Structure
 
-## Overview
-A library for adding character to the web through interactive graphics, animations, and visual effects. Built with PixiJS and TypeScript for high-performance web graphics.
+This package is organized for clarity, scalability, and maintainability. The structure is based on the following taxonomy:
 
-## Table of Contents
+## Directory Structure
 
-- [Overview](#overview)
-- [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [API Reference](#api-reference)
-- [Examples](#examples)
-- [Development](#development)
-- [Back to Monorepo](../../README.md)
+- `core/` — Core engine abstractions and base classes (e.g., `BaseAnimation`).
+- `animations/` — Each animation implementation gets its own folder, containing its logic, manifest, and helpers.
+- `types/` — All shared types, schemas, and utility types.
 
-## Features
+## Rationale
 
-- **Interactive Graphics**: Mouse and touch interaction support
-- **Performance Optimized**: Built on PixiJS for smooth animations
-- **TypeScript**: Full type safety and IntelliSense support
-- **Modular Design**: Composable sprites, behaviors, and generators
-- **Responsive**: Adapts to different screen sizes and input methods
-- **Customizable**: Extensive configuration options for visual effects
+- **Separation of Concerns:** Engine logic, animation implementations, and type definitions are kept distinct.
+- **Scalability:** New animations can be added in their own folders under `animations/`.
+- **Maintainability:** Each part of the system is easy to locate and update.
 
-## Installation
+## Export Pattern
 
-```bash
-npm install @bracketbear/flateralus
-```
+Each directory contains an `index.ts` file to provide clean exports. The package root `index.ts` re-exports from these submodules for a simple public API.
 
-## Quick Start
+---
 
-```typescript
-import { FlateralusCanvas } from '@bracketbear/flateralus';
-
-const canvas = new FlateralusCanvas({
-  container: document.getElementById('canvas-container'),
-  width: 800,
-  height: 600
-});
-
-// Add interactive elements
-canvas.addSprite(new CircleSprite({
-  x: 400,
-  y: 300,
-  radius: 50,
-  color: 0xff0000
-}));
-
-canvas.start();
-```
-
-## API Reference
-
-### Core Classes
-- `FlateralusCanvas`: Main canvas manager
-- `Sprite`: Base class for visual elements
-- `Behavior`: Base class for sprite behaviors
-- `Generator`: Base class for sprite generators
-
-### Sprites
-- `CircleSprite`: Circular sprites with physics
-- `CustomPathSprite`: Sprites with custom SVG paths
-
-### Behaviors
-- `RepulsionBehavior`: Sprites that repel from each other
-- `SlowReturnBehavior`: Sprites that slowly return to original position
-
-### Generators
-- `GridGenerator`: Generate sprites in a grid pattern
-- `FibonacciSpiralGenerator`: Generate sprites in a spiral pattern
-
-## Examples
-
-See the examples in the `examples/` directory for more detailed usage patterns.
-
-## Development
-
-```bash
-# Install dependencies
-npm install
-
-# Start development mode
-npm run dev
-
-# Build for production
-npm run build
-```
+This pattern should be followed for all future additions to the package. 

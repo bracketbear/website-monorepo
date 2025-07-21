@@ -1,5 +1,10 @@
-import * as PIXI from 'pixi.js';
-import type { Animation, AnimationManifest, ControlValues } from './types';
+import { Application as PixiApplication } from 'pixi.js';
+import type {
+  Animation,
+  AnimationManifest,
+  Control,
+  ControlValues,
+} from '../types';
 
 // ============================================================================
 // BASE ANIMATION CLASS
@@ -12,7 +17,7 @@ import type { Animation, AnimationManifest, ControlValues } from './types';
 export abstract class BaseAnimation<TControlValues extends ControlValues = {}>
   implements Animation<TControlValues>
 {
-  protected app: PIXI.Application | null = null;
+  protected app: PixiApplication | null = null;
   protected controlValues: TControlValues;
   protected previousControlValues: TControlValues;
   protected isInitialized = false;
@@ -41,7 +46,9 @@ export abstract class BaseAnimation<TControlValues extends ControlValues = {}>
 
     // Check if any reset controls have changed
     const hasResetChanges = changedControls.some((controlName) => {
-      const control = manifest.controls.find((c) => c.name === controlName);
+      const control = manifest.controls.find(
+        (control: Control) => control.name === controlName
+      );
       return control?.resetsAnimation === true;
     });
 
@@ -73,7 +80,7 @@ export abstract class BaseAnimation<TControlValues extends ControlValues = {}>
    * Hook for handling animation resets when reset controls change
    * Override this to recreate animation state
    */
-  protected onReset(_app: PIXI.Application, _controls: TControlValues): void {
+  protected onReset(_app: PixiApplication, _controls: TControlValues): void {
     // Default implementation does nothing
     // Override in derived classes to handle animation resets
   }
@@ -86,7 +93,7 @@ export abstract class BaseAnimation<TControlValues extends ControlValues = {}>
   ): void;
 
   abstract onInit(
-    app: PIXI.Application,
+    app: PixiApplication,
     width: number,
     height: number,
     controls: TControlValues
@@ -125,7 +132,7 @@ export abstract class BaseAnimation<TControlValues extends ControlValues = {}>
   /**
    * Initialize the animation
    */
-  init(app: PIXI.Application, width: number, height: number): void {
+  init(app: PixiApplication, width: number, height: number): void {
     this.app = app;
     this.isInitialized = true;
     this.lastUpdateTime = Date.now();
@@ -162,7 +169,7 @@ export abstract class BaseAnimation<TControlValues extends ControlValues = {}>
   /**
    * Helper method to get the PIXI application
    */
-  protected getApp(): PIXI.Application | null {
+  protected getApp(): PixiApplication | null {
     return this.app;
   }
 

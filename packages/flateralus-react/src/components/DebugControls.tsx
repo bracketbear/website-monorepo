@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import type {
   AnimationManifest,
   ControlValues,
   Control,
-} from './animations/types';
-import { ReactButton } from '@bracketbear/core';
+} from '@bracketbear/flateralus';
+import { Button } from '@bracketbear/core/react';
 
 // Gear icon component
 const GearIcon = () => (
@@ -214,13 +214,13 @@ export default function DebugControls({
   return (
     <div className="absolute top-4 right-4 z-50">
       {/* Gear toggle button */}
-      <ReactButton
+      <Button
         variant="gear"
         onClick={() => setIsExpanded(!isExpanded)}
         className="mb-2"
       >
         <GearIcon />
-      </ReactButton>
+      </Button>
 
       {/* Debug panel */}
       {isExpanded && (

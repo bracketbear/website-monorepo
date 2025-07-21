@@ -1,6 +1,6 @@
 import { Button } from '@bracketbear/core/react';
-import AnimationStage from './AnimationStage';
-import { createBlobAnimation } from './animations/blobAnimation';
+import { AnimationStage } from '@bracketbear/flateralus-react';
+import { createBlobAnimation } from '@bracketbear/flateralus-animations';
 
 interface HeroSectionProps {
   className?: string;

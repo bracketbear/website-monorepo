@@ -1,5 +1,5 @@
 {
-  "name": "@bracketbear/flateralus",
+  "name": "@bracketbear/flateralus-animations",
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,12 +13,10 @@
     "test": "echo \"No tests yet\" && exit 0"
   },
   "dependencies": {
-    "@bracketbear/core": "file:../core",
-    "pixi.js": "^8.0.0",
-    "zod": "^3.22.2"
+    "@bracketbear/flateralus": "file:../flateralus"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "Flateralus animation engine. TypeScript-first, but works in JS."
-}
+  "description": "Custom animation implementations for the Flateralus engine. TypeScript-first, but works in JS."
+} 
