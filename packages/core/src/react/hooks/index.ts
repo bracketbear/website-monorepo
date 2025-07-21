@@ -1,1 +1,2 @@
-export { useIntersectionObserver } from './useIntersectionObserver'; 
+export * from './useIntersectionObserver';
+export * from './useDebounce';

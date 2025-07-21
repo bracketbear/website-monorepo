@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import type {
   AnimationManifest,
   ControlValues,
   Control,
 } from '@bracketbear/flateralus';
 import { Button } from '@bracketbear/core/react';
+import {
+  NumberControl,
+  BooleanControl,
+  ColorControl,
+  SelectControl,
+} from './controls';
 
 // Gear icon component
 const GearIcon = () => (
@@ -45,204 +51,127 @@ interface DebugControlsProps {
  * Provides a dynamic UI for adjusting animation parameters in real-time
  * based on the animation's manifest and control schema
  */
-export default function DebugControls({
-  manifest,
-  controlValues,
-  onControlsChange,
-  isVisible = false,
-}: DebugControlsProps) {
-  const [localValues, setLocalValues] = useState<ControlValues>(controlValues);
-  const [isExpanded, setIsExpanded] = useState(false);
+const DebugControls = memo<DebugControlsProps>(
+  ({ manifest, controlValues, onControlsChange, isVisible = false }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isPanelVisible, setIsPanelVisible] = useState(false);
 
-  // Update local values when props change
-  useEffect(() => {
-    setLocalValues(controlValues);
-  }, [controlValues]);
+    // Handle panel mount/unmount for animation
+    useEffect(() => {
+      if (isExpanded) {
+        setIsPanelVisible(true);
+      } else {
+        const timeout = setTimeout(() => setIsPanelVisible(false), 250);
+        return () => clearTimeout(timeout);
+      }
+    }, [isExpanded]);
 
-  const handleControlChange = (
-    key: string,
-    value: number | boolean | string
-  ) => {
-    const newValues = { ...localValues, [key]: value };
-    setLocalValues(newValues);
-    onControlsChange({ [key]: value });
-  };
+    const handleControlChange = useCallback(
+      (key: string, value: number | boolean | string) => {
+        onControlsChange({ [key]: value });
+      },
+      [onControlsChange]
+    );
 
-  const resetToDefaults = () => {
-    const defaultValues: ControlValues = {};
-    manifest.controls.forEach((control) => {
-      defaultValues[control.name] = control.defaultValue;
-    });
-    setLocalValues(defaultValues);
-    onControlsChange(defaultValues);
-  };
+    const resetToDefaults = () => {
+      const defaultValues: ControlValues = {};
+      manifest.controls.forEach((control) => {
+        defaultValues[control.name] = control.defaultValue;
+      });
+      onControlsChange(defaultValues);
+    };
 
-  const renderControl = (control: Control) => {
-    const value = localValues[control.name];
+    const renderControl = (control: Control) => {
+      const value = controlValues[control.name];
 
-    // Skip controls that shouldn't be shown in debug
-    if (!control.debug) return null;
+      // Skip controls that shouldn't be shown in debug
+      if (!control.debug) return null;
 
-    switch (control.type) {
-      case 'number':
-        return renderNumberControl(control, value as number);
-      case 'boolean':
-        return renderBooleanControl(control, value as boolean);
-      case 'color':
-        return renderColorControl(control, value as string);
-      case 'select':
-        return renderSelectControl(control, value as string);
-      default:
-        return null;
-    }
-  };
+      switch (control.type) {
+        case 'number':
+          return (
+            <NumberControl
+              key={control.name}
+              control={control as Control & { type: 'number' }}
+              value={value as number}
+              onControlChange={handleControlChange}
+            />
+          );
+        case 'boolean':
+          return (
+            <BooleanControl
+              key={control.name}
+              control={control as Control & { type: 'boolean' }}
+              value={value as boolean}
+              onControlChange={handleControlChange}
+            />
+          );
+        case 'color':
+          return (
+            <ColorControl
+              key={control.name}
+              control={control as Control & { type: 'color' }}
+              value={value as string}
+              onControlChange={handleControlChange}
+            />
+          );
+        case 'select':
+          return (
+            <SelectControl
+              key={control.name}
+              control={control as Control & { type: 'select' }}
+              value={value as string}
+              onControlChange={handleControlChange}
+            />
+          );
+        default:
+          return null;
+      }
+    };
 
-  const renderNumberControl = (
-    control: Control & { type: 'number' },
-    value: number
-  ) => (
-    <div key={control.name} className="space-y-2">
-      <label className="block text-xs text-white/60">
-        {control.label}: {value}
-        {control.description && (
-          <span className="ml-2 text-white/40">({control.description})</span>
-        )}
-      </label>
-      <div className="space-y-1">
-        <input
-          type="range"
-          min={control.min}
-          max={control.max}
-          step={control.step}
-          value={value}
-          onChange={(e) =>
-            handleControlChange(control.name, Number(e.target.value))
-          }
-          className="slider h-2 w-full cursor-pointer appearance-none rounded-lg bg-white/20"
-        />
-        <input
-          type="number"
-          min={control.min}
-          max={control.max}
-          step={control.step}
-          value={value}
-          onChange={(e) =>
-            handleControlChange(control.name, Number(e.target.value))
-          }
-          className="w-full rounded bg-white/10 px-2 py-1 text-xs text-white"
-        />
-      </div>
-    </div>
-  );
+    if (!isVisible) return null;
 
-  const renderBooleanControl = (
-    control: Control & { type: 'boolean' },
-    value: boolean
-  ) => (
-    <div key={control.name} className="flex items-center justify-between">
-      <label className="text-xs text-white/60">
-        {control.label}
-        {control.description && (
-          <span className="ml-2 text-white/40">({control.description})</span>
-        )}
-      </label>
-      <input
-        type="checkbox"
-        checked={value}
-        onChange={(e) => handleControlChange(control.name, e.target.checked)}
-        className="rounded bg-white/10"
-      />
-    </div>
-  );
+    return (
+      <div className="absolute top-4 right-4 z-50 flex w-full max-w-160 flex-col items-end">
+        {/* Gear toggle button */}
+        <Button
+          variant="gear"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="mb-2"
+        >
+          <GearIcon />
+        </Button>
 
-  const renderColorControl = (
-    control: Control & { type: 'color' },
-    value: string
-  ) => (
-    <div key={control.name}>
-      <label className="mb-1 block text-xs text-white/60">
-        {control.label}
-        {control.description && (
-          <span className="ml-2 text-white/40">({control.description})</span>
-        )}
-      </label>
-      <div className="flex items-center gap-2">
-        <input
-          type="color"
-          value={value}
-          onChange={(e) => handleControlChange(control.name, e.target.value)}
-          className="h-8 w-12 rounded border border-white/20"
-        />
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => handleControlChange(control.name, e.target.value)}
-          className="flex-1 rounded bg-white/10 px-2 py-1 text-xs text-white"
-          placeholder="#000000"
-        />
-      </div>
-    </div>
-  );
-
-  const renderSelectControl = (
-    control: Control & { type: 'select' },
-    value: string
-  ) => (
-    <div key={control.name}>
-      <label className="mb-1 block text-xs text-white/60">
-        {control.label}
-        {control.description && (
-          <span className="ml-2 text-white/40">({control.description})</span>
-        )}
-      </label>
-      <select
-        value={value}
-        onChange={(e) => handleControlChange(control.name, e.target.value)}
-        className="w-full rounded bg-white/10 px-2 py-1 text-xs text-white"
-      >
-        {control.options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-
-  if (!isVisible) return null;
-
-  return (
-    <div className="absolute top-4 right-4 z-50">
-      {/* Gear toggle button */}
-      <Button
-        variant="gear"
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="mb-2"
-      >
-        <GearIcon />
-      </Button>
-
-      {/* Debug panel */}
-      {isExpanded && (
-        <div className="min-w-80 rounded-lg border border-white/20 bg-black/90 p-4 text-white shadow-lg">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-bold">{manifest.name}</h3>
-              <p className="text-xs text-white/60">{manifest.description}</p>
+        {/* Debug panel */}
+        {isPanelVisible && (
+          <div
+            className={`rounded-xl border border-neutral-700 bg-neutral-900/95 p-4 text-white shadow-2xl shadow-black/60 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${isExpanded ? 'translate-y-0 scale-100 opacity-100' : 'pointer-events-none translate-y-4 scale-95 opacity-0'}`}
+            style={{ willChange: 'opacity, transform' }}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-white/90">
+                  {manifest.name}
+                </h3>
+              </div>
+              <Button variant="warning" onClick={resetToDefaults} size="sm">
+                Reset
+              </Button>
             </div>
-            <button
-              onClick={resetToDefaults}
-              className="rounded bg-red-600 px-2 py-1 text-sm transition-colors hover:bg-red-700"
-            >
-              Reset
-            </button>
+            <div className="mb-3 text-xs text-white/50">
+              {manifest.description}
+            </div>
+            <div className="max-h-96 space-y-2 overflow-y-auto pr-1">
+              {manifest.controls.map(renderControl)}
+              {/* Remove the test slider */}
+            </div>
           </div>
+        )}
+      </div>
+    );
+  }
+);
 
-          <div className="max-h-96 space-y-4 overflow-y-auto">
-            {manifest.controls.map(renderControl)}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+DebugControls.displayName = 'DebugControls';
+
+export default DebugControls;

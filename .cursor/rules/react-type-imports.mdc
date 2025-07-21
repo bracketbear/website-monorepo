@@ -1,0 +1,7 @@
+# React Type Imports
+
+Always import types directly from 'react' (e.g., `import { type FC } from "react";`), never use `React.something` for types. This ensures type-only imports are tree-shakable and avoids unnecessary runtime dependencies.
+description:
+globs:
+alwaysApply: false
+---

@@ -104,9 +104,12 @@ export const AnimationManifestSchema = z.object({
 export type Control = z.infer<typeof ControlSchema>;
 export type AnimationManifest = z.infer<typeof AnimationManifestSchema>;
 
-export type ControlValues = Record<string, string | number | boolean>;
+export type ControlValueTypes = string | number | boolean;
+
+export type ControlValues = Record<string, ControlValueTypes>;
 
 // One control → its value type
+// TODO: This is a hack to get the value type of a control
 export type ControlValue<C extends Control> = C['type'] extends 'number'
   ? number
   : C['type'] extends 'boolean'

@@ -2,20 +2,20 @@
 
 /* Base button utility - applies all common button styles */
 @utility button {
-  @apply border-default transform font-black uppercase transition-all cursor-pointer rounded-lg shadow-md hover:shadow-lg active:shadow-sm outline-amber-500 button-interactive;
+  @apply border-default button-interactive transform cursor-pointer rounded-lg font-black uppercase shadow-md outline-amber-500 transition-all hover:shadow-lg active:shadow-sm;
 }
 
 /* Button sizes - only modify padding and text size */
 @utility button-sm {
-  @apply px-4 py-2 text-sm rounded-md;
+  @apply rounded-md px-4 py-2 text-sm;
 }
 
 @utility button-md {
-  @apply px-6 py-3 text-base rounded-lg;
+  @apply rounded-lg px-6 py-3 text-base;
 }
 
 @utility button-lg {
-  @apply px-8 py-4 text-xl rounded-xl;
+  @apply rounded-xl px-8 py-4 text-xl;
 }
 
 /* Button variants - only modify colors and backgrounds */
@@ -28,12 +28,20 @@
 }
 
 @utility button-ghost {
-  @apply bg-transparent text-brand-dark;
+  @apply text-brand-dark bg-transparent;
+}
+
+@utility button-error {
+  @apply bg-brand-red text-brand-dark;
+}
+
+@utility button-warning {
+  @apply bg-brand-yellow text-brand-dark;
 }
 
 /* Gear button for debug controls */
 @utility button-gear {
-  @apply bg-black/90 text-white border border-white/20 rounded-lg p-2 hover:bg-black/95 hover:border-white/30 transition-all;
+  @apply rounded-lg border border-white/20 bg-black/90 p-2 text-white transition-all hover:border-white/30 hover:bg-black/95;
 }
 
 /* Interactive states - only modify hover/active effects */

@@ -1,18 +1,21 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import * as PIXI from 'pixi.js';
 import type {
   Animation,
   AnimationFactory,
   ControlValues,
   AnimationControlValues,
+  AnimationManifest,
 } from '@bracketbear/flateralus';
 import DebugControls from './DebugControls';
 import { clsx } from '@bracketbear/core';
 
-// ============================================================================
-// ANIMATION STAGE CONFIGURATION
-// ============================================================================
-/** Background color (transparent) */
 const BACKGROUND_COLOR = 'transparent';
 
 interface AnimationStageProps<
@@ -33,7 +36,7 @@ interface AnimationStageProps<
 /**
  * Animation Stage Component
  *
- * A simple stage that hosts one specific animation and displays its debug controls.
+ * A stage that hosts an animation and displays its debug controls.
  */
 export default function AnimationStage<
   TAnimation extends Animation<ControlValues>,
@@ -51,6 +54,9 @@ export default function AnimationStage<
   const animationRef = useRef<TAnimation | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const [controlValues, setControlValues] = useState<ControlValues>({});
+  const [manifest, setManifest] = useState<AnimationManifest | undefined>(
+    undefined
+  );
 
   /**
    * Initialize the PixiJS application and animation
@@ -113,11 +119,17 @@ export default function AnimationStage<
 
       // Apply initial values if provided
       if (Object.keys(initialValues).length > 0) {
-        animationRef.current.updateControls(initialValues);
+        animationRef.current.updateControls({
+          ...initialValues,
+          ...animationRef.current.getControlValues(),
+        });
         setControlValues(animationRef.current.getControlValues());
       } else {
         setControlValues(animationRef.current.getControlValues());
       }
+
+      // Set manifest after animation is initialized
+      setManifest(animationRef.current.getManifest());
 
       // Animation loop
       app.ticker.add(() => {
@@ -131,12 +143,24 @@ export default function AnimationStage<
   /**
    * Handle control changes from debug panel
    */
-  const handleControlsChange = (newValues: Partial<ControlValues>) => {
-    if (animationRef.current) {
-      animationRef.current.updateControls(newValues);
-      setControlValues(animationRef.current.getControlValues());
-    }
-  };
+  const handleControlsChange = useCallback(
+    (newValues: Partial<ControlValues>) => {
+      setControlValues((prev) => {
+        const merged = { ...prev };
+        for (const key in newValues) {
+          if (newValues[key] !== undefined) {
+            merged[key] = newValues[key] as string | number | boolean;
+          }
+        }
+        return merged;
+      });
+
+      if (animationRef.current) {
+        animationRef.current.updateControls(newValues);
+      }
+    },
+    [animationRef]
+  );
 
   useEffect(() => {
     const startApp = async () => {
@@ -173,6 +197,7 @@ export default function AnimationStage<
       if (resizeObserverRef.current) {
         resizeObserverRef.current.disconnect();
       }
+
       if (appRef.current) {
         try {
           appRef.current.destroy();
@@ -180,6 +205,7 @@ export default function AnimationStage<
           console.warn('Error destroying PixiJS app:', error);
         }
       }
+
       // Clean up animation
       if (animationRef.current) {
         animationRef.current.destroy();
@@ -197,9 +223,9 @@ export default function AnimationStage<
         }}
       ></div>
       <div className="relative z-20 h-full w-full">{children}</div>
-      {showDebugControls && animationRef.current && (
+      {showDebugControls && animationRef.current && manifest && (
         <DebugControls
-          manifest={animationRef.current.getManifest()}
+          manifest={manifest}
           controlValues={controlValues}
           onControlsChange={handleControlsChange}
           isVisible={showDebugControls}

@@ -1,18 +1,24 @@
-import React, { forwardRef, InputHTMLAttributes } from 'react';
+import { forwardRef, type InputHTMLAttributes } from 'react';
 
-export interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface TextInputProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   error?: string;
   className?: string;
+  size?: 'sm' | 'md';
 }
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ error, className = '', ...props }, ref) => {
+  ({ error, className = '', size = 'md', ...props }, ref) => {
+    const sizeClasses =
+      size === 'sm'
+        ? 'p-1 text-xs border rounded border-2'
+        : 'p-2 font-mono border-2';
     return (
       <input
         ref={ref}
-        className={`border-brand-dark focus:ring-brand-orange w-full rounded rounded-tl-none border-2 bg-white p-2 font-mono transition-all focus:ring-2 focus:outline-none ${
+        className={`border-brand-dark focus:ring-brand-orange w-full rounded rounded-tl-none bg-white transition-all focus:ring-2 focus:outline-none text-brand-dark ${
           error ? 'animate-shake border-brand-red' : ''
-        } ${className}`}
+        } ${sizeClasses} ${className}`}
         aria-invalid={!!error}
         aria-describedby={error ? `${props.id || props.name}-error` : undefined}
         {...props}

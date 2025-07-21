@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect, type FC } from 'react';
 import * as PIXI from 'pixi.js';
 
 /**
@@ -355,7 +355,7 @@ class MouseCursorEffect {
  * <PointerFX />
  * ```
  */
-const PointerFX: React.FC = () => {
+const PointerFX: FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
   const mouseRef = useRef<MouseState>({
