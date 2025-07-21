@@ -31,6 +31,11 @@
   @apply bg-transparent text-brand-dark;
 }
 
+/* Gear button for debug controls */
+@utility button-gear {
+  @apply bg-black/90 text-white border border-white/20 rounded-lg p-2 hover:bg-black/95 hover:border-white/30 transition-all;
+}
+
 /* Interactive states - only modify hover/active effects */
 @utility button-interactive {
   @apply hover:scale-105 active:scale-95;

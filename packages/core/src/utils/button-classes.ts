@@ -4,6 +4,7 @@ export const buttonVariantClasses = {
   primary: 'button-primary',
   secondary: 'button-secondary',
   ghost: 'button-ghost',
+  gear: 'button-gear',
 } as const;
 
 export const buttonSizeClasses = {

@@ -1,0 +1,50 @@
+# Portfolio Implementation Patterns
+
+## Page Structure
+All portfolio pages should follow the established Bracket Bear design system patterns:
+
+### Homepage (index.astro)
+- **Hero Section**: Dark background with large name/title and availability announcement
+- **About Section**: Light background with card containing introduction text
+- **Work Experience**: Dark background with light cards for job entries
+- **Featured Projects**: Light background with dark cards for project previews
+- **Contact Section**: Dark background with light card containing contact form
+
+### Content Pages (about.astro, work.astro, projects.astro, contact.astro)
+- Use `ContentLayout` component for consistent page structure
+- Include proper breadcrumb navigation
+- Apply alternating dark/light section backgrounds
+- Use `DetailBlock` and `SummaryBlock` components for structured content
+
+## Content Management
+- **Data Sources**: Use Astro content collections for all dynamic content
+- **Job Data**: Import from `workJobs` collection with proper date formatting
+- **Project Data**: Import from `workProject` collection with featured filtering
+- **Skill Data**: Import from `workSkills` collection for tags and filtering
+- **Company Data**: Import from `workCompany` collection for job associations
+
+## Component Usage
+- **Contact Forms**: Use `ContactForm` component with `client:load` directive
+- **Skills Ticker**: Use `SkillsTicker` component in hero sections
+- **Work History**: Use `FilteredWorkHistory` component for interactive filtering
+- **Navigation**: Use consistent breadcrumb patterns from config
+
+## Styling Patterns
+- **Cards**: Always use `card` utility class for content containers
+- **Typography**: Apply `font-heading` to all headings for halftone effect
+- **Colors**: Use brand colors consistently (brand-dark, brand-light, brand-orange)
+- **Spacing**: Use `py-24` for major sections, `py-8` for smaller sections
+- **Grids**: Use responsive grid patterns for project and job listings
+
+## Interactive Features
+- **Filtering**: Implement skill-based filtering for work history and projects
+- **Hover Effects**: Use `hover:scale-105` for card interactions
+- **Form Validation**: Use `ValidatedForm` with proper error handling
+- **Navigation**: Ensure proper link structure and breadcrumb trails
+
+## File References
+- Main layout: [apps/portfolio/src/layouts/Layout.astro](mdc:apps/portfolio/src/layouts/Layout.astro)
+- Content layout: [apps/portfolio/src/layouts/ContentLayout.astro](mdc:apps/portfolio/src/layouts/ContentLayout.astro)
+- Contact form: [apps/portfolio/src/components/ContactForm.tsx](mdc:apps/portfolio/src/components/ContactForm.tsx)
+- Work history: [apps/portfolio/src/components/FilteredWorkHistory.tsx](mdc:apps/portfolio/src/components/FilteredWorkHistory.tsx)
+- Skills ticker: [apps/portfolio/src/components/SkillsTicker.tsx](mdc:apps/portfolio/src/components/SkillsTicker.tsx)

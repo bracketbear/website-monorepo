@@ -41,7 +41,6 @@ export {
   ensureMediaImage,
 } from './src/image-copy';
 
-
 // Export content image loader (recommended - automatically handles images when content is loaded)
 export {
   createContentImageLoader,

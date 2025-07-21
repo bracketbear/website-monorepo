@@ -1,0 +1,66 @@
+
+# Bracket Bear Design System
+
+## Core Design Philosophy
+The Bracket Bear design system follows a brutalist aesthetic that prioritizes bold typography, clean layouts, and strategic use of brand colors. It emphasizes functionality and impact over decorative elements.
+
+## Color System
+- **Primary Backgrounds**: Use `bg-brand-dark` for hero sections and alternating content areas
+- **Content Areas**: Use `bg-brand-light` for readable content sections
+- **Text Colors**: 
+  - `text-brand-light` for text on dark backgrounds
+  - `text-brand-dark` for text on light backgrounds
+  - Use opacity modifiers (`text-brand-dark/80`) for secondary text
+- **Accent Color**: Use `bg-brand-orange` strategically for call-to-action elements and highlights
+- **Avoid**: Arbitrary colors or the old colorful section backgrounds (brand-red, brand-blue, brand-green)
+
+## Typography
+- **Headings**: Always use `font-heading` utility class for all headings to apply the halftone effect
+- **Font Weights**: Use `font-black` for main headings, `font-bold` for subheadings
+- **Text Sizing**: 
+  - Hero titles: `text-8xl`
+  - Section headings: `text-5xl`
+  - Card titles: `text-2xl`
+  - Body text: `text-xl` for primary, `text-lg` for secondary
+- **Tracking**: Use `tracking-tight` for headings
+- **Case**: Use `uppercase` for headings and labels
+
+## Layout Patterns
+- **Card System**: Use the `card` utility class for all content containers
+- **Section Spacing**: Use `py-24` for major sections
+- **Container**: Use `container mx-auto px-6` for content wrapping
+- **Grid Layouts**: Use `grid gap-8` with responsive breakpoints (`md:grid-cols-2 lg:grid-cols-3`)
+- **Alternating Backgrounds**: Dark sections should contain light cards, light sections should contain dark cards
+
+## Component Patterns
+- **Buttons**: Use the `Button` component from `@bracketbear/core/astro`
+- **Forms**: Use `ValidatedForm` and related components from `@bracketbear/core/react`
+- **Pills/Tags**: Use `pill pill-skill` for skill tags and `pill pill-category` for categories
+- **Navigation**: Use consistent breadcrumb patterns and navigation links
+
+## Interactive Elements
+- **Hover Effects**: Use `hover:scale-105` for card interactions
+- **Transitions**: Use `transition-transform` for smooth interactions
+- **Focus States**: Ensure proper focus indicators for accessibility
+
+## Content Structure
+- **Hero Sections**: Dark background with large typography and availability announcements
+- **Content Sections**: Alternating dark/light backgrounds with card-based content
+- **Contact Forms**: Dark background with light card containing the form
+- **Skills Ticker**: Dark background with brand-orange accent icons
+
+## Best Practices
+- **No Arbitrary Colors**: Always use predefined brand colors from the design system
+- **Consistent Spacing**: Use the spacing scale consistently (8, 16, 24, etc.)
+- **Typography Hierarchy**: Maintain clear visual hierarchy with consistent heading styles
+- **Card Content**: Always wrap content in cards with proper background colors
+- **Brand Integration**: Use Bracket Bear logo and branding elements strategically
+- **Accessibility**: Ensure proper contrast ratios and focus states
+
+## File References
+- Design system utilities: [packages/core/src/styles/bracketbear.tailwind.css](mdc:packages/core/src/styles/bracketbear.tailwind.css)
+- Core components: [packages/core/src/react/index.ts](mdc:packages/core/src/react/index.ts)
+- Astro components: [packages/core/src/astro/index.ts](mdc:packages/core/src/astro/index.ts)
+
+- Core components: [packages/core/src/react/index.ts](mdc:packages/core/src/react/index.ts)
+- Astro components: [packages/core/src/astro/index.ts](mdc:packages/core/src/astro/index.ts)

@@ -1,13 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
-import { Picture } from 'astro:assets';
-import { getProjectImageUrl } from '@bracketbear/astro-content';
-import { DetailBlock, SummaryBlock, getProjectUrl } from '@bracketbear/core';
+import { DetailBlock, SummaryBlock } from '@bracketbear/core';
 import { getBreadcrumbs } from '@/config/breadcrumbs';
 import ContentLayout from '@/layouts/ContentLayout.astro';
+import ProjectCard from '@/components/ProjectCard';
 
 const workProject = await getCollection('workProject');
-const workSkills = await getCollection('workSkills');
 const workProjectCategories = await getCollection('workProjectCategory');
 const breadcrumbs = getBreadcrumbs({
   label: 'Projects',
@@ -28,21 +26,13 @@ const projectsByCategory = workProjectCategories
   })
   .filter((group) => group.projects.length > 0);
 
+// Get skills for project cards
+const workSkills = await getCollection('workSkills');
+
 // Calculate some stats for detail blocks
 const totalProjects = workProject.length;
 const featuredProjects = workProject.filter((p) => p.data.isFeatured).length;
 const totalSkills = workSkills.length;
-
-// Get cover image URLs for all projects
-const coverImageMap: Record<string, string | undefined> = {};
-for (const project of workProject) {
-  if (project.data.coverImage) {
-    const imageUrl = getProjectImageUrl(project.id, project.data.coverImage);
-    coverImageMap[project.id] = imageUrl;
-  } else {
-    coverImageMap[project.id] = undefined;
-  }
-}
 ---
 
 <ContentLayout title="Projects" breadcrumbs={breadcrumbs} showHero={true}>
@@ -81,79 +71,17 @@ for (const project of workProject) {
           </div>
 
           <div class="grid gap-8 lg:grid-cols-2">
-            {projects.map((project) => {
-              // Get skills in the order they appear in the array, limit to top 3
-              const projectSkills = (project.data.skills ?? [])
-                .map((skillId: string) =>
-                  workSkills.find((s) => s.id === skillId)
-                )
-                .filter(Boolean)
-                .slice(0, 3);
-              const coverImage = coverImageMap[project.id];
-              return (
-                <a
-                  href={getProjectUrl(project.id)}
-                  class="block hover:no-underline"
-                >
-                  <div class="card flex h-full flex-col">
-                    {/* Cover Image */}
-                    <div class="border-brand-dark/30 mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl border">
-                      {coverImage ? (
-                        <Picture
-                          src={coverImage}
-                          alt={`${project.data.title} cover`}
-                          width={800}
-                          height={600}
-                          layout="full-width"
-                          fit="cover"
-                          class="h-full w-full object-cover"
-                        />
-                      ) : (
-                        // TODO: Add a placeholder image
-                        <span class="text-brand-yellow font-mono text-xs opacity-60">
-                          [No Cover Image]
-                        </span>
-                      )}
-                    </div>
-                    {/* Project category and featured badges */}
-                    <div class="mb-4 flex items-center gap-4">
-                      {project.data.category && (
-                        <span class="pill pill-category">
-                          {project.data.category}
-                        </span>
-                      )}
-                      {project.data.isFeatured && (
-                        <span class="pill pill-featured">Featured</span>
-                      )}
-                    </div>
-
-                    <div class="flex flex-1 flex-col">
-                      <h3 class="font-heading mb-3 text-2xl font-black tracking-tight uppercase">
-                        {project.data.title}
-                      </h3>
-
-                      {/* Project summary */}
-                      {project.data.summary && (
-                        <div class="text-foreground mb-4 line-clamp-3 text-lg leading-relaxed font-medium">
-                          {project.data.summary}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Skills row */}
-                    {projectSkills.length > 0 && (
-                      <div class="border-brand-dark mt-auto flex flex-wrap gap-2 border-t-2 pt-3">
-                        {projectSkills.map((skill: any) => (
-                          <span class="pill pill-skill">
-                            {skill?.data.title}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </a>
-              );
-            })}
+            {projects.map((project) => (
+              <ProjectCard
+                project={project}
+                skills={workSkills}
+                variant="light"
+                showImage={true}
+                showBadges={true}
+                showSkills={true}
+                maxSkills={3}
+              />
+            ))}
           </div>
         </section>
       ))

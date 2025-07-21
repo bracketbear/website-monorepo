@@ -1,23 +1,16 @@
 ---
 import { getCollection } from 'astro:content';
 import { Button } from '@bracketbear/core/astro';
-import { getProjectUrl } from '@bracketbear/core';
-import { BracketBearLogo } from '@bracketbear/core/react';
 import Layout from '@/layouts/Layout.astro';
-import SkillsTicker from '@/components/SkillsTicker';
 import ContactForm from '@/components/ContactForm';
+import ProjectCard from '@/components/ProjectCard';
 import type {
   WorkJobEntry,
   WorkSkillEntry,
   WorkProjectEntry,
   WorkCompanyEntry,
 } from '@bracketbear/astro-content';
-
-const snakeText = [
-  'Software Engineer.',
-  'Problem Solver.',
-  'Creative Developer.',
-] as const;
+import HeroSection from '@/components/HeroSection';
 
 const workJobs: WorkJobEntry[] = await getCollection('workJobs');
 const workSkills: WorkSkillEntry[] = await getCollection('workSkills');
@@ -42,9 +35,8 @@ const featuredSkills = workSkills
 // Get current job
 const currentJob = sortedJobs.find((job) => job.data.isCurrentJob);
 
-// Helper function to format dates correctly (fix the one month behind issue)
+// Helper function to format dates correctly
 function formatDate(date: Date): string {
-  // Add one month to fix the display issue
   const adjustedDate = new Date(date);
   adjustedDate.setMonth(adjustedDate.getMonth() + 1);
 
@@ -65,500 +57,152 @@ function getCompanyName(
 ---
 
 <Layout title="Harrison Callahan - Portfolio" hideContactForm={true}>
-  <!-- Hero Section -->
-  <section
-    class="bg-brand-red dark:bg-brand-red/20 relative z-0 overflow-hidden pt-24"
-  >
-    <div class="relative z-10 container mx-auto px-6">
-      <div class="mb-16 max-w-4xl">
-        <div class="inline-block">
-          <h1
-            class="text-brand-light text-8xl font-black tracking-tight uppercase"
-          >
-            Harrison<br />
-            Callahan
-          </h1>
-        </div>
-        <div class="mt-8">
-          <p
-            class="text-foreground text-2xl font-bold tracking-tight uppercase"
-          >
-            Full-Stack Developer & Creative Technologist
-          </p>
-          {
-            currentJob && (
-              <p class="text-foreground/80 mt-4 text-xl font-medium">
-                Currently: {currentJob.data.title} at{' '}
-                {getCompanyName(currentJob.data.company, workCompanies)}
-              </p>
-            )
-          }
-        </div>
-      </div>
+  <!-- Hero Section with Particle Galaxy Background -->
+  <HeroSection className="h-screen w-full" client:load />
 
-      <!-- Availability Announcement -->
-      <div
-        class="mt-16 w-full lg:absolute lg:top-24 lg:right-6 lg:mt-0 lg:w-96"
-      >
-        <div
-          class="availability-box border-default bg-tertiary text-background transform p-6 lg:rotate-2"
+  <!-- What I Do Section -->
+  <section class="bg-brand-light py-24">
+    <div class="container mx-auto px-6">
+      <div class="mx-auto max-w-4xl text-center">
+        <h2
+          class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase"
         >
-          <h2 class="mb-2 text-4xl font-black tracking-tight uppercase">
-            Available Now!
-          </h2>
-          <p class="mb-4 text-xl font-bold">
-            Open to <span class="text-foreground bg-background px-2 py-1"
-              >full-time</span
-            >
-            and <span class="text-foreground bg-background px-2 py-1"
-              >contract</span
-            > full-stack roles.<br />
-            Let's build something amazing together.
+          What I Do
+        </h2>
+        <div class="card">
+          <p class="text-brand-dark mb-6 text-xl leading-relaxed font-bold">
+            I'm a full-stack developer and creative technologist with a passion
+            for building innovative solutions that bridge the gap between
+            technology and human experience.
           </p>
-          <a
-            href="mailto:contact@harrisoncallahan.com"
-            class="border-default text-foreground bg-background border-background inline-block px-6 py-3 text-lg font-black transition-transform hover:scale-105"
-          >
-            Let's Talk →
-          </a>
+          <p class="text-brand-dark/80 text-lg leading-relaxed font-medium">
+            With expertise in both traditional web development and cutting-edge
+            experiential technologies, I specialize in creating robust content
+            management systems, interactive installations, and scalable SaaS
+            platforms that not only work well today but can evolve with your
+            needs tomorrow.
+          </p>
         </div>
       </div>
     </div>
-    <SkillsTicker
-      skills={featuredSkills}
-      LogoComponent={BracketBearLogo}
-      client:load
-    />
   </section>
 
-  <main class="bg-background">
-    <!-- About Blurb Section -->
-    <section class="bg-brand-blue relative py-24">
-      <div class="relative z-10 container mx-auto px-6">
-        <div class="max-w-4xl">
-          <h2
-            class="border-default bg-background text-foreground mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase"
-          >
-            About Me
-          </h2>
-          <div class="border-default bg-background p-8">
-            <p class="text-foreground text-xl leading-relaxed font-bold">
-              I'm a full-stack developer and creative technologist with a
-              passion for building innovative solutions that bridge the gap
-              between tecurlhnology and human experience. With expertise in both
-              traditional web development and cutting-edge experiential
-              technologies, I specialize in creating robust content management
-              systems, interactive installations, and scalable SaaS platforms.
-            </p>
-            <p
-              class="text-foreground/80 mt-6 text-lg leading-relaxed font-medium"
-            >
-              My background spans from agency work at experiential marketing
-              firms to freelance development, giving me a unique perspective on
-              both the technical and business challenges that organizations
-              face. I believe in writing clean, maintainable code and building
-              systems that not only work well today but can evolve with your
-              needs tomorrow.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Recent Work Experience -->
-    <section class="bg-brand-orange relative py-24">
-      <div class="relative z-10 container mx-auto px-6">
+  <!-- Featured Projects Section -->
+  <section class="bg-brand-light py-24">
+    <div class="container mx-auto px-6">
+      <div class="mb-16 text-center">
         <h2
-          class="border-default bg-background text-foreground mb-16 inline-block p-6 text-5xl font-black tracking-tight uppercase"
-        >
-          Recent Experience
-        </h2>
-        <div class="space-y-8">
-          {
-            sortedJobs.slice(0, 3).map((job) => (
-              <div class="border-default bg-background p-8">
-                <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <h3 class="text-2xl font-black uppercase">
-                      {job.data.title}
-                    </h3>
-                    <p class="text-foreground/80 text-xl">
-                      {getCompanyName(job.data.company, workCompanies)}
-                    </p>
-                  </div>
-                  <div class="mt-2 text-right md:mt-0">
-                    <p class="text-foreground/60 font-bold">
-                      {formatDate(job.data.startDate)} -
-                      {job.data.endDate
-                        ? formatDate(job.data.endDate)
-                        : 'Present'}
-                    </p>
-                  </div>
-                </div>
-                {job.data.description && (
-                  <p class="text-foreground mb-4">{job.data.description}</p>
-                )}
-                {job.data.highlights && job.data.highlights.length > 0 && (
-                  <ul class="mb-4 list-inside list-disc space-y-1">
-                    {job.data.highlights
-                      .slice(0, 3)
-                      .map((highlight: string) => (
-                        <li class="text-foreground/80">{highlight}</li>
-                      ))}
-                  </ul>
-                )}
-                {job.data.workSkills && job.data.workSkills.length > 0 && (
-                  <div class="flex flex-wrap gap-2">
-                    {job.data.workSkills.map((skillKey: string) => {
-                      const skill = workSkills.find((s) => s.id === skillKey);
-                      return skill ? (
-                        <span class="bg-primary text-primary-foreground px-3 py-1 text-sm font-bold uppercase">
-                          {skill.data.title}
-                        </span>
-                      ) : null;
-                    })}
-                  </div>
-                )}
-              </div>
-            ))
-          }
-        </div>
-        <div class="mt-12 text-center">
-          <a href="/work">
-            <Button>View Full Work History →</Button>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Featured Projects Section -->
-    <section class="bg-brand-green relative py-24">
-      <div class="relative z-10 container mx-auto px-6">
-        <h2
-          class="border-default bg-background text-foreground mb-16 inline-block p-6 text-5xl font-black tracking-tight uppercase"
+          class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase"
         >
           Featured Projects
         </h2>
-        <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {
-            featuredProjects.map((project) => (
-              <a href={getProjectUrl(project.id)}>
-                <div class="border-default bg-background p-6 transition-transform hover:scale-105">
-                  <h3 class="mb-4 text-2xl font-black uppercase">
-                    {project.data.title}
+        <p class="text-brand-dark/80 mx-auto max-w-2xl text-xl">
+          Here's a taste of what I've been building. Each project represents a
+          unique challenge and showcases different aspects of my skills.
+        </p>
+      </div>
+      <div class="grid gap-8 lg:grid-cols-3">
+        {
+          featuredProjects.map((project) => (
+            <ProjectCard project={project} skills={workSkills} variant="dark" />
+          ))
+        }
+      </div>
+      <div class="mt-12 text-center">
+        <a href="/projects">
+          <Button variant="primary" size="lg">View All Projects →</Button>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Experience Section -->
+  <section class="bg-brand-dark py-24">
+    <div class="container mx-auto px-6">
+      <div class="mb-16 text-center">
+        <h2
+          class="font-heading text-brand-light mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase"
+        >
+          Recent Experience
+        </h2>
+        <p class="text-brand-light/80 mx-auto max-w-2xl text-xl">
+          My journey spans from agency work at experiential marketing firms to
+          freelance development, giving me a unique perspective on both
+          technical and business challenges.
+        </p>
+      </div>
+      <div class="mx-auto max-w-4xl space-y-8">
+        {
+          sortedJobs.slice(0, 3).map((job) => (
+            <div class="card-dark">
+              <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h3 class="font-heading text-brand-light text-2xl font-black uppercase">
+                    {job.data.title}
                   </h3>
-                  <p class="text-foreground/80 mb-4">{project.data.duration}</p>
-                  {project.data.description && (
-                    <p class="text-foreground mb-4">
-                      {project.data.description}
-                    </p>
-                  )}
-                  {project.data.skills && project.data.skills.length > 0 && (
-                    <div class="flex flex-wrap gap-2">
-                      {project.data.skills
-                        .slice(0, 3)
-                        .map((skillKey: string) => {
-                          const skill = workSkills.find(
-                            (s) => s.id === skillKey
-                          );
-                          return skill ? (
-                            <span class="bg-primary text-primary-foreground px-2 py-1 text-sm font-bold uppercase">
-                              {skill.data.title}
-                            </span>
-                          ) : null;
-                        })}
-                    </div>
-                  )}
+                  <p class="text-brand-light/80 text-xl">
+                    {getCompanyName(job.data.company, workCompanies)}
+                  </p>
                 </div>
-              </a>
-            ))
-          }
-        </div>
-        <div class="mt-12 text-center">
-          <a href="/work">
-            <Button type="button" data-interactive>View All Projects →</Button>
-          </a>
+                <div class="mt-2 text-right md:mt-0">
+                  <p class="text-brand-light/60 font-bold">
+                    {formatDate(job.data.startDate)} -
+                    {job.data.endDate
+                      ? formatDate(job.data.endDate)
+                      : 'Present'}
+                  </p>
+                </div>
+              </div>
+              {job.data.description && (
+                <p class="text-brand-light mb-4">{job.data.description}</p>
+              )}
+              {job.data.highlights && job.data.highlights.length > 0 && (
+                <ul class="mb-4 list-inside list-disc space-y-1">
+                  {job.data.highlights.slice(0, 3).map((highlight: string) => (
+                    <li class="text-brand-light/80">{highlight}</li>
+                  ))}
+                </ul>
+              )}
+              {job.data.workSkills && job.data.workSkills.length > 0 && (
+                <div class="flex flex-wrap gap-2">
+                  {job.data.workSkills.map((skillKey: string) => {
+                    const skill = workSkills.find((s) => s.id === skillKey);
+                    return skill ? (
+                      <span class="pill pill-skill">{skill.data.title}</span>
+                    ) : null;
+                  })}
+                </div>
+              )}
+            </div>
+          ))
+        }
+      </div>
+      <div class="mt-12 text-center">
+        <a href="/work">
+          <Button variant="secondary" size="lg">View Full Work History →</Button
+          >
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Let's Connect Section -->
+  <section class="bg-brand-dark py-24">
+    <div class="container mx-auto px-6">
+      <div class="mx-auto max-w-4xl text-center">
+        <h2
+          class="font-heading text-brand-light mb-8 p-6 text-5xl font-black tracking-tight uppercase"
+        >
+          Let's Work Together
+        </h2>
+        <p class="text-brand-light/80 mx-auto mb-12 max-w-2xl text-xl">
+          Ready to build something amazing? Whether you have a project in mind
+          or just want to chat about possibilities, I'd love to hear from you.
+        </p>
+        <div class="card bg-brand-light">
+          <ContactForm client:load />
         </div>
       </div>
-    </section>
-  </main>
-
-  <!-- Contact Form Section -->
-  <ContactForm client:load />
+    </div>
+  </section>
 </Layout>
-
-<style>
-  @keyframes shake {
-    0%,
-    100% {
-      transform: rotate(2deg) translate(0, 0) scale(1);
-    }
-    25% {
-      transform: rotate(3deg) translate(-2px, -2px) scale(1.02);
-    }
-    50% {
-      transform: rotate(1deg) translate(2px, 2px) scale(1.05);
-    }
-    75% {
-      transform: rotate(3deg) translate(-2px, 2px) scale(1.02);
-    }
-  }
-
-  .shake-animation {
-    animation: shake 0.5s ease-in-out;
-    transform-style: preserve-3d;
-    perspective: 1000px;
-  }
-
-  .availability-box {
-    transform-style: preserve-3d;
-    transition: transform 0.3s ease;
-  }
-
-  .snake-text-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .snake-text {
-    position: relative;
-    transform-origin: left;
-  }
-</style>
-
-<script>
-  interface Particle {
-    x: number;
-    y: number;
-    size: number;
-    speedX: number;
-    speedY: number;
-    rotation: number;
-    rotationSpeed: number;
-    type: 'plus' | 'logo' | 'dot';
-  }
-
-  class ParticleAnimation {
-    private canvas: HTMLCanvasElement;
-    private ctx: CanvasRenderingContext2D;
-    private particles: Particle[];
-    private particleCount: number;
-    private logoImage: HTMLImageElement;
-    private announcementBox: HTMLElement | null;
-
-    constructor() {
-      this.canvas = document.getElementById(
-        'particle-canvas'
-      ) as HTMLCanvasElement;
-      if (!this.canvas) {
-        throw new Error("Canvas element with id 'particle-canvas' not found.");
-      }
-      this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
-      if (!this.ctx) {
-        throw new Error('Could not get 2D context from canvas.');
-      }
-      this.particles = [];
-      this.particleCount = 50;
-      this.logoImage = new Image();
-      this.logoImage.src = '/favicon.svg';
-      this.announcementBox = document.querySelector('.availability-box');
-
-      this.init();
-      this.animate();
-      this.startShakeAnimation();
-    }
-
-    private startShakeAnimation(): void {
-      if (!this.announcementBox) return;
-
-      const shakeInterval = () => {
-        this.announcementBox?.classList.add('shake-animation');
-        setTimeout(() => {
-          this.announcementBox?.classList.remove('shake-animation');
-        }, 500);
-      };
-
-      // Initial shake
-      setTimeout(shakeInterval, 2000);
-
-      // Repeat every 8-12 seconds
-      const repeatShake = () => {
-        const randomDelay = Math.floor(Math.random() * 4000) + 8000; // 8-12 seconds
-        setTimeout(() => {
-          shakeInterval();
-          repeatShake();
-        }, randomDelay);
-      };
-
-      repeatShake();
-    }
-
-    private init(): void {
-      // Set canvas size
-      const resize = (): void => {
-        const dpr = window.devicePixelRatio || 1;
-        this.canvas.width = this.canvas.offsetWidth * dpr;
-        this.canvas.height = this.canvas.offsetHeight * dpr;
-        this.ctx.scale(dpr, dpr);
-      };
-
-      window.addEventListener('resize', resize);
-      resize();
-
-      // Create initial particles
-      for (let i = 0; i < this.particleCount; i++) {
-        this.particles.push(this.createParticle());
-      }
-    }
-
-    private createParticle(): Particle {
-      return {
-        x: Math.random() * this.canvas.width,
-        y: Math.random() * this.canvas.height,
-        size: Math.random() * 20 + 10,
-        speedX: Math.random() * 2 - 1,
-        speedY: Math.random() * 2 - 1,
-        rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: (Math.random() - 0.5) * 0.02,
-        type:
-          Math.random() < 0.2 ? 'logo' : Math.random() < 0.5 ? 'plus' : 'dot',
-      };
-    }
-
-    private drawPlus(
-      x: number,
-      y: number,
-      size: number,
-      rotation: number
-    ): void {
-      this.ctx.save();
-      this.ctx.translate(x, y);
-      this.ctx.rotate(rotation);
-
-      this.ctx.strokeStyle = 'rgba(191, 87, 0, 0.3)';
-      this.ctx.lineWidth = 2;
-      this.ctx.beginPath();
-
-      // Horizontal line
-      this.ctx.moveTo(-size / 2, 0);
-      this.ctx.lineTo(size / 2, 0);
-
-      // Vertical line
-      this.ctx.moveTo(0, -size / 2);
-      this.ctx.lineTo(0, size / 2);
-
-      this.ctx.stroke();
-      this.ctx.restore();
-    }
-
-    private drawLogo(
-      x: number,
-      y: number,
-      size: number,
-      rotation: number
-    ): void {
-      this.ctx.save();
-      this.ctx.translate(x, y);
-      this.ctx.rotate(rotation);
-
-      // Apply the dark orange tint to the logo
-      this.ctx.globalAlpha = 0.3;
-      this.ctx.filter =
-        'sepia(100%) hue-rotate(-15deg) saturate(400%) brightness(50%)';
-
-      // Draw the logo
-      if (this.logoImage.complete) {
-        const aspectRatio = this.logoImage.width / this.logoImage.height;
-        const width = size;
-        const height = size / aspectRatio;
-
-        this.ctx.drawImage(
-          this.logoImage,
-          -width / 2,
-          -height / 2,
-          width,
-          height
-        );
-      }
-
-      this.ctx.restore();
-    }
-
-    private drawDot(
-      x: number,
-      y: number,
-      size: number,
-      rotation: number
-    ): void {
-      this.ctx.save();
-      this.ctx.translate(x, y);
-
-      const color = 'rgba(191, 87, 0, 0.3)';
-      this.ctx.strokeStyle = color;
-      this.ctx.fillStyle = color;
-      this.ctx.lineWidth = 2;
-      this.ctx.beginPath();
-
-      this.ctx.arc(0, 0, size / 6, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      this.ctx.restore();
-    }
-
-    private animate(): void {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-      this.particles.forEach((particle: Particle) => {
-        // Update position
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
-        particle.rotation += particle.rotationSpeed;
-
-        // Wrap around edges
-        if (particle.x < 0) particle.x = this.canvas.width;
-        if (particle.x > this.canvas.width) particle.x = 0;
-        if (particle.y < 0) particle.y = this.canvas.height;
-        if (particle.y > this.canvas.height) particle.y = 0;
-
-        // Draw particle based on type
-        if (particle.type === 'logo') {
-          this.drawLogo(
-            particle.x,
-            particle.y,
-            particle.size,
-            particle.rotation
-          );
-        } else if (particle.type === 'plus') {
-          this.drawPlus(
-            particle.x,
-            particle.y,
-            particle.size,
-            particle.rotation
-          );
-        } else {
-          // dot
-          this.drawDot(
-            particle.x,
-            particle.y,
-            particle.size,
-            particle.rotation
-          );
-        }
-      });
-
-      requestAnimationFrame(() => this.animate());
-    }
-  }
-
-  function tryInitParticleAnimation() {
-    const canvas = document.getElementById('particle-canvas');
-    if (canvas) {
-      new ParticleAnimation();
-    } else {
-      setTimeout(tryInitParticleAnimation, 100);
-    }
-  }
-  document.addEventListener('DOMContentLoaded', tryInitParticleAnimation);
-</script>

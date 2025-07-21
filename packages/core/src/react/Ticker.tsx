@@ -77,7 +77,7 @@ export default function Ticker({
   };
 
   return (
-    <div className={`bg-gray-900 overflow-hidden w-full ${className}`}>
+    <div className={`bg-brand-dark overflow-hidden w-full ${className}`}>
       <div
         ref={tickerRef}
         className="flex items-center gap-4 py-8 overflow-x-hidden whitespace-nowrap w-full"
@@ -91,7 +91,7 @@ export default function Ticker({
           <div
             key={`${item.id}-${index}`}
             ref={index === tickerItems.length - 1 ? lastItemRef : undefined}
-            className={`flex items-center gap-4 text-white flex-shrink-0 ${itemClassName} ${
+            className={`flex items-center gap-4 text-brand-light flex-shrink-0 ${itemClassName} ${
               item.link
                 ? 'cursor-pointer hover:opacity-80 transition-opacity'
                 : ''
@@ -100,9 +100,9 @@ export default function Ticker({
           >
             <span className="text-xl font-bold">{item.title}</span>
             {item.icon && (
-              <div className="flex items-center justify-center bg-red-500 p-1 rounded-full w-6 aspect-square">
+              <div className="flex items-center justify-center bg-brand-orange p-1 rounded-full w-6 aspect-square">
                 <item.icon
-                  className={`-rotate-12 text-white ${iconClassName}`}
+                  className={`-rotate-12 text-brand-dark ${iconClassName}`}
                 />
               </div>
             )}

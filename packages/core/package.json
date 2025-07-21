@@ -45,8 +45,9 @@
   ],
   "scripts": {
     "build": "tsc && cpx \"src/styles/**/*\" dist/styles && cpx \"src/types/**/*\" dist/types && cpx \"src/config/**/*\" dist/config && cpx \"src/utils/**/*\" dist/utils && cpx \"src/assets/**/*\" dist/assets",
-    "dev": "concurrently \"tsc --watch\" \"npm run copy:astro:watch\" \"npm run copy:styles:watch\" \"npm run copy:types:watch\" \"npm run copy:config:watch\" \"npm run copy:utils:watch\"",
+    "dev": "concurrently \"tsc --watch\" \"npm run copy:astro:watch\" \"npm run copy:styles:watch\" \"npm run copy:types:watch\" \"npm run copy:config:watch\" \"npm run copy:utils:watch\" \"npm run copy:assets:watch\"",
     "clean": "rm -rf dist",
+    "copy:assets:watch": "cpx \"src/assets/**/*\" dist/assets",
     "copy:astro:watch": "cpx \"src/astro/**/*\" dist/astro --watch",
     "copy:styles:watch": "cpx \"src/styles/**/*\" dist/styles --watch",
     "copy:types:watch": "cpx \"src/types/**/*\" dist/types --watch",
