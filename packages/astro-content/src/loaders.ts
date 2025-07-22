@@ -330,6 +330,8 @@ function discoverImagesForEntry(
  *
  * This loader wraps Astro's built-in glob loader and automatically discovers and copies
  * images associated with content entries to the public directory.
+ * We do this so that we can use the images in the content layer without having to
+ * manually copy them to the public directory.
  *
  * @param options - Configuration options for the loader
  * @returns A custom Astro loader that handles both content and images

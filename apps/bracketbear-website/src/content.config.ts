@@ -1,5 +1,9 @@
 import { defineCollection } from 'astro:content';
-import { allCollections, createContentImageLoader } from '@bracketbear/astro-content';
+import {
+  allCollections,
+  createContentImageLoader,
+} from '@bracketbear/astro-content';
+import type { Schema } from 'astro:schema';
 
 /**
  * Creates a typed JSON-based collection using Astro's defineCollection and glob loaders.
@@ -10,7 +14,7 @@ function createJsonCollection({
   schema,
 }: {
   base: string;
-  schema: any;
+  schema: Schema;
 }) {
   // Create the content image loader that automatically handles images
   const contentImageLoader = createContentImageLoader();
