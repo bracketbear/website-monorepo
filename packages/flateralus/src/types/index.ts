@@ -1,9 +1,13 @@
-import type { ObjectKeys, ObjectValues } from '@bracketbear/core';
+import type { DeepReadonly, ObjectKeys, ObjectValues } from '@bracketbear/core';
 import { z } from 'zod';
 
 // ============================================================================
 // CONTROL SCHEMAS
 // ============================================================================
+
+export interface HasType<T extends string> {
+  type: T;
+}
 
 export const VALUE_TYPES = {
   number: 'number',
@@ -102,38 +106,45 @@ export const AnimationManifestSchema = z.object({
 // ============================================================================
 
 export type Control = z.infer<typeof ControlSchema>;
-export type AnimationManifest = z.infer<typeof AnimationManifestSchema>;
+export interface AnimationManifest
+  extends HasControls,
+    DeepReadonly<{
+      id: string;
+      name: string;
+      description: string;
+    }> {}
 
 export type ControlValueTypes = string | number | boolean;
 
 export type ControlValues = Record<string, ControlValueTypes>;
 
-// One control → its value type
-// TODO: This is a hack to get the value type of a control
-export type ControlValue<C extends Control> = C['type'] extends 'number'
-  ? number
-  : C['type'] extends 'boolean'
-    ? boolean
-    : /* color | select */ string;
+type ControlTypeToValueTypeMap = {
+  number: number;
+  boolean: boolean;
+  color: string;
+  select: string;
+};
+
+export interface HasControlType extends HasType<ControlType> {}
+
+export interface HasControls {
+  controls: ReadonlyArray<Control>;
+}
+
+export type ControlValueType<C extends HasControlType> =
+  ControlTypeToValueTypeMap[C['type']];
 
 // Entire manifest → { [name]: valueType }
-export type ManifestControlValues<M extends { controls: readonly Control[] }> =
-  {
-    [C in M['controls'][number] as C['name']]: ControlValue<C>;
-  };
+export type ManifestControlValues<M extends HasControls> = {
+  [C in M['controls'][number] as C['name']]: ControlValueType<C>;
+};
 
 /**
  * Utility type to extract control value types from a manifest
  * Maps control names to their inferred types based on the control type
  */
-export type ManifestToControlValues<TManifest extends AnimationManifest> = {
-  [K in TManifest['controls'][number] as K['name']]: K['type'] extends 'number'
-    ? number
-    : K['type'] extends 'boolean'
-      ? boolean
-      : K['type'] extends 'color' | 'select'
-        ? string
-        : never;
+export type ManifestToControlValues<M extends HasControls> = {
+  [C in M['controls'][number] as C['name']]: ControlValueType<C>;
 };
 
 /**

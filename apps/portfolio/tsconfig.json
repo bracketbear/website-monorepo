@@ -16,6 +16,11 @@
     },
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "typeRoots": [
+      "./src/types",
+      "../../packages/core/types",
+      "./node_modules/@types"
+    ]
   }
 }

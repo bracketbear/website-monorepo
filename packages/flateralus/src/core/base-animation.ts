@@ -3,8 +3,9 @@ import type {
   Animation,
   AnimationManifest,
   Control,
-  ControlValues,
+  ManifestToControlValues,
 } from '../types';
+import { getManifestDefaultControlValues } from '../utils/getManifestDefaultControlValues';
 
 // ============================================================================
 // BASE ANIMATION CLASS
@@ -13,25 +14,40 @@ import type {
 /**
  * Base animation class that handles common animation logic
  * Derived animations should extend this and implement lifecycle hooks
+ * Now accepts a manifest and infers control types from it.
  */
-export abstract class BaseAnimation<TControlValues extends ControlValues = {}>
-  implements Animation<TControlValues>
+export abstract class BaseAnimation<
+  TManifest extends AnimationManifest,
+  TControlValues extends
+    ManifestToControlValues<TManifest> = ManifestToControlValues<TManifest>,
+> implements Animation<TControlValues>
 {
   protected app: PixiApplication | null = null;
   protected controlValues: TControlValues;
   protected previousControlValues: TControlValues;
   protected isInitialized = false;
   protected lastUpdateTime = 0;
+  protected manifest: TManifest;
 
-  constructor(initialControls: TControlValues) {
-    this.controlValues = { ...initialControls };
-    this.previousControlValues = { ...initialControls };
+  /**
+   * @param manifest The animation manifest (type-safe, deeply readonly)
+   * @param initialControls The initial control values
+   */
+  constructor(manifest: TManifest, initialControls?: Partial<TControlValues>) {
+    this.manifest = manifest;
+    this.controlValues = {
+      ...getManifestDefaultControlValues(manifest),
+      ...initialControls,
+    } as TControlValues;
+    this.previousControlValues = { ...this.controlValues };
   }
 
   /**
-   * Get the animation manifest - must be implemented by derived classes
+   * Get the animation manifest
    */
-  abstract getManifest(): AnimationManifest;
+  getManifest(): TManifest {
+    return this.manifest;
+  }
 
   /**
    * Handle control changes - can be overridden for custom logic

@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { Button } from '@bracketbear/core/astro';
+import { AstroButton } from '@bracketbear/core/astro';
 import Layout from '@/layouts/Layout.astro';
 import ContactForm from '@/components/ContactForm';
 import ProjectCard from '@/components/ProjectCard';
@@ -110,7 +110,9 @@ function getCompanyName(
       </div>
       <div class="mt-12 text-center">
         <a href="/projects">
-          <Button variant="primary" size="lg">View All Projects →</Button>
+          <AstroButton variant="primary" size="lg"
+            >View All Projects →</AstroButton
+          >
         </a>
       </div>
     </div>
@@ -179,7 +181,8 @@ function getCompanyName(
       </div>
       <div class="mt-12 text-center">
         <a href="/work">
-          <Button variant="secondary" size="lg">View Full Work History →</Button
+          <AstroButton variant="secondary" size="lg"
+            >View Full Work History →</AstroButton
           >
         </a>
       </div>

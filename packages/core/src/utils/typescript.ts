@@ -26,3 +26,11 @@ export function hasObjectKey<T extends Record<string, any>, K extends string>(
 export function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
 }
+
+export type DeepReadonly<T> = T extends (...args: any[]) => any
+  ? T
+  : T extends Array<infer U>
+    ? ReadonlyArray<DeepReadonly<U>>
+    : T extends object
+      ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
+      : T;

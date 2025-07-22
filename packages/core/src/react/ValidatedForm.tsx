@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { z, ZodTypeAny } from 'zod';
+import { z } from 'zod';
 
 /**
  * Props for the ValidatedForm component.
  * @template TSchema - The Zod schema type for the form.
  */
-interface ValidatedFormProps<TSchema extends ZodTypeAny> {
+interface ValidatedFormProps<TSchema extends z.ZodTypeAny> {
   schema: TSchema;
   onSubmit: (values: z.infer<TSchema>) => Promise<void> | void;
   children: (props: {
@@ -22,13 +22,13 @@ interface ValidatedFormProps<TSchema extends ZodTypeAny> {
     submitSuccess: boolean;
   }) => React.ReactNode;
   initialValues?: Partial<z.infer<TSchema>>;
-  submitLabe?: string;
+  submitLabel?: string;
   animateOnSuccess?: boolean;
   animateOnError?: boolean;
   className?: string;
 }
 
-export function ValidatedForm<TSchema extends ZodTypeAny>({
+export function ValidatedForm<TSchema extends z.ZodTypeAny>({
   schema,
   onSubmit,
   children,

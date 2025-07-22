@@ -4,10 +4,10 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "isolatedModules": true,
-    "noEmit": false,
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
+    "noEmit": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -19,7 +19,8 @@
     "jsxImportSource": "react",
     "types": [
       "astro/client",
-      "./types/astro"
+      "./types/astro",
+      "./types/svg"
     ],
   },
   "include": ["src/**/*", "types/**/*"],

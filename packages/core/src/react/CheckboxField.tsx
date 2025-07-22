@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckboxInput, CheckboxInputProps } from './CheckboxInput';
+import { CheckboxInput, type CheckboxInputProps } from './CheckboxInput';
 
 export interface CheckboxFieldProps extends Omit<CheckboxInputProps, 'type'> {
   label: string;

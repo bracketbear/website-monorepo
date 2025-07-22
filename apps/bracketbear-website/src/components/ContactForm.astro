@@ -1,5 +1,5 @@
 ---
-import { Input, Textarea, Button } from '@bracketbear/core/astro';
+import { Input, Textarea, AstroButton } from '@bracketbear/core/astro';
 
 interface Props {
   class?: string;
@@ -62,7 +62,7 @@ const { class: className } = Astro.props satisfies Props;
         />
 
         <div class="mt-4 flex flex-col items-center gap-4">
-          <Button type="submit" size="lg"> Send Message → </Button>
+          <AstroButton type="submit" size="lg"> Send Message → </AstroButton>
           <small class="text-foreground/70 font-bold">
             * Required fields
           </small>

@@ -1,9 +1,9 @@
 import {
-  type AnimationManifest,
   type ManifestToControlValues,
   BaseAnimation,
 } from '@bracketbear/flateralus';
 import * as PIXI from 'pixi.js';
+import { createManifest } from '@bracketbear/flateralus';
 
 // ============================================================================
 // ANIMATION CONSTANTS
@@ -61,17 +61,6 @@ interface BlobSystem {
   mouseY: number;
   isMouseActive: boolean;
   time: number;
-}
-
-// ============================================================================
-// TYPE-SAFE MANIFEST CREATION
-// ============================================================================
-
-/**
- * Helper function to create a manifest with proper type inference
- */
-function createManifest<T extends AnimationManifest>(manifest: T): T {
-  return manifest;
 }
 
 /**
@@ -223,18 +212,9 @@ const MANIFEST = createManifest({
       resetsAnimation: true,
     },
   ],
-} as const);
+});
 
-// ============================================================================
-// INFERRED CONTROL VALUES
-// ============================================================================
-
-/** Control values inferred directly from the manifest */
 type BlobControlValues = ManifestToControlValues<typeof MANIFEST>;
-
-// ============================================================================
-// ANIMATION IMPLEMENTATION
-// ============================================================================
 
 /**
  * Create a particle texture with glow effect
@@ -280,9 +260,9 @@ const createBlobParticle = (
   const sprite = new PIXI.Sprite(texture);
   sprite.anchor.set(0.5);
   sprite.blendMode = 'add';
-
   const size =
-    Math.random() * controls.particleSizeVariation + controls.particleBaseSize;
+    Math.random() * Number(controls.particleSizeVariation) +
+    Number(controls.particleBaseSize);
   sprite.scale.set(size);
 
   // Position particle on sphere surface using spherical coordinates
@@ -444,16 +424,12 @@ const updateParticleVisuals = (
  * Blob Animation Class
  * Extends BaseAnimation and implements lifecycle hooks
  */
-class BlobAnimation extends BaseAnimation<BlobControlValues> {
+class BlobAnimation extends BaseAnimation<typeof MANIFEST, BlobControlValues> {
   private blobSystem: BlobSystem | null = null;
   private particleTexture: PIXI.Texture | null = null;
 
-  constructor(initialControls: BlobControlValues) {
-    super(initialControls);
-  }
-
-  getManifest(): AnimationManifest {
-    return MANIFEST as AnimationManifest;
+  constructor(initialControls?: BlobControlValues) {
+    super(MANIFEST, initialControls);
   }
 
   onInit(
@@ -597,23 +573,8 @@ class BlobAnimation extends BaseAnimation<BlobControlValues> {
 /**
  * Create a blob animation instance
  */
-export function createBlobAnimation(): BlobAnimation {
-  // Initialize default control values from manifest
-  const initialValues: BlobControlValues = {
-    radius: BLOB_RADIUS,
-    surfaceTension: SURFACE_TENSION,
-    centerAttractionStrength: CENTER_ATTRACTION_STRENGTH,
-    mouseInfluenceRadius: MOUSE_INFLUENCE_RADIUS,
-    mouseRepulsionStrength: MOUSE_REPULSION_STRENGTH,
-    particleCount: PARTICLE_COUNT,
-    particleBaseSize: PARTICLE_BASE_SIZE,
-    particleSizeVariation: PARTICLE_SIZE_VARIATION,
-    animationSpeed: ANIMATION_SPEED,
-    showTrails: false,
-    trailLength: 8,
-    particleColor: '#000000',
-    interactiveColor: '#ff4b3e',
-  };
-
-  return new BlobAnimation(initialValues);
+export function createBlobAnimation(
+  initialControls?: BlobControlValues
+): BlobAnimation {
+  return new BlobAnimation(initialControls);
 }

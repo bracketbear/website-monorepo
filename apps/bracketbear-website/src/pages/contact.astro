@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { Input, Textarea, Button } from '@bracketbear/core/astro';
+import { Input, Textarea, AstroButton } from '@bracketbear/core/astro';
 ---
 
 <Layout title="Contact Us" hideContactForm={true}>
@@ -121,7 +121,9 @@ import { Input, Textarea, Button } from '@bracketbear/core/astro';
                 />
 
                 <div class="mt-4 flex flex-col items-center gap-4">
-                  <Button type="submit" size="lg"> Send Message → </Button>
+                  <AstroButton type="submit" size="lg">
+                    Send Message →
+                  </AstroButton>
                   <small class="text-foreground/70 font-bold">
                     * Required fields
                   </small>
