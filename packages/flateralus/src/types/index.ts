@@ -1,5 +1,6 @@
 import type { DeepReadonly, ObjectKeys, ObjectValues } from '@bracketbear/core';
 import { z } from 'zod';
+import type { ControlSchema } from '../schemas';
 
 // ============================================================================
 // CONTROL SCHEMAS
@@ -27,83 +28,6 @@ export const CONTROL_TYPES = Object.keys(
 ) as ControlType[];
 
 export type ControlType = ObjectKeys<typeof CONTROL_TYPES_TO_VALUE_TYPE>;
-
-/**
- * Base control schema for all controls
- */
-const BaseControlSchema = z.object({
-  name: z.string(),
-  type: z.enum(['number', 'boolean', 'color', 'select']),
-  label: z.string(),
-  description: z.string().optional(),
-  debug: z.boolean().default(false),
-  resetsAnimation: z.boolean().default(false).optional(),
-});
-
-/**
- * Number control schema
- */
-const NumberControlSchema = BaseControlSchema.extend({
-  type: z.literal('number'),
-  min: z.number().optional(),
-  max: z.number().optional(),
-  step: z.number().optional(),
-  defaultValue: z.number(),
-});
-
-/**
- * Boolean control schema
- */
-const BooleanControlSchema = BaseControlSchema.extend({
-  type: z.literal('boolean'),
-  defaultValue: z.boolean(),
-});
-
-/**
- * Color control schema
- */
-const ColorControlSchema = BaseControlSchema.extend({
-  type: z.literal('color'),
-  defaultValue: z.string(),
-});
-
-/**
- * Select control schema
- */
-const SelectControlSchema = BaseControlSchema.extend({
-  type: z.literal('select'),
-  options: z.array(
-    z.object({
-      value: z.string(),
-      label: z.string(),
-    })
-  ),
-  defaultValue: z.string(),
-});
-
-/**
- * Union of all control schemas
- */
-export const ControlSchema = z.discriminatedUnion('type', [
-  NumberControlSchema,
-  BooleanControlSchema,
-  ColorControlSchema,
-  SelectControlSchema,
-]);
-
-/**
- * Animation manifest schema
- */
-export const AnimationManifestSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  controls: z.array(ControlSchema),
-});
-
-// ============================================================================
-// TYPESCRIPT TYPES
-// ============================================================================
 
 export type Control = z.infer<typeof ControlSchema>;
 export interface AnimationManifest
