@@ -5,7 +5,7 @@ import type {
   Control,
   ManifestToControlValues,
 } from '../types';
-import { getManifestDefaultControlValues } from '../utils/getManifestDefaultControlValues';
+import { getManifestDefaultControlValues } from '../utils/get-manifest-default-control-values';
 
 // ============================================================================
 // BASE ANIMATION CLASS
@@ -62,9 +62,9 @@ export abstract class BaseAnimation<
 
     // Check if any reset controls have changed
     const hasResetChanges = changedControls.some((controlName) => {
-      const control = manifest.controls.find(
-        (control: Control) => control.name === controlName
-      );
+      const control = manifest.controls.find((control) => {
+        return control.name === controlName;
+      });
       return control?.resetsAnimation === true;
     });
 

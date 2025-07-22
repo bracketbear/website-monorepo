@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { getManifestDefaultControlValues } from './getManifestDefaultControlValues';
-import { createManifest } from './createManifest';
+import { getManifestDefaultControlValues } from './get-manifest-default-control-values';
+import { createManifest } from './create-manifest';
+import type { AnimationManifest } from '../types';
 
 describe('getDefaultControlValues', () => {
   it('should return the default control values', () => {
@@ -74,7 +75,7 @@ describe('getDefaultControlValues', () => {
   });
 
   it('should return the default control values for a manifest with all control types', () => {
-    const manifest = createManifest({
+    const manifest: AnimationManifest = createManifest({
       id: 'test',
       name: 'test',
       description: 'test',

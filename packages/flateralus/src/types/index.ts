@@ -31,7 +31,7 @@ export type ControlType = ObjectKeys<typeof CONTROL_TYPES_TO_VALUE_TYPE>;
 
 export type Control = z.infer<typeof ControlSchema>;
 export interface AnimationManifest
-  extends HasControls,
+  extends DeepReadonly<HasControls>,
     DeepReadonly<{
       id: string;
       name: string;
@@ -67,7 +67,7 @@ export type ManifestControlValues<M extends HasControls> = {
  * Utility type to extract control value types from a manifest
  * Maps control names to their inferred types based on the control type
  */
-export type ManifestToControlValues<M extends HasControls> = {
+export type ManifestToControlValues<M extends AnimationManifest> = {
   [C in M['controls'][number] as C['name']]: ControlValueType<C>;
 };
 

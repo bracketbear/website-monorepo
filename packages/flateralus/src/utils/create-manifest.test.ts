@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createManifest } from './createManifest';
+import { createManifest } from './create-manifest';
 
 // Example manifest type
 const manifest = createManifest({

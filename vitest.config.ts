@@ -9,13 +9,7 @@ export default defineConfig({
       'packages/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       'apps/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
-    exclude: [
-      'node_modules',
-      'dist',
-      '.astro',
-      '**/*.d.ts',
-      '**/node_modules/**',
-    ],
+    exclude: ['.astro', '**/*.d.ts', '**/node_modules/**', '**/dist/**'],
   },
   resolve: {
     alias: {
