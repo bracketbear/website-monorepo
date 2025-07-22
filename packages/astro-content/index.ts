@@ -34,33 +34,4 @@
  * ```
  */
 
-// Export image copy utilities (legacy - consider using Vite plugin instead)
-export {
-  ensureContentImage,
-  ensureProjectImage,
-  ensureMediaImage,
-} from './src/image-copy';
-
-// Export content image loader (recommended - automatically handles images when content is loaded)
-export {
-  createContentImageLoader,
-  getContentImageUrl,
-  getProjectImageUrl,
-  getMediaImageUrl,
-} from './src/loaders';
-
-// Export utility functions
-export { generateRelativeImagePath, contentPath, workPath } from './src/utils';
-
-// Export schemas
-export * from './src/schemas';
-
-// Export types
-export * from './src/types';
-
-// Export collection configurations
-export {
-  workCollections,
-  contentCollections,
-  allCollections,
-} from './src/collections';
+export * from './src';
