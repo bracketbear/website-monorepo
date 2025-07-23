@@ -27,14 +27,6 @@ const featuredProjects = workProjects
   .filter((project) => project.data.isFeatured)
   .slice(0, 3);
 
-// Get featured skills
-const featuredSkills = workSkills
-  .filter((skill) => skill.data.isFeatured)
-  .slice(0, 6);
-
-// Get current job
-const currentJob = sortedJobs.find((job) => job.data.isCurrentJob);
-
 // Helper function to format dates correctly
 function formatDate(date: Date): string {
   const adjustedDate = new Date(date);

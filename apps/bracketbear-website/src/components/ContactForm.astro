@@ -1,5 +1,9 @@
 ---
-import { Input, Textarea, AstroButton } from '@bracketbear/core/astro';
+import {
+  AstroInput,
+  AstroTextarea,
+  AstroButton,
+} from '@bracketbear/core/astro';
 
 interface Props {
   class?: string;
@@ -36,8 +40,13 @@ const { class: className } = Astro.props;
         </p>
 
         <div class="grid gap-6 md:grid-cols-2">
-          <Input name="name" label="Name" placeholder="Your name" required />
-          <Input
+          <AstroInput
+            name="name"
+            label="Name"
+            placeholder="Your name"
+            required
+          />
+          <AstroInput
             name="email"
             type="email"
             label="Email"
@@ -46,14 +55,14 @@ const { class: className } = Astro.props;
           />
         </div>
 
-        <Input
+        <AstroInput
           name="subject"
           label="Subject"
           placeholder="What's on your mind?"
           required
         />
 
-        <Textarea
+        <AstroTextarea
           name="message"
           label="Message"
           placeholder="Tell me about your project or idea. Keep Portland weird! 🌲"

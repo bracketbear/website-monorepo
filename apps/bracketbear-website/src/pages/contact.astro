@@ -1,6 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { Input, Textarea, AstroButton } from '@bracketbear/core/astro';
+import {
+  AstroInput,
+  AstroTextarea,
+  AstroButton,
+} from '@bracketbear/core/astro';
 ---
 
 <Layout title="Contact Us" hideContactForm={true}>
@@ -90,13 +94,13 @@ import { Input, Textarea, AstroButton } from '@bracketbear/core/astro';
                 </p>
 
                 <div class="grid gap-6 md:grid-cols-2">
-                  <Input
+                  <AstroInput
                     name="name"
                     label="Name"
                     placeholder="Your name"
                     required
                   />
-                  <Input
+                  <AstroInput
                     name="email"
                     type="email"
                     label="Email"
@@ -105,14 +109,14 @@ import { Input, Textarea, AstroButton } from '@bracketbear/core/astro';
                   />
                 </div>
 
-                <Input
+                <AstroInput
                   name="subject"
                   label="Subject"
                   placeholder="What's on your mind?"
                   required
                 />
 
-                <Textarea
+                <AstroTextarea
                   name="message"
                   label="Message"
                   placeholder="Tell me about your project or idea. Keep Portland weird! 🌲"

@@ -2,7 +2,6 @@ import { Application as PixiApplication } from 'pixi.js';
 import type {
   Animation,
   AnimationManifest,
-  Control,
   ManifestToControlValues,
 } from '../types';
 import { getManifestDefaultControlValues } from '../utils/get-manifest-default-control-values';
