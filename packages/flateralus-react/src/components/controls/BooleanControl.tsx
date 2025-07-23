@@ -1,9 +1,9 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { CheckboxInput } from '@bracketbear/core/react';
-import type { Control } from '@bracketbear/flateralus';
+import type { BooleanControl as BooleanControlType } from '@bracketbear/flateralus';
 
 interface BooleanControlProps {
-  control: Control & { type: 'boolean' };
+  control: BooleanControlType;
   value: boolean;
   onControlChange: (key: string, value: boolean) => void;
 }

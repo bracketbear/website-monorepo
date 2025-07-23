@@ -1,8 +1,8 @@
-import React, { memo } from 'react';
-import type { Control } from '@bracketbear/flateralus';
+import { memo } from 'react';
+import type { ColorControl as ColorControlType } from '@bracketbear/flateralus';
 
 interface ColorControlProps {
-  control: Control & { type: 'color' };
+  control: ColorControlType;
   value: string;
   onControlChange: (key: string, value: string) => void;
 }

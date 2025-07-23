@@ -1,8 +1,8 @@
-import React, { memo } from 'react';
-import type { Control } from '@bracketbear/flateralus';
+import { memo } from 'react';
+import type { SelectControl as SelectControlType } from '@bracketbear/flateralus';
 
 interface SelectControlProps {
-  control: Control & { type: 'select' };
+  control: SelectControlType;
   value: string;
   onControlChange: (key: string, value: string) => void;
 }

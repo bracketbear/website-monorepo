@@ -1,9 +1,9 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { Slider, TextInput } from '@bracketbear/core/react';
-import type { Control } from '@bracketbear/flateralus';
+import type { NumberControl as NumberControlType } from '@bracketbear/flateralus';
 
 interface NumberControlProps {
-  control: Control & { type: 'number' };
+  control: NumberControlType;
   value: number;
   onControlChange: (key: string, value: number) => void;
 }
