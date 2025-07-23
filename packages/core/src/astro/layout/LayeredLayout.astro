@@ -1,17 +1,13 @@
 ---
 import type { LayoutProps, ThemeConfig } from '../../types/layout';
-import type { NavigationConfig } from '../../types/navigation';
 import { LAYERS } from '../../types/layers';
 import NavBar from '../components/NavBar.astro';
 import Footer from '../components/Footer.astro';
-import type { Breadcrumb } from '../../types/breadcrumb';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 export interface Props extends LayoutProps {
-  navigation: NavigationConfig;
   theme?: ThemeConfig;
   contactForm?: any;
-  breadcrumbs?: Breadcrumb[];
 }
 
 const {
@@ -75,7 +71,7 @@ const isDark = themeValue === 'dark';
 
     <!-- Content Layer (default slot) -->
     <div style={`z-index: ${LAYERS.content}; position: relative;`}>
-      {!hideNavigation && <NavBar config={navigation} class="relative z-10" />}
+      {!hideNavigation && <NavBar config={navigation} />}
       {
         breadcrumbs && breadcrumbs.length > 0 && (
           <Breadcrumbs breadcrumbs={breadcrumbs} />

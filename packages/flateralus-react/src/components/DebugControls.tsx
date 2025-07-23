@@ -3,6 +3,10 @@ import type {
   AnimationManifest,
   ControlValues,
   Control,
+  NumberControl as NumberControlType,
+  BooleanControl as BooleanControlType,
+  ColorControl as ColorControlType,
+  SelectControl as SelectControlType,
 } from '@bracketbear/flateralus';
 import { Button } from '@bracketbear/core/react';
 import {
@@ -12,6 +16,7 @@ import {
   SelectControl,
 } from './controls';
 import { GearIcon } from '@bracketbear/core/assets';
+import type { DeepReadonly } from '@bracketbear/core';
 
 interface DebugControlsProps {
   manifest: AnimationManifest;
@@ -56,7 +61,7 @@ const DebugControls = memo<DebugControlsProps>(
       onControlsChange(defaultValues);
     };
 
-    const renderControl = (control: Control) => {
+    const renderControl = (control: DeepReadonly<Control>) => {
       const value = controlValues[control.name];
 
       // Skip controls that shouldn't be shown in debug
@@ -67,7 +72,7 @@ const DebugControls = memo<DebugControlsProps>(
           return (
             <NumberControl
               key={control.name}
-              control={control as Control & { type: 'number' }}
+              control={control as NumberControlType}
               value={value as number}
               onControlChange={handleControlChange}
             />
@@ -76,7 +81,7 @@ const DebugControls = memo<DebugControlsProps>(
           return (
             <BooleanControl
               key={control.name}
-              control={control as Control & { type: 'boolean' }}
+              control={control as BooleanControlType}
               value={value as boolean}
               onControlChange={handleControlChange}
             />
@@ -85,7 +90,7 @@ const DebugControls = memo<DebugControlsProps>(
           return (
             <ColorControl
               key={control.name}
-              control={control as Control & { type: 'color' }}
+              control={control as ColorControlType}
               value={value as string}
               onControlChange={handleControlChange}
             />
@@ -94,7 +99,7 @@ const DebugControls = memo<DebugControlsProps>(
           return (
             <SelectControl
               key={control.name}
-              control={control as Control & { type: 'select' }}
+              control={control as SelectControlType}
               value={value as string}
               onControlChange={handleControlChange}
             />

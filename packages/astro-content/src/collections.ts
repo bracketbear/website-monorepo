@@ -1,4 +1,3 @@
-import type { ZodSchema } from 'zod';
 import { join } from 'node:path';
 import { contentPath, workPath } from './utils';
 import {
@@ -68,25 +67,6 @@ export const allCollections = {
   ...workCollections,
   ...contentCollections,
 };
-
-/**
- * Utility function to create a JSON collection using Astro's defineCollection
- * This should be used in the individual Astro apps, not in this shared package
- */
-export function createJsonCollection<T>({
-  base,
-  schema,
-}: {
-  base: string;
-  schema: ZodSchema<T>;
-}) {
-  // This function should be called from within an Astro app context
-  // where astro:content is available
-  throw new Error(
-    'createJsonCollection should be called from within an Astro app context. ' +
-      'Import the collection configurations and use them with defineCollection in your content.config.ts'
-  );
-}
 
 /**
  * Creates collections with automatic image handling using the content image loader

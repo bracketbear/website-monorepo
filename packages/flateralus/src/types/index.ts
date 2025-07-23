@@ -1,6 +1,12 @@
 import type { DeepReadonly, ObjectKeys, ObjectValues } from '@bracketbear/core';
 import { z } from 'zod';
-import type { ControlSchema } from '../schemas';
+import type {
+  BooleanControlSchema,
+  ColorControlSchema,
+  ControlSchema,
+  NumberControlSchema,
+  SelectControlSchema,
+} from '../schemas';
 
 // ============================================================================
 // CONTROL SCHEMAS
@@ -30,6 +36,12 @@ export const CONTROL_TYPES = Object.keys(
 export type ControlType = ObjectKeys<typeof CONTROL_TYPES_TO_VALUE_TYPE>;
 
 export type Control = z.infer<typeof ControlSchema>;
+
+export type NumberControl = z.infer<typeof NumberControlSchema>;
+export type BooleanControl = z.infer<typeof BooleanControlSchema>;
+export type ColorControl = z.infer<typeof ColorControlSchema>;
+export type SelectControl = z.infer<typeof SelectControlSchema>;
+
 export interface AnimationManifest
   extends DeepReadonly<HasControls>,
     DeepReadonly<{

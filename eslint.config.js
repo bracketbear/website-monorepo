@@ -73,7 +73,7 @@ export default defineConfig([
     ...love,
     plugins: {
       '@typescript-eslint': typescriptEslint,
-      prettier: prettierPlugin,
+      // prettier: prettierPlugin,
       astro: eslintPluginAstro,
     },
     languageOptions: {
@@ -81,7 +81,6 @@ export default defineConfig([
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        parser: typescriptParser,
         extraFileExtensions: ['.astro'],
       },
     },

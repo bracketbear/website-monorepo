@@ -3,11 +3,10 @@ import type { NavigationConfig } from '../../types/navigation.js';
 import { NAVIGATION_CONSTANTS } from '../../utils/constants.js';
 
 interface Props {
-  class?: string;
   config: NavigationConfig;
 }
 
-const { config, class: className } = Astro.props;
+const { config } = Astro.props;
 const { items: navItems, branding, socialLinks } = config;
 ---
 

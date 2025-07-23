@@ -44,7 +44,7 @@ const services: ServiceEntry[] = await getCollection('services');
             snakeText.map((text, index) => (
               <p
                 class="snake-text text-foreground hover:text-primary text-2xl font-bold tracking-tight uppercase"
-                style="--index: {index}"
+                style={`--index: ${index}`}
               >
                 {text}
               </p>
