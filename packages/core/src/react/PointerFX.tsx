@@ -464,7 +464,7 @@ const PointerFX: FC = () => {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-20 pointer-events-none"
+      className="pointer-events-none fixed inset-0 z-20"
       style={{ width: '100vw', height: '100vh' }}
     />
   );

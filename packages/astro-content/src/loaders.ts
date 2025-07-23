@@ -88,9 +88,7 @@ function copyImageToPublic(
     try {
       copyFileSync(realPath, publicPath);
     } catch (error) {
-      console.error(
-        error
-      );
+      console.error(error);
     }
   }
 

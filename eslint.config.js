@@ -4,6 +4,7 @@ import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 import prettierPlugin from 'eslint-plugin-prettier';
 import eslintPluginAstro from 'eslint-plugin-astro';
+import astroParser from 'astro-eslint-parser';
 
 export default defineConfig([
   // Base configuration for all files
@@ -76,10 +77,12 @@ export default defineConfig([
       astro: eslintPluginAstro,
     },
     languageOptions: {
-      parser: typescriptParser,
+      parser: astroParser,
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
+        parser: typescriptParser,
+        extraFileExtensions: ['.astro'],
       },
     },
     rules: {

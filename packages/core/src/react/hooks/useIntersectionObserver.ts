@@ -43,4 +43,4 @@ export function useIntersectionObserver({
   );
 
   return { lastItemRef };
-} 
+}

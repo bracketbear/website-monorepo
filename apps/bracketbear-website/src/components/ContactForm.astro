@@ -5,7 +5,7 @@ interface Props {
   class?: string;
 }
 
-const { class: className } = Astro.props satisfies Props;
+const { class: className } = Astro.props;
 ---
 
 <section class:list={['py-24', className]}>

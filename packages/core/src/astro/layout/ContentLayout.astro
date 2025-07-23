@@ -1,12 +1,14 @@
 ---
 import clsx from 'clsx';
 import LayeredLayout, {
-  Props as LayeredLayoutProps,
+  type Props as LayeredLayoutProps,
 } from './LayeredLayout.astro';
-
 interface Props extends LayeredLayoutProps {
+  /** The title to display in the hero section and page title */
   title: string;
+  /** Whether to show the hero section at the top of the page */
   showHero?: boolean;
+  /** The maximum width of the content area */
   contentWidth?: 'narrow' | 'wide';
 }
 
@@ -17,7 +19,6 @@ const maxWidthClass = contentWidth === 'narrow' ? 'max-w-6xl' : '';
 
 <LayeredLayout title={title} {...rest}>
   {showHero && (
-    <!-- Dark Hero Section -->
     <div class="bg-brand-dark relative pb-8">
       <div class={clsx('container mx-auto px-6 py-12', {
         'max-w-6xl': contentWidth === 'narrow',

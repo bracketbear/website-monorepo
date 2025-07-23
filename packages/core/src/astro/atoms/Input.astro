@@ -1,7 +1,7 @@
 ---
 interface Props {
   name: string;
-  type?: "text" | "email" | "tel" | "url" | "number";
+  type?: 'text' | 'email' | 'tel' | 'url' | 'number';
   label: string;
   placeholder?: string;
   required?: boolean;
@@ -10,7 +10,7 @@ interface Props {
 
 const {
   name,
-  type = "text",
+  type = 'text',
   label,
   placeholder,
   required = false,
@@ -27,8 +27,7 @@ const {
     type={type}
     name={name}
     placeholder={placeholder}
-    class:list={["form-input", className]}
+    class:list={['form-input', className]}
     required={required}
   />
 </div>
-

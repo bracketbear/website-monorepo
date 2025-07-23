@@ -16,7 +16,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     return (
       <input
         ref={ref}
-        className={`border-brand-dark focus:ring-brand-orange w-full rounded rounded-tl-none bg-white transition-all focus:ring-2 focus:outline-none text-brand-dark ${
+        className={`border-brand-dark focus:ring-brand-orange text-brand-dark w-full rounded rounded-tl-none bg-white transition-all focus:ring-2 focus:outline-none ${
           error ? 'animate-shake border-brand-red' : ''
         } ${sizeClasses} ${className}`}
         aria-invalid={!!error}

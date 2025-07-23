@@ -16,4 +16,4 @@ export const buttonSizeClasses = {
 } as const;
 
 export type ButtonVariant = keyof typeof buttonVariantClasses;
-export type ButtonSize = keyof typeof buttonSizeClasses; 
+export type ButtonSize = keyof typeof buttonSizeClasses;

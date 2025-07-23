@@ -77,10 +77,10 @@ export default function Ticker({
   };
 
   return (
-    <div className={`bg-brand-dark overflow-hidden w-full ${className}`}>
+    <div className={`bg-brand-dark w-full overflow-hidden ${className}`}>
       <div
         ref={tickerRef}
-        className="flex items-center gap-4 py-8 overflow-x-hidden whitespace-nowrap w-full"
+        className="flex w-full items-center gap-4 overflow-x-hidden py-8 whitespace-nowrap"
         style={{ scrollBehavior: 'auto' }}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
@@ -91,18 +91,18 @@ export default function Ticker({
           <div
             key={`${item.id}-${index}`}
             ref={index === tickerItems.length - 1 ? lastItemRef : undefined}
-            className={`flex items-center gap-4 text-brand-light flex-shrink-0 ${itemClassName} ${
+            className={`text-brand-light flex flex-shrink-0 items-center gap-4 ${itemClassName} ${
               item.link
-                ? 'cursor-pointer hover:opacity-80 transition-opacity'
+                ? 'cursor-pointer transition-opacity hover:opacity-80'
                 : ''
             }`}
             onClick={() => handleItemClick(item)}
           >
             <span className="text-xl font-bold">{item.title}</span>
             {item.icon && (
-              <div className="flex items-center justify-center bg-brand-orange p-1 rounded-full w-6 aspect-square">
+              <div className="bg-brand-orange flex aspect-square w-6 items-center justify-center rounded-full p-1">
                 <item.icon
-                  className={`-rotate-12 text-brand-dark ${iconClassName}`}
+                  className={`text-brand-dark -rotate-12 ${iconClassName}`}
                 />
               </div>
             )}

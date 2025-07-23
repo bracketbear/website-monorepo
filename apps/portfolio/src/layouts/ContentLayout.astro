@@ -1,9 +1,7 @@
 ---
 import { navigationConfig } from '@/config/navigation';
-import {
-  ContentLayout as CoreContentLayout,
-  type ContentLayoutProps,
-} from '@bracketbear/core/astro';
+import { ContentLayout as CoreContentLayout } from '@bracketbear/core/astro';
+import type { ContentLayoutProps } from '@bracketbear/core/astro';
 import '@/styles/global.css';
 
 interface Props extends Omit<ContentLayoutProps, 'navigation'> {}

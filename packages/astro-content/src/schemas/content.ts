@@ -81,4 +81,4 @@ export const serviceSchema = z.object({
   description: z.string().optional(),
   icon: z.string().optional(),
   isFeatured: z.boolean().default(false),
-}); 
+});

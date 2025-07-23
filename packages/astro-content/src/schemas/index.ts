@@ -32,8 +32,4 @@ export {
 } from './work';
 
 // Export all content schemas
-export {
-  blogSchema,
-  pageSchema,
-  serviceSchema,
-} from './content'; 
+export { blogSchema, pageSchema, serviceSchema } from './content';

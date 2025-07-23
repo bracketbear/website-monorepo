@@ -172,4 +172,4 @@ export const workProjectSchema = z.object({
   isFeatured: z.boolean().default(false),
   category: z.string().optional(), // references "workProjectCategory"
   skills: z.array(z.string()).optional(), // references "workSkills"
-}); 
+});

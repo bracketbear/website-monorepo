@@ -47,4 +47,4 @@ export type WorkSkillWithCategory = WorkSkillEntry & {
 };
 
 // Re-export CollectionEntry for convenience
-export type { CollectionEntry } from 'astro:content'; 
+export type { CollectionEntry } from 'astro:content';

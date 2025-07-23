@@ -84,7 +84,7 @@ export function createJsonCollection<T>({
   // where astro:content is available
   throw new Error(
     'createJsonCollection should be called from within an Astro app context. ' +
-    'Import the collection configurations and use them with defineCollection in your content.config.ts'
+      'Import the collection configurations and use them with defineCollection in your content.config.ts'
   );
 }
 
@@ -97,6 +97,6 @@ export function createCollectionsWithImageHandling() {
   // where astro:content is available
   throw new Error(
     'createCollectionsWithImageHandling should be called from within an Astro app context. ' +
-    'Import the collection configurations and use them with defineCollection in your content.config.ts'
+      'Import the collection configurations and use them with defineCollection in your content.config.ts'
   );
-} 
+}

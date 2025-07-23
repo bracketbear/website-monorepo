@@ -26,4 +26,4 @@ export async function getKeyedCollection<T extends CollectionName>(
     keyedCollection[entryKey] = entry;
   });
   return keyedCollection;
-} 
+}

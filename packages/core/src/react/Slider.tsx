@@ -33,7 +33,7 @@ export const Slider: FC<SliderProps> = ({
         onChange(Number(e.target.value))
       }
       disabled={disabled}
-      className={`h-2 w-full cursor-pointer appearance-none rounded-lg bg-neutral-700/60 transition-all focus:outline-none focus:ring-2 focus:ring-brand-blue/60 disabled:opacity-50 ${className}`}
+      className={`focus:ring-brand-blue/60 h-2 w-full cursor-pointer appearance-none rounded-lg bg-neutral-700/60 transition-all focus:ring-2 focus:outline-none disabled:opacity-50 ${className}`}
       style={{
         accentColor: 'var(--color-brand-blue, #3b82f6)', // fallback to Tailwind blue-500
       }}
