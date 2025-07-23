@@ -81,6 +81,7 @@ export default defineConfig([
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
+        parser: typescriptParser,
         extraFileExtensions: ['.astro'],
       },
     },
@@ -93,18 +94,6 @@ export default defineConfig([
         {
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
-        },
-      ],
-      'prettier/prettier': [
-        'error',
-        {
-          trailingComma: 'es5',
-          tabWidth: 2,
-          semi: true,
-          singleQuote: true,
-          printWidth: 80,
-          endOfLine: 'lf',
-          bracketSpacing: true,
         },
       ],
       'astro/missing-client-only-directive-value': 'error',
