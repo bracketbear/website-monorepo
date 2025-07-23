@@ -19,16 +19,14 @@ import { clsx } from '@bracketbear/core';
 const BACKGROUND_COLOR = 'transparent';
 
 interface AnimationStageProps<
-  TAnimation extends Animation<ControlValues>,
-  TAnimationFactory extends
-    AnimationFactory<TAnimation> = AnimationFactory<TAnimation>,
+  TControlValues extends ControlValues = ControlValues,
 > {
   /** Whether to show debug controls */
   showDebugControls?: boolean;
   /** Animation factory function */
-  animation?: TAnimationFactory;
+  animation?: () => Animation<TControlValues>;
   /** Initial control values override - typed to match the animation's control values */
-  initialValues?: Partial<AnimationControlValues<TAnimation>>;
+  initialValues?: Partial<TControlValues>;
   children?: ReactNode;
   className?: string;
 }
@@ -39,19 +37,17 @@ interface AnimationStageProps<
  * A stage that hosts an animation and displays its debug controls.
  */
 export default function AnimationStage<
-  TAnimation extends Animation<ControlValues>,
-  TAnimationFactory extends
-    AnimationFactory<TAnimation> = AnimationFactory<TAnimation>,
+  TControlValues extends ControlValues = ControlValues,
 >({
   showDebugControls = false,
   animation,
   initialValues = {},
   children,
   className,
-}: AnimationStageProps<TAnimation, TAnimationFactory>) {
+}: AnimationStageProps<TControlValues>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
-  const animationRef = useRef<TAnimation | null>(null);
+  const animationRef = useRef<Animation<TControlValues> | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const [controlValues, setControlValues] = useState<ControlValues>({});
   const [manifest, setManifest] = useState<AnimationManifest | undefined>(
@@ -144,7 +140,7 @@ export default function AnimationStage<
    * Handle control changes from debug panel
    */
   const handleControlsChange = useCallback(
-    (newValues: Partial<ControlValues>) => {
+    (newValues: Partial<TControlValues>) => {
       setControlValues((prev) => {
         const merged = { ...prev };
         for (const key in newValues) {
