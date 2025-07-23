@@ -1,5 +1,6 @@
 import type { DeepReadonly, ObjectKeys, ObjectValues } from '@bracketbear/core';
 import { z } from 'zod';
+import { type Application as PIXIApplication } from 'pixi.js';
 import type {
   BooleanControlSchema,
   ColorControlSchema,
@@ -7,10 +8,6 @@ import type {
   NumberControlSchema,
   SelectControlSchema,
 } from '../schemas';
-
-// ============================================================================
-// CONTROL SCHEMAS
-// ============================================================================
 
 export interface HasType<T extends string> {
   type: T;
@@ -97,7 +94,7 @@ export interface Animation<TControlValues extends ControlValues = {}> {
   updateControls(values: Partial<TControlValues>): void;
 
   /** Initialize the animation with a PIXI application */
-  init(app: any, width: number, height: number): void;
+  init(app: PIXIApplication, width: number, height: number): void;
 
   /** Update the animation (called each frame) */
   update(width: number, height: number): void;
