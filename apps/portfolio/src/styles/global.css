@@ -1,3 +1,24 @@
 @import '@bracketbear/core/styles';
 @source '../../../../node_modules/@bracketbear/core';
 @source '../../../../node_modules/@bracketbear/flateralus-react';
+
+/* Custom gradient backgrounds */
+@utility bg-gradient-radial {
+  background: radial-gradient(circle at center, var(--tw-gradient-stops));
+}
+
+@utility from-brand-orange {
+  --tw-gradient-from: #ffc15e;
+  --tw-gradient-to: rgb(255 193 94 / 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+@utility via-brand-yellow {
+  --tw-gradient-via: #98ce00;
+  --tw-gradient-stops:
+    var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to);
+}
+
+@utility to-brand-red {
+  --tw-gradient-to: #bb4430;
+}

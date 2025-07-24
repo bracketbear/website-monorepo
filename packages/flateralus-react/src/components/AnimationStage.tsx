@@ -8,9 +8,7 @@ import {
 import * as PIXI from 'pixi.js';
 import type {
   Animation,
-  AnimationFactory,
   ControlValues,
-  AnimationControlValues,
   AnimationManifest,
 } from '@bracketbear/flateralus';
 import DebugControls from './DebugControls';
@@ -24,11 +22,10 @@ interface AnimationStageProps<
   /** Whether to show debug controls */
   showDebugControls?: boolean;
   /** Animation factory function */
-  animation?: () => Animation<TControlValues>;
-  /** Initial control values override - typed to match the animation's control values */
-  initialValues?: Partial<TControlValues>;
+  animation?: (initialControls?: ControlValues) => Animation<TControlValues>;
   children?: ReactNode;
   className?: string;
+  debugControlsClassName?: string;
 }
 
 /**
@@ -41,9 +38,9 @@ export default function AnimationStage<
 >({
   showDebugControls = false,
   animation,
-  initialValues = {},
   children,
   className,
+  debugControlsClassName,
 }: AnimationStageProps<TControlValues>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
@@ -53,11 +50,12 @@ export default function AnimationStage<
   const [manifest, setManifest] = useState<AnimationManifest | undefined>(
     undefined
   );
+  const [showResetToast, setShowResetToast] = useState(false);
 
   /**
    * Initialize the PixiJS application and animation
    */
-  const initApp = async () => {
+  const initApp = async (initialControls?: ControlValues) => {
     if (!containerRef.current || !animation) return;
 
     // Clean up existing app
@@ -66,7 +64,10 @@ export default function AnimationStage<
         if (appRef.current.canvas && appRef.current.canvas.parentNode) {
           appRef.current.canvas.parentNode.removeChild(appRef.current.canvas);
         }
-        appRef.current.destroy();
+        appRef.current.destroy(true, { children: true, texture: true });
+        if (containerRef.current) {
+          containerRef.current.innerHTML = '';
+        }
       } catch (error) {
         console.warn('Error destroying PixiJS app:', error);
       }
@@ -81,7 +82,7 @@ export default function AnimationStage<
 
     if (width <= 0 || height <= 0) {
       console.warn('Container has invalid dimensions, retrying...');
-      setTimeout(() => initApp(), 100);
+      setTimeout(() => initApp(initialControls), 100);
       return;
     }
 
@@ -108,21 +109,11 @@ export default function AnimationStage<
     app.canvas.style.height = '100%';
     app.canvas.style.pointerEvents = 'none'; // Let clicks pass through
 
-    // Create and initialize the animation
-    animationRef.current = animation();
+    // Create and initialize the animation with initialControls if provided
+    animationRef.current = animation(initialControls as any);
     if (animationRef.current) {
       animationRef.current.init(app, width, height);
-
-      // Apply initial values if provided
-      if (Object.keys(initialValues).length > 0) {
-        animationRef.current.updateControls({
-          ...initialValues,
-          ...animationRef.current.getControlValues(),
-        });
-        setControlValues(animationRef.current.getControlValues());
-      } else {
-        setControlValues(animationRef.current.getControlValues());
-      }
+      setControlValues(animationRef.current.getControlValues());
 
       // Set manifest after animation is initialized
       setManifest(animationRef.current.getManifest());
@@ -134,28 +125,58 @@ export default function AnimationStage<
         }
       });
     }
+    return;
   };
 
   /**
    * Handle control changes from debug panel
    */
   const handleControlsChange = useCallback(
-    (newValues: Partial<TControlValues>) => {
-      setControlValues((prev) => {
-        const merged = { ...prev };
+    async (newValues: Partial<ControlValues>) => {
+      let shouldReset = false;
+
+      if (manifest) {
         for (const key in newValues) {
-          if (newValues[key] !== undefined) {
-            merged[key] = newValues[key] as string | number | boolean;
+          const control = manifest.controls.find((c) => c.name === key);
+          if (control && control.resetsAnimation) {
+            shouldReset = true;
+            break;
           }
         }
-        return merged;
-      });
+      }
 
-      if (animationRef.current) {
-        animationRef.current.updateControls(newValues);
+      if (shouldReset) {
+        setShowResetToast(true);
+        setTimeout(() => setShowResetToast(false), 1500);
+        // Merge new values with current state for reset
+        const merged: ControlValues = { ...controlValues };
+
+        for (const key in newValues) {
+          if (newValues[key] !== undefined) {
+            merged[key] = newValues[key] as any;
+          }
+        }
+
+        if (animationRef.current) {
+          (animationRef.current as any).reset(merged);
+          setControlValues(merged);
+        }
+      } else {
+        setControlValues((prev) => {
+          const merged: ControlValues = { ...prev };
+          for (const key in newValues) {
+            if (newValues[key] !== undefined) {
+              merged[key] = newValues[key] as any;
+            }
+          }
+          return merged;
+        });
+        if (animationRef.current) {
+          animationRef.current.updateControls(newValues as any);
+        }
       }
     },
-    [animationRef]
+    [animationRef, manifest, controlValues]
   );
 
   useEffect(() => {
@@ -163,7 +184,6 @@ export default function AnimationStage<
       await new Promise((resolve) => setTimeout(resolve, 100));
       await initApp();
     };
-
     startApp();
 
     // Set up resize observer
@@ -196,7 +216,7 @@ export default function AnimationStage<
 
       if (appRef.current) {
         try {
-          appRef.current.destroy();
+          appRef.current.destroy(true, { children: true, texture: true });
         } catch (error) {
           console.warn('Error destroying PixiJS app:', error);
         }
@@ -225,7 +245,17 @@ export default function AnimationStage<
           controlValues={controlValues}
           onControlsChange={handleControlsChange}
           isVisible={showDebugControls}
+          animationRef={animationRef}
+          className={clsx(
+            'absolute top-16 right-4 z-45',
+            debugControlsClassName
+          )}
         />
+      )}
+      {showResetToast && (
+        <div className="animate-toast-in card fixed bottom-8 left-1/2 z-50 -translate-x-1/2 px-6 py-3 text-lg font-bold shadow-xl">
+          Animation reset
+        </div>
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import {
   buttonVariantClasses,
   buttonSizeClasses,
@@ -6,20 +7,19 @@ import {
   type ButtonSize,
 } from '../../utils/button-classes';
 
-interface Props {
+interface Props extends HTMLAttributes<'button'> {
   type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
   size?: ButtonSize;
-  class?: string;
-  disabled?: boolean;
 }
 
 const {
+  class: className,
   type = 'button',
   variant = 'primary',
   size = 'md',
-  class: className,
   disabled = false,
+  ...props
 } = Astro.props;
 ---
 
@@ -27,13 +27,13 @@ const {
   type={type}
   class:list={[
     'button',
-    // Disabled state overrides hover effects
     disabled ? 'button-disabled' : 'button-interactive',
     buttonVariantClasses[variant],
     buttonSizeClasses[size],
     className,
   ]}
   disabled={disabled}
+  {...props}
 >
   <slot />
 </button>

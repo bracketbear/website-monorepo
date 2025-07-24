@@ -46,9 +46,17 @@
 
 /* Interactive states - only modify hover/active effects */
 @utility button-interactive {
-  @apply hover:scale-105 active:scale-95;
+  @apply cursor-pointer hover:scale-105 active:scale-95;
 }
 
 @utility button-disabled {
   @apply cursor-not-allowed opacity-50 hover:scale-100 active:scale-100;
+}
+
+@utility button-transparent-dark {
+  @apply hover:text-brand-light bg-transparent text-white;
+}
+
+@utility button-transparent-light {
+  @apply hover:text-brand-dark/5 bg-transparent text-white;
 }

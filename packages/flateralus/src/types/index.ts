@@ -7,6 +7,7 @@ import type {
   ControlSchema,
   NumberControlSchema,
   SelectControlSchema,
+  GroupControlSchema,
 } from '../schemas';
 
 export interface HasType<T extends string> {
@@ -25,6 +26,7 @@ export const CONTROL_TYPES_TO_VALUE_TYPE = {
   boolean: 'boolean',
   color: 'string',
   select: 'string',
+  group: 'array',
 } as const;
 export const CONTROL_TYPES = Object.keys(
   CONTROL_TYPES_TO_VALUE_TYPE
@@ -38,6 +40,7 @@ export type NumberControl = z.infer<typeof NumberControlSchema>;
 export type BooleanControl = z.infer<typeof BooleanControlSchema>;
 export type ColorControl = z.infer<typeof ColorControlSchema>;
 export type SelectControl = z.infer<typeof SelectControlSchema>;
+export type GroupControl = z.infer<typeof GroupControlSchema>; // Now supports minItems, maxItems, static
 
 export interface AnimationManifest
   extends DeepReadonly<HasControls>,
@@ -47,7 +50,7 @@ export interface AnimationManifest
       description: string;
     }> {}
 
-export type ControlValueTypes = string | number | boolean;
+export type ControlValueTypes = string | number | boolean | readonly any[];
 
 export type ControlValues = Record<string, ControlValueTypes>;
 
@@ -56,6 +59,7 @@ type ControlTypeToValueTypeMap = {
   boolean: boolean;
   color: string;
   select: string;
+  group: Array<Record<string, ControlValueTypes>>;
 };
 
 export interface HasControlType extends HasType<ControlType> {}
@@ -65,7 +69,15 @@ export interface HasControls {
 }
 
 export type ControlValueType<C extends HasControlType> =
-  ControlTypeToValueTypeMap[C['type']];
+  C['type'] extends 'group'
+    ? C extends {
+        items: Array<{ name: string; type: keyof ControlTypeToValueTypeMap }>;
+      }
+      ? Array<{
+          [K in C['items'][number] as K['name']]: ControlTypeToValueTypeMap[K['type']];
+        }>
+      : never
+    : ControlTypeToValueTypeMap[C['type']];
 
 // Entire manifest → { [name]: valueType }
 export type ManifestControlValues<M extends HasControls> = {
@@ -98,6 +110,9 @@ export interface Animation<TControlValues extends ControlValues = {}> {
 
   /** Update the animation (called each frame) */
   update(width: number, height: number): void;
+
+  /** Reset the animation to default or specified control values */
+  reset(controls?: TControlValues): void;
 
   /** Clean up the animation */
   destroy(): void;

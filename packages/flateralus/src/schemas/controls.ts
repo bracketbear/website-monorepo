@@ -54,6 +54,25 @@ export const SelectControlSchema = BaseControlSchema.extend({
 });
 
 /**
+ * Group (collection) control schema
+ */
+export const GroupControlSchema = BaseControlSchema.extend({
+  type: z.literal('group'),
+  items: z.array(
+    z.discriminatedUnion('type', [
+      NumberControlSchema,
+      BooleanControlSchema,
+      ColorControlSchema,
+      SelectControlSchema,
+    ])
+  ),
+  defaultValue: z.array(z.any()), // Will be typed more strictly in types
+  minItems: z.number().optional(),
+  maxItems: z.number().optional(),
+  static: z.boolean().default(false).optional(),
+});
+
+/**
  * Union of all control schemas
  */
 export const ControlSchema = z.discriminatedUnion('type', [
@@ -61,6 +80,7 @@ export const ControlSchema = z.discriminatedUnion('type', [
   BooleanControlSchema,
   ColorControlSchema,
   SelectControlSchema,
+  GroupControlSchema,
 ]);
 
 /**

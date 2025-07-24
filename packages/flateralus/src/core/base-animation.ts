@@ -27,6 +27,7 @@ export abstract class BaseAnimation<
   protected isInitialized = false;
   protected lastUpdateTime = 0;
   protected manifest: TManifest;
+  protected isResetting = false;
 
   /**
    * @param manifest The animation manifest (type-safe, deeply readonly)
@@ -69,7 +70,7 @@ export abstract class BaseAnimation<
 
     // If reset controls changed, call the reset hook
     if (hasResetChanges && this.app) {
-      this.onReset(this.app, controls);
+      this.reset(controls);
     }
 
     // Call the dynamic update hook for all changed controls
@@ -168,6 +169,25 @@ export abstract class BaseAnimation<
 
     // Call lifecycle hook if implemented
     this.onUpdate(width, height, this.controlValues, deltaTime);
+  }
+
+  /**
+   * Reset the animation
+   */
+  reset(controls?: TControlValues): void {
+    if (!this.app) return;
+
+    // If no controls provided, reset to default values from manifest
+    const resetControls =
+      controls || getManifestDefaultControlValues(this.manifest);
+
+    // Update control values to the reset values
+    this.controlValues = { ...resetControls } as TControlValues;
+    this.previousControlValues = { ...this.controlValues };
+
+    this.isResetting = true;
+    this.onReset(this.app, this.controlValues);
+    this.isResetting = false;
   }
 
   /**

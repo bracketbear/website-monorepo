@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { AstroButton } from '@bracketbear/core/astro';
-import Layout from '@/layouts/Layout.astro';
+import HomeLayout from '@/layouts/HomeLayout.astro';
 import ContactForm from '@/components/ContactForm';
 import ProjectCard from '@/components/ProjectCard';
 import type {
@@ -48,7 +48,7 @@ function getCompanyName(
 }
 ---
 
-<Layout title="Harrison Callahan - Portfolio" hideContactForm={true}>
+<HomeLayout title="Harrison Callahan - Portfolio" hideContactForm={true}>
   <!-- Hero Section with Particle Galaxy Background -->
   <HeroSection className="h-screen w-full" client:load />
 
@@ -200,4 +200,4 @@ function getCompanyName(
       </div>
     </div>
   </section>
-</Layout>
+</HomeLayout>

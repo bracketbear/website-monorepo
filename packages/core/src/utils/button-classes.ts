@@ -1,5 +1,3 @@
-/* Shared button class mappings for React and Astro components */
-
 export const buttonVariantClasses = {
   primary: 'button-primary',
   secondary: 'button-secondary',
@@ -7,6 +5,8 @@ export const buttonVariantClasses = {
   error: 'button-error',
   warning: 'button-warning',
   gear: 'button-gear',
+  ghostDark: 'button-ghost-dark',
+  ghostLight: 'button-ghost-light',
 } as const;
 
 export const buttonSizeClasses = {

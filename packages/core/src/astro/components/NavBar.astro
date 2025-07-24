@@ -1,17 +1,24 @@
 ---
 import type { NavigationConfig } from '../../types/navigation.js';
 import { NAVIGATION_CONSTANTS } from '../../utils/constants.js';
+import Button from '../atoms/Button.astro';
 
 interface Props {
   config: NavigationConfig;
+  variant?: 'default' | 'ghost-dark' | 'ghost-light';
 }
 
-const { config } = Astro.props;
+const { config, variant = 'default' } = Astro.props;
 const { items: navItems, branding, socialLinks } = config;
 ---
 
 <nav
-  class="border-foreground bg-brand-orange flex min-h-20 items-center border-y-2"
+  class:list={[
+    'flex min-h-20 items-center border-y-2',
+    variant === 'ghost-dark'
+      ? 'absolute top-0 right-0 left-0 z-50 border-transparent bg-transparent'
+      : 'border-foreground bg-brand-orange',
+  ]}
 >
   <div
     class="container mx-auto flex h-full items-center justify-between px-6 py-4"
@@ -21,18 +28,23 @@ const { items: navItems, branding, socialLinks } = config;
       {
         branding?.logo && (
           <div class="flex h-16 w-16 items-center justify-center">
-            <img
-              src={branding.logo}
-              alt={branding.name}
-              class="text-foreground"
-            />
+            <img src={branding.logo} alt={branding.name} class="text-white" />
           </div>
         )
       }
       <div
-        class="text-foreground font-heading text-2xl leading-5.5 font-black tracking-wider uppercase"
+        class:list={[
+          'font-heading text-2xl leading-5.5 font-black tracking-wider uppercase',
+          variant === 'ghost-dark' ? 'text-white' : 'text-foreground',
+        ]}
       >
-        <a href={branding?.href || '/'}>
+        <a
+          href={branding?.href || '/'}
+          class:list={[
+            variant === 'ghost-dark' ? 'hover:text-brand-light' : '',
+            'transition-colors',
+          ]}
+        >
           {branding?.name || 'Brand'}
         </a>
       </div>
@@ -48,7 +60,14 @@ const { items: navItems, branding, socialLinks } = config;
               Array.isArray(item.children) &&
               item.children.length > 0 ? (
                 <div>
-                  <button class="group text-foreground relative inline-flex items-center font-black uppercase">
+                  <button
+                    class:list={[
+                      'group relative inline-flex items-center font-black uppercase transition-colors',
+                      variant === 'ghost-dark'
+                        ? 'hover:text-brand-light text-white'
+                        : 'text-foreground',
+                    ]}
+                  >
                     {item.name}
                     <svg
                       class="ml-1 h-4 w-4"
@@ -66,13 +85,22 @@ const { items: navItems, branding, socialLinks } = config;
                   </button>
                   <div class="invisible absolute left-0 z-50 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100">
                     <div
-                      class="border-default py-4 shadow-[8px_8px_0_0_#111111]"
-                      class:list={[NAVIGATION_CONSTANTS.BACKGROUND_COLOR]}
+                      class:list={[
+                        'border-default py-4 shadow-[8px_8px_0_0_#111111]',
+                        variant === 'ghost-dark'
+                          ? 'bg-brand-dark'
+                          : NAVIGATION_CONSTANTS.BACKGROUND_COLOR,
+                      ]}
                     >
                       {item.children.map((child) => (
                         <a
                           href={child.href}
-                          class="text-foreground hover:bg-foreground hover:text-primary block px-4 py-4 text-sm font-black uppercase transition-colors"
+                          class:list={[
+                            'block px-4 py-4 text-sm font-black uppercase transition-colors',
+                            variant === 'ghost-light'
+                              ? 'hover:bg-brand-light hover:text-brand-dark text-white'
+                              : 'text-foreground hover:bg-foreground hover:text-primary',
+                          ]}
                         >
                           {child.name}
                         </a>
@@ -82,7 +110,12 @@ const { items: navItems, branding, socialLinks } = config;
                 </div>
               ) : (
                 <a
-                  class="group text-foreground link-underline relative font-black uppercase transition-all hover:translate-x-[-1px] hover:translate-y-[-1px]"
+                  class:list={[
+                    'group link-underline relative font-black uppercase transition-all hover:translate-x-[-1px] hover:translate-y-[-1px]',
+                    variant === 'ghost-dark'
+                      ? 'hover:text-brand-light text-white'
+                      : 'text-foreground',
+                  ]}
                   href={item.href}
                 >
                   {item.name}
@@ -99,7 +132,12 @@ const { items: navItems, branding, socialLinks } = config;
           socialLinks?.linkedin && (
             <a
               href={socialLinks.linkedin}
-              class="flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px]"
+              class:list={[
+                'flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px]',
+                variant === 'ghost-dark'
+                  ? 'hover:text-brand-light text-white'
+                  : '',
+              ]}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -107,7 +145,9 @@ const { items: navItems, branding, socialLinks } = config;
                 height="20"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                class="text-foreground"
+                class:list={[
+                  variant === 'ghost-dark' ? 'text-white' : 'text-foreground',
+                ]}
               >
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
               </svg>
@@ -118,12 +158,14 @@ const { items: navItems, branding, socialLinks } = config;
     </div>
 
     <!-- Mobile Menu Button -->
-    <button
+    <Button
+      class="p-2 md:hidden"
+      variant="ghostDark"
       id="mobile-menu-button"
-      class="border-default p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111] md:hidden"
+      type="button"
     >
       <svg
-        class="text-foreground h-6 w-6"
+        class="h-6 w-6"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -134,7 +176,7 @@ const { items: navItems, branding, socialLinks } = config;
           stroke-width="2"
           d="M4 6h16M4 12h16M4 18h16"></path>
       </svg>
-    </button>
+    </Button>
   </div>
 
   <!-- Mobile Menu -->
@@ -143,9 +185,12 @@ const { items: navItems, branding, socialLinks } = config;
     class="border-default bg-background fixed top-0 right-0 z-50 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
   >
     <div class="p-6">
-      <button
+      <Button
         id="close-menu-button"
-        class="border-default absolute top-4 right-4 p-2 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111]"
+        class="absolute top-4 right-4"
+        variant="ghostLight"
+        type="button"
+        size="sm"
       >
         <svg
           class="text-foreground h-6 w-6"
@@ -159,7 +204,7 @@ const { items: navItems, branding, socialLinks } = config;
             stroke-width="2"
             d="M6 18L18 6M6 6l12 12"></path>
         </svg>
-      </button>
+      </Button>
 
       <ul class="mt-8 space-y-4">
         {
@@ -239,33 +284,60 @@ const { items: navItems, branding, socialLinks } = config;
     const closeMenuButton = document.getElementById('close-menu-button');
     const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
 
+    // Only proceed if we have the required elements
+    if (
+      !mobileMenu ||
+      !mobileMenuButton ||
+      !closeMenuButton ||
+      !mobileMenuOverlay
+    ) {
+      console.warn('Mobile menu elements not found');
+      return;
+    }
+
     const openMenu = () => {
-      mobileMenu?.classList.remove('translate-x-full');
-      mobileMenuOverlay?.classList.remove('hidden');
+      mobileMenu.classList.remove('translate-x-full');
+      mobileMenuOverlay.classList.remove('hidden', '-z-40');
       setTimeout(() => {
-        mobileMenuOverlay?.classList.add('opacity-50');
+        mobileMenuOverlay.classList.add('opacity-50', 'z-40');
       }, 10);
       document.body.style.overflow = 'hidden';
     };
 
     const closeMenu = () => {
-      mobileMenu?.classList.add('translate-x-full');
-      mobileMenuOverlay?.classList.remove('opacity-50');
+      mobileMenu.classList.add('translate-x-full');
+      mobileMenuOverlay.classList.remove('opacity-50', 'z-40');
       setTimeout(() => {
-        mobileMenuOverlay?.classList.add('hidden');
+        mobileMenuOverlay.classList.add('hidden', '-z-40');
       }, 300);
       document.body.style.overflow = '';
     };
 
-    mobileMenuButton?.addEventListener('click', openMenu);
-    closeMenuButton?.addEventListener('click', closeMenu);
-    mobileMenuOverlay?.addEventListener('click', closeMenu);
+    // Add event listeners
+    mobileMenuButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openMenu();
+    });
 
+    closeMenuButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeMenu();
+    });
+
+    mobileMenuOverlay.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeMenu();
+    });
+
+    // Only close menu when clicking outside AND menu is open
     document.addEventListener('click', (e) => {
+      const target = e.target as Node;
+      const isMenuOpen = !mobileMenu.classList.contains('translate-x-full');
+
       if (
-        !mobileMenu?.contains(e.target as Node) &&
-        !mobileMenuButton?.contains(e.target as Node) &&
-        !mobileMenu?.classList.contains('translate-x-full')
+        isMenuOpen &&
+        !mobileMenu.contains(target) &&
+        !mobileMenuButton.contains(target)
       ) {
         closeMenu();
       }
