@@ -232,6 +232,8 @@ const MANIFEST = createManifest({
 
 type ParticleNetworkControlValues = ManifestToControlValues<typeof MANIFEST>;
 
+export type { ParticleNetworkControlValues };
+
 function createParticle(
   app: PIXI.Application,
   width: number,

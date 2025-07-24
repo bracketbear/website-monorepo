@@ -6,10 +6,10 @@ import { BooleanControl } from './index';
 import { SelectControl } from './index';
 // import BaseControlWrapper from './BaseControlWrapper'; // To be implemented
 
-interface GroupControlProps {
+interface GroupControlProps<T> {
   control: GroupControlType;
-  value: Array<Record<string, any>>;
-  onChange: (newValue: Array<Record<string, any>>) => void;
+  value: T[];
+  onChange: (newValue: T[]) => void;
   minItems?: number;
   maxItems?: number;
   isStatic?: boolean;
@@ -17,7 +17,7 @@ interface GroupControlProps {
   toggleCollapse?: () => void;
 }
 
-const GroupControl: React.FC<GroupControlProps> = ({
+const GroupControl = <T,>({
   control,
   value,
   onChange,
@@ -26,7 +26,7 @@ const GroupControl: React.FC<GroupControlProps> = ({
   isStatic = false,
   isCollapsed = false,
   toggleCollapse,
-}) => {
+}: GroupControlProps<T>) => {
   const handleItemChange = (idx: number, itemKey: string, itemValue: any) => {
     const newGroup = value.map((item, i) =>
       i === idx ? { ...item, [itemKey]: itemValue } : item
@@ -35,7 +35,7 @@ const GroupControl: React.FC<GroupControlProps> = ({
   };
 
   const handleAdd = () => {
-    const newItem: Record<string, any> = {};
+    const newItem: any = {};
     control.items.forEach((item) => {
       newItem[item.name] = item.defaultValue;
     });
@@ -101,7 +101,7 @@ const GroupControl: React.FC<GroupControlProps> = ({
                     <ColorControl
                       key={`color-${control.name}-${idx}-${itemControl.name}`}
                       control={itemControl}
-                      value={item[itemControl.name]}
+                      value={(item as any)[itemControl.name]}
                       onControlChange={(_key, v) =>
                         handleItemChange(idx, itemControl.name, v)
                       }
@@ -112,7 +112,7 @@ const GroupControl: React.FC<GroupControlProps> = ({
                     <NumberControl
                       key={`number-${control.name}-${idx}-${itemControl.name}`}
                       control={itemControl}
-                      value={item[itemControl.name]}
+                      value={(item as any)[itemControl.name]}
                       onControlChange={(_key, v) =>
                         handleItemChange(idx, itemControl.name, v)
                       }
@@ -123,7 +123,7 @@ const GroupControl: React.FC<GroupControlProps> = ({
                     <BooleanControl
                       key={`boolean-${control.name}-${idx}-${itemControl.name}`}
                       control={itemControl}
-                      value={item[itemControl.name]}
+                      value={(item as any)[itemControl.name]}
                       onControlChange={(_key, v) =>
                         handleItemChange(idx, itemControl.name, v)
                       }
@@ -134,7 +134,7 @@ const GroupControl: React.FC<GroupControlProps> = ({
                     <SelectControl
                       key={`select-${control.name}-${idx}-${itemControl.name}`}
                       control={itemControl}
-                      value={item[itemControl.name]}
+                      value={(item as any)[itemControl.name]}
                       onControlChange={(_key, v) =>
                         handleItemChange(idx, itemControl.name, v)
                       }

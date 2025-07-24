@@ -21,11 +21,14 @@ interface AnimationStageProps<
 > {
   /** Whether to show debug controls */
   showDebugControls?: boolean;
+  /** Whether to show the download button in debug controls */
+  showDownloadButton?: boolean;
   /** Animation factory function */
-  animation?: (initialControls?: ControlValues) => Animation<TControlValues>;
+  animation?: (initialControls?: TControlValues) => Animation<TControlValues>;
   children?: ReactNode;
   className?: string;
   debugControlsClassName?: string;
+  initialControls?: Partial<TControlValues>;
 }
 
 /**
@@ -37,10 +40,12 @@ export default function AnimationStage<
   TControlValues extends ControlValues = ControlValues,
 >({
   showDebugControls = false,
+  showDownloadButton = true,
   animation,
   children,
   className,
   debugControlsClassName,
+  initialControls,
 }: AnimationStageProps<TControlValues>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
@@ -55,7 +60,7 @@ export default function AnimationStage<
   /**
    * Initialize the PixiJS application and animation
    */
-  const initApp = async (initialControls?: ControlValues) => {
+  const initApp = async (initialControls?: Partial<TControlValues>) => {
     if (!containerRef.current || !animation) return;
 
     // Clean up existing app
@@ -182,7 +187,7 @@ export default function AnimationStage<
   useEffect(() => {
     const startApp = async () => {
       await new Promise((resolve) => setTimeout(resolve, 100));
-      await initApp();
+      await initApp(initialControls);
     };
     startApp();
 
@@ -202,7 +207,7 @@ export default function AnimationStage<
           ) {
             currentWidth = newRect.width;
             currentHeight = newRect.height;
-            await initApp();
+            await initApp(initialControls);
           }
         }, 250);
       });
@@ -246,6 +251,7 @@ export default function AnimationStage<
           onControlsChange={handleControlsChange}
           isVisible={showDebugControls}
           animationRef={animationRef}
+          showDownloadButton={showDownloadButton}
           className={clsx(
             'absolute top-16 right-4 z-45',
             debugControlsClassName

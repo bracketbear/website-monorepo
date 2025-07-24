@@ -107,7 +107,7 @@ const DebugControls = memo<DebugControlsProps>(
 
       if (control.type === 'group') {
         const groupValue = Array.isArray(controlValues[control.name])
-          ? (controlValues[control.name] as any[])
+          ? (controlValues[control.name] as unknown[])
           : [];
         const minItems = control.minItems ?? 0;
         const maxItems = control.maxItems ?? Infinity;
@@ -118,12 +118,16 @@ const DebugControls = memo<DebugControlsProps>(
             ...prev,
             [control.name]: !isCollapsed,
           }));
+        type GroupItem = (typeof groupValue)[number];
+        const GroupControlTyped = GroupControl as unknown as React.FC<
+          React.ComponentProps<typeof GroupControl<GroupItem>>
+        >;
         return (
-          <GroupControl
+          <GroupControlTyped
             key={control.name}
             control={control as GroupControlType}
-            value={groupValue}
-            onChange={(newValue: Array<Record<string, any>>) =>
+            value={groupValue as GroupItem[]}
+            onChange={(newValue: GroupItem[]) =>
               onControlsChange({ [control.name]: newValue })
             }
             minItems={minItems}

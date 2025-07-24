@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { CheckboxInput } from '@bracketbear/core/react';
 import type { BooleanControl as BooleanControlType } from '@bracketbear/flateralus';
+import BaseControlWrapper from './BaseControlWrapper';
 
 interface BooleanControlProps {
   control: BooleanControlType;
@@ -15,24 +16,14 @@ interface BooleanControlProps {
  */
 const BooleanControl = memo<BooleanControlProps>(
   ({ control, value, onControlChange }) => (
-    <div className="flex flex-col gap-0.5 py-2">
-      <div className="flex items-center gap-2">
-        <label className="w-32 shrink-0 text-xs text-white/70">
-          {control.label}
-        </label>
-        <CheckboxInput
-          checked={value}
-          onChange={(e) => onControlChange(control.name, e.target.checked)}
-          className="ml-auto rounded bg-white/10"
-          size="sm"
-        />
-      </div>
-      {control.description && (
-        <div className="mt-0.5 ml-0.5 text-[11px] leading-tight text-white/40">
-          {control.description}
-        </div>
-      )}
-    </div>
+    <BaseControlWrapper label={control.label} description={control.description}>
+      <CheckboxInput
+        checked={value}
+        onChange={(e) => onControlChange(control.name, e.target.checked)}
+        className="ml-auto rounded bg-white/10"
+        size="sm"
+      />
+    </BaseControlWrapper>
   )
 );
 
