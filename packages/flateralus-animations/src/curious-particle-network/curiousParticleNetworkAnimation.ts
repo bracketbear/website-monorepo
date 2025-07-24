@@ -442,7 +442,7 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
       if (!p.isInteraction) {
         p.x += p.vx * controls.animationSpeed;
         p.y += p.vy * controls.animationSpeed;
-        
+
         // Handle bounds based on keepInBounds setting
         if (controls.keepInBounds) {
           // Bounce off edges
@@ -456,7 +456,7 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
           if (p.y > height + 50) p.y = -50;
           if (p.y < -50) p.y = height + 50;
         }
-        
+
         // Mouse interactivity: attract particles to mouse if within radius
         if (this.system.isMouseActive) {
           const dx = this.system.mouseX - p.x;
@@ -503,7 +503,7 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
           p.debugZeroCount = 0;
         }
       }
-      
+
       // Draw glow effect if enabled
       if (
         p.glowGraphics &&
