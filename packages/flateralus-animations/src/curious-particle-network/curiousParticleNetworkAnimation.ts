@@ -219,14 +219,6 @@ const MANIFEST = createManifest({
       defaultValue: '#fffbe0',
       debug: true,
     },
-    {
-      name: 'debugLogging',
-      type: 'boolean',
-      label: 'Debug Logging',
-      description: 'Enable debug logs for stuck particles',
-      defaultValue: false,
-      debug: true,
-    },
   ],
 });
 
@@ -265,13 +257,6 @@ function createParticle(
     angle += Math.PI / 4;
     vx = Math.cos(angle) * speed;
     vy = Math.sin(angle) * speed;
-  }
-  if (controls.debugLogging) {
-    // Log initial velocity for debugging
-
-    console.log(
-      `[Particle ${colorIndex}] Created at (${x.toFixed(1)}, ${y.toFixed(1)}) with velocity (${vx.toFixed(3)}, ${vy.toFixed(3)})`
-    );
   }
   graphics.zIndex = 2;
   app.stage.addChild(graphics);
