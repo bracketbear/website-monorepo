@@ -5,6 +5,7 @@ import type {
   ManifestToControlValues,
 } from '../types';
 import { getManifestDefaultControlValues } from '../utils/get-manifest-default-control-values';
+import { createControlValuesSchema } from '../utils/create-control-values-schema';
 
 // ============================================================================
 // BASE ANIMATION CLASS
@@ -35,10 +36,16 @@ export abstract class BaseAnimation<
    */
   constructor(manifest: TManifest, initialControls?: Partial<TControlValues>) {
     this.manifest = manifest;
-    this.controlValues = {
+    const schema = createControlValuesSchema(manifest);
+    const merged = {
       ...getManifestDefaultControlValues(manifest),
       ...initialControls,
-    } as TControlValues;
+    };
+    const result = schema.safeParse(merged);
+    if (!result.success) {
+      throw new Error('Invalid control values: ' + result.error.message);
+    }
+    this.controlValues = result.data as TControlValues;
     this.previousControlValues = { ...this.controlValues };
   }
 
@@ -139,7 +146,13 @@ export abstract class BaseAnimation<
       }
     });
 
-    this.controlValues = mergedValues;
+    // Validate merged values
+    const schema = createControlValuesSchema(this.manifest);
+    const result = schema.safeParse(mergedValues);
+    if (!result.success) {
+      throw new Error('Invalid control values: ' + result.error.message);
+    }
+    this.controlValues = result.data as TControlValues;
 
     // Call lifecycle hook if implemented
     this.onControlsChange(this.controlValues, this.previousControlValues);
@@ -181,8 +194,14 @@ export abstract class BaseAnimation<
     const resetControls =
       controls || getManifestDefaultControlValues(this.manifest);
 
+    // Validate reset controls
+    const schema = createControlValuesSchema(this.manifest);
+    const result = schema.safeParse(resetControls);
+    if (!result.success) {
+      throw new Error('Invalid control values: ' + result.error.message);
+    }
     // Update control values to the reset values
-    this.controlValues = { ...resetControls } as TControlValues;
+    this.controlValues = result.data as TControlValues;
     this.previousControlValues = { ...this.controlValues };
 
     this.isResetting = true;
