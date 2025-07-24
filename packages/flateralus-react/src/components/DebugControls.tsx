@@ -11,12 +11,14 @@ import type {
   SelectControl as SelectControlType,
   GroupControl as GroupControlType,
 } from '@bracketbear/flateralus';
+import { getManifestDefaultControlValues } from '@bracketbear/flateralus';
 import { Button } from '@bracketbear/core/react';
 import {
   NumberControl,
   BooleanControl,
   ColorControl,
   SelectControl,
+  GroupControl,
 } from './controls';
 import { GearIcon } from '@bracketbear/core/assets';
 import type { DeepReadonly } from '@bracketbear/core';
@@ -27,6 +29,7 @@ interface DebugControlsProps {
   onControlsChange: (values: Partial<ControlValues>) => void;
   isVisible?: boolean;
   animationRef?: React.RefObject<Animation | null>;
+  showDownloadButton?: boolean;
   className?: string;
 }
 
@@ -43,6 +46,7 @@ const DebugControls = memo<DebugControlsProps>(
     onControlsChange,
     isVisible = false,
     animationRef,
+    showDownloadButton = false,
     className,
   }) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -68,152 +72,32 @@ const DebugControls = memo<DebugControlsProps>(
       [onControlsChange]
     );
 
-    const handleGroupItemChange = useCallback(
-      (
-        groupName: string,
-        idx: number,
-        itemKey: string,
-        value: number | boolean | string
-      ) => {
-        const group = Array.isArray(controlValues[groupName])
-          ? [...(controlValues[groupName] as any[])]
-          : [];
-        group[idx] = { ...group[idx], [itemKey]: value };
-        onControlsChange({ [groupName]: group });
-      },
-      [controlValues, onControlsChange]
-    );
+    const downloadSettings = useCallback(() => {
+      // Get default values to ensure we have all required controls
+      const defaultValues = getManifestDefaultControlValues(manifest);
 
-    const handleGroupAdd = useCallback(
-      (groupControl: GroupControlType) => {
-        const groupName = groupControl.name;
-        const group = Array.isArray(controlValues[groupName])
-          ? [...(controlValues[groupName] as any[])]
-          : [];
-        // Use default values from items
-        const newItem: any = {};
-        groupControl.items.forEach((item) => {
-          newItem[item.name] = item.defaultValue;
-        });
-        group.push(newItem);
-        onControlsChange({ [groupName]: group });
-      },
-      [controlValues, onControlsChange]
-    );
+      // Merge current values with defaults to ensure completeness
+      const completeValues = { ...defaultValues, ...controlValues };
 
-    const handleGroupRemove = useCallback(
-      (groupName: string, idx: number) => {
-        const group = Array.isArray(controlValues[groupName])
-          ? [...(controlValues[groupName] as any[])]
-          : [];
-        group.splice(idx, 1);
-        onControlsChange({ [groupName]: group });
-      },
-      [controlValues, onControlsChange]
-    );
+      // Create a clean object with only the control values
+      const settingsToDownload = {
+        manifestId: manifest.id,
+        controlValues: completeValues,
+      };
 
-    const renderGroupControl = (control: GroupControlType) => {
-      const groupValue = Array.isArray(controlValues[control.name])
-        ? (controlValues[control.name] as any[])
-        : [];
-      const minItems = control.minItems ?? 0;
-      const maxItems = control.maxItems ?? Infinity;
-      const isStatic = !!control.static;
-      const isCollapsed = collapsedGroups[control.name] ?? false;
-      const toggleCollapse = () =>
-        setCollapsedGroups((prev) => ({
-          ...prev,
-          [control.name]: !isCollapsed,
-        }));
-      return (
-        <div
-          key={control.name}
-          className="flex flex-col gap-2 border-b border-white/10 py-2"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="text-xs text-white/60 hover:text-white/90 focus:outline-none"
-                onClick={toggleCollapse}
-                aria-label={isCollapsed ? 'Expand group' : 'Collapse group'}
-              >
-                {isCollapsed ? '▶' : '▼'}
-              </button>
-              <label className="text-xs font-bold text-white/70">
-                {control.label}
-              </label>
-            </div>
-            {!isStatic && groupValue.length < maxItems && (
-              <button
-                type="button"
-                className="rounded bg-white/10 px-2 py-1 text-xs text-white hover:bg-white/20"
-                onClick={() => handleGroupAdd(control)}
-                disabled={groupValue.length >= maxItems}
-              >
-                + Add
-              </button>
-            )}
-          </div>
-          {control.description && (
-            <div className="mt-0.5 ml-6 text-[11px] leading-tight text-white/40">
-              {control.description}
-            </div>
-          )}
-          {!isCollapsed && groupValue.length === 0 && (
-            <div className="ml-6 text-xs text-white/40 italic">No items</div>
-          )}
-          {!isCollapsed &&
-            groupValue.map((item, idx) => (
-              <div
-                key={`group-item-${control.name}-${idx}`}
-                className="group-item-indent relative ml-6 flex items-center gap-2"
-              >
-                <span
-                  className="absolute top-0 bottom-0 left-0 w-2 border-l border-white/20"
-                  aria-hidden="true"
-                ></span>
-                {control.items.map((itemControl) => {
-                  if (itemControl.type === 'color') {
-                    return (
-                      <ColorControl
-                        key={`color-${control.name}-${idx}-${itemControl.name}`}
-                        control={itemControl as ColorControlType}
-                        value={item[itemControl.name]}
-                        onControlChange={(key, value) =>
-                          handleGroupItemChange(control.name, idx, key, value)
-                        }
-                      />
-                    );
-                  }
-                  // Add support for other types if needed
-                  return null;
-                })}
-                {!isStatic && groupValue.length > minItems && (
-                  <button
-                    type="button"
-                    className="ml-2 rounded bg-red-700/80 px-2 py-1 text-xs text-white hover:bg-red-800"
-                    onClick={() => handleGroupRemove(control.name, idx)}
-                    title="Remove"
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
-        </div>
-      );
-    };
-
-    const resetToDefaults = () => {
-      if (animationRef?.current) {
-        animationRef.current.reset();
-        // The animation will update its own control values, so we need to trigger a re-render
-        // by calling onControlsChange with the updated values
-        const updatedValues = animationRef.current.getControlValues();
-        onControlsChange(updatedValues);
-      }
-    };
+      // Create and download the JSON file
+      const blob = new Blob([JSON.stringify(settingsToDownload, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${manifest.id}-settings.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, [manifest, controlValues]);
 
     const renderControl = (control: DeepReadonly<Control>) => {
       const value = controlValues[control.name];
@@ -221,21 +105,33 @@ const DebugControls = memo<DebugControlsProps>(
       // Skip controls that shouldn't be shown in debug
       if (!control.debug) return null;
 
-      const showReset = !!control.resetsAnimation;
-
       if (control.type === 'group') {
+        const groupValue = Array.isArray(controlValues[control.name])
+          ? (controlValues[control.name] as any[])
+          : [];
+        const minItems = control.minItems ?? 0;
+        const maxItems = control.maxItems ?? Infinity;
+        const isStatic = !!control.static;
+        const isCollapsed = collapsedGroups[control.name] ?? false;
+        const toggleCollapse = () =>
+          setCollapsedGroups((prev) => ({
+            ...prev,
+            [control.name]: !isCollapsed,
+          }));
         return (
-          <div className="relative">
-            {renderGroupControl(control as GroupControlType)}
-            {showReset && (
-              <span
-                className="text-brand-red absolute top-0 right-0"
-                title="Changing this will reset the animation."
-              >
-                ⟳
-              </span>
-            )}
-          </div>
+          <GroupControl
+            key={control.name}
+            control={control as GroupControlType}
+            value={groupValue}
+            onChange={(newValue: Array<Record<string, any>>) =>
+              onControlsChange({ [control.name]: newValue })
+            }
+            minItems={minItems}
+            maxItems={maxItems}
+            isStatic={isStatic}
+            isCollapsed={isCollapsed}
+            toggleCollapse={toggleCollapse}
+          />
         );
       }
 
@@ -281,6 +177,16 @@ const DebugControls = memo<DebugControlsProps>(
       }
     };
 
+    const resetToDefaults = () => {
+      if (animationRef?.current) {
+        animationRef.current.reset();
+        // The animation will update its own control values, so we need to trigger a re-render
+        // by calling onControlsChange with the updated values
+        const updatedValues = animationRef.current.getControlValues();
+        onControlsChange(updatedValues);
+      }
+    };
+
     if (!isVisible) return null;
 
     return (
@@ -313,9 +219,20 @@ const DebugControls = memo<DebugControlsProps>(
                   {manifest.name}
                 </h3>
               </div>
-              <Button variant="warning" onClick={resetToDefaults} size="sm">
-                Reset
-              </Button>
+              <div className="flex items-center gap-2">
+                {showDownloadButton && (
+                  <Button
+                    variant="secondary"
+                    onClick={downloadSettings}
+                    size="sm"
+                  >
+                    Download
+                  </Button>
+                )}
+                <Button variant="warning" onClick={resetToDefaults} size="sm">
+                  Reset
+                </Button>
+              </div>
             </div>
             <div className="mb-3 text-xs text-white/50">
               {manifest.description}
