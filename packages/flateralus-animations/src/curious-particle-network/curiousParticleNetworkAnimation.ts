@@ -35,6 +35,7 @@ interface Particle {
   fadeIn: boolean;
   isInteraction?: boolean;
   debugZeroCount?: number;
+  glowGraphics?: PIXI.Graphics;
 }
 
 interface ParticleNetworkSystem {
@@ -272,6 +273,15 @@ function createParticle(
   }
   graphics.zIndex = 2;
   app.stage.addChild(graphics);
+
+  // Create glow graphics if glow radius is set
+  let glowGraphics: PIXI.Graphics | undefined;
+  if (controls.particleGlowRadius && controls.particleGlowRadius > 0) {
+    glowGraphics = new PIXI.Graphics();
+    glowGraphics.zIndex = 1; // Behind the main particle
+    app.stage.addChild(glowGraphics);
+  }
+
   return {
     graphics,
     x,
@@ -284,6 +294,7 @@ function createParticle(
     fadeIn: !isInteraction,
     isInteraction,
     debugZeroCount: 0,
+    glowGraphics,
   };
 }
 
@@ -431,22 +442,51 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
       if (!p.isInteraction) {
         p.x += p.vx * controls.animationSpeed;
         p.y += p.vy * controls.animationSpeed;
-        // Bounce with buffer
-        const buffer = 100;
-        if (p.x > width + buffer || p.x < -buffer) p.vx *= -1;
-        if (p.y > height + buffer || p.y < -buffer) p.vy *= -1;
-        // Mouse interactivity: attract particles to mouse if within a larger radius
+        
+        // Handle bounds based on keepInBounds setting
+        if (controls.keepInBounds) {
+          // Bounce off edges
+          const buffer = 100;
+          if (p.x > width + buffer || p.x < -buffer) p.vx *= -1;
+          if (p.y > height + buffer || p.y < -buffer) p.vy *= -1;
+        } else {
+          // Wrap around edges
+          if (p.x > width + 50) p.x = -50;
+          if (p.x < -50) p.x = width + 50;
+          if (p.y > height + 50) p.y = -50;
+          if (p.y < -50) p.y = height + 50;
+        }
+        
+        // Mouse interactivity: attract particles to mouse if within radius
         if (this.system.isMouseActive) {
           const dx = this.system.mouseX - p.x;
           const dy = this.system.mouseY - p.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          const attractionRadius = 120;
+          const attractionRadius = controls.cursorAttractionRadius ?? 120;
           if (dist < attractionRadius) {
-            // Smooth falloff for attraction
+            // Smooth falloff for attraction using the control value
             const strength =
-              ((attractionRadius - dist) / attractionRadius) * 0.18;
+              ((attractionRadius - dist) / attractionRadius) *
+              (controls.cursorAttractionStrength ?? 0.18);
             p.vx += (dx / dist) * strength;
             p.vy += (dy / dist) * strength;
+          }
+        }
+
+        // Apply attraction between particles if attractionStrength is set
+        if (controls.attractionStrength && controls.attractionStrength > 0) {
+          for (let j = 0; j < particles.length; j++) {
+            if (i === j || particles[j].isInteraction) continue;
+            const p2 = particles[j];
+            const dx = p2.x - p.x;
+            const dy = p2.y - p.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist > 0 && dist < 100) {
+              // Attraction within 100px
+              const force = (controls.attractionStrength / (dist * dist)) * 0.1;
+              p.vx += (dx / dist) * force;
+              p.vy += (dy / dist) * force;
+            }
           }
         }
       }
@@ -463,7 +503,24 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
           p.debugZeroCount = 0;
         }
       }
-      // Draw
+      
+      // Draw glow effect if enabled
+      if (
+        p.glowGraphics &&
+        controls.particleGlowRadius &&
+        controls.particleGlowRadius > 0
+      ) {
+        p.glowGraphics.clear();
+        p.glowGraphics.circle(0, 0, controls.particleGlowRadius);
+        p.glowGraphics.fill({
+          color: new PIXI.Color(controls.glowColor ?? '#fffbe0').toNumber(),
+          alpha: p.opacity * 0.3, // Subtle glow
+        });
+        p.glowGraphics.x = p.x;
+        p.glowGraphics.y = p.y;
+      }
+
+      // Draw main particle
       p.graphics.clear();
       p.graphics.circle(0, 0, p.radius);
       // Mouse interactivity: highlight particle if near mouse
@@ -497,6 +554,13 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
           }
           p.graphics.destroy({ children: true, texture: true });
         }
+        // Clean up glow graphics
+        if (p.glowGraphics) {
+          if (p.glowGraphics.parent) {
+            p.glowGraphics.parent.removeChild(p.glowGraphics);
+          }
+          p.glowGraphics.destroy({ children: true, texture: true });
+        }
       }
       // Remove and destroy lines graphics
       if (this.linesGraphics) {
@@ -519,6 +583,13 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
             p.graphics.parent.removeChild(p.graphics);
           }
           p.graphics.destroy({ children: true, texture: true });
+        }
+        // Clean up glow graphics
+        if (p.glowGraphics) {
+          if (p.glowGraphics.parent) {
+            p.glowGraphics.parent.removeChild(p.glowGraphics);
+          }
+          p.glowGraphics.destroy({ children: true, texture: true });
         }
       }
       this.system.particles = [];
