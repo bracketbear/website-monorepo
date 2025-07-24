@@ -125,3 +125,9 @@ export type AnimationControlValues<TAnimation extends Animation> = ReturnType<
 export type AnimationFactory<TAnimation extends Animation> = (
   controls?: Partial<AnimationControlValues<TAnimation>>
 ) => TAnimation;
+
+export type DefaultableControl =
+  | NumberControl
+  | BooleanControl
+  | ColorControl
+  | SelectControl;

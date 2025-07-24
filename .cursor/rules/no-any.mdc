@@ -1,0 +1,7 @@
+# No 'any' Type Rule
+
+Using 'any' is unacceptable in almost all contexts. Use explicit, strong TypeScript types for all values, parameters, and return types. Only use 'any' in rare, unavoidable edge cases, and always document why.
+description:
+globs:
+alwaysApply: false
+---

@@ -1,0 +1,47 @@
+# Vitest Unit Testing Standards
+
+## Testing Framework
+- Always use **Vitest** for unit testing (version 2.1.8+)
+- Tests run in Node.js environment with globals enabled
+- Use the test scripts: `npm run test`, `npm run test:run`, `npm run test:ui`
+
+## Test File Organization
+- Unit tests should live in the **same folder** as the file they're testing
+- Test files should have the **same name** as the file they're testing, but include `.test` before the file extension
+- Example: `testable.ts` becomes `testable.test.ts`
+- Example: `randomize-controls.ts` becomes `randomize-controls.test.ts`
+
+## Test Configuration
+- Tests are configured in [vitest.config.ts](mdc:vitest.config.ts)
+- Includes: `packages/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}`
+- Excludes: `.astro`, `**/*.d.ts`, `**/node_modules/**`, `**/dist/**`
+- Aliases configured for `@bracketbear/core` and `@bracketbear/astro-content`
+
+## Test Structure
+- Use `describe()` for test suites
+- Use `it()` or `test()` for individual test cases
+- Use `expect()` for assertions
+- Use `beforeEach()`, `afterEach()`, `beforeAll()`, `afterAll()` for setup/teardown
+- Use `vi.fn()` for mocks and `vi.mock()` for module mocking
+
+## Example Test Structure
+```typescript
+import { describe, it, expect } from 'vitest';
+import { functionToTest } from './file-to-test';
+
+describe('functionToTest', () => {
+  it('should handle normal case', () => {
+    const result = functionToTest('input');
+    expect(result).toBe('expected');
+  });
+
+  it('should handle edge case', () => {
+    const result = functionToTest('');
+    expect(result).toBe('');
+  });
+});
+```
+description:
+globs:
+alwaysApply: false
+---

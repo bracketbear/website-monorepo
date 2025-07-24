@@ -13,6 +13,7 @@ export const buttonSizeClasses = {
   sm: 'button-sm',
   md: 'button-md',
   lg: 'button-lg',
+  icon: 'button-icon', // Add icon size
 } as const;
 
 export type ButtonVariant = keyof typeof buttonVariantClasses;

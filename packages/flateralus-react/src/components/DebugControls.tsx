@@ -20,7 +20,13 @@ import {
   SelectControl,
   GroupControl,
 } from './controls';
-import { GearIcon } from '@bracketbear/core/assets';
+import {
+  GearIcon,
+  DiceIcon,
+  DownloadIcon,
+  ResetIcon,
+} from '@bracketbear/core/assets';
+import { getRandomControlValues } from '@bracketbear/flateralus';
 import type { DeepReadonly } from '@bracketbear/core';
 
 interface DebugControlsProps {
@@ -54,6 +60,10 @@ const DebugControls = memo<DebugControlsProps>(
     const [collapsedGroups, setCollapsedGroups] = useState<
       Record<string, boolean>
     >({});
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
+    const [toastTimeout, setToastTimeout] = useState<NodeJS.Timeout | null>(
+      null
+    );
 
     // Handle panel mount/unmount for animation
     useEffect(() => {
@@ -98,6 +108,33 @@ const DebugControls = memo<DebugControlsProps>(
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }, [manifest, controlValues]);
+
+    const showToast = (message: string) => {
+      setToastMessage(message);
+      if (toastTimeout) clearTimeout(toastTimeout);
+      const timeout = setTimeout(() => setToastMessage(null), 1500);
+      setToastTimeout(timeout);
+    };
+
+    const randomizeSettings = useCallback(() => {
+      if (manifest) {
+        const randomValues = getRandomControlValues(manifest);
+        if (animationRef?.current) {
+          animationRef.current.updateControls(randomValues);
+        }
+        onControlsChange(randomValues);
+        showToast('Controls randomized!');
+      }
+    }, [manifest, animationRef, onControlsChange]);
+
+    const resetToDefaults = () => {
+      if (animationRef?.current) {
+        animationRef.current.reset();
+        const updatedValues = animationRef.current.getControlValues();
+        onControlsChange(updatedValues);
+        showToast('Animation reset');
+      }
+    };
 
     const renderControl = (control: DeepReadonly<Control>) => {
       const value = controlValues[control.name];
@@ -181,16 +218,6 @@ const DebugControls = memo<DebugControlsProps>(
       }
     };
 
-    const resetToDefaults = () => {
-      if (animationRef?.current) {
-        animationRef.current.reset();
-        // The animation will update its own control values, so we need to trigger a re-render
-        // by calling onControlsChange with the updated values
-        const updatedValues = animationRef.current.getControlValues();
-        onControlsChange(updatedValues);
-      }
-    };
-
     if (!isVisible) return null;
 
     return (
@@ -224,17 +251,35 @@ const DebugControls = memo<DebugControlsProps>(
                 </h3>
               </div>
               <div className="flex items-center gap-2">
+                <Button
+                  variant="secondary"
+                  onClick={randomizeSettings}
+                  size="icon"
+                  aria-label="Randomize"
+                >
+                  <img src={DiceIcon.src} alt="Randomize" className="h-4 w-4" />
+                </Button>
                 {showDownloadButton && (
                   <Button
                     variant="secondary"
                     onClick={downloadSettings}
-                    size="sm"
+                    size="icon"
+                    aria-label="Download"
                   >
-                    Download
+                    <img
+                      src={DownloadIcon.src}
+                      alt="Download"
+                      className="h-4 w-4"
+                    />
                   </Button>
                 )}
-                <Button variant="warning" onClick={resetToDefaults} size="sm">
-                  Reset
+                <Button
+                  variant="warning"
+                  onClick={resetToDefaults}
+                  size="icon"
+                  aria-label="Reset"
+                >
+                  <img src={ResetIcon.src} alt="Reset" className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -243,8 +288,12 @@ const DebugControls = memo<DebugControlsProps>(
             </div>
             <div className="max-h-96 space-y-2 overflow-y-auto pr-1">
               {manifest.controls.map(renderControl)}
-              {/* Remove the test slider */}
             </div>
+          </div>
+        )}
+        {toastMessage && (
+          <div className="animate-toast-in card fixed bottom-8 left-1/2 z-50 -translate-x-1/2 px-6 py-3 text-lg font-bold shadow-xl">
+            {toastMessage}
           </div>
         )}
       </div>

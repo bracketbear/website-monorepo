@@ -60,3 +60,14 @@
 @utility button-transparent-light {
   @apply hover:text-brand-dark/5 bg-transparent text-white;
 }
+
+.button-icon {
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
