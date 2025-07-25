@@ -1,0 +1,23 @@
+{
+  "name": "@bracketbear/flateralus-pixi",
+  "version": "1.0.0",
+  "description": "PIXI.js adapter for Flateralus animation framework.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "dependencies": {
+    "pixi.js": "^8.0.0",
+    "@bracketbear/flateralus": "file:../flateralus"
+  },
+  "keywords": [],
+  "author": "Bracket Bear",
+  "license": "ISC"
+}

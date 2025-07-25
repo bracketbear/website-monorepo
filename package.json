@@ -7,8 +7,8 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace=@bracketbear/core\" \"npm run dev --workspace=@bracketbear/flateralus\" \"npm run dev --workspace=@bracketbear/flateralus-animations\" \"npm run dev --workspace=@bracketbear/flateralus-react\"  \"npm run dev --workspace=@bracketbear/cms\"  \"npm run dev --workspace=@bracketbear/bracketbear-website\" \"npm run dev --workspace=@bracketbear/portfolio\"",
-    "build": "npm run build --workspace=@bracketbear/core --workspace=@bracketbear/flateralus --workspace=@bracketbear/flateralus-animations --workspace=@bracketbear/flateralus-react --workspace=@bracketbear/bracketbear-website --workspace=@bracketbear/portfolio",
+    "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace=@bracketbear/core\" \"npm run dev --workspace=@bracketbear/flateralus\" \"npm run dev --workspace=@bracketbear/flateralus-animations\" \"npm run dev --workspace=@bracketbear/flateralus-react\"  \"npm run dev --workspace=@bracketbear/flateralus-pixi\"  \"npm run dev --workspace=@bracketbear/cms\"  \"npm run dev --workspace=@bracketbear/bracketbear-website\" \"npm run dev --workspace=@bracketbear/portfolio\"",
+    "build": "npm run build --workspace=@bracketbear/core --workspace=@bracketbear/flateralus --workspace=@bracketbear/flateralus-animations --workspace=@bracketbear/flateralus-react --workspace=@bracketbear/flateralus-pixi --workspace=@bracketbear/bracketbear-website --workspace=@bracketbear/portfolio",
     "preview:bracketbear": "npm run preview --workspace=@bracketbear/bracketbear-website",
     "preview:portfolio": "npm run preview --workspace=@bracketbear/portfolio",
     "test": "vitest",

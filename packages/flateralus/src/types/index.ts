@@ -1,6 +1,5 @@
 import type { DeepReadonly, ObjectKeys, ObjectValues } from '@bracketbear/core';
 import { z } from 'zod';
-import { type Application as PIXIApplication } from 'pixi.js';
 import type {
   BooleanControlSchema,
   ColorControlSchema,
@@ -95,7 +94,10 @@ export type ManifestToControlValues<M extends AnimationManifest> = {
 /**
  * Animation interface that any animation must implement
  */
-export interface Animation<TControlValues extends ControlValues = {}> {
+export interface Animation<
+  TControlValues extends ControlValues = {},
+  TContext = unknown,
+> {
   /** Get the animation manifest with control definitions */
   getManifest(): AnimationManifest;
 
@@ -105,11 +107,11 @@ export interface Animation<TControlValues extends ControlValues = {}> {
   /** Update control values */
   updateControls(values: Partial<TControlValues>): void;
 
-  /** Initialize the animation with a PIXI application */
-  init(app: PIXIApplication, width: number, height: number): void;
+  /** Initialize the animation with a rendering context */
+  init(context: TContext): void;
 
   /** Update the animation (called each frame) */
-  update(width: number, height: number): void;
+  update(): void;
 
   /** Reset the animation to default or specified control values */
   reset(controls?: TControlValues): void;
@@ -130,4 +132,5 @@ export type DefaultableControl =
   | NumberControl
   | BooleanControl
   | ColorControl
-  | SelectControl;
+  | SelectControl
+  | GroupControl;

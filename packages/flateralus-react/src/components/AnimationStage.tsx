@@ -117,7 +117,7 @@ export default function AnimationStage<
     // Create and initialize the animation with initialControls if provided
     animationRef.current = animation(initialControls as any);
     if (animationRef.current) {
-      animationRef.current.init(app, width, height);
+      animationRef.current.init(app);
       setControlValues(animationRef.current.getControlValues());
 
       // Set manifest after animation is initialized
@@ -126,7 +126,7 @@ export default function AnimationStage<
       // Animation loop
       app.ticker.add(() => {
         if (animationRef.current) {
-          animationRef.current.update(width, height);
+          animationRef.current.update();
         }
       });
     }

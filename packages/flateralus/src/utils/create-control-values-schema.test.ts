@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createControlValuesSchema } from './create-control-values-schema';
 import { createManifest } from './create-manifest';
+import type { AnimationManifest } from '../types';
 
 const manifest = createManifest({
   id: 'test',
@@ -43,7 +44,7 @@ const manifest = createManifest({
     },
     {
       name: 'group',
-      type: 'group',
+      type: 'group' as const,
       label: 'Group',
       defaultValue: [],
       items: [
@@ -70,13 +71,13 @@ const manifest = createManifest({
     },
     {
       name: 'nestedGroup',
-      type: 'group',
+      type: 'group' as const,
       label: 'NestedGroup',
       defaultValue: [],
       items: [
         {
           name: 'inner',
-          type: 'group',
+          type: 'group' as const,
           label: 'Inner',
           defaultValue: [],
           items: [
@@ -100,7 +101,7 @@ const manifest = createManifest({
       debug: false,
     },
   ],
-});
+} as AnimationManifest);
 
 describe('createControlValuesSchema', () => {
   const schema = createControlValuesSchema(manifest);

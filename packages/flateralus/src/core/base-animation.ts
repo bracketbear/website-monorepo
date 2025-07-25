@@ -1,4 +1,3 @@
-import { Application as PixiApplication } from 'pixi.js';
 import type {
   Animation,
   AnimationManifest,
@@ -12,17 +11,23 @@ import { createControlValuesSchema } from '../utils/create-control-values-schema
 // ============================================================================
 
 /**
- * Base animation class that handles common animation logic
- * Derived animations should extend this and implement lifecycle hooks
- * Now accepts a manifest and infers control types from it.
+ * BaseAnimation is an abstract, rendering-agnostic class for schema-driven, controllable animations.
+ *
+ * @template TManifest - The animation manifest type (deeply readonly, describes controls)
+ * @template TControlValues - The inferred control values type from the manifest
+ * @template TContext - The rendering or animation context (e.g., PIXI Application, Canvas, etc.)
+ *
+ * Extend this class and implement the lifecycle methods to create a new animation.
+ * Use an adapter (e.g., PixiAnimation) for framework-specific logic.
  */
 export abstract class BaseAnimation<
   TManifest extends AnimationManifest,
   TControlValues extends
     ManifestToControlValues<TManifest> = ManifestToControlValues<TManifest>,
-> implements Animation<TControlValues>
+  TContext = unknown,
+> implements Animation<TControlValues, TContext>
 {
-  protected app: PixiApplication | null = null;
+  protected context: TContext | null = null;
   protected controlValues: TControlValues;
   protected previousControlValues: TControlValues;
   protected isInitialized = false;
@@ -76,7 +81,7 @@ export abstract class BaseAnimation<
     });
 
     // If reset controls changed, call the reset hook
-    if (hasResetChanges && this.app) {
+    if (hasResetChanges && this.context) {
       this.reset(controls);
     }
 
@@ -103,25 +108,28 @@ export abstract class BaseAnimation<
    * Hook for handling animation resets when reset controls change
    * Override this to recreate animation state
    */
-  protected onReset(_app: PixiApplication, _controls: TControlValues): void {
+  protected onReset(_context: TContext, _controls: TControlValues): void {
     // Default implementation does nothing
     // Override in derived classes to handle animation resets
   }
 
+  /**
+   * Animation update lifecycle method (must be implemented by subclass)
+   */
   abstract onUpdate(
-    width: number,
-    height: number,
+    context: TContext,
     controls: TControlValues,
     deltaTime: number
   ): void;
 
-  abstract onInit(
-    app: PixiApplication,
-    width: number,
-    height: number,
-    controls: TControlValues
-  ): void;
+  /**
+   * Animation initialization lifecycle method (must be implemented by subclass)
+   */
+  abstract onInit(context: TContext, controls: TControlValues): void;
 
+  /**
+   * Animation destroy lifecycle method (must be implemented by subclass)
+   */
   abstract onDestroy(): void;
 
   /**
@@ -161,34 +169,34 @@ export abstract class BaseAnimation<
   /**
    * Initialize the animation
    */
-  init(app: PixiApplication, width: number, height: number): void {
-    this.app = app;
+  init(context: TContext): void {
+    this.context = context;
     this.isInitialized = true;
     this.lastUpdateTime = Date.now();
 
     // Call lifecycle hook
-    this.onInit(app, width, height, this.controlValues);
+    this.onInit(context, this.controlValues);
   }
 
   /**
    * Update the animation each frame
    */
-  update(width: number, height: number): void {
-    if (!this.isInitialized || !this.app) return;
+  update(): void {
+    if (!this.isInitialized || !this.context) return;
 
     const currentTime = Date.now();
     const deltaTime = (currentTime - this.lastUpdateTime) / 1000; // Convert to seconds
     this.lastUpdateTime = currentTime;
 
     // Call lifecycle hook if implemented
-    this.onUpdate(width, height, this.controlValues, deltaTime);
+    this.onUpdate(this.context, this.controlValues, deltaTime);
   }
 
   /**
    * Reset the animation
    */
   reset(controls?: TControlValues): void {
-    if (!this.app) return;
+    if (!this.context) return;
 
     // If no controls provided, reset to default values from manifest
     const resetControls =
@@ -205,7 +213,7 @@ export abstract class BaseAnimation<
     this.previousControlValues = { ...this.controlValues };
 
     this.isResetting = true;
-    this.onReset(this.app, this.controlValues);
+    this.onReset(this.context, this.controlValues);
     this.isResetting = false;
   }
 
@@ -216,15 +224,15 @@ export abstract class BaseAnimation<
     // Call lifecycle hook if implemented
     this.onDestroy();
 
-    this.app = null;
+    this.context = null;
     this.isInitialized = false;
   }
 
   /**
-   * Helper method to get the PIXI application
+   * Helper method to get the rendering context
    */
-  protected getApp(): PixiApplication | null {
-    return this.app;
+  protected getContext(): TContext | null {
+    return this.context;
   }
 
   /**
@@ -244,7 +252,7 @@ export abstract class BaseAnimation<
   /**
    * Helper method to get all changed control names
    */
-  private getChangedControls(
+  protected getChangedControls(
     controls: TControlValues,
     previousControls: TControlValues
   ): string[] {
@@ -259,4 +267,81 @@ export abstract class BaseAnimation<
     });
     return changed;
   }
+}
+
+/**
+ * Factory helper for creating a typed animation instance with minimal boilerplate.
+ *
+ * Usage:
+ *   const anim = createAnimation({ manifest, onInit, onUpdate, ... });
+ *
+ * Note: The returned value is an instance, not a class.
+ */
+export function createAnimation<
+  TManifest extends AnimationManifest,
+  TControlValues extends ManifestToControlValues<TManifest> = ManifestToControlValues<TManifest>,
+  TContext = unknown,
+>(config: {
+  manifest: TManifest;
+  onInit: (
+    this: BaseAnimation<TManifest, TControlValues, TContext>,
+    context: TContext,
+    controls: TControlValues
+  ) => void;
+  onUpdate: (
+    this: BaseAnimation<TManifest, TControlValues, TContext>,
+    context: TContext,
+    controls: TControlValues,
+    deltaTime: number
+  ) => void;
+  onDestroy?: (
+    this: BaseAnimation<TManifest, TControlValues, TContext>
+  ) => void;
+  onReset?: (
+    this: BaseAnimation<TManifest, TControlValues, TContext>,
+    context: TContext,
+    controls: TControlValues
+  ) => void;
+  onDynamicControlsChange?: (
+    this: BaseAnimation<TManifest, TControlValues, TContext>,
+    controls: TControlValues,
+    previousControls: TControlValues,
+    changedControls: string[]
+  ) => void;
+  initialControls?: Partial<TControlValues>;
+}): BaseAnimation<TManifest, TControlValues, TContext> {
+  class AnimationImpl extends BaseAnimation<
+    TManifest,
+    TControlValues,
+    TContext
+  > {
+    constructor() {
+      super(config.manifest, config.initialControls);
+    }
+    onInit(context: TContext, controls: TControlValues) {
+      config.onInit.call(this, context, controls);
+    }
+    onUpdate(context: TContext, controls: TControlValues, deltaTime: number) {
+      config.onUpdate.call(this, context, controls, deltaTime);
+    }
+    onDestroy() {
+      config.onDestroy?.call(this);
+    }
+    onReset(context: TContext, controls: TControlValues) {
+      config.onReset?.call(this, context, controls);
+    }
+    onDynamicControlsChange(
+      controls: TControlValues,
+      previousControls: TControlValues,
+      changedControls: string[]
+    ) {
+      config.onDynamicControlsChange?.call(
+        this,
+        controls,
+        previousControls,
+        changedControls
+      );
+    }
+  }
+  return new AnimationImpl();
 }

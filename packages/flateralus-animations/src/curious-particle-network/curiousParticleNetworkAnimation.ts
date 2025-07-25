@@ -1,7 +1,5 @@
-import {
-  type ManifestToControlValues,
-  BaseAnimation,
-} from '@bracketbear/flateralus';
+import { type ManifestToControlValues } from '@bracketbear/flateralus';
+import { PixiAnimation } from '@bracketbear/flateralus-pixi';
 import * as PIXI from 'pixi.js';
 import { createManifest } from '@bracketbear/flateralus';
 
@@ -161,8 +159,8 @@ const MANIFEST = createManifest({
       type: 'number',
       label: 'Particle Glow Radius',
       description: 'Glow radius for interactive particles',
-      min: 8,
-      max: 32,
+      min: 0,
+      max: 100,
       step: 1,
       defaultValue: PARTICLE_GLOW_RADIUS,
       debug: true,
@@ -219,11 +217,18 @@ const MANIFEST = createManifest({
       defaultValue: '#fffbe0',
       debug: true,
     },
+    {
+      name: 'debugLogging',
+      type: 'boolean',
+      label: 'Debug Logging',
+      description: 'Enable debug logging',
+      defaultValue: false,
+      debug: true,
+    },
   ],
 });
 
 type ParticleNetworkControlValues = ManifestToControlValues<typeof MANIFEST>;
-
 export type { ParticleNetworkControlValues };
 
 function createParticle(
@@ -285,7 +290,7 @@ function createParticle(
   };
 }
 
-class CuriousParticleNetworkAnimation extends BaseAnimation<
+class CuriousParticleNetworkAnimation extends PixiAnimation<
   typeof MANIFEST,
   ParticleNetworkControlValues
 > {
@@ -297,12 +302,7 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
     super(MANIFEST, initialControls);
   }
 
-  onInit(
-    app: PIXI.Application,
-    width: number,
-    height: number,
-    controls: ParticleNetworkControlValues
-  ): void {
+  onInit(app: PIXI.Application, controls: ParticleNetworkControlValues): void {
     const particleCount = controls.particleCount;
     // Create graphics for lines
     this.linesGraphics = new PIXI.Graphics();
@@ -313,8 +313,8 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
     this.system = {
       particles: [],
       graphics: this.linesGraphics,
-      mouseX: width / 2,
-      mouseY: height / 2,
+      mouseX: app.renderer.width / 2,
+      mouseY: app.renderer.height / 2,
       isMouseActive: false,
       time: 0,
     };
@@ -323,7 +323,13 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
 
     // Create particles, cycling through colors
     for (let i = 0; i < particleCount; i++) {
-      const particle = createParticle(app, width, height, controls, i);
+      const particle = createParticle(
+        app,
+        app.renderer.width,
+        app.renderer.height,
+        controls,
+        i
+      );
       this.system.particles.push(particle);
     }
 
@@ -337,8 +343,8 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
         if (!this.interactionParticle) {
           this.interactionParticle = createParticle(
             app,
-            width,
-            height,
+            app.renderer.width,
+            app.renderer.height,
             controls,
             0,
             true
@@ -366,8 +372,7 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
   }
 
   onUpdate(
-    width: number,
-    height: number,
+    app: PIXI.Application,
     controls: ParticleNetworkControlValues,
     deltaTime: number
   ): void {
@@ -434,14 +439,14 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
         if (controls.keepInBounds) {
           // Bounce off edges
           const buffer = 100;
-          if (p.x > width + buffer || p.x < -buffer) p.vx *= -1;
-          if (p.y > height + buffer || p.y < -buffer) p.vy *= -1;
+          if (p.x > app.renderer.width + buffer || p.x < -buffer) p.vx *= -1;
+          if (p.y > app.renderer.height + buffer || p.y < -buffer) p.vy *= -1;
         } else {
           // Wrap around edges
-          if (p.x > width + 50) p.x = -50;
-          if (p.x < -50) p.x = width + 50;
-          if (p.y > height + 50) p.y = -50;
-          if (p.y < -50) p.y = height + 50;
+          if (p.x > app.renderer.width + 50) p.x = -50;
+          if (p.x < -50) p.x = app.renderer.width + 50;
+          if (p.y > app.renderer.height + 50) p.y = -50;
+          if (p.y < -50) p.y = app.renderer.height + 50;
         }
 
         // Mouse interactivity: attract particles to mouse if within radius
@@ -561,7 +566,10 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
     }
   }
 
-  onReset(app: PIXI.Application, controls: ParticleNetworkControlValues): void {
+  protected onReset(
+    app: PIXI.Application,
+    controls: ParticleNetworkControlValues
+  ): void {
     // Remove and destroy all particle graphics
     if (this.system) {
       for (const p of this.system.particles) {
@@ -623,6 +631,8 @@ class CuriousParticleNetworkAnimation extends BaseAnimation<
     }
   }
 }
+
+export { CuriousParticleNetworkAnimation };
 
 export function createCuriousParticleNetworkAnimation(
   initialControls?: ParticleNetworkControlValues

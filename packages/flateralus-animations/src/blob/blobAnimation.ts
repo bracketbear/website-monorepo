@@ -432,20 +432,15 @@ class BlobAnimation extends BaseAnimation<typeof MANIFEST, BlobControlValues> {
     super(MANIFEST, initialControls);
   }
 
-  onInit(
-    app: PIXI.Application,
-    width: number,
-    height: number,
-    _controls: BlobControlValues
-  ): void {
+  onInit(app: PIXI.Application, _controls: BlobControlValues): void {
     // Create particle texture
     this.particleTexture = createParticleTexture();
 
     // Initialize blob system
     this.blobSystem = {
       particles: [],
-      centerX: width / 2,
-      centerY: height / 2,
+      centerX: app.screen.width / 2,
+      centerY: app.screen.height / 2,
       mouseX: 0,
       mouseY: 0,
       isMouseActive: false,
@@ -476,13 +471,8 @@ class BlobAnimation extends BaseAnimation<typeof MANIFEST, BlobControlValues> {
     });
   }
 
-  onUpdate(
-    _width: number,
-    _height: number,
-    controls: BlobControlValues,
-    deltaTime: number
-  ): void {
-    if (!this.blobSystem || !this.getApp()) {
+  onUpdate(app: PIXI.Application, controls: BlobControlValues, deltaTime: number): void {
+    if (!this.blobSystem || !this.getContext()) {
       return;
     }
 
@@ -549,8 +539,8 @@ class BlobAnimation extends BaseAnimation<typeof MANIFEST, BlobControlValues> {
   }
 
   onDestroy(): void {
-    if (this.blobSystem && this.getApp()) {
-      const app = this.getApp()!;
+    if (this.blobSystem && this.getContext()) {
+      const app = this.getContext() as PIXI.Application;
 
       // Remove all particles
       this.blobSystem.particles.forEach((particle) => {

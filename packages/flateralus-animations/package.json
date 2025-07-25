@@ -13,7 +13,8 @@
     "test": "echo \"No tests yet\" && exit 0"
   },
   "dependencies": {
-    "@bracketbear/flateralus": "file:../flateralus"
+    "@bracketbear/flateralus": "file:../flateralus",
+    "@bracketbear/flateralus-pixi": "file:../flateralus-pixi"
   },
   "keywords": [],
   "author": "",
