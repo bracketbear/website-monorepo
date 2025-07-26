@@ -13,8 +13,12 @@ import type {
 } from '@bracketbear/flateralus';
 import DebugControls from './DebugControls';
 import { clsx } from '@bracketbear/core';
+import { averageLuminanceFromPixi } from '@bracketbear/flateralus-animations';
 
 const BACKGROUND_COLOR = 'transparent';
+
+// WCAG 2.1 AA contrast ratio threshold for normal text
+const CONTRAST_RATIO_THRESHOLD = 4.5;
 
 interface AnimationStageProps<
   TControlValues extends ControlValues = ControlValues,
@@ -29,12 +33,15 @@ interface AnimationStageProps<
   className?: string;
   debugControlsClassName?: string;
   initialControls?: Partial<TControlValues>;
+  /** Whether to enable automatic text color adjustment based on background luminance */
+  enableLuminanceDetection?: boolean;
 }
 
 /**
  * Animation Stage Component
  *
  * A stage that hosts an animation and displays its debug controls.
+ * Can automatically adjust text colors based on background luminance for accessibility.
  */
 export default function AnimationStage<
   TControlValues extends ControlValues = ControlValues,
@@ -46,6 +53,7 @@ export default function AnimationStage<
   className,
   debugControlsClassName,
   initialControls,
+  enableLuminanceDetection = true,
 }: AnimationStageProps<TControlValues>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
@@ -56,6 +64,70 @@ export default function AnimationStage<
     undefined
   );
   const [showResetToast, setShowResetToast] = useState(false);
+  const [_textColorMode, setTextColorMode] = useState<'light' | 'dark'>('dark');
+  const luminanceCheckRef = useRef<NodeJS.Timeout | null>(null);
+
+  /**
+   * Check background luminance and update text color mode
+   */
+  const checkLuminanceAndUpdateTextColor = useCallback(() => {
+    if (!enableLuminanceDetection || !appRef.current) return;
+
+    try {
+      const luminance = averageLuminanceFromPixi(
+        appRef.current,
+        undefined,
+        false
+      );
+
+      // Determine if we need light or dark text based on background luminance
+      // Using WCAG 2.1 AA contrast ratio of 4.5:1
+      // For light text on dark background: (luminance + 0.05) / (0.05) >= 4.5
+      // For dark text on light background: (1.05) / (luminance + 0.05) >= 4.5
+
+      const lightTextContrast = (luminance + 0.05) / 0.05;
+      const darkTextContrast = 1.05 / (luminance + 0.05);
+
+      const newTextColorMode =
+        lightTextContrast >= CONTRAST_RATIO_THRESHOLD
+          ? 'light'
+          : darkTextContrast >= CONTRAST_RATIO_THRESHOLD
+            ? 'dark'
+            : luminance > 0.5
+              ? 'dark'
+              : 'light'; // Fallback based on luminance
+
+      setTextColorMode(newTextColorMode);
+
+      // Apply text color mode by adding/removing CSS classes
+      if (containerRef.current) {
+        const root = containerRef.current;
+
+        // Remove existing text color mode classes
+        root.classList.remove('text-mode-light', 'text-mode-dark');
+
+        // Add the appropriate text color mode class
+        root.classList.add(`text-mode-${newTextColorMode}`);
+      }
+
+      console.log('luminance', luminance, 'text mode:', newTextColorMode);
+    } catch (error) {
+      console.warn('Error checking luminance:', error);
+    }
+  }, [enableLuminanceDetection]);
+
+  /**
+   * Debounced luminance check
+   */
+  const debouncedLuminanceCheck = useCallback(() => {
+    if (luminanceCheckRef.current) {
+      clearTimeout(luminanceCheckRef.current);
+    }
+    luminanceCheckRef.current = setTimeout(
+      checkLuminanceAndUpdateTextColor,
+      100
+    );
+  }, [checkLuminanceAndUpdateTextColor]);
 
   /**
    * Initialize the PixiJS application and animation
@@ -123,10 +195,15 @@ export default function AnimationStage<
       // Set manifest after animation is initialized
       setManifest(animationRef.current.getManifest());
 
-      // Animation loop
+      // Animation loop with luminance detection
       app.ticker.add(() => {
         if (animationRef.current) {
           animationRef.current.update();
+        }
+
+        // Check luminance periodically (every 10 frames for performance)
+        if (enableLuminanceDetection && app.ticker.lastTime % 10 === 0) {
+          debouncedLuminanceCheck();
         }
       });
     }
@@ -180,8 +257,19 @@ export default function AnimationStage<
           animationRef.current.updateControls(newValues as any);
         }
       }
+
+      // Check luminance after control changes
+      if (enableLuminanceDetection) {
+        debouncedLuminanceCheck();
+      }
     },
-    [animationRef, manifest, controlValues]
+    [
+      animationRef,
+      manifest,
+      controlValues,
+      enableLuminanceDetection,
+      debouncedLuminanceCheck,
+    ]
   );
 
   useEffect(() => {
@@ -215,6 +303,10 @@ export default function AnimationStage<
     }
 
     return () => {
+      if (luminanceCheckRef.current) {
+        clearTimeout(luminanceCheckRef.current);
+      }
+
       if (resizeObserverRef.current) {
         resizeObserverRef.current.disconnect();
       }
@@ -232,7 +324,7 @@ export default function AnimationStage<
         animationRef.current.destroy();
       }
     };
-  }, [animation]);
+  }, [animation, enableLuminanceDetection]);
 
   return (
     <div className={clsx('relative', className)}>
@@ -243,7 +335,9 @@ export default function AnimationStage<
           background: BACKGROUND_COLOR,
         }}
       ></div>
-      <div className="relative z-20 h-full w-full">{children}</div>
+      {children && (
+        <div className="relative z-20 h-full w-full">{children}</div>
+      )}
       {showDebugControls && animationRef.current && manifest && (
         <DebugControls
           manifest={manifest}

@@ -1,0 +1,64 @@
+# PixiJS v8 Migration Guide
+
+## Critical Graphics API Changes (v7 → v8)
+
+### Graphics Drawing Methods
+**OLD (v7):**
+```typescript
+graphics.lineStyle(width, color, alpha);
+graphics.beginFill(color, alpha);
+graphics.drawCircle(x, y, radius);
+graphics.endFill();
+```
+
+**NEW (v8):**
+```typescript
+graphics.stroke({ width, color, alpha });
+graphics.fill({ color, alpha });
+graphics.circle(x, y, radius);
+```
+
+### Key Breaking Changes for Animations
+
+1. **Graphics API Overhaul**: All drawing methods now use object parameters instead of positional arguments
+2. **Stroke and Fill**: `lineStyle()` → `stroke()`, `beginFill()/endFill()` → `fill()`
+3. **Shape Drawing**: `drawCircle()` → `circle()`, `drawRect()` → `rect()`, etc.
+4. **Async Initialization**: Applications must be awaited: `await app.init()`
+5. **Package Structure**: Single package import: `import { Application, Graphics } from 'pixi.js'`
+
+### Common Animation Patterns
+
+**Drawing Lines (v8):**
+```typescript
+graphics.stroke({ width: 2, color: 0xff0000, alpha: 0.8 });
+graphics.moveTo(x1, y1);
+graphics.lineTo(x2, y2);
+```
+
+**Drawing Filled Shapes (v8):**
+```typescript
+graphics.fill({ color: 0x00ff00, alpha: 1.0 });
+graphics.circle(0, 0, radius);
+```
+
+**Clearing Graphics:**
+```typescript
+graphics.clear(); // Same in both versions
+```
+
+### Debugging Tips
+- Always check console for deprecation warnings
+- Verify `await app.init()` is called before using the application
+- Use object syntax for all graphics methods
+- Remember: `stroke()` and `fill()` are separate operations
+
+### Migration Checklist
+- [ ] Replace `lineStyle()` with `stroke()`
+- [ ] Replace `beginFill()/endFill()` with `fill()`
+- [ ] Update shape drawing methods (`drawCircle` → `circle`)
+- [ ] Ensure async initialization
+- [ ] Check for deprecated method usage in console
+description:
+globs:
+alwaysApply: false
+---

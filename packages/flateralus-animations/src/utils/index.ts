@@ -1,0 +1,1 @@
+export { averageLuminanceFromPixi } from './averageLuminanceFromPixi';

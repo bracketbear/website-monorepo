@@ -28,18 +28,21 @@
   --halftone-middle-color: rgb(0, 0, 0, 0);
   --halftone-background-size: 0.067em;
   --halftone-layer-spacing: -0.0625em;
-  
+
   background: url("data:image/svg+xml,%3Csvg viewBox='0 0 8 8' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='4' cy='4' r='2' fill='%23000000' fill-opacity='0.7'/%3E%3C/svg%3E");
-  background-size: var(--halftone-background-size) var(--halftone-background-size);
+  background-size: var(--halftone-background-size)
+    var(--halftone-background-size);
   background-repeat: repeat;
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
-  margin: calc(var(--halftone-layer-spacing) * -2) 0 0 calc(var(--halftone-layer-spacing) * -2);
+  margin: calc(var(--halftone-layer-spacing) * -2) 0 0
+    calc(var(--halftone-layer-spacing) * -2);
   text-shadow:
-    calc(var(--halftone-layer-spacing) * 2) calc(var(--halftone-layer-spacing) * 2) 0 var(--halftone-foreground-color),
-    var(--halftone-layer-spacing) var(--halftone-layer-spacing) 0 var(--halftone-middle-color)
-  ;
+    calc(var(--halftone-layer-spacing) * 2)
+      calc(var(--halftone-layer-spacing) * 2) 0 var(--halftone-foreground-color),
+    var(--halftone-layer-spacing) var(--halftone-layer-spacing) 0
+      var(--halftone-middle-color);
 }
 
 /* A utility to set the middle color of the halftone text shadow. */
@@ -57,6 +60,60 @@
   box-shadow: 4px 4px 0 0 var(--color-shadow);
 }
 
+/* Text mode classes that apply appropriate text colors based on background */
+@layer components {
+  /* Light text mode - for dark backgrounds */
+  .text-mode-light {
+    /* Use light text colors for dark backgrounds */
+    .text-brand-dark,
+    .text-foreground,
+    .text-black {
+      color: var(--color-brand-light);
+    }
+
+    .text-brand-dark\/80,
+    .text-foreground\/80,
+    .text-black\/80 {
+      color: color-mix(in srgb, var(--color-brand-light) 80%, transparent);
+    }
+
+    .text-brand-dark\/60,
+    .text-foreground\/60,
+    .text-black\/60 {
+      color: color-mix(in srgb, var(--color-brand-light) 60%, transparent);
+    }
+
+    /* Use light text for headings */
+    .font-heading {
+      color: var(--color-brand-light);
+    }
+  }
+
+  /* Dark text mode - for light backgrounds */
+  .text-mode-dark {
+    /* Use dark text colors for light backgrounds */
+    .text-brand-light,
+    .text-white {
+      color: var(--color-brand-dark);
+    }
+
+    .text-brand-light\/80,
+    .text-white\/80 {
+      color: color-mix(in srgb, var(--color-brand-dark) 80%, transparent);
+    }
+
+    .text-brand-light\/60,
+    .text-white\/60 {
+      color: color-mix(in srgb, var(--color-brand-dark) 60%, transparent);
+    }
+
+    /* Use dark text for headings */
+    .font-heading {
+      color: var(--color-brand-dark);
+    }
+  }
+}
+
 @layer components {
   /* Brutalist Utility Classes */
 
@@ -71,7 +128,7 @@
 
   /* Comic Book Panel Styles */
   .comic-panel {
-    @apply comic-book-shadow bg-background border-2 border-foreground p-6;
+    @apply comic-book-shadow bg-background border-foreground border-2 p-6;
     position: relative;
   }
 
@@ -86,11 +143,11 @@
     pointer-events: none;
     z-index: -1;
   }
-  
+
   .link-underline {
     position: relative;
   }
-  
+
   .link-underline::after {
     content: '';
     position: absolute;
@@ -99,10 +156,10 @@
     width: 0;
     height: 0.2em;
     background-color: currentColor;
-    transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1;
   }
-  
+
   .link-underline:hover::after,
   .link-underline:focus-visible::after {
     width: 100%;

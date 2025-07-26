@@ -78,17 +78,12 @@ export type ControlValueType<C extends HasControlType> =
       : never
     : ControlTypeToValueTypeMap[C['type']];
 
-// Entire manifest → { [name]: valueType }
-export type ManifestControlValues<M extends HasControls> = {
-  [C in M['controls'][number] as C['name']]: ControlValueType<C>;
-};
-
 /**
  * Utility type to extract control value types from a manifest
  * Maps control names to their inferred types based on the control type
  */
-export type ManifestToControlValues<M extends AnimationManifest> = {
-  [C in M['controls'][number] as C['name']]: ControlValueType<C>;
+export type ManifestToControlValues<TManifest extends AnimationManifest> = {
+  [TControl in TManifest['controls'][number] as TControl['name']]: ControlValueType<TControl>;
 };
 
 /**

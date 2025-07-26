@@ -11,6 +11,7 @@ import type {
   WorkCompanyEntry,
 } from '@bracketbear/astro-content';
 import HeroSection from '@/components/HeroSection';
+import FeaturedProjectsWaveBG from '@/components/FeaturedProjectsWaveBG';
 
 const workJobs: WorkJobEntry[] = await getCollection('workJobs');
 const workSkills: WorkSkillEntry[] = await getCollection('workSkills');
@@ -80,34 +81,43 @@ function getCompanyName(
   </section>
 
   <!-- Featured Projects Section -->
-  <section class="bg-brand-light py-24">
-    <div class="container mx-auto px-6">
-      <div class="mb-16 text-center">
-        <h2
-          class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase"
-        >
-          Featured Projects
-        </h2>
-        <p class="text-brand-dark/80 mx-auto max-w-2xl text-xl">
-          Here's a taste of what I've been building. Each project represents a
-          unique challenge and showcases different aspects of my skills.
-        </p>
-      </div>
-      <div class="grid gap-8 lg:grid-cols-3">
-        {
-          featuredProjects.map((project) => (
-            <ProjectCard project={project} skills={workSkills} variant="dark" />
-          ))
-        }
-      </div>
-      <div class="mt-12 text-center">
-        <a href="/projects">
-          <AstroButton variant="primary" size="lg"
-            >View All Projects →</AstroButton
+  <section class="bg-brand-light relative min-h-[600px] py-24">
+    <FeaturedProjectsWaveBG
+      className="absolute inset-0 z-0 h-full w-full"
+      client:load
+    >
+      <div class="relative z-10 container mx-auto px-6">
+        <div class="mb-16 text-center">
+          <h2
+            class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase"
           >
-        </a>
+            Featured Projects
+          </h2>
+          <p class="text-brand-dark/80 mx-auto max-w-2xl text-xl">
+            Here's a taste of what I've been building. Each project represents a
+            unique challenge and showcases different aspects of my skills.
+          </p>
+        </div>
+        <div class="grid gap-8 lg:grid-cols-3">
+          {
+            featuredProjects.map((project) => (
+              <ProjectCard
+                project={project}
+                skills={workSkills}
+                variant="dark"
+              />
+            ))
+          }
+        </div>
+        <div class="mt-12 text-center">
+          <a href="/projects">
+            <AstroButton variant="primary" size="lg"
+              >View All Projects →</AstroButton
+            >
+          </a>
+        </div>
       </div>
-    </div>
+    </FeaturedProjectsWaveBG>
   </section>
 
   <!-- Recent Experience Section -->
