@@ -12,7 +12,7 @@ import type {
   AnimationManifest,
 } from '@bracketbear/flateralus';
 import DebugControls from './DebugControls';
-import { clsx } from '@bracketbear/core';
+import { clsx, useVisibilityObserver } from '@bracketbear/core';
 import { averageLuminanceFromPixi } from '@bracketbear/flateralus-animations';
 
 const BACKGROUND_COLOR = 'transparent';
@@ -35,6 +35,12 @@ interface AnimationStageProps<
   initialControls?: Partial<TControlValues>;
   /** Whether to enable automatic text color adjustment based on background luminance */
   enableLuminanceDetection?: boolean;
+  /** Whether to pause animation when not visible (defaults to true) */
+  pauseWhenHidden?: boolean;
+  /** Threshold for visibility detection (0-1, defaults to 0.1) */
+  visibilityThreshold?: number;
+  /** Root margin for visibility detection (defaults to '0px') */
+  visibilityRootMargin?: string;
 }
 
 /**
@@ -54,6 +60,9 @@ export default function AnimationStage<
   debugControlsClassName,
   initialControls,
   enableLuminanceDetection = true,
+  pauseWhenHidden = true,
+  visibilityThreshold = 0.1,
+  visibilityRootMargin = '0px',
 }: AnimationStageProps<TControlValues>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
@@ -66,6 +75,13 @@ export default function AnimationStage<
   const [showResetToast, setShowResetToast] = useState(false);
   const [_textColorMode, setTextColorMode] = useState<'light' | 'dark'>('dark');
   const luminanceCheckRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Visibility observer for pausing animations when not visible
+  const { ref: visibilityRef, isVisible } = useVisibilityObserver({
+    threshold: visibilityThreshold,
+    rootMargin: visibilityRootMargin,
+    enabled: pauseWhenHidden,
+  });
 
   /**
    * Check background luminance and update text color mode
@@ -326,8 +342,26 @@ export default function AnimationStage<
     };
   }, [animation, enableLuminanceDetection]);
 
+  // Effect to handle visibility changes for animation pausing
+  useEffect(() => {
+    if (!appRef.current || !animationRef.current) return;
+
+    // Pause or resume the animation based on visibility
+    if (pauseWhenHidden) {
+      if (isVisible) {
+        // Resume animation by ensuring the ticker is running
+        appRef.current.ticker.start();
+        console.log('AnimationStage: Animation resumed (visible)');
+      } else {
+        // Pause animation by stopping the ticker
+        appRef.current.ticker.stop();
+        console.log('AnimationStage: Animation paused (hidden)');
+      }
+    }
+  }, [isVisible, pauseWhenHidden]);
+
   return (
-    <div className={clsx('relative', className)}>
+    <div ref={visibilityRef} className={clsx('relative', className)}>
       <div
         ref={containerRef}
         className="absolute inset-0 z-10"

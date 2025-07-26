@@ -12,6 +12,7 @@ import type {
 } from '@bracketbear/astro-content';
 import HeroSection from '@/components/HeroSection';
 import FeaturedProjectsWaveBG from '@/components/FeaturedProjectsWaveBG';
+import SkillsTicker from '@/components/SkillsTicker';
 
 const workJobs: WorkJobEntry[] = await getCollection('workJobs');
 const workSkills: WorkSkillEntry[] = await getCollection('workSkills');
@@ -54,27 +55,41 @@ function getCompanyName(
   <HeroSection className="h-screen w-full" client:load />
 
   <!-- What I Do Section -->
-  <section class="bg-brand-light py-24">
+  <section class="bg-brand-dark py-24">
     <div class="container mx-auto px-6">
       <div class="mx-auto max-w-4xl text-center">
         <h2
-          class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase"
+          class="font-heading text-brand-light mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase"
         >
           What I Do
         </h2>
-        <div class="card">
-          <p class="text-brand-dark mb-6 text-xl leading-relaxed font-bold">
-            I'm a full-stack developer and creative technologist with a passion
-            for building innovative solutions that bridge the gap between
-            technology and human experience.
+        <div class="card-dark">
+          <p class="text-brand-light mb-6 text-xl leading-relaxed font-bold">
+            I can tell you that I'm a full-stack developer who's been working on
+            the web for over two decades, but I'm really a professional "figure
+            it the fuck out" guy who stumbled into programming.
           </p>
-          <p class="text-brand-dark/80 text-lg leading-relaxed font-medium">
-            With expertise in both traditional web development and cutting-edge
-            experiential technologies, I specialize in creating robust content
-            management systems, interactive installations, and scalable SaaS
-            platforms that not only work well today but can evolve with your
-            needs tomorrow.
+          <p class="text-brand-light/80 text-lg leading-relaxed font-medium">
+            I've been working on the web for so long that I've seen it go from
+            skeuomorphic websites built with tables to modern, responsive,
+            accessible, and performant web applications built with your favorite
+            AI agents.
           </p>
+          <p class="text-brand-light/80 text-lg leading-relaxed font-medium">
+            Throughout my career, I've worked on a ton of different projects and
+            tech stacks, from the LAMP stack to C++ compiled Windows
+            applications to modern web applications built with React, Astro, and
+            TailwindCSS.
+          </p>
+          <p class="text-brand-light/80 text-lg leading-relaxed font-medium">
+            Beyond my technical skills, I've also collected a ton of experience
+            in non-technical areas, from project management to business
+            development to solid customer/client relations.
+          </p>
+          <h3 class="text-brand-light mt-8 text-2xl font-bold">
+            Featured Skills:
+          </h3>
+          <SkillsTicker skills={workSkills} client:load />
         </div>
       </div>
     </div>
@@ -94,8 +109,8 @@ function getCompanyName(
             Featured Projects
           </h2>
           <p class="text-brand-dark/80 mx-auto max-w-2xl text-xl">
-            Here's a taste of what I've been building. Each project represents a
-            unique challenge and showcases different aspects of my skills.
+            I've been fortunate to work on some really cool projects over the
+            years, but these are the ones that I hang my hat on.
           </p>
         </div>
         <div class="grid gap-8 lg:grid-cols-3">
