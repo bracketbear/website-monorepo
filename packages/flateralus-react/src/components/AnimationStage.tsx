@@ -5,12 +5,12 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import * as PIXI from 'pixi.js';
 import type {
   Animation,
   ControlValues,
   AnimationManifest,
 } from '@bracketbear/flateralus';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
 import DebugControls from './DebugControls';
 import { clsx, useVisibilityObserver } from '@bracketbear/core';
 import { averageLuminanceFromPixi } from '@bracketbear/flateralus-animations';
@@ -65,9 +65,8 @@ export default function AnimationStage<
   visibilityRootMargin = '0px',
 }: AnimationStageProps<TControlValues>) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const appRef = useRef<PIXI.Application | null>(null);
+  const applicationRef = useRef<PixiApplication | null>(null);
   const animationRef = useRef<Animation<TControlValues> | null>(null);
-  const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const [controlValues, setControlValues] = useState<ControlValues>({});
   const [manifest, setManifest] = useState<AnimationManifest | undefined>(
     undefined
@@ -84,14 +83,56 @@ export default function AnimationStage<
   });
 
   /**
+   * Initialize the application and animation
+   */
+  const initApplication = useCallback(async () => {
+    if (!containerRef.current || !animation) return;
+
+    // Clean up existing application
+    if (applicationRef.current) {
+      applicationRef.current.destroy();
+      applicationRef.current = null;
+    }
+
+    // Create new application
+    const app = new PixiApplication({
+      config: {
+        autoResize: true,
+        backgroundAlpha: 0,
+        antialias: true,
+      },
+      pauseWhenHidden,
+      enableLuminanceDetection,
+    });
+
+    // Initialize application with container
+    await app.init(containerRef.current);
+
+    // Create and set animation
+    const animationInstance = animation(initialControls as any);
+    app.setAnimation(animationInstance);
+
+    // Start the application
+    app.start();
+
+    // Store references
+    applicationRef.current = app;
+    animationRef.current = animationInstance;
+
+    // Update state
+    setControlValues(animationInstance.getControlValues());
+    setManifest(animationInstance.getManifest());
+  }, [animation, initialControls, pauseWhenHidden, enableLuminanceDetection]);
+
+  /**
    * Check background luminance and update text color mode
    */
   const checkLuminanceAndUpdateTextColor = useCallback(() => {
-    if (!enableLuminanceDetection || !appRef.current) return;
+    if (!enableLuminanceDetection || !applicationRef.current) return;
 
     try {
       const luminance = averageLuminanceFromPixi(
-        appRef.current,
+        applicationRef.current.getPixiApp(),
         undefined,
         false
       );
@@ -144,87 +185,6 @@ export default function AnimationStage<
       100
     );
   }, [checkLuminanceAndUpdateTextColor]);
-
-  /**
-   * Initialize the PixiJS application and animation
-   */
-  const initApp = async (initialControls?: Partial<TControlValues>) => {
-    if (!containerRef.current || !animation) return;
-
-    // Clean up existing app
-    if (appRef.current) {
-      try {
-        if (appRef.current.canvas && appRef.current.canvas.parentNode) {
-          appRef.current.canvas.parentNode.removeChild(appRef.current.canvas);
-        }
-        appRef.current.destroy(true, { children: true, texture: true });
-        if (containerRef.current) {
-          containerRef.current.innerHTML = '';
-        }
-      } catch (error) {
-        console.warn('Error destroying PixiJS app:', error);
-      }
-      appRef.current = null;
-    }
-
-    // Get container dimensions
-    const container = containerRef.current;
-    const rect = container.getBoundingClientRect();
-    const width = rect.width || window.innerWidth;
-    const height = rect.height || window.innerHeight;
-
-    if (width <= 0 || height <= 0) {
-      console.warn('Container has invalid dimensions, retrying...');
-      setTimeout(() => initApp(initialControls), 100);
-      return;
-    }
-
-    // Create PIXI application
-    const app = new PIXI.Application();
-
-    await app.init({
-      width,
-      height,
-      backgroundAlpha: 0, // Transparent background
-      antialias: true,
-      resolution: Math.min(window.devicePixelRatio, 2),
-      autoDensity: true,
-    });
-
-    container.appendChild(app.canvas);
-    appRef.current = app;
-
-    // Set canvas styles
-    app.canvas.style.position = 'absolute';
-    app.canvas.style.top = '0';
-    app.canvas.style.left = '0';
-    app.canvas.style.width = '100%';
-    app.canvas.style.height = '100%';
-    app.canvas.style.pointerEvents = 'none'; // Let clicks pass through
-
-    // Create and initialize the animation with initialControls if provided
-    animationRef.current = animation(initialControls as any);
-    if (animationRef.current) {
-      animationRef.current.init(app);
-      setControlValues(animationRef.current.getControlValues());
-
-      // Set manifest after animation is initialized
-      setManifest(animationRef.current.getManifest());
-
-      // Animation loop with luminance detection
-      app.ticker.add(() => {
-        if (animationRef.current) {
-          animationRef.current.update();
-        }
-
-        // Check luminance periodically (every 10 frames for performance)
-        if (enableLuminanceDetection && app.ticker.lastTime % 10 === 0) {
-          debouncedLuminanceCheck();
-        }
-      });
-    }
-    return;
-  };
 
   /**
    * Handle control changes from debug panel
@@ -289,72 +249,25 @@ export default function AnimationStage<
   );
 
   useEffect(() => {
-    const startApp = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      await initApp(initialControls);
-    };
-    startApp();
-
-    // Set up resize observer
-    if (containerRef.current) {
-      let currentWidth = 0;
-      let currentHeight = 0;
-
-      resizeObserverRef.current = new ResizeObserver(async () => {
-        clearTimeout((resizeObserverRef.current as any).timeout);
-        (resizeObserverRef.current as any).timeout = setTimeout(async () => {
-          const newRect = containerRef.current?.getBoundingClientRect();
-          if (
-            newRect &&
-            (Math.abs(newRect.width - currentWidth) > 50 ||
-              Math.abs(newRect.height - currentHeight) > 50)
-          ) {
-            currentWidth = newRect.width;
-            currentHeight = newRect.height;
-            await initApp(initialControls);
-          }
-        }, 250);
-      });
-      resizeObserverRef.current.observe(containerRef.current);
-    }
+    initApplication();
 
     return () => {
-      if (luminanceCheckRef.current) {
-        clearTimeout(luminanceCheckRef.current);
-      }
-
-      if (resizeObserverRef.current) {
-        resizeObserverRef.current.disconnect();
-      }
-
-      if (appRef.current) {
-        try {
-          appRef.current.destroy(true, { children: true, texture: true });
-        } catch (error) {
-          console.warn('Error destroying PixiJS app:', error);
-        }
-      }
-
-      // Clean up animation
-      if (animationRef.current) {
-        animationRef.current.destroy();
+      if (applicationRef.current) {
+        applicationRef.current.destroy();
       }
     };
-  }, [animation, enableLuminanceDetection]);
+  }, [initApplication]);
 
   // Effect to handle visibility changes for animation pausing
   useEffect(() => {
-    if (!appRef.current || !animationRef.current) return;
+    if (!applicationRef.current) return;
 
-    // Pause or resume the animation based on visibility
     if (pauseWhenHidden) {
       if (isVisible) {
-        // Resume animation by ensuring the ticker is running
-        appRef.current.ticker.start();
+        applicationRef.current.resume();
         console.log('AnimationStage: Animation resumed (visible)');
       } else {
-        // Pause animation by stopping the ticker
-        appRef.current.ticker.stop();
+        applicationRef.current.pause();
         console.log('AnimationStage: Animation paused (hidden)');
       }
     }
@@ -365,10 +278,8 @@ export default function AnimationStage<
       <div
         ref={containerRef}
         className="absolute inset-0 z-10"
-        style={{
-          background: BACKGROUND_COLOR,
-        }}
-      ></div>
+        style={{ background: 'transparent' }}
+      />
       {children && (
         <div className="relative z-20 h-full w-full">{children}</div>
       )}
