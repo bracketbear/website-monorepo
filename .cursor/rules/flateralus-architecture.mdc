@@ -1,0 +1,57 @@
+
+# Flateralus Animation Framework Architecture
+
+## Core Principles
+
+### Separation of Concerns
+- **Base Classes**: Use abstract base classes (BaseAnimation, BaseApplication) for framework-agnostic logic
+- **Implementation Classes**: Create specific implementations (PixiAnimation, PixiApplication) for rendering backends
+- **Hooks**: Extract React-specific logic into focused, reusable hooks
+- **Contracts**: Define clear interfaces (Animation, Application) for all implementations
+
+### Modular Hook Architecture
+When building React components with complex logic, extract functionality into focused hooks:
+
+- `useAnimationStage`: Core application and animation management
+- `useControls`: Control value management and validation  
+- `useDebugControls`: Debug UI state and interactions
+- `useLuminanceDetection`: Accessibility features (text color adaptation)
+
+### Application Factory Pattern
+Always use factory functions to create application instances:
+```typescript
+// Create factory function
+export const createPixiApplication = (options?: any): Application => {
+  return new PixiApplication(options);
+};
+
+// Use in component
+<AnimationStage
+  applicationFactory={createPixiApplication}
+  animation={myAnimation}
+/>
+```
+
+### Framework Agnostic Design
+- Core animation logic should be rendering-agnostic
+- Use adapter pattern for framework-specific implementations
+- Components should depend on interfaces, not concrete classes
+- Enable usage in React, vanilla JS, or other frameworks
+
+## File Organization
+
+### Package Structure
+```
+packages/
+  flateralus/           # Core framework (rendering-agnostic)
+    src/core/          # BaseAnimation, BaseApplication
+    src/types/         # Animation, Application interfaces
+  flateralus-pixi/     # PIXI.js adapter
+    src/              # PixiAnimation, PixiApplication  
+  flateralus-react/    # React bindings
+    src/hooks/        # useAnimationStage, useControls, etc.
+    src/components/   # AnimationStage component
+```
+
+alwaysApply: false
+---

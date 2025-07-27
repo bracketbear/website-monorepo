@@ -96,9 +96,9 @@ function getCompanyName(
   </section>
 
   <!-- Featured Projects Section -->
-  <section class="bg-brand-light relative min-h-[600px] py-24">
+  <section class="bg-brand-light relative min-h-[600px]">
     <FeaturedProjectsWaveBG
-      className="absolute inset-0 z-0 h-full w-full"
+      className="absolute inset-0 z-0 h-full w-full py-24"
       client:load
     >
       <div class="relative z-10 container mx-auto px-6">
@@ -113,7 +113,7 @@ function getCompanyName(
             years, but these are the ones that I hang my hat on.
           </p>
         </div>
-        <div class="grid gap-8 lg:grid-cols-3">
+        <div class="grid gap-8 lg:grid-cols-2">
           {
             featuredProjects.map((project) => (
               <ProjectCard

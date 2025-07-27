@@ -17,8 +17,6 @@ const workPath = <T extends string>(slug: T) => {
 
 const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-console.log('CONTENT_PATH', CONTENT_PATH);
-
 export default config({
   storage: {
     kind: 'local',

@@ -6,7 +6,7 @@ import {
 
 /**
  * PixiApplication extends BaseApplication to provide PIXI.js-specific functionality.
- * It can work with both React refs and direct canvas/container elements.
+ * It implements the Application interface and can work with React, vanilla JS, or any other framework.
  */
 export class PixiApplication extends BaseApplication<PixiApp> {
   private pixiApp: PixiApp | null = null;
@@ -58,12 +58,6 @@ export class PixiApplication extends BaseApplication<PixiApp> {
     if (!this.pixiApp) return;
 
     this.pixiApp.renderer.resize(width, height);
-
-    // Re-initialize animation with new dimensions if needed
-    if (this.animation) {
-      // You might want to call a resize method on the animation
-      // or re-initialize it depending on your needs
-    }
   }
 
   /**

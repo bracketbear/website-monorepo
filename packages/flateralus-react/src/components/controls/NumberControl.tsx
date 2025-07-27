@@ -5,7 +5,7 @@ import BaseControlWrapper from './BaseControlWrapper';
 
 interface NumberControlProps {
   control: NumberControlType;
-  value: number;
+  value: number | undefined;
   onControlChange: (key: string, value: number) => void;
 }
 
@@ -16,6 +16,10 @@ interface NumberControlProps {
  */
 const NumberControl = memo<NumberControlProps>(
   ({ control, value, onControlChange }) => {
+    // Provide default value if undefined
+    const defaultValue = control.defaultValue ?? 0;
+    const currentValue = value ?? defaultValue;
+
     return (
       <BaseControlWrapper
         label={control.label}
@@ -23,7 +27,7 @@ const NumberControl = memo<NumberControlProps>(
       >
         <Slider
           key={`slider-${control.name}`}
-          value={value}
+          value={currentValue}
           min={control.min ?? 0}
           max={control.max ?? 100}
           step={control.step ?? 1}
@@ -36,7 +40,7 @@ const NumberControl = memo<NumberControlProps>(
           min={control.min}
           max={control.max}
           step={control.step}
-          value={value}
+          value={currentValue}
           onChange={(e) =>
             onControlChange(control.name, Number(e.target.value))
           }

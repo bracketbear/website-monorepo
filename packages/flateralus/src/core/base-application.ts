@@ -1,4 +1,4 @@
-import type { Animation, ControlValues } from '../types';
+import type { Animation, ControlValues, Application } from '../types';
 
 // ============================================================================
 // BASE APPLICATION CLASS
@@ -36,21 +36,22 @@ export interface ApplicationOptions {
 
 /**
  * BaseApplication is an abstract, rendering-agnostic class for managing animation applications.
- * It handles common application lifecycle, canvas management, and animation coordination.
+ * It implements the Application interface and handles common application lifecycle.
  *
  * @template TContext - The rendering context type (e.g., PIXI.Application, Canvas2DContext, etc.)
  */
-export abstract class BaseApplication<TContext = unknown> {
+export abstract class BaseApplication<TContext = unknown>
+  implements Application<TContext>
+{
   protected context: TContext | null = null;
   protected animation: Animation<any, TContext> | null = null;
   protected container: HTMLElement | null = null;
   protected canvas: HTMLCanvasElement | null = null;
   protected config: ApplicationConfig;
   protected options: ApplicationOptions;
-  protected isInitialized = false;
-  protected isRunning = false;
+  protected _isInitialized = false;
+  protected _isRunning = false;
   protected resizeObserver: ResizeObserver | null = null;
-  protected rafId: number | null = null;
 
   constructor(options: ApplicationOptions = {}) {
     this.config = {
@@ -60,7 +61,8 @@ export abstract class BaseApplication<TContext = unknown> {
       backgroundColor: 'transparent',
       backgroundAlpha: 0,
       antialias: true,
-      resolution: Math.min(window.devicePixelRatio || 1, 2),
+      // Safe for SSR - will be updated when init() is called
+      resolution: 1,
       autoDensity: true,
       ...options.config,
     };
@@ -72,10 +74,16 @@ export abstract class BaseApplication<TContext = unknown> {
     };
   }
 
+  // ============================================================================
+  // ABSTRACT METHODS (must be implemented by subclasses)
+  // ============================================================================
+
   /**
    * Initialize the application context (must be implemented by subclass)
    */
-  protected abstract createContext(config: ApplicationConfig): Promise<TContext>;
+  protected abstract createContext(
+    config: ApplicationConfig
+  ): Promise<TContext>;
 
   /**
    * Start the render loop (must be implemented by subclass)
@@ -92,10 +100,9 @@ export abstract class BaseApplication<TContext = unknown> {
    */
   protected abstract handleResize(width: number, height: number): void;
 
-  /**
-   * Get canvas element (must be implemented by subclass)
-   */
-  public abstract getCanvas(): HTMLCanvasElement | null;
+  // ============================================================================
+  // APPLICATION INTERFACE IMPLEMENTATION
+  // ============================================================================
 
   /**
    * Get the rendering context
@@ -105,11 +112,21 @@ export abstract class BaseApplication<TContext = unknown> {
   }
 
   /**
+   * Get canvas element (must be implemented by subclass)
+   */
+  public abstract getCanvas(): HTMLCanvasElement | null;
+
+  /**
    * Initialize the application with a container element
    */
   public async init(container: HTMLElement | HTMLCanvasElement): Promise<void> {
-    if (this.isInitialized) {
+    if (this._isInitialized) {
       throw new Error('Application already initialized');
+    }
+
+    // Update resolution with actual device pixel ratio (now safe to access window)
+    if (typeof window !== 'undefined') {
+      this.config.resolution = Math.min(window.devicePixelRatio || 1, 2);
     }
 
     // Handle both container div and direct canvas
@@ -127,7 +144,12 @@ export abstract class BaseApplication<TContext = unknown> {
 
     // Create the rendering context
     this.context = await this.createContext(this.config);
-    this.isInitialized = true;
+    this._isInitialized = true;
+
+    // Initialize animation if it was set before context creation
+    if (this.animation && this.context) {
+      this.animation.init(this.context);
+    }
 
     // Setup resize observer if auto-resize is enabled
     if (this.config.autoResize && this.container) {
@@ -164,13 +186,13 @@ export abstract class BaseApplication<TContext = unknown> {
    * Start the application
    */
   public start(): void {
-    if (!this.isInitialized) {
+    if (!this._isInitialized) {
       throw new Error('Application not initialized');
     }
 
-    if (this.isRunning) return;
+    if (this._isRunning) return;
 
-    this.isRunning = true;
+    this._isRunning = true;
     this.startRenderLoop();
   }
 
@@ -178,9 +200,9 @@ export abstract class BaseApplication<TContext = unknown> {
    * Stop the application
    */
   public stop(): void {
-    if (!this.isRunning) return;
+    if (!this._isRunning) return;
 
-    this.isRunning = false;
+    this._isRunning = false;
     this.stopRenderLoop();
   }
 
@@ -199,6 +221,20 @@ export abstract class BaseApplication<TContext = unknown> {
   }
 
   /**
+   * Check if the application is running
+   */
+  public isRunning(): boolean {
+    return this._isRunning;
+  }
+
+  /**
+   * Check if the application is initialized
+   */
+  public isInitialized(): boolean {
+    return this._isInitialized;
+  }
+
+  /**
    * Destroy the application and clean up resources
    */
   public destroy(): void {
@@ -214,23 +250,22 @@ export abstract class BaseApplication<TContext = unknown> {
       this.resizeObserver = null;
     }
 
-    if (this.rafId) {
-      cancelAnimationFrame(this.rafId);
-      this.rafId = null;
-    }
-
     this.context = null;
     this.container = null;
     this.canvas = null;
-    this.isInitialized = false;
-    this.isRunning = false;
+    this._isInitialized = false;
+    this._isRunning = false;
   }
+
+  // ============================================================================
+  // PROTECTED METHODS
+  // ============================================================================
 
   /**
    * Update the animation (called each frame)
    */
   protected updateAnimation(): void {
-    if (this.animation && this.isRunning) {
+    if (this.animation && this._isRunning) {
       this.animation.update();
     }
   }

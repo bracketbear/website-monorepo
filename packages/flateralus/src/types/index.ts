@@ -123,6 +123,50 @@ export type AnimationFactory<TAnimation extends Animation> = (
   controls?: Partial<AnimationControlValues<TAnimation>>
 ) => TAnimation;
 
+/**
+ * Application interface that any animation application must implement
+ */
+export interface Application<TContext = unknown> {
+  /** Get the rendering context */
+  getContext(): TContext | null;
+
+  /** Get the canvas element (if applicable) */
+  getCanvas(): HTMLCanvasElement | null;
+
+  /** Initialize the application with a container */
+  init(container: HTMLElement | HTMLCanvasElement): Promise<void>;
+
+  /** Set the animation to be rendered */
+  setAnimation<TControlValues extends ControlValues>(
+    animation: Animation<TControlValues, TContext> | null
+  ): void;
+
+  /** Start the application */
+  start(): void;
+
+  /** Stop the application */
+  stop(): void;
+
+  /** Pause the application */
+  pause(): void;
+
+  /** Resume the application */
+  resume(): void;
+
+  /** Check if the application is running */
+  isRunning(): boolean;
+
+  /** Check if the application is initialized */
+  isInitialized(): boolean;
+
+  /** Destroy the application and clean up resources */
+  destroy(): void;
+}
+
+export type ApplicationFactory<TApplication extends Application> = (
+  options?: any
+) => TApplication;
+
 export type DefaultableControl =
   | NumberControl
   | BooleanControl

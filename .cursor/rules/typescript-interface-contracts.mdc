@@ -1,0 +1,124 @@
+---
+globs: *.ts,*.tsx
+description: TypeScript interface patterns for framework-agnostic design
+---
+
+# TypeScript Interface Contracts
+
+## Depend on Interfaces, Not Implementations
+
+### Pattern: Interface-First Design
+Define clear contracts before implementation:
+```typescript
+// ✅ Good: Define interface first
+export interface Application<TContext = unknown> {
+  getContext(): TContext | null;
+  init(container: HTMLElement): Promise<void>;
+  start(): void;
+  stop(): void;
+  destroy(): void;
+}
+
+// Implementation depends on interface
+export class PixiApplication implements Application<PixiApp> {
+  // Concrete implementation
+}
+```
+
+### Pattern: Generic Constraints
+Use generic constraints to maintain type safety across implementations:
+```typescript
+// ✅ Good: Generic with constraints
+export function useAnimationStage<TControlValues extends ControlValues>(
+  options: UseAnimationStageOptions<TControlValues>
+): UseAnimationStageReturn<TControlValues>
+
+// Consumer gets full type safety
+const stage = useAnimationStage<MyControlValues>({...});
+// stage.controlValues is properly typed as MyControlValues
+```
+
+### Pattern: Factory Function Types
+Define factory function types for consistent APIs:
+```typescript
+export type ApplicationFactory<TApplication extends Application> = (
+  options?: any
+) => TApplication;
+
+export type AnimationFactory<TAnimation extends Animation> = (
+  controls?: Partial<AnimationControlValues<TAnimation>>
+) => TAnimation;
+```
+
+## Framework Agnostic Patterns
+
+### Abstract Base Classes
+Use abstract classes for shared logic, interfaces for contracts:
+```typescript
+// ✅ Interface for contract
+export interface Application<TContext> {
+  // Public API
+}
+
+// ✅ Abstract class for shared implementation
+export abstract class BaseApplication<TContext> implements Application<TContext> {
+  // Shared logic
+  protected abstract createContext(): Promise<TContext>;
+}
+
+// ✅ Concrete implementation
+export class PixiApplication extends BaseApplication<PixiApp> {
+  protected async createContext(): Promise<PixiApp> {
+    // PIXI-specific logic
+  }
+}
+```
+
+### Adapter Pattern
+Use adapters to bridge different frameworks:
+```typescript
+// Core logic (framework agnostic)
+export class BaseAnimation<TManifest, TControlValues, TContext> {
+  // Framework-agnostic animation logic
+}
+
+// Framework adapter
+export class PixiAnimation<TManifest, TControlValues> 
+  extends BaseAnimation<TManifest, TControlValues, PixiApp> {
+  // PIXI-specific rendering
+}
+```
+
+## Type Extraction Patterns
+
+### Infer Types from Implementations
+Extract types from concrete implementations:
+```typescript
+export type AnimationControlValues<TAnimation extends Animation> = ReturnType<
+  TAnimation['getControlValues']
+>;
+
+// Usage: Automatically infer control types
+type MyControlValues = AnimationControlValues<typeof myAnimation>;
+```
+
+### Conditional Types for Flexibility
+Use conditional types for optional features:
+```typescript
+export interface UseAnimationStageOptions<TControlValues> {
+  animationFactory?: (controls?: TControlValues) => Animation<TControlValues>;
+  // Make animation optional for flexibility
+}
+```
+
+This approach enables building systems that are:
+- **Extensible**: Easy to add new implementations
+- **Type-safe**: Full TypeScript support throughout
+- **Framework-agnostic**: Core logic works anywhere
+- **Testable**: Clear contracts enable easy mocking
+```
+
+description:
+globs:
+alwaysApply: false
+---
