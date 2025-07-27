@@ -20,13 +20,7 @@ export function averageLuminanceFromPixi(
 
   // Ensure we have valid pixel data
   if (!pixels || pixels.length === 0) {
-    if (debug) console.log('No pixel data available');
     return 0;
-  }
-
-  if (debug) {
-    console.log(`Total pixels: ${pixels.length / 4}`);
-    console.log(`Sample step: 4 (sampling every 4th pixel)`);
   }
 
   let sumL = 0;
@@ -67,31 +61,14 @@ export function averageLuminanceFromPixi(
     const luminance = 0.2126 * rl + 0.7152 * gl + 0.0722 * bl;
     sumL += luminance;
     sampleCount++;
-
-    if (debug && sampleCount <= 5) {
-      console.log(
-        `Sample ${sampleCount}: RGB(${r},${g},${b}) A:${a} -> L:${luminance.toFixed(4)}`
-      );
-    }
-  }
-
-  if (debug) {
-    console.log(
-      `Sampled ${totalSampled} pixels, ${transparentCount} transparent, ${sampleCount} visible`
-    );
   }
 
   // If no visible pixels were found, return a default value
   if (sampleCount === 0) {
-    if (debug)
-      console.log('No visible pixels found, returning default luminance 0.5');
     return 0.5; // Default to medium luminance
   }
 
   const averageLuminance = sumL / sampleCount;
-  if (debug) {
-    console.log(`Average luminance: ${averageLuminance.toFixed(4)}`);
-  }
 
   return averageLuminance;
 }

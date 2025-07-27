@@ -6,7 +6,6 @@ interface Props {
 }
 
 const { class: className, checked = false, onChange } = Astro.props;
-console.log('Switch', { className, checked, onChange });
 ---
 
 <button
@@ -126,9 +125,7 @@ console.log('Switch', { className, checked, onChange });
 </style>
 
 <script define:vars={{ checked, onChange }}>
-  console.log('Switch', { checked, onChange });
   function setupSwitch() {
-    console.log('setupSwitch');
     const switchElement = document.getElementById('switch');
     const selectedLeftIcon = document.querySelector('.selected-left-icon');
     const selectedRightIcon = document.querySelector('.selected-right-icon');
@@ -150,25 +147,16 @@ console.log('Switch', { className, checked, onChange });
       // Call the parent's onChange callback
       if (typeof onChange === 'function') {
         onChange(newChecked);
-        console.log('onChange', newChecked);
-      } else {
-        console.log('onChange is not a function');
       }
 
       // Update the DOM manually to reflect the new state
       switchElement.dataset.checked = newChecked.toString();
-      console.log(
-        'switchElement.dataset.checked',
-        switchElement.dataset.checked
-      );
-      console.log({ switchElement, newChecked, isChecked });
 
       // Toggle icon visibility
       const selectedLeftIcon = document.querySelector('.selected-left-icon');
       const selectedRightIcon = document.querySelector('.selected-right-icon');
 
       if (newChecked) {
-        console.log({ selectedLeftIcon, selectedRightIcon });
         selectedLeftIcon?.classList.add('hidden');
         selectedRightIcon?.classList.remove('hidden');
       } else {

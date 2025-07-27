@@ -530,10 +530,6 @@ class CuriousParticleNetworkAnimation extends PixiAnimation<
       p.graphics.x = p.x;
       p.graphics.y = p.y;
     }
-    // Debug: log connection distance
-    if (controls.debugLogging) {
-      console.log('Connection distance:', controls.connectionDistance);
-    }
   }
 
   onDestroy(): void {
