@@ -68,8 +68,6 @@ export function useLuminanceDetection(
         // Add the appropriate text color mode class
         containerElement.classList.add(`text-mode-${newTextColorMode}`);
       }
-
-      console.log('luminance', luminance, 'text mode:', newTextColorMode);
     } catch (error) {
       console.warn('Error checking luminance:', error);
     }
