@@ -136,6 +136,9 @@ export interface Application<TContext = unknown> {
   /** Initialize the application with a container */
   init(container: HTMLElement | HTMLCanvasElement): Promise<void>;
 
+  /** Get the current animation */
+  getAnimation(): Animation<any, TContext> | null;
+
   /** Set the animation to be rendered */
   setAnimation<TControlValues extends ControlValues>(
     animation: Animation<TControlValues, TContext> | null

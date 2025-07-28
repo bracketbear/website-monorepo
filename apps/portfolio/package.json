@@ -16,6 +16,7 @@
     "@bracketbear/core": "file:../../packages/core",
     "@bracketbear/flateralus": "file:../../packages/flateralus",
     "@bracketbear/flateralus-animations": "file:../../packages/flateralus-animations",
+    "@bracketbear/flateralus-pixi": "file:../../packages/flateralus-pixi",
     "@bracketbear/flateralus-react": "file:../../packages/flateralus-react",
     "astro": "^5.10.1",
     "pixi.js": "^8.11.0",

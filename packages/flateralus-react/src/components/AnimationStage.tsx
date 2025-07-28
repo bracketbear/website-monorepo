@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import { clsx } from '@bracketbear/core';
-import type { Application, ControlValues } from '@bracketbear/flateralus';
+import type { Application } from '@bracketbear/flateralus';
 import {
   useAnimationStage,
   useDebugControls,
@@ -85,11 +85,12 @@ export default function AnimationStage({
       {children && (
         <div className="relative z-20 h-full w-full">{children}</div>
       )}
-      {debugControlsProps.isVisible && (
+      {debugControlsProps.isVisible && debugControlsProps.manifest && (
         <DebugControls
           {...debugControlsProps}
+          manifest={debugControlsProps.manifest}
           className={clsx(
-            'absolute top-16 right-4 z-45',
+            'absolute top-4 right-4 z-50',
             debugControlsClassName
           )}
         />

@@ -165,6 +165,13 @@ export abstract class BaseApplication<TContext = unknown>
   }
 
   /**
+   * Get the current animation
+   */
+  public getAnimation(): Animation<any, TContext> | null {
+    return this.animation;
+  }
+
+  /**
    * Set the animation to be rendered
    */
   public setAnimation<TControlValues extends ControlValues>(
@@ -315,4 +322,4 @@ export abstract class BaseApplication<TContext = unknown>
 
     this.resizeObserver.observe(this.container);
   }
-} 
+}

@@ -57,7 +57,7 @@ export function useDebugControls(
   } = options;
 
   // Get the animation from the application
-  const animation = (application as any).animation || null;
+  const animation = application.getAnimation?.() || null;
 
   const { controlValues, handleControlsChange, showResetToast } = useControls({
     animation,

@@ -18,7 +18,7 @@ const BooleanControl = memo<BooleanControlProps>(
   ({ control, value, onControlChange }) => (
     <BaseControlWrapper label={control.label} description={control.description}>
       <CheckboxInput
-        checked={value}
+        checked={Boolean(value)}
         onChange={(e) => onControlChange(control.name, e.target.checked)}
         className="ml-auto rounded bg-white/10"
         size="sm"

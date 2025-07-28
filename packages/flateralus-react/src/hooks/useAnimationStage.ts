@@ -83,8 +83,8 @@ export function useAnimationStage(
 
       // If application has an animation, get its control values and manifest
       const context = application.getContext();
-      if (context && (application as any).animation) {
-        const animation = (application as any).animation;
+      const animation = application.getAnimation();
+      if (context && animation) {
         setControlValues(animation.getControlValues());
         setManifest(animation.getManifest());
       }

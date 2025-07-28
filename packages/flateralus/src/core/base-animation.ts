@@ -195,12 +195,16 @@ export abstract class BaseAnimation<
   /**
    * Reset the animation
    */
-  reset(controls?: TControlValues): void {
+  reset(controls?: Partial<TControlValues>): void {
     if (!this.context) return;
 
-    // If no controls provided, reset to default values from manifest
-    const resetControls =
-      controls || getManifestDefaultControlValues(this.manifest);
+    // Get default values from manifest
+    const defaultControls = getManifestDefaultControlValues(this.manifest);
+
+    // Merge provided controls with defaults
+    const resetControls = controls
+      ? { ...defaultControls, ...controls }
+      : defaultControls;
 
     // Validate reset controls
     const schema = createControlValuesSchema(this.manifest);
