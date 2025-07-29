@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import LayeredLayout, {
   type Props as LayeredLayoutProps,
 } from './LayeredLayout.astro';
+import { HeroBackgroundWrapper } from '../components';
 
 interface Props extends LayeredLayoutProps {
   /** The title to display in the hero section and page title */
@@ -18,64 +19,65 @@ const { title, showHero = true, contentWidth = 'wide', ...rest } = Astro.props;
 const maxWidthClass = contentWidth === 'narrow' ? 'max-w-6xl' : '';
 ---
 
-<LayeredLayout title={title} {...rest}>
+<LayeredLayout title={title} hideNavigation={true} {...rest}>
+  <!-- Transparent Navigation -->
+  <div class="relative z-50">
+    <slot name="navigation" />
+  </div>
+
   {showHero && (
-    <div class="bg-brand-dark relative pb-8">
-      <div class={clsx('container mx-auto px-6 py-12', {
-        'max-w-6xl': contentWidth === 'narrow',
-      })}>
-        <div
-          class="flex flex-col gap-8 md:flex-row md:items-end md:justify-between"
-        >
-          <div class="flex-1">
-            <!-- Title Pills -->
-            <div class="mb-4 flex items-center gap-4">
-              <slot name="title-pills" />
-            </div>
-            
-            <!-- Main Title -->
-            <h1
-              class="font-heading text-brand-orange mb-2 text-4xl leading-none uppercase md:text-6xl"
-            >
-              {title}
-            </h1>
-            
-            <!-- Detail Blocks -->
-            <div class="mt-8 flex items-start gap-12 md:flex-row">
-              <slot name="detail-blocks" />
-            </div>
-          </div>
-          
-          <!-- Cover Image/Art -->
-          <div class="flex flex-shrink-0 flex-col items-end gap-2">
-            <slot name="cover-image">
-              <!-- Default placeholder -->
-              <div
-                class="border-brand-orange flex h-48 w-48 items-center justify-center border-2 bg-black"
-              >
-                <span class="text-brand-orange font-mono text-xs opacity-60"
-                  >[Cover Image]</span
+    <section class="relative h-[60vh] w-full">
+      <!-- Animation Background with Content -->
+      <slot name="hero-background">
+        <!-- Default particle wave background -->
+        <HeroBackgroundWrapper>
+          <!-- Hero Content as child of AnimationStage -->
+          <div class="relative z-10 flex h-full items-center justify-center">
+            <div class={clsx('container mx-auto px-6', {
+              'max-w-6xl': contentWidth === 'narrow',
+            })}>
+              <div class="mx-auto max-w-4xl text-center">
+                <!-- Title Pills -->
+                <div class="mb-6 flex items-center justify-center gap-4">
+                  <slot name="title-pills" />
+                </div>
+                
+                <!-- Main Title -->
+                <h1
+                  class="font-heading text-white mb-6 text-5xl leading-none uppercase drop-shadow-lg md:text-7xl lg:text-8xl"
                 >
+                  {title}
+                </h1>
+                
+                <!-- Detail Blocks -->
+                <div class="mt-8 flex flex-col items-center gap-8 md:flex-row md:justify-center">
+                  <slot name="detail-blocks" />
+                </div>
+                
+                <!-- Cover Image/Art -->
+                <div class="mt-12 flex justify-center">
+                  <slot name="cover-image">
+                    <!-- Default placeholder -->
+                    <div
+                      class="border-white flex h-32 w-32 items-center justify-center border-2 bg-white/10 backdrop-blur-sm md:h-48 md:w-48"
+                    >
+                      <span class="text-white font-mono text-xs opacity-60"
+                        >[Cover Image]</span
+                      >
+                    </div>
+                  </slot>
+                </div>
               </div>
-            </slot>
+              
+              <!-- Summary Block -->
+              <div class="mt-12">
+                <slot name="summary" />
+              </div>
+            </div>
           </div>
-        </div>
-        
-        <!-- Summary Block -->
-        <slot name="summary" />
-        
-        <!-- Halftone Pattern -->
-        <div
-          class="pointer-events-none absolute bottom-0 left-0 flex w-full justify-center select-none"
-        >
-          <div
-            class="h-4 w-2/3 bg-repeat-x"
-            style="background-image: url('/patterns/halftone.svg'); opacity: 0.12;"
-          >
-          </div>
-        </div>
-      </div>
-    </div>
+        </HeroBackgroundWrapper>
+      </slot>
+    </section>
   )}
   
   <!-- Main Content -->

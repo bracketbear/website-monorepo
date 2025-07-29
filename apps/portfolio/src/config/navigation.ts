@@ -1,4 +1,4 @@
-import type { NavigationConfig, NavItem } from '@bracketbear/core/astro';
+import type { NavigationConfig, NavItem } from '@bracketbear/core';
 
 export const navItems: NavItem[] = [
   { name: 'Home', href: '/' },

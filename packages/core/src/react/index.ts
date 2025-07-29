@@ -10,4 +10,5 @@ export { Field } from './Field';
 export { CheckboxField } from './CheckboxField';
 export { default as SkillPill } from './SkillPill';
 export { Slider } from './Slider';
+export { default as HeroBackground } from './HeroBackground';
 export * from './hooks';
