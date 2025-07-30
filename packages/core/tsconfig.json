@@ -4,8 +4,8 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "isolatedModules": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "outDir": "dist",
+    "rootDir": "src",
     "strict": true,
     "noEmit": false,
     "skipLibCheck": true,
@@ -15,6 +15,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
+    "incremental": false,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "types": [
@@ -23,11 +24,17 @@
       "./types/svg"
     ],
   },
-  "include": ["src/**/*", "types/**/*"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "types/**/*.ts"
+  ],
   "exclude": [
     "node_modules",
-    "./dist/**/*",
+    "dist",
     "src/**/*.astro",
-    "src/**/*.svg"
+    "src/**/*.svg",
+    "dist/**/*.d.ts",
+    "dist/**/*"
   ]
-} 
+}

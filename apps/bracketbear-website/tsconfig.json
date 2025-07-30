@@ -2,8 +2,9 @@
   "extends": "astro/tsconfigs/strict",
   "include": [
     ".astro/types.d.ts",
-    "**/*",
-    "../../packages/portfolio-content/scripts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.astro",
     "../../eslint.config.js"
   ],
   "exclude": [

@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "tsc --watch",
+    "dev": "tsc --watch -p tsconfig.dev.json",
     "build": "tsc",
     "test": "echo \"No tests yet\" && exit 0"
   },
