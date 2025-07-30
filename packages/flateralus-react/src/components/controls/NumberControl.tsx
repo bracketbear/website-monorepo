@@ -31,7 +31,7 @@ const NumberControl = memo<NumberControlProps>(
           min={control.min ?? 0}
           max={control.max ?? 100}
           step={control.step ?? 1}
-          onChange={(v) => onControlChange(control.name, v)}
+          onChange={(v: number) => onControlChange(control.name, v)}
           className="mx-2"
         />
         <TextInput
@@ -41,7 +41,7 @@ const NumberControl = memo<NumberControlProps>(
           max={control.max}
           step={control.step}
           value={currentValue}
-          onChange={(e) =>
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             onControlChange(control.name, Number(e.target.value))
           }
           className="w-20 overflow-x-auto text-right"
