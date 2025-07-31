@@ -1,10 +1,10 @@
-import React from 'react';
+import type { ReactNode, FC } from 'react';
 
 interface BaseControlWrapperProps {
   label: string;
   description?: string;
   className?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 /**
@@ -12,7 +12,7 @@ interface BaseControlWrapperProps {
  *
  * Provides consistent layout, label, and description for all controls.
  */
-const BaseControlWrapper: React.FC<BaseControlWrapperProps> = ({
+const BaseControlWrapper: FC<BaseControlWrapperProps> = ({
   label,
   description,
   className = '',

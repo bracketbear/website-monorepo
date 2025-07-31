@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import { clsx } from 'clsx';
 import {
   buttonVariantClasses,
@@ -7,8 +7,7 @@ import {
   type ButtonSize,
 } from '../utils/button-classes';
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
 }

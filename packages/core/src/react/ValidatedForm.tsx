@@ -1,4 +1,10 @@
-import React, { useState } from 'react';
+import {
+  useState,
+  type ChangeEvent,
+  type FocusEvent,
+  type FormEvent,
+  type ReactNode,
+} from 'react';
 import { z } from 'zod';
 
 /**
@@ -12,15 +18,13 @@ interface ValidatedFormProps<TSchema extends z.ZodTypeAny> {
     values: z.infer<TSchema>;
     errors: Partial<Record<keyof z.infer<TSchema>, string>>;
     handleChange: (
-      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => void;
-    handleBlur: (
-      e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => void;
+    handleBlur: (e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     isSubmitting: boolean;
     submitError: string | null;
     submitSuccess: boolean;
-  }) => React.ReactNode;
+  }) => ReactNode;
   initialValues?: Partial<z.infer<TSchema>>;
   submitLabel?: string;
   animateOnSuccess?: boolean;
@@ -49,7 +53,7 @@ export function ValidatedForm<TSchema extends z.ZodTypeAny>({
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, type, value } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
@@ -61,7 +65,7 @@ export function ValidatedForm<TSchema extends z.ZodTypeAny>({
   };
 
   const handleBlur = (
-    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     const result = schema.safeParse({ ...values, [name]: value });
@@ -79,7 +83,7 @@ export function ValidatedForm<TSchema extends z.ZodTypeAny>({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
     setSubmitSuccess(false);

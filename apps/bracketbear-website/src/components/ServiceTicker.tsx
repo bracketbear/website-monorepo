@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react';
 import type { CollectionEntry } from 'astro:content';
 import {
   Ticker,
@@ -7,7 +8,7 @@ import {
 
 interface ServiceTickerProps {
   services: CollectionEntry<'services'>[];
-  LogoComponent?: React.ComponentType<{ className?: string }>;
+  LogoComponent?: ComponentType<{ className?: string }>;
 }
 
 export default function ServiceTicker({

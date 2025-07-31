@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type ChangeEvent } from 'react';
 import { Slider, TextInput } from '@bracketbear/core/react';
 import type { NumberControl as NumberControlType } from '@bracketbear/flateralus';
 import BaseControlWrapper from './BaseControlWrapper';
@@ -41,7 +41,7 @@ const NumberControl = memo<NumberControlProps>(
           max={control.max}
           step={control.step}
           value={currentValue}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
             onControlChange(control.name, Number(e.target.value))
           }
           className="w-20 overflow-x-auto text-right"

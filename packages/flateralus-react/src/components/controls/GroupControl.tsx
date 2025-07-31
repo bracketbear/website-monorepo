@@ -1,4 +1,3 @@
-import React from 'react';
 import type { GroupControl as GroupControlType } from '@bracketbear/flateralus';
 import { ColorControl } from './index';
 import { NumberControl } from './index';

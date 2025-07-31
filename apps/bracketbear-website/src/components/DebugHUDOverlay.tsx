@@ -1,5 +1,12 @@
-import React, { useEffect, useState } from 'react';
-export default function DebugHUDOverlay({ open, onClose }) {
+import { useEffect, useState } from 'react';
+
+export default function DebugHUDOverlay({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
   useEffect(() => {
     if (!open) return;

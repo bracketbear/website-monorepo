@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { useVisibilityObserver } from '@bracketbear/core';
 import type {
   Application,
@@ -19,7 +19,7 @@ export interface UseAnimationStageOptions {
 
 export interface UseAnimationStageReturn {
   /** Ref to attach to the container element */
-  containerRef: React.RefObject<HTMLDivElement | null>;
+  containerRef: RefObject<HTMLDivElement | null>;
   /** Current application instance */
   application: Application | null;
   /** Current control values (if animation is set) */

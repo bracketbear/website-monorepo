@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { useIntersectionObserver } from './hooks';
 
 const DEFAULT_SCROLL_SPEED = 0.5 as const;
@@ -7,7 +7,7 @@ const DEFAULT_REFRESH_INTERVAL = 20 as const;
 export interface TickerItem {
   id: string;
   title: string;
-  icon?: React.ComponentType<{ className?: string }>;
+  icon?: ComponentType<{ className?: string }>;
   link?: string;
 }
 

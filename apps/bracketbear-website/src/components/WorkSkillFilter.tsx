@@ -1,8 +1,9 @@
 import type { CollectionEntry } from 'astro:content';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import { clsx } from '@bracketbear/core';
 import WorkHistory from './WorkHistory';
 import ProjectCard from './ProjectCard';
+import type { WorkSkill } from '@bracketbear/astro-content';
 
 interface WorkSkillFilterProps {
   skills: CollectionEntry<'workSkills'>[];
@@ -88,7 +89,9 @@ export default function WorkSkillFilter({
 
   const filteredJobs = jobs.filter((job) => {
     if (selectedSkills.length === 0) return true;
-    return job.data.workSkills?.some((skill) => selectedSkills.includes(skill));
+    return job.data.workSkills?.some((skill: string) =>
+      selectedSkills.includes(skill)
+    );
   });
 
   const filteredProjects = projects.filter((project) => {
@@ -99,7 +102,7 @@ export default function WorkSkillFilter({
   const hasActiveFilters =
     selectedCategories.length > 0 || selectedSkills.length > 0;
 
-  const renderSection = (title: string, children: React.ReactNode) => (
+  const renderSection = (title: string, children: ReactNode) => (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-foreground text-2xl font-black uppercase">

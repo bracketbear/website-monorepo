@@ -1,4 +1,12 @@
-import { useState, useEffect, useCallback, memo } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  memo,
+  type ComponentProps,
+  type FC,
+  type RefObject,
+} from 'react';
 import clsx from 'clsx';
 import type {
   Animation,
@@ -34,7 +42,7 @@ interface DebugControlsProps {
   controlValues: ControlValues;
   onControlsChange: (values: Partial<ControlValues>) => void;
   isVisible?: boolean;
-  animationRef?: React.RefObject<Animation | null>;
+  animationRef?: RefObject<Animation | null>;
   showDownloadButton?: boolean;
   className?: string;
 }
@@ -156,8 +164,8 @@ const DebugControls = memo<DebugControlsProps>(
             [control.name]: !isCollapsed,
           }));
         type GroupItem = (typeof groupValue)[number];
-        const GroupControlTyped = GroupControl as unknown as React.FC<
-          React.ComponentProps<typeof GroupControl<GroupItem>>
+        const GroupControlTyped = GroupControl as unknown as FC<
+          ComponentProps<typeof GroupControl<GroupItem>>
         >;
         return (
           <GroupControlTyped

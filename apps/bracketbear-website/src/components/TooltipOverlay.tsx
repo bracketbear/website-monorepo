@@ -1,5 +1,9 @@
-import React from 'react';
-export default function TooltipOverlay({ open, onClose }) {
+interface TooltipOverlayProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export default function TooltipOverlay({ open, onClose }: TooltipOverlayProps) {
   if (!open) return null;
   return (
     <div className="bg-background border-foreground fixed top-32 left-1/2 z-50 -translate-x-1/2 transform rounded border-2 p-4 shadow-lg">

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { getProjectUrl } from '@bracketbear/core';
 import type { CollectionEntry } from 'astro:content';
 import clsx from 'clsx';
@@ -176,7 +177,7 @@ export default function WorkHistory({
               '--color-background': 'var(--color-brand-light)',
               '--color-brand-orange': 'var(--color-brand-orange)',
               '--color-brand-red': 'var(--color-brand-red)',
-            } as React.CSSProperties
+            } as CSSProperties
           }
         >
           <div className="text-foreground py-8 text-center">

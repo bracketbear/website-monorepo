@@ -1,4 +1,10 @@
-import { forwardRef, useRef, useEffect, type ReactNode } from 'react';
+import {
+  forwardRef,
+  useRef,
+  useEffect,
+  type ReactNode,
+  type MutableRefObject,
+} from 'react';
 import * as PIXI from 'pixi.js';
 import { clsx } from '@bracketbear/core';
 
@@ -208,7 +214,7 @@ export const ParticleButton = forwardRef<
 
     // Forward the ref
     if (ref) {
-      (ref as React.MutableRefObject<HTMLButtonElement | null>).current =
+      (ref as MutableRefObject<HTMLButtonElement | null>).current =
         buttonRef.current;
     }
 

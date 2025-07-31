@@ -1,13 +1,12 @@
+import { useMemo, type ReactNode } from 'react';
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
 import { createParticleWaveAnimation } from '@bracketbear/flateralus-animations';
-import type { ParticleWaveControlValues } from '@bracketbear/flateralus-animations';
 import { clsx } from '@bracketbear/core';
-import { useMemo } from 'react';
 
 interface FeaturedProjectsWaveBGProps {
   className?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 export default function FeaturedProjectsWaveBG({

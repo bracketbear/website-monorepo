@@ -1,16 +1,16 @@
 import clsx from 'clsx';
-import React from 'react';
+import type { FC, ReactNode } from 'react';
 
 export interface FieldProps {
   label: string;
   id: string;
   error?: string;
   className?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   errorSpace?: boolean; // If true, always reserve space for error
 }
 
-export const Field: React.FC<FieldProps> = ({
+export const Field: FC<FieldProps> = ({
   label,
   id,
   error,

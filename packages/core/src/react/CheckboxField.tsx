@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import { CheckboxInput, type CheckboxInputProps } from './CheckboxInput';
 
 export interface CheckboxFieldProps extends Omit<CheckboxInputProps, 'type'> {
@@ -7,7 +7,7 @@ export interface CheckboxFieldProps extends Omit<CheckboxInputProps, 'type'> {
   className?: string;
 }
 
-export const CheckboxField: React.FC<CheckboxFieldProps> = ({
+export const CheckboxField: FC<CheckboxFieldProps> = ({
   label,
   id,
   error,

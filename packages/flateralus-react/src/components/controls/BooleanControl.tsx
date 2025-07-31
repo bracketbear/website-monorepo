@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type ChangeEvent } from 'react';
 import { CheckboxInput } from '@bracketbear/core/react';
 import type { BooleanControl as BooleanControlType } from '@bracketbear/flateralus';
 import BaseControlWrapper from './BaseControlWrapper';
@@ -19,7 +19,7 @@ const BooleanControl = memo<BooleanControlProps>(
     <BaseControlWrapper label={control.label} description={control.description}>
       <CheckboxInput
         checked={Boolean(value)}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
           onControlChange(control.name, e.target.checked)
         }
         className="ml-auto rounded bg-white/10"
