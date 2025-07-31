@@ -1,5 +1,4 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
 import {
   buttonVariantClasses,
   buttonSizeClasses,
@@ -7,10 +6,12 @@ import {
   type ButtonSize,
 } from '../../utils/button-classes';
 
-interface Props extends HTMLAttributes<'button'> {
+interface Props {
   type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
   size?: ButtonSize;
+  disabled?: boolean;
+  class?: string;
 }
 
 const {
