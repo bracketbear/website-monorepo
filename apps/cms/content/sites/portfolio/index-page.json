@@ -7,9 +7,9 @@
   "ogImage": "portfolio-hero.jpg",
   "noIndex": false,
   "hero": {
-    "title": "Harrison Callahan",
-    "subtitle": "Full Stack Developer",
-    "description": "Building amazing web experiences for over two decades",
+    "title": "Harrison",
+    "subtitle": "and I build full-stack experiential solutions.",
+    "description": "Hi, I'm",
     "showParticleBackground": true
   },
   "about": {
@@ -22,7 +22,9 @@
     "featuredSkills": [
       "react",
       "typescript",
-      "astro"
+      "astro",
+      "vue",
+      "node"
     ]
   },
   "featuredProjects": {
@@ -34,7 +36,6 @@
     "viewAllButtonLink": "/projects",
     "selectedProjects": [
       "ds-elekta",
-      "ds-pwc",
       "ds-bridge"
     ]
   },
@@ -61,10 +62,5 @@
     "showFeaturedProjects": true,
     "showRecentExperience": true,
     "showContactSection": true
-  },
-  "seo": {
-    "structuredData": true,
-    "enableAnalytics": true,
-    "preloadCriticalAssets": true
   }
 }

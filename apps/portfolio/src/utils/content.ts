@@ -3,6 +3,7 @@ import {
   type AnyEntryMap,
   type CollectionEntry,
 } from 'astro:content';
+import type { PortfolioAboutPageData } from '@bracketbear/astro-content';
 
 type GetCollectionParams<
   C extends keyof AnyEntryMap,
@@ -26,4 +27,27 @@ export async function getKeyedCollection<T extends CollectionName>(
     keyedCollection[entryKey] = entry;
   });
   return keyedCollection;
+}
+
+/**
+ * Get the about page data from the CMS
+ */
+export async function getAboutPageData(): Promise<PortfolioAboutPageData | null> {
+  try {
+    const collection = await getCollection('portfolioAboutPage');
+    console.log(
+      'Available entries:',
+      collection.map((entry) => entry.id)
+    );
+    const aboutPage = collection.find((entry) => entry.id === 'about');
+    console.log('Found about page:', aboutPage ? 'yes' : 'no');
+    if (aboutPage) {
+      console.log('About page data keys:', Object.keys(aboutPage.data));
+    }
+
+    return aboutPage ? aboutPage.data : null;
+  } catch (error) {
+    console.warn('Failed to load about page data:', error);
+    return null;
+  }
 }

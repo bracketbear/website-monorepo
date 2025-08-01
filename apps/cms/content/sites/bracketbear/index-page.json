@@ -60,7 +60,8 @@
     "showContactSection": true
   },
   "seo": {
-    "structuredData": true,
+    "structuredData": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"Organization\",\n  \"name\": \"Bracket Bear\",\n  \"description\": \"Creative technology studio specializing in experiential marketing and interactive installations.\",\n  \"url\": \"https://bracketbear.com\",\n  \"sameAs\": [\n    \"https://linkedin.com/company/bracketbear\"\n  ]\n}",
+    "additionalMetaTags": "<meta name=\"author\" content=\"Bracket Bear\" />\n<meta name=\"keywords\" content=\"creative technology, experiential marketing, interactive installations, digital experiences\" />",
     "enableAnalytics": true,
     "preloadCriticalAssets": true
   }

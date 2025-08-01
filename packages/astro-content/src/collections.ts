@@ -13,6 +13,8 @@ import {
   serviceSchema,
   makePageSchema,
   indexPageSchema,
+  portfolioAboutPageSchema,
+  portfolioIndexPageSchema,
 } from './schemas';
 
 /**
@@ -71,7 +73,8 @@ export const siteSpecificCollections = {
   // Portfolio site singletons
   portfolioIndexPage: {
     base: join(contentPath, 'sites/portfolio'),
-    schema: indexPageSchema,
+    schema: portfolioIndexPageSchema,
+    pattern: 'index-page.json',
   },
   portfolioContactPage: {
     base: join(contentPath, 'sites/portfolio'),
@@ -81,56 +84,48 @@ export const siteSpecificCollections = {
       contactFormId: z.string().optional(),
       officeHours: z.string().optional(),
     }),
+    pattern: 'contact-page.json',
   },
   portfolioAboutPage: {
     base: join(contentPath, 'sites/portfolio'),
-    schema: makePageSchema({
-      teamMembers: z
-        .array(
-          z.object({
-            name: z.string(),
-            role: z.string(),
-            bio: z.string().optional(),
-            image: z.string().optional(),
-          })
-        )
-        .optional(),
-      companyValues: z.array(z.string()).optional(),
-      foundedYear: z.number().optional(),
-    }),
+    schema: portfolioAboutPageSchema,
+    pattern: 'about-page.json',
   },
-
-  // Bracket Bear site singletons
-  bracketbearIndexPage: {
-    base: join(contentPath, 'sites/bracketbear'),
-    schema: indexPageSchema,
-  },
-  bracketbearContactPage: {
-    base: join(contentPath, 'sites/bracketbear'),
-    schema: makePageSchema({
-      phone: z.string().optional(),
-      address: z.string().optional(),
-      contactFormId: z.string().optional(),
-      officeHours: z.string().optional(),
-    }),
-  },
-  bracketbearAboutPage: {
-    base: join(contentPath, 'sites/bracketbear'),
-    schema: makePageSchema({
-      teamMembers: z
-        .array(
-          z.object({
-            name: z.string(),
-            role: z.string(),
-            bio: z.string().optional(),
-            image: z.string().optional(),
-          })
-        )
-        .optional(),
-      companyValues: z.array(z.string()).optional(),
-      foundedYear: z.number().optional(),
-    }),
-  },
+  // TODO: Add Bracket Bear collections when Bracket Bear site is implemented
+  // bracketBearAboutPage: {
+  //   base: join(contentPath, 'sites/bracketbear'),
+  //   schema: bracketBearAboutPageSchema,
+  // },
+  // bracketbearIndexPage: {
+  //   base: join(contentPath, 'sites/bracketbear'),
+  //   schema: indexPageSchema,
+  // },
+  // bracketbearContactPage: {
+  //   base: join(contentPath, 'sites/bracketbear'),
+  //   schema: makePageSchema({
+  //     phone: z.string().optional(),
+  //     address: z.string().optional(),
+  //     contactFormId: z.string().optional(),
+  //     officeHours: z.string().optional(),
+  //   }),
+  // },
+  // bracketbearAboutPage: {
+  //   base: join(contentPath, 'sites/bracketbear'),
+  //   schema: makePageSchema({
+  //     teamMembers: z
+  //       .array(
+  //         z.object({
+  //           name: z.string(),
+  //           role: z.string(),
+  //           bio: z.string().optional(),
+  //           image: z.string().optional(),
+  //         })
+  //       )
+  //       .optional(),
+  //     companyValues: z.array(z.string()).optional(),
+  //     foundedYear: z.number().optional(),
+  //   }),
+  // },
 };
 
 /**

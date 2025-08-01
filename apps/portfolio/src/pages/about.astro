@@ -1,14 +1,21 @@
 ---
 import { DetailBlock, type Breadcrumb } from '@bracketbear/core';
+import { getCollection } from 'astro:content';
 import ContentLayout from '@/layouts/ContentLayout.astro';
 import { getAboutBreadcrumbs } from '@/config/breadcrumbs';
 
 const breadcrumbs: Breadcrumb[] = getAboutBreadcrumbs();
 
+// Get the about page singleton (following the same pattern as index.astro)
+const aboutPageEntries = await getCollection('portfolioAboutPage');
+const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
+
+console.log('About page data:', aboutPage?.data);
+
 const details: {
   label: string;
   value: string[];
-}[] = [
+}[] = aboutPage?.data?.detailBlocks || [
   {
     label: 'Specialties & Services',
     value: [
@@ -59,144 +66,90 @@ const details: {
     ))
   }
 
-  <!-- Personal Story Section -->
-  <div class="mb-12">
-    <div class="card">
-      <h2 class="font-heading text-brand-dark mb-6 text-4xl tracking-tight">
-        MY STORY
-      </h2>
-      <div
-        class="text-brand-dark space-y-6 text-xl leading-relaxed font-medium"
-      >
-        <p>
-          I started coding because I was curious about how things worked. That
-          curiosity turned into a passion, and that passion turned into a
-          career. I've always been the kind of person who takes things apart to
-          understand them, then puts them back together better than before.
-        </p>
-        <p>
-          Over the years, I've learned that the best solutions aren't always the
-          most complex ones. Sometimes the simplest approach is the right
-          approach. I've worked with teams that over-engineered everything and
-          teams that under-engineered everything. The sweet spot is somewhere in
-          between - build what you need, plan for what you might need, and keep
-          it maintainable.
-        </p>
-        <p>
-          When I'm not coding, you'll find me exploring new technologies,
-          mentoring other developers, or working on side projects that push my
-          boundaries. I believe in continuous learning and sharing knowledge -
-          because the best engineers are the ones who never stop growing.
-        </p>
-      </div>
-    </div>
-  </div>
-
   <!-- Mission Statement -->
-  <div class="mb-12">
-    <div class="card">
-      <h2 class="font-heading text-brand-dark mb-6 text-4xl tracking-tight">
-        MISSION STATEMENT
-      </h2>
-      <div
-        class="text-brand-dark space-y-4 text-xl leading-relaxed font-medium"
-      >
-        <p>
-          I build digital solutions that work. No fancy buzzwords, no
-          over-engineering, just solid code that solves real problems. Think of
-          me as your digital contractor - I show up, I work hard, and I get the
-          job done right.
-        </p>
-        <p>
-          From startups to Fortune 500s, I've been the guy who fixes what's
-          broken and builds what's needed. When you need someone who can handle
-          the full stack - frontend, backend, design, deployment - I'm your
-          engineer.
-        </p>
+  {
+    aboutPage?.data?.missionStatement && (
+      <div class="mb-12">
+        <div class="card">
+          <h2 class="font-heading text-brand-dark mb-6 text-4xl tracking-tight">
+            {aboutPage.data.missionStatement.title}
+          </h2>
+          <div class="text-brand-dark space-y-4 text-xl leading-relaxed font-medium">
+            {aboutPage.data.missionStatement.paragraphs.map(
+              (paragraph: string) => (
+                <p>{paragraph}</p>
+              )
+            )}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    )
+  }
+
+  <!-- Personal Story Section -->
+  {
+    aboutPage?.data?.personalStory && (
+      <div class="mb-12">
+        <div class="card">
+          <h2 class="font-heading text-brand-dark mb-6 text-4xl tracking-tight">
+            {aboutPage.data.personalStory.title}
+          </h2>
+          <div class="text-brand-dark space-y-6 text-xl leading-relaxed font-medium">
+            {aboutPage.data.personalStory.paragraphs.map(
+              (paragraph: string) => (
+                <p>{paragraph}</p>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   <!-- Work Philosophy -->
-  <div class="mb-12">
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
-      <div class="card">
-        <h3 class="font-heading text-brand-dark mb-4 text-2xl tracking-tight">
-          WHAT I DO
-        </h3>
-        <ol
-          class="text-brand-dark list-inside list-decimal space-y-3 text-lg font-medium [&>li]:flex [&>li]:items-start [&>li]:gap-3"
-        >
-          <li>
-            <span
-              class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold"
-              >01</span
-            >
-            Build scalable web applications from concept to deployment
-          </li>
-          <li>
-            <span
-              class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold"
-              >02</span
-            >
-            Design intuitive user experiences that people actually want to use
-          </li>
-          <li>
-            <span
-              class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold"
-              >03</span
-            >
-            Architect robust backend systems that handle real-world scale
-          </li>
-          <li>
-            <span
-              class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold"
-              >04</span
-            >
-            Lead development teams and mentor junior engineers
-          </li>
-        </ol>
-      </div>
+  {
+    aboutPage?.data?.workPhilosophy && (
+      <div class="mb-12">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div class="card">
+            <h3 class="font-heading text-brand-dark mb-4 text-2xl tracking-tight">
+              {aboutPage.data.workPhilosophy.whatIDo.title}
+            </h3>
+            <ol class="text-brand-dark list-inside list-decimal space-y-3 text-lg font-medium [&>li]:flex [&>li]:items-start [&>li]:gap-3">
+              {aboutPage.data.workPhilosophy.whatIDo.items.map(
+                (item: any, index: number) => (
+                  <li>
+                    <span class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold">
+                      {item.number || String(index + 1).padStart(2, '0')}
+                    </span>
+                    {item.text}
+                  </li>
+                )
+              )}
+            </ol>
+          </div>
 
-      <div class="card">
-        <h3 class="font-heading text-brand-dark mb-4 text-2xl tracking-tight">
-          HOW I WORK
-        </h3>
-        <ol
-          class="text-brand-dark list-inside list-decimal space-y-3 text-lg font-medium [&>li]:flex [&>li]:items-start [&>li]:gap-3"
-        >
-          <li>
-            <span
-              class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold"
-              >01</span
-            >
-            Listen to your needs, not just your wants
-          </li>
-          <li>
-            <span
-              class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold"
-              >02</span
-            >
-            Build with the future in mind, not just today
-          </li>
-          <li>
-            <span
-              class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold"
-              >03</span
-            >
-            Test everything, deploy with confidence
-          </li>
-          <li>
-            <span
-              class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold"
-              >04</span
-            >
-            Document what matters, maintain what works
-          </li>
-        </ol>
+          <div class="card">
+            <h3 class="font-heading text-brand-dark mb-4 text-2xl tracking-tight">
+              {aboutPage.data.workPhilosophy.howIWork.title}
+            </h3>
+            <ol class="text-brand-dark list-inside list-decimal space-y-3 text-lg font-medium [&>li]:flex [&>li]:items-start [&>li]:gap-3">
+              {aboutPage.data.workPhilosophy.howIWork.items.map(
+                (item: any, index: number) => (
+                  <li>
+                    <span class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold">
+                      {item.number || String(index + 1).padStart(2, '0')}
+                    </span>
+                    {item.text}
+                  </li>
+                )
+              )}
+            </ol>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    )
+  }
 </ContentLayout>
 
 <style>

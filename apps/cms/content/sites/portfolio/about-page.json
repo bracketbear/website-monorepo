@@ -1,0 +1,100 @@
+{
+  "title": "About Me",
+  "metaTitle": "About Me - Portfolio",
+  "metaDescription": "Learn more about my background, skills, and work philosophy",
+  "noIndex": false,
+  "detailBlocks": [
+    {
+      "label": "Specialties & Services",
+      "value": [
+        "Full Stack Software Engineering",
+        "Experiential Content Management Systems Development",
+        "Experiential Software Development and Integrations",
+        "Software/System Architecture & Design"
+      ]
+    },
+    {
+      "label": "Technical Qualifications",
+      "value": [
+        "10+ Years Experience",
+        "Wide Range of Technical Skills",
+        "Proven Adaptability & Problem Solving",
+        "Self-Taught A.F."
+      ]
+    },
+    {
+      "label": "Work Ethic & Values",
+      "value": [
+        "Pragmatic & Results-Oriented",
+        "Radical Candor",
+        "Continuous Improvement & Learning"
+      ]
+    },
+    {
+      "label": "Non-Technical Experience",
+      "value": [
+        "2+ Years of Management Experience",
+        "4 Years of Business Development Experience",
+        "4 Years of Graphic Design Experience"
+      ]
+    }
+  ],
+  "personalStory": {
+    "title": "Personal Story",
+    "paragraphs": [
+      "I'm a self-taught developer who started building websites in high school and never looked back. What began as a hobby turned into a career that's taken me from startups to Fortune 500 companies.",
+      "I believe in building things that work. No fancy buzzwords, no over-engineering - just solid code that solves real problems. When you need someone who can handle the full stack - frontend, backend, design, deployment - I'm your engineer."
+    ]
+  },
+  "missionStatement": {
+    "title": "Mission Statement",
+    "paragraphs": [
+      "I build digital solutions that work. No fancy buzzwords, no over-engineering, just solid code that solves real problems. Think of me as your digital contractor - I show up, I work hard, and I get the job done right.",
+      "From startups to Fortune 500s, I've been the guy who fixes what's broken and builds what's needed. When you need someone who can handle the full stack - frontend, backend, design, deployment - I'm your engineer."
+    ]
+  },
+  "workPhilosophy": {
+    "whatIDo": {
+      "title": "What I Do",
+      "items": [
+        {
+          "text": "Build scalable web applications from concept to deployment",
+          "number": "01"
+        },
+        {
+          "text": "Design intuitive user experiences that people actually want to use",
+          "number": "02"
+        },
+        {
+          "text": "Architect robust backend systems that handle real-world scale",
+          "number": "03"
+        },
+        {
+          "text": "Lead development teams and mentor junior engineers",
+          "number": "04"
+        }
+      ]
+    },
+    "howIWork": {
+      "title": "How I Work",
+      "items": [
+        {
+          "text": "Listen to your needs, not just your wants",
+          "number": "01"
+        },
+        {
+          "text": "Build with the future in mind, not just today",
+          "number": "02"
+        },
+        {
+          "text": "Test everything, deploy with confidence",
+          "number": "03"
+        },
+        {
+          "text": "Document what matters, maintain what works",
+          "number": "04"
+        }
+      ]
+    }
+  }
+}

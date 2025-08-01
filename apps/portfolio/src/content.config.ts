@@ -8,7 +8,15 @@ import {
  * Creates a typed JSON-based collection using Astro's defineCollection and glob loaders.
  * Now with automatic image handling via the content image loader.
  */
-function createJsonCollection({ base, schema }: { base: string; schema: any }) {
+function createJsonCollection({
+  base,
+  schema,
+  pattern,
+}: {
+  base: string;
+  schema: any;
+  pattern?: string;
+}) {
   // Create the content image loader that automatically handles images
   const contentImageLoader = createContentImageLoader();
 
@@ -16,7 +24,7 @@ function createJsonCollection({ base, schema }: { base: string; schema: any }) {
     type: 'content_layer',
     loader: contentImageLoader({
       base,
-      pattern: '**/*.json',
+      pattern: pattern || '**/*.json',
       generateId: (entry) => `${entry.entry.replace(/\.json$/, '')}`, // Generate ID from the entry path
     }),
     schema,

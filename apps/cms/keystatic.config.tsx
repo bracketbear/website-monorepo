@@ -22,11 +22,6 @@ export default config({
         'portfolioContactPage',
         'portfolioAboutPage',
       ],
-      'Bracket Bear Site': [
-        'bracketbearIndexPage',
-        'bracketbearContactPage',
-        'bracketbearAboutPage',
-      ],
       'Work Content': [
         'workCompany',
         'workJobs',
@@ -36,7 +31,8 @@ export default config({
         'workProjectCategory',
       ],
       'General Content': ['blog', 'pages', 'services'],
-      'Site Settings': ['contactInfo', 'siteSettings'],
+      // TODO: Add site settings when needed
+      // 'Site Settings': ['siteSettings'],
     },
   },
   collections: {

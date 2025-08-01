@@ -1,6 +1,6 @@
 import { defineCollection } from 'astro:content';
 import {
-  allCollections,
+  workCollections,
   createContentImageLoader,
 } from '@bracketbear/astro-content';
 import type { Schema } from 'astro:schema';
@@ -32,7 +32,7 @@ function createJsonCollection({
 
 // Create collections from configurations
 export const collections = Object.fromEntries(
-  Object.entries(allCollections).map(([key, config]) => [
+  Object.entries(workCollections).map(([key, config]) => [
     key,
     createJsonCollection(config),
   ])
