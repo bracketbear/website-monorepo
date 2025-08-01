@@ -1,94 +1,59 @@
 import { z } from 'astro:content';
 import { makePageSchema } from './page';
 
-/**
- * Schema for detail block items used in about pages
- *
- * Represents a labeled list of values, typically used for qualifications,
- * skills, or other categorized information.
- */
-export const detailBlockSchema = z.object({
-  label: z.string(),
-  value: z.array(z.string()),
-});
-
-/**
- * Schema for work philosophy items
- *
- * Represents numbered list items with optional custom numbering.
- */
-export const workPhilosophyItemSchema = z.object({
-  text: z.string(),
-  number: z.string().optional(), // Custom number like "01", "02", etc.
-});
-
-/**
- * Schema for work philosophy sections
- *
- * Represents a section with a title and numbered list of items.
- */
-export const workPhilosophySectionSchema = z.object({
+// --- New sub–section schemas ---
+const narrativeSectionSchema = z.object({
   title: z.string(),
-  items: z.array(workPhilosophyItemSchema),
+  paragraphs: z.array(z.string()),
 });
 
-/**
- * Portfolio about page schema
- *
- * This schema captures the portfolio about page structure with:
- * - Detail blocks for qualifications and experience
- * - Personal story section
- * - Mission statement section
- * - Work philosophy with two sections (What I Do, How I Work)
- *
- * @example
- * ```typescript
- * const portfolioAboutData = {
- *   title: "About Me",
- *   detailBlocks: [
- *     {
- *       label: "Specialties & Services",
- *       value: ["Full Stack Software Engineering", "..."],
- *     },
- *   ],
- *   personalStory: {
- *     title: "MY STORY",
- *     paragraphs: ["I started coding because...", "..."],
- *   },
- *   missionStatement: {
- *     title: "MISSION STATEMENT",
- *     paragraphs: ["I build digital solutions...", "..."],
- *   },
- *   workPhilosophy: {
- *     whatIDo: {
- *       title: "WHAT I DO",
- *       items: [
- *         { text: "Build scalable web applications...", number: "01" },
- *       ],
- *     },
- *     howIWork: {
- *       title: "HOW I WORK",
- *       items: [
- *         { text: "Listen to your needs...", number: "01" },
- *       ],
- *     },
- *   },
- * };
- * ```
- */
+const skillsSchema = z.object({
+  coreStrengths: z.array(z.string()), // 3-4 punchy bullets
+  technicalExpertise: z.array(z.string()), // short tech / domain labels
+  beyondTech: z.array(z.string()), // leadership, design, biz, etc.
+});
+
+const valuesCardSchema = z.object({
+  title: z.string(),
+  items: z.array(
+    z.object({
+      // max 3 bullets per card
+      text: z.string(),
+      number: z.string().optional(), // "01", "02", …
+    })
+  ),
+});
+
+// --- Revised page schema ---
 export const portfolioAboutPageSchema = makePageSchema({
-  detailBlocks: z.array(detailBlockSchema),
-  personalStory: z.object({
+  /** Hero / intro block */
+  hero: z.object({
     title: z.string(),
-    paragraphs: z.array(z.string()),
+    subtitle: z.string().optional(),
+    description: z.string().optional(),
+    showParticleBackground: z.boolean().default(true),
   }),
-  missionStatement: z.object({
-    title: z.string(),
-    paragraphs: z.array(z.string()),
+
+  /** Story + philosophy merged into one narrative */
+  narrative: narrativeSectionSchema,
+
+  /** Clustered skill highlights */
+  skills: skillsSchema,
+
+  /** Work-style cards (formerly What I Do / How I Work) */
+  workStyle: z.object({
+    whatIDo: valuesCardSchema,
+    howIWork: valuesCardSchema,
   }),
-  workPhilosophy: z.object({
-    whatIDo: workPhilosophySectionSchema,
-    howIWork: workPhilosophySectionSchema,
+
+  /** Optional fun-facts / personal bits */
+  funFacts: z.array(z.string()).optional(),
+
+  /** CTA footer */
+  contactCTA: z.object({
+    text: z.string(),
+    buttonText: z.string().default('Reach Out'),
+    buttonLink: z.string().default('/reach-out'),
   }),
 });
 

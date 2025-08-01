@@ -9,172 +9,168 @@ import { makePageSchema } from '../../schemas/page';
  * and work philosophy that makes sense for a developer portfolio.
  */
 export const portfolioAboutPageSchema = makePageSchema({
-  detailBlocks: fields.array(
-    fields.object({
-      label: fields.text({
-        label: 'Section Label',
-        description:
-          'The heading for this section (e.g., "Specialties & Services", "Technical Qualifications")',
+  // Hero / intro block
+  hero: fields.object({
+    title: fields.text({
+      label: 'Hero Title',
+      description: 'Main headline for the about page',
+    }),
+    subtitle: fields.text({
+      label: 'Hero Subtitle',
+      description: 'Optional subtitle below the main title',
+    }),
+    description: fields.text({
+      label: 'Hero Description',
+      description: 'Optional description text',
+      multiline: true,
+    }),
+    showParticleBackground: fields.checkbox({
+      label: 'Show Particle Background',
+      defaultValue: true,
+    }),
+  }),
+
+  // Story + philosophy merged into one narrative
+  narrative: fields.object({
+    title: fields.text({
+      label: 'Narrative Title',
+      description: 'Title for the combined story and mission section',
+    }),
+    paragraphs: fields.array(
+      fields.text({
+        label: 'Paragraph',
+        multiline: true,
+        description: 'Write a paragraph about your story and mission',
       }),
-      value: fields.array(
-        fields.text({
-          label: 'Bullet Points',
-          description: 'Individual items to display under this section',
+      {
+        label: 'Narrative Paragraphs',
+        description: 'Add paragraphs that tell your story and mission',
+        itemLabel: (props) =>
+          props.value?.substring(0, 50) + '...' || 'New Paragraph',
+      }
+    ),
+  }),
+
+  // Clustered skill highlights
+  skills: fields.object({
+    coreStrengths: fields.array(
+      fields.text({
+        label: 'Core Strength',
+        description: '3-4 punchy bullets about your core strengths',
+      }),
+      {
+        label: 'Core Strengths',
+        description: 'Your key strengths and capabilities',
+        itemLabel: (props) => props.value || 'New Strength',
+      }
+    ),
+    technicalExpertise: fields.array(
+      fields.text({
+        label: 'Technical Skill',
+        description: 'Short tech/domain labels',
+      }),
+      {
+        label: 'Technical Expertise',
+        description: 'Your technical skills and expertise areas',
+        itemLabel: (props) => props.value || 'New Skill',
+      }
+    ),
+    beyondTech: fields.array(
+      fields.text({
+        label: 'Non-Technical Skill',
+        description: 'Leadership, design, business, etc.',
+      }),
+      {
+        label: 'Beyond Tech',
+        description: 'Non-technical skills and experience',
+        itemLabel: (props) => props.value || 'New Skill',
+      }
+    ),
+  }),
+
+  // Work-style cards (formerly What I Do / How I Work)
+  workStyle: fields.object({
+    whatIDo: fields.object({
+      title: fields.text({
+        label: 'What I Do Title',
+        description: 'Title for the "What I Do" section',
+      }),
+      items: fields.array(
+        fields.object({
+          text: fields.text({
+            label: 'Activity Description',
+            multiline: true,
+            description: 'Describe what you do (max 3 bullets per card)',
+          }),
+          number: fields.text({
+            label: 'Number (optional)',
+            description: 'Optional custom number (e.g., "01", "02")',
+          }),
         }),
         {
-          label: 'Bullet Points',
-          itemLabel: (props) => props.value || 'New Bullet Point',
-          description:
-            'Add bullet points that will be displayed as a list under this section',
+          label: 'What I Do Items',
+          description: 'List what you do (max 3 items)',
+          itemLabel: (props) =>
+            props.fields.text.value?.substring(0, 50) + '...' || 'New Item',
         }
       ),
     }),
-    {
-      label: 'About Page Sections',
-      description:
-        'These sections appear at the top of the about page with your key qualifications and background',
-      itemLabel: (props) => props.fields.label.value || 'New Section',
-    }
-  ),
-  personalStory: fields.object(
-    {
+    howIWork: fields.object({
       title: fields.text({
-        label: 'Section Title',
-        description:
-          'The heading for your personal story section (e.g., "Personal Story", "My Journey")',
+        label: 'How I Work Title',
+        description: 'Title for the "How I Work" section',
       }),
-      paragraphs: fields.array(
-        fields.text({
-          label: 'Paragraph',
-          multiline: true,
-          description:
-            'Write a paragraph about your background, experience, or personal journey',
+      items: fields.array(
+        fields.object({
+          text: fields.text({
+            label: 'Process Description',
+            multiline: true,
+            description: 'Describe how you work (max 3 bullets per card)',
+          }),
+          number: fields.text({
+            label: 'Number (optional)',
+            description: 'Optional custom number (e.g., "01", "02")',
+          }),
         }),
         {
-          label: 'Story Paragraphs',
-          description:
-            'Add paragraphs that tell your personal story and background',
+          label: 'How I Work Items',
+          description: 'List how you work (max 3 items)',
           itemLabel: (props) =>
-            props.value?.substring(0, 50) + '...' || 'New Paragraph',
+            props.fields.text.value?.substring(0, 50) + '...' || 'New Item',
         }
       ),
-    },
+    }),
+  }),
+
+  // Optional fun-facts / personal bits
+  funFacts: fields.array(
+    fields.text({
+      label: 'Fun Fact',
+      description: 'Add interesting personal facts or trivia',
+    }),
     {
-      label: 'Personal Story Section',
-      description:
-        'This section appears after the detail blocks and tells visitors about your background and journey',
+      label: 'Fun Facts',
+      description: 'Optional fun facts about yourself',
+      itemLabel: (props) => props.value || 'New Fun Fact',
     }
   ),
-  missionStatement: fields.object(
-    {
-      title: fields.text({
-        label: 'Section Title',
-        description:
-          'The heading for your mission statement (e.g., "Mission Statement", "My Approach")',
-      }),
-      paragraphs: fields.array(
-        fields.text({
-          label: 'Paragraph',
-          multiline: true,
-          description:
-            'Write a paragraph explaining your mission, values, or approach to work',
-        }),
-        {
-          label: 'Mission Paragraphs',
-          description:
-            'Add paragraphs that explain your mission, values, and approach to work',
-          itemLabel: (props) =>
-            props.value?.substring(0, 50) + '...' || 'New Paragraph',
-        }
-      ),
-    },
-    {
-      label: 'Mission Statement Section',
-      description:
-        'This section explains your mission, values, and approach to work',
-    }
-  ),
-  workPhilosophy: fields.object(
-    {
-      whatIDo: fields.object(
-        {
-          title: fields.text({
-            label: 'Section Title',
-            description:
-              'The heading for what you do (e.g., "What I Do", "My Services")',
-          }),
-          items: fields.array(
-            fields.object({
-              text: fields.text({
-                label: 'Service/Activity Description',
-                multiline: true,
-                description:
-                  'Describe a service you provide or activity you perform',
-              }),
-              number: fields.text({
-                label: 'Number (optional)',
-                description:
-                  'Optional custom number (e.g., "01", "02"). Leave empty to auto-generate',
-              }),
-            }),
-            {
-              label: 'Services/Activities',
-              description:
-                'List the main services you provide or activities you perform',
-              itemLabel: (props) =>
-                props.fields.text.value?.substring(0, 50) + '...' ||
-                'New Service',
-            }
-          ),
-        },
-        {
-          label: 'What I Do',
-          description: 'This section lists your main services and activities',
-        }
-      ),
-      howIWork: fields.object(
-        {
-          title: fields.text({
-            label: 'Section Title',
-            description:
-              'The heading for how you work (e.g., "How I Work", "My Process")',
-          }),
-          items: fields.array(
-            fields.object({
-              text: fields.text({
-                label: 'Process/Approach Description',
-                multiline: true,
-                description: 'Describe your process, approach, or methodology',
-              }),
-              number: fields.text({
-                label: 'Number (optional)',
-                description:
-                  'Optional custom number (e.g., "01", "02"). Leave empty to auto-generate',
-              }),
-            }),
-            {
-              label: 'Process Steps',
-              description:
-                'List your key processes, approaches, or methodologies',
-              itemLabel: (props) =>
-                props.fields.text.value?.substring(0, 50) + '...' ||
-                'New Process Step',
-            }
-          ),
-        },
-        {
-          label: 'How I Work',
-          description:
-            'This section explains your process, approach, and methodology',
-        }
-      ),
-    },
-    {
-      label: 'Work Philosophy',
-      description:
-        'This section appears at the bottom and explains both what you do and how you work',
-    }
-  ),
+
+  // CTA footer
+  contactCTA: fields.object({
+    text: fields.text({
+      label: 'CTA Text',
+      description: 'Call-to-action text',
+      multiline: true,
+    }),
+    buttonText: fields.text({
+      label: 'Button Text',
+      defaultValue: 'Reach Out',
+    }),
+    buttonLink: fields.text({
+      label: 'Button Link',
+      defaultValue: '/reach-out',
+    }),
+  }),
 });
 
 /**

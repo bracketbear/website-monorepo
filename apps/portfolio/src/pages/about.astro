@@ -1,5 +1,5 @@
 ---
-import { DetailBlock, type Breadcrumb } from '@bracketbear/core';
+import { type Breadcrumb } from '@bracketbear/core';
 import { getCollection } from 'astro:content';
 import ContentLayout from '@/layouts/ContentLayout.astro';
 import { getAboutBreadcrumbs } from '@/config/breadcrumbs';
@@ -11,91 +11,42 @@ const aboutPageEntries = await getCollection('portfolioAboutPage');
 const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
 
 console.log('About page data:', aboutPage?.data);
-
-const details: {
-  label: string;
-  value: string[];
-}[] = aboutPage?.data?.detailBlocks || [
-  {
-    label: 'Specialties & Services',
-    value: [
-      'Full Stack Software Engineering',
-      'Experiential Content Management Systems Development',
-      'Experiential Software Development and Integrations',
-      'Software/System Architecture & Design',
-    ],
-  },
-  {
-    label: 'Technical Qualifications',
-    value: [
-      '10+ Years Experience',
-      'Wide Range of Technical Skills',
-      'Proven Adaptability & Problem Solving',
-      'Self-Taught A.F.',
-    ],
-  },
-  {
-    label: 'Work Ethic & Values',
-    value: [
-      'Pragmatic & Results-Oriented',
-      'Radical Candor',
-      'Continuous Improvement & Learning',
-    ],
-  },
-  {
-    label: 'Non-Technical Experience',
-    value: [
-      '2+ Years of Management Experience',
-      '4 Years of Business Development Experience',
-      '4 Years of Graphic Design Experience',
-    ],
-  },
-];
 ---
 
 <ContentLayout title="About Me" breadcrumbs={breadcrumbs}>
+  <!-- Hero Section -->
   {
-    details.map((detail) => (
-      <DetailBlock slot="detail-blocks" label={detail.label}>
-        <ul slot="value" class="list-outside list-disc">
-          {detail.value.map((value) => (
-            <li class="ml-4">{value}</li>
-          ))}
-        </ul>
-      </DetailBlock>
-    ))
-  }
-
-  <!-- Mission Statement -->
-  {
-    aboutPage?.data?.missionStatement && (
+    aboutPage?.data?.hero && (
       <div class="mb-12">
         <div class="card">
-          <h2 class="font-heading text-brand-dark mb-6 text-4xl tracking-tight">
-            {aboutPage.data.missionStatement.title}
-          </h2>
-          <div class="text-brand-dark space-y-4 text-xl leading-relaxed font-medium">
-            {aboutPage.data.missionStatement.paragraphs.map(
-              (paragraph: string) => (
-                <p>{paragraph}</p>
-              )
-            )}
-          </div>
+          <h1 class="font-heading text-brand-dark mb-4 text-5xl tracking-tight">
+            {aboutPage.data.hero.title}
+          </h1>
+          {aboutPage.data.hero.subtitle && (
+            <h2 class="text-brand-dark mb-4 text-2xl font-medium">
+              {aboutPage.data.hero.subtitle}
+            </h2>
+          )}
+          {aboutPage.data.hero.description && (
+            <p class="text-brand-dark text-xl leading-relaxed font-medium">
+              {aboutPage.data.hero.description}
+            </p>
+          )}
         </div>
       </div>
     )
   }
 
-  <!-- Personal Story Section -->
+  <!-- Narrative Section (Story + Mission merged) -->
   {
-    aboutPage?.data?.personalStory && (
+    aboutPage?.data?.narrative && (
       <div class="mb-12">
         <div class="card">
           <h2 class="font-heading text-brand-dark mb-6 text-4xl tracking-tight">
-            {aboutPage.data.personalStory.title}
+            {aboutPage.data.narrative.title}
           </h2>
           <div class="text-brand-dark space-y-6 text-xl leading-relaxed font-medium">
-            {aboutPage.data.personalStory.paragraphs.map(
+            {aboutPage.data.narrative.paragraphs.map(
               (paragraph: string) => (
                 <p>{paragraph}</p>
               )
@@ -106,17 +57,63 @@ const details: {
     )
   }
 
-  <!-- Work Philosophy -->
+  <!-- Skills Section (Three-column layout) -->
   {
-    aboutPage?.data?.workPhilosophy && (
+    aboutPage?.data?.skills && (
       <div class="mb-12">
-        <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+          <!-- Core Strengths -->
           <div class="card">
             <h3 class="font-heading text-brand-dark mb-4 text-2xl tracking-tight">
-              {aboutPage.data.workPhilosophy.whatIDo.title}
+              Core Strengths
+            </h3>
+            <ul class="text-brand-dark list-outside list-disc space-y-2 text-lg font-medium">
+              {aboutPage.data.skills.coreStrengths.map((strength: string) => (
+                <li class="ml-4">{strength}</li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- Technical Expertise -->
+          <div class="card">
+            <h3 class="font-heading text-brand-dark mb-4 text-2xl tracking-tight">
+              Technical Expertise
+            </h3>
+            <ul class="text-brand-dark list-outside list-disc space-y-2 text-lg font-medium">
+              {aboutPage.data.skills.technicalExpertise.map((skill: string) => (
+                <li class="ml-4">{skill}</li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- Beyond Tech -->
+          <div class="card">
+            <h3 class="font-heading text-brand-dark mb-4 text-2xl tracking-tight">
+              Beyond Tech
+            </h3>
+            <ul class="text-brand-dark list-outside list-disc space-y-2 text-lg font-medium">
+              {aboutPage.data.skills.beyondTech.map((skill: string) => (
+                <li class="ml-4">{skill}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  <!-- Work Style Section (What I Do / How I Work) -->
+  {
+    aboutPage?.data?.workStyle && (
+      <div class="mb-12">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+          <!-- What I Do -->
+          <div class="card">
+            <h3 class="font-heading text-brand-dark mb-4 text-2xl tracking-tight">
+              {aboutPage.data.workStyle.whatIDo.title}
             </h3>
             <ol class="text-brand-dark list-inside list-decimal space-y-3 text-lg font-medium [&>li]:flex [&>li]:items-start [&>li]:gap-3">
-              {aboutPage.data.workPhilosophy.whatIDo.items.map(
+              {aboutPage.data.workStyle.whatIDo.items.map(
                 (item: any, index: number) => (
                   <li>
                     <span class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold">
@@ -129,12 +126,13 @@ const details: {
             </ol>
           </div>
 
+          <!-- How I Work -->
           <div class="card">
             <h3 class="font-heading text-brand-dark mb-4 text-2xl tracking-tight">
-              {aboutPage.data.workPhilosophy.howIWork.title}
+              {aboutPage.data.workStyle.howIWork.title}
             </h3>
             <ol class="text-brand-dark list-inside list-decimal space-y-3 text-lg font-medium [&>li]:flex [&>li]:items-start [&>li]:gap-3">
-              {aboutPage.data.workPhilosophy.howIWork.items.map(
+              {aboutPage.data.workStyle.howIWork.items.map(
                 (item: any, index: number) => (
                   <li>
                     <span class="bg-brand-dark text-brand-light min-w-[2rem] px-2 py-1 text-center text-sm font-bold">
@@ -146,6 +144,43 @@ const details: {
               )}
             </ol>
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  <!-- Fun Facts Section (Optional) -->
+  {
+    aboutPage?.data?.funFacts && aboutPage.data.funFacts.length > 0 && (
+      <div class="mb-12">
+        <div class="card">
+          <h2 class="font-heading text-brand-dark mb-6 text-4xl tracking-tight">
+            Fun Facts
+          </h2>
+          <ul class="text-brand-dark list-outside list-disc space-y-3 text-lg font-medium">
+            {aboutPage.data.funFacts.map((fact: string) => (
+              <li class="ml-4">{fact}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    )
+  }
+
+  <!-- Contact CTA Section -->
+  {
+    aboutPage?.data?.contactCTA && (
+      <div class="mb-12">
+        <div class="card text-center">
+          <p class="text-brand-dark mb-6 text-xl leading-relaxed font-medium">
+            {aboutPage.data.contactCTA.text}
+          </p>
+          <a
+            href={aboutPage.data.contactCTA.buttonLink}
+            class="inline-block bg-brand-red text-brand-light px-8 py-3 text-lg font-bold shadow-[3px_3px_0_var(--color-brand-dark)] transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
+          >
+            {aboutPage.data.contactCTA.buttonText}
+          </a>
         </div>
       </div>
     )
