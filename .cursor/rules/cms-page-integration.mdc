@@ -1,0 +1,142 @@
+# CMS Page Integration Patterns
+
+## Overview
+This rule covers the correct patterns for integrating Astro pages with the Keystatic CMS, based on successful implementations in the portfolio app.
+
+## Key Principles
+
+### 1. Use Direct Collection Access (Not Custom Functions)
+**✅ Correct Pattern:**
+```typescript
+// In your Astro page frontmatter
+import { getCollection } from 'astro:content';
+
+// Get the singleton entry directly
+const pageEntries = await getCollection('portfolioAboutPage');
+const page = pageEntries[0]; // Singletons have only one entry
+
+// Access data directly
+const data = page?.data;
+```
+
+**❌ Avoid Custom Functions:**
+```typescript
+// Don't use custom utility functions that add complexity
+import { getAboutPageData } from '@/utils/content';
+const data = await getAboutPageData(); // This adds unnecessary abstraction
+```
+
+### 2. Collection Naming Convention
+- Use site-specific collection names: `portfolioAboutPage`, `portfolioIndexPage`
+- Follow the pattern: `{siteName}{PageType}Page`
+- Collections are defined in [packages/astro-content/src/collections.ts](mdc:packages/astro-content/src/collections.ts)
+
+### 3. Schema Organization
+- Site-specific schemas go in [apps/cms/src/sites/{site}/schemas.ts](mdc:apps/cms/src/sites/portfolio/schemas.ts)
+- Use `makePageSchema()` wrapper for consistent page structure
+- Include proper labels and descriptions for CMS UX
+
+### 4. Relationship Fields
+**✅ Use Relationship Fields for References:**
+```typescript
+// In schema definition
+featuredSkills: fields.array(
+  fields.relationship({
+    label: 'Skill',
+    collection: 'workSkills',
+    description: 'Select a skill from the skills collection',
+  }),
+  {
+    label: 'Featured Skills',
+    itemLabel: (props) => props.value || 'New Skill',
+    description: 'Select skills to feature in the about section',
+  }
+),
+```
+
+**❌ Avoid Text Fields for References:**
+```typescript
+// Don't use text fields for collection references
+featuredSkills: fields.array(fields.text({ label: 'Skill' }), {
+  label: 'Featured Skills',
+}),
+```
+
+### 5. Content File Structure
+- Content files must match the schema exactly
+- Include all required fields from `makePageSchema()`:
+  - `title`, `content`, `metaTitle`, `metaDescription`, `canonicalUrl`, `ogImage`, `noIndex`
+- Place in correct directory: `apps/cms/content/sites/{site}/`
+
+### 6. Template Data Access
+**✅ Correct Pattern:**
+```astro
+---
+// Get data directly from collection
+const pageEntries = await getCollection('portfolioAboutPage');
+const page = pageEntries[0];
+
+// Access data with optional chaining
+const details = page?.data?.detailBlocks || fallbackData;
+---
+
+<!-- In template -->
+{page?.data?.missionStatement && (
+  <div>
+    <h2>{page.data.missionStatement.title}</h2>
+    {page.data.missionStatement.paragraphs.map(paragraph => (
+      <p>{paragraph}</p>
+    ))}
+  </div>
+)}
+```
+
+**❌ Avoid Type Casting:**
+```astro
+<!-- Don't use type casting that can cause issues -->
+{(pageData as AnyType)?.missionStatement && (
+  <div>{(pageData as AnyType).missionStatement!.title}</div>
+)}
+```
+
+## File Structure Reference
+
+### CMS Schema Files
+- [apps/cms/src/sites/portfolio/schemas.ts](mdc:apps/cms/src/sites/portfolio/schemas.ts) - Portfolio site schemas
+- [apps/cms/src/sites/portfolio/singletons.ts](mdc:apps/cms/src/sites/portfolio/singletons.ts) - Portfolio site singletons
+
+### Astro Content Configuration
+- [packages/astro-content/src/collections.ts](mdc:packages/astro-content/src/collections.ts) - Collection definitions
+- [packages/astro-content/src/schemas/about-page.ts](mdc:packages/astro-content/src/schemas/about-page.ts) - Zod schemas
+
+### Example Implementations
+- [apps/portfolio/src/pages/index.astro](mdc:apps/portfolio/src/pages/index.astro) - Working home page
+- [apps/portfolio/src/pages/about.astro](mdc:apps/portfolio/src/pages/about.astro) - Working about page
+
+## Common Issues and Solutions
+
+### 1. "Content does not match collection schema"
+- Ensure content file includes all required fields from `makePageSchema()`
+- Check that relationship fields store slug strings, not objects
+- Verify file is in correct directory with correct name
+
+### 2. "Collection not found"
+- Verify collection is defined in [packages/astro-content/src/collections.ts](mdc:packages/astro-content/src/collections.ts)
+- Check collection name matches exactly (case-sensitive)
+- Ensure pattern matches actual file name
+
+### 3. "Type errors in template"
+- Use optional chaining (`?.`) instead of type casting
+- Access data directly: `page?.data?.fieldName`
+- Avoid custom type definitions that conflict with generated types
+
+## Testing Checklist
+- [ ] Page loads without errors
+- [ ] CMS data displays instead of fallback
+- [ ] Changes in CMS reflect on page
+- [ ] Relationship fields show dropdown selectors in CMS
+- [ ] All required fields are present in content file
+description:
+globs:
+alwaysApply: false
+---
