@@ -33,3 +33,5 @@ export {
 
 // Export all content schemas
 export { blogSchema, pageSchema, serviceSchema } from './content';
+export { basePageSchema, makePageSchema } from './page';
+export { indexPageSchema, type IndexPageData } from './index-page';

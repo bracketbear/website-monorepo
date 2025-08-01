@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import { z } from 'astro:content';
 import { contentPath, workPath } from './utils';
 import {
   workCompanySchema,
@@ -10,6 +11,8 @@ import {
   blogSchema,
   pageSchema,
   serviceSchema,
+  makePageSchema,
+  indexPageSchema,
 } from './schemas';
 
 /**
@@ -61,11 +64,120 @@ export const contentCollections = {
 };
 
 /**
+ * Site-specific singleton page collections
+ * Each site gets its own singleton collections to avoid conflicts
+ */
+export const siteSpecificCollections = {
+  // Portfolio site singletons
+  portfolioIndexPage: {
+    base: join(contentPath, 'sites/portfolio'),
+    schema: indexPageSchema,
+  },
+  portfolioContactPage: {
+    base: join(contentPath, 'sites/portfolio'),
+    schema: makePageSchema({
+      phone: z.string().optional(),
+      address: z.string().optional(),
+      contactFormId: z.string().optional(),
+      officeHours: z.string().optional(),
+    }),
+  },
+  portfolioAboutPage: {
+    base: join(contentPath, 'sites/portfolio'),
+    schema: makePageSchema({
+      teamMembers: z
+        .array(
+          z.object({
+            name: z.string(),
+            role: z.string(),
+            bio: z.string().optional(),
+            image: z.string().optional(),
+          })
+        )
+        .optional(),
+      companyValues: z.array(z.string()).optional(),
+      foundedYear: z.number().optional(),
+    }),
+  },
+
+  // Bracket Bear site singletons
+  bracketbearIndexPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: indexPageSchema,
+  },
+  bracketbearContactPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: makePageSchema({
+      phone: z.string().optional(),
+      address: z.string().optional(),
+      contactFormId: z.string().optional(),
+      officeHours: z.string().optional(),
+    }),
+  },
+  bracketbearAboutPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: makePageSchema({
+      teamMembers: z
+        .array(
+          z.object({
+            name: z.string(),
+            role: z.string(),
+            bio: z.string().optional(),
+            image: z.string().optional(),
+          })
+        )
+        .optional(),
+      companyValues: z.array(z.string()).optional(),
+      foundedYear: z.number().optional(),
+    }),
+  },
+};
+
+/**
+ * Legacy singleton collections (for backward compatibility)
+ * @deprecated Use site-specific collections instead
+ */
+export const singletonPageCollections = {
+  indexPage: {
+    base: join(contentPath, 'pages'),
+    schema: indexPageSchema,
+  },
+  contactPage: {
+    base: join(contentPath, 'pages'),
+    schema: makePageSchema({
+      phone: z.string().optional(),
+      address: z.string().optional(),
+      contactFormId: z.string().optional(),
+      officeHours: z.string().optional(),
+    }),
+  },
+  aboutPage: {
+    base: join(contentPath, 'pages'),
+    schema: makePageSchema({
+      teamMembers: z
+        .array(
+          z.object({
+            name: z.string(),
+            role: z.string(),
+            bio: z.string().optional(),
+            image: z.string().optional(),
+          })
+        )
+        .optional(),
+      companyValues: z.array(z.string()).optional(),
+      foundedYear: z.number().optional(),
+    }),
+  },
+};
+
+/**
  * All collection configurations
  */
 export const allCollections = {
   ...workCollections,
   ...contentCollections,
+  ...siteSpecificCollections,
+  ...singletonPageCollections, // Keep for backward compatibility
 };
 
 /**

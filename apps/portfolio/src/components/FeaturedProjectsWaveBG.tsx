@@ -1,9 +1,8 @@
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
 import { createParticleWaveAnimation } from '@bracketbear/flateralus-animations';
-import type { ParticleWaveControlValues } from '@bracketbear/flateralus-animations';
 import { clsx } from '@bracketbear/core';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 interface FeaturedProjectsWaveBGProps {
   className?: string;
@@ -14,9 +13,16 @@ export default function FeaturedProjectsWaveBG({
   className,
   children,
 }: FeaturedProjectsWaveBGProps) {
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure we're on the client before rendering
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // Create application and animation only once
   const application = useMemo(() => {
-    if (typeof window === 'undefined') return null;
+    if (!isClient) return null;
 
     const app = new PixiApplication({
       config: {
@@ -30,7 +36,16 @@ export default function FeaturedProjectsWaveBG({
     app.setAnimation(animation);
 
     return app;
-  }, []);
+  }, [isClient]);
+
+  // Don't render anything on the server
+  if (!isClient) {
+    return (
+      <div className={clsx('absolute inset-0 h-full w-full', className)} />
+    );
+  }
+
+  if (!application) return null;
 
   return (
     <AnimationStage

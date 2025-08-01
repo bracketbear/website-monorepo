@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { basePageSchema } from './page';
 
 /**
  * General content schemas for blog posts, pages, and services
@@ -40,8 +41,8 @@ export const blogSchema = z.object({
 /**
  * Schema for static page information
  *
- * Defines the structure for static page data including title, content,
- * and SEO metadata.
+ * Defines the structure for static page data using the base page schema.
+ * This provides consistent SEO metadata and content structure across all pages.
  *
  * @example
  * ```typescript
@@ -49,16 +50,14 @@ export const blogSchema = z.object({
  *   title: "About Bracket Bear",
  *   content: "# About Bracket Bear...",
  *   metaDescription: "Learn about Bracket Bear's mission and values",
- *   isPublished: true
+ *   metaTitle: "About Bracket Bear - Custom Software Development",
+ *   canonicalUrl: "https://bracketbear.com/about",
+ *   ogImage: "about-og-image.jpg",
+ *   noIndex: false
  * };
  * ```
  */
-export const pageSchema = z.object({
-  title: z.string(),
-  content: z.string(), // This will be the rich text content
-  metaDescription: z.string().optional(),
-  isPublished: z.boolean().default(true),
-});
+export const pageSchema = basePageSchema;
 
 /**
  * Schema for service offering information

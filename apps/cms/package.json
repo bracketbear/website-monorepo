@@ -7,7 +7,7 @@
     "name": "Harrison Callahan"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start"
   },
@@ -15,9 +15,9 @@
     "@bracketbear/astro-content": "file:../../packages/astro-content",
     "@bracketbear/core": "file:../../packages/core",
     "@keystatic/next": "^5.0.4",
-    "next": "^14.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "next": "^15.4.5",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",

@@ -1,0 +1,70 @@
+{
+  "title": "Harrison Callahan - Portfolio",
+  "content": "Welcome to my portfolio\n\nI'm a full-stack developer with over two decades of experience building web applications and digital experiences. I specialize in creating performant, accessible, and user-friendly web applications using modern technologies.",
+  "metaTitle": "Harrison Callahan - Full Stack Developer Portfolio",
+  "metaDescription": "Professional portfolio showcasing web development projects and experience across multiple technologies and industries. Specializing in React, Astro, TypeScript, and modern web development.",
+  "canonicalUrl": "https://harrisoncallahan.com/",
+  "ogImage": "portfolio-hero.jpg",
+  "noIndex": false,
+  "hero": {
+    "title": "Harrison Callahan",
+    "subtitle": "Full Stack Developer",
+    "description": "Building amazing web experiences for over two decades",
+    "showParticleBackground": true
+  },
+  "about": {
+    "title": "What I Do",
+    "introduction": "I can tell you that I'm a full-stack developer who's been working on the web for over two decades, but I'm really a professional \"figure it the fuck out\" guy who stumbled into programming.",
+    "description": "I've been working on the web for so long that I've seen it go from skeuomorphic websites built with tables to modern, responsive, accessible, and performant web applications built with your favorite AI agents.\n\n## Throughout my career, I've worked on a ton of different projects and tech stacks, from the LAMP stack to C++ compiled Windows applications to modern web applications built with React, Astro, and TailwindCSS.",
+    "experience": "Beyond my technical skills, I've also collected a ton of experience in non-technical areas, from project management to business development to solid customer/client relations.",
+    "additional": "I specialize in creating performant, accessible, and user-friendly web applications using modern technologies like **React**, **TypeScript**, and **Astro**.",
+    "showSkillsTicker": true,
+    "featuredSkills": [
+      "react",
+      "typescript",
+      "astro"
+    ]
+  },
+  "featuredProjects": {
+    "title": "Featured Projects",
+    "subtitle": "I've been fortunate to work on some really cool projects over the years, but these are the ones that I hang my hat on.\n\nEach project represents a unique challenge and showcases different aspects of my technical skills.",
+    "maxDisplay": 3,
+    "showViewAllButton": true,
+    "viewAllButtonText": "View All Projects →",
+    "viewAllButtonLink": "/projects",
+    "selectedProjects": [
+      "ds-elekta",
+      "ds-pwc",
+      "ds-bridge"
+    ]
+  },
+  "recentExperience": {
+    "title": "Recent Experience",
+    "subtitle": "My journey spans from agency work at experiential marketing firms to freelance development, giving me a unique perspective on both technical and business challenges.\n\nI've worked with companies ranging from startups to enterprise-level organizations.",
+    "maxDisplay": 3,
+    "showViewAllButton": true,
+    "viewAllButtonText": "View Full Work History →",
+    "viewAllButtonLink": "/work",
+    "selectedJobs": [
+      "dl-full-stack-software-engineer"
+    ]
+  },
+  "contact": {
+    "title": "Let's Work Together",
+    "subtitle": "Ready to build something amazing? Whether you have a project in mind or just want to chat about possibilities, I'd love to hear from you.",
+    "showContactForm": true
+  },
+  "layout": {
+    "hideContactForm": true,
+    "showHeroSection": true,
+    "showAboutSection": true,
+    "showFeaturedProjects": true,
+    "showRecentExperience": true,
+    "showContactSection": true
+  },
+  "seo": {
+    "structuredData": true,
+    "enableAnalytics": true,
+    "preloadCriticalAssets": true
+  }
+}

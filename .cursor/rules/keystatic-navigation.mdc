@@ -1,0 +1,235 @@
+# Keystatic Navigation Organization Patterns
+
+## Overview
+This rule documents how we organized the Keystatic CMS navigation to support multiple independent websites with logical grouping and clear separation of concerns.
+
+## Navigation Structure Pattern
+
+### 1. Site-Specific Grouping
+```typescript
+// apps/cms/keystatic.config.tsx
+export default config({
+  // ... storage and other config
+  ui: {
+    navigation: {
+      'Portfolio Site': [
+        'portfolioIndexPage',
+        'portfolioContactPage',
+        'portfolioAboutPage',
+      ],
+      'Bracket Bear Site': [
+        'bracketbearIndexPage',
+        'bracketbearContactPage',
+        'bracketbearAboutPage',
+      ],
+      'Work Content': [
+        'workCompany',
+        'workJobs',
+        'workProject',
+        'workSkills',
+        'workSkillCategory',
+        'workProjectCategory',
+      ],
+      'General Content': ['blog', 'pages', 'services'],
+      'Site Settings': ['contactInfo', 'siteSettings'],
+    },
+  },
+  collections: {
+    ...workCollections,
+    ...contentCollections,
+  },
+  singletons: {
+    ...singletons,
+  },
+});
+```
+
+### 2. Modular Configuration Pattern
+```typescript
+// apps/cms/src/collections/work.ts
+export const workCollections = {
+  workCompany: collection({
+    label: 'Companies',
+    slugField: 'title',
+    path: workPath('companies'),
+    format: 'json',
+    schema: {
+      // ... schema definition
+    },
+  }),
+  workJobs: collection({
+    label: 'Jobs',
+    slugField: 'title',
+    format: 'json',
+    path: workPath('jobs'),
+    columns: ['title', 'company', 'startDate', 'endDate'],
+    entryLayout: 'content',
+    schema: {
+      // ... schema definition with relationship fields
+    },
+  }),
+  // ... more work collections
+};
+
+// apps/cms/src/collections/content.ts
+export const contentCollections = {
+  blog: collection({
+    label: 'Blog Posts',
+    slugField: 'title',
+    format: 'json',
+    path: collectionPath('blog'),
+    schema: {
+      // ... schema definition
+    },
+  }),
+  // ... more content collections
+};
+
+// apps/cms/src/singletons/index.ts
+export const singletons = {
+  portfolioIndexPage: singleton({
+    label: 'Portfolio Homepage',
+    path: singletonPath('sites/portfolio/index-page'),
+    schema: {
+      // ... complex schema with nested objects
+    },
+  }),
+  // ... more singletons
+};
+```
+
+## Navigation Organization Principles
+
+### 1. Site-Specific Separation
+- **Portfolio Site**: All portfolio-specific pages and content
+- **Bracket Bear Site**: All bracketbear-specific pages and content
+- **Work Content**: Shared work-related collections (companies, jobs, projects, skills)
+- **General Content**: Shared content types (blog, pages, services)
+- **Site Settings**: Global site configuration
+
+### 2. Logical Grouping
+```typescript
+// Group by site first, then by content type
+'Portfolio Site': [
+  'portfolioIndexPage',    // Homepage
+  'portfolioContactPage',  // Contact page
+  'portfolioAboutPage',    // About page
+],
+
+// Group shared content by type
+'Work Content': [
+  'workCompany',           // Companies
+  'workJobs',             // Jobs
+  'workProject',          // Projects
+  'workSkills',           // Skills
+  'workSkillCategory',    // Skill categories
+  'workProjectCategory',  // Project categories
+],
+```
+
+### 3. Relationship Field Integration
+```typescript
+// Work collections with relationship fields
+workJobs: collection({
+  // ... other config
+  schema: {
+    company: fields.relationship({
+      label: 'Company',
+      collection: 'workCompany',
+      validation: { isRequired: true },
+    }),
+    workSkills: fields.multiRelationship({
+      label: 'Skills',
+      collection: 'workSkills',
+    }),
+  },
+}),
+
+workProject: collection({
+  // ... other config
+  schema: {
+    job: fields.relationship({
+      label: 'Job',
+      collection: 'workJobs',
+      validation: { isRequired: true },
+    }),
+    skills: fields.multiRelationship({
+      label: 'Skills',
+      collection: 'workSkills',
+    }),
+    category: fields.relationship({
+      label: 'Category',
+      collection: 'workProjectCategory',
+    }),
+  },
+}),
+```
+
+## File Organization Pattern
+
+### 1. Modular Configuration Files
+```
+apps/cms/src/
+├── collections/
+│   ├── work.ts          # Work-related collections
+│   └── content.ts       # General content collections
+├── singletons/
+│   └── index.ts         # All singleton configurations
+└── keystatic.config.tsx # Main config that imports modules
+```
+
+### 2. Path Creator Functions
+```typescript
+// apps/cms/src/collections/work.ts
+const workPath = <T extends string>(slug: T) => {
+  return collectionPath(`${WORK_PATH}/${slug}`);
+};
+
+// apps/cms/src/singletons/index.ts
+const singletonPath = <T extends string>(slug: T) => {
+  return `${CONTENT_PATH}/${PAGES_PATH}/${slug}` as const;
+};
+```
+
+## Best Practices
+
+### 1. Navigation Grouping
+- **Group by site first**: Keep site-specific content together
+- **Group by content type**: Organize shared content logically
+- **Use descriptive labels**: Make navigation intuitive for content editors
+
+### 2. Collection Organization
+- **Separate concerns**: Work content vs general content
+- **Use relationship fields**: Link related content across collections
+- **Consistent naming**: Use clear, descriptive collection names
+
+### 3. Schema Design
+- **Extend base schemas**: Use `makePageSchema()` for consistency
+- **Include relationship fields**: Enable content linking
+- **Validate relationships**: Ensure data integrity
+
+### 4. File Structure
+- **Modular configuration**: Break large configs into smaller files
+- **Consistent patterns**: Use the same structure across sites
+- **Clear separation**: Keep site-specific and shared content separate
+
+## Migration Considerations
+
+### 1. From Monolithic to Modular
+- Start with modular configuration files
+- Import collections and singletons in main config
+- Update navigation to reflect new organization
+
+### 2. Content Editor Experience
+- Group related content together in navigation
+- Use clear, descriptive labels
+- Provide logical flow for content management
+
+### 3. Relationship Management
+- Ensure relationship fields work across collections
+- Test content linking after configuration changes
+- Validate data integrity with relationship constraints
+description:
+globs:
+alwaysApply: false
+---

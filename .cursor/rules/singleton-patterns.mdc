@@ -1,0 +1,166 @@
+# Singleton Patterns for Multi-Site Content Management
+
+## Overview
+This rule documents the patterns we established for creating singleton collections that support multiple independent websites within the same CMS.
+
+## Site-Specific Singleton Pattern
+
+### 1. Collection Configuration Structure
+```typescript
+// packages/astro-content/src/collections.ts
+export const siteSpecificCollections = {
+  // Portfolio site singletons
+  portfolioIndexPage: {
+    base: join(contentPath, 'sites/portfolio'),
+    schema: indexPageSchema,
+  },
+  portfolioContactPage: {
+    base: join(contentPath, 'sites/portfolio'),
+    schema: makePageSchema({
+      phone: z.string().optional(),
+      address: z.string().optional(),
+      contactFormId: z.string().optional(),
+      officeHours: z.string().optional(),
+    }),
+  },
+  portfolioAboutPage: {
+    base: join(contentPath, 'sites/portfolio'),
+    schema: makePageSchema({
+      teamMembers: z.array(z.object({
+        name: z.string(),
+        role: z.string(),
+        bio: z.string().optional(),
+        image: z.string().optional(),
+      })).optional(),
+      companyValues: z.array(z.string()).optional(),
+      foundedYear: z.number().optional(),
+    }),
+  },
+
+  // Bracket Bear site singletons
+  bracketbearIndexPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: indexPageSchema,
+  },
+  // ... more site-specific collections
+};
+```
+
+### 2. File Structure Pattern
+```
+apps/cms/content/
+├── sites/
+│   ├── portfolio/
+│   │   ├── index-page.json
+│   │   ├── contact-page.json
+│   │   └── about-page.json
+│   └── bracketbear/
+│       ├── index-page.json
+│       ├── contact-page.json
+│       └── about-page.json
+└── work/
+    ├── skills/
+    ├── projects/
+    └── jobs/
+```
+
+### 3. Schema Reusability Pattern
+```typescript
+// packages/astro-content/src/schemas/page.ts
+export const basePageSchema = z.object({
+  title: z.string(),
+  content: z.string(),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  canonicalUrl: z.string().url().optional(),
+  ogImage: z.string().optional(),
+  noIndex: z.boolean().default(false),
+});
+
+export function makePageSchema<
+  Extras extends z.ZodRawShape = z.ZodRawShape
+>(extras?: Extras) {
+  return extras
+    ? basePageSchema.merge(z.object(extras))
+    : basePageSchema;
+}
+```
+
+## Key Principles
+
+### 1. Site Isolation
+- Each site gets its own singleton collections to avoid conflicts
+- Base paths are separated by site: `sites/portfolio/` vs `sites/bracketbear/`
+- Collection names are prefixed with site: `portfolioIndexPage`, `bracketbearIndexPage`
+
+### 2. Schema Reusability
+- Use `basePageSchema` for common SEO fields
+- Use `makePageSchema()` to extend with site-specific fields
+- Keep shared schemas in separate files for reusability
+
+### 3. Backward Compatibility
+```typescript
+// Legacy collections for backward compatibility
+export const singletonPageCollections = {
+  indexPage: {
+    base: join(contentPath, 'pages'),
+    schema: indexPageSchema,
+  },
+  // ... other legacy collections
+};
+
+// Export both for compatibility
+export const allCollections = {
+  ...workCollections,
+  ...contentCollections,
+  ...siteSpecificCollections,
+  ...singletonPageCollections, // Keep for backward compatibility
+};
+```
+
+## Usage in Astro Pages
+
+### Loading Site-Specific Singletons
+```typescript
+// apps/portfolio/src/pages/index.astro
+const indexPageEntries = await getCollection('portfolioIndexPage');
+const indexPage = indexPageEntries[0]; // Singletons have only one entry
+```
+
+### Relationship Field Integration
+```typescript
+// CMS content with relationship fields
+{
+  "featuredSkills": ["react", "typescript", "astro"],
+  "selectedProjects": ["ds-elekta", "ds-pwc", "ds-bridge"]
+}
+
+// Frontend filtering
+const featuredSkills = workSkills.filter((skill) =>
+  indexPage.data.about.featuredSkills.includes(skill.id)
+);
+```
+
+## Migration Strategy
+
+### 1. From Legacy to Site-Specific
+- Keep legacy collections for backward compatibility
+- Gradually migrate to site-specific collections
+- Update Astro pages to use new collection names
+
+### 2. Content Migration
+- Move content from `pages/` to `sites/{site}/`
+- Update file names to match new patterns
+- Test relationship fields work with new structure
+
+## Best Practices
+
+1. **Always use site prefixes** for collection names to avoid conflicts
+2. **Extend base schemas** rather than duplicating common fields
+3. **Keep legacy collections** for backward compatibility during migration
+4. **Use consistent file naming** across sites
+5. **Test relationship fields** after any schema changes
+description:
+globs:
+alwaysApply: false
+---

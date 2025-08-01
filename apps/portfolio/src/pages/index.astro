@@ -13,21 +13,125 @@ import type {
 import HeroSection from '@/components/HeroSection';
 import FeaturedProjectsWaveBG from '@/components/FeaturedProjectsWaveBG';
 import SkillsTicker from '@/components/SkillsTicker';
+import { marked } from 'marked';
 
+// Get the index page singleton
+const indexPageEntries = await getCollection('portfolioIndexPage');
+const indexPage = indexPageEntries[0]; // Singletons have only one entry
+
+// Get all work collections for relationship lookups
 const workJobs: WorkJobEntry[] = await getCollection('workJobs');
 const workSkills: WorkSkillEntry[] = await getCollection('workSkills');
 const workProjects: WorkProjectEntry[] = await getCollection('workProject');
 const workCompanies: WorkCompanyEntry[] = await getCollection('workCompany');
 
-// Sort jobs by start date (most recent first)
-const sortedJobs = workJobs.sort(
+// Debug: Log what we're getting from collections
+console.log('Total skills found:', workSkills.length);
+console.log('Total projects found:', workProjects.length);
+console.log('Total jobs found:', workJobs.length);
+console.log(
+  'Sample skill IDs:',
+  workSkills.slice(0, 5).map((s) => s.id)
+);
+console.log(
+  'Sample project IDs:',
+  workProjects.slice(0, 5).map((p) => p.id)
+);
+
+// Get recent experience based on CMS configuration
+let recentJobs = workJobs.sort(
   (a, b) => b.data.startDate.getTime() - a.data.startDate.getTime()
 );
 
-// Get featured projects
-const featuredProjects = workProjects
-  .filter((project) => project.data.isFeatured)
-  .slice(0, 3);
+// If specific jobs are selected in CMS, use those instead
+if (
+  indexPage.data.recentExperience.selectedJobs &&
+  indexPage.data.recentExperience.selectedJobs.length > 0
+) {
+  console.log(
+    'CMS selected jobs:',
+    indexPage.data.recentExperience.selectedJobs
+  );
+  console.log(
+    'Available jobs:',
+    workJobs.map((j) => j.id)
+  );
+  recentJobs = workJobs.filter((job) =>
+    indexPage.data.recentExperience.selectedJobs.includes(job.id)
+  );
+  console.log(
+    'Filtered jobs:',
+    recentJobs.map((j) => j.data.title)
+  );
+}
+
+// Limit to max display count
+recentJobs = recentJobs.slice(0, indexPage.data.recentExperience.maxDisplay);
+
+// Get featured projects based on CMS configuration
+let featuredProjects = workProjects.filter(
+  (project) => project.data.isFeatured
+);
+
+// If specific projects are selected in CMS, use those instead
+if (
+  indexPage.data.featuredProjects.selectedProjects &&
+  indexPage.data.featuredProjects.selectedProjects.length > 0
+) {
+  console.log(
+    'CMS selected projects:',
+    indexPage.data.featuredProjects.selectedProjects
+  );
+  console.log(
+    'Available projects:',
+    workProjects.map((p) => p.id)
+  );
+  console.log(
+    'Looking for projects:',
+    indexPage.data.featuredProjects.selectedProjects
+  );
+  featuredProjects = workProjects.filter((project) => {
+    const isIncluded =
+      indexPage.data.featuredProjects.selectedProjects.includes(project.id);
+    console.log(`Project ${project.id}: ${isIncluded ? 'FOUND' : 'NOT FOUND'}`);
+    return isIncluded;
+  });
+  console.log(
+    'Filtered projects:',
+    featuredProjects.map((p) => p.data.title)
+  );
+}
+
+// Limit to max display count
+featuredProjects = featuredProjects.slice(
+  0,
+  indexPage.data.featuredProjects.maxDisplay
+);
+
+// Get featured skills for the about section
+let featuredSkills = workSkills.filter((skill) => skill.data.isFeatured);
+
+// If specific skills are selected in CMS, use those instead
+if (
+  indexPage.data.about.featuredSkills &&
+  indexPage.data.about.featuredSkills.length > 0
+) {
+  console.log('CMS selected skills:', indexPage.data.about.featuredSkills);
+  console.log(
+    'Available skills:',
+    workSkills.map((s) => s.id)
+  );
+  console.log('Looking for skills:', indexPage.data.about.featuredSkills);
+  featuredSkills = workSkills.filter((skill) => {
+    const isIncluded = indexPage.data.about.featuredSkills.includes(skill.id);
+    console.log(`Skill ${skill.id}: ${isIncluded ? 'FOUND' : 'NOT FOUND'}`);
+    return isIncluded;
+  });
+  console.log(
+    'Filtered skills:',
+    featuredSkills.map((s) => s.data.title)
+  );
+}
 
 // Helper function to format dates correctly
 function formatDate(date: Date): string {
@@ -48,181 +152,227 @@ function getCompanyName(
   const company = companies.find((c) => c.id === companyKey);
   return company?.data.title || companyKey;
 }
+
+// Helper function to parse markdown content
+function parseMarkdown(content: string): string {
+  return marked.parse(content) as string;
+}
 ---
 
-<HomeLayout title="Harrison Callahan - Portfolio" hideContactForm={true}>
+<HomeLayout
+  title={indexPage.data.title}
+  hideContactForm={indexPage.data.layout.hideContactForm}
+>
   <!-- Hero Section with Particle Galaxy Background -->
-  <HeroSection className="h-screen w-full" client:load />
+  <HeroSection
+    className="h-screen w-full"
+    client:load
+    title={indexPage.data.hero.title}
+    subtitle={indexPage.data.hero.subtitle}
+    description={indexPage.data.hero.description}
+    showParticleBackground={indexPage.data.hero.showParticleBackground}
+  />
 
   <!-- What I Do Section -->
-  <section class="bg-brand-dark py-24">
-    <div class="container mx-auto px-6">
-      <div class="mx-auto max-w-4xl text-center">
-        <h2
-          class="font-heading text-brand-light mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase"
-        >
-          What I Do
-        </h2>
-        <div class="card-dark">
-          <p class="text-brand-light mb-6 text-xl leading-relaxed font-bold">
-            I can tell you that I'm a full-stack developer who's been working on
-            the web for over two decades, but I'm really a professional "figure
-            it the fuck out" guy who stumbled into programming.
-          </p>
-          <p class="text-brand-light/80 text-lg leading-relaxed font-medium">
-            I've been working on the web for so long that I've seen it go from
-            skeuomorphic websites built with tables to modern, responsive,
-            accessible, and performant web applications built with your favorite
-            AI agents.
-          </p>
-          <p class="text-brand-light/80 text-lg leading-relaxed font-medium">
-            Throughout my career, I've worked on a ton of different projects and
-            tech stacks, from the LAMP stack to C++ compiled Windows
-            applications to modern web applications built with React, Astro, and
-            TailwindCSS.
-          </p>
-          <p class="text-brand-light/80 text-lg leading-relaxed font-medium">
-            Beyond my technical skills, I've also collected a ton of experience
-            in non-technical areas, from project management to business
-            development to solid customer/client relations.
-          </p>
-          <h3 class="text-brand-light mt-8 text-2xl font-bold">
-            Featured Skills:
-          </h3>
-          <SkillsTicker skills={workSkills} client:load />
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Featured Projects Section -->
-  <section class="bg-brand-light relative min-h-[600px]">
-    <FeaturedProjectsWaveBG
-      className="absolute inset-0 z-0 h-full w-full py-24"
-      client:load
-    >
-      <div class="relative z-10 container mx-auto px-6">
-        <div class="mb-16 text-center">
-          <h2
-            class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase"
-          >
-            Featured Projects
-          </h2>
-          <p class="text-brand-dark/80 mx-auto max-w-2xl text-xl">
-            I've been fortunate to work on some really cool projects over the
-            years, but these are the ones that I hang my hat on.
-          </p>
-        </div>
-        <div class="grid gap-8 lg:grid-cols-2">
-          {
-            featuredProjects.map((project) => (
-              <ProjectCard
-                project={project}
-                skills={workSkills}
-                variant="dark"
-              />
-            ))
-          }
-        </div>
-        <div class="mt-12 text-center">
-          <a href="/projects">
-            <AstroButton variant="primary" size="lg"
-              >View All Projects →</AstroButton
-            >
-          </a>
-        </div>
-      </div>
-    </FeaturedProjectsWaveBG>
-  </section>
-
-  <!-- Recent Experience Section -->
-  <section class="bg-brand-dark py-24">
-    <div class="container mx-auto px-6">
-      <div class="mb-16 text-center">
-        <h2
-          class="font-heading text-brand-light mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase"
-        >
-          Recent Experience
-        </h2>
-        <p class="text-brand-light/80 mx-auto max-w-2xl text-xl">
-          My journey spans from agency work at experiential marketing firms to
-          freelance development, giving me a unique perspective on both
-          technical and business challenges.
-        </p>
-      </div>
-      <div class="mx-auto max-w-4xl space-y-8">
-        {
-          sortedJobs.slice(0, 3).map((job) => (
+  {
+    indexPage.data.layout.showAboutSection && (
+      <section class="bg-brand-dark py-24">
+        <div class="container mx-auto px-6">
+          <div class="mx-auto max-w-4xl text-center">
+            <h2 class="font-heading text-brand-light mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
+              {indexPage.data.about.title}
+            </h2>
             <div class="card-dark">
-              <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
-                <div>
-                  <h3 class="font-heading text-brand-light text-2xl font-black uppercase">
-                    {job.data.title}
+              {indexPage.data.about.introduction && (
+                <div
+                  class="text-brand-light mb-6 text-xl leading-relaxed font-bold"
+                  set:html={parseMarkdown(indexPage.data.about.introduction)}
+                />
+              )}
+              {indexPage.data.about.description && (
+                <div
+                  class="text-brand-light/80 text-lg leading-relaxed font-medium"
+                  set:html={parseMarkdown(indexPage.data.about.description)}
+                />
+              )}
+              {indexPage.data.about.experience && (
+                <div
+                  class="text-brand-light/80 text-lg leading-relaxed font-medium"
+                  set:html={parseMarkdown(indexPage.data.about.experience)}
+                />
+              )}
+              {indexPage.data.about.additional && (
+                <div
+                  class="text-brand-light/80 text-lg leading-relaxed font-medium"
+                  set:html={parseMarkdown(indexPage.data.about.additional)}
+                />
+              )}
+              {indexPage.data.about.showSkillsTicker && (
+                <>
+                  <h3 class="text-brand-light mt-8 text-2xl font-bold">
+                    Featured Skills:
                   </h3>
-                  <p class="text-brand-light/80 text-xl">
-                    {getCompanyName(job.data.company, workCompanies)}
-                  </p>
-                </div>
-                <div class="mt-2 text-right md:mt-0">
-                  <p class="text-brand-light/60 font-bold">
-                    {formatDate(job.data.startDate)} -
-                    {job.data.endDate
-                      ? formatDate(job.data.endDate)
-                      : 'Present'}
-                  </p>
-                </div>
-              </div>
-              {job.data.description && (
-                <p class="text-brand-light mb-4">{job.data.description}</p>
-              )}
-              {job.data.highlights && job.data.highlights.length > 0 && (
-                <ul class="mb-4 list-inside list-disc space-y-1">
-                  {job.data.highlights.slice(0, 3).map((highlight: string) => (
-                    <li class="text-brand-light/80">{highlight}</li>
-                  ))}
-                </ul>
-              )}
-              {job.data.workSkills && job.data.workSkills.length > 0 && (
-                <div class="flex flex-wrap gap-2">
-                  {job.data.workSkills.map((skillKey: string) => {
-                    const skill = workSkills.find((s) => s.id === skillKey);
-                    return skill ? (
-                      <span class="pill pill-skill">{skill.data.title}</span>
-                    ) : null;
-                  })}
-                </div>
+                  <SkillsTicker skills={featuredSkills} client:load />
+                </>
               )}
             </div>
-          ))
-        }
-      </div>
-      <div class="mt-12 text-center">
-        <a href="/work">
-          <AstroButton variant="secondary" size="lg"
-            >View Full Work History →</AstroButton
-          >
-        </a>
-      </div>
-    </div>
-  </section>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Featured Projects Section -->
+  {
+    indexPage.data.layout.showFeaturedProjects && (
+      <section class="bg-brand-light relative min-h-[600px]">
+        <FeaturedProjectsWaveBG
+          className="absolute inset-0 z-0 h-full w-full py-24"
+          client:load
+        >
+          <div class="relative z-10 container mx-auto px-6">
+            <div class="mb-16 text-center">
+              <h2 class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
+                {indexPage.data.featuredProjects.title}
+              </h2>
+              {indexPage.data.featuredProjects.subtitle && (
+                <div
+                  class="text-brand-dark/80 mx-auto max-w-2xl text-xl"
+                  set:html={parseMarkdown(
+                    indexPage.data.featuredProjects.subtitle
+                  )}
+                />
+              )}
+            </div>
+            {JSON.stringify(indexPage.data.recentExperience.selectedJobs)}
+            <div class="grid gap-8 lg:grid-cols-2">
+              {featuredProjects.map((project) => (
+                <ProjectCard
+                  project={project}
+                  skills={workSkills}
+                  variant="light"
+                />
+              ))}
+            </div>
+            {indexPage.data.featuredProjects.showViewAllButton && (
+              <div class="mt-12 text-center">
+                <a href={indexPage.data.featuredProjects.viewAllButtonLink}>
+                  <AstroButton variant="primary" size="lg">
+                    {indexPage.data.featuredProjects.viewAllButtonText}
+                  </AstroButton>
+                </a>
+              </div>
+            )}
+          </div>
+        </FeaturedProjectsWaveBG>
+      </section>
+    )
+  }
+
+  <!-- Recent Experience Section -->
+  {
+    indexPage.data.layout.showRecentExperience && (
+      <section class="bg-brand-dark py-24">
+        <div class="container mx-auto px-6">
+          <div class="mb-16 text-center">
+            <h2 class="font-heading text-brand-light mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
+              {indexPage.data.recentExperience.title}
+            </h2>
+            {indexPage.data.recentExperience.subtitle && (
+              <div
+                class="text-brand-light/80 mx-auto max-w-2xl text-xl"
+                set:html={parseMarkdown(
+                  indexPage.data.recentExperience.subtitle
+                )}
+              />
+            )}
+          </div>
+          <div class="mx-auto max-w-4xl space-y-8">
+            {recentJobs.map((job) => (
+              <div class="card-dark">
+                <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <h3 class="font-heading text-brand-light text-2xl font-black uppercase">
+                      {job.data.title}
+                    </h3>
+                    <p class="text-brand-light/80 text-xl">
+                      {getCompanyName(job.data.company, workCompanies)}
+                    </p>
+                  </div>
+                  <div class="mt-2 text-right md:mt-0">
+                    <p class="text-brand-light/60 font-bold">
+                      {formatDate(job.data.startDate)} -
+                      {job.data.endDate
+                        ? formatDate(job.data.endDate)
+                        : 'Present'}
+                    </p>
+                  </div>
+                </div>
+                {job.data.description && (
+                  <div
+                    class="text-brand-light mb-4"
+                    set:html={parseMarkdown(job.data.description)}
+                  />
+                )}
+                {job.data.highlights && job.data.highlights.length > 0 && (
+                  <ul class="mb-4 list-inside list-disc space-y-1">
+                    {job.data.highlights
+                      .slice(0, 3)
+                      .map((highlight: string) => (
+                        <li class="text-brand-light/80">{highlight}</li>
+                      ))}
+                  </ul>
+                )}
+                {job.data.workSkills && job.data.workSkills.length > 0 && (
+                  <div class="flex flex-wrap gap-2">
+                    {job.data.workSkills.map((skillKey: string) => {
+                      const skill = workSkills.find((s) => s.id === skillKey);
+                      return skill ? (
+                        <span class="pill pill-skill">{skill.data.title}</span>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          {indexPage.data.recentExperience.showViewAllButton && (
+            <div class="mt-12 text-center">
+              <a href={indexPage.data.recentExperience.viewAllButtonLink}>
+                <AstroButton variant="secondary" size="lg">
+                  {indexPage.data.recentExperience.viewAllButtonText}
+                </AstroButton>
+              </a>
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
 
   <!-- Let's Connect Section -->
-  <section class="bg-brand-dark py-24">
-    <div class="container mx-auto px-6">
-      <div class="mx-auto max-w-4xl text-center">
-        <h2
-          class="font-heading text-brand-light mb-8 p-6 text-5xl font-black tracking-tight uppercase"
-        >
-          Let's Work Together
-        </h2>
-        <p class="text-brand-light/80 mx-auto mb-12 max-w-2xl text-xl">
-          Ready to build something amazing? Whether you have a project in mind
-          or just want to chat about possibilities, I'd love to hear from you.
-        </p>
-        <div class="card bg-brand-light">
-          <ContactForm client:load />
+  {
+    indexPage.data.layout.showContactSection && (
+      <section class="bg-brand-dark py-24">
+        <div class="container mx-auto px-6">
+          <div class="mx-auto max-w-4xl text-center">
+            <h2 class="font-heading text-brand-light mb-8 p-6 text-5xl font-black tracking-tight uppercase">
+              {indexPage.data.contact.title}
+            </h2>
+            {indexPage.data.contact.subtitle && (
+              <div
+                class="text-brand-light/80 mx-auto mb-12 max-w-2xl text-xl"
+                set:html={parseMarkdown(indexPage.data.contact.subtitle)}
+              />
+            )}
+            {indexPage.data.contact.showContactForm && (
+              <div class="card bg-brand-light">
+                <ContactForm client:load />
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
+    )
+  }
 </HomeLayout>

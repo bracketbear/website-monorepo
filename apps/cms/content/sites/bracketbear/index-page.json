@@ -1,0 +1,67 @@
+{
+  "title": "Bracket Bear - Creative Technology Studio",
+  "content": "# Welcome to Bracket Bear\n\nWe're a creative technology studio specializing in experiential marketing and interactive installations.",
+  "metaTitle": "Bracket Bear - Creative Technology Studio",
+  "metaDescription": "Creative technology studio specializing in experiential marketing, interactive installations, and digital experiences.",
+  "canonicalUrl": "https://bracketbear.com/",
+  "ogImage": "bracketbear-hero.jpg",
+  "noIndex": false,
+  "hero": {
+    "title": "Bracket Bear",
+    "subtitle": "Creative Technology Studio",
+    "description": "Building immersive digital experiences",
+    "showParticleBackground": true
+  },
+  "about": {
+    "title": "What We Do",
+    "introduction": "We're a creative technology studio that specializes in experiential marketing and interactive installations.",
+    "description": "Our team combines cutting-edge technology with creative storytelling to create unforgettable brand experiences.\n\nWe work with brands, agencies, and venues to bring their visions to life through interactive installations, digital experiences, and immersive environments.",
+    "experience": "With years of experience in the experiential marketing industry, we understand what it takes to create moments that matter.",
+    "additional": "We specialize in **interactive installations**, **digital experiences**, and **immersive environments**.",
+    "showSkillsTicker": true,
+    "featuredSkills": [
+      "react",
+      "typescript",
+      "pixi"
+    ]
+  },
+  "featuredProjects": {
+    "title": "Featured Work",
+    "subtitle": "Our portfolio showcases the diverse range of experiences we've created for clients across various industries.\n\nEach project represents our commitment to innovation and creative excellence.",
+    "maxDisplay": 2,
+    "showViewAllButton": true,
+    "viewAllButtonText": "View All Work →",
+    "viewAllButtonLink": "/work",
+    "selectedProjects": [
+      "ds-elekta",
+      "ds-pwc"
+    ]
+  },
+  "recentExperience": {
+    "title": "Our Services",
+    "subtitle": "We offer a comprehensive range of creative technology services to help brands create meaningful connections with their audiences.\n\nFrom concept to execution, we handle every aspect of your project.",
+    "maxDisplay": 2,
+    "showViewAllButton": true,
+    "viewAllButtonText": "Learn More →",
+    "viewAllButtonLink": "/services",
+    "selectedJobs": []
+  },
+  "contact": {
+    "title": "Let's Create Something Amazing",
+    "subtitle": "Ready to bring your vision to life? We'd love to discuss your project and explore how we can help you create an unforgettable experience.",
+    "showContactForm": true
+  },
+  "layout": {
+    "hideContactForm": true,
+    "showHeroSection": true,
+    "showAboutSection": true,
+    "showFeaturedProjects": true,
+    "showRecentExperience": true,
+    "showContactSection": true
+  },
+  "seo": {
+    "structuredData": true,
+    "enableAnalytics": true,
+    "preloadCriticalAssets": true
+  }
+} 
