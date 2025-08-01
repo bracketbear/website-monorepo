@@ -23,7 +23,11 @@
       "./types/svg"
     ],
   },
-  "include": ["src/**/*", "types/**/*"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "types/**/*"
+  ],
   "exclude": [
     "node_modules",
     "dist",
