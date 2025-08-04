@@ -18,5 +18,10 @@
     "html",
     "css"
   ],
-  "summary": "The project that I thought would change the way we looked at an experiential CMS."
+  "summary": "The project that I thought would change the way we looked at an experiential CMS.",
+  "cta": {
+    "text": "Want to create an experience that enhances your brand and delights your customers? Let's build something that'll make your business the talk of the town!",
+    "buttonText": "Enhance Your Brand",
+    "buttonLink": "/contact"
+  }
 }

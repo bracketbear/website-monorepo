@@ -1,0 +1,19 @@
+{
+  "title": "Project Page Template",
+  "metaDescription": "Template for individual project pages",
+  "sectionHeadings": {
+    "company": "Company",
+    "duration": "Duration",
+    "role": "Role",
+    "technologies": "Technologies",
+    "overview": "About This Project",
+    "challenges": "Challenges & Solutions",
+    "results": "Results Achieved",
+    "gallery": "Project Gallery"
+  },
+  "defaultCTA": {
+    "text": "I'd love to discuss how I can help with your project.",
+    "buttonText": "Get in Touch",
+    "buttonLink": "/contact"
+  }
+}

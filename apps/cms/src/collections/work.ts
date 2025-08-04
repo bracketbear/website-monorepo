@@ -199,6 +199,29 @@ export const workCollections = {
         description: 'Select the skills that belong to this project',
         collection: 'workSkills',
       }),
+      cta: fields.object(
+        {
+          text: fields.text({
+            label: 'CTA Text',
+            description: 'Custom call-to-action text for this project',
+            multiline: true,
+          }),
+          buttonText: fields.text({
+            label: 'Button Text',
+            description: 'Text for the CTA button',
+            defaultValue: 'Get in Touch',
+          }),
+          buttonLink: fields.text({
+            label: 'Button Link',
+            description: 'Link for the CTA button',
+            defaultValue: '/contact',
+          }),
+        },
+        {
+          label: 'Call to Action',
+          description: 'Custom CTA for this project page',
+        }
+      ),
     },
   }),
 };

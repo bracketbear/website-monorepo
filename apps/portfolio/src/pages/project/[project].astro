@@ -1,12 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
-import { DetailBlock, SummaryBlock } from '@bracketbear/core';
-import type { LabelValue } from '@bracketbear/core';
 import { getProjectImageUrl } from '@bracketbear/astro-content';
 import { getKeyedCollection } from '@/utils/content';
 import { getBreadcrumbs } from '@/config/breadcrumbs';
-import ContentLayout from '../../layouts/ContentLayout.astro';
+import { generatePortfolioMetaTitle } from '@/config/meta-title';
+import HeroLayout from '@/layouts/HeroLayout.astro';
 import { Picture } from 'astro:assets';
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -16,12 +15,18 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }));
 };
 
+// Get all collections
 const workJobs = await getCollection('workJobs');
 const workSkills = await getCollection('workSkills');
 const workProject = await getCollection('workProject');
 const workCompanies = await getKeyedCollection('workCompany');
 const projectCategories = await getCollection('workProjectCategory');
+const portfolioProjectPageEntries = await getCollection('portfolioProjectPage');
 
+// Get the project page singleton
+const projectPage = portfolioProjectPageEntries[0];
+
+// Get the current project
 const workProjectItem = workProject.find(
   (project) => project.id === Astro.params.project
 );
@@ -35,31 +40,85 @@ const job = workJobs.find((job) => job.id === workProjectItem.data.job);
 const category = projectCategories.find(
   (category) => category.id === workProjectItem.data.category
 );
-// Get skills in the order set in Keystatic
 const projectSkills = (workProjectItem.data.skills ?? [])
-  .map((skillId) => workSkills.find((s) => s.id === skillId))
+  .map((skillId: string) => workSkills.find((s) => s.id === skillId))
   .filter(Boolean);
 
 const companyTitle =
   job !== undefined ? workCompanies[job.data.company].data.title : 'Unknown';
 
-const detailBlockContent: Partial<LabelValue>[] = [
-  {
-    label: 'Company',
-    value: companyTitle,
-  },
-  {
-    label: 'Role',
-    value: job?.data.title,
-  },
-  {
-    label: 'Technologies Used',
-    value: projectSkills
-      .map((skill) => skill?.data.title)
-      .filter(Boolean)
-      .join(', '),
-  },
-];
+// Generate dynamic metadata
+const _metaTitle = generatePortfolioMetaTitle(workProjectItem.data.title);
+const metaDescription =
+  workProjectItem.data.summary ||
+  workProjectItem.data.description?.slice(0, 160) ||
+  `Learn about ${workProjectItem.data.title} - a project by Harrison Callahan`;
+
+// Get cover image (unused for now)
+let _coverImage: string | undefined;
+if (workProjectItem.data.coverImage) {
+  try {
+    _coverImage = getProjectImageUrl(
+      workProjectItem.id,
+      workProjectItem.data.coverImage
+    );
+  } catch (error) {
+    console.warn(
+      `Failed to load cover image for project ${workProjectItem.id}:`,
+      error
+    );
+  }
+}
+
+// Generate witty CTA based on project data
+function generateWittyCTA(project: any, job: any, company: string): string {
+  const projectTitle = project.data.title.toLowerCase();
+  const _companyName = company.toLowerCase();
+
+  // Witty CTAs based on project type and company
+  if (projectTitle.includes('museum') || projectTitle.includes('experience')) {
+    return "Want to create something that makes people go 'wow'? Let's build an experience that'll have your users raving about it!";
+  }
+
+  if (projectTitle.includes('cms') || projectTitle.includes('content')) {
+    return "Tired of fighting with your content management system? Let's build one that actually works (and doesn't make you want to throw your computer out the window).";
+  }
+
+  if (projectTitle.includes('bridge') || projectTitle.includes('connection')) {
+    return 'Need to connect systems that hate each other? I specialize in digital diplomacy - making your tech stack play nice together.';
+  }
+
+  if (company.includes('deeplocal')) {
+    return "Want to create something as weird and wonderful as the projects I built at DeepLocal? Let's make something that makes people stop and stare!";
+  }
+
+  if (company.includes('downstream')) {
+    return "Need someone who can turn complex business problems into elegant solutions? Let's build something that actually makes sense to your users.";
+  }
+
+  if (project.data.isFeatured) {
+    return "This was one of my favorite projects - want to create something equally awesome? Let's build something that'll make your competitors jealous!";
+  }
+
+  // Default witty CTA
+  return "Ready to build something that doesn't suck? Let's create something that'll make your users actually want to use your product!";
+}
+
+const wittyCTA = generateWittyCTA(workProjectItem, job, companyTitle);
+
+// Use project-specific CTA if available, otherwise use CMS default, then fallback to witty CTA
+const ctaText =
+  workProjectItem.data.cta?.text ||
+  projectPage?.data.defaultCTA?.text ||
+  wittyCTA;
+const ctaButtonText =
+  workProjectItem.data.cta?.buttonText ||
+  projectPage?.data.defaultCTA?.buttonText ||
+  'Get in Touch';
+const ctaButtonLink =
+  workProjectItem.data.cta?.buttonLink ||
+  projectPage?.data.defaultCTA?.buttonLink ||
+  '/contact';
 
 const breadcrumbs = getBreadcrumbs(
   {
@@ -71,127 +130,197 @@ const breadcrumbs = getBreadcrumbs(
     href: `/project/${workProjectItem.id}`,
   }
 );
-
-// Get cover image using the new getProjectImageUrl function
-let coverImage: string | undefined;
-if (workProjectItem.data.coverImage) {
-  try {
-    coverImage = getProjectImageUrl(
-      workProjectItem.id,
-      workProjectItem.data.coverImage
-    );
-  } catch (error) {
-    console.warn(
-      `Failed to load cover image for project ${workProjectItem.id}:`,
-      error
-    );
-  }
-}
 ---
 
-<ContentLayout
+<HeroLayout
+  pageTitle={workProjectItem.data.title}
   title={workProjectItem.data.title}
+  subtitle={category?.data.title}
+  description={workProjectItem.data.summary}
   breadcrumbs={breadcrumbs}
-  contentWidth="narrow"
+  animationPreset="curious-particle-network"
+  contactCTA={{
+    text: ctaText,
+    buttonText: ctaButtonText,
+    buttonLink: ctaButtonLink,
+  }}
+  metaDescription={metaDescription}
 >
-  <!-- Title Pills -->
-  <span slot="title-pills" class="pill pill-category">
-    {category?.data.title}
-  </span>
-  {
-    workProjectItem.data.isFeatured && (
-      <span slot="title-pills" class="pill pill-featured">
-        Featured Project
-      </span>
-    )
-  }
-
-  <!-- Cover Image -->
-  <div
-    slot="cover-image"
-    class="bg-brand-dark border-brand-orange flex aspect-[4/3] w-80 max-w-2xl overflow-hidden rounded-xl border-2"
-  >
-    {
-      coverImage ? (
-        <Picture
-          src={coverImage}
-          alt={workProjectItem.data.title + ' cover'}
-          class="h-full w-full object-cover"
-          width={1000}
-          height={1000}
-          formats={['avif', 'webp']}
-          layout="full-width"
-          fit="cover"
-        />
-      ) : (
-        <span class="text-brand-yellow font-mono text-xs opacity-60">
-          [No Cover Image]
-        </span>
-      )
-    }
-  </div>
-
-  <!-- Summary -->
-  {
-    workProjectItem.data.summary && (
-      <SummaryBlock slot="summary" content={workProjectItem.data.summary} />
-    )
-  }
-
-  <!-- Detail Blocks -->
-  {
-    detailBlockContent.map((detail) => (
-      <DetailBlock
-        slot="detail-blocks"
-        label={detail.label || ''}
-        value={detail.value || ''}
-      />
-    ))
-  }
-
-  <!-- Main Content Grid -->
-  <div class="w-full gap-12">
-    <!-- Main Content -->
-    <div class="mb-12 flex flex-col gap-12">
-      <!-- About This Project -->
-      {
-        workProjectItem.data.description?.trim() !== '' && (
-          <div class="styled-section">
-            <h2 class="font-heading mb-4 text-3xl font-black tracking-tight uppercase">
-              About This Project
-            </h2>
-            <p class="text-foreground text-lg leading-relaxed font-medium">
-              {workProjectItem.data.description}
+  <!-- Project Info Section -->
+  <section class="mb-40 px-6">
+    <div class="container mx-auto">
+      <div class="mx-auto max-w-4xl">
+        <div class="mb-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          {
+            job !== undefined && (
+              <div class="text-center">
+                <h4 class="mb-2 text-sm font-black text-white/70 uppercase">
+                  {projectPage?.data.sectionHeadings?.company || 'Company'}
+                </h4>
+                <p class="text-lg font-bold text-white">{companyTitle}</p>
+              </div>
+            )
+          }
+          <div class="text-center">
+            <h4 class="mb-2 text-sm font-black text-white/70 uppercase">
+              {projectPage?.data.sectionHeadings?.duration || 'Duration'}
+            </h4>
+            <p class="text-lg font-bold text-white">
+              {workProjectItem.data.duration}
             </p>
           </div>
-        )
-      }
-      <!-- Challenges & Solutions -->
-      {
-        workProjectItem.data.challengesAndSolutions?.trim() !== '' && (
-          <div class="styled-section">
-            <h2 class="font-heading mb-4 text-3xl font-black tracking-tight uppercase">
-              Challenges & Solutions
-            </h2>
-            <p class="text-lg leading-relaxed font-medium text-black">
-              {workProjectItem.data.challengesAndSolutions}
-            </p>
-          </div>
-        )
-      }
-      <!-- Results -->
-      {
-        workProjectItem.data.resultsAchieved?.trim() !== '' && (
-          <div class="styled-section">
-            <h2 class="font-heading mb-4 text-3xl font-black tracking-tight uppercase">
-              Results Achieved
-            </h2>
-            <p class="text-lg leading-relaxed font-medium text-black">
-              {workProjectItem.data.resultsAchieved}
-            </p>
-          </div>
-        )
-      }
+          {
+            job !== undefined && (
+              <div class="text-center">
+                <h4 class="mb-2 text-sm font-black text-white/70 uppercase">
+                  {projectPage?.data.sectionHeadings?.role || 'Role'}
+                </h4>
+                <p class="text-lg font-bold text-white">{job.data.title}</p>
+              </div>
+            )
+          }
+          {
+            projectSkills.length > 0 && (
+              <div class="text-center">
+                <h4 class="mb-2 text-sm font-black text-white/70 uppercase">
+                  {projectPage?.data.sectionHeadings?.technologies ||
+                    'Technologies'}
+                </h4>
+                <div class="flex flex-wrap justify-center gap-2">
+                  {projectSkills.slice(0, 3).map((skill: any) => (
+                    <span class="rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white">
+                      {skill?.data.title}
+                    </span>
+                  ))}
+                  {projectSkills.length > 3 && (
+                    <span class="rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white">
+                      +{projectSkills.length - 3} more
+                    </span>
+                  )}
+                </div>
+              </div>
+            )
+          }
+        </div>
+        {
+          workProjectItem.data.isFeatured === true && (
+            <div class="text-center">
+              <span class="bg-brand-red px-4 py-2 text-sm font-black text-white">
+                Featured Project
+              </span>
+            </div>
+          )
+        }
+      </div>
     </div>
-  </div>
-</ContentLayout>
+  </section>
+
+  <!-- Main Content -->
+  <section class="mb-40 px-6">
+    <div class="container mx-auto">
+      <div class="mx-auto max-w-4xl">
+        <div class="space-y-16">
+          <!-- Description -->
+          {
+            workProjectItem.data.description?.trim() !== '' && (
+              <div>
+                <h2 class="font-heading mb-8 text-3xl font-black tracking-tight text-white uppercase">
+                  {projectPage?.data.sectionHeadings?.overview ||
+                    'About This Project'}
+                </h2>
+                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90">
+                  <p>{workProjectItem.data.description}</p>
+                </div>
+              </div>
+            )
+          }
+
+          <!-- Challenges & Solutions -->
+          {
+            workProjectItem.data.challengesAndSolutions?.trim() !== '' && (
+              <div>
+                <h2 class="font-heading mb-8 text-3xl font-black tracking-tight text-white uppercase">
+                  {projectPage?.data.sectionHeadings?.challenges ||
+                    'Challenges & Solutions'}
+                </h2>
+                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90">
+                  <p>{workProjectItem.data.challengesAndSolutions}</p>
+                </div>
+              </div>
+            )
+          }
+
+          <!-- Results -->
+          {
+            workProjectItem.data.resultsAchieved?.trim() !== '' && (
+              <div>
+                <h2 class="font-heading mb-8 text-3xl font-black tracking-tight text-white uppercase">
+                  {projectPage?.data.sectionHeadings?.results ||
+                    'Results Achieved'}
+                </h2>
+                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90">
+                  <p>{workProjectItem.data.resultsAchieved}</p>
+                </div>
+              </div>
+            )
+          }
+
+          <!-- Media Gallery -->
+          {
+            (workProjectItem.data.media ?? []).length > 0 && (
+              <div>
+                <h2 class="font-heading mb-8 text-3xl font-black tracking-tight text-white uppercase">
+                  {projectPage?.data.sectionHeadings?.gallery ||
+                    'Project Gallery'}
+                </h2>
+                {workProjectItem.data.mediaDescription && (
+                  <p class="mb-8 text-lg text-white/90">
+                    {workProjectItem.data.mediaDescription}
+                  </p>
+                )}
+                <div class="grid grid-cols-2 gap-6 md:grid-cols-3">
+                  {(workProjectItem.data.media ?? []).map(
+                    async (mediaItem: any) => {
+                      if (!mediaItem?.image) return null;
+
+                      let imageUrl: string;
+                      try {
+                        imageUrl = getProjectImageUrl(
+                          workProjectItem.id,
+                          mediaItem.image
+                        );
+                      } catch (error) {
+                        console.warn(
+                          `Failed to load media image: ${mediaItem.image}`,
+                          error
+                        );
+                        return null;
+                      }
+
+                      return (
+                        <div class="aspect-video overflow-hidden rounded-lg">
+                          <Picture
+                            src={imageUrl}
+                            alt={
+                              mediaItem.caption || workProjectItem.data.title
+                            }
+                            class="h-full w-full object-cover"
+                            width={400}
+                            height={300}
+                            formats={['avif', 'webp']}
+                            layout="full-width"
+                            fit="cover"
+                          />
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
+              </div>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</HeroLayout>

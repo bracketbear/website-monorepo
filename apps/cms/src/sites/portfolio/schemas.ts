@@ -533,7 +533,8 @@ export const portfolioProjectsPageSchema = makePageSchema({
     fields.object({
       title: fields.text({
         label: 'Category Title',
-        description: 'Title for this project category (e.g., "Experiential Engineering")',
+        description:
+          'Title for this project category (e.g., "Experiential Engineering")',
       }),
       description: fields.text({
         label: 'Category Description',
@@ -573,6 +574,79 @@ export const portfolioProjectsPageSchema = makePageSchema({
     }),
     buttonLink: fields.text({
       label: 'Button Link',
+      defaultValue: '/contact',
+    }),
+  }),
+});
+
+/**
+ * Portfolio Project Page Schema
+ *
+ * This schema defines the individual project page structure for the portfolio site.
+ * It includes customizable section headings and CTAs while allowing dynamic content
+ * from the project data.
+ */
+export const portfolioProjectPageSchema = makePageSchema({
+  // Section headings that can be customized
+  sectionHeadings: fields.object({
+    // Top info bar labels
+    company: fields.text({
+      label: 'Company Label',
+      description: 'Label for the company field in the top info bar',
+      defaultValue: 'Company',
+    }),
+    duration: fields.text({
+      label: 'Duration Label',
+      description: 'Label for the duration field in the top info bar',
+      defaultValue: 'Duration',
+    }),
+    role: fields.text({
+      label: 'Role Label',
+      description: 'Label for the role field in the top info bar',
+      defaultValue: 'Role',
+    }),
+    technologies: fields.text({
+      label: 'Technologies Label',
+      description: 'Label for the technologies field in the top info bar',
+      defaultValue: 'Technologies',
+    }),
+    // Main content section headings
+    overview: fields.text({
+      label: 'Overview Section Title',
+      description: 'Title for the project overview section',
+      defaultValue: 'About This Project',
+    }),
+    challenges: fields.text({
+      label: 'Challenges Section Title',
+      description: 'Title for the challenges and solutions section',
+      defaultValue: 'Challenges & Solutions',
+    }),
+    results: fields.text({
+      label: 'Results Section Title',
+      description: 'Title for the results achieved section',
+      defaultValue: 'Results Achieved',
+    }),
+    gallery: fields.text({
+      label: 'Gallery Section Title',
+      description: 'Title for the project gallery section',
+      defaultValue: 'Project Gallery',
+    }),
+  }),
+
+  // Default CTA (can be overridden by project-specific CTA)
+  defaultCTA: fields.object({
+    text: fields.text({
+      label: 'Default CTA Text',
+      description: 'Default call-to-action text for project pages',
+      multiline: true,
+      defaultValue: "I'd love to discuss how I can help with your project.",
+    }),
+    buttonText: fields.text({
+      label: 'Default Button Text',
+      defaultValue: 'Get in Touch',
+    }),
+    buttonLink: fields.text({
+      label: 'Default Button Link',
       defaultValue: '/contact',
     }),
   }),

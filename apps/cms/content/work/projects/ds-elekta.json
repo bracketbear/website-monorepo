@@ -18,5 +18,10 @@
     "html",
     "css"
   ],
-  "summary": "The project that I thought would change the way we looked at an experiential CMS."
+  "summary": "The project that I thought would change the way we looked at an experiential CMS.",
+  "cta": {
+    "text": "Want to create something that makes people go 'wow'? Let's build an experience that'll have your clients raving about it!",
+    "buttonText": "Create the Wow Factor",
+    "buttonLink": "/contact"
+  }
 }

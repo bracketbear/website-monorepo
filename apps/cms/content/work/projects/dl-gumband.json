@@ -23,5 +23,10 @@
     "storybook",
     "express",
     "sequelize"
-  ]
+  ],
+  "cta": {
+    "text": "Tired of fighting with your content management system? Let's build one that actually works (and doesn't make you want to throw your computer out the window).",
+    "buttonText": "Build a Better CMS",
+    "buttonLink": "/contact"
+  }
 }

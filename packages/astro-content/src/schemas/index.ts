@@ -38,3 +38,4 @@ export { indexPageSchema, type IndexPageData } from './index-page';
 export * from './about-page';
 export * from './work-page';
 export * from './projects-page';
+export * from './project-page';

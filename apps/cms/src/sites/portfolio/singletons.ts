@@ -5,6 +5,7 @@ import {
   portfolioIndexPageSchema,
   portfolioWorkPageSchema,
   portfolioProjectsPageSchema,
+  portfolioProjectPageSchema,
 } from './schemas';
 
 const siteSingletonPath = (singletonName: string) =>
@@ -46,6 +47,12 @@ export const portfolioSingletons = {
     label: 'Portfolio Projects Page',
     path: siteSingletonPath('projects-page'),
     schema: portfolioProjectsPageSchema,
+    format: 'json',
+  }),
+  portfolioProjectPage: singleton({
+    label: 'Portfolio Project Page Template',
+    path: siteSingletonPath('project-page'),
+    schema: portfolioProjectPageSchema,
     format: 'json',
   }),
 };

@@ -15,5 +15,10 @@
     "photoshop",
     "git"
   ],
-  "summary": "The project that I thought would change the way we looked at an experiential CMS."
+  "summary": "The project that I thought would change the way we looked at an experiential CMS.",
+  "cta": {
+    "text": "Want to create an interactive experience that makes people stop and stare? Let's build something that'll have your visitors talking about it for weeks!",
+    "buttonText": "Create the Experience",
+    "buttonLink": "/contact"
+  }
 }

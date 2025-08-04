@@ -15,5 +15,10 @@
     "rust",
     "typescript",
     "tailwind-css"
-  ]
+  ],
+  "cta": {
+    "text": "Need to connect systems that hate each other? I specialize in digital diplomacy - making your tech stack play nice together.",
+    "buttonText": "Bridge Your Systems",
+    "buttonLink": "/contact"
+  }
 }

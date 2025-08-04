@@ -16,5 +16,10 @@
     "tailwind-css",
     "git",
     "javascript"
-  ]
+  ],
+  "cta": {
+    "text": "Need to modernize your e-commerce platform? Let's build something that actually converts visitors into customers (instead of just confusing them).",
+    "buttonText": "Modernize Your Store",
+    "buttonLink": "/contact"
+  }
 }
