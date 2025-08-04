@@ -8,13 +8,6 @@ import { makePageSchema } from './page';
  * It includes sections for introducing the work history and filtering tools.
  */
 export const portfolioWorkPageSchema = makePageSchema({
-  // Hero / intro block
-  hero: z.object({
-    title: z.string(),
-    subtitle: z.string().optional(),
-    description: z.string().optional(),
-    showParticleBackground: z.boolean().default(true),
-  }),
 
   // Introduction section
   introduction: z.object({

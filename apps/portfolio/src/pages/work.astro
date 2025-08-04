@@ -25,15 +25,12 @@ function parseMarkdown(content: string): string {
 ---
 
 <HeroLayout
+  pageTitle={workPage.data.title}
   title={workPage.data.title}
-  hero={{
-    title: workPage.data.hero.title,
-    subtitle: workPage.data.hero.subtitle,
-    description: workPage.data.hero.description,
-    showParticleBackground: workPage.data.hero.showParticleBackground,
-  }}
+  subtitle={workPage.data.subtitle}
   breadcrumbs={breadcrumbs}
   animationPreset="curious-particle-network"
+  contactCTA={workPage.data.contactCTA}
 >
   <!-- Introduction Section -->
   <section class="mb-40 px-6">
@@ -82,20 +79,5 @@ function parseMarkdown(content: string): string {
       companies={workCompanies}
       client:load
     />
-  </div>
-
-  <!-- Contact CTA Section -->
-  <div class="mb-40 px-6">
-    <div class="mx-auto max-w-4xl text-center">
-      <p class="mb-8 text-xl leading-relaxed font-medium text-white/90">
-        {workPage.data.contactCTA.text}
-      </p>
-      <a
-        href={workPage.data.contactCTA.buttonLink}
-        class="button button-primary button-lg"
-      >
-        {workPage.data.contactCTA.buttonText}
-      </a>
-    </div>
   </div>
 </HeroLayout>

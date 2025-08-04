@@ -156,10 +156,10 @@ function parseMarkdown(content: string): string {
   <HeroSection
     className="h-screen w-full"
     client:load
-    title={indexPage.data.hero.title}
-    subtitle={indexPage.data.hero.subtitle}
-    description={indexPage.data.hero.description}
-    showParticleBackground={indexPage.data.hero.showParticleBackground}
+    title={indexPage.data.title}
+    subtitle={indexPage.data.subtitle}
+    description={indexPage.data.hero?.description}
+    showParticleBackground={indexPage.data.hero?.showParticleBackground}
   />
 
   <!-- What I Do Section -->

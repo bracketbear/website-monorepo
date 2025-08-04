@@ -1,13 +1,8 @@
 {
   "title": "Work History",
-
+  "subtitle": "A decade of building digital experiences",
   "metaDescription": "Explore my work experience and projects across different roles and industries.",
   "noIndex": false,
-  "hero": {
-    "title": "Work History",
-    "subtitle": "A decade of building digital experiences",
-    "showParticleBackground": true
-  },
   "introduction": {
     "title": "My Experience",
     "content": "I've been working as a software engineer for over 10 years. I've worked in a variety of roles, from a solo developer to a team of 12+ engineers. I've worked in a variety of industries, from startups to large corporations."

@@ -9,57 +9,30 @@ import { makePageSchema } from '../../schemas/page';
  * and work philosophy that makes sense for a developer portfolio.
  */
 export const portfolioAboutPageSchema = makePageSchema({
-  // Hero / intro block
-  hero: fields.object({
-    title: fields.text({
-      label: 'Hero Title',
-      description: 'Main headline for the about page',
-    }),
-    subtitle: fields.text({
-      label: 'Hero Subtitle',
-      description: 'Optional subtitle below the main title',
-    }),
-    description: fields.text({
-      label: 'Hero Description',
-      description: 'Optional description text',
-      multiline: true,
-    }),
-    ctaText: fields.text({
-      label: 'CTA Button Text',
-      description: 'Optional call-to-action button text',
-    }),
-    ctaHref: fields.text({
-      label: 'CTA Button Link',
-      description: 'Optional call-to-action button link',
-    }),
-    stats: fields.array(
-      fields.object({
-        label: fields.text({
-          label: 'Stat Label',
-          description: 'Label for the stat (e.g., "Years Experience")',
-        }),
-        value: fields.text({
-          label: 'Stat Value',
-          description: 'Value for the stat (e.g., "10+")',
-        }),
-        description: fields.text({
-          label: 'Stat Description',
-          description: 'Optional description for the stat',
-        }),
+  // Stats section
+  stats: fields.array(
+    fields.object({
+      label: fields.text({
+        label: 'Stat Label',
+        description: 'Label for the stat (e.g., "Years Experience")',
       }),
-      {
-        label: 'Header Stats',
-        description: 'Optional stats to display in the header',
-        itemLabel: (props) =>
-          `${props.fields.label.value}: ${props.fields.value.value}` ||
-          'New Stat',
-      }
-    ),
-    showParticleBackground: fields.checkbox({
-      label: 'Show Particle Background',
-      defaultValue: true,
+      value: fields.text({
+        label: 'Stat Value',
+        description: 'Value for the stat (e.g., "10+")',
+      }),
+      description: fields.text({
+        label: 'Stat Description',
+        description: 'Optional description for the stat',
+      }),
     }),
-  }),
+    {
+      label: 'Header Stats',
+      description: 'Optional stats to display in the header',
+      itemLabel: (props) =>
+        `${props.fields.label.value}: ${props.fields.value.value}` ||
+        'New Stat',
+    }
+  ),
 
   // Story + philosophy merged into one narrative
   narrative: fields.object({
@@ -438,28 +411,6 @@ export const portfolioIndexPageSchema = makePageSchema({
  * It includes sections for introducing the work history and filtering tools.
  */
 export const portfolioWorkPageSchema = makePageSchema({
-  // Hero / intro block
-  hero: fields.object({
-    title: fields.text({
-      label: 'Hero Title',
-      description: 'Main headline for the work page',
-      defaultValue: 'Work History',
-    }),
-    subtitle: fields.text({
-      label: 'Hero Subtitle',
-      description: 'Optional subtitle below the main title',
-    }),
-    description: fields.text({
-      label: 'Hero Description',
-      description: 'Optional description text',
-      multiline: true,
-    }),
-    showParticleBackground: fields.checkbox({
-      label: 'Show Particle Background',
-      defaultValue: true,
-    }),
-  }),
-
   // Introduction section
   introduction: fields.object({
     title: fields.text({
@@ -538,28 +489,6 @@ export const portfolioWorkPageSchema = makePageSchema({
  * It includes sections for introducing the projects and displaying them by category.
  */
 export const portfolioProjectsPageSchema = makePageSchema({
-  // Hero / intro block
-  hero: fields.object({
-    title: fields.text({
-      label: 'Hero Title',
-      description: 'Main headline for the projects page',
-      defaultValue: 'My Projects',
-    }),
-    subtitle: fields.text({
-      label: 'Hero Subtitle',
-      description: 'Optional subtitle below the main title',
-    }),
-    description: fields.text({
-      label: 'Hero Description',
-      description: 'Optional description text',
-      multiline: true,
-    }),
-    showParticleBackground: fields.checkbox({
-      label: 'Show Particle Background',
-      defaultValue: true,
-    }),
-  }),
-
   // Introduction section
   introduction: fields.object({
     title: fields.text({

@@ -30,6 +30,12 @@ type Preset = ObjectValues<typeof presets>;
 
 export interface Props {
   pageTitle?: string;
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  ctaText?: string;
+  ctaHref?: string;
+  stats?: any[];
   hideContactForm?: boolean;
   hideFooter?: boolean;
   hideNavigation?: boolean;
@@ -38,12 +44,18 @@ export interface Props {
   animationPreset?: Preset;
   animationControls?: ControlValues;
   container?: boolean;
+  contactCTA?: {
+    text: string;
+    buttonText: string;
+    buttonLink: string;
+  };
 }
 
 const {
   pageTitle,
   animationPreset = 'curious-particle-network' as const,
   container = true,
+  contactCTA,
   ...props
 } = Astro.props;
 
@@ -59,18 +71,18 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
 
   <!-- Header Section with Flateralus Animation -->
   {
-    props.hero && (
+    props.title && (
       <HeaderSection
         preset={presets[animationPreset]}
         className="bg-[#5c7c4f] from-brand-red/20 to-[#5c7c4f] bg-radial"
         showDebugControls={true}
         enableLuminanceDetection={true}
-        title={props.hero.title}
-        subtitle={props.hero.subtitle}
-        description={props.hero.description}
-        ctaText={props.hero.ctaText}
-        ctaHref={props.hero.ctaHref}
-        stats={props.hero.stats}
+        title={props.title}
+        subtitle={props.subtitle}
+        description={props.description}
+        ctaText={props.ctaText}
+        ctaHref={props.ctaHref}
+        stats={props.stats}
         client:load
       />
     )
@@ -82,4 +94,25 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
       <slot />
     </div>
   </div>
+
+  <!-- Contact CTA Section -->
+  {
+    contactCTA && (
+      <div class="bg-brand-dark py-24">
+        <div class="container mx-auto px-6">
+          <div class="mx-auto max-w-4xl text-center">
+            <p class="mb-8 text-xl leading-relaxed font-medium text-white/90">
+              {contactCTA.text}
+            </p>
+            <a
+              href={contactCTA.buttonLink}
+              class="button button-primary button-lg"
+            >
+              {contactCTA.buttonText}
+            </a>
+          </div>
+        </div>
+      </div>
+    )
+  }
 </Layout>

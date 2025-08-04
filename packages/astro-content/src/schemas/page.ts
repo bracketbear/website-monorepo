@@ -20,6 +20,8 @@ import { z } from 'astro:content';
  * ```
  */
 export const basePageSchema = z.object({
+  title: z.string().optional(),
+  subtitle: z.string().optional(),
   content: z.string().optional(),
   metaDescription: z.string().optional(),
   canonicalUrl: z.string().url().optional(),

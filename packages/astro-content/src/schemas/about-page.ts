@@ -32,16 +32,8 @@ const headerStatSchema = z.object({
 
 // --- Revised page schema ---
 export const portfolioAboutPageSchema = makePageSchema({
-  /** Hero / intro block */
-  hero: z.object({
-    title: z.string(),
-    subtitle: z.string().optional(),
-    description: z.string().optional(), // Markdown content
-    ctaText: z.string().optional(),
-    ctaHref: z.string().optional(),
-    stats: z.array(headerStatSchema).optional(),
-    showParticleBackground: z.boolean().default(true),
-  }),
+  /** Stats section */
+  stats: z.array(headerStatSchema).optional(),
 
   /** Story + philosophy merged into one narrative */
   narrative: narrativeSectionSchema,
@@ -100,14 +92,6 @@ export type AboutPageData = PortfolioAboutPageData; // Legacy type alias
  * contact, and layout controls.
  */
 export const portfolioIndexPageSchema = makePageSchema({
-  // Hero section content
-  hero: z.object({
-    title: z.string(),
-    subtitle: z.string().optional(),
-    description: z.string().optional(),
-    showParticleBackground: z.boolean().default(true),
-  }),
-
   // About/What I Do section
   about: z.object({
     title: z.string().default('What I Do'),

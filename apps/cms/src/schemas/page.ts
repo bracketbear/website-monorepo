@@ -20,10 +20,21 @@ import { fields } from '@keystatic/core';
  */
 export function makeBasePageFields() {
   return {
+    title: fields.text({
+      label: 'Page Title',
+      description: 'The main title for this page',
+    }),
+    subtitle: fields.text({
+      label: 'Page Subtitle',
+      description: 'Optional subtitle for this page',
+    }),
     content: fields.text({
       label: 'Content',
       multiline: true,
       description: 'Main page content (markdown supported)',
+      validation: {
+        isRequired: false,
+      },
     }),
     metaDescription: fields.text({ label: 'Meta Description' }),
     canonicalUrl: fields.text({ label: 'Canonical URL' }),

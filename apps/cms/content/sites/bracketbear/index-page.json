@@ -1,17 +1,12 @@
 {
   "title": "Bracket Bear - Creative Technology Studio",
+  "subtitle": "Creative Technology Studio",
   "content": "# Welcome to Bracket Bear\n\nWe're a creative technology studio specializing in experiential marketing and interactive installations.",
 
   "metaDescription": "Creative technology studio specializing in experiential marketing, interactive installations, and digital experiences.",
   "canonicalUrl": "https://bracketbear.com/",
   "ogImage": "bracketbear-hero.jpg",
   "noIndex": false,
-  "hero": {
-    "title": "Bracket Bear",
-    "subtitle": "Creative Technology Studio",
-    "description": "Building immersive digital experiences",
-    "showParticleBackground": true
-  },
   "about": {
     "title": "What We Do",
     "introduction": "We're a creative technology studio that specializes in experiential marketing and interactive installations.",

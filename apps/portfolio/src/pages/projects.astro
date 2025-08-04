@@ -90,15 +90,12 @@ const statsData =
 ---
 
 <HeroLayout
-  pageTitle={projectsPage.data.hero.title}
-  hero={{
-    title: projectsPage.data.hero.title,
-    subtitle: projectsPage.data.hero.subtitle,
-    description: projectsPage.data.hero.description,
-    showParticleBackground: projectsPage.data.hero.showParticleBackground,
-  }}
+  pageTitle={projectsPage.data.title}
+  title={projectsPage.data.title}
+  subtitle={projectsPage.data.subtitle}
   breadcrumbs={breadcrumbs}
   animationPreset="curious-particle-network"
+  contactCTA={projectsPage.data.contactCTA}
 >
   <!-- Introduction Section -->
   <section class="mb-40 px-6">
@@ -160,23 +157,4 @@ const statsData =
       </div>
     </div>
   </div>
-
-  <!-- Contact CTA Section -->
-  {
-    projectsPage.data.contactCTA && (
-      <div class="mb-40 px-6">
-        <div class="mx-auto max-w-4xl text-center">
-          <p class="mb-8 text-xl leading-relaxed font-medium text-white/90">
-            {projectsPage.data.contactCTA.text}
-          </p>
-          <a
-            href={projectsPage.data.contactCTA.buttonLink}
-            class="button button-primary button-lg"
-          >
-            {projectsPage.data.contactCTA.buttonText}
-          </a>
-        </div>
-      </div>
-    )
-  }
 </HeroLayout>

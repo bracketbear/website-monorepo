@@ -1,5 +1,5 @@
 ---
-import { Button, type Breadcrumb } from '@bracketbear/core';
+import { type Breadcrumb } from '@bracketbear/core';
 import { getCollection } from 'astro:content';
 import { getAboutBreadcrumbs } from '@/config/breadcrumbs';
 import HeroLayout from '@/layouts/HeroLayout.astro';
@@ -12,7 +12,15 @@ const aboutPageEntries = await getCollection('portfolioAboutPage');
 const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
 ---
 
-<HeroLayout title="About Me" hero={aboutPage.data.hero} breadcrumbs={breadcrumbs} animationPreset="curious-particle-network">
+<HeroLayout 
+  pageTitle="About Me" 
+  title={aboutPage.data.title}
+  subtitle={aboutPage.data.subtitle}
+  stats={aboutPage.data.stats}
+  breadcrumbs={breadcrumbs} 
+  animationPreset="curious-particle-network"
+  contactCTA={aboutPage.data.contactCTA}
+>
   <!-- Narrative Section -->
   {
     aboutPage?.data?.narrative && (
@@ -28,10 +36,10 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
           </div>
         </div>
         <!-- Stats row below narrative, if present -->
-        {aboutPage?.data?.hero?.stats && aboutPage.data.hero.stats.length > 0 && (
+        {aboutPage?.data?.stats && aboutPage.data.stats.length > 0 && (
           <div class="mx-auto mt-40 max-w-7xl px-6 lg:px-8">
             <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center sm:grid-cols-2 lg:grid-cols-4">
-              {aboutPage.data.hero.stats.map((stat: any) => (
+              {aboutPage.data.stats.map((stat: any) => (
                 <div class="mx-auto flex max-w-xs flex-col gap-y-4">
                   <dt class="text-base leading-7 text-white/60">{stat.label}</dt>
                   <dd class="order-first text-3xl font-bold tracking-tight text-white sm:text-5xl">{stat.value}</dd>
@@ -166,22 +174,6 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
               </li>
             ))}
           </ul>
-        </div>
-      </div>
-    )
-  }
-
-  <!-- Contact CTA Section -->
-  {
-    aboutPage?.data?.contactCTA && (
-      <div class="mb-40">
-        <div class="mx-auto max-w-4xl text-center">
-          <p class="text-white/90 mb-8 text-xl leading-relaxed font-medium">
-            {aboutPage.data.contactCTA.text}
-          </p>
-          <Button variant="primary" size="lg">
-            {aboutPage.data.contactCTA.buttonText}
-          </Button>
         </div>
       </div>
     )

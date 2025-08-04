@@ -1,68 +1,61 @@
 {
   "title": "About Me",
-
+  "subtitle": "Builder of management systems and virtual fidget spinners",
   "metaDescription": "Get to know the person behind the code.",
+  "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget aliquam massa nisl quis neque. Etiam euismod, urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget aliquam massa nisl quis neque.\n\nSed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.\n\nNemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.\n\nUt enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.\n\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
   "noIndex": false,
-  "hero": {
-    "title": "Builder of management systems and virtual fidget spinners",
-    "showParticleBackground": true,
-    "stats": [
+  "stats": [
+    {
+      "label": "Years Experience",
+      "value": "10+",
+      "description": "Building digital experiences"
+    },
+    {
+      "label": "Projects Delivered",
+      "value": "50+",
+      "description": "From startups to enterprise"
+    },
+    {
+      "label": "Technologies Mastered",
+      "value": "25+",
+      "description": "Frontend to backend"
+    }
+  ],
+  "values": {
+    "title": "Our Values",
+    "description": "The principles that guide my work and approach to problem-solving.",
+    "items": [
       {
-        "label": "Years Experience",
-        "value": "10+",
-        "description": "Building digital experiences"
+        "title": "Innovation",
+        "description": "Pushing boundaries and exploring new technologies to create cutting-edge solutions.",
+        "icon": "rocket"
       },
       {
-        "label": "Projects Delivered",
-        "value": "50+",
-        "description": "From startups to enterprise"
+        "title": "Quality",
+        "description": "Building robust, maintainable code that stands the test of time.",
+        "icon": "star"
       },
       {
-        "label": "Technologies Mastered",
-        "value": "25+",
-        "description": "Frontend to backend"
+        "title": "Collaboration",
+        "description": "Working closely with teams to understand needs and deliver exceptional results.",
+        "icon": "handshake"
+      },
+      {
+        "title": "Learning",
+        "description": "Continuously expanding knowledge and staying current with industry trends.",
+        "icon": "graduation-cap"
+      },
+      {
+        "title": "Efficiency",
+        "description": "Optimizing processes and code to deliver faster, better results.",
+        "icon": "bolt"
+      },
+      {
+        "title": "User-First",
+        "description": "Designing experiences that prioritize user needs and accessibility.",
+        "icon": "heart"
       }
     ]
-  },
-  "narrative": {
-    "title": "My Story & Mission",
-        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget aliquam massa nisl quis neque. Etiam euismod, urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget aliquam massa nisl quis neque.\n\nSed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.\n\nNemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.\n\nUt enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.\n\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-      },
-      "values": {
-        "title": "Our Values",
-        "description": "The principles that guide my work and approach to problem-solving.",
-        "items": [
-          {
-            "title": "Innovation",
-            "description": "Pushing boundaries and exploring new technologies to create cutting-edge solutions.",
-            "icon": "rocket"
-          },
-          {
-            "title": "Quality",
-            "description": "Building robust, maintainable code that stands the test of time.",
-            "icon": "star"
-          },
-          {
-            "title": "Collaboration",
-            "description": "Working closely with teams to understand needs and deliver exceptional results.",
-            "icon": "handshake"
-          },
-          {
-            "title": "Learning",
-            "description": "Continuously expanding knowledge and staying current with industry trends.",
-            "icon": "graduation-cap"
-          },
-          {
-            "title": "Efficiency",
-            "description": "Optimizing processes and code to deliver faster, better results.",
-            "icon": "bolt"
-          },
-          {
-            "title": "User-First",
-            "description": "Designing experiences that prioritize user needs and accessibility.",
-            "icon": "heart"
-          }
-        ]
   },
   "skills": {
     "coreStrengths": [
