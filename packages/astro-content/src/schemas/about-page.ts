@@ -4,7 +4,7 @@ import { makePageSchema } from './page';
 // --- New sub–section schemas ---
 const narrativeSectionSchema = z.object({
   title: z.string(),
-  paragraphs: z.array(z.string()),
+  content: z.string(), // Markdown content instead of paragraphs array
 });
 
 const skillsSchema = z.object({
@@ -24,13 +24,22 @@ const valuesCardSchema = z.object({
   ),
 });
 
+const headerStatSchema = z.object({
+  label: z.string(),
+  value: z.string(),
+  description: z.string().optional(),
+});
+
 // --- Revised page schema ---
 export const portfolioAboutPageSchema = makePageSchema({
   /** Hero / intro block */
   hero: z.object({
     title: z.string(),
     subtitle: z.string().optional(),
-    description: z.string().optional(),
+    description: z.string().optional(), // Markdown content
+    ctaText: z.string().optional(),
+    ctaHref: z.string().optional(),
+    stats: z.array(headerStatSchema).optional(),
     showParticleBackground: z.boolean().default(true),
   }),
 
@@ -51,7 +60,7 @@ export const portfolioAboutPageSchema = makePageSchema({
 
   /** CTA footer */
   contactCTA: z.object({
-    text: z.string(),
+    text: z.string(), // Markdown content
     buttonText: z.string().default('Reach Out'),
     buttonLink: z.string().default('/reach-out'),
   }),

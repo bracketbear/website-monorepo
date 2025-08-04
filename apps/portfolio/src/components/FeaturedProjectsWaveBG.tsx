@@ -52,6 +52,7 @@ export default function FeaturedProjectsWaveBG({
       application={application}
       className={clsx('absolute inset-0 h-full w-full', className)}
       showDebugControls
+      layoutClassName="absolute inset-0"
     >
       {children}
     </AnimationStage>

@@ -116,21 +116,10 @@ if (
   indexPage.data.about.featuredSkills &&
   indexPage.data.about.featuredSkills.length > 0
 ) {
-  console.log('CMS selected skills:', indexPage.data.about.featuredSkills);
-  console.log(
-    'Available skills:',
-    workSkills.map((s) => s.id)
-  );
-  console.log('Looking for skills:', indexPage.data.about.featuredSkills);
   featuredSkills = workSkills.filter((skill) => {
     const isIncluded = indexPage.data.about.featuredSkills.includes(skill.id);
-    console.log(`Skill ${skill.id}: ${isIncluded ? 'FOUND' : 'NOT FOUND'}`);
     return isIncluded;
   });
-  console.log(
-    'Filtered skills:',
-    featuredSkills.map((s) => s.data.title)
-  );
 }
 
 // Helper function to format dates correctly

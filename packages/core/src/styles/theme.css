@@ -6,13 +6,13 @@
   /* Brand Colors */
   --color-brand-dark: hsl(200, 0%, 15%);
   --color-brand-dark-muted: hsl(200, 0%, 75%);
-  --color-brand-red: #FF4B3E;
-  --color-brand-orange:	rgb(255, 213, 128);
+  --color-brand-red: #ff4b3e;
+  --color-brand-orange: #f1880d;
   --color-brand-blue: #7ebdc2;
-  --color-brand-green: #98CE00;
+  --color-brand-green: #98ce00;
   --color-brand-yellow: #f3dfa2;
-  --color-brand-purple: #B185A7;
-  --color-brand-light: #F2F0EF;
+  --color-brand-purple: #b185a7;
+  --color-brand-light: #f2f0ef;
 
   /* Theme Tokens - Light Mode Defaults */
   --color-primary: var(--color-brand-orange);

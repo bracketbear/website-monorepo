@@ -24,6 +24,35 @@ export const portfolioAboutPageSchema = makePageSchema({
       description: 'Optional description text',
       multiline: true,
     }),
+    ctaText: fields.text({
+      label: 'CTA Button Text',
+      description: 'Optional call-to-action button text',
+    }),
+    ctaHref: fields.text({
+      label: 'CTA Button Link',
+      description: 'Optional call-to-action button link',
+    }),
+    stats: fields.array(
+      fields.object({
+        label: fields.text({
+          label: 'Stat Label',
+          description: 'Label for the stat (e.g., "Years Experience")',
+        }),
+        value: fields.text({
+          label: 'Stat Value',
+          description: 'Value for the stat (e.g., "10+")',
+        }),
+        description: fields.text({
+          label: 'Stat Description',
+          description: 'Optional description for the stat',
+        }),
+      }),
+      {
+        label: 'Header Stats',
+        description: 'Optional stats to display in the header',
+        itemLabel: (props) => `${props.value?.label}: ${props.value?.value}` || 'New Stat',
+      }
+    ),
     showParticleBackground: fields.checkbox({
       label: 'Show Particle Background',
       defaultValue: true,

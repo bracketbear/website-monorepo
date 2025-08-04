@@ -5,6 +5,9 @@ import { createCuriousParticleNetworkAnimation } from '@bracketbear/flateralus-a
 import { clsx } from '@bracketbear/core';
 import { useMemo, useState, useEffect } from 'react';
 
+const BACKGROUND_CLASS =
+  'bg-brand-orange from-brand-yellow to-brand-orange/90 bg-radial' as const;
+
 interface HeroSectionProps {
   className?: string;
   title?: string;
@@ -13,12 +16,11 @@ interface HeroSectionProps {
   showParticleBackground?: boolean;
 }
 
-export default function HeroSection({ 
-  className, 
-  title = "Harrison",
-  subtitle = "and I build software for creative technologists.",
+export default function HeroSection({
+  className,
+  title = 'Harrison',
+  subtitle = 'and I build software for creative technologists.',
   description,
-  showParticleBackground = true 
 }: HeroSectionProps) {
   const [isClient, setIsClient] = useState(false);
 
@@ -45,11 +47,53 @@ export default function HeroSection({
         },
       });
 
-      const animation = createCuriousParticleNetworkAnimation();
+      const animation = createCuriousParticleNetworkAnimation({
+        particleCount: 190,
+        connectionDistance: 60,
+        lineThickness: 2.3000000000000003,
+        particleBaseSize: 2,
+        particleSizeVariation: 0.8,
+        animationSpeed: 0.65,
+        attractionStrength: 0.011,
+        cursorAttractionRadius: 90,
+        cursorAttractionStrength: 0.17500000000000002,
+        particleGlowRadius: 5,
+        // @ts-expect-error - TODO: Groups are not typed properly yet.
+        particleColors: [
+          {
+            color: '#9ce8e9',
+          },
+          {
+            color: '#db53ce',
+          },
+          {
+            color: '#0dc37a',
+          },
+          {
+            color: '#802ff8',
+          },
+          {
+            color: '#c9d019',
+          },
+          {
+            color: '#9823c7',
+          },
+          {
+            color: '#c1fc2e',
+          },
+          {
+            color: '#33a5e6',
+          },
+        ],
+        keepInBounds: true,
+        connectionColor: '#06c26c',
+        glowColor: '#147a8c',
+        debugLogging: false,
+      });
       app.setAnimation(animation);
 
       return app;
-    } catch (error) {
+    } catch {
       return null;
     }
   }, [isClient]);
@@ -57,12 +101,7 @@ export default function HeroSection({
   // Don't render the animation on the server
   if (!isClient) {
     return (
-      <div
-        className={clsx(
-          'bg-brand-orange from-brand-orange via-brand-red/20 to-brand-red/90 bg-radial',
-          className
-        )}
-      >
+      <div className={clsx(BACKGROUND_CLASS, className)}>
         <div className="relative z-10 mb-8 flex h-full flex-col items-center justify-center">
           {description && (
             <p className="text-2xl font-bold tracking-tight text-white/90 uppercase drop-shadow-lg">
@@ -92,12 +131,10 @@ export default function HeroSection({
   return (
     <AnimationStage
       application={application}
-      className={clsx(
-        'bg-brand-orange from-brand-orange via-brand-red/20 to-brand-red/90 bg-radial',
-        className
-      )}
+      className={clsx(BACKGROUND_CLASS, className)}
       showDebugControls
       debugControlsClassName="top-32"
+      layoutClassName="relative flex h-full w-full items-end"
     >
       <div className="relative z-10 mb-8 flex h-full flex-col items-center justify-center">
         {description && (

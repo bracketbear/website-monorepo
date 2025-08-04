@@ -26,6 +26,8 @@ interface AnimationStageProps {
   visibilityThreshold?: number;
   /** Root margin for visibility detection (defaults to '0px') */
   visibilityRootMargin?: string;
+  /** Layout classes for the main container (defaults to 'relative flex h-full w-full items-end') */
+  layoutClassName?: string;
 }
 
 /**
@@ -46,6 +48,7 @@ export default function AnimationStage({
   pauseWhenHidden = true,
   visibilityThreshold = 0.1,
   visibilityRootMargin = '0px',
+  layoutClassName = 'relative flex h-full w-full items-end',
 }: AnimationStageProps) {
   // Main animation stage hook
   const {
@@ -76,10 +79,10 @@ export default function AnimationStage({
   });
 
   return (
-    <div className={clsx('relative', className)}>
+    <div className={clsx(layoutClassName, className)}>
       <div
         ref={containerRef}
-        className="absolute inset-0 z-10"
+        className="absolute inset-0 z-10 h-full w-full"
         style={{ background: 'transparent' }}
       />
       {children && (

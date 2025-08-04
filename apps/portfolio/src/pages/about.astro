@@ -1,42 +1,18 @@
 ---
-import { type Breadcrumb } from '@bracketbear/core';
+import { Button, type Breadcrumb } from '@bracketbear/core';
 import { getCollection } from 'astro:content';
-import ContentLayout from '@/layouts/ContentLayout.astro';
 import { getAboutBreadcrumbs } from '@/config/breadcrumbs';
+import HeroLayout from '@/layouts/HeroLayout.astro';
+import { marked } from 'marked';
 
 const breadcrumbs: Breadcrumb[] = getAboutBreadcrumbs();
 
 // Get the about page singleton (following the same pattern as index.astro)
 const aboutPageEntries = await getCollection('portfolioAboutPage');
 const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
-
-console.log('About page data:', aboutPage?.data);
 ---
 
-<ContentLayout title="About Me" breadcrumbs={breadcrumbs}>
-  <!-- Hero Section -->
-  {
-    aboutPage?.data?.hero && (
-      <div class="mb-12">
-        <div class="card">
-          <h1 class="font-heading text-brand-dark mb-4 text-5xl tracking-tight">
-            {aboutPage.data.hero.title}
-          </h1>
-          {aboutPage.data.hero.subtitle && (
-            <h2 class="text-brand-dark mb-4 text-2xl font-medium">
-              {aboutPage.data.hero.subtitle}
-            </h2>
-          )}
-          {aboutPage.data.hero.description && (
-            <p class="text-brand-dark text-xl leading-relaxed font-medium">
-              {aboutPage.data.hero.description}
-            </p>
-          )}
-        </div>
-      </div>
-    )
-  }
-
+<HeroLayout title="About Me" hero={aboutPage.data.hero} breadcrumbs={breadcrumbs} animationPreset="curious-particle-network">
   <!-- Narrative Section (Story + Mission merged) -->
   {
     aboutPage?.data?.narrative && (
@@ -45,12 +21,8 @@ console.log('About page data:', aboutPage?.data);
           <h2 class="font-heading text-brand-dark mb-6 text-4xl tracking-tight">
             {aboutPage.data.narrative.title}
           </h2>
-          <div class="text-brand-dark space-y-6 text-xl leading-relaxed font-medium">
-            {aboutPage.data.narrative.paragraphs.map(
-              (paragraph: string) => (
-                <p>{paragraph}</p>
-              )
-            )}
+          <div class="text-brand-dark space-y-6 text-xl leading-relaxed font-medium prose prose-lg max-w-none">
+            <Fragment set:html={marked.parse(aboutPage.data.narrative.content)} />
           </div>
         </div>
       </div>
@@ -175,17 +147,14 @@ console.log('About page data:', aboutPage?.data);
           <p class="text-brand-dark mb-6 text-xl leading-relaxed font-medium">
             {aboutPage.data.contactCTA.text}
           </p>
-          <a
-            href={aboutPage.data.contactCTA.buttonLink}
-            class="inline-block bg-brand-red text-brand-light px-8 py-3 text-lg font-bold shadow-[3px_3px_0_var(--color-brand-dark)] transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
-          >
+          <Button variant="primary" size="lg">
             {aboutPage.data.contactCTA.buttonText}
-          </a>
+          </Button>
         </div>
       </div>
     )
   }
-</ContentLayout>
+</HeroLayout>
 
 <style>
   /* Custom ordered list styling */

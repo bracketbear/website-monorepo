@@ -22,3 +22,60 @@
 @utility to-brand-red {
   --tw-gradient-to: #bb4430;
 }
+
+/* Section utilities for consistent spacing */
+@utility section {
+  @apply my-14 w-full scroll-mt-24 px-6 lg:my-20 lg:px-8;
+}
+
+@utility section-wide {
+  @apply section mx-auto max-w-7xl;
+}
+
+@utility section-narrow {
+  @apply section mx-auto max-w-prose;
+}
+
+/* Background texture utilities */
+@utility bg-paper {
+  background: url('/textures/paper.png') repeat;
+}
+
+@utility bg-diag-stripes {
+  background: repeating-linear-gradient(
+    45deg,
+    hsl(var(--brand-light) / 0.15) 0 8px,
+    transparent 8px 16px
+  );
+}
+
+@utility bg-noise {
+  background-image: url('/textures/noise.svg');
+  background-repeat: repeat;
+}
+
+@utility bg-charcoal {
+  background-color: hsl(var(--brand-dark) / 0.95);
+}
+
+/* Shadow utilities */
+@utility shadow-card {
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* Custom ordered list styling - desktop only */
+@media (min-width: 1024px) {
+  ol {
+    counter-reset: item;
+  }
+
+  ol > li {
+    counter-increment: item;
+  }
+
+  ol > li::marker {
+    content: counter(item, decimal-leading-zero);
+    font-weight: bold;
+    color: var(--color-brand-dark);
+  }
+}

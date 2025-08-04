@@ -2,15 +2,14 @@
   "title": "About Me",
   "metaTitle": "About Me – Portfolio",
   "metaDescription": "Get to know the person behind the code.",
+  "noIndex": false,
   "hero": {
-    "title": "Engineer. Designer. Builder of Things That Work.",
-    "subtitle": "",
-    "description": "",
+    "title": "Builder of management systems and virtual fidget spinners",
     "showParticleBackground": true
   },
   "narrative": {
     "title": "My Story & Mission",
-    "paragraphs": []
+    "content": "## HERLLO!\n\nTest"
   },
   "skills": {
     "coreStrengths": [],

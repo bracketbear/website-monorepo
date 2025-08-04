@@ -1,0 +1,80 @@
+---
+/**
+ * HeroLayout - Local hero layout with AnimationStage background and transparent nav
+ *
+ * This layout provides a hero section with AnimationStage for particle backgrounds
+ * and transparent navigation overlay, similar to the homepage.
+ *
+ * Usage:
+ * <HeroLayout
+ *   title="Page Title"
+ *   hero={page.hero}
+ *   breadcrumbs={breadcrumbs}
+ * >
+ *   <!-- Page content here -->
+ * </HeroLayout>
+ */
+import Layout from './Layout.astro';
+import { clsx, NavBar, type ObjectValues } from '@bracketbear/core';
+import { navigationConfig } from '@/config/navigation';
+import HeaderSection from '@/components/HeaderSection';
+import type { ControlValues } from '@bracketbear/flateralus';
+
+const presets = {
+  'curious-particle-network': 'curious-particle-network',
+  'particle-wave': 'particle-wave',
+  'topographic-lines': 'topographic-lines',
+} as const;
+type Preset = ObjectValues<typeof presets>;
+
+export interface Props {
+  title?: string;
+  hideContactForm?: boolean;
+  hideFooter?: boolean;
+  hideNavigation?: boolean;
+  breadcrumbs?: any;
+  hero?: any;
+  animationPreset?: Preset;
+  animationControls?: ControlValues;
+  container?: boolean;
+}
+
+const {
+  animationPreset = 'curious-particle-network' as const,
+  container = true,
+  ...props
+} = Astro.props;
+---
+
+<Layout {...props} hideNavigation={true}>
+  <!-- Transparent Navigation -->
+  <div class="relative z-50">
+    <NavBar config={navigationConfig} variant="ghost-dark" />
+  </div>
+
+  <!-- Header Section with Flateralus Animation -->
+  {
+    props.hero && (
+      <HeaderSection
+        preset={presets[animationPreset]}
+        className="bg-[#5c7c4f] from-brand-red/20 to-[#5c7c4f] bg-radial"
+        showDebugControls={true}
+        enableLuminanceDetection={true}
+        title={props.hero.title}
+        subtitle={props.hero.subtitle}
+        description={props.hero.description}
+        ctaText={props.hero.ctaText}
+        ctaHref={props.hero.ctaHref}
+        stats={props.hero.stats}
+        client:load
+      />
+    )
+  }
+
+  <!-- Page Content -->
+  <div class="bg-brand-dark relative py-24">
+    <div class={clsx(container && 'container mx-auto')}>
+      <slot />
+    </div>
+  </div>
+</Layout>
