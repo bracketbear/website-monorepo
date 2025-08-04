@@ -49,6 +49,7 @@ export interface Props {
     buttonText: string;
     buttonLink: string;
   };
+  metaDescription?: string;
 }
 
 const {
@@ -56,6 +57,7 @@ const {
   animationPreset = 'curious-particle-network' as const,
   container = true,
   contactCTA,
+  metaDescription,
   ...props
 } = Astro.props;
 
@@ -63,7 +65,12 @@ const {
 const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
 ---
 
-<Layout {...props} hideNavigation={true} title={metaTitle}>
+<Layout
+  {...props}
+  hideNavigation={true}
+  title={metaTitle}
+  description={metaDescription}
+>
   <!-- Transparent Navigation -->
   <div class="relative z-50">
     <NavBar config={navigationConfig} variant="ghost-dark" />

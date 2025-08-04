@@ -13,15 +13,16 @@ const skillsSchema = z.object({
   beyondTech: z.array(z.string()), // leadership, design, biz, etc.
 });
 
-const valuesCardSchema = z.object({
+const valuesItemSchema = z.object({
   title: z.string(),
-  items: z.array(
-    z.object({
-      // max 3 bullets per card
-      text: z.string(),
-      number: z.string().optional(), // "01", "02", …
-    })
-  ),
+  description: z.string(),
+  icon: z.string().optional(), // Icon name for the value
+});
+
+const valuesSectionSchema = z.object({
+  title: z.string(),
+  description: z.string().optional(),
+  items: z.array(valuesItemSchema),
 });
 
 const headerStatSchema = z.object({
@@ -38,14 +39,11 @@ export const portfolioAboutPageSchema = makePageSchema({
   /** Story + philosophy merged into one narrative */
   narrative: narrativeSectionSchema,
 
+  /** Values section with icons */
+  values: valuesSectionSchema,
+
   /** Clustered skill highlights */
   skills: skillsSchema,
-
-  /** Work-style cards (formerly What I Do / How I Work) */
-  workStyle: z.object({
-    whatIDo: valuesCardSchema,
-    howIWork: valuesCardSchema,
-  }),
 
   /** Optional fun-facts / personal bits */
   funFacts: z.array(z.string()).optional(),

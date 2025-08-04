@@ -1,7 +1,7 @@
 {
   "title": "My Projects",
   "subtitle": "Showcasing my work across different domains",
-  "noIndex": false,
+  "metaDescription": "Explore my portfolio of projects across web development, UI/UX design, and experiential engineering.",
   "introduction": {
     "title": "Project Portfolio",
     "content": "Here are the projects I've worked on, organized by category. Each project represents a unique challenge and solution that showcases different aspects of my skills and experience. From **web development** and **UI/UX design** to **experiential engineering**, these projects demonstrate my ability to tackle complex problems and deliver innovative solutions."

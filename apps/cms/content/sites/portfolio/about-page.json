@@ -2,8 +2,6 @@
   "title": "About Me",
   "subtitle": "Builder of management systems and virtual fidget spinners",
   "metaDescription": "Get to know the person behind the code.",
-  "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget aliquam massa nisl quis neque. Etiam euismod, urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget aliquam massa nisl quis neque.\n\nSed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.\n\nNemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.\n\nUt enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.\n\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-  "noIndex": false,
   "stats": [
     {
       "label": "Years Experience",
@@ -21,6 +19,10 @@
       "description": "Frontend to backend"
     }
   ],
+  "narrative": {
+    "title": "My Story & Mission",
+    "content": "I've been building digital experiences for over a decade, starting with simple websites and evolving into complex management systems and interactive experiences. My journey began with a curiosity about how things work, which led me to explore everything from frontend frameworks to backend architectures.\n\nMy mission is to create systems that not only solve problems but delight users. I believe that the best technology is invisible - it works so seamlessly that users don't even think about it. Whether it's a content management system that makes designers' lives easier or an interactive experience that captivates audiences, I focus on the human experience first.\n\nOver the years, I've worked across various industries and team sizes, from solo developer to leading teams of 12+ engineers. This diverse experience has taught me that successful projects require more than just technical skills - they need clear communication, thoughtful planning, and a deep understanding of user needs."
+  },
   "values": {
     "title": "Our Values",
     "description": "The principles that guide my work and approach to problem-solving.",
@@ -77,42 +79,6 @@
       "Technical writing and documentation"
     ]
   },
-  "workStyle": {
-    "whatIDo": {
-      "title": "What I Do",
-      "items": [
-        {
-          "text": "Build scalable web applications from concept to deployment, focusing on performance and user experience.",
-          "number": "01"
-        },
-        {
-          "text": "Design and implement complex system architectures that handle high traffic and maintain reliability.",
-          "number": "02"
-        },
-        {
-          "text": "Optimize existing applications for better performance, security, and maintainability.",
-          "number": "03"
-        }
-      ]
-    },
-    "howIWork": {
-      "title": "How I Work",
-      "items": [
-        {
-          "text": "Start with deep understanding of requirements and user needs before writing any code.",
-          "number": "01"
-        },
-        {
-          "text": "Build iteratively with frequent feedback loops to ensure alignment with goals.",
-          "number": "02"
-        },
-        {
-          "text": "Document thoroughly and maintain clean, testable code for long-term success.",
-          "number": "03"
-        }
-      ]
-    }
-  },
   "funFacts": [
     "I once debugged a production issue while on a roller coaster",
     "My first computer was a Commodore 64",
@@ -120,7 +86,7 @@
     "I've written code in 15 different programming languages"
   ],
   "contactCTA": {
-    "text": "If this sounds like someone you'd like on your team, let's talk.",
+    "text": "If this sounds like someone you'd like on your team, let's talk!",
     "buttonText": "Reach Out",
     "buttonLink": "/reach-out"
   }

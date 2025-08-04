@@ -10,16 +10,24 @@ interface Props {
   hideFooter?: boolean;
   hideNavigation?: boolean;
   breadcrumbs?: any;
+  description?: string;
 }
 
-const { title, hideContactForm, hideFooter, hideNavigation, breadcrumbs } =
-  Astro.props;
+const {
+  title,
+  hideContactForm,
+  hideFooter,
+  hideNavigation,
+  breadcrumbs,
+  description,
+} = Astro.props;
 
 const pageTitle = makeTitle(title);
 ---
 
 <LayeredLayout
   title={pageTitle}
+  description={description}
   hideContactForm={hideContactForm}
   hideFooter={hideFooter}
   hideNavigation={hideNavigation}
