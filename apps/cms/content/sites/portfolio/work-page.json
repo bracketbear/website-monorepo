@@ -1,0 +1,41 @@
+{
+  "title": "Work History",
+  "metaTitle": "Work History – Portfolio",
+  "metaDescription": "Explore my work experience and projects across different roles and industries.",
+  "noIndex": false,
+  "hero": {
+    "title": "Work History",
+    "subtitle": "A decade of building digital experiences",
+    "showParticleBackground": true
+  },
+  "introduction": {
+    "title": "My Experience",
+    "content": "I've been working as a software engineer for over 10 years. I've worked in a variety of roles, from a solo developer to a team of 12+ engineers. I've worked in a variety of industries, from startups to large corporations."
+  },
+  "toolDescription": {
+    "title": "Explore My Work",
+    "content": "The tool below is to help you understand my skills and experience. Select a skill to see projects I've worked on that use that skill, or a category to choose multiple skills at once. We'll filter the list of jobs and projects and show you the ones that match your selection."
+  },
+  "stats": [
+    {
+      "label": "Years Experience",
+      "value": "10+",
+      "description": "Building digital experiences"
+    },
+    {
+      "label": "Projects Delivered",
+      "value": "50+",
+      "description": "From startups to enterprise"
+    },
+    {
+      "label": "Companies Worked With",
+      "value": "15+",
+      "description": "Across various industries"
+    }
+  ],
+  "contactCTA": {
+    "text": "If you'd like to work together on your next project, let's talk.",
+    "buttonText": "Get In Touch",
+    "buttonLink": "/contact"
+  }
+}

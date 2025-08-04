@@ -36,3 +36,4 @@ export { blogSchema, pageSchema, serviceSchema } from './content';
 export { basePageSchema, makePageSchema } from './page';
 export { indexPageSchema, type IndexPageData } from './index-page';
 export * from './about-page';
+export * from './work-page';

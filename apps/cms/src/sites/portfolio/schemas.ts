@@ -430,3 +430,103 @@ export const portfolioIndexPageSchema = makePageSchema({
     }),
   }),
 });
+
+/**
+ * Portfolio Work Page Schema
+ *
+ * This schema defines the work page structure for the portfolio site.
+ * It includes sections for introducing the work history and filtering tools.
+ */
+export const portfolioWorkPageSchema = makePageSchema({
+  // Hero / intro block
+  hero: fields.object({
+    title: fields.text({
+      label: 'Hero Title',
+      description: 'Main headline for the work page',
+      defaultValue: 'Work History',
+    }),
+    subtitle: fields.text({
+      label: 'Hero Subtitle',
+      description: 'Optional subtitle below the main title',
+    }),
+    description: fields.text({
+      label: 'Hero Description',
+      description: 'Optional description text',
+      multiline: true,
+    }),
+    showParticleBackground: fields.checkbox({
+      label: 'Show Particle Background',
+      defaultValue: true,
+    }),
+  }),
+
+  // Introduction section
+  introduction: fields.object({
+    title: fields.text({
+      label: 'Introduction Title',
+      description: 'Title for the introduction section',
+      defaultValue: 'My Experience',
+    }),
+    content: fields.text({
+      label: 'Introduction Content',
+      description: 'Content describing your work experience and approach',
+      multiline: true,
+    }),
+  }),
+
+  // Tool description section
+  toolDescription: fields.object({
+    title: fields.text({
+      label: 'Tool Description Title',
+      description: 'Title explaining the filtering tool',
+      defaultValue: 'Explore My Work',
+    }),
+    content: fields.text({
+      label: 'Tool Description Content',
+      description: 'Content explaining how to use the filtering tool',
+      multiline: true,
+    }),
+  }),
+
+  // Optional stats section
+  stats: fields.array(
+    fields.object({
+      label: fields.text({
+        label: 'Stat Label',
+        description: 'Label for the stat (e.g., "Years Experience")',
+      }),
+      value: fields.text({
+        label: 'Stat Value',
+        description: 'Value for the stat (e.g., "10+")',
+      }),
+      description: fields.text({
+        label: 'Stat Description',
+        description: 'Optional description for the stat',
+      }),
+    }),
+    {
+      label: 'Work Stats',
+      description: 'Optional stats to display about your work experience',
+      itemLabel: (props) =>
+        `${props.fields.label.value}: ${props.fields.value.value}` ||
+        'New Stat',
+    }
+  ),
+
+  // Contact CTA section
+  contactCTA: fields.object({
+    text: fields.text({
+      label: 'CTA Text',
+      description: 'Call-to-action text',
+      multiline: true,
+    }),
+    buttonText: fields.text({
+      label: 'Button Text',
+      defaultValue: 'Get In Touch',
+    }),
+    buttonLink: fields.text({
+      label: 'Button Link',
+      defaultValue: '/contact',
+    }),
+  }),
+});

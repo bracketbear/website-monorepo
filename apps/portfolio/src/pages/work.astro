@@ -2,36 +2,101 @@
 import { getCollection } from 'astro:content';
 import FilteredWorkHistory from '@/components/FilteredWorkHistory';
 import { getWorkBreadcrumbs } from '@/config/breadcrumbs';
-import ContentLayout from '@/layouts/ContentLayout.astro';
+import HeroLayout from '@/layouts/HeroLayout.astro';
+import { marked } from 'marked';
 
+// Get the work page singleton from CMS
+const workPageEntries = await getCollection('portfolioWorkPage');
+const workPage = workPageEntries[0]; // Singletons have only one entry
+
+// Get all work collections for the FilteredWorkHistory component
 const workProjects = await getCollection('workProject');
 const workSkills = await getCollection('workSkills');
 const workJobs = await getCollection('workJobs');
 const workCompanies = await getCollection('workCompany');
 const workSkillCategories = await getCollection('workSkillCategory');
 const breadcrumbs = getWorkBreadcrumbs();
+
+// Helper function to parse markdown content
+function parseMarkdown(content: string): string {
+  return marked.parse(content) as string;
+}
 ---
 
-<ContentLayout title="Work History" breadcrumbs={breadcrumbs}>
-  <div class="py-8">
-    <div class="card">
-      <p class="text-foreground text-xl leading-relaxed font-medium">
-        I've been working as a software engineer for over 10 years. I've worked
-        in a variety of roles, from a solo developer to a team of 12+ engineers.
-        I've worked in a variety of industries, from startups to large
-        corporations.
-      </p>
+<HeroLayout
+  title={workPage.data.title}
+  hero={{
+    title: workPage.data.hero.title,
+    subtitle: workPage.data.hero.subtitle,
+    description: workPage.data.hero.description,
+    showParticleBackground: workPage.data.hero.showParticleBackground,
+  }}
+  breadcrumbs={breadcrumbs}
+  animationPreset="curious-particle-network"
+>
+  <!-- Introduction Section -->
+  <section class="mb-40 px-6">
+    <div class="container mx-auto text-center">
+      <h2 class="font-heading mb-6 text-4xl tracking-tight text-white">
+        {workPage.data.introduction.title}
+      </h2>
     </div>
-    <div class="card mt-6">
-      <p class="text-foreground text-xl leading-relaxed font-medium">
-        The tool below is to help you understand my skills and experience.
-        Select a skill to see projects I've worked on that use that skill, or a
-        category to choose multiple skills at once. We'll filter the list of
-        jobs and projects and show you the ones that match your selection.
-      </p>
+    <div class="container mx-auto mt-8">
+      <div
+        class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90"
+      >
+        <div set:html={parseMarkdown(workPage.data.introduction.content)} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section (if available) -->
+  {
+    workPage.data.stats && workPage.data.stats.length > 0 && (
+      <section class="mb-40 px-6">
+        <div class="container mx-auto">
+          <div class="grid gap-8 md:grid-cols-3">
+            {workPage.data.stats.map(
+              (stat: {
+                label: string;
+                value: string;
+                description?: string;
+              }) => (
+                <div class="text-center">
+                  <div class="font-heading mb-2 text-4xl font-black text-white">
+                    {stat.value}
+                  </div>
+                  <div class="mb-1 text-xl font-bold text-white/90">
+                    {stat.label}
+                  </div>
+                  {stat.description && (
+                    <div class="text-white/70">{stat.description}</div>
+                  )}
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Tool Description Section -->
+  <div class="mb-40 px-6">
+    <div class="mx-auto max-w-4xl text-center">
+      <h2 class="font-heading mb-4 text-4xl tracking-tight text-white">
+        {workPage.data.toolDescription.title}
+      </h2>
+      <div
+        class="prose prose-lg prose-headings:text-white prose-p:text-white/80 mb-12 text-xl leading-relaxed text-white/80"
+      >
+        <div set:html={parseMarkdown(workPage.data.toolDescription.content)} />
+      </div>
     </div>
   </div>
-  <div class="py-16">
+
+  <!-- Work History Section -->
+  <div class="mb-40 px-6">
     <FilteredWorkHistory
       skills={workSkills}
       skillCategories={workSkillCategories}
@@ -41,4 +106,19 @@ const breadcrumbs = getWorkBreadcrumbs();
       client:load
     />
   </div>
-</ContentLayout>
+
+  <!-- Contact CTA Section -->
+  <div class="mb-40 px-6">
+    <div class="mx-auto max-w-4xl text-center">
+      <p class="mb-8 text-xl leading-relaxed font-medium text-white/90">
+        {workPage.data.contactCTA.text}
+      </p>
+      <a
+        href={workPage.data.contactCTA.buttonLink}
+        class="button button-primary button-lg"
+      >
+        {workPage.data.contactCTA.buttonText}
+      </a>
+    </div>
+  </div>
+</HeroLayout>
