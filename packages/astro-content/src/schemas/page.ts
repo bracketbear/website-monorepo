@@ -5,11 +5,11 @@ import { z } from 'astro:content';
  *
  * This schema provides a foundation for all page types with standard
  * SEO metadata, content structure, and publishing controls.
+ * Meta titles are auto-generated from hero titles to reduce redundancy.
  *
  * @example
  * ```typescript
  * const pageData = {
- *   title: "About Bracket Bear",
  *   content: "# About Bracket Bear...",
  *   metaTitle: "About Bracket Bear - Custom Software Development",
  *   metaDescription: "Learn about Bracket Bear's mission and values",
@@ -20,9 +20,7 @@ import { z } from 'astro:content';
  * ```
  */
 export const basePageSchema = z.object({
-  title: z.string(),
   content: z.string().optional(),
-  metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   canonicalUrl: z.string().url().optional(),
   ogImage: z.string().optional(),
@@ -34,6 +32,7 @@ export const basePageSchema = z.object({
  *
  * This function allows extending the base page schema with custom fields
  * while maintaining all the standard SEO and content structure.
+ * This should be consistent with the CMS version in apps/cms/src/schemas/page.ts
  *
  * @param extras - Optional additional Zod schema fields to merge
  * @returns A merged schema that includes base page fields plus any extras

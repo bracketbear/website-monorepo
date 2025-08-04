@@ -22,6 +22,7 @@ export default config({
         'portfolioContactPage',
         'portfolioAboutPage',
         'portfolioWorkPage',
+        'portfolioProjectsPage',
       ],
       'Work Content': [
         'workCompany',

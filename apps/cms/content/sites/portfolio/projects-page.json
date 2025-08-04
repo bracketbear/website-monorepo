@@ -1,0 +1,60 @@
+{
+  "noIndex": false,
+  "hero": {
+    "title": "My Projects",
+    "subtitle": "Showcasing my work across different domains",
+    "showParticleBackground": true
+  },
+  "introduction": {
+    "title": "Project Portfolio",
+    "content": "Here are the projects I've worked on, organized by category. Each project represents a unique challenge and solution that showcases different aspects of my skills and experience. From **web development** and **UI/UX design** to **experiential engineering**, these projects demonstrate my ability to tackle complex problems and deliver innovative solutions."
+  },
+  "stats": [
+    {
+      "label": "Total Projects",
+      "value": "0",
+      "description": "Completed across various domains"
+    },
+    {
+      "label": "Featured Projects",
+      "value": "0",
+      "description": "Highlighted work"
+    },
+    {
+      "label": "Technologies",
+      "value": "0+",
+      "description": "Skills utilized"
+    }
+  ],
+  "projectCategories": [
+    {
+      "title": "SaaS Experiential Content Management Systems",
+      "description": "My bread and butter. I'm on a crusade to make the most designer, developer, and content-manager friendly system out there. I think that there's a ton of untapped potential in this market, and I'm the only person I know who's worked on two or more of these systems.",
+      "projects": [
+        "dl-gumband",
+        "ds-bridge"
+      ]
+    },
+    {
+      "title": "Experiential Projects",
+      "description": "In my brief time as an experiential developer, I got to work on some pretty cool projects. These really opened up my eyes to how a CMS can make their lives much easier if done right.",
+      "projects": [
+        "ds-elekta",
+        "ds-pwc",
+        "ds-stoller-winery"
+      ]
+    },
+    {
+      "title": "Full-Stack Development",
+      "description": "End-to-end web applications that demonstrate full-stack development capabilities and modern architecture.",
+      "projects": [
+        "ss-supply-stream"
+      ]
+    }
+  ],
+  "contactCTA": {
+    "text": "Interested in working together? Let's discuss your project and see how I can help bring your vision to life.",
+    "buttonText": "Get In Touch",
+    "buttonLink": "/contact"
+  }
+}

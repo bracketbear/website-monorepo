@@ -1,11 +1,12 @@
 import type { CollectionEntry } from 'astro:content';
-import { getProjectUrl } from '@bracketbear/core';
+import { clsx, getProjectUrl } from '@bracketbear/core';
 import { getProjectImageUrl } from '@bracketbear/astro-content';
 
 export interface ProjectCardProps {
   project: CollectionEntry<'workProject'>;
   skills: CollectionEntry<'workSkills'>[];
   variant?: 'light' | 'dark';
+  compact?: boolean;
   showImage?: boolean;
   showBadges?: boolean;
   showSkills?: boolean;
@@ -16,6 +17,7 @@ export default function ProjectCard({
   project,
   skills,
   variant = 'light',
+  compact = false,
   showImage = true,
   showBadges = true,
   showSkills = true,
@@ -95,7 +97,10 @@ export default function ProjectCard({
             className={`${borderClass} mt-auto flex flex-wrap gap-2 border-t-2 pt-3`}
           >
             {projectSkills.map((skill: any) => (
-              <span key={skill.id} className="pill pill-skill">
+              <span
+                key={skill.id}
+                className={clsx('pill', compact && 'pill-sm', 'pill-skill')}
+              >
                 {skill?.data.title}
               </span>
             ))}

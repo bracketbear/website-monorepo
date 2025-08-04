@@ -1,0 +1,82 @@
+# Meta Title Auto-Generation
+
+To reduce redundancy and confusion in the CMS, meta titles are now auto-generated from hero titles instead of requiring separate fields.
+
+## The Problem
+
+Previously, we had three confusing title fields:
+- **Page Title**: Redundant internal reference
+- **Meta Title**: SEO title for browser tabs/search
+- **Hero Title**: Visible content on the page
+
+This created confusion and redundancy.
+
+## The Solution
+
+Now we use a cleaner approach:
+
+1. **Hero Title**: Primary visible content (e.g., "My Projects")
+2. **Auto-Generated Meta Title**: SEO title (e.g., "My Projects - Harrison Callahan")
+3. **Route/Slug**: Programmatic references (e.g., `/projects`)
+
+## Implementation
+
+### CMS Schema
+- Removed `metaTitle` field from base page schema
+- Meta titles are always auto-generated from hero titles
+- No more manual meta title fields to maintain
+
+### Content Files
+```json
+{
+  "hero": {
+    "title": "My Projects",
+    "subtitle": "Showcasing my work across different domains"
+  }
+  // metaTitle is auto-generated as "My Projects - Harrison Callahan"
+}
+```
+
+### Page Components
+```typescript
+// Auto-generate meta title from hero title
+function generateMetaTitle(heroTitle: string): string {
+  return `${heroTitle} - Harrison Callahan`;
+}
+
+const metaTitle = generateMetaTitle(projectsPage.data.hero.title);
+```
+
+## Benefits
+
+✅ **Less Confusion**: Only one primary title field (hero title)
+✅ **Consistent SEO**: Auto-generated meta titles follow the same pattern
+✅ **Reduced Redundancy**: No duplicate title fields
+✅ **Better UX**: CMS is simpler and clearer
+✅ **Maintainable**: Changes to hero titles automatically update SEO
+✅ **Simplified Schema**: No more metaTitle fields to maintain
+
+## Meta Title Generation
+
+Meta titles are now always auto-generated from hero titles using the utility functions in `packages/core/src/utils/meta-title.ts`:
+
+```typescript
+// Core utility
+generateMetaTitle("My Projects", "Harrison Callahan")
+// "My Projects - Harrison Callahan"
+
+// Site-specific utility
+generatePortfolioMetaTitle("My Projects")
+// "My Projects - Harrison Callahan"
+```
+
+## Utility Functions
+
+Use the utility functions in `apps/cms/src/utils/meta-title.ts`:
+
+- `generateMetaTitle(heroTitle, siteName)`: Generate meta title from hero title
+- `generatePageMetaTitle(pageData, siteName)`: Generate meta title from page data with override support
+description:
+globs:
+alwaysApply: false
+---

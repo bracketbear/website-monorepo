@@ -1,90 +1,182 @@
 ---
-import { getCollection } from 'astro:content';
-import { DetailBlock, SummaryBlock } from '@bracketbear/core';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import { getBreadcrumbs } from '@/config/breadcrumbs';
-import ContentLayout from '@/layouts/ContentLayout.astro';
+import HeroLayout from '@/layouts/HeroLayout.astro';
 import ProjectCard from '@/components/ProjectCard';
+import StatsSection from '@/components/StatsSection';
+import { marked } from 'marked';
+
+// Type definitions
+type WorkProjectEntry = CollectionEntry<'workProject'>;
+
+interface ProjectCategory {
+  title: string;
+  description: string;
+  projects: string[];
+}
+
+interface CategoryWithProjects {
+  category: {
+    data: {
+      title: string;
+      description: string;
+    };
+  };
+  projects: WorkProjectEntry[];
+}
+
+// Get the projects page singleton from CMS
+const projectsPageEntries = await getCollection('portfolioProjectsPage');
+const projectsPage = projectsPageEntries[0]; // Singletons have only one entry
 
 const workProject = await getCollection('workProject');
-const workProjectCategories = await getCollection('workProjectCategory');
 const breadcrumbs = getBreadcrumbs({
   label: 'Projects',
   href: '/projects',
 });
 
-// Group projects by category
-const projectsByCategory = workProjectCategories
-  .map((category) => {
-    const categoryProjects = workProject.filter(
-      (project) => project.data.category === category.id
+// Get projects by CMS-defined categories
+const projectsByCategory: CategoryWithProjects[] =
+  projectsPage.data.projectCategories?.map((category: ProjectCategory) => {
+    const categoryProjects = workProject.filter((project: WorkProjectEntry) =>
+      category.projects.includes(project.id)
     );
 
     return {
-      category,
+      category: {
+        data: {
+          title: category.title,
+          description: category.description,
+        },
+      },
       projects: categoryProjects,
     };
-  })
-  .filter((group) => group.projects.length > 0);
+  }) || [];
 
 // Get skills for project cards
 const workSkills = await getCollection('workSkills');
 
-// Calculate some stats for detail blocks
+// Calculate dynamic stats
 const totalProjects = workProject.length;
 const featuredProjects = workProject.filter((p) => p.data.isFeatured).length;
 const totalSkills = workSkills.length;
+
+// Helper function to parse markdown content
+function parseMarkdown(content: string): string {
+  return marked.parse(content) as string;
+}
+
+// Prepare stats data
+const statsData =
+  projectsPage.data.stats?.map(
+    (stat: { label: string; value: string; description?: string }) => {
+      // Replace dynamic values
+      let displayValue = stat.value;
+      if (stat.label === 'Total Projects') {
+        displayValue = totalProjects.toString();
+      } else if (stat.label === 'Featured Projects') {
+        displayValue = featuredProjects.toString();
+      } else if (stat.label === 'Technologies') {
+        displayValue = `${totalSkills}+`;
+      }
+
+      return {
+        label: stat.label,
+        value: displayValue,
+        description: stat.description,
+      };
+    }
+  ) || [];
 ---
 
-<ContentLayout title="Projects" breadcrumbs={breadcrumbs} showHero={true}>
-  <!-- Detail Blocks -->
-  <DetailBlock
-    slot="detail-blocks"
-    label="Total Projects"
-    value={totalProjects.toString()}
-  />
-  <DetailBlock
-    slot="detail-blocks"
-    label="Featured Projects"
-    value={featuredProjects.toString()}
-  />
-  <DetailBlock
-    slot="detail-blocks"
-    label="Technologies"
-    value={totalSkills.toString()}
-  />
+<HeroLayout
+  pageTitle={projectsPage.data.hero.title}
+  hero={{
+    title: projectsPage.data.hero.title,
+    subtitle: projectsPage.data.hero.subtitle,
+    description: projectsPage.data.hero.description,
+    showParticleBackground: projectsPage.data.hero.showParticleBackground,
+  }}
+  breadcrumbs={breadcrumbs}
+  animationPreset="curious-particle-network"
+>
+  <!-- Introduction Section -->
+  <section class="mb-40 px-6">
+    <div class="container mx-auto text-center">
+      <h2 class="font-heading mb-6 text-4xl tracking-tight text-white">
+        {projectsPage.data.introduction.title}
+      </h2>
+    </div>
+    <div class="container mx-auto mt-8">
+      <div
+        class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90"
+      >
+        <div set:html={parseMarkdown(projectsPage.data.introduction.content)} />
+      </div>
+    </div>
+  </section>
 
-  <!-- Summary -->
-  <SummaryBlock
-    slot="summary"
-    content="Here are the projects I've worked on, organized by category. Each project represents a unique challenge and solution that showcases different aspects of my skills and experience."
-  />
+  <!-- Stats Section -->
+  {statsData.length > 0 && <StatsSection stats={statsData} />}
 
-  <div class="space-y-16">
-    {
-      projectsByCategory.map(({ category, projects }) => (
-        <section class="bg-brand-dark tangible tangible-card overflow-hidden rounded-4xl p-8">
-          {/* Section Title */}
-          <div class="bg-brand-orange mb-8 inline-block rounded-xl py-8 pr-12 pl-6">
-            <h2 class="font-heading text-brand-dark inline-block text-4xl font-black tracking-tight uppercase">
-              {category.data.title}
-            </h2>
-          </div>
+  <!-- Projects by Category Section -->
+  <div class="mb-40 px-6">
+    <div class="container mx-auto">
+      <div class="space-y-16">
+        {
+          projectsByCategory.map(
+            ({ category, projects }: CategoryWithProjects) => (
+              <section>
+                {/* Section Title */}
+                <div class="py-12">
+                  <h2 class="font-heading inline-block text-4xl font-black tracking-tight text-white uppercase">
+                    {category.data.title}
+                  </h2>
+                  {category.data.description && (
+                    <p class="mt-4 max-w-3xl text-lg text-white/70">
+                      {category.data.description}
+                    </p>
+                  )}
+                </div>
 
-          <div class="grid gap-8 lg:grid-cols-2">
-            {projects.map((project) => (
-              <ProjectCard
-                project={project}
-                skills={workSkills}
-                variant="light"
-                showImage={true}
-                showBadges={true}
-                showSkills={true}
-                maxSkills={3}
-              />
-            ))}
-          </div>
-        </section>
-      ))
-    }
+                <div class="grid gap-8 lg:grid-cols-2 xl:grid-cols-3">
+                  {projects.map((project: WorkProjectEntry) => (
+                    <ProjectCard
+                      project={project}
+                      skills={workSkills}
+                      variant="light"
+                      showImage={true}
+                      showBadges={false}
+                      showSkills={true}
+                      maxSkills={5}
+                      compact={true}
+                    />
+                  ))}
+                </div>
+              </section>
+            )
+          )
+        }
+      </div>
+    </div>
   </div>
-</ContentLayout>
+
+  <!-- Contact CTA Section -->
+  {
+    projectsPage.data.contactCTA && (
+      <div class="mb-40 px-6">
+        <div class="mx-auto max-w-4xl text-center">
+          <p class="mb-8 text-xl leading-relaxed font-medium text-white/90">
+            {projectsPage.data.contactCTA.text}
+          </p>
+          <a
+            href={projectsPage.data.contactCTA.buttonLink}
+            class="button button-primary button-lg"
+          >
+            {projectsPage.data.contactCTA.buttonText}
+          </a>
+        </div>
+      </div>
+    )
+  }
+</HeroLayout>

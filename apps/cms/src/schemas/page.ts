@@ -5,6 +5,7 @@ import { fields } from '@keystatic/core';
  *
  * This schema provides a foundation for all page types with standard
  * SEO metadata, content structure, and publishing controls.
+ * Meta titles are auto-generated from hero titles to reduce redundancy.
  *
  * @example
  * ```typescript
@@ -19,16 +20,11 @@ import { fields } from '@keystatic/core';
  */
 export function makeBasePageFields() {
   return {
-    title: fields.text({
-      label: 'Page Title',
-      validation: { isRequired: true },
-    }),
     content: fields.text({
       label: 'Content',
       multiline: true,
       description: 'Main page content (markdown supported)',
     }),
-    metaTitle: fields.text({ label: 'Meta Title' }),
     metaDescription: fields.text({ label: 'Meta Description' }),
     canonicalUrl: fields.text({ label: 'Canonical URL' }),
     ogImage: fields.text({ label: 'Open Graph Image' }),
@@ -45,6 +41,7 @@ export function makeBasePageFields() {
  *
  * This function allows extending the base page schema with custom fields
  * while maintaining all the standard SEO and content structure.
+ * This should be consistent with the Astro content version in packages/astro-content/src/schemas/page.ts
  *
  * @param extras - Optional additional field definitions to merge
  * @returns A merged schema that includes base page fields plus any extras

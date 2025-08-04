@@ -1,0 +1,62 @@
+# Astro React Component Prerendering
+
+When using React (or Vue, Svelte, etc.) components in Astro, you can prerender them statically without making them interactive by **omitting client directives**.
+
+## Static Prerendering (Recommended)
+
+If your React component doesn't need interactivity, omit the client directive entirely:
+
+```tsx
+// ✅ Static prerendering - no client directive
+<StatsSection stats={statsData} />
+```
+
+This approach:
+- **Prerenders** the component during build time
+- **No JavaScript** is sent to the client
+- **Better performance** - no hydration overhead
+- **SEO friendly** - content is immediately available
+- **Smaller bundle** - no client-side JavaScript
+
+## When to Use Static Prerendering
+
+Use static prerendering when your component:
+- ✅ Displays static data
+- ✅ Shows computed values
+- ✅ Renders CMS content
+- ✅ Has no user interactions
+- ✅ Is purely presentational
+
+## Client Directives (Only When Needed)
+
+Only add client directives when you need interactivity:
+
+```tsx
+// ❌ Only use when you need interactivity
+<InteractiveForm client:load />
+
+// ✅ Use for static content
+<StatsSection stats={statsData} />
+```
+
+## Reference
+
+See the [Astro client directives documentation](https://docs.astro.build/en/reference/directives-reference/#client-directives) for more details on when to use each directive.
+
+## Examples in This Codebase
+
+- `StatsSection` component: Used without client directive for static stats display
+- `ProjectCard` component: Used without client directive for project information
+- `FilteredWorkHistory` component: Uses `client:load` because it has interactive filtering
+
+## Performance Benefits
+
+Static prerendering provides:
+- **Faster page loads** - no JavaScript execution
+- **Better Core Web Vitals** - reduced LCP and CLS
+- **Lower bandwidth** - smaller bundle sizes
+- **Better accessibility** - content available without JavaScript
+description:
+globs:
+alwaysApply: false
+---

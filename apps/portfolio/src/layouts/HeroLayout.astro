@@ -7,7 +7,7 @@
  *
  * Usage:
  * <HeroLayout
- *   title="Page Title"
+ *   pageTitle="My Projects"
  *   hero={page.hero}
  *   breadcrumbs={breadcrumbs}
  * >
@@ -17,6 +17,7 @@
 import Layout from './Layout.astro';
 import { clsx, NavBar, type ObjectValues } from '@bracketbear/core';
 import { navigationConfig } from '@/config/navigation';
+import { generatePortfolioMetaTitle } from '@/config/meta-title';
 import HeaderSection from '@/components/HeaderSection';
 import type { ControlValues } from '@bracketbear/flateralus';
 
@@ -28,7 +29,7 @@ const presets = {
 type Preset = ObjectValues<typeof presets>;
 
 export interface Props {
-  title?: string;
+  pageTitle?: string;
   hideContactForm?: boolean;
   hideFooter?: boolean;
   hideNavigation?: boolean;
@@ -40,13 +41,17 @@ export interface Props {
 }
 
 const {
+  pageTitle,
   animationPreset = 'curious-particle-network' as const,
   container = true,
   ...props
 } = Astro.props;
+
+// Generate meta title from page title
+const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
 ---
 
-<Layout {...props} hideNavigation={true}>
+<Layout {...props} hideNavigation={true} title={metaTitle}>
   <!-- Transparent Navigation -->
   <div class="relative z-50">
     <NavBar config={navigationConfig} variant="ghost-dark" />

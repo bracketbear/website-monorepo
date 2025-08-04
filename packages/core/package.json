@@ -47,6 +47,8 @@
     "build": "tsc && cpx \"src/styles/**/*\" dist/styles && cpx \"src/types/**/*\" dist/types && cpx \"src/config/**/*\" dist/config && cpx \"src/utils/**/*\" dist/utils && cpx \"src/assets/**/*.svg\" dist/assets && cpx \"src/astro/**/*.astro\" dist/astro",
     "dev": "concurrently \"tsc --watch\" \"npm run copy:astro:watch\" \"npm run copy:styles:watch\" \"npm run copy:types:watch\" \"npm run copy:config:watch\" \"npm run copy:utils:watch\" \"npm run copy:assets:watch\"",
     "clean": "rm -rf dist",
+    "test": "vitest",
+    "test:run": "vitest run",
     "copy:assets:watch": "cpx \"src/assets/**/*.svg\" dist/assets --watch",
     "copy:astro:watch": "cpx \"src/astro/**/*.astro\" dist/astro --watch",
     "copy:styles:watch": "cpx \"src/styles/**/*\" dist/styles --watch",
@@ -70,7 +72,8 @@
     "cpx": "^1.5.0",
     "react": "^19.0.0",
     "tailwindcss": "^4.0.14",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^2.1.8"
   },
   "peerDependencies": {
     "react-dom": "^19.0.0",

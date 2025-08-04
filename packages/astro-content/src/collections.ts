@@ -16,6 +16,7 @@ import {
   portfolioAboutPageSchema,
   portfolioIndexPageSchema,
   portfolioWorkPageSchema,
+  portfolioProjectsPageSchema,
 } from './schemas';
 
 /**
@@ -96,6 +97,11 @@ export const siteSpecificCollections = {
     base: join(contentPath, 'sites/portfolio'),
     schema: portfolioWorkPageSchema,
     pattern: 'work-page.json',
+  },
+  portfolioProjectsPage: {
+    base: join(contentPath, 'sites/portfolio'),
+    schema: portfolioProjectsPageSchema,
+    pattern: 'projects-page.json',
   },
   // TODO: Add Bracket Bear collections when Bracket Bear site is implemented
   // bracketBearAboutPage: {

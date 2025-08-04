@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import FilteredWorkHistory from '@/components/FilteredWorkHistory';
+import StatsSection from '@/components/StatsSection';
 import { getWorkBreadcrumbs } from '@/config/breadcrumbs';
 import HeroLayout from '@/layouts/HeroLayout.astro';
 import { marked } from 'marked';
@@ -53,31 +54,7 @@ function parseMarkdown(content: string): string {
   <!-- Stats Section (if available) -->
   {
     workPage.data.stats && workPage.data.stats.length > 0 && (
-      <section class="mb-40 px-6">
-        <div class="container mx-auto">
-          <div class="grid gap-8 md:grid-cols-3">
-            {workPage.data.stats.map(
-              (stat: {
-                label: string;
-                value: string;
-                description?: string;
-              }) => (
-                <div class="text-center">
-                  <div class="font-heading mb-2 text-4xl font-black text-white">
-                    {stat.value}
-                  </div>
-                  <div class="mb-1 text-xl font-bold text-white/90">
-                    {stat.label}
-                  </div>
-                  {stat.description && (
-                    <div class="text-white/70">{stat.description}</div>
-                  )}
-                </div>
-              )
-            )}
-          </div>
-        </div>
-      </section>
+      <StatsSection stats={workPage.data.stats} client:load />
     )
   }
 

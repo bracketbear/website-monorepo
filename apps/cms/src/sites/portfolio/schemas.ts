@@ -530,3 +530,121 @@ export const portfolioWorkPageSchema = makePageSchema({
     }),
   }),
 });
+
+/**
+ * Portfolio Projects Page Schema
+ *
+ * This schema defines the projects page structure for the portfolio site.
+ * It includes sections for introducing the projects and displaying them by category.
+ */
+export const portfolioProjectsPageSchema = makePageSchema({
+  // Hero / intro block
+  hero: fields.object({
+    title: fields.text({
+      label: 'Hero Title',
+      description: 'Main headline for the projects page',
+      defaultValue: 'My Projects',
+    }),
+    subtitle: fields.text({
+      label: 'Hero Subtitle',
+      description: 'Optional subtitle below the main title',
+    }),
+    description: fields.text({
+      label: 'Hero Description',
+      description: 'Optional description text',
+      multiline: true,
+    }),
+    showParticleBackground: fields.checkbox({
+      label: 'Show Particle Background',
+      defaultValue: true,
+    }),
+  }),
+
+  // Introduction section
+  introduction: fields.object({
+    title: fields.text({
+      label: 'Introduction Title',
+      description: 'Title for the introduction section',
+      defaultValue: 'Project Portfolio',
+    }),
+    content: fields.text({
+      label: 'Introduction Content',
+      description: 'Content describing your projects and approach',
+      multiline: true,
+    }),
+  }),
+
+  // Optional stats section
+  stats: fields.array(
+    fields.object({
+      label: fields.text({
+        label: 'Stat Label',
+        description: 'Label for the stat (e.g., "Total Projects")',
+      }),
+      value: fields.text({
+        label: 'Stat Value',
+        description: 'Value for the stat (e.g., "6")',
+      }),
+      description: fields.text({
+        label: 'Stat Description',
+        description: 'Optional description for the stat',
+      }),
+    }),
+    {
+      label: 'Project Stats',
+      description: 'Optional stats to display about your projects',
+      itemLabel: (props) =>
+        `${props.fields.label.value}: ${props.fields.value.value}` ||
+        'New Stat',
+    }
+  ),
+
+  // Project Categories section
+  projectCategories: fields.array(
+    fields.object({
+      title: fields.text({
+        label: 'Category Title',
+        description: 'Title for this project category (e.g., "Experiential Engineering")',
+      }),
+      description: fields.text({
+        label: 'Category Description',
+        description: 'Description of this project category',
+        multiline: true,
+      }),
+      projects: fields.array(
+        fields.relationship({
+          label: 'Project',
+          collection: 'workProject',
+          description: 'Select projects to include in this category',
+        }),
+        {
+          label: 'Projects in Category',
+          description: 'Select projects to display in this category',
+          itemLabel: (props) => props.value || 'New Project',
+        }
+      ),
+    }),
+    {
+      label: 'Project Categories',
+      description: 'Organize projects into custom categories with descriptions',
+      itemLabel: (props) => props.fields.title.value || 'New Category',
+    }
+  ),
+
+  // Contact CTA section
+  contactCTA: fields.object({
+    text: fields.text({
+      label: 'CTA Text',
+      description: 'Call-to-action text',
+      multiline: true,
+    }),
+    buttonText: fields.text({
+      label: 'Button Text',
+      defaultValue: 'Get In Touch',
+    }),
+    buttonLink: fields.text({
+      label: 'Button Link',
+      defaultValue: '/contact',
+    }),
+  }),
+});

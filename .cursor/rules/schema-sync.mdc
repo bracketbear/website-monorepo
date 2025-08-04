@@ -1,0 +1,85 @@
+# Schema Synchronization
+
+When working with schemas, ensure that the Astro content package and CMS schemas are always in sync.
+
+## Two Schema Locations
+
+1. **Astro Content Package**: `packages/astro-content/src/schemas/`
+   - Uses Zod schemas (`z.object`, `z.string`, etc.)
+   - Used by Astro content collections
+   - Example: `portfolioProjectsPageSchema`
+
+2. **CMS Package**: `apps/cms/src/schemas/`
+   - Uses Keystatic fields (`fields.text`, `fields.object`, etc.)
+   - Used by the CMS interface
+   - Example: `portfolioProjectsPageSchema`
+
+## Required Synchronization
+
+When creating or updating schemas, ensure both versions have:
+
+✅ **Same field names** (e.g., `hero`, `introduction`)
+✅ **Same field types** (string, boolean, array, object)
+✅ **Same required/optional fields**
+✅ **Same default values**
+✅ **Same structure** (nested objects, arrays)
+
+## Base Page Schema
+
+Both `makePageSchema` functions should include the same base fields:
+
+- `content` (optional)
+- `metaDescription` (optional)
+- `canonicalUrl` (optional)
+- `ogImage` (optional)
+- `noIndex` (optional, default: false)
+
+**Note**: The `metaTitle` field has been removed. Meta titles are now always auto-generated from hero titles:
+- **Hero titles** for visible content
+- **Auto-generated meta titles** for SEO (from hero titles)
+- **Route/slug** for programmatic references
+
+## Example: Projects Page Schema
+
+**Astro Content** (`packages/astro-content/src/schemas/projects-page.ts`):
+```typescript
+export const portfolioProjectsPageSchema = makePageSchema({
+  hero: z.object({
+    title: z.string(),
+    subtitle: z.string().optional(),
+    description: z.string().optional(),
+    showParticleBackground: z.boolean().default(true),
+  }),
+  // ... other fields
+});
+```
+
+**CMS** (`apps/cms/src/sites/portfolio/schemas.ts`):
+```typescript
+export const portfolioProjectsPageSchema = makePageSchema({
+  hero: fields.object({
+    title: fields.text({ label: 'Hero Title' }),
+    subtitle: fields.text({ label: 'Hero Subtitle' }),
+    description: fields.text({ label: 'Hero Description', multiline: true }),
+    showParticleBackground: fields.checkbox({ defaultValue: true }),
+  }),
+  // ... other fields
+});
+```
+
+## Auto-Generation Rules
+
+- **Meta titles** are auto-generated from hero titles (e.g., "My Projects" → "My Projects - Harrison Callahan")
+- **Page references** use route/slug instead of redundant title fields
+- **Hero titles** are the primary visible content titles
+
+## Validation Checklist
+
+Before committing schema changes:
+- [ ] Both versions have identical field names
+- [ ] Both versions have matching field types
+- [ ] Both versions have same required/optional fields
+- [ ] Both versions have same default values
+- [ ] Both versions have same nested structure
+- [ ] Content files work with both schemas
+- [ ] No redundant title fields (use hero titles instead)

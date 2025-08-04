@@ -1,0 +1,89 @@
+# Vitest Root Configuration
+
+When adding tests to any package or app, use the root `vitest.config.ts` configuration instead of creating package-specific configs.
+
+## Root Configuration
+
+The root `vitest.config.ts` is already configured to handle tests across the entire monorepo:
+
+```typescript
+// vitest.config.ts
+export default defineConfig({
+  test: {
+    globals: true,
+    environment: 'node',
+    include: [
+      'packages/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'apps/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+    ],
+    exclude: ['.astro', '**/*.d.ts', '**/node_modules/**', '**/dist/**'],
+  },
+  resolve: {
+    alias: {
+      '@bracketbear/core': resolve(__dirname, './packages/core/src'),
+      '@bracketbear/astro-content': resolve(__dirname, './packages/astro-content'),
+    },
+  },
+});
+```
+
+## Usage Guidelines
+
+✅ **Use root config**: All tests use the same configuration
+✅ **No package-level configs**: Don't create `vitest.config.ts` in individual packages
+✅ **Run from root**: Always run tests from the workspace root
+✅ **Consistent aliases**: All packages can use the same import aliases
+
+## Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests for specific package
+npm test packages/core
+
+# Run tests for specific app
+npm test apps/portfolio
+
+# Run tests with watch mode
+npm run test:watch
+```
+
+## Test File Locations
+
+Tests should be co-located with the code they test:
+
+```
+packages/core/src/utils/meta-title.ts
+packages/core/src/utils/meta-title.test.ts
+
+apps/portfolio/src/components/StatsSection.tsx
+apps/portfolio/src/components/StatsSection.test.tsx
+```
+
+## Package.json Scripts
+
+Add test scripts to individual packages if needed:
+
+```json
+{
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run"
+  }
+}
+```
+
+But the actual test execution uses the root configuration.
+
+## Benefits
+
+- **Consistent configuration**: All tests use the same settings
+- **Simplified maintenance**: One config file to manage
+- **Shared aliases**: All packages can use the same import paths
+- **Unified tooling**: Same test runner, coverage, and reporting
+description:
+globs:
+alwaysApply: false
+---
