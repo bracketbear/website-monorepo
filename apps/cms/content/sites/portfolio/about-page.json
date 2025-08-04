@@ -5,28 +5,127 @@
   "noIndex": false,
   "hero": {
     "title": "Builder of management systems and virtual fidget spinners",
-    "showParticleBackground": true
+    "showParticleBackground": true,
+    "stats": [
+      {
+        "label": "Years Experience",
+        "value": "10+",
+        "description": "Building digital experiences"
+      },
+      {
+        "label": "Projects Delivered",
+        "value": "50+",
+        "description": "From startups to enterprise"
+      },
+      {
+        "label": "Technologies Mastered",
+        "value": "25+",
+        "description": "Frontend to backend"
+      }
+    ]
   },
   "narrative": {
     "title": "My Story & Mission",
-    "content": "## HERLLO!\n\nTest"
+        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget aliquam massa nisl quis neque. Etiam euismod, urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget aliquam massa nisl quis neque.\n\nSed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.\n\nNemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.\n\nUt enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.\n\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+      },
+      "values": {
+        "title": "Our Values",
+        "description": "The principles that guide my work and approach to problem-solving.",
+        "items": [
+          {
+            "title": "Innovation",
+            "description": "Pushing boundaries and exploring new technologies to create cutting-edge solutions.",
+            "icon": "rocket"
+          },
+          {
+            "title": "Quality",
+            "description": "Building robust, maintainable code that stands the test of time.",
+            "icon": "star"
+          },
+          {
+            "title": "Collaboration",
+            "description": "Working closely with teams to understand needs and deliver exceptional results.",
+            "icon": "handshake"
+          },
+          {
+            "title": "Learning",
+            "description": "Continuously expanding knowledge and staying current with industry trends.",
+            "icon": "graduation-cap"
+          },
+          {
+            "title": "Efficiency",
+            "description": "Optimizing processes and code to deliver faster, better results.",
+            "icon": "bolt"
+          },
+          {
+            "title": "User-First",
+            "description": "Designing experiences that prioritize user needs and accessibility.",
+            "icon": "heart"
+          }
+        ]
   },
   "skills": {
-    "coreStrengths": [],
-    "technicalExpertise": [],
-    "beyondTech": []
+    "coreStrengths": [
+      "Full-stack development with modern frameworks",
+      "Complex system architecture and design",
+      "Performance optimization and scalability",
+      "User experience and interface design"
+    ],
+    "technicalExpertise": [
+      "React, Vue, Angular",
+      "Node.js, Python, Go",
+      "AWS, Docker, Kubernetes",
+      "PostgreSQL, MongoDB, Redis"
+    ],
+    "beyondTech": [
+      "Project management and team leadership",
+      "Client communication and requirements gathering",
+      "Agile development methodologies",
+      "Technical writing and documentation"
+    ]
   },
   "workStyle": {
     "whatIDo": {
       "title": "What I Do",
-      "items": []
+      "items": [
+        {
+          "text": "Build scalable web applications from concept to deployment, focusing on performance and user experience.",
+          "number": "01"
+        },
+        {
+          "text": "Design and implement complex system architectures that handle high traffic and maintain reliability.",
+          "number": "02"
+        },
+        {
+          "text": "Optimize existing applications for better performance, security, and maintainability.",
+          "number": "03"
+        }
+      ]
     },
     "howIWork": {
       "title": "How I Work",
-      "items": []
+      "items": [
+        {
+          "text": "Start with deep understanding of requirements and user needs before writing any code.",
+          "number": "01"
+        },
+        {
+          "text": "Build iteratively with frequent feedback loops to ensure alignment with goals.",
+          "number": "02"
+        },
+        {
+          "text": "Document thoroughly and maintain clean, testable code for long-term success.",
+          "number": "03"
+        }
+      ]
     }
   },
-  "funFacts": [],
+  "funFacts": [
+    "I once debugged a production issue while on a roller coaster",
+    "My first computer was a Commodore 64",
+    "I can recite the entire Monty Python and the Holy Grail script",
+    "I've written code in 15 different programming languages"
+  ],
   "contactCTA": {
     "text": "If this sounds like someone you'd like on your team, let's talk.",
     "buttonText": "Reach Out",

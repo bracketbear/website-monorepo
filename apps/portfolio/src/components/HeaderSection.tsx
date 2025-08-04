@@ -115,7 +115,7 @@ export default function HeaderSection({
   return (
     <div
       className={clsx(
-        'relative min-h-[60vh] w-full bg-brand-dark lg:min-h-[70vh]',
+        'bg-brand-dark relative min-h-[60vh] w-full lg:min-h-[70vh]',
         className
       )}
     >
@@ -149,7 +149,7 @@ export default function HeaderSection({
                 <div className="mt-10">
                   <a
                     href={ctaHref}
-                    className="inline-flex items-center justify-center rounded-md bg-white px-8 py-3 text-lg font-semibold text-brand-dark shadow-sm hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    className="text-brand-dark inline-flex items-center justify-center rounded-md bg-white px-8 py-3 text-lg font-semibold shadow-sm hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   >
                     {ctaText}
                   </a>
@@ -162,13 +162,20 @@ export default function HeaderSection({
               <div className="mx-auto mt-16 max-w-7xl px-6 lg:px-8">
                 <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
                   {stats.map((stat, index) => (
-                    <div key={index} className="mx-auto flex max-w-xs flex-col gap-y-4">
-                      <dt className="text-base leading-7 text-white/60">{stat.label}</dt>
+                    <div
+                      key={index}
+                      className="mx-auto flex max-w-xs flex-col gap-y-4"
+                    >
+                      <dt className="text-base leading-7 text-white/60">
+                        {stat.label}
+                      </dt>
                       <dd className="order-first text-3xl font-bold tracking-tight text-white sm:text-5xl">
                         {stat.value}
                       </dd>
                       {stat.description && (
-                        <dd className="text-base leading-7 text-white/60">{stat.description}</dd>
+                        <dd className="text-base leading-7 text-white/60">
+                          {stat.description}
+                        </dd>
                       )}
                     </div>
                   ))}

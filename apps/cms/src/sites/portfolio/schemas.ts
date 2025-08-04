@@ -50,7 +50,9 @@ export const portfolioAboutPageSchema = makePageSchema({
       {
         label: 'Header Stats',
         description: 'Optional stats to display in the header',
-        itemLabel: (props) => `${props.value?.label}: ${props.value?.value}` || 'New Stat',
+        itemLabel: (props) =>
+          `${props.fields.label.value}: ${props.fields.value.value}` ||
+          'New Stat',
       }
     ),
     showParticleBackground: fields.checkbox({
@@ -76,6 +78,42 @@ export const portfolioAboutPageSchema = makePageSchema({
         description: 'Add paragraphs that tell your story and mission',
         itemLabel: (props) =>
           props.value?.substring(0, 50) + '...' || 'New Paragraph',
+      }
+    ),
+  }),
+
+  // Values section
+  values: fields.object({
+    title: fields.text({
+      label: 'Values Title',
+      description: 'Title for the values section',
+      defaultValue: 'Our Values',
+    }),
+    description: fields.text({
+      label: 'Values Description',
+      description: 'Brief description of your values',
+      multiline: true,
+    }),
+    items: fields.array(
+      fields.object({
+        title: fields.text({
+          label: 'Value Title',
+          description: 'Title of the value (e.g., "Innovation")',
+        }),
+        description: fields.text({
+          label: 'Value Description',
+          description: 'Description of this value',
+          multiline: true,
+        }),
+        icon: fields.text({
+          label: 'Icon Name',
+          description: 'Optional icon name (e.g., "rocket", "star")',
+        }),
+      }),
+      {
+        label: 'Values',
+        description: 'Your core values and principles',
+        itemLabel: (props) => props.fields.title.value || 'New Value',
       }
     ),
   }),

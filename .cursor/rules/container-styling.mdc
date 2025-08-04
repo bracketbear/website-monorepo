@@ -1,0 +1,35 @@
+# Container Styling Preference
+
+## Use `container mx-auto` Instead of Manual Max-Widths
+
+When creating layout containers, prefer using Tailwind's `container mx-auto` utility over manually setting max-widths with classes like `max-w-4xl`, `max-w-5xl`, etc.
+
+### Preferred Pattern:
+```html
+<div class="container mx-auto">
+  <!-- Content here -->
+</div>
+```
+
+### Instead of:
+```html
+<div class="mx-auto max-w-4xl">
+  <!-- Content here -->
+</div>
+```
+
+### Why This Matters:
+- `container mx-auto` provides responsive behavior out of the box
+- It automatically adjusts based on screen size breakpoints
+- Reduces the need to manually manage different max-widths for different screen sizes
+- Creates more consistent spacing across the application
+
+### Exception:
+Only use manual max-widths when you need very specific control over the content width that differs from the standard container behavior.
+
+### Examples in the codebase:
+- [apps/portfolio/src/pages/about.astro](mdc:apps/portfolio/src/pages/about.astro) - Uses manual max-widths that could be simplified
+- [apps/portfolio/src/layouts/HeroLayout.astro](mdc:apps/portfolio/src/layouts/HeroLayout.astro) - Shows proper container usage
+---
+alwaysApply: true
+---
