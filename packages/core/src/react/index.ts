@@ -9,5 +9,6 @@ export { CheckboxInput } from './CheckboxInput';
 export { Field } from './Field';
 export { CheckboxField } from './CheckboxField';
 export { default as SkillPill } from './SkillPill';
+export { Stats, type StatsProps } from './Stats';
 export { Slider } from './Slider';
 export * from './hooks';

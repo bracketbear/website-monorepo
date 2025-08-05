@@ -7,6 +7,7 @@ import { getBreadcrumbs } from '@/config/breadcrumbs';
 import { generatePortfolioMetaTitle } from '@/config/meta-title';
 import HeroLayout from '@/layouts/HeroLayout.astro';
 import { Picture } from 'astro:assets';
+import { Stats } from '@bracketbear/core/react';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const workProjects = await getCollection('workProject');
@@ -130,6 +131,51 @@ const breadcrumbs = getBreadcrumbs(
     href: `/project/${workProjectItem.id}`,
   }
 );
+
+// Helper function to format skills as text
+function formatSkillsText(skills: any[]): string {
+  const skillNames = skills.slice(0, 3).map((skill: any) => skill?.data.title);
+  const moreCount = skills.length - 3;
+
+  if (moreCount > 0) {
+    return `${skillNames.join(', ')} +${moreCount} more`;
+  }
+
+  return skillNames.join(', ');
+}
+
+// Define stats data
+const stats = [
+  ...(job !== undefined
+    ? [
+        {
+          label: projectPage?.data.sectionHeadings?.company || 'Company',
+          value: companyTitle,
+        },
+      ]
+    : []),
+  {
+    label: projectPage?.data.sectionHeadings?.duration || 'Duration',
+    value: workProjectItem.data.duration,
+  },
+  ...(job !== undefined
+    ? [
+        {
+          label: projectPage?.data.sectionHeadings?.role || 'Role',
+          value: job.data.title,
+        },
+      ]
+    : []),
+  ...(projectSkills.length > 0
+    ? [
+        {
+          label:
+            projectPage?.data.sectionHeadings?.technologies || 'Technologies',
+          value: formatSkillsText(projectSkills),
+        },
+      ]
+    : []),
+];
 ---
 
 <HeroLayout
@@ -146,74 +192,10 @@ const breadcrumbs = getBreadcrumbs(
   }}
   metaDescription={metaDescription}
 >
-  <!-- Project Info Section -->
-  <section class="mb-40 px-6">
-    <div class="container mx-auto">
-      <div class="mx-auto max-w-4xl">
-        <div class="mb-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {
-            job !== undefined && (
-              <div class="text-center">
-                <h4 class="mb-2 text-sm font-black text-white/70 uppercase">
-                  {projectPage?.data.sectionHeadings?.company || 'Company'}
-                </h4>
-                <p class="text-lg font-bold text-white">{companyTitle}</p>
-              </div>
-            )
-          }
-          <div class="text-center">
-            <h4 class="mb-2 text-sm font-black text-white/70 uppercase">
-              {projectPage?.data.sectionHeadings?.duration || 'Duration'}
-            </h4>
-            <p class="text-lg font-bold text-white">
-              {workProjectItem.data.duration}
-            </p>
-          </div>
-          {
-            job !== undefined && (
-              <div class="text-center">
-                <h4 class="mb-2 text-sm font-black text-white/70 uppercase">
-                  {projectPage?.data.sectionHeadings?.role || 'Role'}
-                </h4>
-                <p class="text-lg font-bold text-white">{job.data.title}</p>
-              </div>
-            )
-          }
-          {
-            projectSkills.length > 0 && (
-              <div class="text-center">
-                <h4 class="mb-2 text-sm font-black text-white/70 uppercase">
-                  {projectPage?.data.sectionHeadings?.technologies ||
-                    'Technologies'}
-                </h4>
-                <div class="flex flex-wrap justify-center gap-2">
-                  {projectSkills.slice(0, 3).map((skill: any) => (
-                    <span class="rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white">
-                      {skill?.data.title}
-                    </span>
-                  ))}
-                  {projectSkills.length > 3 && (
-                    <span class="rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white">
-                      +{projectSkills.length - 3} more
-                    </span>
-                  )}
-                </div>
-              </div>
-            )
-          }
-        </div>
-        {
-          workProjectItem.data.isFeatured === true && (
-            <div class="text-center">
-              <span class="bg-brand-red px-4 py-2 text-sm font-black text-white">
-                Featured Project
-              </span>
-            </div>
-          )
-        }
-      </div>
-    </div>
-  </section>
+  <Stats
+    stats={stats}
+    className="relative z-10 -mt-40 mb-16 drop-shadow-xl drop-shadow-black/30"
+  />
 
   <!-- Main Content -->
   <section class="mb-40 px-6">
