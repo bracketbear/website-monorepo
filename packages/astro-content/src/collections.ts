@@ -11,9 +11,11 @@ import {
   blogSchema,
   pageSchema,
   serviceSchema,
+  contactMethodSchema,
   makePageSchema,
   indexPageSchema,
   portfolioAboutPageSchema,
+  portfolioContactPageSchema,
   portfolioIndexPageSchema,
   portfolioWorkPageSchema,
   portfolioProjectsPageSchema,
@@ -81,12 +83,7 @@ export const siteSpecificCollections = {
   },
   portfolioContactPage: {
     base: join(contentPath, 'sites/portfolio'),
-    schema: makePageSchema({
-      phone: z.string().optional(),
-      address: z.string().optional(),
-      contactFormId: z.string().optional(),
-      officeHours: z.string().optional(),
-    }),
+    schema: portfolioContactPageSchema,
     pattern: 'contact-page.json',
   },
   portfolioAboutPage: {
@@ -108,6 +105,11 @@ export const siteSpecificCollections = {
     base: join(contentPath, 'sites/portfolio'),
     schema: portfolioProjectPageSchema,
     pattern: 'project-page.json',
+  },
+  // Portfolio site collections
+  portfolioContactMethods: {
+    base: join(contentPath, 'sites/portfolio/contact-methods'),
+    schema: contactMethodSchema,
   },
   // TODO: Add Bracket Bear collections when Bracket Bear site is implemented
   // bracketBearAboutPage: {

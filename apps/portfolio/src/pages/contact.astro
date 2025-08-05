@@ -1,117 +1,137 @@
 ---
-import ContentLayout from '@/layouts/ContentLayout.astro';
-import ContactForm from '@/components/ContactForm';
+import { getCollection } from 'astro:content';
 import { getContactBreadcrumbs } from '@/config/breadcrumbs';
-import type { LabelValue } from '@bracketbear/core';
+import HeroLayout from '@/layouts/HeroLayout.astro';
+import ContactForm from '@/components/ContactForm';
+import { Stats, ContactIcon } from '@bracketbear/core/react';
+import { marked } from 'marked';
 
-/**
- * TODO: I hate all of the copy in this page.
- */
+// Get the contact page singleton from CMS
+const contactPageEntries = await getCollection('portfolioContactPage');
+const contactPage = contactPageEntries[0]; // Singletons have only one entry
+const contactMethods = await getCollection('portfolioContactMethods');
 
 const breadcrumbs = getContactBreadcrumbs();
 
-interface ContactMethod extends LabelValue {
-  icon: string;
+// Helper function to parse markdown content
+function parseMarkdown(content: string): string {
+  return marked.parse(content) as string;
 }
 
-const contactMethods: ContactMethod[] = [
-  {
-    label: 'Email',
-    value: 'harrison@harrisoncallahan.com',
-    icon: '📧',
-  },
-  {
-    label: 'LinkedIn',
-    value: 'https://linkedin.com/in/harrison-callahan',
-    icon: '💼',
-  },
-  { label: 'GitHub', value: 'https://github.com/bracketbear', icon: '🐙' },
-];
+// Prepare stats data from quick info
+const statsData =
+  contactPage.data.quickInfo?.map((info: { label: string; value: string }) => ({
+    label: info.label,
+    value: info.value,
+  })) || [];
+
+// Get contact methods in the order specified by CMS
+const selectedContactMethods =
+  contactPage.data.contactMethods
+    ?.map((methodId: string) =>
+      contactMethods.find((method) => method.id === methodId)
+    )
+    .filter(Boolean) || [];
 ---
 
-<ContentLayout title="Reach Out" breadcrumbs={breadcrumbs}>
-  <!-- Hero Section with Contact Form -->
-  <div class="mb-16">
-    <div
-      class="bg-brand-dark text-brand-light relative overflow-hidden rounded-4xl p-12"
-    >
-      <!-- Main Content -->
-      <div class="relative z-10">
-        <div class="grid items-start gap-8 lg:grid-cols-2">
+<HeroLayout
+  pageTitle={contactPage.data.title}
+  title={contactPage.data.title}
+  subtitle={contactPage.data.subtitle}
+  breadcrumbs={breadcrumbs}
+  animationPreset="curious-particle-network"
+  metaDescription={contactPage.data.metaDescription}
+>
+  <!-- Introduction Section -->
+  <section class="mb-40 px-6">
+    <div class="container mx-auto text-center">
+      <h2 class="font-heading mb-6 text-4xl tracking-tight text-white">
+        {contactPage.data.introduction.title}
+      </h2>
+    </div>
+    <div class="container mx-auto mt-8">
+      <div
+        class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90"
+      >
+        <div set:html={parseMarkdown(contactPage.data.introduction.content)} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  {
+    statsData.length > 0 && (
+      <Stats
+        stats={statsData}
+        className="relative z-10 -mt-40 mb-16 drop-shadow-xl drop-shadow-black/30"
+      />
+    )
+  }
+
+  <!-- Main Contact Section -->
+  <section class="mb-40 px-6">
+    <div class="container mx-auto">
+      <div
+        class="grid items-start gap-8 rounded-3xl bg-blue-600/40 p-2 lg:grid-cols-2"
+      >
+        <!-- Contact Information -->
+        <div class="space-y-8 px-6 py-10">
           <div>
             <h2
-              class="font-heading text-brand-light mb-6 text-5xl tracking-tight uppercase"
+              class="font-heading mb-6 text-3xl tracking-tight text-white uppercase"
             >
-              Ready to Ship?
+              GET IN TOUCH
             </h2>
-            <div class="space-y-4 text-xl leading-relaxed font-medium">
-              <p>
-                I build digital solutions that work. No fancy buzzwords, no
-                over-engineering. Just solid code that solves real problems.
-              </p>
-              <p class="text-brand-orange font-bold">
-                Currently available for new projects.
-              </p>
+            <div class="space-y-4 text-lg font-medium">
+              {
+                selectedContactMethods.map((method: any) => (
+                  <a
+                    href={method.data.value}
+                    class="hover:text-brand-orange flex items-center gap-3 text-white/90 transition-colors"
+                  >
+                    <span class="text-2xl">
+                      <ContactIcon name={method.data.icon} />
+                    </span>
+                    <span>{method.data.label}</span>
+                  </a>
+                ))
+              }
             </div>
+          </div>
 
-            <!-- Contact Links -->
-            <div class="mt-8 space-y-4">
-              <h3
-                class="font-heading text-brand-light mb-4 text-2xl tracking-tight"
-              >
-                GET IN TOUCH
-              </h3>
-              <div class="space-y-3 text-lg font-medium">
-                {
-                  contactMethods.map((method) => (
-                    <a
-                      href={method.value}
-                      class="hover:text-brand-orange flex items-center gap-3 transition-colors"
-                    >
-                      <span class="text-2xl">{method.icon}</span>
-                      <span>{method.label}</span>
-                    </a>
-                  ))
-                }
-              </div>
-
-              <!-- Quick Info -->
-              <div class="border-brand-light/20 mt-6 border-t pt-6">
-                <div class="space-y-2 text-lg font-medium">
-                  <div class="flex justify-between">
-                    <span>Response Time:</span>
-                    <span class="text-brand-orange font-bold">24h</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Experience:</span>
-                    <span class="text-brand-orange font-bold">10+ Years</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Location:</span>
-                    <span class="text-brand-orange font-bold">Remote/PGH</span>
+          <!-- Quick Info -->
+          {
+            contactPage.data.quickInfo &&
+              contactPage.data.quickInfo.length > 0 && (
+                <div class="border-t border-white/20 pt-6">
+                  <div class="space-y-3 text-lg font-medium">
+                    {contactPage.data.quickInfo.map(
+                      (info: { label: string; value: string }) => (
+                        <div class="flex justify-between">
+                          <span class="text-white/70">{info.label}:</span>
+                          <span class="text-brand-orange font-bold">
+                            {info.value}
+                          </span>
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
+              )
+          }
+        </div>
 
-          <div class="bg-brand-light text-brand-dark rounded-2xl p-8">
-            <h3 class="font-heading mb-6 text-2xl tracking-tight">
-              SEND ME A MESSAGE
-            </h3>
-            <div
-              class="text-brand-dark mb-6 text-lg leading-relaxed font-medium"
-            >
-              <p>
-                Tell me about your project, timeline, and what you're looking
-                for. I'll get back to you with how I can help bring your vision
-                to life.
-              </p>
-            </div>
-            <ContactForm client:load />
+        <!-- Contact Form -->
+        <div class="card pt-10">
+          <h3 class="font-heading mb-6 text-2xl tracking-tight uppercase">
+            {contactPage.data.contactForm.title}
+          </h3>
+          <div class="text-brand-dark mb-6 text-lg leading-relaxed font-medium">
+            <p>{contactPage.data.contactForm.description}</p>
           </div>
+          <ContactForm client:load />
         </div>
       </div>
     </div>
-  </div>
-</ContentLayout>
+  </section>
+</HeroLayout>

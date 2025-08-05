@@ -37,6 +37,7 @@ export const basePageSchema = z.object({
  * This should be consistent with the CMS version in apps/cms/src/schemas/page.ts
  *
  * @param extras - Optional additional Zod schema fields to merge
+ * @param options - Optional configuration for the schema
  * @returns A merged schema that includes base page fields plus any extras
  *
  * @example
@@ -51,7 +52,7 @@ export const basePageSchema = z.object({
  *   contactFormId: z.string(),
  * });
  *
- * // About page with custom fields
+ * // About page with custom fields and conditional CTA
  * const aboutPageSchema = makePageSchema({
  *   teamMembers: z.array(z.object({
  *     name: z.string(),
@@ -59,11 +60,31 @@ export const basePageSchema = z.object({
  *     bio: z.string()
  *   })),
  *   companyValues: z.array(z.string())
- * });
+ * }, { showCta: true });
  * ```
  */
 export function makePageSchema<Extras extends z.ZodRawShape = z.ZodRawShape>(
-  extras?: Extras
+  extras?: Extras,
+  options?: { showCta?: boolean }
 ) {
-  return extras ? basePageSchema.merge(z.object(extras)) : basePageSchema;
+  const showCta = options?.showCta !== false; // Default to true for backward compatibility
+
+  // Define CTA fields
+  const ctaFields = showCta
+    ? {
+        contactCTA: z.object({
+          text: z.string(),
+          buttonText: z.string().default('Get In Touch'),
+          buttonLink: z.string().default('/contact'),
+        }),
+      }
+    : {};
+
+  const allFields = extras
+    ? { ...ctaFields, ...extras }
+    : ctaFields;
+
+  return allFields
+    ? basePageSchema.merge(z.object(allFields))
+    : basePageSchema;
 }

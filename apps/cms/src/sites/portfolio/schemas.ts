@@ -40,19 +40,11 @@ export const portfolioAboutPageSchema = makePageSchema({
       label: 'Narrative Title',
       description: 'Title for the combined story and mission section',
     }),
-    paragraphs: fields.array(
-      fields.text({
-        label: 'Paragraph',
-        multiline: true,
-        description: 'Write a paragraph about your story and mission',
-      }),
-      {
-        label: 'Narrative Paragraphs',
-        description: 'Add paragraphs that tell your story and mission',
-        itemLabel: (props) =>
-          props.value?.substring(0, 50) + '...' || 'New Paragraph',
-      }
-    ),
+    content: fields.text({
+      label: 'Narrative Content',
+      description: 'Content for the combined story and mission section',
+      multiline: true,
+    }),
   }),
 
   // Values section
@@ -219,15 +211,79 @@ export const portfolioAboutPageSchema = makePageSchema({
  * This schema defines the contact page structure for the portfolio site.
  * It includes fields relevant to a developer portfolio contact page.
  */
-export const portfolioContactPageSchema = makePageSchema({
-  phone: fields.text({ label: 'Phone' }),
-  address: fields.text({ label: 'Address' }),
-  contactFormId: fields.text({ label: 'Contact Form ID' }),
-  officeHours: fields.text({ label: 'Office Hours' }),
-  // Portfolio-specific fields
-  availability: fields.text({ label: 'Availability Status' }),
-  responseTime: fields.text({ label: 'Expected Response Time' }),
-});
+export const portfolioContactPageSchema = makePageSchema(
+  {
+    // Introduction section
+    introduction: fields.object({
+      title: fields.text({
+        label: 'Introduction Title',
+        description: 'Title for the introduction section',
+        defaultValue: 'Ready to Ship?',
+      }),
+      content: fields.text({
+        label: 'Introduction Content',
+        description: 'Content describing your availability and approach',
+        multiline: true,
+      }),
+    }),
+
+    // Contact methods section - now using relationship field
+    contactMethods: fields.array(
+      fields.relationship({
+        label: 'Contact Method',
+        collection: 'portfolioContactMethods',
+        description: 'Select contact methods to display on this page',
+      }),
+      {
+        label: 'Contact Methods',
+        description: 'Contact methods to display on this page',
+        itemLabel: (props) => props.value || 'New Contact Method',
+      }
+    ),
+
+    // Quick info section
+    quickInfo: fields.array(
+      fields.object({
+        label: fields.text({
+          label: 'Quick Info Label',
+          description: 'Label for the quick info item (e.g., "Response Time")',
+        }),
+        value: fields.text({
+          label: 'Quick Info Value',
+          description: 'Value for the quick info item (e.g., "24h")',
+        }),
+      }),
+      {
+        label: 'Quick Info',
+        description: 'Quick information about your availability and experience',
+        itemLabel: (props) => props.fields.label.value || 'New Quick Info',
+      }
+    ),
+
+    // Contact form section
+    contactForm: fields.object({
+      title: fields.text({
+        label: 'Contact Form Title',
+        description: 'Title for the contact form section',
+        defaultValue: 'Send Me a Message',
+      }),
+      description: fields.text({
+        label: 'Contact Form Description',
+        description: 'Description for the contact form section',
+        multiline: true,
+      }),
+    }),
+
+    // Legacy fields (kept for backward compatibility)
+    phone: fields.text({ label: 'Phone' }),
+    address: fields.text({ label: 'Address' }),
+    contactFormId: fields.text({ label: 'Contact Form ID' }),
+    officeHours: fields.text({ label: 'Office Hours' }),
+    availability: fields.text({ label: 'Availability Status' }),
+    responseTime: fields.text({ label: 'Expected Response Time' }),
+  },
+  { showCta: false }
+); // Disable CTA for contact page since they're already on the contact page
 
 /**
  * Portfolio Index Page Schema

@@ -1,6 +1,7 @@
 import { config } from '@keystatic/core';
 import { workCollections } from './src/collections/work';
 import { contentCollections } from './src/collections/content';
+import { portfolioCollections } from './src/sites/portfolio/collections';
 import { singletons } from './src/singletons';
 
 export default config({
@@ -23,6 +24,7 @@ export default config({
         'portfolioAboutPage',
         'portfolioWorkPage',
         'portfolioProjectsPage',
+        'portfolioContactMethods',
       ],
       'Work Content': [
         'workCompany',
@@ -40,6 +42,7 @@ export default config({
   collections: {
     ...workCollections,
     ...contentCollections,
+    ...portfolioCollections,
   },
   singletons,
 });

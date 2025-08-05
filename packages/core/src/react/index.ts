@@ -11,4 +11,5 @@ export { CheckboxField } from './CheckboxField';
 export { default as SkillPill } from './SkillPill';
 export { Stats, type StatsProps } from './Stats';
 export { Slider } from './Slider';
+export { ContactIcon } from './ContactIcon';
 export * from './hooks';

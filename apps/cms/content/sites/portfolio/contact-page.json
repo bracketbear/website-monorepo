@@ -1,0 +1,33 @@
+{
+  "title": "Reach Out",
+  "subtitle": "Let's build something amazing together",
+  "metaDescription": "Get in touch with Harrison Callahan to discuss your next project. Available for new opportunities and collaborations.",
+  "noIndex": false,
+  "introduction": {
+    "title": "Ready to Ship?",
+    "content": "I build digital solutions that work. No fancy buzzwords, no over-engineering. Just solid code that solves real problems.\n\nCurrently available for new projects."
+  },
+  "contactMethods": [
+    "linkedin",
+    "email",
+    "github"
+  ],
+  "quickInfo": [
+    {
+      "label": "Response Time",
+      "value": "24h"
+    },
+    {
+      "label": "Experience",
+      "value": "10+ Years"
+    },
+    {
+      "label": "Location",
+      "value": "Remote/PGH"
+    }
+  ],
+  "contactForm": {
+    "title": "Contact Form",
+    "description": "Tell me about your project, timeline, and what you're looking for. I'll get back to you with how I can help bring your vision to life."
+  }
+}

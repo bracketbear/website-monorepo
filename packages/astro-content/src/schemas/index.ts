@@ -32,10 +32,11 @@ export {
 } from './work';
 
 // Export all content schemas
-export { blogSchema, pageSchema, serviceSchema } from './content';
+export { blogSchema, pageSchema, serviceSchema, contactMethodSchema } from './content';
 export { basePageSchema, makePageSchema } from './page';
 export { indexPageSchema, type IndexPageData } from './index-page';
 export * from './about-page';
+export * from './contact-page';
 export * from './work-page';
 export * from './projects-page';
 export * from './project-page';

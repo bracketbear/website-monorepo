@@ -55,6 +55,7 @@ export function makeBasePageFields() {
  * This should be consistent with the Astro content version in packages/astro-content/src/schemas/page.ts
  *
  * @param extras - Optional additional field definitions to merge
+ * @param options - Optional configuration for the schema
  * @returns A merged schema that includes base page fields plus any extras
  *
  * @example
@@ -69,7 +70,7 @@ export function makeBasePageFields() {
  *   contactFormId: fields.text({ label: 'Contact Form ID' }),
  * });
  *
- * // About page with custom fields
+ * // About page with custom fields and conditional CTA
  * const aboutPageSchema = makePageSchema({
  *   teamMembers: fields.array(
  *     fields.object({
@@ -83,18 +84,47 @@ export function makeBasePageFields() {
  *     fields.text({ label: 'Value' }),
  *     { label: 'Company Values' }
  *   ),
- * });
+ * }, { showCta: true });
  * ```
  */
-export function makePageSchema(extras?: Record<string, any>) {
+export function makePageSchema(
+  extras?: Record<string, any>,
+  options?: { showCta?: boolean }
+) {
   const baseFields = makeBasePageFields();
+  const showCta = options?.showCta !== false; // Default to true for backward compatibility
+
+  // Define CTA fields
+  const ctaFields = showCta
+    ? {
+        contactCTA: fields.object({
+          text: fields.text({
+            label: 'CTA Text',
+            description: 'Call-to-action text',
+            multiline: true,
+          }),
+          buttonText: fields.text({
+            label: 'Button Text',
+            defaultValue: 'Get In Touch',
+          }),
+          buttonLink: fields.text({
+            label: 'Button Link',
+            defaultValue: '/contact',
+          }),
+        }),
+      }
+    : {};
 
   if (!extras) {
-    return baseFields;
+    return {
+      ...baseFields,
+      ...ctaFields,
+    };
   }
 
   return {
     ...baseFields,
+    ...ctaFields,
     ...extras,
   };
 }
