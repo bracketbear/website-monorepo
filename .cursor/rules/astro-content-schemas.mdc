@@ -1,0 +1,49 @@
+---
+alwaysApply: false
+---
+# Astro Content Schema Guidelines
+
+## Import Rules
+
+### ✅ Correct: Import from 'zod' directly
+```typescript
+import { z } from 'zod';
+import { makePageSchema } from './page';
+```
+
+### ❌ Incorrect: Import from 'astro:content'
+```typescript
+import { z } from 'astro:content'; // This will cause errors!
+```
+
+## Why This Matters
+
+The `@bracketbear/astro-content` package is a standalone package, not an Astro application. The `astro:content` module is a virtual module that's only available within Astro applications.
+
+- **Standalone packages** should import `zod` directly
+- **Astro applications** can import from `astro:content` (which re-exports `zod`)
+
+## Schema Creation Pattern
+
+When creating new schemas in `packages/astro-content/src/schemas/`:
+
+1. Always import `z` from `'zod'`
+2. Use the existing `makePageSchema` helper from `'./page'`
+3. Export both the schema and its inferred types
+
+```typescript
+import { z } from 'zod';
+import { makePageSchema } from './page';
+
+export const mySchema = makePageSchema({
+  // Your schema definition here
+});
+
+export type MySchemaData = z.infer<typeof mySchema>;
+```
+
+## Related Files
+
+- [packages/astro-content/src/schemas/page.ts](mdc:packages/astro-content/src/schemas/page.ts) - Base page schema helper
+- [packages/astro-content/src/schemas/index.ts](mdc:packages/astro-content/src/schemas/index.ts) - Schema exports
+- [packages/astro-content/package.json](mdc:packages/astro-content/package.json) - Package dependencies
