@@ -9,10 +9,10 @@
 
 /* A useful utility for limiting the width of prose text. */
 @utility max-w-prose {
-  max-width: 65ch;
+  @apply max-w-[65ch];
 
   @variant xl {
-    max-width: 75ch;
+    @apply max-w-[75ch];
   }
 }
 
@@ -38,589 +38,312 @@
   }
 }
 
-/* Prose utility - replicates Tailwind's typography plugin */
-@layer components {
-  .prose {
-    color: var(--color-brand-dark);
-    max-width: 65ch;
-  }
+/* Base prose utility - replicates Tailwind's typography plugin */
+@utility prose {
+  @apply text-brand-dark;
 
-  .prose h1 {
-    color: inherit;
-    font-weight: 800;
-    font-size: 2.25em;
-    margin-top: 0;
-    margin-bottom: 0.8888889em;
+  /* Base prose variables - these will be overridden by size variants */
+  --prose-font-size: 1rem;
+  --prose-line-height: 1.75;
+  --prose-spacing: 1.25em;
+  --prose-heading-spacing: 0.5em;
+  --prose-list-spacing: 1.625em;
+  --prose-blockquote-spacing: 1em;
+  --prose-pre-spacing: 0.8571429em;
+  --prose-table-spacing: 0.5714286em;
+  --prose-hr-spacing: 3em;
+
+  /* Heading size multipliers */
+  --prose-h1-size: 2.25em;
+  --prose-h2-size: 1.5em;
+  --prose-h3-size: 1.25em;
+  --prose-h4-size: 1em;
+
+  & h1 {
+    @apply mt-0 mb-[0.8888889em] font-extrabold;
+    font-size: var(--prose-h1-size);
     line-height: 1.1111111;
   }
 
-  .prose h2 {
-    color: inherit;
-    font-weight: 700;
-    font-size: 1.5em;
-    margin-top: 2em;
-    margin-bottom: 1em;
+  & h2 {
+    @apply mt-8 mb-4 font-bold;
+    font-size: var(--prose-h2-size);
     line-height: 1.3333333;
   }
 
-  .prose h3 {
-    color: inherit;
-    font-weight: 600;
-    font-size: 1.25em;
-    margin-top: 1.6em;
-    margin-bottom: 0.6em;
+  & h3 {
+    @apply mt-6 mb-2 font-semibold;
+    font-size: var(--prose-h3-size);
     line-height: 1.6;
   }
 
-  .prose h4 {
-    color: inherit;
-    font-weight: 600;
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
+  & h4 {
+    @apply mt-6 mb-2 font-semibold;
+    font-size: var(--prose-h4-size);
     line-height: 1.5;
   }
 
-  .prose p {
-    margin-top: 1.25em;
-    margin-bottom: 1.25em;
-    line-height: 1.75;
+  & p {
+    margin-top: var(--prose-spacing);
+    margin-bottom: var(--prose-spacing);
+    line-height: var(--prose-line-height);
   }
 
-  .prose ul,
-  .prose ol {
-    margin-top: 1.25em;
-    margin-bottom: 1.25em;
-    padding-left: 1.625em;
+  & ul,
+  & ol {
+    margin-top: var(--prose-spacing);
+    margin-bottom: var(--prose-spacing);
+    padding-left: var(--prose-list-spacing);
   }
 
-  .prose li {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
+  & li {
+    margin-top: calc(var(--prose-spacing) * 0.25);
+    margin-bottom: calc(var(--prose-spacing) * 0.25);
   }
 
-  .prose ul > li {
-    position: relative;
+  & ul > li {
+    @apply relative;
     padding-left: 1.375em;
   }
 
-  .prose ul > li::before {
+  & ul > li::before {
     content: '';
-    width: 0.375em;
-    height: 0.375em;
-    position: absolute;
-    top: 0.6875em;
-    left: 0.25em;
-    border-radius: 50%;
-    background-color: currentColor;
+    @apply absolute top-[0.6875em] left-[0.25em] h-[0.375em] w-[0.375em] rounded-full bg-current;
   }
 
-  .prose ol > li {
-    position: relative;
+  & ol > li {
+    @apply relative;
     padding-left: 1.375em;
   }
 
-  .prose ol > li::before {
+  & ol > li::before {
     content: counter(list-item, decimal) '.';
-    width: 1.625em;
-    position: absolute;
-    top: 0;
-    left: 0;
-    font-weight: 400;
-    color: currentColor;
+    @apply absolute top-0 left-0 w-[1.625em] font-normal text-current;
   }
 
-  .prose blockquote {
-    font-weight: 500;
-    font-style: italic;
-    color: inherit;
-    border-left-width: 0.25rem;
-    border-left-color: currentColor;
+  & blockquote {
+    @apply border-l-4 border-l-current font-medium italic;
+    margin-top: calc(var(--prose-spacing) * 1.2);
+    margin-bottom: calc(var(--prose-spacing) * 1.2);
+    padding-left: var(--prose-blockquote-spacing);
     quotes: '\201C' '\201D' '\2018' '\2019';
-    margin-top: 1.6em;
-    margin-bottom: 1.6em;
-    padding-left: 1em;
   }
 
-  .prose blockquote p:first-of-type::before {
+  & blockquote p:first-of-type::before {
     content: open-quote;
   }
 
-  .prose blockquote p:last-of-type::after {
+  & blockquote p:last-of-type::after {
     content: close-quote;
   }
 
-  .prose code {
-    color: inherit;
-    font-weight: 600;
-    font-size: 0.875em;
+  & code {
+    @apply text-sm font-semibold;
   }
 
-  .prose code::before {
+  & code::before {
     content: '`';
   }
 
-  .prose code::after {
+  & code::after {
     content: '`';
   }
 
-  .prose pre {
-    color: inherit;
-    background-color: transparent;
-    border: 1px solid currentColor;
-    border-radius: 0.375rem;
-    font-size: 0.875em;
-    font-weight: 400;
+  & pre {
+    @apply overflow-x-auto rounded-md border border-current bg-transparent text-sm font-normal;
+    margin-top: var(--prose-spacing);
+    margin-bottom: var(--prose-spacing);
+    padding: var(--prose-pre-spacing) 1em;
     line-height: 1.7142857;
-    margin: 1.7142857em 0;
-    overflow-x: auto;
-    padding: 0.8571429em 1.1428571em;
   }
 
-  .prose pre code {
-    background-color: transparent;
-    border-width: 0;
-    border-radius: 0;
-    color: inherit;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-    padding: 0;
+  & pre code {
+    @apply rounded-none border-0 bg-transparent p-0;
   }
 
-  .prose pre code::before {
+  & pre code::before {
     content: none;
   }
 
-  .prose pre code::after {
+  & pre code::after {
     content: none;
   }
 
-  .prose table {
-    width: 100%;
-    table-layout: auto;
-    text-align: left;
-    margin-top: 2em;
-    margin-bottom: 2em;
-    font-size: 0.875em;
+  & table {
+    @apply w-full table-auto text-left text-sm;
+    margin-top: var(--prose-spacing);
+    margin-bottom: var(--prose-spacing);
     line-height: 1.7142857;
   }
 
-  .prose thead {
-    color: inherit;
-    font-weight: 600;
-    border-bottom: 1px solid currentColor;
+  & thead {
+    @apply border-b border-current font-semibold;
   }
 
-  .prose thead th {
-    vertical-align: bottom;
-    padding-right: 0.5714286em;
-    padding-bottom: 0.5714286em;
-    padding-left: 0.5714286em;
+  & thead th {
+    @apply align-bottom;
+    padding: var(--prose-table-spacing) 0.5714286em;
   }
 
-  .prose tbody tr {
-    border-bottom: 1px solid currentColor;
+  & tbody tr {
+    @apply border-b border-current;
   }
 
-  .prose tbody tr:last-child {
-    border-bottom-width: 0;
+  & tbody tr:last-child {
+    @apply border-b-0;
   }
 
-  .prose tbody td {
-    vertical-align: baseline;
-    padding: 0.5714286em;
+  & tbody td {
+    @apply align-baseline;
+    padding: var(--prose-table-spacing) 0.5714286em;
   }
 
-  .prose a {
-    color: inherit;
-    text-decoration: underline;
-    font-weight: 500;
+  & a {
+    @apply font-medium underline;
   }
 
-  .prose a:hover {
-    color: inherit;
+  & img {
+    margin-top: var(--prose-spacing);
+    margin-bottom: var(--prose-spacing);
   }
 
-  .prose img {
-    margin-top: 2em;
-    margin-bottom: 2em;
+  & hr {
+    @apply border-t border-current;
+    margin-top: var(--prose-hr-spacing);
+    margin-bottom: var(--prose-hr-spacing);
   }
 
-  .prose hr {
-    border-color: currentColor;
-    border-top-width: 1px;
-    margin-top: 3em;
-    margin-bottom: 3em;
+  & strong {
+    @apply font-semibold;
   }
 
-  .prose strong {
-    color: inherit;
-    font-weight: 600;
+  & em {
+    @apply italic;
   }
 
-  .prose em {
-    color: inherit;
-    font-style: italic;
+  & small {
+    @apply text-sm;
   }
 
-  .prose small {
-    color: inherit;
-    font-size: 0.875em;
+  & abbr {
+    @apply underline decoration-dotted;
   }
 
-  .prose del {
-    color: inherit;
+  & mark {
+    @apply bg-current;
   }
+}
 
-  .prose abbr {
-    color: inherit;
-    text-decoration: underline;
-    text-decoration-style: dotted;
-  }
-
-  .prose mark {
-    background-color: currentColor;
-    color: inherit;
-  }
-
-  /* Prose size variants */
-  .prose-sm {
-    font-size: 0.875rem;
-    line-height: 1.7142857;
-  }
-
-  .prose-sm p {
-    margin-top: 1.1428571em;
-    margin-bottom: 1.1428571em;
-  }
-
-  .prose-sm h1,
-  .prose-sm h2,
-  .prose-sm h3,
-  .prose-sm h4 {
-    margin-top: 1.1428571em;
-    margin-bottom: 0.5714286em;
-  }
-
-  .prose-sm ul,
-  .prose-sm ol {
-    margin-top: 1.1428571em;
-    margin-bottom: 1.1428571em;
-  }
-
-  .prose-sm li {
-    margin-top: 0.2857143em;
-    margin-bottom: 0.2857143em;
-  }
-
-  .prose-sm blockquote {
-    margin-top: 1.3333333em;
-    margin-bottom: 1.3333333em;
-    padding-left: 1.1111111em;
-  }
-
-  .prose-sm h1 {
-    font-size: 1.4285714em;
-  }
-
-  .prose-sm h2 {
-    font-size: 1.2857143em;
-  }
-
-  .prose-sm h3 {
-    font-size: 1.1428571em;
-  }
-
-  .prose-sm h4 {
-    font-size: 1em;
-  }
-
-  .prose-sm ul,
-  .prose-sm ol {
-    padding-left: 1.5714286em;
-  }
-
-  .prose-sm pre {
-    margin-top: 1.1428571em;
-    margin-bottom: 1.1428571em;
-    padding: 0.75em 1em;
-  }
-
-  .prose-sm table {
-    margin-top: 1.1428571em;
-    margin-bottom: 1.1428571em;
-  }
-
-  .prose-sm img {
-    margin-top: 1.1428571em;
-    margin-bottom: 1.1428571em;
-  }
-
-  .prose-sm hr {
-    margin-top: 2.2857143em;
-    margin-bottom: 2.2857143em;
-  }
-
-  .prose-lg {
-    font-size: 1.125rem;
-    line-height: 1.7777778;
-  }
-
-  .prose-lg p {
-    margin-top: 1.3333333em;
-    margin-bottom: 1.3333333em;
-  }
-
-  .prose-lg h1,
-  .prose-lg h2,
-  .prose-lg h3,
-  .prose-lg h4 {
-    margin-top: 1.3333333em;
-    margin-bottom: 0.6666667em;
-  }
-
-  .prose-lg ul,
-  .prose-lg ol {
-    margin-top: 1.3333333em;
-    margin-bottom: 1.3333333em;
-  }
-
-  .prose-lg li {
-    margin-top: 0.3333333em;
-    margin-bottom: 0.3333333em;
-  }
-
-  .prose-lg blockquote {
-    margin-top: 1.6666667em;
-    margin-bottom: 1.6666667em;
-    padding-left: 1em;
-  }
-
-  .prose-lg h1 {
-    font-size: 2.6666667em;
-  }
-
-  .prose-lg h2 {
-    font-size: 1.6666667em;
-  }
-
-  .prose-lg h3 {
-    font-size: 1.3333333em;
-  }
-
-  .prose-lg h4 {
-    font-size: 1.1111111em;
-  }
-
-  .prose-lg ul,
-  .prose-lg ol {
-    padding-left: 1.5555556em;
-  }
-
-  .prose-lg pre {
-    margin-top: 1.3333333em;
-    margin-bottom: 1.3333333em;
-    padding: 0.8888889em 1.1111111em;
-  }
-
-  .prose-lg table {
-    margin-top: 1.3333333em;
-    margin-bottom: 1.3333333em;
-  }
+/* Prose size variants - apply the prose utility and override variables */
+@utility prose-sm {
+  @apply prose;
 
-  .prose-lg img {
-    margin-top: 1.3333333em;
-    margin-bottom: 1.3333333em;
-  }
-
-  .prose-lg hr {
-    margin-top: 2.6666667em;
-    margin-bottom: 2.6666667em;
-  }
-
-  .prose-xl {
-    font-size: 1.25rem;
-    line-height: 1.75;
-  }
-
-  .prose-xl p {
-    margin-top: 1.375em;
-    margin-bottom: 1.375em;
-  }
-
-  .prose-xl h1,
-  .prose-xl h2,
-  .prose-xl h3,
-  .prose-xl h4 {
-    margin-top: 1.375em;
-    margin-bottom: 0.6875em;
-  }
-
-  .prose-xl ul,
-  .prose-xl ol {
-    margin-top: 1.375em;
-    margin-bottom: 1.375em;
-  }
-
-  .prose-xl li {
-    margin-top: 0.34375em;
-    margin-bottom: 0.34375em;
-  }
-
-  .prose-xl blockquote {
-    margin-top: 1.75em;
-    margin-bottom: 1.75em;
-    padding-left: 1em;
-  }
-
-  .prose-xl h1 {
-    font-size: 3em;
-  }
-
-  .prose-xl h2 {
-    font-size: 1.875em;
-  }
-
-  .prose-xl h3 {
-    font-size: 1.5em;
-  }
-
-  .prose-xl h4 {
-    font-size: 1.25em;
-  }
-
-  .prose-xl ul,
-  .prose-xl ol {
-    padding-left: 1.5em;
-  }
-
-  .prose-xl pre {
-    margin-top: 1.375em;
-    margin-bottom: 1.375em;
-    padding: 0.75em 1em;
-  }
-
-  .prose-xl table {
-    margin-top: 1.375em;
-    margin-bottom: 1.375em;
-  }
+  --prose-font-size: 0.875rem;
+  --prose-line-height: 1.7142857;
+  --prose-spacing: 1.1428571em;
+  --prose-heading-spacing: 0.5714286em;
+  --prose-list-spacing: 1.5714286em;
+  --prose-blockquote-spacing: 1.1111111em;
+  --prose-pre-spacing: 0.75em;
+  --prose-table-spacing: 0.5714286em;
+  --prose-hr-spacing: 2.2857143em;
+  --prose-h1-size: 1.4285714em;
+  --prose-h2-size: 1.2857143em;
+  --prose-h3-size: 1.1428571em;
+  --prose-h4-size: 1em;
 
-  .prose-xl img {
-    margin-top: 1.375em;
-    margin-bottom: 1.375em;
-  }
-
-  .prose-xl hr {
-    margin-top: 2.75em;
-    margin-bottom: 2.75em;
-  }
-
-  .prose-2xl {
-    font-size: 1.5rem;
-    line-height: 1.6666667;
-  }
-
-  .prose-2xl p {
-    margin-top: 1.4166667em;
-    margin-bottom: 1.4166667em;
-  }
-
-  .prose-2xl h1,
-  .prose-2xl h2,
-  .prose-2xl h3,
-  .prose-2xl h4 {
-    margin-top: 1.4166667em;
-    margin-bottom: 0.7083333em;
-  }
-
-  .prose-2xl ul,
-  .prose-2xl ol {
-    margin-top: 1.4166667em;
-    margin-bottom: 1.4166667em;
-  }
-
-  .prose-2xl li {
-    margin-top: 0.3541667em;
-    margin-bottom: 0.3541667em;
-  }
-
-  .prose-2xl blockquote {
-    margin-top: 1.8333333em;
-    margin-bottom: 1.8333333em;
-    padding-left: 1em;
-  }
+  @apply text-sm;
+}
 
-  .prose-2xl h1 {
-    font-size: 3.3333333em;
-  }
-
-  .prose-2xl h2 {
-    font-size: 2.0833333em;
-  }
-
-  .prose-2xl h3 {
-    font-size: 1.6666667em;
-  }
-
-  .prose-2xl h4 {
-    font-size: 1.3333333em;
-  }
+@utility prose-lg {
+  @apply prose;
 
-  .prose-2xl ul,
-  .prose-2xl ol {
-    padding-left: 1.4583333em;
-  }
-
-  .prose-2xl pre {
-    margin-top: 1.4166667em;
-    margin-bottom: 1.4166667em;
-    padding: 0.6666667em 0.8333333em;
-  }
-
-  .prose-2xl table {
-    margin-top: 1.4166667em;
-    margin-bottom: 1.4166667em;
-  }
-
-  .prose-2xl img {
-    margin-top: 1.4166667em;
-    margin-bottom: 1.4166667em;
-  }
+  --prose-font-size: 1.125rem;
+  --prose-line-height: 1.7777778;
+  --prose-spacing: 1.3333333em;
+  --prose-heading-spacing: 0.6666667em;
+  --prose-list-spacing: 1.5555556em;
+  --prose-blockquote-spacing: 1em;
+  --prose-pre-spacing: 0.8888889em;
+  --prose-table-spacing: 0.5714286em;
+  --prose-hr-spacing: 2.6666667em;
+  --prose-h1-size: 2.6666667em;
+  --prose-h2-size: 1.6666667em;
+  --prose-h3-size: 1.3333333em;
+  --prose-h4-size: 1.1111111em;
 
-  .prose-2xl hr {
-    margin-top: 2.8333333em;
-    margin-bottom: 2.8333333em;
-  }
+  @apply text-lg;
+}
 
-  /* Prose color modifiers */
+@utility prose-xl {
+  @apply prose;
+
+  --prose-font-size: 1.25rem;
+  --prose-line-height: 1.75;
+  --prose-spacing: 1.375em;
+  --prose-heading-spacing: 0.6875em;
+  --prose-list-spacing: 1.5em;
+  --prose-blockquote-spacing: 1em;
+  --prose-pre-spacing: 0.75em;
+  --prose-table-spacing: 0.5714286em;
+  --prose-hr-spacing: 2.75em;
+  --prose-h1-size: 3em;
+  --prose-h2-size: 1.875em;
+  --prose-h3-size: 1.5em;
+  --prose-h4-size: 1.25em;
+
+  @apply text-xl;
+}
+
+@utility prose-2xl {
+  @apply prose;
+
+  --prose-font-size: 1.5rem;
+  --prose-line-height: 1.6666667;
+  --prose-spacing: 1.4166667em;
+  --prose-heading-spacing: 0.7083333em;
+  --prose-list-spacing: 1.4583333em;
+  --prose-blockquote-spacing: 1em;
+  --prose-pre-spacing: 0.6666667em;
+  --prose-table-spacing: 0.5714286em;
+  --prose-hr-spacing: 2.8333333em;
+  --prose-h1-size: 3.3333333em;
+  --prose-h2-size: 2.0833333em;
+  --prose-h3-size: 1.6666667em;
+  --prose-h4-size: 1.3333333em;
+
+  @apply text-2xl;
+}
+
+/* Prose color modifiers */
+@layer components {
   .prose-headings\:text-white h1,
   .prose-headings\:text-white h2,
   .prose-headings\:text-white h3,
   .prose-headings\:text-white h4 {
-    color: white;
+    @apply text-white;
   }
 
   .prose-p\:text-white\/90 p {
-    color: color-mix(in srgb, white 90%, transparent);
+    @apply text-white/90;
   }
 
   .prose-p\:text-white\/80 p {
-    color: color-mix(in srgb, white 80%, transparent);
+    @apply text-white/80;
   }
 
   .prose-headings\:text-brand-dark h1,
   .prose-headings\:text-brand-dark h2,
   .prose-headings\:text-brand-dark h3,
   .prose-headings\:text-brand-dark h4 {
-    color: var(--color-brand-dark);
+    @apply text-brand-dark;
   }
 
   .prose-p\:text-brand-dark\/90 p {
-    color: color-mix(in srgb, var(--color-brand-dark) 90%, transparent);
+    @apply text-brand-dark/90;
   }
 
   .prose-p\:text-brand-dark\/80 p {
-    color: color-mix(in srgb, var(--color-brand-dark) 80%, transparent);
+    @apply text-brand-dark/80;
   }
 }

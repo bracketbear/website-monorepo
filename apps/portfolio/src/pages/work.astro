@@ -40,13 +40,10 @@ function parseMarkdown(content: string): string {
         {workPage.data.introduction.title}
       </h2>
     </div>
-    <div class="container mx-auto mt-8">
-      <div
-        class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90"
-      >
-        <div set:html={parseMarkdown(workPage.data.introduction.content)} />
-      </div>
-    </div>
+    <div
+      class="prose prose-lg prose-headings:text-white prose-p:text-white/90 typography leading-relaxed text-white/90"
+      set:html={parseMarkdown(workPage.data.introduction.content)}
+    />
   </section>
 
   <!-- Stats Section (if available) -->
@@ -57,16 +54,15 @@ function parseMarkdown(content: string): string {
   }
 
   <!-- Tool Description Section -->
-  <div class="mb-40 px-6">
-    <div class="mx-auto max-w-4xl text-center">
+  <div class="mb-8 px-6">
+    <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <h2 class="font-heading mb-4 text-4xl tracking-tight text-white">
         {workPage.data.toolDescription.title}
       </h2>
       <div
-        class="prose prose-lg prose-headings:text-white prose-p:text-white/80 mb-12 text-xl leading-relaxed text-white/80"
-      >
-        <div set:html={parseMarkdown(workPage.data.toolDescription.content)} />
-      </div>
+        class="prose-xl max-w-prose text-white/80"
+        set:html={parseMarkdown(workPage.data.toolDescription.content)}
+      />
     </div>
   </div>
 

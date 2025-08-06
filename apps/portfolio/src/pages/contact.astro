@@ -58,7 +58,7 @@ const metaTitle = generatePortfolioMetaTitle(contactPage.data.title);
   </div>
 
   <!-- Hero Section with Contact Form -->
-  <div class="bg-brand-dark relative min-h-screen w-full">
+  <div class="bg-brand-dark w-full">
     <div class="container mx-auto flex h-full items-center px-6 py-40">
       <div class="grid w-full items-center gap-12 lg:grid-cols-2">
         <!-- Left Content Section -->
@@ -94,7 +94,7 @@ const metaTitle = generatePortfolioMetaTitle(contactPage.data.title);
             statsData.length > 0 && (
               <Stats
                 stats={statsData}
-                className="relative z-10 drop-shadow-xl drop-shadow-black/30"
+                className=" z-10 drop-shadow-xl drop-shadow-black/30"
               />
             )
           }
@@ -125,8 +125,8 @@ const metaTitle = generatePortfolioMetaTitle(contactPage.data.title);
         </div>
 
         <!-- Right Contact Form Section -->
-        <div class="relative">
-          <div class="card sticky top-8">
+        <div class="">
+          <div class="card">
             {
               contactPage.data.contactForm.title && (
                 <h3 class="font-heading mb-6 text-2xl tracking-tight uppercase">
