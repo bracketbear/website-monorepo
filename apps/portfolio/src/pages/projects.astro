@@ -107,10 +107,9 @@ const statsData =
     </div>
     <div class="container mx-auto mt-8">
       <div
-        class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90"
-      >
-        <div set:html={parseMarkdown(projectsPage.data.introduction.content)} />
-      </div>
+        class="prose-2xl mx-auto max-w-prose text-center text-white/90"
+        set:html={parseMarkdown(projectsPage.data.introduction.content)}
+      />
     </div>
   </section>
 
@@ -131,7 +130,7 @@ const statsData =
                     {category.data.title}
                   </h2>
                   {category.data.description && (
-                    <p class="mt-4 max-w-3xl text-lg text-white/70">
+                    <p class="prose-lg mt-4 max-w-prose text-white/70">
                       {category.data.description}
                     </p>
                   )}

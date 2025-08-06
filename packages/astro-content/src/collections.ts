@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { z } from 'astro:content';
+import { z } from 'zod';
 import { contentPath, workPath } from './utils';
 import {
   workCompanySchema,

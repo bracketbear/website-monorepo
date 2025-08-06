@@ -29,8 +29,10 @@ const thisYear = new Date().getFullYear();
             />
           </div>
         ) : (
-          <div class="font-heading text-6xl font-black tracking-wide uppercase">
-            <span class="text-background">{branding?.name || 'Brand'}</span>
+          <div class="font-heading text-center text-6xl font-black tracking-wide uppercase">
+            <span class="text-background w-full">
+              {branding?.name || 'Brand'}
+            </span>
           </div>
         )
       }

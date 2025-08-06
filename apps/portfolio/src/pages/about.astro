@@ -12,12 +12,12 @@ const aboutPageEntries = await getCollection('portfolioAboutPage');
 const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
 ---
 
-<HeroLayout 
-  pageTitle="About Me" 
+<HeroLayout
+  pageTitle="About Me"
   title={aboutPage.data.title}
   subtitle={aboutPage.data.subtitle}
   stats={aboutPage.data.stats}
-  breadcrumbs={breadcrumbs} 
+  breadcrumbs={breadcrumbs}
   animationPreset="curious-particle-network"
   contactCTA={aboutPage.data.contactCTA}
 >
@@ -25,26 +25,34 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
   {
     aboutPage?.data?.narrative && (
       <section class="mb-40">
-        <div class="mx-auto container text-center">
-          <h2 class="font-heading text-white mb-6 text-4xl tracking-tight">
+        <div class="container mx-auto text-center">
+          <h2 class="font-heading mb-6 text-4xl tracking-tight text-white">
             {aboutPage.data.narrative.title}
           </h2>
         </div>
-        <div class="mx-auto container mt-8">
-          <div class="text-white/90 text-xl leading-relaxed prose prose-lg prose-headings:text-white prose-p:text-white/90 columns-1 md:columns-2 lg:columns-2 gap-10">
-            <Fragment set:html={marked.parse(aboutPage.data.narrative.content)} />
+        <div class="container mx-auto mt-8">
+          <div class="prose-2xl mx-auto max-w-prose text-white/90">
+            <Fragment
+              set:html={marked.parse(aboutPage.data.narrative.content)}
+            />
           </div>
         </div>
-        <!-- Stats row below narrative, if present -->
+        {/* Stats row below narrative, if present */}
         {aboutPage?.data?.stats && aboutPage.data.stats.length > 0 && (
           <div class="mx-auto mt-40 max-w-7xl px-6 lg:px-8">
             <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center sm:grid-cols-2 lg:grid-cols-4">
               {aboutPage.data.stats.map((stat: any) => (
                 <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-                  <dt class="text-base leading-7 text-white/60">{stat.label}</dt>
-                  <dd class="order-first text-3xl font-bold tracking-tight text-white sm:text-5xl">{stat.value}</dd>
+                  <dt class="text-base leading-7 text-white/60">
+                    {stat.label}
+                  </dt>
+                  <dd class="order-first text-3xl font-bold tracking-tight text-white sm:text-5xl">
+                    {stat.value}
+                  </dd>
                   {stat.description && (
-                    <dd class="text-base leading-7 text-white/60">{stat.description}</dd>
+                    <dd class="text-base leading-7 text-white/60">
+                      {stat.description}
+                    </dd>
                   )}
                 </div>
               ))}
@@ -60,11 +68,11 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
     aboutPage?.data?.values && (
       <div class="mb-40">
         <div class="mx-auto max-w-4xl text-center">
-          <h2 class="font-heading text-white mb-4 text-4xl tracking-tight">
+          <h2 class="font-heading mb-4 text-4xl tracking-tight text-white">
             {aboutPage.data.values.title}
           </h2>
           {aboutPage.data.values.description && (
-            <p class="text-white/80 mb-12 text-xl leading-relaxed">
+            <p class="mb-12 text-xl leading-relaxed text-white/80">
               {aboutPage.data.values.description}
             </p>
           )}
@@ -73,10 +81,10 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
           <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {aboutPage.data.values.items.map((value: any) => (
               <div class="text-left">
-                <h3 class="font-heading text-white text-xl font-semibold mb-4">
+                <h3 class="font-heading mb-4 text-xl font-semibold text-white">
                   {value.title}
                 </h3>
-                <p class="text-white/80 leading-relaxed text-lg">
+                <p class="text-lg leading-relaxed text-white/80">
                   {value.description}
                 </p>
               </div>
@@ -92,66 +100,64 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
     aboutPage?.data?.skills && (
       <div class="mb-40">
         <div class="mx-auto max-w-4xl">
-          <h2 class="font-heading text-white mb-8 text-4xl tracking-tight text-center">
+          <h2 class="font-heading mb-8 text-center text-4xl tracking-tight text-white">
             Skills & Expertise
           </h2>
           <div class="grid grid-cols-1 gap-12 md:grid-cols-3">
-            <!-- Core Strengths -->
-            {
-              aboutPage.data.skills.coreStrengths.length > 0 && (
-                <div>
-                  <h3 class="font-heading text-white mb-6 text-2xl tracking-tight">
-                    Core Strengths
-                  </h3>
-                  <ul class="text-white/90 space-y-3 text-lg font-medium">
-                    {aboutPage.data.skills.coreStrengths.map((strength: string) => (
+            {/* Core Strengths */}
+            {aboutPage.data.skills.coreStrengths.length > 0 && (
+              <div>
+                <h3 class="font-heading mb-6 text-2xl tracking-tight text-white">
+                  Core Strengths
+                </h3>
+                <ul class="space-y-3 text-lg font-medium text-white/90">
+                  {aboutPage.data.skills.coreStrengths.map(
+                    (strength: string) => (
                       <li class="flex items-start gap-3">
-                        <span class="text-white text-sm mt-2">•</span>
+                        <span class="mt-2 text-sm text-white">•</span>
                         <span>{strength}</span>
                       </li>
-                    ))}
-                  </ul>
-                </div>
-              )
-            }
+                    )
+                  )}
+                </ul>
+              </div>
+            )}
 
-            <!-- Technical Expertise -->
-            {
-              aboutPage.data.skills.technicalExpertise.length > 0 && (
-                <div>
-                  <h3 class="font-heading text-white mb-6 text-2xl tracking-tight">
-                    Technical Expertise
-                  </h3>
-                  <ul class="text-white/90 space-y-3 text-lg font-medium">
-                    {aboutPage.data.skills.technicalExpertise.map((skill: string) => (
+            {/* Technical Expertise */}
+            {aboutPage.data.skills.technicalExpertise.length > 0 && (
+              <div>
+                <h3 class="font-heading mb-6 text-2xl tracking-tight text-white">
+                  Technical Expertise
+                </h3>
+                <ul class="space-y-3 text-lg font-medium text-white/90">
+                  {aboutPage.data.skills.technicalExpertise.map(
+                    (skill: string) => (
                       <li class="flex items-start gap-3">
-                        <span class="text-white text-sm mt-2">•</span>
+                        <span class="mt-2 text-sm text-white">•</span>
                         <span>{skill}</span>
                       </li>
-                    ))}
-                  </ul>
-                </div>
-              )
-            }
+                    )
+                  )}
+                </ul>
+              </div>
+            )}
 
-            <!-- Beyond Tech -->
-            {
-              aboutPage.data.skills.beyondTech.length > 0 && (
-                <div>
-                  <h3 class="font-heading text-white mb-6 text-2xl tracking-tight">
-                    Beyond Tech
-                  </h3>
-                  <ul class="text-white/90 space-y-3 text-lg font-medium">
-                    {aboutPage.data.skills.beyondTech.map((skill: string) => (
-                      <li class="flex items-start gap-3">
-                        <span class="text-white text-sm mt-2">•</span>
-                        <span>{skill}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )
-            }
+            {/* Beyond Tech */}
+            {aboutPage.data.skills.beyondTech.length > 0 && (
+              <div>
+                <h3 class="font-heading mb-6 text-2xl tracking-tight text-white">
+                  Beyond Tech
+                </h3>
+                <ul class="space-y-3 text-lg font-medium text-white/90">
+                  {aboutPage.data.skills.beyondTech.map((skill: string) => (
+                    <li class="flex items-start gap-3">
+                      <span class="mt-2 text-sm text-white">•</span>
+                      <span>{skill}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -163,13 +169,13 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
     aboutPage?.data?.funFacts && aboutPage.data.funFacts.length > 0 && (
       <div class="mb-40">
         <div class="mx-auto max-w-4xl text-center">
-          <h2 class="font-heading text-white mb-8 text-4xl tracking-tight">
+          <h2 class="font-heading mb-8 text-4xl tracking-tight text-white">
             Fun Facts
           </h2>
-          <ul class="text-white/90 space-y-4 text-xl font-medium">
+          <ul class="space-y-4 text-xl font-medium text-white/90">
             {aboutPage.data.funFacts.map((fact: string) => (
               <li class="flex items-center justify-center gap-3">
-                <span class="text-white text-sm">•</span>
+                <span class="text-sm text-white">•</span>
                 <span>{fact}</span>
               </li>
             ))}

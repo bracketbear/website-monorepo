@@ -1,0 +1,132 @@
+---
+description: React components should use named exports instead of default exports for better tree-shaking, consistent imports, and improved developer experience.
+globs:
+  - "**/*.tsx"
+alwaysApply: true
+---
+
+# React Component Export Rules
+
+## Overview
+React components should use **named exports** instead of default exports for better tree-shaking, consistent imports, and improved developer experience.
+
+## Rules
+
+### ✅ Use Named Exports
+```tsx
+// ✅ Correct - Named export
+export function MyComponent({ prop1, prop2 }: MyComponentProps) {
+  return <div>{prop1} {prop2}</div>;
+}
+
+// ✅ Correct - Named export with type
+export interface MyComponentProps {
+  prop1: string;
+  prop2: number;
+}
+
+export function MyComponent({ prop1, prop2 }: MyComponentProps) {
+  return <div>{prop1} {prop2}</div>;
+}
+```
+
+### ❌ Avoid Default Exports
+```tsx
+// ❌ Incorrect - Default export
+export default function MyComponent({ prop1, prop2 }: MyComponentProps) {
+  return <div>{prop1} {prop2}</div>;
+}
+
+// ❌ Incorrect - Default export with const
+const MyComponent = ({ prop1, prop2 }: MyComponentProps) => {
+  return <div>{prop1} {prop2}</div>;
+};
+
+export default MyComponent;
+```
+
+## Benefits of Named Exports
+
+1. **Better Tree-shaking**: Unused components can be eliminated from bundles
+2. **Consistent Imports**: All imports use the same pattern
+3. **Better IDE Support**: Autocomplete and refactoring work better
+4. **Explicit Dependencies**: Clear what's being imported
+5. **Easier Testing**: Components can be imported individually
+
+## Migration Pattern
+
+### Before (Default Export)
+```tsx
+// Component file
+export default function MyComponent({ prop1, prop2 }: MyComponentProps) {
+  return <div>{prop1} {prop2}</div>;
+}
+
+// Usage
+import MyComponent from './MyComponent';
+```
+
+### After (Named Export)
+```tsx
+// Component file
+export function MyComponent({ prop1, prop2 }: MyComponentProps) {
+  return <div>{prop1} {prop2}</div>;
+}
+
+// Usage
+import { MyComponent } from './MyComponent';
+```
+
+## Index File Pattern
+
+When creating index files for component directories, use named exports:
+
+```tsx
+// ✅ Correct - index.ts
+export { MyComponent } from './MyComponent';
+export { AnotherComponent } from './AnotherComponent';
+export type { MyComponentProps } from './MyComponent';
+
+// ❌ Incorrect - index.ts
+export { default as MyComponent } from './MyComponent';
+```
+
+## Examples in This Codebase
+
+### Current Pattern (Needs Migration)
+- [packages/core/src/react/BracketBearLogo.tsx](mdc:packages/core/src/react/BracketBearLogo.tsx) - Uses default export
+- [packages/core/src/react/SkillPill.tsx](mdc:packages/core/src/react/SkillPill.tsx) - Uses default export
+- [packages/core/src/react/Ticker.tsx](mdc:packages/core/src/react/Ticker.tsx) - Uses default export
+- [apps/portfolio/src/components/HeaderSection.tsx](mdc:apps/portfolio/src/components/HeaderSection.tsx) - Uses default export
+
+### Correct Pattern (Already Following)
+- [packages/core/src/react/Button.tsx](mdc:packages/core/src/react/Button.tsx) - Uses named export
+- [packages/core/src/react/ValidatedForm.tsx](mdc:packages/core/src/react/ValidatedForm.tsx) - Uses named export
+
+## Migration Steps
+
+1. **Change export statement**: `export default function` → `export function`
+2. **Update imports**: `import ComponentName` → `import { ComponentName }`
+3. **Update index files**: `export { default as ComponentName }` → `export { ComponentName }`
+4. **Update type exports**: Ensure types are also named exports
+
+## Exceptions
+
+- **Page components** in Next.js/Astro apps can use default exports (e.g., `page.tsx`, `layout.tsx`)
+- **Entry points** that need to be the default export for framework requirements
+- **Legacy components** that are being gradually migrated
+
+## Enforcement
+
+This rule applies to:
+- All `.tsx` files containing React components
+- Component libraries and shared components
+- New component development
+
+The rule does not apply to:
+- Framework-specific files (pages, layouts)
+- Utility files without React components
+- Legacy code being gradually migrated
+
+- Utility files without React components
+- Legacy code being gradually migrated

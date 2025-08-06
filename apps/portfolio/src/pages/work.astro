@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
+import { Stats } from '@bracketbear/core/react';
 import FilteredWorkHistory from '@/components/FilteredWorkHistory';
-import StatsSection from '@/components/StatsSection';
 import { getWorkBreadcrumbs } from '@/config/breadcrumbs';
 import HeroLayout from '@/layouts/HeroLayout.astro';
 import { marked } from 'marked';
@@ -41,7 +41,7 @@ function parseMarkdown(content: string): string {
       </h2>
     </div>
     <div
-      class="prose prose-lg prose-headings:text-white prose-p:text-white/90 typography leading-relaxed text-white/90"
+      class="prose-2xl mx-auto max-w-prose text-center text-white/90"
       set:html={parseMarkdown(workPage.data.introduction.content)}
     />
   </section>
@@ -49,7 +49,7 @@ function parseMarkdown(content: string): string {
   <!-- Stats Section (if available) -->
   {
     workPage.data.stats && workPage.data.stats.length > 0 && (
-      <StatsSection stats={workPage.data.stats} client:load />
+      <Stats stats={workPage.data.stats} className="mb-40 mx-2 md:mx-0" />
     )
   }
 
