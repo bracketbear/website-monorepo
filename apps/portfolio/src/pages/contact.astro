@@ -1,17 +1,17 @@
 ---
 import { getCollection } from 'astro:content';
-import { getContactBreadcrumbs } from '@/config/breadcrumbs';
-import HeroLayout from '@/layouts/HeroLayout.astro';
+import Layout from '@/layouts/Layout.astro';
 import ContactForm from '@/components/ContactForm';
 import { Stats, ContactIcon } from '@bracketbear/core/react';
 import { marked } from 'marked';
+import { NavBar } from '@bracketbear/core';
+import { navigationConfig } from '@/config/navigation';
+import { generatePortfolioMetaTitle } from '@/config/meta-title';
 
 // Get the contact page singleton from CMS
 const contactPageEntries = await getCollection('portfolioContactPage');
-const contactPage = contactPageEntries[0]; // Singletons have only one entry
+const contactPage = contactPageEntries[0];
 const contactMethods = await getCollection('portfolioContactMethods');
-
-const breadcrumbs = getContactBreadcrumbs();
 
 // Helper function to parse markdown content
 function parseMarkdown(content: string): string {
@@ -32,106 +32,119 @@ const selectedContactMethods =
       contactMethods.find((method) => method.id === methodId)
     )
     .filter(Boolean) || [];
+
+// Generate meta title from page title
+const metaTitle = generatePortfolioMetaTitle(contactPage.data.title);
 ---
 
-<HeroLayout
-  pageTitle={contactPage.data.title}
-  title={contactPage.data.title}
-  subtitle={contactPage.data.subtitle}
-  breadcrumbs={breadcrumbs}
-  animationPreset="curious-particle-network"
-  metaDescription={contactPage.data.metaDescription}
+<Layout
+  title={metaTitle}
+  description={contactPage.data.metaDescription}
+  hideNavigation={true}
+  breadcrumbs={[
+    {
+      label: 'Home',
+      href: '/',
+    },
+    {
+      label: 'Contact',
+      href: '/contact',
+    },
+  ]}
 >
-  <!-- Introduction Section -->
-  <section class="mb-40 px-6">
-    <div class="container mx-auto text-center">
-      <h2 class="font-heading mb-6 text-4xl tracking-tight text-white">
-        {contactPage.data.introduction.title}
-      </h2>
-    </div>
-    <div class="container mx-auto mt-8">
-      <div
-        class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90"
-      >
-        <div set:html={parseMarkdown(contactPage.data.introduction.content)} />
-      </div>
-    </div>
-  </section>
+  <!-- Transparent Navigation -->
+  <div class="relative z-50">
+    <NavBar config={navigationConfig} variant="ghost-dark" />
+  </div>
 
-  <!-- Stats Section -->
-  {
-    statsData.length > 0 && (
-      <Stats
-        stats={statsData}
-        className="relative z-10 -mt-40 mb-16 drop-shadow-xl drop-shadow-black/30"
-      />
-    )
-  }
-
-  <!-- Main Contact Section -->
-  <section class="mb-40 px-6">
-    <div class="container mx-auto">
-      <div
-        class="grid items-start gap-8 rounded-3xl bg-blue-600/40 p-2 lg:grid-cols-2"
-      >
-        <!-- Contact Information -->
-        <div class="space-y-8 px-6 py-10">
-          <div>
-            <h2
-              class="font-heading mb-6 text-3xl tracking-tight text-white uppercase"
+  <!-- Hero Section with Contact Form -->
+  <div class="bg-brand-dark relative min-h-screen w-full">
+    <div class="container mx-auto flex h-full items-center px-6 py-40">
+      <div class="grid w-full items-center gap-12 lg:grid-cols-2">
+        <!-- Left Content Section -->
+        <div class="space-y-8">
+          <!-- Main Heading -->
+          <div class="space-y-6">
+            <h1
+              class="font-heading text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl"
             >
-              GET IN TOUCH
-            </h2>
-            <div class="space-y-4 text-lg font-medium">
-              {
-                selectedContactMethods.map((method: any) => (
-                  <a
-                    href={method.data.value}
-                    class="hover:text-brand-orange flex items-center gap-3 text-white/90 transition-colors"
-                  >
-                    <span class="text-2xl">
-                      <ContactIcon name={method.data.icon} />
-                    </span>
-                    <span>{method.data.label}</span>
-                  </a>
-                ))
-              }
-            </div>
+              {contactPage.data.title}
+            </h1>
+            {
+              contactPage.data.subtitle && (
+                <p class="text-xl leading-8 text-white/90 lg:text-2xl">
+                  {contactPage.data.subtitle}
+                </p>
+              )
+            }
           </div>
 
-          <!-- Quick Info -->
+          <!-- Introduction Content -->
           {
-            contactPage.data.quickInfo &&
-              contactPage.data.quickInfo.length > 0 && (
-                <div class="border-t border-white/20 pt-6">
-                  <div class="space-y-3 text-lg font-medium">
-                    {contactPage.data.quickInfo.map(
-                      (info: { label: string; value: string }) => (
-                        <div class="flex justify-between">
-                          <span class="text-white/70">{info.label}:</span>
-                          <span class="text-brand-orange font-bold">
-                            {info.value}
-                          </span>
-                        </div>
-                      )
-                    )}
-                  </div>
+            contactPage.data.introduction && (
+              <div
+                class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-white/90"
+                set:html={parseMarkdown(contactPage.data.introduction.content)}
+              />
+            )
+          }
+
+          <!-- Stats Section (if any) -->
+          {
+            statsData.length > 0 && (
+              <Stats
+                stats={statsData}
+                className="relative z-10 drop-shadow-xl drop-shadow-black/30"
+              />
+            )
+          }
+
+          <!-- Contact Methods -->
+          {
+            selectedContactMethods.length > 0 && (
+              <div class="space-y-4">
+                <h2 class="font-heading text-2xl tracking-tight text-white uppercase">
+                  GET IN TOUCH
+                </h2>
+                <div class="space-y-3 text-lg font-medium">
+                  {selectedContactMethods.map((method: any) => (
+                    <a
+                      href={method.data.value}
+                      class="hover:text-brand-orange flex items-center gap-3 text-white/90 transition-colors"
+                    >
+                      <span class="text-2xl">
+                        <ContactIcon name={method.data.icon} />
+                      </span>
+                      <span>{method.data.label}</span>
+                    </a>
+                  ))}
                 </div>
-              )
+              </div>
+            )
           }
         </div>
 
-        <!-- Contact Form -->
-        <div class="card pt-10">
-          <h3 class="font-heading mb-6 text-2xl tracking-tight uppercase">
-            {contactPage.data.contactForm.title}
-          </h3>
-          <div class="text-brand-dark mb-6 text-lg leading-relaxed font-medium">
-            <p>{contactPage.data.contactForm.description}</p>
+        <!-- Right Contact Form Section -->
+        <div class="relative">
+          <div class="card sticky top-8">
+            {
+              contactPage.data.contactForm.title && (
+                <h3 class="font-heading mb-6 text-2xl tracking-tight uppercase">
+                  {contactPage.data.contactForm.title}
+                </h3>
+              )
+            }
+            {
+              contactPage.data.contactForm.description && (
+                <div class="text-brand-dark mb-6 text-lg leading-relaxed font-medium">
+                  <p>{contactPage.data.contactForm.description}</p>
+                </div>
+              )
+            }
+            <ContactForm client:load />
           </div>
-          <ContactForm client:load />
         </div>
       </div>
     </div>
-  </section>
-</HeroLayout>
+  </div>
+</Layout>

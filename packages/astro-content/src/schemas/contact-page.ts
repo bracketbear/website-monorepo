@@ -1,4 +1,4 @@
-import { z } from 'astro:content';
+import { z } from 'zod';
 import { makePageSchema } from './page';
 
 /**
@@ -28,8 +28,8 @@ export const portfolioContactPageSchema = makePageSchema(
 
     // Contact form section
     contactForm: z.object({
-      title: z.string(),
-      description: z.string(),
+      title: z.string().optional(),
+      description: z.string().optional(),
     }),
 
     // Legacy fields (kept for backward compatibility)
