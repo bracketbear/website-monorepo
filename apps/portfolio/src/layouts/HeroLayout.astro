@@ -96,7 +96,13 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
   }
 
   <!-- Page Content -->
-  <div class="bg-brand-dark relative py-24">
+  <div
+    class={clsx(
+      'bg-brand-dark relative ',
+      props.title ? 'py-32' : 'py-24',
+      props.hideFooter && 'pb-0'
+    )}
+  >
     <div class={clsx(container && 'container mx-auto')}>
       <slot />
     </div>

@@ -5,16 +5,9 @@ import {
   createCuriousParticleNetworkAnimation,
   createParticleWaveAnimation,
 } from '@bracketbear/flateralus-animations';
-import { clsx, Stats } from '@bracketbear/core';
+import { clsx, Stats, type LabelValue } from '@bracketbear/core';
 
-export interface HeaderStat {
-  /** Stat label */
-  label: string;
-  /** Stat value */
-  value: string;
-  /** Optional description */
-  description?: string;
-}
+export type HeaderStat = LabelValue;
 
 export interface HeaderSectionProps {
   /** Animation preset to use */
@@ -156,14 +149,23 @@ export default function HeaderSection({
                 </div>
               )}
             </div>
-
-            {/* Stats section */}
-            {stats && stats.length > 0 && <Stats stats={stats} />}
           </div>
         )}
 
         {/* Custom children content */}
         {children && <div className="relative z-10">{children}</div>}
+
+        {/* Stats section - positioned as overlay */}
+        {stats && stats.length > 0 && (
+          <div className="absolute inset-x-0 bottom-0 z-20 container mx-auto w-full">
+            <div className="relative -mb-16">
+              <Stats
+                stats={stats}
+                className="drop-shadow-xl drop-shadow-black/30"
+              />
+            </div>
+          </div>
+        )}
       </AnimationStage>
     </div>
   );

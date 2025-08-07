@@ -41,7 +41,7 @@ export const portfolioContactPageSchema = makePageSchema(
     responseTime: z.string().optional(),
   },
   { showCta: false }
-); // Disable CTA for contact page since they're already on the contact page
+);
 
 /**
  * Types for contact page data
