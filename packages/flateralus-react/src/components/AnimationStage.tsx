@@ -82,11 +82,11 @@ export default function AnimationStage({
     <div className={clsx(layoutClassName, className)}>
       <div
         ref={containerRef}
-        className="absolute inset-0 z-10 h-full w-full"
+        className="absolute inset-0 z-0 h-full w-full"
         style={{ background: 'transparent' }}
       />
       {children && (
-        <div className="relative z-20 h-full w-full">{children}</div>
+        <div className="relative z-10 h-full w-full">{children}</div>
       )}
       {debugControlsProps.isVisible && debugControlsProps.manifest && (
         <DebugControls

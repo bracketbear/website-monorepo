@@ -214,11 +214,8 @@ function parseMarkdown(content: string): string {
   <!-- Featured Projects Section -->
   {
     indexPage.data.layout.showFeaturedProjects && (
-      <section class="bg-brand-light relative min-h-[600px]">
-        <FeaturedProjectsWaveBG
-          className="absolute inset-0 z-0 h-full w-full py-24"
-          client:load
-        >
+      <section class="bg-brand-light relative min-h-[600px] overflow-hidden py-24">
+        <FeaturedProjectsWaveBG className="relative w-full" client:load>
           <div class="relative z-10 container mx-auto px-6">
             <div class="mb-16 text-center">
               <h2 class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
@@ -233,7 +230,6 @@ function parseMarkdown(content: string): string {
                 />
               )}
             </div>
-            {JSON.stringify(indexPage.data.recentExperience.selectedJobs)}
             <div class="grid gap-8 lg:grid-cols-2">
               {featuredProjects.map((project) => (
                 <ProjectCard

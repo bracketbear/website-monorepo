@@ -40,21 +40,19 @@ export default function FeaturedProjectsWaveBG({
 
   // Don't render anything on the server
   if (!isClient) {
-    return (
-      <div className={clsx('absolute inset-0 h-full w-full', className)} />
-    );
+    return <div className={clsx('relative w-full', className)} />;
   }
 
   if (!application) return null;
 
   return (
-    <AnimationStage
-      application={application}
-      className={clsx('absolute inset-0 h-full w-full', className)}
-      showDebugControls
-      layoutClassName="absolute inset-0"
-    >
-      {children}
-    </AnimationStage>
+    <div className={clsx('relative w-full', className)}>
+      <AnimationStage
+        application={application}
+        className={clsx('absolute inset-0 h-full w-full pointer-events-none')}
+        layoutClassName="absolute inset-0"
+      />
+      <div className="relative z-10">{children}</div>
+    </div>
   );
 }
