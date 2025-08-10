@@ -22,19 +22,11 @@
  */
 
 // Export all work schemas
-export {
-  workCompanySchema,
-  workJobSchema,
-  workSkillSchema,
-  workSkillCategorySchema,
-  workProjectCategorySchema,
-  workProjectSchema,
-} from './work';
+export * from './work';
 
 // Export all content schemas
-export { blogSchema, pageSchema, serviceSchema, contactMethodSchema } from './content';
-export { basePageSchema, makePageSchema } from './page';
-export { indexPageSchema, type IndexPageData } from './index-page';
+export * from './content';
+export * from './page';
 export * from './about-page';
 export * from './contact-page';
 export * from './work-page';

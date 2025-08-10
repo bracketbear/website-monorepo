@@ -78,28 +78,11 @@ if (
   indexPage.data.featuredProjects.selectedProjects &&
   indexPage.data.featuredProjects.selectedProjects.length > 0
 ) {
-  console.log(
-    'CMS selected projects:',
-    indexPage.data.featuredProjects.selectedProjects
-  );
-  console.log(
-    'Available projects:',
-    workProjects.map((p) => p.id)
-  );
-  console.log(
-    'Looking for projects:',
-    indexPage.data.featuredProjects.selectedProjects
-  );
   featuredProjects = workProjects.filter((project) => {
     const isIncluded =
       indexPage.data.featuredProjects.selectedProjects.includes(project.id);
-    console.log(`Project ${project.id}: ${isIncluded ? 'FOUND' : 'NOT FOUND'}`);
     return isIncluded;
   });
-  console.log(
-    'Filtered projects:',
-    featuredProjects.map((p) => p.data.title)
-  );
 }
 
 // Limit to max display count
@@ -342,15 +325,15 @@ function parseMarkdown(content: string): string {
         <div class="container mx-auto px-6">
           <div class="mx-auto max-w-4xl text-center">
             <h2 class="font-heading text-brand-light mb-8 p-6 text-5xl font-black tracking-tight uppercase">
-              {indexPage.data.contact.title}
+              {indexPage.data.contactCTA.title}
             </h2>
-            {indexPage.data.contact.subtitle && (
+            {indexPage.data.contactCTA.text && (
               <div
                 class="text-brand-light/80 mx-auto mb-12 max-w-2xl text-xl"
-                set:html={parseMarkdown(indexPage.data.contact.subtitle)}
+                set:html={parseMarkdown(indexPage.data.contactCTA.text)}
               />
             )}
-            {indexPage.data.contact.showContactForm && (
+            {indexPage.data.contactCTA && (
               <div class="card bg-brand-light">
                 <ContactForm client:load />
               </div>

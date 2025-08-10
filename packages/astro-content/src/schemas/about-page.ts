@@ -123,13 +123,6 @@ export const portfolioIndexPageSchema = makePageSchema({
     selectedJobs: z.array(z.string()),
   }),
 
-  // Contact section
-  contact: z.object({
-    title: z.string().default("Let's Work Together"),
-    subtitle: z.string(),
-    showContactForm: z.boolean().default(true),
-  }),
-
   // Layout and styling options
   layout: z.object({
     hideContactForm: z.boolean().default(true),

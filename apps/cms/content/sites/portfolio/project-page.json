@@ -15,5 +15,10 @@
     "text": "I'd love to discuss how I can help with your project.",
     "buttonText": "Get in Touch",
     "buttonLink": "/contact"
+  },
+  "contactCTA": {
+    "text": "Have a rough idea, an active project, or just want to say hi? I'd love to hear from you.",
+    "buttonText": "Get in touch",
+    "buttonLink": "/contact"
   }
 }
