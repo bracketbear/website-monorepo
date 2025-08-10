@@ -1,56 +1,64 @@
 import { z } from 'zod';
 import { makePageSchema } from './page';
 
-// --- New sub–section schemas ---
-const narrativeSectionSchema = z.object({
+// --- New sub-section schemas ---
+const richSection = z.object({
   title: z.string(),
-  content: z.string(), // Markdown content instead of paragraphs array
+  content: z.string(), // markdown
 });
 
-const skillsSchema = z.object({
-  coreStrengths: z.array(z.string()), // 3-4 punchy bullets
-  technicalExpertise: z.array(z.string()), // short tech / domain labels
-  beyondTech: z.array(z.string()), // leadership, design, biz, etc.
-});
-
-const valuesItemSchema = z.object({
+const bulletSection = z.object({
   title: z.string(),
-  description: z.string(),
-  icon: z.string().optional(), // Icon name for the value
+  items: z.array(z.string()),
 });
 
-const valuesSectionSchema = z.object({
-  title: z.string(),
-  description: z.string().optional(),
-  items: z.array(valuesItemSchema),
+const storyItem = z.object({
+  headline: z.string(),
+  content: z.string(), // 1–3 short paragraphs, markdown
 });
 
-const headerStatSchema = z.object({
-  label: z.string(),
-  value: z.string(),
-  description: z.string().optional(),
+// Timeline and Testimonials
+const timelineItem = z.object({
+  label: z.string(), // e.g., "Polich Art Works"
+  sublabel: z.string().optional(), // e.g., "first real break"
+  description: z.string(), // 1–2 sentences
 });
 
-// --- Revised page schema ---
+const testimonialItem = z.object({
+  quote: z.string(),
+  name: z.string(),
+  role: z.string().optional(),
+  org: z.string().optional(),
+  avatar: z.string().optional(), // path or URL if you have one
+});
+
 export const portfolioAboutPageSchema = makePageSchema({
-  /** Stats section */
-  stats: z.array(headerStatSchema).optional(),
+  // Core narrative
+  narrative: richSection, // "Story"
+  whatIDoNow: richSection, // "What I do now"
+  howIPartner: bulletSection, // bullets
 
-  /** Story + philosophy merged into one narrative */
-  narrative: narrativeSectionSchema,
+  // Two short vignettes
+  stories: z.array(storyItem).min(2).max(3),
 
-  /** Values section with icons */
-  values: valuesSectionSchema,
+  // Principles
+  principles: bulletSection, // "What I care about"
 
-  /** Clustered skill highlights */
-  skills: skillsSchema,
+  // NEW: Timeline and Testimonials
+  timeline: z.array(timelineItem).min(3).max(6),
+  testimonials: z.array(testimonialItem).max(3).optional(),
 
-  /** Optional fun-facts / personal bits */
-  funFacts: z.array(z.string()).optional(),
+  // Fit (single plain-text block)
+  fit: z.object({
+    bestFit: z.string(),
+  }),
 
-  /** CTA footer */
+  // NEW: How to start
+  howToStart: bulletSection,
+
+  // Footer CTA (keep existing shape)
   contactCTA: z.object({
-    text: z.string(), // Markdown content
+    text: z.string(),
     buttonText: z.string().default('Reach Out'),
     buttonLink: z.string().default('/reach-out'),
   }),

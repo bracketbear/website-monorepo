@@ -1,5 +1,6 @@
 ---
 import { type Breadcrumb } from '@bracketbear/core';
+import { AstroButton } from '@bracketbear/core/astro';
 import { getCollection } from 'astro:content';
 import { getAboutBreadcrumbs } from '@/config/breadcrumbs';
 import HeroLayout from '@/layouts/HeroLayout.astro';
@@ -13,10 +14,9 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
 ---
 
 <HeroLayout
-  pageTitle="About Me"
+  pageTitle="About"
   title={aboutPage.data.title}
   subtitle={aboutPage.data.subtitle}
-  stats={aboutPage.data.stats}
   breadcrumbs={breadcrumbs}
   animationPreset="curious-particle-network"
   contactCTA={aboutPage.data.contactCTA}
@@ -37,122 +37,194 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
             />
           </div>
         </div>
-        {/* Stats row below narrative, if present */}
-        {aboutPage?.data?.stats && aboutPage.data.stats.length > 0 && (
-          <div class="mx-auto mt-40 max-w-7xl px-6 lg:px-8">
-            <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center sm:grid-cols-2 lg:grid-cols-4">
-              {aboutPage.data.stats.map((stat: any) => (
-                <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-                  <dt class="text-base leading-7 text-white/60">
-                    {stat.label}
-                  </dt>
-                  <dd class="order-first text-3xl font-bold tracking-tight text-white sm:text-5xl">
-                    {stat.value}
-                  </dd>
-                  {stat.description && (
-                    <dd class="text-base leading-7 text-white/60">
-                      {stat.description}
-                    </dd>
-                  )}
-                </div>
-              ))}
-            </dl>
-          </div>
-        )}
       </section>
     )
   }
 
-  <!-- Values Section -->
+  <!-- Timeline Section (after Narrative) -->
   {
-    aboutPage?.data?.values && (
-      <div class="mb-40">
-        <div class="mx-auto max-w-4xl text-center">
-          <h2 class="font-heading mb-4 text-4xl tracking-tight text-white">
-            {aboutPage.data.values.title}
+    aboutPage?.data?.timeline && aboutPage.data.timeline.length > 0 && (
+      <section class="mb-40">
+        <div class="mx-auto max-w-6xl px-6 lg:px-8">
+          <h2 class="font-heading mb-10 text-center text-3xl tracking-tight text-white">
+            Timeline
           </h2>
-          {aboutPage.data.values.description && (
-            <p class="mb-12 text-xl leading-relaxed text-white/80">
-              {aboutPage.data.values.description}
-            </p>
-          )}
+          <ol class="grid grid-cols-1 gap-8 md:grid-cols-3">
+            {aboutPage.data.timeline.map((item: any) => (
+              <li class="relative flex flex-col gap-3">
+                <div class="flex items-center gap-3">
+                  <span class="bg-brand-yellow inline-block h-2 w-2 rounded-full" />
+                  <div class="text-white text-lg font-semibold">{item.label}</div>
+                </div>
+                {item.sublabel && (
+                  <div class="text-white/60 text-sm">{item.sublabel}</div>
+                )}
+                <p class="prose-lg text-white/80">{item.description}</p>
+              </li>
+            ))}
+          </ol>
         </div>
+      </section>
+    )
+  }
+
+  <!-- What I Do Now Section -->
+  {
+    aboutPage?.data?.whatIDoNow && (
+      <section class="mb-40">
+        <div class="container mx-auto text-center">
+          <h2 class="font-heading mb-6 text-4xl tracking-tight text-white">
+            {aboutPage.data.whatIDoNow.title}
+          </h2>
+        </div>
+        <div class="container mx-auto mt-8">
+          <div class="prose-2xl mx-auto max-w-prose text-white/90">
+            <Fragment
+              set:html={marked.parse(aboutPage.data.whatIDoNow.content)}
+            />
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Mid-page CTA (after What I do now) -->
+  <section class="mb-40">
+    <div class="mx-auto max-w-4xl text-center">
+      <p class="mb-6 text-xl leading-relaxed font-medium text-white/90">
+        Have something in mind?
+      </p>
+      <a href="/contact" class="button button-primary button-lg">
+        Talk through your project
+      </a>
+    </div>
+  </section>
+
+  <!-- How I Partner Section -->
+  {
+    aboutPage?.data?.howIPartner && (
+      <section class="mb-40">
+        <div class="mx-auto max-w-4xl text-center">
+          <h2 class="font-heading mb-8 text-4xl tracking-tight text-white">
+            {aboutPage.data.howIPartner.title}
+          </h2>
+        </div>
+        <div class="mx-auto max-w-4xl px-6 lg:px-8">
+          <ul class="space-y-4 text-xl font-medium text-white/90">
+            {aboutPage.data.howIPartner.items.map((item: string) => (
+              <li class="flex items-start gap-3">
+                <span class="mt-2 text-sm text-white">•</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Testimonials Section (after How I partner) -->
+  {
+    aboutPage?.data?.testimonials && aboutPage.data.testimonials.length > 0 && (
+      <section class="mb-40">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
-          <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {aboutPage.data.values.items.map((value: any) => (
-              <div class="text-left">
-                <h3 class="font-heading mb-4 text-xl font-semibold text-white">
-                  {value.title}
+          <h2 class="font-heading mb-10 text-center text-3xl tracking-tight text-white">
+            Testimonials
+          </h2>
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {aboutPage.data.testimonials.map((t: any) => (
+              <figure class="border-brand-yellow/40 bg-white/5 rounded-lg border-l-4 p-6 backdrop-blur-sm">
+                <blockquote class="prose-lg text-white/90">
+                  “{t.quote}”
+                </blockquote>
+                <figcaption class="mt-4 flex items-center gap-3 text-white/80">
+                  {/* Avatar reserved; using placeholder circle when no avatar */}
+                  <span class="bg-white/20 inline-block h-8 w-8 rounded-full" />
+                  <div class="flex flex-col">
+                    <strong class="text-white">{t.name}</strong>
+                    <span class="text-sm text-white/70">
+                      {t.role}
+                      {t.org ? `, ${t.org}` : ''}
+                    </span>
+                  </div>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Stories Section -->
+  {
+    aboutPage?.data?.stories && aboutPage.data.stories.length > 0 && (
+      <section class="mb-40">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+          <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+            {aboutPage.data.stories.map((story: any) => (
+              <div class="rounded-lg border border-white/20 bg-white/5 p-8 backdrop-blur-sm">
+                <h3 class="font-heading mb-4 text-2xl tracking-tight text-white">
+                  {story.headline}
                 </h3>
-                <p class="text-lg leading-relaxed text-white/80">
-                  {value.description}
-                </p>
+                <div class="prose-lg text-white/90">
+                  <Fragment set:html={marked.parse(story.content)} />
+                </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
     )
   }
 
-  <!-- Skills Section -->
+  <!-- Principles Section -->
   {
-    aboutPage?.data?.skills && (
-      <div class="mb-40">
-        <div class="mx-auto max-w-4xl">
-          <h2 class="font-heading mb-8 text-center text-4xl tracking-tight text-white">
-            Skills & Expertise
+    aboutPage?.data?.principles && (
+      <section class="mb-40">
+        <div class="mx-auto max-w-4xl text-center">
+          <h2 class="font-heading mb-8 text-4xl tracking-tight text-white">
+            {aboutPage.data.principles.title}
           </h2>
-          <div class="grid grid-cols-1 gap-12 md:grid-cols-3">
-            {/* Core Strengths */}
-            {aboutPage.data.skills.coreStrengths.length > 0 && (
-              <div>
-                <h3 class="font-heading mb-6 text-2xl tracking-tight text-white">
-                  Core Strengths
-                </h3>
-                <ul class="space-y-3 text-lg font-medium text-white/90">
-                  {aboutPage.data.skills.coreStrengths.map(
-                    (strength: string) => (
-                      <li class="flex items-start gap-3">
-                        <span class="mt-2 text-sm text-white">•</span>
-                        <span>{strength}</span>
-                      </li>
-                    )
-                  )}
-                </ul>
-              </div>
-            )}
+        </div>
+        <div class="mx-auto max-w-4xl px-6 lg:px-8">
+          <ul class="space-y-4 text-xl font-medium text-white/90">
+            {aboutPage.data.principles.items.map((item: string) => (
+              <li class="flex items-start gap-3">
+                <span class="mt-2 text-sm text-white">•</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
 
-            {/* Technical Expertise */}
-            {aboutPage.data.skills.technicalExpertise.length > 0 && (
-              <div>
-                <h3 class="font-heading mb-6 text-2xl tracking-tight text-white">
-                  Technical Expertise
+  <!-- Fit Section & How to start -->
+  {
+    aboutPage?.data?.fit && (
+      <section class="mb-40">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+          <div class="grid grid-cols-1 gap-12 md:grid-cols-2">
+            <div class="text-center md:text-left">
+              <h3 class="font-heading mb-4 text-2xl tracking-tight text-white">
+                Best fit
+              </h3>
+              <p class="text-lg leading-relaxed text-white/80">
+                {aboutPage.data.fit.bestFit}
+              </p>
+            </div>
+            {aboutPage?.data?.howToStart && (
+              <div class="text-center md:text-left">
+                <h3 class="font-heading mb-4 text-2xl tracking-tight text-white">
+                  {aboutPage.data.howToStart.title}
                 </h3>
-                <ul class="space-y-3 text-lg font-medium text-white/90">
-                  {aboutPage.data.skills.technicalExpertise.map(
-                    (skill: string) => (
-                      <li class="flex items-start gap-3">
-                        <span class="mt-2 text-sm text-white">•</span>
-                        <span>{skill}</span>
-                      </li>
-                    )
-                  )}
-                </ul>
-              </div>
-            )}
-
-            {/* Beyond Tech */}
-            {aboutPage.data.skills.beyondTech.length > 0 && (
-              <div>
-                <h3 class="font-heading mb-6 text-2xl tracking-tight text-white">
-                  Beyond Tech
-                </h3>
-                <ul class="space-y-3 text-lg font-medium text-white/90">
-                  {aboutPage.data.skills.beyondTech.map((skill: string) => (
+                <ul class="space-y-3 text-left text-white/90">
+                  {aboutPage.data.howToStart.items.map((item: string) => (
                     <li class="flex items-start gap-3">
                       <span class="mt-2 text-sm text-white">•</span>
-                      <span>{skill}</span>
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -160,28 +232,7 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
             )}
           </div>
         </div>
-      </div>
-    )
-  }
-
-  <!-- Fun Facts Section -->
-  {
-    aboutPage?.data?.funFacts && aboutPage.data.funFacts.length > 0 && (
-      <div class="mb-40">
-        <div class="mx-auto max-w-4xl text-center">
-          <h2 class="font-heading mb-8 text-4xl tracking-tight text-white">
-            Fun Facts
-          </h2>
-          <ul class="space-y-4 text-xl font-medium text-white/90">
-            {aboutPage.data.funFacts.map((fact: string) => (
-              <li class="flex items-center justify-center gap-3">
-                <span class="text-sm text-white">•</span>
-                <span>{fact}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      </section>
     )
   }
 </HeroLayout>

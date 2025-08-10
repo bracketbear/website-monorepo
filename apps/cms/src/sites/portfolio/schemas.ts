@@ -9,183 +9,175 @@ import { makePageSchema } from '../../schemas/page';
  * and work philosophy that makes sense for a developer portfolio.
  */
 export const portfolioAboutPageSchema = makePageSchema({
-  // Stats section
-  stats: fields.array(
-    fields.object({
-      label: fields.text({
-        label: 'Stat Label',
-        description: 'Label for the stat (e.g., "Years Experience")',
-      }),
-      value: fields.text({
-        label: 'Stat Value',
-        description: 'Value for the stat (e.g., "10+")',
-      }),
-      description: fields.text({
-        label: 'Stat Description',
-        description: 'Optional description for the stat',
-      }),
-    }),
-    {
-      label: 'Header Stats',
-      description: 'Optional stats to display in the header',
-      itemLabel: (props) =>
-        `${props.fields.label.value}: ${props.fields.value.value}` ||
-        'New Stat',
-    }
-  ),
-
-  // Story + philosophy merged into one narrative
+  // Core narrative
   narrative: fields.object({
     title: fields.text({
       label: 'Narrative Title',
-      description: 'Title for the combined story and mission section',
+      description: 'Title for the story section',
     }),
     content: fields.text({
       label: 'Narrative Content',
-      description: 'Content for the combined story and mission section',
+      description: 'Content for the story section (markdown)',
       multiline: true,
     }),
   }),
 
-  // Values section
-  values: fields.object({
+  // What I do now
+  whatIDoNow: fields.object({
     title: fields.text({
-      label: 'Values Title',
-      description: 'Title for the values section',
-      defaultValue: 'Our Values',
+      label: 'What I Do Now Title',
+      description: 'Title for the "What I do now" section',
     }),
-    description: fields.text({
-      label: 'Values Description',
-      description: 'Brief description of your values',
+    content: fields.text({
+      label: 'What I Do Now Content',
+      description: 'Content describing what you do now (markdown)',
       multiline: true,
+    }),
+  }),
+
+  // How I partner
+  howIPartner: fields.object({
+    title: fields.text({
+      label: 'How I Partner Title',
+      description: 'Title for the "How I partner" section',
     }),
     items: fields.array(
-      fields.object({
-        title: fields.text({
-          label: 'Value Title',
-          description: 'Title of the value (e.g., "Innovation")',
-        }),
-        description: fields.text({
-          label: 'Value Description',
-          description: 'Description of this value',
-          multiline: true,
-        }),
-        icon: fields.text({
-          label: 'Icon Name',
-          description: 'Optional icon name (e.g., "rocket", "star")',
-        }),
+      fields.text({
+        label: 'Partnering Item',
+        description: 'How you partner with teams and clients',
+        multiline: true,
       }),
       {
-        label: 'Values',
-        description: 'Your core values and principles',
-        itemLabel: (props) => props.fields.title.value || 'New Value',
+        label: 'How I Partner Items',
+        description: 'List of how you partner (clarity first approach)',
+        itemLabel: (props) =>
+          props.value?.substring(0, 50) + '...' || 'New Item',
       }
     ),
   }),
 
-  // Clustered skill highlights
-  skills: fields.object({
-    coreStrengths: fields.array(
-      fields.text({
-        label: 'Core Strength',
-        description: '3-4 punchy bullets about your core strengths',
+  // Stories
+  stories: fields.array(
+    fields.object({
+      headline: fields.text({
+        label: 'Story Headline',
+        description: 'Headline for the story vignette',
       }),
-      {
-        label: 'Core Strengths',
-        description: 'Your key strengths and capabilities',
-        itemLabel: (props) => props.value || 'New Strength',
-      }
-    ),
-    technicalExpertise: fields.array(
-      fields.text({
-        label: 'Technical Skill',
-        description: 'Short tech/domain labels',
+      content: fields.text({
+        label: 'Story Content',
+        description: 'Content for the story vignette (markdown)',
+        multiline: true,
       }),
-      {
-        label: 'Technical Expertise',
-        description: 'Your technical skills and expertise areas',
-        itemLabel: (props) => props.value || 'New Skill',
-      }
-    ),
-    beyondTech: fields.array(
-      fields.text({
-        label: 'Non-Technical Skill',
-        description: 'Leadership, design, business, etc.',
-      }),
-      {
-        label: 'Beyond Tech',
-        description: 'Non-technical skills and experience',
-        itemLabel: (props) => props.value || 'New Skill',
-      }
-    ),
-  }),
-
-  // Work-style cards (formerly What I Do / How I Work)
-  workStyle: fields.object({
-    whatIDo: fields.object({
-      title: fields.text({
-        label: 'What I Do Title',
-        description: 'Title for the "What I Do" section',
-      }),
-      items: fields.array(
-        fields.object({
-          text: fields.text({
-            label: 'Activity Description',
-            multiline: true,
-            description: 'Describe what you do (max 3 bullets per card)',
-          }),
-          number: fields.text({
-            label: 'Number (optional)',
-            description: 'Optional custom number (e.g., "01", "02")',
-          }),
-        }),
-        {
-          label: 'What I Do Items',
-          description: 'List what you do (max 3 items)',
-          itemLabel: (props) =>
-            props.fields.text.value?.substring(0, 50) + '...' || 'New Item',
-        }
-      ),
-    }),
-    howIWork: fields.object({
-      title: fields.text({
-        label: 'How I Work Title',
-        description: 'Title for the "How I Work" section',
-      }),
-      items: fields.array(
-        fields.object({
-          text: fields.text({
-            label: 'Process Description',
-            multiline: true,
-            description: 'Describe how you work (max 3 bullets per card)',
-          }),
-          number: fields.text({
-            label: 'Number (optional)',
-            description: 'Optional custom number (e.g., "01", "02")',
-          }),
-        }),
-        {
-          label: 'How I Work Items',
-          description: 'List how you work (max 3 items)',
-          itemLabel: (props) =>
-            props.fields.text.value?.substring(0, 50) + '...' || 'New Item',
-        }
-      ),
-    }),
-  }),
-
-  // Optional fun-facts / personal bits
-  funFacts: fields.array(
-    fields.text({
-      label: 'Fun Fact',
-      description: 'Add interesting personal facts or trivia',
     }),
     {
-      label: 'Fun Facts',
-      description: 'Optional fun facts about yourself',
-      itemLabel: (props) => props.value || 'New Fun Fact',
+      label: 'Stories',
+      description: 'Two short story vignettes (2-3 items)',
+      itemLabel: (props) => props.fields.headline.value || 'New Story',
     }
   ),
+
+  // Principles
+  principles: fields.object({
+    title: fields.text({
+      label: 'Principles Title',
+      description: 'Title for the "What I care about" section',
+    }),
+    items: fields.array(
+      fields.text({
+        label: 'Principle Item',
+        description: 'What you care about and value',
+      }),
+      {
+        label: 'Principles',
+        description: 'List of what you care about',
+        itemLabel: (props) => props.value || 'New Principle',
+      }
+    ),
+  }),
+
+  // Timeline
+  timeline: fields.array(
+    fields.object({
+      label: fields.text({
+        label: 'Label',
+        description: 'Main label (e.g., Polich Art Works)',
+      }),
+      sublabel: fields.text({
+        label: 'Sublabel',
+        description: 'Optional sublabel',
+        multiline: false,
+      }),
+      description: fields.text({
+        label: 'Description',
+        description:
+          '1–2 sentences (markdown supported if rendered as HTML later)',
+        multiline: true,
+      }),
+    }),
+    {
+      label: 'Timeline Items',
+      description: '3–6 items describing your path',
+      itemLabel: (props) => props.fields.label.value || 'Timeline Item',
+    }
+  ),
+
+  // Testimonials
+  testimonials: fields.array(
+    fields.object({
+      quote: fields.text({ label: 'Quote', multiline: true }),
+      name: fields.text({ label: 'Name' }),
+      role: fields.text({ label: 'Role (optional)' }),
+      org: fields.text({ label: 'Organization (optional)' }),
+      avatar: fields.image({ label: 'Avatar (optional)' }),
+    }),
+    {
+      label: 'Testimonials',
+      description: 'Up to 3 short testimonials',
+      itemLabel: (props) => props.fields.name.value || 'Testimonial',
+    }
+  ),
+
+  // Fit
+  fit: fields.object({
+    bestFit: fields.text({
+      label: 'Best Fit',
+      description: 'Description of who you work best with',
+      multiline: true,
+    }),
+  }),
+
+  // How to start
+  howToStart: fields.object({
+    title: fields.text({
+      label: 'Section Title',
+      defaultValue: 'How to start',
+    }),
+    items: fields.array(
+      fields.text({ label: 'Step', description: 'Short actionable step' }),
+      {
+        label: 'Steps',
+        description: '2–3 steps to get started',
+        itemLabel: (props) => props.value || 'New Step',
+      }
+    ),
+  }),
+
+  // Footer CTA
+  contactCTA: fields.object({
+    text: fields.text({
+      label: 'CTA Text',
+      description: 'Call-to-action text (markdown)',
+      multiline: true,
+    }),
+    buttonText: fields.text({
+      label: 'Button Text',
+      defaultValue: 'Reach Out',
+    }),
+    buttonLink: fields.text({
+      label: 'Button Link',
+      defaultValue: '/reach-out',
+    }),
+  }),
 });
 
 /**
