@@ -27,6 +27,10 @@
   @apply bg-brand-light text-brand-dark;
 }
 
+@utility button-dark {
+  @apply bg-brand-dark text-brand-light;
+}
+
 @utility button-ghost {
   @apply text-brand-dark bg-transparent;
 }

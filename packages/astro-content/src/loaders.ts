@@ -286,41 +286,44 @@ function discoverImagesForEntry(
   contentId: string,
   imageExtensions: string[]
 ): void {
-  const entryDir = dirname(entryPath);
+  const rootDir = dirname(entryPath);
 
-  if (!existsSync(entryDir)) {
+  if (!existsSync(rootDir)) {
     return;
   }
 
-  try {
-    const entries = readdirSync(entryDir, { withFileTypes: true });
-
-    for (const entry of entries) {
-      if (entry.isFile()) {
-        const ext = extname(entry.name).toLowerCase().slice(1);
-        if (imageExtensions.includes(ext)) {
-          const imagePath = join(entryDir, entry.name);
-          const cacheKey = `${contentType}/${contentId}/${entry.name}`;
-
-          // Only process if not already cached
-          if (!imageCache.has(cacheKey)) {
-            const publicUrl = copyImageToPublic(
-              imagePath,
-              contentType,
-              contentId,
-              entry.name
-            );
-            imageCache.set(cacheKey, publicUrl);
+  const walk = (dir: string) => {
+    try {
+      const entries = readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = join(dir, entry.name);
+        if (entry.isDirectory()) {
+          walk(fullPath);
+        } else if (entry.isFile()) {
+          const ext = extname(entry.name).toLowerCase().slice(1);
+          if (imageExtensions.includes(ext)) {
+            const cacheKey = `${contentType}/${contentId}/${entry.name}`;
+            if (!imageCache.has(cacheKey)) {
+              const publicUrl = copyImageToPublic(
+                fullPath,
+                contentType,
+                contentId,
+                entry.name
+              );
+              imageCache.set(cacheKey, publicUrl);
+            }
           }
         }
       }
+    } catch (error) {
+      console.warn(
+        `[content-image-loader] Failed to scan directory for images: ${dir}`,
+        error
+      );
     }
-  } catch (error) {
-    console.warn(
-      `[content-image-loader] Failed to scan directory for images: ${entryDir}`,
-      error
-    );
-  }
+  };
+
+  walk(rootDir);
 }
 
 /**

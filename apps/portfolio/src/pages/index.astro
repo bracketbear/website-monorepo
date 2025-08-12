@@ -25,19 +25,6 @@ const workSkills: WorkSkillEntry[] = await getCollection('workSkills');
 const workProjects: WorkProjectEntry[] = await getCollection('workProject');
 const workCompanies: WorkCompanyEntry[] = await getCollection('workCompany');
 
-// Debug: Log what we're getting from collections
-console.log('Total skills found:', workSkills.length);
-console.log('Total projects found:', workProjects.length);
-console.log('Total jobs found:', workJobs.length);
-console.log(
-  'Sample skill IDs:',
-  workSkills.slice(0, 5).map((s) => s.id)
-);
-console.log(
-  'Sample project IDs:',
-  workProjects.slice(0, 5).map((p) => p.id)
-);
-
 // Get recent experience based on CMS configuration
 let recentJobs = workJobs.sort(
   (a, b) => b.data.startDate.getTime() - a.data.startDate.getTime()
@@ -48,20 +35,8 @@ if (
   indexPage.data.recentExperience.selectedJobs &&
   indexPage.data.recentExperience.selectedJobs.length > 0
 ) {
-  console.log(
-    'CMS selected jobs:',
-    indexPage.data.recentExperience.selectedJobs
-  );
-  console.log(
-    'Available jobs:',
-    workJobs.map((j) => j.id)
-  );
   recentJobs = workJobs.filter((job) =>
     indexPage.data.recentExperience.selectedJobs.includes(job.id)
-  );
-  console.log(
-    'Filtered jobs:',
-    recentJobs.map((j) => j.data.title)
   );
 }
 
@@ -197,7 +172,7 @@ function parseMarkdown(content: string): string {
   <!-- Featured Projects Section -->
   {
     indexPage.data.layout.showFeaturedProjects && (
-      <section class="bg-brand-light relative min-h-[600px] overflow-hidden py-24">
+      <section class="bg-brand-orange relative min-h-[600px] overflow-hidden py-24">
         <FeaturedProjectsWaveBG className="relative w-full" client:load>
           <div class="relative z-10 container mx-auto px-6">
             <div class="mb-16 text-center">
@@ -219,13 +194,15 @@ function parseMarkdown(content: string): string {
                   project={project}
                   skills={workSkills}
                   variant="light"
+                  showBadges={false}
+                  className="card-interactive tangible-elevated-xs"
                 />
               ))}
             </div>
             {indexPage.data.featuredProjects.showViewAllButton && (
               <div class="mt-12 text-center">
                 <a href={indexPage.data.featuredProjects.viewAllButtonLink}>
-                  <AstroButton variant="primary" size="lg">
+                  <AstroButton variant="dark" size="lg">
                     {indexPage.data.featuredProjects.viewAllButtonText}
                   </AstroButton>
                 </a>

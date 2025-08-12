@@ -19,6 +19,7 @@ import { clsx, NavBar, type ObjectValues } from '@bracketbear/core';
 import { navigationConfig } from '@/config/navigation';
 import { generatePortfolioMetaTitle } from '@/config/meta-title';
 import HeaderSection from '@/components/HeaderSection';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import type { ControlValues } from '@bracketbear/flateralus';
 
 const presets = {
@@ -79,19 +80,21 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
   <!-- Header Section with Flateralus Animation -->
   {
     props.title && (
-      <HeaderSection
-        preset={presets[animationPreset]}
-        className="bg-[#5c7c4f] from-brand-red/20 to-[#5c7c4f] bg-radial"
-        showDebugControls={true}
-        enableLuminanceDetection={true}
-        title={props.title}
-        subtitle={props.subtitle}
-        description={props.description}
-        ctaText={props.ctaText}
-        ctaHref={props.ctaHref}
-        stats={props.stats}
-        client:load
-      />
+      <ErrorBoundary client:load>
+        <HeaderSection
+          preset={presets[animationPreset]}
+          className="bg-[#5c7c4f] from-brand-red/20 to-[#5c7c4f] bg-radial"
+          showDebugControls={true}
+          enableLuminanceDetection={true}
+          title={props.title}
+          subtitle={props.subtitle}
+          description={props.description}
+          ctaText={props.ctaText}
+          ctaHref={props.ctaHref}
+          stats={props.stats}
+          client:load
+        />
+      </ErrorBoundary>
     )
   }
 

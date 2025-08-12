@@ -1,6 +1,7 @@
 export const buttonVariantClasses = {
   primary: 'button-primary',
   secondary: 'button-secondary',
+  dark: 'button-dark',
   ghost: 'button-ghost',
   error: 'button-error',
   warning: 'button-warning',

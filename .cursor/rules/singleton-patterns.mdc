@@ -98,26 +98,6 @@ export function makePageSchema<
 - Use `makePageSchema()` to extend with site-specific fields
 - Keep shared schemas in separate files for reusability
 
-### 3. Backward Compatibility
-```typescript
-// Legacy collections for backward compatibility
-export const singletonPageCollections = {
-  indexPage: {
-    base: join(contentPath, 'pages'),
-    schema: indexPageSchema,
-  },
-  // ... other legacy collections
-};
-
-// Export both for compatibility
-export const allCollections = {
-  ...workCollections,
-  ...contentCollections,
-  ...siteSpecificCollections,
-  ...singletonPageCollections, // Keep for backward compatibility
-};
-```
-
 ## Usage in Astro Pages
 
 ### Loading Site-Specific Singletons

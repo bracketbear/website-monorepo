@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
 import {

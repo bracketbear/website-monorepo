@@ -11,6 +11,7 @@ export interface ProjectCardProps {
   showBadges?: boolean;
   showSkills?: boolean;
   maxSkills?: number;
+  className?: string;
 }
 
 export default function ProjectCard({
@@ -22,6 +23,7 @@ export default function ProjectCard({
   showBadges = true,
   showSkills = true,
   maxSkills = 3,
+  className,
 }: ProjectCardProps) {
   const projectSkills = (project.data.skills ?? [])
     .map((skillId: string) => skills.find((s) => s.id === skillId))
@@ -40,7 +42,7 @@ export default function ProjectCard({
 
   return (
     <a href={getProjectUrl(project.id)} className="block hover:no-underline">
-      <div className={`${cardClass} flex h-full flex-col`}>
+      <div className={clsx('flex h-full flex-col', cardClass, className)}>
         {/* Cover Image */}
         {showImage && (
           <div

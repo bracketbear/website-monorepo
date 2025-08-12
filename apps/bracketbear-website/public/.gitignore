@@ -1,0 +1,4 @@
+# In order for CMS images to work, they need to be in the public directory.
+# However, I want the CMS to also be the source of truth for the images, so
+# we need to ignore the content-images directory.
+/content-images

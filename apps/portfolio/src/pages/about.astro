@@ -1,16 +1,21 @@
 ---
 import { type Breadcrumb } from '@bracketbear/core';
-import { AstroButton } from '@bracketbear/core/astro';
 import { getCollection } from 'astro:content';
 import { getAboutBreadcrumbs } from '@/config/breadcrumbs';
 import HeroLayout from '@/layouts/HeroLayout.astro';
 import { marked } from 'marked';
+import { getContentImageUrl } from '@bracketbear/astro-content';
+import { Testimonial } from '@bracketbear/core/react';
 
 const breadcrumbs: Breadcrumb[] = getAboutBreadcrumbs();
 
 // Get the about page singleton (following the same pattern as index.astro)
 const aboutPageEntries = await getCollection('portfolioAboutPage');
 const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
+const testimonialMarkdown = await marked.parse(
+  aboutPage.data.testimonials[0].quote
+);
+const t = aboutPage.data.testimonials[0];
 ---
 
 <HeroLayout
@@ -26,7 +31,7 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
     aboutPage?.data?.narrative && (
       <section class="mb-40">
         <div class="container mx-auto text-center">
-          <h2 class="font-heading mb-6 text-4xl tracking-tight text-white">
+          <h2 class="font-heading mb-6 text-5xl tracking-tight text-white">
             {aboutPage.data.narrative.title}
           </h2>
         </div>
@@ -44,22 +49,26 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
   <!-- Timeline Section (after Narrative) -->
   {
     aboutPage?.data?.timeline && aboutPage.data.timeline.length > 0 && (
-      <section class="mb-40">
+      <section class="mt-24 mb-40">
         <div class="mx-auto max-w-6xl px-6 lg:px-8">
-          <h2 class="font-heading mb-10 text-center text-3xl tracking-tight text-white">
+          <h2 class="font-heading mb-10 text-center text-4xl tracking-tight text-white">
             Timeline
           </h2>
-          <ol class="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {aboutPage.data.timeline.map((item: any) => (
-              <li class="relative flex flex-col gap-3">
+          <ol class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {aboutPage.data.timeline.map((item: any, idx: number) => (
+              <li class="relative flex flex-col gap-3 md:border-t md:border-white/10 md:pt-4">
                 <div class="flex items-center gap-3">
                   <span class="bg-brand-yellow inline-block h-2 w-2 rounded-full" />
-                  <div class="text-white text-lg font-semibold">{item.label}</div>
+                  <div class="text-lg font-semibold text-white">
+                    {item.label}
+                  </div>
                 </div>
                 {item.sublabel && (
-                  <div class="text-white/60 text-sm">{item.sublabel}</div>
+                  <div class="text-sm text-white/60">{item.sublabel}</div>
                 )}
-                <p class="prose-lg text-white/80">{item.description}</p>
+                <p class="prose-lg text-white/80 md:line-clamp-2">
+                  {item.description}
+                </p>
               </li>
             ))}
           </ol>
@@ -73,7 +82,7 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
     aboutPage?.data?.whatIDoNow && (
       <section class="mb-40">
         <div class="container mx-auto text-center">
-          <h2 class="font-heading mb-6 text-4xl tracking-tight text-white">
+          <h2 class="font-heading mb-6 text-5xl tracking-tight text-white">
             {aboutPage.data.whatIDoNow.title}
           </h2>
         </div>
@@ -90,31 +99,35 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
 
   <!-- Mid-page CTA (after What I do now) -->
   <section class="mb-40">
-    <div class="mx-auto max-w-4xl text-center">
-      <p class="mb-6 text-xl leading-relaxed font-medium text-white/90">
-        Have something in mind?
-      </p>
-      <a href="/contact" class="button button-primary button-lg">
-        Talk through your project
-      </a>
+    <div class="mx-auto max-w-4xl px-6 lg:px-8">
+      <div
+        class="rounded-lg bg-white/5 p-8 text-center backdrop-blur-sm md:p-10"
+      >
+        <p class="mb-6 text-xl leading-relaxed font-medium text-white/90">
+          Have something in mind?
+        </p>
+        <a href="/contact" class="button button-primary button-lg">
+          Talk through your project
+        </a>
+      </div>
     </div>
   </section>
 
-  <!-- How I Partner Section -->
+  <!-- How I Work/Partner Section -->
   {
     aboutPage?.data?.howIPartner && (
       <section class="mb-40">
         <div class="mx-auto max-w-4xl text-center">
-          <h2 class="font-heading mb-8 text-4xl tracking-tight text-white">
+          <h2 class="font-heading mb-8 text-5xl tracking-tight text-white">
             {aboutPage.data.howIPartner.title}
           </h2>
         </div>
         <div class="mx-auto max-w-4xl px-6 lg:px-8">
-          <ul class="space-y-4 text-xl font-medium text-white/90">
-            {aboutPage.data.howIPartner.items.map((item: string) => (
-              <li class="flex items-start gap-3">
-                <span class="mt-2 text-sm text-white">•</span>
-                <span>{item}</span>
+          <ul class="list-none space-y-12 pl-6 text-xl font-medium text-white/90">
+            {aboutPage.data.howIPartner.items.map((item: string, index: number) => (
+              <li class="flex flex-col items-center gap-3">
+                <div class="text-white/90 rounded-full bg-brand-orange aspect-square w-10 flex items-center justify-center">{index + 1}</div>
+                <div class="text-white/90 text-center max-w-prose text-xl">{item}</div>
               </li>
             ))}
           </ul>
@@ -126,31 +139,26 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
   <!-- Testimonials Section (after How I partner) -->
   {
     aboutPage?.data?.testimonials && aboutPage.data.testimonials.length > 0 && (
-      <section class="mb-40">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-          <h2 class="font-heading mb-10 text-center text-3xl tracking-tight text-white">
-            Testimonials
-          </h2>
-          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {aboutPage.data.testimonials.map((t: any) => (
-              <figure class="border-brand-yellow/40 bg-white/5 rounded-lg border-l-4 p-6 backdrop-blur-sm">
-                <blockquote class="prose-lg text-white/90">
-                  “{t.quote}”
-                </blockquote>
-                <figcaption class="mt-4 flex items-center gap-3 text-white/80">
-                  {/* Avatar reserved; using placeholder circle when no avatar */}
-                  <span class="bg-white/20 inline-block h-8 w-8 rounded-full" />
-                  <div class="flex flex-col">
-                    <strong class="text-white">{t.name}</strong>
-                    <span class="text-sm text-white/70">
-                      {t.role}
-                      {t.org ? `, ${t.org}` : ''}
-                    </span>
-                  </div>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
+      <section class="mt-24 mb-40">
+        <div class=" mx-auto max-w-7xl">
+            <Testimonial
+              quote={t.quote}
+              name={t.name}
+              role={t.role}
+              org={t.org}
+              className=" card"
+              avatarUrl={
+                t.avatar
+                  ? getContentImageUrl(
+                      'sites/portfolio',
+                      'about-page',
+                      t.avatar
+                    )
+                  : undefined
+              }
+              variant="dark"
+              }
+            />
         </div>
       </section>
     )
@@ -161,10 +169,13 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
     aboutPage?.data?.stories && aboutPage.data.stories.length > 0 && (
       <section class="mb-40">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
-          <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             {aboutPage.data.stories.map((story: any) => (
-              <div class="rounded-lg border border-white/20 bg-white/5 p-8 backdrop-blur-sm">
-                <h3 class="font-heading mb-4 text-2xl tracking-tight text-white">
+              <div class="rounded-lg border border-white/20 bg-white/5 p-4 backdrop-blur-sm md:p-6">
+                <div class="font-semibold tracking-wider text-white/60 uppercase">
+                  Case note
+                </div>
+                <h3 class="font-heading mt-2 mb-4 text-2xl tracking-tight text-white">
                   {story.headline}
                 </h3>
                 <div class="prose-lg text-white/90">
@@ -183,7 +194,7 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
     aboutPage?.data?.principles && (
       <section class="mb-40">
         <div class="mx-auto max-w-4xl text-center">
-          <h2 class="font-heading mb-8 text-4xl tracking-tight text-white">
+          <h2 class="font-heading mb-8 text-5xl tracking-tight text-white">
             {aboutPage.data.principles.title}
           </h2>
         </div>
@@ -206,8 +217,8 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
     aboutPage?.data?.fit && (
       <section class="mb-40">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
-          <div class="grid grid-cols-1 gap-12 md:grid-cols-2">
-            <div class="text-center md:text-left">
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div class="rounded-lg border border-white/20 bg-white/5 p-6 text-center backdrop-blur-sm md:text-left">
               <h3 class="font-heading mb-4 text-2xl tracking-tight text-white">
                 Best fit
               </h3>
@@ -216,7 +227,7 @@ const aboutPage = aboutPageEntries[0]; // Singletons have only one entry
               </p>
             </div>
             {aboutPage?.data?.howToStart && (
-              <div class="text-center md:text-left">
+              <div class="rounded-lg border border-white/20 bg-white/5 p-6 text-center backdrop-blur-sm md:text-left">
                 <h3 class="font-heading mb-4 text-2xl tracking-tight text-white">
                   {aboutPage.data.howToStart.title}
                 </h3>

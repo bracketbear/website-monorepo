@@ -40,8 +40,6 @@
 
 /* Base prose utility - replicates Tailwind's typography plugin */
 @utility prose {
-  @apply text-brand-dark;
-
   /* Base prose variables - these will be overridden by size variants */
   --prose-font-size: 1rem;
   --prose-line-height: 1.75;

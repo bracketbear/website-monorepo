@@ -13,7 +13,6 @@ import {
   serviceSchema,
   contactMethodSchema,
   makePageSchema,
-  indexPageSchema,
   portfolioAboutPageSchema,
   portfolioContactPageSchema,
   portfolioIndexPageSchema,
@@ -149,50 +148,12 @@ export const siteSpecificCollections = {
 };
 
 /**
- * Legacy singleton collections (for backward compatibility)
- * @deprecated Use site-specific collections instead
- */
-export const singletonPageCollections = {
-  indexPage: {
-    base: join(contentPath, 'pages'),
-    schema: indexPageSchema,
-  },
-  contactPage: {
-    base: join(contentPath, 'pages'),
-    schema: makePageSchema({
-      phone: z.string().optional(),
-      address: z.string().optional(),
-      contactFormId: z.string().optional(),
-      officeHours: z.string().optional(),
-    }),
-  },
-  aboutPage: {
-    base: join(contentPath, 'pages'),
-    schema: makePageSchema({
-      teamMembers: z
-        .array(
-          z.object({
-            name: z.string(),
-            role: z.string(),
-            bio: z.string().optional(),
-            image: z.string().optional(),
-          })
-        )
-        .optional(),
-      companyValues: z.array(z.string()).optional(),
-      foundedYear: z.number().optional(),
-    }),
-  },
-};
-
-/**
  * All collection configurations
  */
 export const allCollections = {
   ...workCollections,
   ...contentCollections,
   ...siteSpecificCollections,
-  ...singletonPageCollections, // Keep for backward compatibility
 };
 
 /**

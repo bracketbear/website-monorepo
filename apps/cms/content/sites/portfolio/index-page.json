@@ -6,6 +6,11 @@
   "canonicalUrl": "https://harrisoncallahan.com/",
   "ogImage": "portfolio-hero.jpg",
   "noIndex": false,
+  "contactCTA": {
+    "text": "Have a rough idea or an active project? Happy to talk it through.",
+    "buttonText": "Get in touch",
+    "buttonLink": "/contact"
+  },
   "hero": {
     "showParticleBackground": true
   },
@@ -24,13 +29,13 @@
   },
   "featuredProjects": {
     "title": "Selected projects",
-    "subtitle": "A few builds. Short notes on what was unclear, what I tried, and how it turned out.",
+    "subtitle": "Here are the projects that I think really define how I think about building software. Click on any card to learn more about the project and my role on it.",
     "maxDisplay": 3,
     "showViewAllButton": true,
     "viewAllButtonText": "See all projects →",
     "viewAllButtonLink": "/projects",
     "selectedProjects": [
-      "ds-elekta",
+      "dl-gumband",
       "ds-bridge"
     ]
   },
@@ -44,11 +49,6 @@
     "selectedJobs": [
       "dl-full-stack-software-engineer"
     ]
-  },
-  "contactCTA": {
-    "text": "Have a rough idea or an active project? Happy to talk it through.",
-    "buttonText": "Get in touch",
-    "buttonLink": "/contact"
   },
   "layout": {
     "hideContactForm": false,

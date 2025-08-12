@@ -2,6 +2,12 @@
   "title": "About",
   "subtitle": "I build full-stack tools for experiential teams. I like clear problems, steady progress, and work people can rely on.",
   "metaDescription": "About Harrison Callahan — self-taught developer building full-stack tools for experiential teams; practical, collaborative, and reliability-focused.",
+  "noIndex": false,
+  "contactCTA": {
+    "text": "Based in Pacific time; remote-friendly, and travel is fine when it helps. Have a repo, problem statement, or a Figma you want to walk through? Send it over and let's talk.",
+    "buttonText": "Start a conversation",
+    "buttonLink": "/reach-out"
+  },
   "narrative": {
     "title": "My Story",
     "content": "Hey there! I'm Harrison. I've been working on the web in some form or another since high school. My first real break was at Polich Art Works—an art foundry that took a chance on a kid who's only selling point was that he could use a computer. That path moved me from Dreamweaver and Photoshop to Flash and ActionScript, and eventually into building things because someone needed them.\n\nLater, working at a brewery, we needed a monthly newsletter. I taught myself PHP, built a very rough sender, and then moved us to Mailchimp. I wrote a WordPress theme and a couple of plugins to manage menus. None of it was glamorous, but it worked—and it taught me that good software starts with a real need and gets better in public.\n\nFeeling stuck a few years in, I took a three-month Laravel contract with an experiential shop. Seeing a museum app driving content on a wall flipped a switch: this wasn't just websites—it was the systems that let creative teams do their jobs without fighting the tools. I pushed for the full-time role, got it, and never looked back. Since then I've spent years in experiential—Downstream, Deeplocal—building management software, smoothing handoffs, and making the unglamorous parts dependable. I'm self-taught, practical, and happiest when the work helps a team breathe easier."
@@ -11,7 +17,7 @@
     "content": "I design and build the systems behind interactive work: content and device management, scheduling, tooling, and the small frameworks that keep everything sane. I like projects with clear ownership and a real outcome attached.\n\nI'm open to full-time roles, and I also partner with agencies and collaborators. Either way, the goal is the same: make the work easier to run tomorrow than it was today."
   },
   "howIPartner": {
-    "title": "How I partner (clarity first)",
+    "title": "How I Work",
     "items": [
       "Agree on the problem, decision-makers, and timeline up front.",
       "Write things down: short docs, in-code notes, shared checklists.",
@@ -41,17 +47,6 @@
       "Share what I learn so others can move faster"
     ]
   },
-  "fit": {
-    "bestFit": "Teams that know the outcome they need and value candid, respectful communication. Clear ownership, realistic timelines, and steady progress."
-  },
-  "howToStart": {
-    "title": "How to start",
-    "items": [
-      "Share a repo, problem statement, or Figma",
-      "One 25-minute call to align",
-      "I return a short plan with options"
-    ]
-  },
   "timeline": [
     {
       "label": "Polich Art Works",
@@ -71,21 +66,22 @@
   ],
   "testimonials": [
     {
-      "quote": "Harrison brings calm structure. He makes decisions easy and the work predictable.",
-      "name": "First Last",
-      "role": "Producer",
-      "org": "Experiential Agency"
-    },
-    {
-      "quote": "Give him the problem and he’ll return with a plan, a prototype, and clear next steps.",
-      "name": "First Last",
-      "role": "Technical Director",
-      "org": "Interactive Studio"
+      "quote": "In a short time, [Harrison] took on projects that were ambiguous and challenging, but he approached these projects with the determination to learn as much and he could and ultimately succeeded. We deemed him the \"swiss army knife\" because that's exactly what he was.",
+      "name": "Tessa Ribitsch",
+      "role": "Former Producer",
+      "org": "Downstream",
+      "avatar": "testimonials/0/avatar.jpeg"
     }
   ],
-  "contactCTA": {
-    "text": "Based in Pacific time; remote-friendly, and travel is fine when it helps. Have a repo, problem statement, or a Figma you want to walk through? Send it over and let's talk.",
-    "buttonText": "Start a conversation",
-    "buttonLink": "/reach-out"
+  "fit": {
+    "bestFit": "Teams that know the outcome they need and value candid, respectful communication. Clear ownership, realistic timelines, and steady progress."
+  },
+  "howToStart": {
+    "title": "How to start",
+    "items": [
+      "Share a repo, problem statement, or Figma",
+      "One 25-minute call to align",
+      "I return a short plan with options"
+    ]
   }
 }

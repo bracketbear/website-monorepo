@@ -23,17 +23,21 @@
   --tangible-shadow-depth: 0.25rem;
   --tangible-inset-depth: 0.125rem;
   --tangible-highlight-alpha: 10%;
-  --tangible-highlight-color: --alpha(var(--color-brand-light) / var(--tangible-highlight-alpha));
+  --tangible-highlight-color: --alpha(
+    var(--color-brand-light) / var(--tangible-highlight-alpha)
+  );
   --tangible-shadow-color: --alpha(var(--color-brand-dark) / 12%);
-  --tangible-shadow-color: red;
   --tangible-inset-color: --alpha(var(--color-brand-dark) / 10%);
   box-shadow:
     /* Box shadow */
-    var(--tangible-shadow-depth) var(--tangible-shadow-depth) var(--tangible-shadow-depth) var(--tangible-shadow-depth) var(--tangible-shadow-color),
-    /* Inset shadow */
-    inset calc(var(--tangible-inset-depth) * -1) calc(var(--tangible-inset-depth) * -1) calc(var(--tangible-inset-depth) * 2) 0 var(--tangible-inset-color),
-    /* Highlight shadow */
-    inset var(--tangible-inset-depth) var(--tangible-inset-depth) 0.5rem 0 var(--tangible-highlight-color);
+    var(--tangible-shadow-depth) var(--tangible-shadow-depth)
+      var(--tangible-shadow-depth) var(--tangible-shadow-depth)
+      var(--tangible-shadow-color),
+    /* Inset shadow */ inset calc(var(--tangible-inset-depth) * -1)
+      calc(var(--tangible-inset-depth) * -1)
+      calc(var(--tangible-inset-depth) * 2) 0 var(--tangible-inset-color),
+    /* Highlight shadow */ inset var(--tangible-inset-depth)
+      var(--tangible-inset-depth) 0.5rem 0 var(--tangible-highlight-color);
 }
 
 /* Depth variants - using standardized depth scale */
@@ -71,7 +75,7 @@
 /* Interactive states */
 @utility tangible-hover {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   &:hover {
     --tangible-shadow-depth: calc(var(--tangible-shadow-depth) + 0.125rem);
     transform: translateY(-0.125rem);
@@ -88,7 +92,10 @@
 @utility tangible-flat {
   --tangible-shadow-depth: 0;
   --tangible-inset-depth: 0.125rem;
-  box-shadow: 
-    inset calc(var(--tangible-inset-depth) * -1) calc(var(--tangible-inset-depth) * -1) calc(var(--tangible-inset-depth) * 4) 0 var(--tangible-inset-color),
-    inset var(--tangible-inset-depth) var(--tangible-inset-depth) calc(var(--tangible-inset-depth) / 4) 0 var(--tangible-highlight-color);
+  box-shadow:
+    inset calc(var(--tangible-inset-depth) * -1)
+      calc(var(--tangible-inset-depth) * -1)
+      calc(var(--tangible-inset-depth) * 4) 0 var(--tangible-inset-color),
+    inset var(--tangible-inset-depth) var(--tangible-inset-depth)
+      calc(var(--tangible-inset-depth) / 4) 0 var(--tangible-highlight-color);
 }

@@ -267,166 +267,160 @@ export const portfolioContactPageSchema = makePageSchema(
  * It includes all sections: hero, about, featured projects, recent experience,
  * contact, and layout controls.
  */
-export const portfolioIndexPageSchema = makePageSchema(
-  {
-    // Hero section content
-    hero: fields.object({
-      title: fields.text({ label: 'Title' }),
-      subtitle: fields.text({ label: 'Subtitle' }),
-      description: fields.text({ label: 'Description' }),
-      showParticleBackground: fields.checkbox({
-        label: 'Show Particle Background',
-        defaultValue: true,
-      }),
+export const portfolioIndexPageSchema = makePageSchema({
+  // Hero section content
+  hero: fields.object({
+    title: fields.text({ label: 'Title' }),
+    subtitle: fields.text({ label: 'Subtitle' }),
+    description: fields.text({ label: 'Description' }),
+    showParticleBackground: fields.checkbox({
+      label: 'Show Particle Background',
+      defaultValue: true,
     }),
+  }),
 
-    // About/What I Do section
-    about: fields.object({
-      title: fields.text({
-        label: 'Title',
-        defaultValue: 'What I Do',
-      }),
-      introduction: fields.text({
-        label: 'Introduction',
-        multiline: true,
-      }),
-      description: fields.text({
-        label: 'Description',
-        multiline: true,
-      }),
-      experience: fields.text({
-        label: 'Experience',
-        multiline: true,
-      }),
-      additional: fields.text({
-        label: 'Additional Information',
-        multiline: true,
-      }),
-      showSkillsTicker: fields.checkbox({
-        label: 'Show Skills Ticker',
-        defaultValue: true,
-      }),
-      featuredSkills: fields.array(
-        fields.relationship({
-          label: 'Skill',
-          collection: 'workSkills',
-          description: 'Select a skill from the skills collection',
-        }),
-        {
-          label: 'Featured Skills',
-          itemLabel: (props) => props.value || 'New Skill',
-          description: 'Select skills to feature in the about section',
-        }
-      ),
+  // About/What I Do section
+  about: fields.object({
+    title: fields.text({
+      label: 'Title',
+      defaultValue: 'What I Do',
     }),
+    introduction: fields.text({
+      label: 'Introduction',
+      multiline: true,
+    }),
+    description: fields.text({
+      label: 'Description',
+      multiline: true,
+    }),
+    experience: fields.text({
+      label: 'Experience',
+      multiline: true,
+    }),
+    additional: fields.text({
+      label: 'Additional Information',
+      multiline: true,
+    }),
+    showSkillsTicker: fields.checkbox({
+      label: 'Show Skills Ticker',
+      defaultValue: true,
+    }),
+    featuredSkills: fields.array(
+      fields.relationship({
+        label: 'Skill',
+        collection: 'workSkills',
+        description: 'Select a skill from the skills collection',
+      }),
+      {
+        label: 'Featured Skills',
+        itemLabel: (props) => props.value || 'New Skill',
+        description: 'Select skills to feature in the about section',
+      }
+    ),
+  }),
 
-    // Featured Projects section
-    featuredProjects: fields.object({
-      title: fields.text({
-        label: 'Title',
-        defaultValue: 'Featured Projects',
-      }),
-      subtitle: fields.text({ label: 'Subtitle' }),
-      maxDisplay: fields.integer({
-        label: 'Maximum Projects to Display',
-        defaultValue: 3,
-      }),
-      showViewAllButton: fields.checkbox({
-        label: 'Show View All Button',
-        defaultValue: true,
-      }),
-      viewAllButtonText: fields.text({
-        label: 'View All Button Text',
-        defaultValue: 'View All Projects →',
-      }),
-      viewAllButtonLink: fields.text({
-        label: 'View All Button Link',
-        defaultValue: '/projects',
-      }),
-      selectedProjects: fields.array(
-        fields.relationship({
-          label: 'Project',
-          collection: 'workProject',
-          description: 'Select a project from the projects collection',
-        }),
-        {
-          label: 'Selected Projects',
-          itemLabel: (props) => props.value || 'New Project',
-          description: 'Select projects to feature on the homepage',
-        }
-      ),
+  // Featured Projects section
+  featuredProjects: fields.object({
+    title: fields.text({
+      label: 'Title',
+      defaultValue: 'Featured Projects',
     }),
+    subtitle: fields.text({ label: 'Subtitle' }),
+    maxDisplay: fields.integer({
+      label: 'Maximum Projects to Display',
+      defaultValue: 3,
+    }),
+    showViewAllButton: fields.checkbox({
+      label: 'Show View All Button',
+      defaultValue: true,
+    }),
+    viewAllButtonText: fields.text({
+      label: 'View All Button Text',
+      defaultValue: 'View All Projects →',
+    }),
+    viewAllButtonLink: fields.text({
+      label: 'View All Button Link',
+      defaultValue: '/projects',
+    }),
+    selectedProjects: fields.array(
+      fields.relationship({
+        label: 'Project',
+        collection: 'workProject',
+        description: 'Select a project from the projects collection',
+      }),
+      {
+        label: 'Selected Projects',
+        itemLabel: (props) => props.value || 'New Project',
+        description: 'Select projects to feature on the homepage',
+      }
+    ),
+  }),
 
-    // Recent Experience section
-    recentExperience: fields.object({
-      title: fields.text({
-        label: 'Title',
-        defaultValue: 'Recent Experience',
-      }),
-      subtitle: fields.text({ label: 'Subtitle' }),
-      maxDisplay: fields.integer({
-        label: 'Maximum Jobs to Display',
-        defaultValue: 3,
-      }),
-      showViewAllButton: fields.checkbox({
-        label: 'Show View All Button',
-        defaultValue: true,
-      }),
-      viewAllButtonText: fields.text({
-        label: 'View All Button Text',
-        defaultValue: 'View Full Work History →',
-      }),
-      viewAllButtonLink: fields.text({
-        label: 'View All Button Link',
-        defaultValue: '/work',
-      }),
-      selectedJobs: fields.array(
-        fields.relationship({
-          label: 'Job',
-          collection: 'workJobs',
-          description: 'Select a job from the jobs collection',
-        }),
-        {
-          label: 'Selected Jobs',
-          itemLabel: (props) => props.value || 'New Job',
-          description:
-            'Select jobs to feature in the recent experience section',
-        }
-      ),
+  // Recent Experience section
+  recentExperience: fields.object({
+    title: fields.text({
+      label: 'Title',
+      defaultValue: 'Recent Experience',
     }),
+    subtitle: fields.text({ label: 'Subtitle' }),
+    maxDisplay: fields.integer({
+      label: 'Maximum Jobs to Display',
+      defaultValue: 3,
+    }),
+    showViewAllButton: fields.checkbox({
+      label: 'Show View All Button',
+      defaultValue: true,
+    }),
+    viewAllButtonText: fields.text({
+      label: 'View All Button Text',
+      defaultValue: 'View Full Work History →',
+    }),
+    viewAllButtonLink: fields.text({
+      label: 'View All Button Link',
+      defaultValue: '/work',
+    }),
+    selectedJobs: fields.array(
+      fields.relationship({
+        label: 'Job',
+        collection: 'workJobs',
+        description: 'Select a job from the jobs collection',
+      }),
+      {
+        label: 'Selected Jobs',
+        itemLabel: (props) => props.value || 'New Job',
+        description: 'Select jobs to feature in the recent experience section',
+      }
+    ),
+  }),
 
-    // Layout and styling options
-    layout: fields.object({
-      hideContactForm: fields.checkbox({
-        label: 'Hide Contact Form',
-        defaultValue: true,
-      }),
-      showHeroSection: fields.checkbox({
-        label: 'Show Hero Section',
-        defaultValue: true,
-      }),
-      showAboutSection: fields.checkbox({
-        label: 'Show About Section',
-        defaultValue: true,
-      }),
-      showFeaturedProjects: fields.checkbox({
-        label: 'Show Featured Projects',
-        defaultValue: true,
-      }),
-      showRecentExperience: fields.checkbox({
-        label: 'Show Recent Experience',
-        defaultValue: true,
-      }),
-      showContactSection: fields.checkbox({
-        label: 'Show Contact Section',
-        defaultValue: true,
-      }),
+  // Layout and styling options
+  layout: fields.object({
+    hideContactForm: fields.checkbox({
+      label: 'Hide Contact Form',
+      defaultValue: true,
     }),
-  },
-  {
-    showCta: false,
-  }
-);
+    showHeroSection: fields.checkbox({
+      label: 'Show Hero Section',
+      defaultValue: true,
+    }),
+    showAboutSection: fields.checkbox({
+      label: 'Show About Section',
+      defaultValue: true,
+    }),
+    showFeaturedProjects: fields.checkbox({
+      label: 'Show Featured Projects',
+      defaultValue: true,
+    }),
+    showRecentExperience: fields.checkbox({
+      label: 'Show Recent Experience',
+      defaultValue: true,
+    }),
+    showContactSection: fields.checkbox({
+      label: 'Show Contact Section',
+      defaultValue: true,
+    }),
+  }),
+});
 
 /**
  * Portfolio Work Page Schema

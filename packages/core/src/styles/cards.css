@@ -1,7 +1,11 @@
 @utility card {
-  @apply tangible tangible-card rounded-xl border border-solid border-brand-dark-muted bg-brand-light p-6;
+  @apply tangible tangible-card border-brand-dark-muted bg-brand-light rounded-xl border border-solid p-6;
 }
 
 @utility card-dark {
   @apply card bg-brand-dark text-brand-light border-brand-light/30;
-} 
+}
+
+@utility card-interactive {
+  @apply tangible-hover;
+}
