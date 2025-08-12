@@ -1,16 +1,16 @@
 {
   "title": "About",
-  "subtitle": "I build full-stack tools for experiential teams. I like clear problems, steady progress, and work people can rely on.",
+  "subtitle": "I build full-stack tools for experiential teams.",
   "metaDescription": "About Harrison Callahan — self-taught developer building full-stack tools for experiential teams; practical, collaborative, and reliability-focused.",
   "noIndex": false,
   "contactCTA": {
-    "text": "Based in Pacific time; remote-friendly, and travel is fine when it helps. Have a repo, problem statement, or a Figma you want to walk through? Send it over and let's talk.",
+    "text": "Have a project or problem you want to walk through together? Send me a message and let's chat!",
     "buttonText": "Start a conversation",
-    "buttonLink": "/reach-out"
+    "buttonLink": "/contact"
   },
   "narrative": {
     "title": "My Story",
-    "content": "Hey there! I'm Harrison. I've been working on the web in some form or another since high school. My first real break was at Polich Art Works—an art foundry that took a chance on a kid who's only selling point was that he could use a computer. That path moved me from Dreamweaver and Photoshop to Flash and ActionScript, and eventually into building things because someone needed them.\n\nLater, working at a brewery, we needed a monthly newsletter. I taught myself PHP, built a very rough sender, and then moved us to Mailchimp. I wrote a WordPress theme and a couple of plugins to manage menus. None of it was glamorous, but it worked—and it taught me that good software starts with a real need and gets better in public.\n\nFeeling stuck a few years in, I took a three-month Laravel contract with an experiential shop. Seeing a museum app driving content on a wall flipped a switch: this wasn't just websites—it was the systems that let creative teams do their jobs without fighting the tools. I pushed for the full-time role, got it, and never looked back. Since then I've spent years in experiential—Downstream, Deeplocal—building management software, smoothing handoffs, and making the unglamorous parts dependable. I'm self-taught, practical, and happiest when the work helps a team breathe easier."
+    "content": "I'm Harrison. I've been working on the web in some form or another since high school. My first real break was at Polich Art Works—an art foundry that took a chance on a kid who's only selling point was that he could use a computer. That path moved me from Dreamweaver and Photoshop to Flash and ActionScript, and eventually into building things because someone needed them.\n\nLater, working at a brewery, we needed a monthly newsletter. I taught myself PHP, built a very rough sender, and then moved us to Mailchimp. I wrote a WordPress theme and a couple of plugins to manage menus. None of it was glamorous, but it worked—and it taught me that good software starts with a real need and gets better in public.\n\nFeeling stuck a few years in, I took a three-month Laravel contract with an experiential shop. Seeing a museum app driving content on a wall flipped a switch: this wasn't just websites—it was the systems that let creative teams do their jobs without fighting the tools. I pushed for the full-time role, got it, and never looked back. Since then I've spent years in experiential—Downstream, Deeplocal—building management software, smoothing handoffs, and making the unglamorous parts dependable. I'm self-taught, practical, and happiest when the work helps a team breathe easier."
   },
   "whatIDoNow": {
     "title": "What I do now",
@@ -40,11 +40,10 @@
   "principles": {
     "title": "What I care about",
     "items": [
-      "Plain language and honest timelines",
-      "Maintainable systems over clever detours",
-      "Accessibility by default",
-      "Calm teams: clear notes, clear ownership, fewer surprises",
-      "Share what I learn so others can move faster"
+      "Clear communication",
+      "Pragmatic decision making",
+      "Modularity",
+      "Working smarter"
     ]
   },
   "timeline": [
@@ -59,9 +58,9 @@
       "description": "Wrote a PHP newsletter sender, moved the team to Mailchimp, and built a WordPress theme with plugins for menus. Not glamorous—reliable."
     },
     {
-      "label": "Experiential full-time",
+      "label": "Experiential",
       "sublabel": "Downstream → Deeplocal",
-      "description": "Took a Laravel contract, saw a museum app running on a wall, and realized this was the work. Moved into experiential management software and never looked back."
+      "description": "Took a three month contract at an experiential agency and fell in love with the industry"
     }
   ],
   "testimonials": [
@@ -79,7 +78,7 @@
   "howToStart": {
     "title": "How to start",
     "items": [
-      "Share a repo, problem statement, or Figma",
+      "Send me a message to chat",
       "One 25-minute call to align",
       "I return a short plan with options"
     ]
