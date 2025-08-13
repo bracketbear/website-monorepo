@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import ContactForm from '@/components/ContactForm';
-import { Stats, ContactIcon } from '@bracketbear/core/react';
+import { ContactIcon, Stats } from '@bracketbear/core/react';
 import { marked } from 'marked';
 import { NavBar } from '@bracketbear/core';
 import { navigationConfig } from '@/config/navigation';
@@ -18,8 +18,8 @@ function parseMarkdown(content: string): string {
   return marked.parse(content) as string;
 }
 
-// Prepare stats data from quick info
-const statsData =
+// Prepare quick info items
+const quickInfoItems =
   contactPage.data.quickInfo?.map((info: { label: string; value: string }) => ({
     label: info.label,
     value: info.value,
@@ -89,15 +89,15 @@ const metaTitle = generatePortfolioMetaTitle(contactPage.data.title);
             )
           }
 
-          <!-- Stats Section (if any) -->
-          {
-            statsData.length > 0 && (
+          <!-- Quick Info Cards -->
+          <!-- {
+            quickInfoItems.length > 0 && (
               <Stats
-                stats={statsData}
+                stats={quickInfoItems}
                 className=" z-10 drop-shadow-xl drop-shadow-black/30"
               />
             )
-          }
+          } -->
 
           <!-- Contact Methods -->
           {

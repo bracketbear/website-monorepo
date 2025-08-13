@@ -21,10 +21,8 @@ export const Field: React.FC<FieldProps> = ({
   return (
     <div className={`relative mt-6 ${className}`}>
       <span
-        className={`absolute -top-6 left-0 z-10 flex h-6 items-center rounded-t-sm px-4 text-sm font-bold tracking-wide transition-colors duration-200 ${
-          error
-            ? 'bg-brand-red text-brand-light'
-            : 'bg-brand-dark text-brand-light'
+        className={`absolute -top-6 left-0 z-10 flex h-6 items-center rounded-t-sm text-sm font-bold tracking-wide transition-colors duration-200 ${
+          error ? 'text-error' : 'text-brand-dark'
         }`}
       >
         {label}
@@ -38,7 +36,7 @@ export const Field: React.FC<FieldProps> = ({
         )}
       >
         {error && (
-          <div id={`${id}-error`} className="text-brand-red mt-1 font-bold">
+          <div id={`${id}-error`} className="text-error mt-1 text-xs font-bold">
             {error}
           </div>
         )}

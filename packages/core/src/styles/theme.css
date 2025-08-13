@@ -14,6 +14,8 @@
   --color-brand-purple: #b185a7;
   --color-brand-light: #f2f0ef;
 
+  --color-error: var(--color-brand-red);
+
   /* Theme Tokens - Light Mode Defaults */
   --color-primary: var(--color-brand-orange);
   --color-secondary: var(--color-brand-red);

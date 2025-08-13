@@ -1,11 +1,11 @@
 {
   "title": "Reach Out",
-  "subtitle": "Let's build something amazing together",
-  "metaDescription": "Get in touch with Harrison Callahan to discuss your next project. Available for new opportunities and collaborations.",
+  "subtitle": "Tell me what you’re building.",
+  "metaDescription": "Contact Harrison Callahan — talk through a role or project. Short call, clear next steps, and a reply within a day.",
   "noIndex": false,
   "introduction": {
-    "title": "Ready to Ship?",
-    "content": "I build digital solutions that work. No fancy buzzwords, no over-engineering. Just solid code that solves real problems.\n\nCurrently available for new projects."
+    "title": "Let’s talk details",
+    "content": "I build full‑stack tools for experiential teams. If you’ve got a role or a project in mind, I’m happy to walk through it and outline options. Short calls or async is fine.\n\nIf you have one, send a repo, problem statement, or Figma. I usually reply within a day."
   },
   "contactMethods": [
     "linkedin",
@@ -14,17 +14,23 @@
   ],
   "quickInfo": [
     {
-      "label": "Response Time",
-      "value": "Within 24 hours"
-    },
-    {
-      "label": "Experience",
-      "value": "10+ Years"
+      "label": "Response time",
+      "value": "Under a day"
     },
     {
       "label": "Location",
       "value": "Portland, OR"
+    },
+    {
+      "label": "Timezone",
+      "value": "Pacific (PT)"
+    },
+    {
+      "label": "Experience",
+      "value": "12+ years"
     }
   ],
-  "contactForm": {}
+  "contactForm": {
+    "title": "Send a note"
+  }
 }

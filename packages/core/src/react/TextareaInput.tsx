@@ -13,8 +13,8 @@ export const TextareaInput = forwardRef<
   return (
     <textarea
       ref={ref}
-      className={`border-brand-dark focus:ring-brand-orange w-full rounded rounded-tl-none border-2 bg-white p-2 font-mono transition-all focus:ring-2 focus:outline-none ${
-        error ? 'animate-shake border-brand-red' : ''
+      className={`tangible tangible-input border-brand-dark/30 focus:ring-brand-orange w-full rounded border bg-white p-2 font-mono transition-all focus:ring-2 focus:outline-none ${
+        error ? 'animate-shake border-error' : ''
       } ${className}`}
       aria-invalid={!!error}
       aria-describedby={error ? `${props.id || props.name}-error` : undefined}
