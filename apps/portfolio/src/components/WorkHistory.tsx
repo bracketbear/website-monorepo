@@ -120,7 +120,7 @@ export default function WorkHistory({
                           <SkillPill
                             key={skillId}
                             selected={isSelected}
-                            size="md"
+                            size="sm"
                           >
                             {skills.find((s) => s.id === skillId)?.data.title ||
                               skillId}
@@ -172,13 +172,6 @@ export default function WorkHistory({
             'shadow-[4px_4px_0_0_var(--color-brand-red)]',
             'p-6'
           )}
-          style={
-            {
-              '--color-background': 'var(--color-brand-light)',
-              '--color-brand-orange': 'var(--color-brand-orange)',
-              '--color-brand-red': 'var(--color-brand-red)',
-            } as React.CSSProperties
-          }
         >
           <div className="text-foreground py-8 text-center">
             <p className="text-lg font-bold">

@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
-import { clsx, getProjectUrl } from '@bracketbear/core';
+import { clsx, getProjectUrl, SkillPill } from '@bracketbear/core';
 import { getProjectImageUrl } from '@bracketbear/astro-content';
 
 export interface ProjectCardProps {
@@ -89,12 +89,9 @@ export default function ProjectCard({
         {showSkills && projectSkills.length > 0 && (
           <div className="mt-auto flex flex-wrap gap-2 border-t-2 pt-3">
             {projectSkills.map((skill: any) => (
-              <span
-                key={skill.id}
-                className={clsx('pill', compact && 'pill-sm', 'pill-skill')}
-              >
+              <SkillPill key={skill.id} size="sm">
                 {skill?.data.title}
-              </span>
+              </SkillPill>
             ))}
           </div>
         )}

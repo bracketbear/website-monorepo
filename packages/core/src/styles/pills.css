@@ -68,7 +68,7 @@
 }
 
 @utility pill-selected {
-  @apply pill-dark;
+  @apply pill-brand-green;
 }
 
 @utility pill-pressed {
@@ -86,7 +86,7 @@
 }
 
 @utility pill-skill {
-  @apply pill-light;
+  @apply pill-dark;
 }
 
 /* Alternative styles */
