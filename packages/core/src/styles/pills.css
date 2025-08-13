@@ -34,6 +34,18 @@
   --tangible-shadow-color: --alpha(var(--color-brand-purple) / 10%);
 }
 
+@utility pill-dark {
+  @apply bg-brand-dark border-brand-dark text-white;
+}
+
+@utility pill-light {
+  @apply text-brand-dark border-white bg-white;
+}
+
+@utility pill-outline-dark {
+  @apply border-brand-dark text-brand-dark;
+}
+
 /* Size variants */
 @utility pill-sm {
   @apply min-h-6 min-w-6 px-3 py-1 text-xs;
@@ -48,19 +60,15 @@
 
 /* Interactive states */
 @utility pill-hover {
-  @apply tangible-hover;
-  cursor: pointer;
+  @apply tangible-hover cursor-pointer;
+
   &:hover {
-    filter: brightness(0.95) saturate(1.2);
+    filter: brightness(1.1) saturate(1.2);
   }
 }
 
 @utility pill-selected {
-  border-color: #b91c1c;
-  background-color: #fff0f0;
-  color: #b91c1c;
-  box-shadow: 0 0 0 0.2rem #b91c1c33;
-  z-index: 1;
+  @apply pill-dark;
 }
 
 @utility pill-pressed {
@@ -78,7 +86,7 @@
 }
 
 @utility pill-skill {
-  @apply pill-brand-red;
+  @apply pill-light;
 }
 
 /* Alternative styles */

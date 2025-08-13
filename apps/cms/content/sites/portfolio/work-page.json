@@ -1,36 +1,36 @@
 {
   "title": "Work History",
-  "subtitle": "A decade of building digital experiences",
-  "metaDescription": "Explore my work experience and projects across different roles and industries.",
+  "subtitle": "Roles, teams, and the kind of work I did.",
+  "metaDescription": "Work history — Harrison Callahan. Roles, teams, and the kind of problems I solved across experiential and web projects.",
   "noIndex": false,
   "introduction": {
-    "title": "My Experience",
-    "content": "I've been working as a software engineer for over 10 years. I've worked in a variety of roles, from a solo developer to a team of 12+ engineers. I've worked in a variety of industries, from startups to large corporations."
+    "title": "Overview",
+    "content": "About twelve years on the web. I've worked solo and with teams of a dozen+ engineers. My focus has always been on building tools that support the work of others."
   },
   "toolDescription": {
-    "title": "Explore My Work",
-    "content": "The tool below is to help you understand my skills and experience. Select a skill to see projects I've worked on that use that skill, or a category to choose multiple skills at once. We'll filter the list of jobs and projects and show you the ones that match your selection."
+    "title": "Find what's relevant",
+    "content": "Use the filters to jump to the parts that match your needs. Choose the individual skills you're interested in — the list will narrow as you go."
   },
   "stats": [
     {
-      "label": "Years Experience",
-      "value": "10+",
-      "description": "Building digital experiences"
+      "label": "Years on the web",
+      "value": "12+",
+      "description": "Designing and building for the web"
     },
     {
-      "label": "Projects Delivered",
+      "label": "Projects built",
       "value": "50+",
-      "description": "From startups to enterprise"
+      "description": "From small utilities to management software"
     },
     {
-      "label": "Companies Worked With",
+      "label": "Teams collaborated with",
       "value": "15+",
-      "description": "Across various industries"
+      "description": "Agencies and internal teams"
     }
   ],
   "contactCTA": {
-    "text": "Do you have a job that would look good on this page? Let's chat!",
-    "buttonText": "Get In Touch",
+    "text": "Have a role that fits what you see here? Let's talk.",
+    "buttonText": "Start a conversation",
     "buttonLink": "/contact"
   }
 }

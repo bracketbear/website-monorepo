@@ -35,19 +35,13 @@ export default function ProjectCard({
     : undefined;
 
   const cardClass = variant === 'dark' ? 'card-dark' : 'card';
-  const borderClass =
-    variant === 'dark' ? 'border-brand-light/30' : 'border-brand-dark/30';
-  const textClass =
-    variant === 'dark' ? 'text-brand-light/90' : 'text-brand-dark/90';
 
   return (
     <a href={getProjectUrl(project.id)} className="block hover:no-underline">
       <div className={clsx('flex h-full flex-col', cardClass, className)}>
         {/* Cover Image */}
         {showImage && (
-          <div
-            className={`${borderClass} mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl border`}
-          >
+          <div className="mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl border">
             {coverImage ? (
               <img
                 src={coverImage}
@@ -85,9 +79,7 @@ export default function ProjectCard({
 
           {/* Project summary */}
           {project.data.summary && (
-            <div
-              className={`${textClass} mb-4 line-clamp-3 text-lg leading-relaxed font-medium`}
-            >
+            <div className="mb-4 line-clamp-3 text-lg leading-relaxed font-medium">
               {project.data.summary}
             </div>
           )}
@@ -95,9 +87,7 @@ export default function ProjectCard({
 
         {/* Skills row */}
         {showSkills && projectSkills.length > 0 && (
-          <div
-            className={`${borderClass} mt-auto flex flex-wrap gap-2 border-t-2 pt-3`}
-          >
+          <div className="mt-auto flex flex-wrap gap-2 border-t-2 pt-3">
             {projectSkills.map((skill: any) => (
               <span
                 key={skill.id}

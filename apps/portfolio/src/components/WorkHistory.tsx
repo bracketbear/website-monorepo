@@ -1,4 +1,4 @@
-import { getProjectUrl } from '@bracketbear/core';
+import { getProjectUrl, SkillPill } from '@bracketbear/core';
 import type { CollectionEntry } from 'astro:content';
 import clsx from 'clsx';
 
@@ -69,7 +69,7 @@ export default function WorkHistory({
   return (
     <div className="space-y-8">
       {groupedJobs.map((group) => (
-        <div key={group.company.id} className="card">
+        <div key={group.company.id} className="card tangible tangible-card">
           {/* Company header with halftone text shadow */}
           <h3 className="heading mb-6 text-3xl">{group.company.data.title}</h3>
           {/* Company Jobs */}
@@ -117,13 +117,14 @@ export default function WorkHistory({
                       {job.data.workSkills?.map((skillId: string) => {
                         const isSelected = selectedSkills.includes(skillId);
                         return (
-                          <span
+                          <SkillPill
                             key={skillId}
-                            className={`pill pill-skill pill-hover ${isSelected ? 'pill-selected' : ''}`}
+                            selected={isSelected}
+                            size="md"
                           >
                             {skills.find((s) => s.id === skillId)?.data.title ||
                               skillId}
-                          </span>
+                          </SkillPill>
                         );
                       })}
                     </div>

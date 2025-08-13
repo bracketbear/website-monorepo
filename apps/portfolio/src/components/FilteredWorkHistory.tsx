@@ -1,6 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { useRef, useState } from 'react';
 import WorkHistory from './WorkHistory';
+import { SkillPill } from '@bracketbear/core';
 
 export interface FilteredWorkHistoryProps {
   skills: CollectionEntry<'workSkills'>[];
@@ -74,18 +75,14 @@ export default function FilteredWorkHistory({
           <>
             {/* Filter Status Message */}
             {hasActiveFilters && (
-              <div className="comic-panel mb-6">
-                <div className="text-foreground text-center">
-                  <p className="inter text-sm">
-                    Showing {jobs.length - hiddenJobsCount} job
-                    {jobs.length - hiddenJobsCount !== 1 ? 's' : ''} and{' '}
-                    {projects.length - hiddenProjectsCount} project
-                    {projects.length - hiddenProjectsCount !== 1
-                      ? 's'
-                      : ''}{' '}
-                    matching your selected skills
-                  </p>
-                </div>
+              <div className="card-dark mb-6 font-bold">
+                <p className="text-xs">
+                  Showing {jobs.length - hiddenJobsCount} job
+                  {jobs.length - hiddenJobsCount !== 1 ? 's' : ''} and{' '}
+                  {projects.length - hiddenProjectsCount} project
+                  {projects.length - hiddenProjectsCount !== 1 ? 's' : ''}{' '}
+                  matching your selected skills
+                </p>
               </div>
             )}
             {skillCategories.map((category) => {
@@ -94,22 +91,22 @@ export default function FilteredWorkHistory({
               );
 
               return (
-                <div key={category.id} className="mb-4">
-                  <h2 className="heading halftone-text-shadow-middle-background mb-1 text-lg">
+                <div key={category.id} className="mb-6">
+                  <h2 className="heading halftone-text-shadow-middle-background mb-1 text-lg tracking-tight uppercase">
                     {category.data.title}
                   </h2>
                   <div className="flex flex-wrap gap-2 pr-4">
                     {categorySkills.map((skill) => {
                       const isSelected = selectedSkills.includes(skill.id);
                       return (
-                        <button
+                        <SkillPill
                           key={skill.id}
-                          className={`pill pill-skill pill-hover ${isSelected ? 'pill-selected' : ''}`}
                           onClick={() => toggleSkill(skill.id)}
-                          type="button"
+                          selected={isSelected}
+                          size="sm"
                         >
                           {skill.data.title}
-                        </button>
+                        </SkillPill>
                       );
                     })}
                   </div>
