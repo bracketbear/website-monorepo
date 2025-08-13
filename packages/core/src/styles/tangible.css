@@ -1,31 +1,11 @@
 /* Tangible Design System - Layered 3D Effects */
 
-/* 
-  DEPTH HIERARCHY STANDARDS:
-  
-  The depth values follow a consistent scale to maintain visual hierarchy:
-  
-  0rem      - Text, inline elements (no depth)
-  0.125rem  - Pills, badges, small interactive elements
-  0.25rem   - Buttons, form controls
-  0.5rem    - Cards, sections, content containers
-  0.75rem   - Modals, dropdowns, floating content
-  1rem      - Tooltips, highest priority content
-  
-  This ensures users can quickly understand:
-  - What's clickable vs. what's content
-  - The importance/priority of different elements
-  - Consistent interaction patterns
-*/
-
 /* Core tangible utility - subtler by default */
 @utility tangible {
   --tangible-shadow-depth: 0.25rem;
   --tangible-inset-depth: 0.125rem;
   --tangible-highlight-alpha: 10%;
-  --tangible-highlight-color: --alpha(
-    var(--color-brand-light) / var(--tangible-highlight-alpha)
-  );
+  --tangible-highlight-color: var(--color-brand-light);
   --tangible-shadow-color: --alpha(var(--color-brand-dark) / 12%);
   --tangible-inset-color: --alpha(var(--color-brand-dark) / 5%);
   box-shadow:
@@ -39,7 +19,7 @@
       calc(var(--tangible-inset-depth) * 2) 0 var(--tangible-inset-color),
     /* Highlight shadow                                                   */
       inset var(--tangible-inset-depth) var(--tangible-inset-depth) 0.5rem 0
-      var(--tangible-highlight-color);
+      --alpha(var(--tangible-highlight-color) / var(--tangible-highlight-alpha));
 }
 
 /* Depth variants - using standardized depth scale */
@@ -48,9 +28,10 @@
   --tangible-inset-depth: calc(--value(number) * 0.067rem);
 }
 
-@utility tangible-color-brand-* {
-  --tangible-shadow-color: --alpha(var(--color-*) / 12%);
-  --tangible-inset-color: --alpha(var(--color-*) / 5%);
+@utility tangible-inverse {
+  --tangible-shadow-color: --alpha(var(--color-black) / 12%);
+  --tangible-highlight-color: var(--color-white);
+  --tangible-highlight-alpha: 4%;
 }
 
 /* Specific depth presets for different UI elements - following depth hierarchy */
@@ -64,7 +45,7 @@
 }
 
 @utility tangible-card {
-  @apply tangible-elevated-10;
+  @apply tangible-elevated-16;
 }
 
 @utility tangible-modal {

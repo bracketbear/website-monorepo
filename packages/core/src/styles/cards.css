@@ -3,7 +3,7 @@
 }
 
 @utility card-dark {
-  @apply card tangible-color-brand-dark bg-brand-dark text-brand-light border-brand-light/30;
+  @apply card tangible-inverse bg-brand-dark text-brand-light border-brand-light/30;
 }
 
 @utility card-interactive {
