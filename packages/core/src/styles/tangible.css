@@ -7,7 +7,7 @@
   --tangible-highlight-alpha: 10%;
   --tangible-highlight-color: var(--color-brand-light);
   --tangible-shadow-color: --alpha(var(--color-brand-dark) / 12%);
-  --tangible-inset-color: --alpha(var(--color-brand-dark) / 5%);
+  --tangible-inset-color: --alpha(var(--color-brand-dark) / 8%);
   box-shadow:
     /* Box shadow */
     var(--tangible-shadow-depth) var(--tangible-shadow-depth)
@@ -25,7 +25,7 @@
 /* Depth variants - using standardized depth scale */
 @utility tangible-elevated-* {
   --tangible-shadow-depth: calc(--value(number) * 0.067rem);
-  --tangible-inset-depth: calc(--value(number) * 0.067rem);
+  --tangible-inset-depth: calc(--value(number) * 0.125rem);
 }
 
 @utility tangible-inverse {
@@ -36,7 +36,7 @@
 
 /* Specific depth presets for different UI elements - following depth hierarchy */
 @utility tangible-pill {
-  @apply tangible-elevated-2;
+  @apply tangible-elevated-1;
 }
 
 @utility tangible-button {
@@ -45,7 +45,7 @@
 }
 
 @utility tangible-card {
-  @apply tangible-elevated-16;
+  @apply tangible-elevated-12;
 }
 
 @utility tangible-modal {

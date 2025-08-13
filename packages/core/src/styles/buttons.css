@@ -2,7 +2,7 @@
 
 /* Base button utility - applies all common button styles */
 @utility button {
-  @apply border-default button-interactive transform cursor-pointer rounded-lg font-black uppercase shadow-md outline-amber-500 transition-all hover:shadow-lg active:shadow-sm;
+  @apply border-default button-interactive tangible tangible-button font-heading transform cursor-pointer rounded-lg font-black tracking-wide uppercase shadow-md outline-amber-500 transition-all hover:shadow-lg active:shadow-sm;
 }
 
 /* Button sizes - only modify padding and text size */
