@@ -18,7 +18,7 @@ export default function ProjectCard({
   project,
   skills,
   variant = 'light',
-  compact = false,
+  compact: _compact = false,
   showImage = true,
   showBadges = true,
   showSkills = true,
@@ -36,17 +36,26 @@ export default function ProjectCard({
 
   const cardClass = variant === 'dark' ? 'card-dark' : 'card';
 
+  const projectUrl = getProjectUrl(project.id);
+
   return (
-    <a href={getProjectUrl(project.id)} className="block hover:no-underline">
-      <div className={clsx('flex h-full flex-col', cardClass, className)}>
+    <a href={projectUrl} className="block h-full hover:no-underline">
+      <div
+        className={clsx(
+          cardClass,
+          'group flex h-full flex-col overflow-hidden p-0',
+          projectUrl && 'card-interactive',
+          className
+        )}
+      >
         {/* Cover Image */}
         {showImage && (
-          <div className="mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl border">
+          <div className="border-brand-dark/30 inset-shadow-default-2xl aspect-[4/3] w-full overflow-hidden border-b">
             {coverImage ? (
               <img
                 src={coverImage}
                 alt={`${project.data.title} cover`}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
               <div className="flex h-full items-center justify-center">
@@ -58,43 +67,45 @@ export default function ProjectCard({
           </div>
         )}
 
-        {/* Project badges */}
-        {showBadges && (
-          <div className="mb-4 flex items-center gap-4">
-            {project.data.category && (
-              <span className="pill pill-category">
-                {project.data.category}
-              </span>
-            )}
-            {project.data.isFeatured && (
-              <span className="pill pill-featured">Featured</span>
+        <div className="flex flex-1 flex-col p-8 pt-4">
+          {/* Project badges */}
+          {showBadges && (
+            <div className="mb-4 flex items-center gap-4">
+              {project.data.category && (
+                <span className="pill pill-category">
+                  {project.data.category}
+                </span>
+              )}
+              {project.data.isFeatured && (
+                <span className="pill pill-featured">Featured</span>
+              )}
+            </div>
+          )}
+
+          <div className="flex flex-1 flex-grow-1 flex-col">
+            <h3 className="font-heading mb-3 text-2xl font-black tracking-tight uppercase">
+              {project.data.title}
+            </h3>
+
+            {/* Project summary */}
+            {project.data.summary && (
+              <div className="mb-4 line-clamp-3 text-lg leading-relaxed font-medium">
+                {project.data.summary}
+              </div>
             )}
           </div>
-        )}
 
-        <div className="flex flex-1 flex-col">
-          <h3 className="font-heading mb-3 text-2xl font-black tracking-tight uppercase">
-            {project.data.title}
-          </h3>
-
-          {/* Project summary */}
-          {project.data.summary && (
-            <div className="mb-4 line-clamp-3 text-lg leading-relaxed font-medium">
-              {project.data.summary}
+          {/* Skills row */}
+          {showSkills && projectSkills.length > 0 && (
+            <div className="mt-auto flex flex-grow-0 flex-wrap gap-2 border-t-2 pt-3">
+              {projectSkills.map((skill: any) => (
+                <SkillPill key={skill.id} size="sm">
+                  {skill?.data.title}
+                </SkillPill>
+              ))}
             </div>
           )}
         </div>
-
-        {/* Skills row */}
-        {showSkills && projectSkills.length > 0 && (
-          <div className="mt-auto flex flex-wrap gap-2 border-t-2 pt-3">
-            {projectSkills.map((skill: any) => (
-              <SkillPill key={skill.id} size="sm">
-                {skill?.data.title}
-              </SkillPill>
-            ))}
-          </div>
-        )}
       </div>
     </a>
   );

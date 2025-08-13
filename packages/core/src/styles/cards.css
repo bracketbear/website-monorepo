@@ -1,5 +1,5 @@
 @utility card {
-  @apply tangible tangible-card border-brand-dark-muted bg-brand-light rounded-xl border border-solid p-6;
+  @apply tangible tangible-card border-brand-dark/50 bg-brand-light rounded-xl border border-solid p-6;
 }
 
 @utility card-dark {
