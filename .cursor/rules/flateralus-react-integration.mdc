@@ -1,0 +1,1157 @@
+---
+alwaysApply: false
+---
+# Flateralus React Integration Guide
+
+## Overview
+
+Flateralus provides seamless React integration through dedicated components and hooks. This allows you to easily embed animations in React applications while maintaining the framework-agnostic nature of the core animation logic.
+
+## Core Components
+
+### AnimationStage
+
+The main component for hosting Flateralus animations in React:
+
+```typescript
+import { AnimationStage } from '@bracketbear/flateralus-react';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createMyAnimation } from './myAnimation';
+
+function MyComponent() {
+  const application = new PixiApplication();
+  const animation = createMyAnimation();
+
+  return (
+    <AnimationStage
+      application={application}
+      showDebugControls={true}
+      className="h-96 w-full"
+      enableLuminanceDetection={true}
+      pauseWhenHidden={true}
+    />
+  );
+}
+```
+
+#### AnimationStage Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `application` | `Application \| null` | **required** | The animation application instance |
+| `showDebugControls` | `boolean` | `false` | Whether to show debug controls |
+| `showDownloadButton` | `boolean` | `true` | Show download button in debug controls |
+| `className` | `string` | - | Additional CSS classes for the container |
+| `debugControlsClassName` | `string` | - | CSS classes for debug controls |
+| `enableLuminanceDetection` | `boolean` | `true` | Auto-adjust text colors for accessibility |
+| `pauseWhenHidden` | `boolean` | `true` | Pause animation when not visible |
+| `visibilityThreshold` | `number` | `0.1` | Threshold for visibility detection (0-1) |
+| `visibilityRootMargin` | `string` | `'0px'` | Root margin for visibility detection |
+| `layoutClassName` | `string` | `'relative flex h-full w-full items-end'` | Layout classes for main container |
+
+### DebugControls
+
+Automatically generated debug UI for animation controls:
+
+```typescript
+import { DebugControls } from '@bracketbear/flateralus-react';
+
+// Automatically rendered by AnimationStage when showDebugControls={true}
+// Provides real-time control adjustment, reset functionality, and preset management
+```
+
+## Hooks
+
+### useAnimationStage
+
+Core hook for managing animation stage lifecycle:
+
+```typescript
+import { useAnimationStage } from '@bracketbear/flateralus-react';
+
+function MyComponent() {
+  const {
+    containerRef,
+    controlValues,
+    manifest,
+    isInitialized,
+    isRunning,
+    start,
+    stop,
+    pause,
+    resume,
+  } = useAnimationStage({
+    application,
+    pauseWhenHidden: true,
+    visibilityThreshold: 0.1,
+    visibilityRootMargin: '0px',
+  });
+
+  return (
+    <div ref={containerRef} className="h-96 w-full">
+      {/* Animation will be rendered here */}
+      <div className="absolute top-4 left-4 z-10">
+        <button onClick={start} disabled={isRunning}>Start</button>
+        <button onClick={stop} disabled={!isRunning}>Stop</button>
+        <button onClick={pause} disabled={!isRunning}>Pause</button>
+        <button onClick={resume} disabled={isRunning}>Resume</button>
+      </div>
+    </div>
+  );
+}
+```
+
+#### useAnimationStage Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `application` | `Application \| null` | **required** | The animation application |
+| `pauseWhenHidden` | `boolean` | `true` | Pause when not visible |
+| `visibilityThreshold` | `number` | `0.1` | Visibility threshold |
+| `visibilityRootMargin` | `string` | `'0px'` | Intersection observer root margin |
+
+#### useAnimationStage Return Values
+
+| Value | Type | Description |
+|-------|------|-------------|
+| `containerRef` | `RefObject<HTMLDivElement>` | Ref for the animation container |
+| `controlValues` | `TControlValues` | Current control values |
+| `manifest` | `AnimationManifest` | Animation manifest |
+| `isInitialized` | `boolean` | Whether animation is initialized |
+| `isRunning` | `boolean` | Whether animation is running |
+| `start` | `() => void` | Start the animation |
+| `stop` | `() => void` | Stop the animation |
+| `pause` | `() => void` | Pause the animation |
+| `resume` | `() => void` | Resume the animation |
+
+### useControls
+
+Hook for managing control values and validation:
+
+```typescript
+import { useControls } from '@bracketbear/flateralus-react';
+
+function MyComponent() {
+  const {
+    controlValues,
+    updateControls,
+    resetControls,
+    hasChanges,
+    isValid,
+    errors,
+  } = useControls({
+    application,
+    manifest,
+    initialControlValues,
+  });
+
+  const handleSpeedChange = (speed: number) => {
+    updateControls({ speed });
+  };
+
+  const handleReset = () => {
+    resetControls();
+  };
+
+  return (
+    <div>
+      <input
+        type="range"
+        min="0.1"
+        max="5.0"
+        step="0.1"
+        value={controlValues.speed}
+        onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
+        className="w-full"
+      />
+      <span>Speed: {controlValues.speed}</span>
+      {hasChanges && <button onClick={handleReset}>Reset</button>}
+      {!isValid && <div className="text-red-500">Invalid controls: {errors.join(', ')}</div>}
+    </div>
+  );
+}
+```
+
+#### useControls Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `application` | `Application` | **required** | The animation application |
+| `manifest` | `AnimationManifest` | **required** | Animation manifest |
+| `initialControlValues` | `TControlValues` | - | Initial control values |
+
+#### useControls Return Values
+
+| Value | Type | Description |
+|-------|------|-------------|
+| `controlValues` | `TControlValues` | Current control values |
+| `updateControls` | `(values: Partial<TControlValues>) => void` | Update specific controls |
+| `resetControls` | `() => void` | Reset to initial values |
+| `hasChanges` | `boolean` | Whether controls have changed |
+| `isValid` | `boolean` | Whether all controls are valid |
+| `errors` | `string[]` | Validation error messages |
+
+### useDebugControls
+
+Hook for managing debug controls UI:
+
+```typescript
+import { useDebugControls } from '@bracketbear/flateralus-react';
+
+function MyComponent() {
+  const { debugControlsProps, showResetToast } = useDebugControls({
+    showDebugControls: true,
+    showDownloadButton: true,
+    application,
+    manifest,
+    initialControlValues,
+  });
+
+  return (
+    <div>
+      {/* Animation stage */}
+      {debugControlsProps.isVisible && debugControlsProps.manifest && (
+        <DebugControls
+          {...debugControlsProps}
+          manifest={debugControlsProps.manifest}
+          className="absolute top-4 right-4 z-50"
+        />
+      )}
+      
+      {/* Reset toast */}
+      {showResetToast && (
+        <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 px-6 py-3 bg-green-500 text-white rounded-lg">
+          Animation reset
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+#### useDebugControls Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `showDebugControls` | `boolean` | `false` | Whether to show debug controls |
+| `showDownloadButton` | `boolean` | `true` | Show download button |
+| `application` | `Application` | **required** | The animation application |
+| `manifest` | `AnimationManifest` | **required** | Animation manifest |
+| `initialControlValues` | `TControlValues` | - | Initial control values |
+
+### useLuminanceDetection
+
+Hook for automatic text color adjustment based on background:
+
+```typescript
+import { useLuminanceDetection } from '@bracketbear/flateralus-react';
+
+function MyComponent() {
+  useLuminanceDetection({
+    application,
+    enabled: true,
+    containerElement: containerRef.current,
+  });
+
+  // This hook automatically adjusts text colors for optimal contrast
+  // based on the animation's background luminance
+}
+```
+
+#### useLuminanceDetection Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `application` | `Application` | **required** | The animation application |
+| `enabled` | `boolean` | `true` | Whether luminance detection is enabled |
+| `containerElement` | `HTMLElement \| null` | - | Container element for detection |
+
+## Integration Patterns
+
+### 1. Basic Animation Integration
+
+```typescript
+import React, { useEffect, useRef } from 'react';
+import { AnimationStage } from '@bracketbear/flateralus-react';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createMyAnimation } from './myAnimation';
+
+function MyAnimationComponent() {
+  const applicationRef = useRef<PixiApplication | null>(null);
+  const animationRef = useRef<ReturnType<typeof createMyAnimation> | null>(null);
+
+  useEffect(() => {
+    // Create application and animation
+    applicationRef.current = new PixiApplication();
+    animationRef.current = createMyAnimation();
+
+    // Set animation on application
+    applicationRef.current.setAnimation(animationRef.current);
+
+    return () => {
+      // Cleanup
+      if (applicationRef.current) {
+        applicationRef.current.destroy();
+      }
+    };
+  }, []);
+
+  if (!applicationRef.current) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <AnimationStage
+      application={applicationRef.current}
+      showDebugControls={true}
+      className="h-96 w-full border border-gray-300 rounded-lg"
+    />
+  );
+}
+```
+
+### 2. Controlled Animation
+
+```typescript
+import React, { useState, useEffect } from 'react';
+import { AnimationStage } from '@bracketbear/flateralus-react';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createMyAnimation } from './myAnimation';
+
+function ControlledAnimationComponent() {
+  const [application] = useState(() => new PixiApplication());
+  const [animation] = useState(() => createMyAnimation());
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    application.setAnimation(animation);
+  }, [application, animation]);
+
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      application.pause();
+      setIsPlaying(false);
+    } else {
+      application.start();
+      setIsPlaying(true);
+    }
+  };
+
+  const handleReset = () => {
+    animation.reset();
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex space-x-2">
+        <button
+          onClick={handlePlayPause}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          {isPlaying ? 'Pause' : 'Play'}
+        </button>
+        <button
+          onClick={handleReset}
+          className="px-4 py-2 bg-gray-500 text-white rounded"
+        >
+          Reset
+        </button>
+      </div>
+      
+      <AnimationStage
+        application={application}
+        showDebugControls={true}
+        className="h-96 w-full border border-gray-300 rounded-lg"
+      />
+    </div>
+  );
+}
+```
+
+### 3. Custom Control Panel
+
+```typescript
+import React from 'react';
+import { AnimationStage, useControls } from '@bracketbear/flateralus-react';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createMyAnimation } from './myAnimation';
+
+function CustomControlPanel() {
+  const [application] = useState(() => new PixiApplication());
+  const [animation] = useState(() => createMyAnimation());
+
+  const {
+    controlValues,
+    updateControls,
+    resetControls,
+    hasChanges,
+  } = useControls({
+    application,
+    manifest: animation.getManifest(),
+    initialControlValues: animation.getControlValues(),
+  });
+
+  return (
+    <div className="flex space-x-4">
+      <div className="w-64 space-y-4">
+        <h3 className="text-lg font-semibold">Custom Controls</h3>
+        
+        <div>
+          <label className="block text-sm font-medium">Speed</label>
+          <input
+            type="range"
+            min="0.1"
+            max="5.0"
+            step="0.1"
+            value={controlValues.speed}
+            onChange={(e) => updateControls({ speed: parseFloat(e.target.value) })}
+            className="w-full"
+          />
+          <span className="text-sm text-gray-600">{controlValues.speed}</span>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">Show Trails</label>
+          <input
+            type="checkbox"
+            checked={controlValues.showTrails}
+            onChange={(e) => updateControls({ showTrails: e.target.checked })}
+            className="mr-2"
+          />
+        </div>
+
+        {hasChanges && (
+          <button
+            onClick={resetControls}
+            className="w-full px-4 py-2 bg-red-500 text-white rounded"
+          >
+            Reset Changes
+          </button>
+        )}
+      </div>
+
+      <div className="flex-1">
+        <AnimationStage
+          application={application}
+          showDebugControls={false}
+          className="h-96 w-full border border-gray-300 rounded-lg"
+        />
+      </div>
+    </div>
+  );
+}
+```
+
+### 4. Multiple Animations
+
+```typescript
+import React, { useState } from 'react';
+import { AnimationStage } from '@bracketbear/flateralus-react';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createBlobAnimation } from './blobAnimation';
+import { createParticleAnimation } from './particleAnimation';
+
+function MultiAnimationComponent() {
+  const [selectedAnimation, setSelectedAnimation] = useState<'blob' | 'particle'>('blob');
+  
+  const [blobApp] = useState(() => new PixiApplication());
+  const [particleApp] = useState(() => new PixiApplication());
+  const [blobAnimation] = useState(() => createBlobAnimation());
+  const [particleAnimation] = useState(() => createParticleAnimation());
+
+  useEffect(() => {
+    blobApp.setAnimation(blobAnimation);
+    particleApp.setAnimation(particleAnimation);
+  }, [blobApp, particleApp, blobAnimation, particleAnimation]);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex space-x-2">
+        <button
+          onClick={() => setSelectedAnimation('blob')}
+          className={`px-4 py-2 rounded ${
+            selectedAnimation === 'blob' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+          }`}
+        >
+          Blob Animation
+        </button>
+        <button
+          onClick={() => setSelectedAnimation('particle')}
+          className={`px-4 py-2 rounded ${
+            selectedAnimation === 'particle' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+          }`}
+        >
+          Particle Animation
+        </button>
+      </div>
+
+      {selectedAnimation === 'blob' && (
+        <AnimationStage
+          application={blobApp}
+          showDebugControls={true}
+          className="h-96 w-full border border-gray-300 rounded-lg"
+        />
+      )}
+
+      {selectedAnimation === 'particle' && (
+        <AnimationStage
+          application={particleApp}
+          showDebugControls={true}
+          className="h-96 w-full border border-gray-300 rounded-lg"
+        />
+      )}
+    </div>
+  );
+}
+```
+
+## Best Practices
+
+### 1. Application Lifecycle Management
+
+- Create applications and animations in `useState` or `useRef` to persist across renders
+- Always clean up applications in `useEffect` cleanup functions
+- Use `useCallback` for event handlers that update controls
+
+### 2. Performance Optimization
+
+- Use `pauseWhenHidden={true}` to pause animations when not visible
+- Implement proper cleanup in animation `onDestroy` methods
+- Use `useMemo` for expensive computations in control panels
+
+### 3. Accessibility
+
+- Enable `enableLuminanceDetection={true}` for automatic text contrast
+- Provide keyboard controls for animation controls
+- Use semantic HTML for control labels and descriptions
+
+### 4. Error Handling
+
+- Wrap animation components in error boundaries
+- Handle application initialization failures gracefully
+- Provide fallback UI when animations fail to load
+
+### 5. State Synchronization
+
+- Keep control values in sync between custom UI and debug controls
+- Use `useControls` hook for centralized control management
+- Implement proper reset functionality for user controls
+
+## Common Issues and Solutions
+
+### 1. Animation Not Rendering
+
+**Problem**: Animation container is empty or shows loading state indefinitely.
+
+**Solutions**:
+- Ensure application is properly initialized before setting animation
+- Check that container has proper dimensions (height/width)
+- Verify PIXI.js is properly imported and configured
+
+### 2. Controls Not Updating
+
+**Problem**: Control changes don't affect the animation.
+
+**Solutions**:
+- Ensure controls are properly connected to the application
+- Check that control names match the manifest exactly
+- Verify `resetsAnimation` flags are set correctly
+
+### 3. Performance Issues
+
+**Problem**: Animation runs slowly or causes frame drops.
+
+**Solutions**:
+- Enable `pauseWhenHidden={true}` for off-screen animations
+- Reduce particle counts or effect complexity
+- Use object pooling for frequently created/destroyed objects
+- Implement proper cleanup in `onDestroy` methods
+
+### 4. Memory Leaks
+
+**Problem**: Memory usage increases over time.
+
+**Solutions**:
+- Always call `application.destroy()` in cleanup
+- Implement proper cleanup in animation `onDestroy`
+- Remove event listeners and dispose of PIXI resources
+- Use `useEffect` cleanup functions for proper unmounting
+
+This React integration provides a powerful, type-safe way to embed Flateralus animations in React applications while maintaining the framework-agnostic nature of the core animation system.
+# Flateralus React Integration Guide
+
+## Overview
+
+Flateralus provides seamless React integration through dedicated components and hooks. This allows you to easily embed animations in React applications while maintaining the framework-agnostic nature of the core animation logic.
+
+## Core Components
+
+### AnimationStage
+
+The main component for hosting Flateralus animations in React:
+
+```typescript
+import { AnimationStage } from '@bracketbear/flateralus-react';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createMyAnimation } from './myAnimation';
+
+function MyComponent() {
+  const application = new PixiApplication();
+  const animation = createMyAnimation();
+
+  return (
+    <AnimationStage
+      application={application}
+      showDebugControls={true}
+      className="h-96 w-full"
+      enableLuminanceDetection={true}
+      pauseWhenHidden={true}
+    />
+  );
+}
+```
+
+#### AnimationStage Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `application` | `Application \| null` | **required** | The animation application instance |
+| `showDebugControls` | `boolean` | `false` | Whether to show debug controls |
+| `showDownloadButton` | `boolean` | `true` | Show download button in debug controls |
+| `className` | `string` | - | Additional CSS classes for the container |
+| `debugControlsClassName` | `string` | - | CSS classes for debug controls |
+| `enableLuminanceDetection` | `boolean` | `true` | Auto-adjust text colors for accessibility |
+| `pauseWhenHidden` | `boolean` | `true` | Pause animation when not visible |
+| `visibilityThreshold` | `number` | `0.1` | Threshold for visibility detection (0-1) |
+| `visibilityRootMargin` | `string` | `'0px'` | Root margin for visibility detection |
+| `layoutClassName` | `string` | `'relative flex h-full w-full items-end'` | Layout classes for main container |
+
+### DebugControls
+
+Automatically generated debug UI for animation controls:
+
+```typescript
+import { DebugControls } from '@bracketbear/flateralus-react';
+
+// Automatically rendered by AnimationStage when showDebugControls={true}
+// Provides real-time control adjustment, reset functionality, and preset management
+```
+
+## Hooks
+
+### useAnimationStage
+
+Core hook for managing animation stage lifecycle:
+
+```typescript
+import { useAnimationStage } from '@bracketbear/flateralus-react';
+
+function MyComponent() {
+  const {
+    containerRef,
+    controlValues,
+    manifest,
+    isInitialized,
+    isRunning,
+    start,
+    stop,
+    pause,
+    resume,
+  } = useAnimationStage({
+    application,
+    pauseWhenHidden: true,
+    visibilityThreshold: 0.1,
+    visibilityRootMargin: '0px',
+  });
+
+  return (
+    <div ref={containerRef} className="h-96 w-full">
+      {/* Animation will be rendered here */}
+      <div className="absolute top-4 left-4 z-10">
+        <button onClick={start} disabled={isRunning}>Start</button>
+        <button onClick={stop} disabled={!isRunning}>Stop</button>
+        <button onClick={pause} disabled={!isRunning}>Pause</button>
+        <button onClick={resume} disabled={isRunning}>Resume</button>
+      </div>
+    </div>
+  );
+}
+```
+
+#### useAnimationStage Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `application` | `Application \| null` | **required** | The animation application |
+| `pauseWhenHidden` | `boolean` | `true` | Pause when not visible |
+| `visibilityThreshold` | `number` | `0.1` | Visibility threshold |
+| `visibilityRootMargin` | `string` | `'0px'` | Intersection observer root margin |
+
+#### useAnimationStage Return Values
+
+| Value | Type | Description |
+|-------|------|-------------|
+| `containerRef` | `RefObject<HTMLDivElement>` | Ref for the animation container |
+| `controlValues` | `TControlValues` | Current control values |
+| `manifest` | `AnimationManifest` | Animation manifest |
+| `isInitialized` | `boolean` | Whether animation is initialized |
+| `isRunning` | `boolean` | Whether animation is running |
+| `start` | `() => void` | Start the animation |
+| `stop` | `() => void` | Stop the animation |
+| `pause` | `() => void` | Pause the animation |
+| `resume` | `() => void` | Resume the animation |
+
+### useControls
+
+Hook for managing control values and validation:
+
+```typescript
+import { useControls } from '@bracketbear/flateralus-react';
+
+function MyComponent() {
+  const {
+    controlValues,
+    updateControls,
+    resetControls,
+    hasChanges,
+    isValid,
+    errors,
+  } = useControls({
+    application,
+    manifest,
+    initialControlValues,
+  });
+
+  const handleSpeedChange = (speed: number) => {
+    updateControls({ speed });
+  };
+
+  const handleReset = () => {
+    resetControls();
+  };
+
+  return (
+    <div>
+      <input
+        type="range"
+        min="0.1"
+        max="5.0"
+        step="0.1"
+        value={controlValues.speed}
+        onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
+        className="w-full"
+      />
+      <span>Speed: {controlValues.speed}</span>
+      {hasChanges && <button onClick={handleReset}>Reset</button>}
+      {!isValid && <div className="text-red-500">Invalid controls: {errors.join(', ')}</div>}
+    </div>
+  );
+}
+```
+
+#### useControls Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `application` | `Application` | **required** | The animation application |
+| `manifest` | `AnimationManifest` | **required** | Animation manifest |
+| `initialControlValues` | `TControlValues` | - | Initial control values |
+
+#### useControls Return Values
+
+| Value | Type | Description |
+|-------|------|-------------|
+| `controlValues` | `TControlValues` | Current control values |
+| `updateControls` | `(values: Partial<TControlValues>) => void` | Update specific controls |
+| `resetControls` | `() => void` | Reset to initial values |
+| `hasChanges` | `boolean` | Whether controls have changed |
+| `isValid` | `boolean` | Whether all controls are valid |
+| `errors` | `string[]` | Validation error messages |
+
+### useDebugControls
+
+Hook for managing debug controls UI:
+
+```typescript
+import { useDebugControls } from '@bracketbear/flateralus-react';
+
+function MyComponent() {
+  const { debugControlsProps, showResetToast } = useDebugControls({
+    showDebugControls: true,
+    showDownloadButton: true,
+    application,
+    manifest,
+    initialControlValues,
+  });
+
+  return (
+    <div>
+      {/* Animation stage */}
+      {debugControlsProps.isVisible && debugControlsProps.manifest && (
+        <DebugControls
+          {...debugControlsProps}
+          manifest={debugControlsProps.manifest}
+          className="absolute top-4 right-4 z-50"
+        />
+      )}
+      
+      {/* Reset toast */}
+      {showResetToast && (
+        <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 px-6 py-3 bg-green-500 text-white rounded-lg">
+          Animation reset
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+#### useDebugControls Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `showDebugControls` | `boolean` | `false` | Whether to show debug controls |
+| `showDownloadButton` | `boolean` | `true` | Show download button |
+| `application` | `Application` | **required** | The animation application |
+| `manifest` | `AnimationManifest` | **required** | Animation manifest |
+| `initialControlValues` | `TControlValues` | - | Initial control values |
+
+### useLuminanceDetection
+
+Hook for automatic text color adjustment based on background:
+
+```typescript
+import { useLuminanceDetection } from '@bracketbear/flateralus-react';
+
+function MyComponent() {
+  useLuminanceDetection({
+    application,
+    enabled: true,
+    containerElement: containerRef.current,
+  });
+
+  // This hook automatically adjusts text colors for optimal contrast
+  // based on the animation's background luminance
+}
+```
+
+#### useLuminanceDetection Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `application` | `Application` | **required** | The animation application |
+| `enabled` | `boolean` | `true` | Whether luminance detection is enabled |
+| `containerElement` | `HTMLElement \| null` | - | Container element for detection |
+
+## Integration Patterns
+
+### 1. Basic Animation Integration
+
+```typescript
+import React, { useEffect, useRef } from 'react';
+import { AnimationStage } from '@bracketbear/flateralus-react';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createMyAnimation } from './myAnimation';
+
+function MyAnimationComponent() {
+  const applicationRef = useRef<PixiApplication | null>(null);
+  const animationRef = useRef<ReturnType<typeof createMyAnimation> | null>(null);
+
+  useEffect(() => {
+    // Create application and animation
+    applicationRef.current = new PixiApplication();
+    animationRef.current = createMyAnimation();
+
+    // Set animation on application
+    applicationRef.current.setAnimation(animationRef.current);
+
+    return () => {
+      // Cleanup
+      if (applicationRef.current) {
+        applicationRef.current.destroy();
+      }
+    };
+  }, []);
+
+  if (!applicationRef.current) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <AnimationStage
+      application={applicationRef.current}
+      showDebugControls={true}
+      className="h-96 w-full border border-gray-300 rounded-lg"
+    />
+  );
+}
+```
+
+### 2. Controlled Animation
+
+```typescript
+import React, { useState, useEffect } from 'react';
+import { AnimationStage } from '@bracketbear/flateralus-react';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createMyAnimation } from './myAnimation';
+
+function ControlledAnimationComponent() {
+  const [application] = useState(() => new PixiApplication());
+  const [animation] = useState(() => createMyAnimation());
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    application.setAnimation(animation);
+  }, [application, animation]);
+
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      application.pause();
+      setIsPlaying(false);
+    } else {
+      application.start();
+      setIsPlaying(true);
+    }
+  };
+
+  const handleReset = () => {
+    animation.reset();
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex space-x-2">
+        <button
+          onClick={handlePlayPause}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          {isPlaying ? 'Pause' : 'Play'}
+        </button>
+        <button
+          onClick={handleReset}
+          className="px-4 py-2 bg-gray-500 text-white rounded"
+        >
+          Reset
+        </button>
+      </div>
+      
+      <AnimationStage
+        application={application}
+        showDebugControls={true}
+        className="h-96 w-full border border-gray-300 rounded-lg"
+      />
+    </div>
+  );
+}
+```
+
+### 3. Custom Control Panel
+
+```typescript
+import React from 'react';
+import { AnimationStage, useControls } from '@bracketbear/flateralus-react';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createMyAnimation } from './myAnimation';
+
+function CustomControlPanel() {
+  const [application] = useState(() => new PixiApplication());
+  const [animation] = useState(() => createMyAnimation());
+
+  const {
+    controlValues,
+    updateControls,
+    resetControls,
+    hasChanges,
+  } = useControls({
+    application,
+    manifest: animation.getManifest(),
+    initialControlValues: animation.getControlValues(),
+  });
+
+  return (
+    <div className="flex space-x-4">
+      <div className="w-64 space-y-4">
+        <h3 className="text-lg font-semibold">Custom Controls</h3>
+        
+        <div>
+          <label className="block text-sm font-medium">Speed</label>
+          <input
+            type="range"
+            min="0.1"
+            max="5.0"
+            step="0.1"
+            value={controlValues.speed}
+            onChange={(e) => updateControls({ speed: parseFloat(e.target.value) })}
+            className="w-full"
+          />
+          <span className="text-sm text-gray-600">{controlValues.speed}</span>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">Show Trails</label>
+          <input
+            type="checkbox"
+            checked={controlValues.showTrails}
+            onChange={(e) => updateControls({ showTrails: e.target.checked })}
+            className="mr-2"
+          />
+        </div>
+
+        {hasChanges && (
+          <button
+            onClick={resetControls}
+            className="w-full px-4 py-2 bg-red-500 text-white rounded"
+          >
+            Reset Changes
+          </button>
+        )}
+      </div>
+
+      <div className="flex-1">
+        <AnimationStage
+          application={application}
+          showDebugControls={false}
+          className="h-96 w-full border border-gray-300 rounded-lg"
+        />
+      </div>
+    </div>
+  );
+}
+```
+
+### 4. Multiple Animations
+
+```typescript
+import React, { useState } from 'react';
+import { AnimationStage } from '@bracketbear/flateralus-react';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createBlobAnimation } from './blobAnimation';
+import { createParticleAnimation } from './particleAnimation';
+
+function MultiAnimationComponent() {
+  const [selectedAnimation, setSelectedAnimation] = useState<'blob' | 'particle'>('blob');
+  
+  const [blobApp] = useState(() => new PixiApplication());
+  const [particleApp] = useState(() => new PixiApplication());
+  const [blobAnimation] = useState(() => createBlobAnimation());
+  const [particleAnimation] = useState(() => createParticleAnimation());
+
+  useEffect(() => {
+    blobApp.setAnimation(blobAnimation);
+    particleApp.setAnimation(particleAnimation);
+  }, [blobApp, particleApp, blobAnimation, particleAnimation]);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex space-x-2">
+        <button
+          onClick={() => setSelectedAnimation('blob')}
+          className={`px-4 py-2 rounded ${
+            selectedAnimation === 'blob' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+          }`}
+        >
+          Blob Animation
+        </button>
+        <button
+          onClick={() => setSelectedAnimation('particle')}
+          className={`px-4 py-2 rounded ${
+            selectedAnimation === 'particle' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+          }`}
+        >
+          Particle Animation
+        </button>
+      </div>
+
+      {selectedAnimation === 'blob' && (
+        <AnimationStage
+          application={blobApp}
+          showDebugControls={true}
+          className="h-96 w-full border border-gray-300 rounded-lg"
+        />
+      )}
+
+      {selectedAnimation === 'particle' && (
+        <AnimationStage
+          application={particleApp}
+          showDebugControls={true}
+          className="h-96 w-full border border-gray-300 rounded-lg"
+        />
+      )}
+    </div>
+  );
+}
+```
+
+## Best Practices
+
+### 1. Application Lifecycle Management
+
+- Create applications and animations in `useState` or `useRef` to persist across renders
+- Always clean up applications in `useEffect` cleanup functions
+- Use `useCallback` for event handlers that update controls
+
+### 2. Performance Optimization
+
+- Use `pauseWhenHidden={true}` to pause animations when not visible
+- Implement proper cleanup in animation `onDestroy` methods
+- Use `useMemo` for expensive computations in control panels
+
+### 3. Accessibility
+
+- Enable `enableLuminanceDetection={true}` for automatic text contrast
+- Provide keyboard controls for animation controls
+- Use semantic HTML for control labels and descriptions
+
+### 4. Error Handling
+
+- Wrap animation components in error boundaries
+- Handle application initialization failures gracefully
+- Provide fallback UI when animations fail to load
+
+### 5. State Synchronization
+
+- Keep control values in sync between custom UI and debug controls
+- Use `useControls` hook for centralized control management
+- Implement proper reset functionality for user controls
+
+## Common Issues and Solutions
+
+### 1. Animation Not Rendering
+
+**Problem**: Animation container is empty or shows loading state indefinitely.
+
+**Solutions**:
+- Ensure application is properly initialized before setting animation
+- Check that container has proper dimensions (height/width)
+- Verify PIXI.js is properly imported and configured
+
+### 2. Controls Not Updating
+
+**Problem**: Control changes don't affect the animation.
+
+**Solutions**:
+- Ensure controls are properly connected to the application
+- Check that control names match the manifest exactly
+- Verify `resetsAnimation` flags are set correctly
+
+### 3. Performance Issues
+
+**Problem**: Animation runs slowly or causes frame drops.
+
+**Solutions**:
+- Enable `pauseWhenHidden={true}` for off-screen animations
+- Reduce particle counts or effect complexity
+- Use object pooling for frequently created/destroyed objects
+- Implement proper cleanup in `onDestroy` methods
+
+### 4. Memory Leaks
+
+**Problem**: Memory usage increases over time.
+
+**Solutions**:
+- Always call `application.destroy()` in cleanup
+- Implement proper cleanup in animation `onDestroy`
+- Remove event listeners and dispose of PIXI resources
+- Use `useEffect` cleanup functions for proper unmounting
+
+This React integration provides a powerful, type-safe way to embed Flateralus animations in React applications while maintaining the framework-agnostic nature of the core animation system.

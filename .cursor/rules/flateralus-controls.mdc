@@ -1,0 +1,439 @@
+---
+alwaysApply: false
+---
+
+# Flateralus Control System Guide
+
+## Overview
+
+The Flateralus control system provides a schema-driven approach to creating interactive, controllable animations. All controls are automatically validated, typed, and generate debug UI for real-time experimentation.
+
+## Control Schema Structure
+
+### Base Control Properties
+All controls share these common properties:
+```typescript
+{
+  name: string,           // Unique identifier (used in code)
+  type: ControlType,      // 'number' | 'boolean' | 'color' | 'select' | 'group'
+  label: string,          // Human-readable label for UI
+  description?: string,   // Optional description for tooltips
+  debug?: boolean,        // Show in debug controls (default: false)
+  resetsAnimation?: boolean, // Trigger full reset when changed (default: false)
+}
+```
+
+## Control Types and Examples
+
+### Number Controls
+```typescript
+{
+  name: 'speed',
+  type: 'number',
+  label: 'Animation Speed',
+  description: 'How fast the animation runs',
+  min: 0.1,              // Minimum value
+  max: 5.0,              // Maximum value
+  step: 0.1,             // Step increment
+  defaultValue: 1.0,     // Initial value
+  debug: true,           // Show in debug UI
+}
+```
+
+**Best Practices:**
+- Set `min` and `max` to reasonable bounds
+- Use `step` values that make sense for the parameter
+- Make `defaultValue` a good starting point for experimentation
+
+### Boolean Controls
+```typescript
+{
+  name: 'showTrails',
+  type: 'boolean',
+  label: 'Show Trails',
+  description: 'Display particle trails',
+  defaultValue: false,    // Initial state
+  debug: true,
+}
+```
+
+**Best Practices:**
+- Use descriptive names that clearly indicate on/off state
+- Set `defaultValue` to the most common use case
+- Consider performance implications of boolean features
+
+### Color Controls
+```typescript
+{
+  name: 'particleColor',
+  type: 'color',
+  label: 'Particle Color',
+  description: 'Color of particles',
+  defaultValue: '#ff0000', // Hex color value
+  debug: true,
+  resetsAnimation: true,   // Reset when color changes
+}
+```
+
+**Best Practices:**
+- Use hex colors for consistency
+- Set `resetsAnimation: true` if color affects object creation
+- Provide meaningful default colors that work well together
+
+### Select Controls
+```typescript
+{
+  name: 'particleType',
+  type: 'select',
+  label: 'Particle Type',
+  description: 'Type of particles to render',
+  options: [
+    { value: 'circle', label: 'Circle' },
+    { value: 'square', label: 'Square' },
+    { value: 'triangle', label: 'Triangle' },
+  ],
+  defaultValue: 'circle',  // Must match one of the option values
+  debug: true,
+  resetsAnimation: true,   // Reset when type changes
+}
+```
+
+**Best Practices:**
+- Use descriptive option labels
+- Keep option values simple and consistent
+- Set `resetsAnimation: true` for structural changes
+
+### Group Controls (Collections)
+```typescript
+{
+  name: 'particles',
+  type: 'group',
+  label: 'Particle Settings',
+  description: 'Individual particle properties',
+  items: [
+    {
+      name: 'size',
+      type: 'number',
+      label: 'Size',
+      description: 'Particle size',
+      min: 1,
+      max: 20,
+      step: 1,
+      defaultValue: 5,
+    },
+    {
+      name: 'alpha',
+      type: 'number',
+      label: 'Alpha',
+      description: 'Particle transparency',
+      min: 0,
+      max: 1,
+      step: 0.1,
+      defaultValue: 0.8,
+    },
+  ],
+  defaultValue: [],        // Array of group items
+  minItems: 1,            // Minimum number of items
+  maxItems: 10,           // Maximum number of items
+  static: false,          // Allow adding/removing items
+}
+```
+
+**Best Practices:**
+- Use groups for related, repeatable settings
+- Set reasonable `minItems` and `maxItems` limits
+- Use `static: true` for fixed collections, `false` for dynamic ones
+
+## Control Behavior and Lifecycle
+
+### Reset vs Dynamic Controls
+
+#### Reset Controls (`resetsAnimation: true`)
+- Trigger complete animation reset when changed
+- Recreate all objects and state
+- Use for structural changes that require full rebuild
+- Examples: particle count, object types, major layout changes
+
+#### Dynamic Controls (`resetsAnimation: false` or omitted)
+- Update in real-time without resetting
+- Modify existing objects and behavior
+- Use for visual tweaks and performance parameters
+- Examples: speed, colors, sizes, effects
+
+### Control Change Handling
+
+The framework automatically handles control changes through these lifecycle methods:
+
+```typescript
+class MyAnimation extends BaseAnimation<typeof MANIFEST, MyControlValues> {
+  
+  // Called when ANY control changes
+  onControlsChange(controls: MyControlValues, previousControls: MyControlValues): void {
+    // Base implementation handles resetsAnimation logic automatically
+    super.onControlsChange(controls, previousControls);
+  }
+
+  // Called when NON-RESET controls change (real-time updates)
+  protected onDynamicControlsChange(
+    controls: MyControlValues,
+    previousControls: MyControlValues,
+    changedControls: string[]
+  ): void {
+    // Handle real-time parameter changes
+    if (changedControls.includes('speed')) {
+      this.updateAnimationSpeed(controls.speed);
+    }
+    if (changedControls.includes('particleColor')) {
+      this.updateParticleColors(controls.particleColor);
+    }
+  }
+
+  // Called when RESET controls change (full rebuild)
+  protected onReset(context: TContext, controls: MyControlValues): void {
+    // Recreate animation state
+    this.destroy();
+    this.onInit(context, controls);
+  }
+}
+```
+
+## Control Design Patterns
+
+### 1. Performance Controls
+```typescript
+{
+  name: 'quality',
+  type: 'select',
+  label: 'Quality Level',
+  description: 'Performance vs quality trade-off',
+  options: [
+    { value: 'low', label: 'Low (60fps)' },
+    { value: 'medium', label: 'Medium (30fps)' },
+    { value: 'high', label: 'High (15fps)' },
+  ],
+  defaultValue: 'medium',
+  debug: true,
+  resetsAnimation: true,
+}
+```
+
+### 2. Effect Toggles
+```typescript
+{
+  name: 'enableEffects',
+  type: 'boolean',
+  label: 'Enable Effects',
+  description: 'Toggle visual effects on/off',
+  defaultValue: true,
+  debug: true,
+}
+```
+
+### 3. Range Controls
+```typescript
+{
+  name: 'intensity',
+  type: 'number',
+  label: 'Effect Intensity',
+  description: 'Strength of visual effects',
+  min: 0,
+  max: 1,
+  step: 0.01,
+  defaultValue: 0.5,
+  debug: true,
+}
+```
+
+### 4. Preset Collections
+```typescript
+{
+  name: 'preset',
+  type: 'select',
+  label: 'Preset',
+  description: 'Pre-configured settings',
+  options: [
+    { value: 'subtle', label: 'Subtle' },
+    { value: 'balanced', label: 'Balanced' },
+    { value: 'dramatic', label: 'Dramatic' },
+  ],
+  defaultValue: 'balanced',
+  debug: true,
+  resetsAnimation: true,
+}
+```
+
+## Control Validation and Type Safety
+
+### Automatic Validation
+All controls are validated using Zod schemas:
+- Type checking at runtime
+- Range validation for numbers
+- Required field validation
+- Descriptive error messages
+
+### TypeScript Integration
+```typescript
+// Manifest creates the control values type automatically
+const MANIFEST = createManifest({...});
+type MyControlValues = ManifestToControlValues<typeof MANIFEST>;
+
+// Full type safety in your animation class
+class MyAnimation extends BaseAnimation<typeof MANIFEST, MyControlValues> {
+  onUpdate(context: TContext, controls: MyControlValues, deltaTime: number): void {
+    // controls.speed is typed as number
+    // controls.showTrails is typed as boolean
+    // controls.particleColor is typed as string
+  }
+}
+```
+
+## Debug Controls UI
+
+### Automatic Generation
+The framework automatically generates debug UI for all controls marked with `debug: true`:
+- Real-time parameter adjustment
+- Control value display
+- Reset functionality
+- Download/upload control presets
+
+### Debug Control Best Practices
+- Mark frequently adjusted controls as `debug: true`
+- Use descriptive labels and descriptions
+- Group related controls logically
+- Provide sensible default values for experimentation
+
+## Control Organization
+
+### Logical Grouping
+Organize controls in logical order:
+1. **Core Parameters**: Essential animation settings
+2. **Visual Effects**: Appearance and style controls
+3. **Performance**: Quality and performance options
+4. **Advanced**: Expert-level tweaks
+
+### Control Naming Conventions
+- Use camelCase for control names
+- Make names descriptive and specific
+- Avoid abbreviations unless very common
+- Use consistent terminology across animations
+
+## Common Control Patterns
+
+### Animation Timing
+```typescript
+[
+  {
+    name: 'duration',
+    type: 'number',
+    label: 'Animation Duration',
+    description: 'Length of animation cycle in seconds',
+    min: 0.1,
+    max: 10.0,
+    step: 0.1,
+    defaultValue: 2.0,
+    debug: true,
+  },
+  {
+    name: 'loop',
+    type: 'boolean',
+    label: 'Loop Animation',
+    description: 'Repeat animation continuously',
+    defaultValue: true,
+    debug: true,
+  },
+]
+```
+
+### Physics Parameters
+```typescript
+[
+  {
+    name: 'gravity',
+    type: 'number',
+    label: 'Gravity',
+    description: 'Gravity strength',
+    min: -2.0,
+    max: 2.0,
+    step: 0.1,
+    defaultValue: 0.5,
+    debug: true,
+  },
+  {
+    name: 'friction',
+    type: 'number',
+    label: 'Friction',
+    description: 'Air resistance',
+    min: 0,
+    max: 1,
+    step: 0.01,
+    defaultValue: 0.95,
+    debug: true,
+  },
+]
+```
+
+### Visual Style
+```typescript
+[
+  {
+    name: 'style',
+    type: 'select',
+    label: 'Visual Style',
+    description: 'Overall appearance theme',
+    options: [
+      { value: 'minimal', label: 'Minimal' },
+      { value: 'glowing', label: 'Glowing' },
+      { value: 'particle', label: 'Particle' },
+    ],
+    defaultValue: 'minimal',
+    debug: true,
+    resetsAnimation: true,
+  },
+  {
+    name: 'brightness',
+    type: 'number',
+    label: 'Brightness',
+    description: 'Overall brightness multiplier',
+    min: 0.1,
+    max: 3.0,
+    step: 0.1,
+    defaultValue: 1.0,
+    debug: true,
+  },
+]
+```
+
+## Testing and Validation
+
+### Control Value Testing
+```typescript
+// Test edge cases
+const edgeCases = {
+  speed: [0.1, 5.0, 2.5],           // min, max, default
+  showTrails: [true, false],         // boolean values
+  particleColor: ['#ff0000', '#00ff00', '#0000ff'], // color values
+};
+
+// Test invalid values
+const invalidValues = {
+  speed: -1,                         // Below min
+  speed: 10,                         // Above max
+  particleType: 'invalid',           // Not in options
+};
+```
+
+### Control Change Testing
+```typescript
+// Test dynamic control changes
+animation.updateControls({ speed: 2.0 });
+expect(animation.getControlValues().speed).toBe(2.0);
+
+// Test reset control changes
+animation.updateControls({ particleCount: 200 });
+// Should trigger onReset and recreate particles
+```
+
+This control system provides a powerful, type-safe way to create interactive animations with real-time parameter adjustment and automatic UI generation.
+
+
+This control system provides a powerful, type-safe way to create interactive animations with real-time parameter adjustment and automatic UI generation.

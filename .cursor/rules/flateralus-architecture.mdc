@@ -1,5 +1,11 @@
-
+---
+alwaysApply: false
+---
 # Flateralus Animation Framework Architecture
+
+## Overview
+
+**Flateralus** is a framework-agnostic animation system that separates animation logic from rendering backends. It provides a structured way to create controllable, interactive animations that can work with PIXI.js, Canvas2D, or any other rendering technology.
 
 ## Core Principles
 
@@ -9,6 +15,12 @@
 - **Hooks**: Extract React-specific logic into focused, reusable hooks
 - **Contracts**: Define clear interfaces (Animation, Application) for all implementations
 
+### Framework Agnostic Design
+- Core animation logic should be rendering-agnostic
+- Use adapter pattern for framework-specific implementations
+- Components should depend on interfaces, not concrete classes
+- Enable usage in React, vanilla JS, or other frameworks
+
 ### Modular Hook Architecture
 When building React components with complex logic, extract functionality into focused hooks:
 
@@ -17,7 +29,228 @@ When building React components with complex logic, extract functionality into fo
 - `useDebugControls`: Debug UI state and interactions
 - `useLuminanceDetection`: Accessibility features (text color adaptation)
 
-### Application Factory Pattern
+## Architecture Components
+
+### 1. Base Classes (Framework-Agnostic)
+
+#### BaseAnimation
+- Abstract class for animation logic
+- Handles control value validation and lifecycle management
+- Implements control change detection and reset logic
+- Must implement: `onInit()`, `onUpdate()`, `onDestroy()`
+
+#### BaseApplication
+- Abstract class for rendering applications
+- Manages application lifecycle and animation updates
+- Handles resize events and visibility detection
+- Must implement: `createContext()`, `startRenderLoop()`, `stopRenderLoop()`, `handleResize()`
+
+### 2. Implementation Classes (Framework-Specific)
+
+#### PixiAnimation
+- Extends BaseAnimation for PIXI.js
+- Handles PIXI-specific rendering and resource management
+- Implements PIXI sprite and graphics operations
+
+#### PixiApplication
+- Extends BaseApplication for PIXI.js
+- Manages PIXI.Application lifecycle
+- Handles PIXI ticker and render loop
+
+### 3. React Integration (Optional)
+- `AnimationStage`: React component that hosts animations
+- `useAnimationStage`: Hook for animation management
+- `useControls`: Hook for control value management
+
+## Control System
+
+### Control Types
+
+#### Number Controls
+```typescript
+{
+  name: 'speed',
+  type: 'number',
+  label: 'Animation Speed',
+  description: 'How fast the animation runs',
+  min: 0.1,
+  max: 5.0,
+  step: 0.1,
+  defaultValue: 1.0,
+  debug: true,
+}
+```
+
+#### Boolean Controls
+```typescript
+{
+  name: 'showTrails',
+  type: 'boolean',
+  label: 'Show Trails',
+  description: 'Display particle trails',
+  defaultValue: false,
+  debug: true,
+}
+```
+
+#### Color Controls
+```typescript
+{
+  name: 'particleColor',
+  type: 'color',
+  label: 'Particle Color',
+  description: 'Color of particles',
+  defaultValue: '#ff0000',
+  debug: true,
+  resetsAnimation: true,
+}
+```
+
+#### Select Controls
+```typescript
+{
+  name: 'particleType',
+  type: 'select',
+  label: 'Particle Type',
+  description: 'Type of particles to render',
+  options: [
+    { value: 'circle', label: 'Circle' },
+    { value: 'square', label: 'Square' },
+  ],
+  defaultValue: 'circle',
+  debug: true,
+}
+```
+
+#### Group Controls
+```typescript
+{
+  name: 'particles',
+  type: 'group',
+  label: 'Particle Settings',
+  description: 'Individual particle properties',
+  items: [
+    {
+      name: 'size',
+      type: 'number',
+      label: 'Size',
+      description: 'Particle size',
+      min: 1,
+      max: 20,
+      step: 1,
+      defaultValue: 5,
+    },
+  ],
+  defaultValue: [],
+  minItems: 1,
+  maxItems: 10,
+  static: false,
+}
+```
+
+### Control Behavior
+
+#### Reset vs Dynamic Controls
+- **`resetsAnimation: true`**: When these controls change, the entire animation resets and recreates its state
+- **`resetsAnimation: false` (default)**: These controls update in real-time without resetting
+
+#### Control Validation
+- All controls are automatically validated using Zod schemas
+- Type safety is maintained through TypeScript inference
+- Invalid control values throw descriptive errors
+
+## Animation Lifecycle
+
+### 1. Constructor
+- Validates initial control values against manifest
+- Sets up internal state and control tracking
+
+### 2. Initialization (`onInit`)
+- Called when animation starts
+- Set up animation state, resources, and event listeners
+- Access rendering context and initial control values
+
+### 3. Update Loop (`onUpdate`)
+- Called every frame for animation logic
+- Update positions, physics, and visual effects
+- Access current control values and delta time
+
+### 4. Control Changes
+- **Automatic**: Framework handles control value updates
+- **Reset Controls**: Trigger full animation reset
+- **Dynamic Controls**: Update in real-time via `onDynamicControlsChange`
+
+### 5. Cleanup (`onDestroy`)
+- Clean up resources, event listeners, and objects
+- Remove sprites/graphics from rendering context
+- Reset internal state
+
+## Best Practices
+
+### 1. Constants and Configuration
+```typescript
+// Define major parameters as constants for easy tuning
+const PARTICLE_COUNT = 100;
+const BASE_SIZE = 5;
+const ANIMATION_SPEED = 1.0;
+```
+
+### 2. Type Safety
+```typescript
+// Use manifest to infer control value types
+type MyControlValues = ManifestToControlValues<typeof MANIFEST>;
+
+// Extend BaseAnimation with proper types
+class MyAnimation extends BaseAnimation<typeof MANIFEST, MyControlValues> {
+  // Implementation
+}
+```
+
+### 3. Resource Management
+```typescript
+onDestroy(): void {
+  // Always clean up resources
+  this.particles.forEach(particle => {
+    if (particle.sprite && particle.sprite.parent) {
+      particle.sprite.parent.removeChild(particle.sprite);
+    }
+  });
+  this.particles = [];
+}
+```
+
+### 4. Performance Considerations
+- Use object pooling for frequently created/destroyed objects
+- Batch similar operations
+- Avoid creating new objects in update loops
+- Use efficient data structures for large numbers of objects
+
+### 5. Control Design
+- Use `resetsAnimation: true` sparingly - only for structural changes
+- Make most controls dynamic for real-time experimentation
+- Provide sensible min/max values and step sizes
+- Use descriptive labels and descriptions
+
+## File Organization
+
+### Package Structure
+```
+packages/
+  flateralus/           # Core framework (rendering-agnostic)
+    src/core/          # BaseAnimation, BaseApplication
+    src/types/         # Animation, Application interfaces
+    src/schemas/       # Control validation schemas
+    src/utils/         # Helper functions
+  flateralus-pixi/     # PIXI.js adapter
+    src/              # PixiAnimation, PixiApplication  
+  flateralus-react/    # React bindings
+    src/hooks/        # useAnimationStage, useControls, etc.
+    src/components/   # AnimationStage component
+  flateralus-animations/ # Animation implementations
+    src/              # Individual animation classes
+```
+
+## Application Factory Pattern
 Always use factory functions to create application instances:
 ```typescript
 // Create factory function
@@ -32,26 +265,97 @@ export const createPixiApplication = (options?: any): Application => {
 />
 ```
 
-### Framework Agnostic Design
-- Core animation logic should be rendering-agnostic
-- Use adapter pattern for framework-specific implementations
-- Components should depend on interfaces, not concrete classes
-- Enable usage in React, vanilla JS, or other frameworks
+## Common Animation Patterns
 
-## File Organization
+### Particle Systems
+- Use arrays to manage multiple objects
+- Apply forces and physics in update loops
+- Handle object lifecycle (creation, update, destruction)
 
-### Package Structure
+### Physics Simulations
+- Calculate forces in update loops
+- Apply velocity and acceleration
+- Handle collisions and boundaries
+
+### Interactive Elements
+- Handle mouse/touch events in init
+- Update interaction state in update loops
+- Provide visual feedback for user input
+
+### Visual Effects
+- Use PIXI's built-in effects and shaders
+- Implement custom rendering logic
+- Handle transparency and blending
+
+## Integration Examples
+
+### React Component
+```typescript
+import { AnimationStage } from '@bracketbear/flateralus-react';
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createMyAnimation } from './myAnimation';
+
+function MyComponent() {
+  const application = new PixiApplication();
+  const animation = createMyAnimation();
+
+  return (
+    <AnimationStage
+      application={application}
+      showDebugControls={true}
+      className="h-96 w-full"
+    />
+  );
+}
 ```
-packages/
-  flateralus/           # Core framework (rendering-agnostic)
-    src/core/          # BaseAnimation, BaseApplication
-    src/types/         # Animation, Application interfaces
-  flateralus-pixi/     # PIXI.js adapter
-    src/              # PixiAnimation, PixiApplication  
-  flateralus-react/    # React bindings
-    src/hooks/        # useAnimationStage, useControls, etc.
-    src/components/   # AnimationStage component
+
+### Vanilla JavaScript
+```typescript
+import { PixiApplication } from '@bracketbear/flateralus-pixi';
+import { createMyAnimation } from './myAnimation';
+
+const container = document.getElementById('animation-container');
+const application = new PixiApplication();
+const animation = createMyAnimation();
+
+application.init(container);
+application.setAnimation(animation);
+application.start();
 ```
 
-alwaysApply: false
----
+## Error Handling and Debugging
+
+### Control Validation Errors
+- Invalid control values throw descriptive errors
+- Use debug controls to experiment with parameters
+- Check console for validation error messages
+
+### Performance Monitoring
+- Monitor frame rate and memory usage
+- Use browser dev tools for performance analysis
+- Implement performance budgets for complex animations
+
+### Common Issues
+- **Memory leaks**: Always clean up in onDestroy
+- **Performance**: Avoid object creation in update loops
+- **Type errors**: Ensure manifest types match implementation
+- **Control issues**: Check resetsAnimation flags and validation
+
+## Migration and Compatibility
+
+### From Other Animation Systems
+- Extract core logic into BaseAnimation subclass
+- Implement framework-specific rendering in onInit/onUpdate
+- Use control system for parameter management
+
+### Framework Updates
+- Core logic remains unchanged
+- Update only framework-specific implementations
+- Maintain backward compatibility through interfaces
+
+This architecture enables building systems that are:
+- **Extensible**: Easy to add new implementations and animations
+- **Type-safe**: Full TypeScript support throughout
+- **Framework-agnostic**: Core logic works anywhere
+- **Testable**: Clear contracts enable easy mocking
+- **Maintainable**: Consistent patterns and separation of concerns

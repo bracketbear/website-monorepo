@@ -1,0 +1,642 @@
+---
+alwaysApply: false
+---
+
+# Flateralus Animation Implementation Patterns
+
+## Overview
+
+This guide covers common patterns and best practices for implementing Flateralus animations. These patterns help create performant, maintainable, and visually appealing animations.
+
+## Animation Structure Template
+
+### Basic Animation Class
+```typescript
+import { BaseAnimation, createManifest } from '@bracketbear/flateralus';
+import * as PIXI from 'pixi.js';
+
+// Constants for easy tuning
+const PARTICLE_COUNT = 100;
+const BASE_SIZE = 5;
+const ANIMATION_SPEED = 1.0;
+
+// Animation manifest
+const MANIFEST = createManifest({
+  id: 'my-animation',
+  name: 'My Animation',
+  description: 'Description of what this animation does',
+  controls: [
+    // Define your controls here
+  ],
+});
+
+type MyControlValues = ManifestToControlValues<typeof MANIFEST>;
+
+class MyAnimation extends BaseAnimation<typeof MANIFEST, MyControlValues> {
+  private particles: PIXI.Sprite[] = [];
+  private time: number = 0;
+
+  constructor(initialControls?: Partial<MyControlValues>) {
+    super(MANIFEST, initialControls);
+  }
+
+  onInit(context: PIXI.Application, controls: MyControlValues): void {
+    // Initialize animation state
+    this.createParticles(context, controls);
+    this.setupEventListeners(context);
+  }
+
+  onUpdate(context: PIXI.Application, controls: MyControlValues, deltaTime: number): void {
+    // Update animation logic
+    this.updateParticles(controls, deltaTime);
+    this.time += deltaTime;
+  }
+
+  onDestroy(): void {
+    // Clean up resources
+    this.cleanupParticles();
+  }
+
+  private createParticles(context: PIXI.Application, controls: MyControlValues): void {
+    // Implementation
+  }
+
+  private updateParticles(controls: MyControlValues, deltaTime: number): void {
+    // Implementation
+  }
+
+  private cleanupParticles(): void {
+    // Implementation
+  }
+}
+
+export function createMyAnimation(
+  initialControls?: Partial<MyControlValues>
+): MyAnimation {
+  return new MyAnimation(initialControls);
+}
+```
+
+## Common Animation Patterns
+
+### 1. Particle Systems
+
+#### Basic Particle System
+```typescript
+class ParticleSystemAnimation extends BaseAnimation<typeof MANIFEST, ParticleControlValues> {
+  private particles: Particle[] = [];
+  private texture: PIXI.Texture | null = null;
+
+  onInit(context: PIXI.Application, controls: ParticleControlValues): void {
+    this.texture = this.createParticleTexture();
+    this.createParticles(context, controls);
+  }
+
+  onUpdate(context: PIXI.Application, controls: ParticleControlValues, deltaTime: number): void {
+    this.particles.forEach(particle => {
+      // Update physics
+      particle.velocity.x += particle.acceleration.x * deltaTime;
+      particle.velocity.y += particle.acceleration.y * deltaTime;
+      
+      particle.position.x += particle.velocity.x * deltaTime;
+      particle.position.y += particle.velocity.y * deltaTime;
+      
+      // Update visual
+      particle.sprite.x = particle.position.x;
+      particle.sprite.y = particle.position.y;
+      
+      // Apply damping
+      particle.velocity.x *= 0.98;
+      particle.velocity.y *= 0.98;
+    });
+  }
+
+  private createParticles(context: PIXI.Application, controls: ParticleControlValues): void {
+    for (let i = 0; i < controls.particleCount; i++) {
+      const particle = this.createParticle(context, controls);
+      this.particles.push(particle);
+    }
+  }
+}
+```
+
+#### Particle Object Structure
+```typescript
+interface Particle {
+  sprite: PIXI.Sprite;
+  position: { x: number; y: number };
+  velocity: { x: number; y: number };
+  acceleration: { x: number; y: number };
+  life: number;
+  maxLife: number;
+  size: number;
+  color: number;
+  alpha: number;
+}
+```
+
+### 2. Physics Simulations
+
+#### Gravity and Forces
+```typescript
+class PhysicsAnimation extends BaseAnimation<typeof MANIFEST, PhysicsControlValues> {
+  private objects: PhysicsObject[] = [];
+
+  onUpdate(context: PIXI.Application, controls: PhysicsControlValues, deltaTime: number): void {
+    this.objects.forEach(obj => {
+      // Apply gravity
+      obj.velocity.y += controls.gravity * deltaTime;
+      
+      // Apply custom forces
+      if (controls.enableWind) {
+        obj.velocity.x += controls.windStrength * deltaTime;
+      }
+      
+      // Update position
+      obj.position.x += obj.velocity.x * deltaTime;
+      obj.position.y += obj.velocity.y * deltaTime;
+      
+      // Handle boundaries
+      this.handleBoundaryCollision(obj, context);
+      
+      // Apply friction
+      obj.velocity.x *= controls.friction;
+      obj.velocity.y *= controls.friction;
+    });
+  }
+
+  private handleBoundaryCollision(obj: PhysicsObject, context: PIXI.Application): void {
+    const bounds = context.screen;
+    
+    if (obj.position.x <= 0 || obj.position.x >= bounds.width) {
+      obj.velocity.x *= -controls.bounceFactor;
+      obj.position.x = Math.max(0, Math.min(bounds.width, obj.position.x));
+    }
+    
+    if (obj.position.y >= bounds.height) {
+      obj.velocity.y *= -controls.bounceFactor;
+      obj.position.y = bounds.height;
+    }
+  }
+}
+```
+
+#### Spring Physics
+```typescript
+class SpringAnimation extends BaseAnimation<typeof MANIFEST, SpringControlValues> {
+  private springs: Spring[] = [];
+
+  onUpdate(context: PIXI.Application, controls: SpringControlValues, deltaTime: number): void {
+    this.springs.forEach(spring => {
+      // Calculate spring force
+      const displacement = spring.targetPosition - spring.currentPosition;
+      const springForce = displacement * controls.springStiffness;
+      
+      // Apply damping
+      const dampingForce = -spring.velocity * controls.damping;
+      
+      // Calculate acceleration
+      const acceleration = (springForce + dampingForce) / spring.mass;
+      
+      // Update velocity and position
+      spring.velocity += acceleration * deltaTime;
+      spring.currentPosition += spring.velocity * deltaTime;
+      
+      // Update visual
+      spring.sprite.x = spring.currentPosition;
+    });
+  }
+}
+```
+
+### 3. Interactive Elements
+
+#### Mouse/Touch Interaction
+```typescript
+class InteractiveAnimation extends BaseAnimation<typeof MANIFEST, InteractiveControlValues> {
+  private interactiveObjects: InteractiveObject[] = [];
+  private mousePosition = { x: 0, y: 0 };
+  private isMouseActive = false;
+
+  onInit(context: PIXI.Application, controls: InteractiveControlValues): void {
+    this.setupInteraction(context);
+    this.createInteractiveObjects(context, controls);
+  }
+
+  onUpdate(context: PIXI.Application, controls: InteractiveControlValues, deltaTime: number): void {
+    this.interactiveObjects.forEach(obj => {
+      if (this.isMouseActive) {
+        // Calculate distance to mouse
+        const dx = this.mousePosition.x - obj.sprite.x;
+        const dy = this.mousePosition.y - obj.sprite.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < controls.interactionRadius) {
+          // Apply repulsion/attraction
+          const force = controls.interactionStrength / (distance + 1);
+          obj.velocity.x += (dx / distance) * force * deltaTime;
+          obj.velocity.y += (dy / distance) * force * deltaTime;
+          
+          // Visual feedback
+          obj.sprite.tint = controls.interactiveColor;
+          obj.sprite.scale.set(1.2);
+        } else {
+          // Return to normal state
+          obj.sprite.tint = controls.normalColor;
+          obj.sprite.scale.set(1.0);
+        }
+      }
+      
+      // Update physics
+      this.updateObjectPhysics(obj, controls, deltaTime);
+    });
+  }
+
+  private setupInteraction(context: PIXI.Application): void {
+    context.stage.eventMode = 'static';
+    
+    context.stage.on('pointermove', (event) => {
+      this.mousePosition.x = event.global.x;
+      this.mousePosition.y = event.global.y;
+      this.isMouseActive = true;
+    });
+    
+    context.stage.on('pointerleave', () => {
+      this.isMouseActive = false;
+    });
+  }
+}
+```
+
+### 4. Visual Effects
+
+#### Trail Effects
+```typescript
+class TrailAnimation extends BaseAnimation<typeof MANIFEST, TrailControlValues> {
+  private objects: TrailObject[] = [];
+  private trailContainer: PIXI.Container;
+
+  onInit(context: PIXI.Application, controls: TrailControlValues): void {
+    this.trailContainer = new PIXI.Container();
+    context.stage.addChild(this.trailContainer);
+    this.createObjects(context, controls);
+  }
+
+  onUpdate(context: PIXI.Application, controls: TrailControlValues, deltaTime: number): void {
+    this.objects.forEach(obj => {
+      // Update object
+      this.updateObject(obj, controls, deltaTime);
+      
+      // Create trail
+      if (controls.showTrails) {
+        this.createTrailSegment(obj, controls);
+      }
+      
+      // Clean up old trail segments
+      this.cleanupTrailSegments(obj, controls);
+    });
+  }
+
+  private createTrailSegment(obj: TrailObject, controls: TrailControlValues): void {
+    const trail = new PIXI.Graphics();
+    trail.beginFill(obj.color, controls.trailAlpha);
+    trail.drawCircle(0, 0, controls.trailSize);
+    trail.endFill();
+    
+    trail.x = obj.sprite.x;
+    trail.y = obj.sprite.y;
+    
+    this.trailContainer.addChild(trail);
+    obj.trailSegments.push({
+      graphics: trail,
+      life: controls.trailLife,
+      maxLife: controls.trailLife,
+    });
+  }
+
+  private cleanupTrailSegments(obj: TrailObject, controls: TrailControlValues): void {
+    obj.trailSegments = obj.trailSegments.filter(segment => {
+      segment.life -= controls.trailDecayRate;
+      
+      if (segment.life <= 0) {
+        this.trailContainer.removeChild(segment.graphics);
+        return false;
+      }
+      
+      // Fade out
+      segment.graphics.alpha = segment.life / segment.maxLife;
+      return true;
+    });
+  }
+}
+```
+
+#### Shader Effects
+```typescript
+class ShaderAnimation extends BaseAnimation<typeof MANIFEST, ShaderControlValues> {
+  private shaderContainer: PIXI.Container;
+  private shaderFilter: PIXI.Filter;
+
+  onInit(context: PIXI.Application, controls: ShaderControlValues): void {
+    this.setupShader(controls);
+    this.createVisualElements(context, controls);
+  }
+
+  onUpdate(context: PIXI.Application, controls: ShaderControlValues, deltaTime: number): void {
+    // Update shader uniforms
+    if (this.shaderFilter.uniforms) {
+      this.shaderFilter.uniforms.time += deltaTime;
+      this.shaderFilter.uniforms.intensity = controls.intensity;
+      this.shaderFilter.uniforms.color = this.hexToRgb(controls.effectColor);
+    }
+  }
+
+  private setupShader(controls: ShaderControlValues): void {
+    const fragmentShader = `
+      varying vec2 vTextureCoord;
+      uniform sampler2D uSampler;
+      uniform float time;
+      uniform float intensity;
+      uniform vec3 color;
+      
+      void main(void) {
+        vec2 uv = vTextureCoord;
+        vec4 texColor = texture2D(uSampler, uv);
+        
+        // Add wave effect
+        float wave = sin(uv.x * 10.0 + time) * intensity;
+        vec4 finalColor = texColor + vec4(color * wave, 0.0);
+        
+        gl_FragColor = finalColor;
+      }
+    `;
+
+    this.shaderFilter = new PIXI.Filter(undefined, fragmentShader, {
+      time: 0.0,
+      intensity: controls.intensity,
+      color: this.hexToRgb(controls.effectColor),
+    });
+  }
+
+  private hexToRgb(hex: string): [number, number, number] {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [
+      parseInt(result[1], 16) / 255,
+      parseInt(result[2], 16) / 255,
+      parseInt(result[3], 16) / 255,
+    ] : [0, 0, 0];
+  }
+}
+```
+
+## Performance Optimization Patterns
+
+### 1. Object Pooling
+```typescript
+class ObjectPool<T> {
+  private pool: T[] = [];
+  private createFn: () => T;
+  private resetFn: (obj: T) => void;
+
+  constructor(createFn: () => T, resetFn: (obj: T) => void) {
+    this.createFn = createFn;
+    this.resetFn = resetFn;
+  }
+
+  get(): T {
+    if (this.pool.length > 0) {
+      return this.pool.pop()!;
+    }
+    return this.createFn();
+  }
+
+  release(obj: T): void {
+    this.resetFn(obj);
+    this.pool.push(obj);
+  }
+}
+
+// Usage in animation
+class OptimizedAnimation extends BaseAnimation<typeof MANIFEST, ControlValues> {
+  private particlePool: ObjectPool<Particle>;
+
+  constructor(manifest: typeof MANIFEST, initialControls?: Partial<ControlValues>) {
+    super(manifest, initialControls);
+    this.particlePool = new ObjectPool(
+      () => this.createParticle(),
+      (particle) => this.resetParticle(particle)
+    );
+  }
+
+  private createParticle(): Particle {
+    // Create new particle
+  }
+
+  private resetParticle(particle: Particle): void {
+    // Reset particle to initial state
+  }
+}
+```
+
+### 2. Spatial Partitioning
+```typescript
+class SpatialGrid {
+  private grid: Map<string, GameObject[]> = new Map();
+  private cellSize: number;
+
+  constructor(cellSize: number) {
+    this.cellSize = cellSize;
+  }
+
+  addObject(obj: GameObject): void {
+    const cell = this.getCellKey(obj.position.x, obj.position.y);
+    if (!this.grid.has(cell)) {
+      this.grid.set(cell, []);
+    }
+    this.grid.get(cell)!.push(obj);
+  }
+
+  getNearbyObjects(x: number, y: number, radius: number): GameObject[] {
+    const nearby: GameObject[] = [];
+    const cellRadius = Math.ceil(radius / this.cellSize);
+    
+    for (let dx = -cellRadius; dx <= cellRadius; dx++) {
+      for (let dy = -cellRadius; dy <= cellRadius; dy++) {
+        const cell = this.getCellKey(x + dx * this.cellSize, y + dy * this.cellSize);
+        const objects = this.grid.get(cell);
+        if (objects) {
+          nearby.push(...objects);
+        }
+      }
+    }
+    
+    return nearby;
+  }
+
+  private getCellKey(x: number, y: number): string {
+    const cellX = Math.floor(x / this.cellSize);
+    const cellY = Math.floor(y / this.cellSize);
+    return `${cellX},${cellY}`;
+  }
+}
+```
+
+### 3. Batch Operations
+```typescript
+class BatchedAnimation extends BaseAnimation<typeof MANIFEST, ControlValues> {
+  private updateQueue: UpdateOperation[] = [];
+  private batchSize = 10;
+
+  onUpdate(context: PIXI.Application, controls: ControlValues, deltaTime: number): void {
+    // Process updates in batches
+    while (this.updateQueue.length > 0) {
+      const batch = this.updateQueue.splice(0, this.batchSize);
+      this.processBatch(batch, controls, deltaTime);
+    }
+  }
+
+  private processBatch(batch: UpdateOperation[], controls: ControlValues, deltaTime: number): void {
+    // Process multiple updates together for better performance
+    batch.forEach(operation => {
+      // Apply operation
+    });
+  }
+}
+```
+
+## Animation State Management
+
+### 1. State Machine Pattern
+```typescript
+enum AnimationState {
+  IDLE = 'idle',
+  RUNNING = 'running',
+  PAUSED = 'paused',
+  COMPLETED = 'completed',
+}
+
+class StateMachineAnimation extends BaseAnimation<typeof MANIFEST, ControlValues> {
+  private currentState: AnimationState = AnimationState.IDLE;
+  private stateHandlers: Map<AnimationState, () => void> = new Map();
+
+  onInit(context: PIXI.Application, controls: ControlValues): void {
+    this.setupStateHandlers();
+    this.transitionTo(AnimationState.IDLE);
+  }
+
+  onUpdate(context: PIXI.Application, controls: ControlValues, deltaTime: number): void {
+    const handler = this.stateHandlers.get(this.currentState);
+    if (handler) {
+      handler();
+    }
+  }
+
+  private setupStateHandlers(): void {
+    this.stateHandlers.set(AnimationState.IDLE, () => this.handleIdle());
+    this.stateHandlers.set(AnimationState.RUNNING, () => this.handleRunning());
+    this.stateHandlers.set(AnimationState.PAUSED, () => this.handlePaused());
+    this.stateHandlers.set(AnimationState.COMPLETED, () => this.handleCompleted());
+  }
+
+  private transitionTo(newState: AnimationState): void {
+    this.currentState = newState;
+  }
+}
+```
+
+### 2. Timeline-Based Animation
+```typescript
+class TimelineAnimation extends BaseAnimation<typeof MANIFEST, ControlValues> {
+  private timeline: TimelineEvent[] = [];
+  private currentTime = 0;
+
+  onUpdate(context: PIXI.Application, controls: ControlValues, deltaTime: number): void {
+    this.currentTime += deltaTime;
+    
+    // Process timeline events
+    this.timeline.forEach(event => {
+      if (event.time <= this.currentTime && !event.triggered) {
+        event.execute(controls);
+        event.triggered = true;
+      }
+    });
+  }
+
+  private addTimelineEvent(time: number, action: (controls: ControlValues) => void): void {
+    this.timeline.push({
+      time,
+      execute: action,
+      triggered: false,
+    });
+    
+    // Sort by time
+    this.timeline.sort((a, b) => a.time - b.time);
+  }
+}
+
+interface TimelineEvent {
+  time: number;
+  execute: (controls: ControlValues) => void;
+  triggered: boolean;
+}
+```
+
+## Testing Patterns
+
+### 1. Animation Testing
+```typescript
+describe('MyAnimation', () => {
+  let animation: MyAnimation;
+  let mockContext: PIXI.Application;
+
+  beforeEach(() => {
+    animation = createMyAnimation();
+    mockContext = createMockPixiContext();
+  });
+
+  it('should initialize with default controls', () => {
+    const controls = animation.getControlValues();
+    expect(controls.speed).toBe(1.0);
+    expect(controls.showTrails).toBe(false);
+  });
+
+  it('should handle control updates', () => {
+    animation.updateControls({ speed: 2.0 });
+    expect(animation.getControlValues().speed).toBe(2.0);
+  });
+
+  it('should reset when reset controls change', () => {
+    const resetSpy = jest.spyOn(animation as any, 'onReset');
+    animation.updateControls({ particleCount: 200 });
+    expect(resetSpy).toHaveBeenCalled();
+  });
+});
+```
+
+### 2. Performance Testing
+```typescript
+describe('Performance', () => {
+  it('should maintain 60fps with 1000 particles', () => {
+    const startTime = performance.now();
+    const frameCount = 60;
+    
+    for (let i = 0; i < frameCount; i++) {
+      animation.update();
+    }
+    
+    const endTime = performance.now();
+    const frameTime = (endTime - startTime) / frameCount;
+    
+    expect(frameTime).toBeLessThan(16.67); // 60fps = 16.67ms per frame
+  });
+});
+```
+
+These patterns provide a solid foundation for creating complex, performant Flateralus animations while maintaining clean, maintainable code.
+
+    expect(frameTime).toBeLessThan(16.67); // 60fps = 16.67ms per frame
+  });
+});
+```
+
+These patterns provide a solid foundation for creating complex, performant Flateralus animations while maintaining clean, maintainable code.
