@@ -149,6 +149,16 @@ export const workProjectCategorySchema = z.object({
  * };
  * ```
  */
+// New helper schemas for links and accessibility
+const externalLinkSchema = z.object({
+  label: z.string(),
+  href: z.string(),
+});
+
+const a11ySchema = z.object({
+  coverAlt: z.string().optional(),
+});
+
 export const workProjectSchema = z.object({
   title: z.string(),
   job: z.string(), // references "workJobs"
@@ -161,12 +171,11 @@ export const workProjectSchema = z.object({
   mediaDescription: z.string().optional(),
   media: z
     .array(
-      z
-        .object({
-          image: z.string(),
-          caption: z.string().optional(),
-        })
-        .optional()
+      z.object({
+        image: z.string(),
+        caption: z.string().optional(),
+        alt: z.string().optional(), // NEW
+      })
     )
     .optional(),
   isFeatured: z.boolean().default(false),
@@ -179,4 +188,23 @@ export const workProjectSchema = z.object({
       buttonLink: z.string().optional(),
     })
     .optional(),
+  // Additional optional structured storytelling fields (non-breaking)
+  oneLiner: z.string().optional(), // short explainer under the title
+  problem: z.string().optional(), // plain-English problem
+  scope: z.array(z.string()).optional(), // your responsibilities
+  decisions: z.array(z.string()).optional(), // 3–5 key choices/tradeoffs
+  outcome: z.string().optional(), // what changed (qualitative OK)
+  notes: z.string().optional(), // behind-the-build or reflection
+  status: z.enum(['shipped', 'prototype', 'retired', 'paused']).optional(),
+  links: z.array(externalLinkSchema).optional(),
+  a11y: a11ySchema.optional(),
+  teaser: z
+    .object({
+      headline: z.string().optional(),
+      subline: z.string().optional(),
+    })
+    .optional(),
+  impactTags: z.array(z.string()).optional(),
 });
+
+// Type is exported from types.ts to avoid conflicts

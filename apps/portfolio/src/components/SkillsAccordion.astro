@@ -1,0 +1,49 @@
+---
+import { clsx } from '@bracketbear/core';
+
+interface Props {
+  skills: any[];
+  defaultOpen?: boolean;
+  className?: string;
+  title?: string;
+  titleClasses?: string;
+}
+
+const {
+  skills,
+  defaultOpen = false,
+  className = '',
+  title = 'Tech Stack',
+  titleClasses = '',
+} = Astro.props;
+---
+
+<div class={`${className}`}>
+  <details class="group" open={defaultOpen}>
+    <summary class="cursor-pointer list-none">
+      <div class="flex items-center justify-between">
+        <span
+          class={clsx(
+            'font-heading text-lg font-bold text-white',
+            titleClasses
+          )}>{title}</span
+        >
+        <span
+          class="text-brand-yellow transition-transform group-open:rotate-180"
+          >▼</span
+        >
+      </div>
+    </summary>
+    <div class="mt-4 border-t border-white/20 pt-4">
+      <div class="flex flex-wrap gap-2">
+        {
+          skills.map((skill: any) => (
+            <span class="pill pill-brand-green">
+              {skill?.data?.title || skill}
+            </span>
+          ))
+        }
+      </div>
+    </div>
+  </details>
+</div>

@@ -88,9 +88,20 @@ export default function ProjectCard({
             </h3>
 
             {/* Project summary */}
-            {project.data.summary && (
+            {(project.data.teaser?.headline ||
+              project.data.oneLiner ||
+              project.data.summary) && (
               <div className="mb-4 line-clamp-3 text-lg leading-relaxed font-medium">
-                {project.data.summary}
+                {project.data.teaser?.headline ||
+                  project.data.oneLiner ||
+                  project.data.summary}
+              </div>
+            )}
+
+            {/* Project subline */}
+            {project.data.teaser?.subline && (
+              <div className="mb-4 text-base leading-relaxed text-white/70">
+                {project.data.teaser.subline}
               </div>
             )}
           </div>

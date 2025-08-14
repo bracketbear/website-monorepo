@@ -43,6 +43,11 @@
   @apply bg-brand-yellow text-brand-dark;
 }
 
+/* Unstyled button - minimal styling for custom implementations */
+@utility button-unstyled {
+  @apply border-none bg-transparent font-normal normal-case shadow-none;
+}
+
 /* Gear button for debug controls */
 @utility button-gear {
   @apply rounded-lg border border-white/20 bg-black/90 p-2 text-white transition-all hover:border-white/30 hover:bg-black/95;
@@ -74,4 +79,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.button-icon-rounded {
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.button-icon-rounded:hover {
+  transform: scale(1.1) !important;
 }

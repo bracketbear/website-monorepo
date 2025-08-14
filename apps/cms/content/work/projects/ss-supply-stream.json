@@ -2,10 +2,25 @@
   "title": "SupplyStream App",
   "job": "ss-front-end-developer",
   "duration": "Nine months",
-  "summary": "The project that I thought would change the way we looked at an experiential CMS.",
-  "description": "Developed a headless, API-based front-end e-commerce platform for Trinity Packing Supply.\n\nStarted with BigCommerce's Stencil theme and integrated Vue into the template. Later, migrated the project from Vue 2 to Vue 3 and Nuxt 3. Used TailwindCSS for styling.",
-  "challengesAndSolutions": "One of the challenges was integrating Vue into a template that wasn't designed for it.\n\nThis was solved by transitioning to a headless, API-based front-end. Another challenge was the migration from Vue 2 to Vue 3, which was successfully achieved.",
-  "resultsAchieved": "The development of the application allowed Trinity's business model to switch from a purely sales person driven business to one where sales can happen more organically.",
+  "summary": "Headless storefront for Trinity Packing Supply.",
+  "oneLiner": "Headless e‑commerce front‑end that moved a sales‑led model toward organic online orders.",
+  "problem": "The existing theme wasn’t built for a modern component approach. We needed a cleaner architecture and a path off the template system without breaking the business.",
+  "scope": [
+    "Integrated Vue into BigCommerce’s Stencil theme",
+    "Migrated to a headless front‑end (Vue 3 / Nuxt 3)",
+    "Styled with TailwindCSS and wired to platform APIs"
+  ],
+  "decisions": [
+    "Went headless to keep the UI fast and the integration straightforward",
+    "Planned an incremental migration so the site could keep selling",
+    "Kept the stack simple—fewer moving parts, easier to hand off"
+  ],
+  "outcome": "Enabled a shift from purely salesperson‑driven orders to organic online sales.",
+  "notes": "If I revisited this, I’d add basic A/B hooks to measure UX changes more directly.",
+  "status": "shipped",
+  "a11y": {
+    "coverAlt": "Desktop view of the SupplyStream storefront."
+  },
   "mediaDescription": "The desktop view of the SupplyStream e-commerce website.",
   "media": [],
   "isFeatured": false,
@@ -17,9 +32,17 @@
     "git",
     "javascript"
   ],
+  "impactTags": [
+    "conversion",
+    "maintainability"
+  ],
+  "teaser": {
+    "headline": "Headless storefront",
+    "subline": "Moved from a theme to a modern front‑end without downtime"
+  },
   "cta": {
-    "text": "Need to modernize your e-commerce platform? Let's build something that actually converts visitors into customers (instead of just confusing them).",
-    "buttonText": "Modernize Your Store",
-    "buttonLink": "/contact"
+    "text": "Need to modernize a storefront without starting over? Let’s map a path.",
+    "buttonText": "Start a conversation",
+    "buttonLink": "/reach-out"
   }
 }

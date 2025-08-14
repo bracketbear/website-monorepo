@@ -70,7 +70,7 @@ export function makePageSchema<Extras extends z.ZodRawShape = z.ZodRawShape>(
   const showCta = options?.showCta !== false; // Default to true for backward compatibility
 
   // Define CTA fields
-  const ctaFields = showCta
+  const ctaFields: z.ZodRawShape = showCta
     ? {
         contactCTA: z.object({
           text: z.string(),
@@ -80,11 +80,11 @@ export function makePageSchema<Extras extends z.ZodRawShape = z.ZodRawShape>(
       }
     : {};
 
-  const allFields = extras
-    ? { ...ctaFields, ...extras }
-    : ctaFields;
+  // Merge fields only if there are any to merge
+  if (extras || (showCta && Object.keys(ctaFields).length > 0)) {
+    const fieldsToMerge = { ...ctaFields, ...extras };
+    return basePageSchema.merge(z.object(fieldsToMerge));
+  }
 
-  return allFields
-    ? basePageSchema.merge(z.object(allFields))
-    : basePageSchema;
+  return basePageSchema;
 }

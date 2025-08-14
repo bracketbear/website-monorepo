@@ -3,13 +3,17 @@
   "job": "ds-lead-front-end-developer",
   "duration": "18 Months",
   "coverImage": "/work/projects/ds-bridge/coverImage.webp",
-  "description": "I led the front-end development of a new CMS called Bridge UI. The CMS utilized a Rust backend with a Vue 3 front-end.\n\nResponsibilities included converting existing components from Vue 2 to Vue 3 while Vue 3 was still in beta, converting the entire app to use TypeScript, switching the build tool from Webpack to Vite, and using service workers to communicate between open tabs and to poll the backend for deltas. I was also responsible for reading the backend Rust code to understand the shape of the data being received.",
-  "challengesAndSolutions": "The project involved several complex aspects, such as adapting to Vue 3 during its beta, understanding the Rust back-end, and using service workers.\n\nThese challenges were tackled through a mixture of dedication, continuous learning, and effective problem-solving strategies.",
-  "resultsAchieved": "Successful development of a new CMS, Bridge UI, with improved functionality and efficiency.",
+  "summary": "Front‑end lead on an internal CMS UI for installs.",
   "media": [
     {
       "image": "/work/projects/ds-bridge/media/0/image.png",
-      "caption": "A sneak peek at the tree structure used in Downstream Bridge. Image credit: Downstream"
+      "caption": "A sneak peek at the tree structure used in Downstream Bridge. Image credit: Downstream",
+      "alt": "Bridge CMS project tree UI"
+    },
+    {
+      "image": "/work/projects/ds-bridge/media/1/image.jpg",
+      "caption": "Some of the inputs used in Downstream Bridge.",
+      "alt": "Some of the inputs used in Downstream Bridge."
     }
   ],
   "isFeatured": true,
@@ -22,8 +26,45 @@
     "tailwind-css"
   ],
   "cta": {
-    "text": "Need to connect systems that hate each other? I specialize in digital diplomacy - making your tech stack play nice together.",
-    "buttonText": "Bridge Your Systems",
-    "buttonLink": "/contact"
-  }
+    "text": "Have systems that need to work together? I can help map the problem and build the glue.",
+    "buttonText": "Talk details",
+    "buttonLink": "/reach-out"
+  },
+  "oneLiner": "A CMS UI for installs—front‑end on Vue 3 + TypeScript over a Rust back end.",
+  "problem": "Downstream needed a dependable CMS interface for experiential projects. The existing setup was split across versions and tooling, and the UI had to evolve while a Rust back end was taking shape.",
+  "scope": [
+    "Led front‑end development for Bridge UI",
+    "Migrated components from Vue 2 → Vue 3 (during beta)",
+    "Converted the app to TypeScript",
+    "Moved the build from Webpack to Vite",
+    "Implemented service workers for cross‑tab comms and delta polling",
+    "Read Rust code to map/validate data shapes in the UI"
+  ],
+  "decisions": [
+    "Adopted Vite for faster, simpler builds",
+    "Introduced strict typing to stabilize integration with the Rust API",
+    "Used a service worker to coordinate multiple tabs and background polling",
+    "Established patterns for component structure and data flow so future work stayed consistent"
+  ],
+  "outcome": "A stable, faster UI layer that played nicely with the Rust services and made day‑to‑day authoring predictable.",
+  "notes": "If I did it again, I’d generate types from the Rust models to remove a class of mapping bugs. This would have been a great way of keeping the two sides of the app in sync.",
+  "status": "shipped",
+  "links": [
+    {
+      "label": "Official Bridge Website",
+      "href": "https://www.downstream.com/bridge?hsCtaAttrib=177686930710"
+    }
+  ],
+  "a11y": {
+    "coverAlt": "Bridge CMS UI showing the project tree structure."
+  },
+  "teaser": {
+    "headline": "A CMS UI for installs",
+    "subline": "Led the front‑end and moved the stack to Vue 3 + TypeScript"
+  },
+  "impactTags": [
+    "maintainability",
+    "developer-experience",
+    "performance"
+  ]
 }

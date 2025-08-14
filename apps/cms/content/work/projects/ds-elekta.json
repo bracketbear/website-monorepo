@@ -3,9 +3,26 @@
   "job": "ds-experience-developer",
   "duration": "3 Months",
   "coverImage": "coverImage.jpg",
-  "description": "This was an update to an app for an existing client. We were tasked with adding a bunch of additional features that would allow the client to customize their Boardroom presentations on a per-platform basis. The client also wanted to add functionality to create custom \"context\" menu buttons. Finally, we wanted to be able to make the apps work on Surface 3 tablets so their sales people could take the experience with them on trips and to conferences.",
-  "challengesAndSolutions": "The custom context menu buttons were a real head scratcher. As a company, we hadn't really done this before so it was up to myself and the Experience Developer I was working with to figure out how to get it done. I designed the database schema and joined these new menu items to existing items that were already in the database. I also wanted to create a cool and intuitive way to manage the menu items, so I created a Vue 2 widget that could be used to drag-and-drop the menu items. This was my first time using Vue and I was very happy with the result!",
-  "resultsAchieved": "A more customizable and user-controlled application that gave sales people and executives a really cool tool to sweep their clients off of their feet.",
+  "summary": "Boardroom app updates: more control, tablet support.",
+  "oneLiner": "Updates to an executive boardroom app: per‑platform customization, custom context menus, and Surface tablet support.",
+  "problem": "Elekta needed fine‑grained control of presentations across platforms, plus a way to expose quick actions via context menus and run the experience on Surface 3 tablets.",
+  "scope": [
+    "Designed the database schema for custom context actions",
+    "Linked new buttons to existing content types",
+    "Built a Vue 2 drag‑and‑drop editor for managing menus",
+    "Helped adapt the experience for Surface tablets"
+  ],
+  "decisions": [
+    "Modeled context actions as first‑class entities with clean relations",
+    "Built a reusable menu editor instead of ad‑hoc forms",
+    "Kept platform‑specific logic isolated so behavior stayed predictable"
+  ],
+  "outcome": "A more customizable app that let sales and executives tailor the experience quickly and take it on the road.",
+  "notes": "My first time using Vue—happy with how the editor felt. Next time I’d add a tiny test suite around the menu logic.",
+  "status": "shipped",
+  "a11y": {
+    "coverAlt": "Two people walking in front of a Downstream screen."
+  },
   "mediaDescription": "Two people walking in front of the Downstream screen.",
   "isFeatured": false,
   "category": "experiential-engineering",
@@ -18,10 +35,17 @@
     "html",
     "css"
   ],
-  "summary": "The project that I thought would change the way we looked at an experiential CMS.",
+  "impactTags": [
+    "usability",
+    "reusability"
+  ],
+  "teaser": {
+    "headline": "Boardroom control that fits the room",
+    "subline": "Custom actions, per‑platform tweaks, and tablet support"
+  },
   "cta": {
-    "text": "Want to create something that makes people go 'wow'? Let's build an experience that'll have your clients raving about it!",
-    "buttonText": "Create the Wow Factor",
-    "buttonLink": "/contact"
+    "text": "Working on a similar control surface? Happy to talk through options.",
+    "buttonText": "Start a conversation",
+    "buttonLink": "/reach-out"
   }
 }

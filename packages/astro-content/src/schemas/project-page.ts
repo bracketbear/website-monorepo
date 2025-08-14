@@ -21,6 +21,11 @@ export const portfolioProjectPageSchema = makePageSchema({
     challenges: z.string().default('Challenges & Solutions'),
     results: z.string().default('Results Achieved'),
     gallery: z.string().default('Project Gallery'),
+    roleScope: z.string().default('My Role'),
+    notes: z.string().default('Notes'),
+    stack: z.string().default('Stack'),
+    links: z.string().default('Links'),
+    impact: z.string().default('Impact'),
   }),
 
   // Default CTA (can be overridden by project-specific CTA)

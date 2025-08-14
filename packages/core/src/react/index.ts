@@ -14,3 +14,15 @@ export { Slider } from './Slider';
 export { ContactIcon } from './ContactIcon';
 export * from './hooks';
 export { Testimonial, type TestimonialProps } from './Testimonial';
+
+// Modal system
+export { Modal, type ModalProps } from './Modal';
+export { AlertModal, type AlertModalProps } from './AlertModal';
+export { ConfirmModal, type ConfirmModalProps } from './ConfirmModal';
+export { ImageViewerModal, type ImageViewerModalProps, type ImageItem } from './ImageViewerModal';
+
+// Gallery
+export { ImageGallery, type ImageGalleryProps, type GalleryImage } from './ImageGallery';
+
+// Demo
+export { ModalDemo } from './ModalDemo';

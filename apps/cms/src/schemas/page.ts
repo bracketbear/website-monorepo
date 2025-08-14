@@ -94,10 +94,10 @@ export function makePageSchema(
   const baseFields = makeBasePageFields();
   const showCta = options?.showCta !== false; // Default to true for backward compatibility
 
-  // Define CTA fields
-  const ctaFields = showCta
-    ? {
-        contactCTA: fields.object({
+  // Define CTA fields - always include the field but make it optional when showCta is false
+  const ctaFields = {
+    contactCTA: showCta
+      ? fields.object({
           text: fields.text({
             label: 'CTA Text',
             description: 'Call-to-action text',
@@ -111,9 +111,26 @@ export function makePageSchema(
             label: 'Button Link',
             defaultValue: '/contact',
           }),
+        })
+      : fields.object({
+          text: fields.text({
+            label: 'CTA Text',
+            description: 'Call-to-action text (disabled when showCta is false)',
+            multiline: true,
+            validation: { isRequired: false },
+          }),
+          buttonText: fields.text({
+            label: 'Button Text',
+            defaultValue: 'Get In Touch',
+            validation: { isRequired: false },
+          }),
+          buttonLink: fields.text({
+            label: 'Button Link',
+            defaultValue: '/contact',
+            validation: { isRequired: false },
+          }),
         }),
-      }
-    : {};
+  };
 
   if (!extras) {
     return {

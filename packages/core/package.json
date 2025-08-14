@@ -59,6 +59,7 @@
   "dependencies": {
     "@fontsource/fira-sans": "^5.2.6",
     "@fontsource/oswald": "^5.2.6",
+    "@headlessui/react": "^2.2.7",
     "gsap": "^3.13.0",
     "pixi.js": "^8.10.2",
     "zod": "^3.25.76"

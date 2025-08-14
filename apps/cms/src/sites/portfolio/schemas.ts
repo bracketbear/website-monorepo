@@ -615,6 +615,32 @@ export const portfolioProjectPageSchema = makePageSchema({
       description: 'Title for the project gallery section',
       defaultValue: 'Project Gallery',
     }),
+    // Additional section headings
+    roleScope: fields.text({
+      label: 'Role Scope Section Title',
+      description: 'Title for the role scope section',
+      defaultValue: 'My Role',
+    }),
+    notes: fields.text({
+      label: 'Notes Section Title',
+      description: 'Title for the notes section',
+      defaultValue: 'Notes',
+    }),
+    stack: fields.text({
+      label: 'Stack Section Title',
+      description: 'Title for the technology stack section',
+      defaultValue: 'Stack',
+    }),
+    links: fields.text({
+      label: 'Links Section Title',
+      description: 'Title for the links section',
+      defaultValue: 'Links',
+    }),
+    impact: fields.text({
+      label: 'Impact Section Title',
+      description: 'Title for the impact section',
+      defaultValue: 'Impact',
+    }),
   }),
 
   // Default CTA (can be overridden by project-specific CTA)

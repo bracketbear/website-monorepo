@@ -178,6 +178,10 @@ export const workCollections = {
             publicPath: '/work/projects/',
           }),
           caption: fields.text({ label: 'Caption' }),
+          alt: fields.text({
+            label: 'Alt Text',
+            description: 'Accessibility description for the image',
+          }),
         }),
         {
           label: 'Media',
@@ -222,6 +226,101 @@ export const workCollections = {
           description: 'Custom CTA for this project page',
         }
       ),
+      // New story-first fields
+      oneLiner: fields.text({
+        label: 'One Liner',
+        description: 'Short explainer under the title (max 120 chars)',
+        multiline: false,
+        validation: { length: { max: 120 } },
+      }),
+      problem: fields.text({
+        label: 'Problem',
+        description:
+          'Plain-English description of the problem this project solved',
+        multiline: true,
+      }),
+      scope: fields.array(
+        fields.text({ label: 'Scope Item', multiline: true }),
+        {
+          label: 'Scope',
+          description: 'Your responsibilities and what you worked on',
+          itemLabel: (props) => props.value || 'New Scope Item',
+        }
+      ),
+      decisions: fields.array(
+        fields.text({ label: 'Decision Item', multiline: true }),
+        {
+          label: 'Key Decisions',
+          description: '3-5 key choices or tradeoffs you made',
+          itemLabel: (props) => props.value || 'New Decision',
+        }
+      ),
+      outcome: fields.text({
+        label: 'Outcome',
+        description:
+          'What changed as a result of this project (qualitative OK)',
+        multiline: true,
+      }),
+      notes: fields.text({
+        label: 'Notes',
+        description: 'Behind-the-build insights or reflection',
+        multiline: true,
+      }),
+      status: fields.select({
+        label: 'Status',
+        description: 'Current status of the project',
+        defaultValue: 'shipped',
+        options: [
+          { label: 'Shipped', value: 'shipped' },
+          { label: 'Prototype', value: 'prototype' },
+          { label: 'Retired', value: 'retired' },
+          { label: 'Paused', value: 'paused' },
+        ],
+      }),
+      links: fields.array(
+        fields.object({
+          label: fields.text({ label: 'Link Label' }),
+          href: fields.url({ label: 'Link URL' }),
+        }),
+        {
+          label: 'External Links',
+          description: 'Links to live demos, documentation, etc.',
+          itemLabel: (props) => props.fields.label.value || 'New Link',
+        }
+      ),
+      a11y: fields.object(
+        {
+          coverAlt: fields.text({
+            label: 'Cover Image Alt Text',
+            description: 'Accessibility description for the cover image',
+          }),
+        },
+        {
+          label: 'Accessibility',
+          description: 'Accessibility-related fields',
+        }
+      ),
+      teaser: fields.object(
+        {
+          headline: fields.text({
+            label: 'Teaser Headline',
+            description: 'Alternative headline for project cards',
+          }),
+          subline: fields.text({
+            label: 'Teaser Subline',
+            description: 'Alternative subline for project cards',
+          }),
+        },
+        {
+          label: 'Teaser Content',
+          description: 'Alternative content for project cards and listings',
+        }
+      ),
+      impactTags: fields.array(fields.text({ label: 'Impact Tag' }), {
+        label: 'Impact Tags',
+        description: 'Tags that describe the impact of this project',
+        itemLabel: (props) => props.value || 'New Impact Tag',
+      }),
     },
   }),
 };

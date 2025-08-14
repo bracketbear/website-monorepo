@@ -3,9 +3,25 @@
   "job": "ds-experience-developer",
   "duration": "1 Year",
   "coverImage": "coverImage.jpg",
-  "description": "We were tasked with creating an application for PwC that would handle multiple types of screens with varying purposes: - a digital signage platform for the elevator lobbies that display the current time, photos, upcoming events, and announcements - a digital LED film screen that was placed over a glass wall that could be transparent when nothing was happening or it could show effects, messages, or completely block off visibility into the meeting room if needed. This screen also had lidar sensors that tracked when people walked past the wall and we used those coordinates as inputs that affected the way the effects would be displayed - a \"mosaic\" wall made up of multiple displays that could each show their own content or one image or effect, which created a non-rectangular effect that you can't really see in most digital experiences - the Learning Zone, which I had the most impact on, which was an interactive animated \"point-and-click\" type adventure that could teach you about taxes, auditing, and about PwC as a whole. There were about 20 different interactive widgets that a user could interact with. In addition, an admin could enter a password and access a presentation mode to display images, PDFs, and slide decks.",
-  "challengesAndSolutions": "This project was challenging because there were a ton of things that we hadn't quite done before in a project. The biggest challenge that I faced was that this was my first professional experiential technology app. I had to learn C++ in about a month, then switch from MacOS to Windows, wrap my head around the behemoth that is Visual Studio, understand how our in-house framework worked, and then I had to understand graphics math. This felt like an insurmountable task at first, but luckily my team taught me lessons they had learned over the years and I was given plenty of space and time to make mistakes and to learn from them. I couldn't have asked for a better situation to take this project on. Second, this was the first project where we decided to have all of the platforms and screens run the same application. Previously, all of our projects would have smaller apps that would handle individual screens. This helped with separating concerns but also led to having to juggle multiple apps for the same client, which presented its own set of challenges. By merging all of the platforms into one application, we were able to come up with a solution that we would use in other projects down the road.",
-  "resultsAchieved": "An amazing application that people gravitate towards whenever they see it. I actually got to travel to Washington D.C. to install the application before their office opened their doors to their employees for the first time. One of the coolest experiences I've had professionally was being able to see my app and the Capitol building at the same time.",
+  "summary": "Unified app powering signage, LED film, a mosaic wall, and an interactive Learning Zone.",
+  "oneLiner": "A multi‑screen installation for PwC built as a single application: elevator signage, LED film, a mosaic wall, and a Learning Zone.",
+  "problem": "Previous projects split features across multiple small apps, which made operations harder. PwC needed one application that could drive very different displays and inputs, from LED film with lidar sensors to an interactive learning space.",
+  "scope": [
+    "Learned C++/Windows/Visual Studio quickly and contributed production code",
+    "Built interactive modules for the Learning Zone, including an admin presentation mode",
+    "Helped unify disparate screens into one application with consistent patterns"
+  ],
+  "decisions": [
+    "Chose a single codebase to simplify deployment and support",
+    "Modeled content per screen so each surface stayed flexible",
+    "Mapped lidar inputs to visual effects with predictable scaling"
+  ],
+  "outcome": "A dependable installation that people gravitated to. Personal highlight: seeing the app live while looking out at the Capitol during install week.",
+  "notes": "With more time I’d add lightweight telemetry and automated checks for multi‑screen edge cases.",
+  "status": "shipped",
+  "a11y": {
+    "coverAlt": "Person standing in front of a large interactive screen at PwC."
+  },
   "mediaDescription": "Man standing in front of giant screen with interactive items on it.",
   "isFeatured": false,
   "category": "experiential-engineering",
@@ -15,10 +31,17 @@
     "photoshop",
     "git"
   ],
-  "summary": "The project that I thought would change the way we looked at an experiential CMS.",
+  "impactTags": [
+    "reliability",
+    "systems"
+  ],
+  "teaser": {
+    "headline": "One app, many surfaces",
+    "subline": "Signage, LED film, mosaic wall, and an interactive Learning Zone"
+  },
   "cta": {
-    "text": "Want to create an interactive experience that makes people stop and stare? Let's build something that'll have your visitors talking about it for weeks!",
-    "buttonText": "Create the Experience",
-    "buttonLink": "/contact"
+    "text": "Have a complex install to wrangle? Let’s make the operations simple.",
+    "buttonText": "Talk details",
+    "buttonLink": "/reach-out"
   }
 }

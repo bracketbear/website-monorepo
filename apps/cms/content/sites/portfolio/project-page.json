@@ -9,7 +9,12 @@
     "overview": "About This Project",
     "challenges": "Challenges & Solutions",
     "results": "Results Achieved",
-    "gallery": "Project Gallery"
+    "gallery": "Project Gallery",
+    "roleScope": "My Role",
+    "notes": "Notes",
+    "stack": "Stack",
+    "links": "Links",
+    "impact": "Impact"
   },
   "defaultCTA": {
     "text": "I'd love to discuss how I can help with your project.",

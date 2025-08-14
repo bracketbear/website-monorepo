@@ -7,6 +7,10 @@ import { getBreadcrumbs } from '@/config/breadcrumbs';
 import { generatePortfolioMetaTitle } from '@/config/meta-title';
 import HeroLayout from '@/layouts/HeroLayout.astro';
 import { Picture } from 'astro:assets';
+import Section from '@/components/Section.astro';
+import Callout from '@/components/Callout.astro';
+import SkillsAccordion from '@/components/SkillsAccordion.astro';
+import { ImageGallery } from '@bracketbear/core/react';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const workProjects = await getCollection('workProject');
@@ -70,47 +74,9 @@ if (workProjectItem.data.coverImage) {
   }
 }
 
-// Generate witty CTA based on project data
-function generateWittyCTA(project: any, job: any, company: string): string {
-  const projectTitle = project.data.title.toLowerCase();
-  const _companyName = company.toLowerCase();
-
-  // Witty CTAs based on project type and company
-  if (projectTitle.includes('museum') || projectTitle.includes('experience')) {
-    return "Want to create something that makes people go 'wow'? Let's build an experience that'll have your users raving about it!";
-  }
-
-  if (projectTitle.includes('cms') || projectTitle.includes('content')) {
-    return "Tired of fighting with your content management system? Let's build one that actually works (and doesn't make you want to throw your computer out the window).";
-  }
-
-  if (projectTitle.includes('bridge') || projectTitle.includes('connection')) {
-    return 'Need to connect systems that hate each other? I specialize in digital diplomacy - making your tech stack play nice together.';
-  }
-
-  if (company.includes('deeplocal')) {
-    return "Want to create something as weird and wonderful as the projects I built at DeepLocal? Let's make something that makes people stop and stare!";
-  }
-
-  if (company.includes('downstream')) {
-    return "Need someone who can turn complex business problems into elegant solutions? Let's build something that actually makes sense to your users.";
-  }
-
-  if (project.data.isFeatured) {
-    return "This was one of my favorite projects - want to create something equally awesome? Let's build something that'll make your competitors jealous!";
-  }
-
-  // Default witty CTA
-  return "Ready to build something that doesn't suck? Let's create something that'll make your users actually want to use your product!";
-}
-
-const wittyCTA = generateWittyCTA(workProjectItem, job, companyTitle);
-
-// Use project-specific CTA if available, otherwise use CMS default, then fallback to witty CTA
+// Use project-specific CTA if available, otherwise use CMS default
 const ctaText =
-  workProjectItem.data.cta?.text ||
-  projectPage?.data.defaultCTA?.text ||
-  wittyCTA;
+  workProjectItem.data.cta?.text || projectPage?.data.defaultCTA?.text;
 const ctaButtonText =
   workProjectItem.data.cta?.buttonText ||
   projectPage?.data.defaultCTA?.buttonText ||
@@ -131,20 +97,49 @@ const breadcrumbs = getBreadcrumbs(
   }
 );
 
-// Helper function to format skills as text
-function formatSkillsText(skills: any[]): string {
-  const skillNames = skills.slice(0, 3).map((skill: any) => skill?.data.title);
-  const moreCount = skills.length - 3;
+// Story-first layout data preparation
+const {
+  title,
+  oneLiner,
+  teaser,
+  summary,
+  a11y,
+  coverImage,
+  problem,
+  description,
+  scope,
+  decisions,
+  challengesAndSolutions,
+  outcome,
+  resultsAchieved,
+  notes,
+  status,
+  links,
+  impactTags,
+  skills,
+  cta,
+} = workProjectItem.data;
 
-  if (moreCount > 0) {
-    return `${skillNames.join(', ')} +${moreCount} more`;
-  }
-
-  return skillNames.join(', ');
-}
+// Fallback logic for story-first layout
+const subline = oneLiner ?? teaser?.headline ?? teaser?.subline ?? summary;
+const heroAlt = a11y?.coverAlt ?? title;
+const statusTone =
+  status === 'shipped'
+    ? 'positive'
+    : status === 'prototype'
+      ? 'info'
+      : 'neutral';
 
 // Define stats data
 const stats = [
+  ...(status
+    ? [
+        {
+          label: projectPage?.data.sectionHeadings?.status || 'Status',
+          value: status,
+        },
+      ]
+    : []),
   ...(job !== undefined
     ? [
         {
@@ -165,15 +160,6 @@ const stats = [
         },
       ]
     : []),
-  ...(projectSkills.length > 0
-    ? [
-        {
-          label:
-            projectPage?.data.sectionHeadings?.technologies || 'Technologies',
-          value: formatSkillsText(projectSkills),
-        },
-      ]
-    : []),
 ];
 ---
 
@@ -181,7 +167,7 @@ const stats = [
   pageTitle={workProjectItem.data.title}
   title={workProjectItem.data.title}
   subtitle={category?.data.title}
-  description={workProjectItem.data.summary}
+  description={subline}
   breadcrumbs={breadcrumbs}
   animationPreset="curious-particle-network"
   stats={stats}
@@ -192,108 +178,198 @@ const stats = [
   }}
   metaDescription={metaDescription}
 >
-  <!-- Main Content -->
+  <!-- Story-First Content Layout -->
   <section class="mb-40 px-6">
     <div class="container mx-auto">
       <div class="mx-auto max-w-4xl">
         <div class="space-y-16">
-          <!-- Description -->
+          {/* Cover Image Band */}
           {
-            workProjectItem.data.description?.trim() !== '' && (
-              <div>
-                <h2 class="font-heading mb-8 text-3xl font-black tracking-tight text-white uppercase">
-                  {projectPage?.data.sectionHeadings?.overview ||
-                    'About This Project'}
-                </h2>
-                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90">
-                  <p>{workProjectItem.data.description}</p>
-                </div>
-              </div>
-            )
-          }
-
-          <!-- Challenges & Solutions -->
-          {
-            workProjectItem.data.challengesAndSolutions?.trim() !== '' && (
-              <div>
-                <h2 class="font-heading mb-8 text-3xl font-black tracking-tight text-white uppercase">
-                  {projectPage?.data.sectionHeadings?.challenges ||
-                    'Challenges & Solutions'}
-                </h2>
-                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90">
-                  <p>{workProjectItem.data.challengesAndSolutions}</p>
-                </div>
-              </div>
-            )
-          }
-
-          <!-- Results -->
-          {
-            workProjectItem.data.resultsAchieved?.trim() !== '' && (
-              <div>
-                <h2 class="font-heading mb-8 text-3xl font-black tracking-tight text-white uppercase">
-                  {projectPage?.data.sectionHeadings?.results ||
-                    'Results Achieved'}
-                </h2>
-                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-xl leading-relaxed text-white/90">
-                  <p>{workProjectItem.data.resultsAchieved}</p>
-                </div>
-              </div>
-            )
-          }
-
-          <!-- Media Gallery -->
-          {
-            (workProjectItem.data.media ?? []).length > 0 && (
-              <div>
-                <h2 class="font-heading mb-8 text-3xl font-black tracking-tight text-white uppercase">
-                  {projectPage?.data.sectionHeadings?.gallery ||
-                    'Project Gallery'}
-                </h2>
+            _coverImage && (
+              <figure class="overflow-hidden rounded-lg border border-white/10">
+                <Picture
+                  src={_coverImage}
+                  alt={heroAlt}
+                  width={1280}
+                  height={720}
+                  formats={['avif', 'webp']}
+                  layout="full-width"
+                  fit="cover"
+                />
                 {workProjectItem.data.mediaDescription && (
-                  <p class="mb-8 text-lg text-white/90">
+                  <figcaption class="mt-2 text-sm text-white/70">
                     {workProjectItem.data.mediaDescription}
-                  </p>
+                  </figcaption>
                 )}
-                <div class="grid grid-cols-2 gap-6 md:grid-cols-3">
-                  {(workProjectItem.data.media ?? []).map(
-                    async (mediaItem: any) => {
-                      if (!mediaItem?.image) return null;
+              </figure>
+            )
+          }
 
-                      let imageUrl: string;
-                      try {
-                        imageUrl = getProjectImageUrl(
-                          workProjectItem.id,
-                          mediaItem.image
-                        );
-                      } catch (error) {
-                        console.warn(
-                          `Failed to load media image: ${mediaItem.image}`,
-                          error
-                        );
-                        return null;
-                      }
+          {/* Stack */}
+          {
+            Array.isArray(skills) && skills.length > 0 && (
+              <SkillsAccordion
+                skills={projectSkills}
+                defaultOpen={true}
+                title="Tech Stack"
+              />
+            )
+          }
 
-                      return (
-                        <div class="aspect-video overflow-hidden rounded-lg">
-                          <Picture
-                            src={imageUrl}
-                            alt={
-                              mediaItem.caption || workProjectItem.data.title
-                            }
-                            class="h-full w-full object-cover"
-                            width={400}
-                            height={300}
-                            formats={['avif', 'webp']}
-                            layout="full-width"
-                            fit="cover"
-                          />
-                        </div>
-                      );
-                    }
-                  )}
+          {/* Problem */}
+          {
+            (problem || description) && (
+              <Section title="Problem">
+                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-white/90">
+                  {problem ?? description}
                 </div>
-              </div>
+              </Section>
+            )
+          }
+
+          {/* My role */}
+          {
+            Array.isArray(scope) && scope.length > 0 && (
+              <Section title="My role">
+                <ul class="prose prose-lg prose-headings:text-white prose-p:text-white/90 list-disc pl-6 text-white/90">
+                  {scope.map((item: string) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </Section>
+            )
+          }
+
+          {/* What I changed */}
+          {
+            (Array.isArray(decisions) && decisions.length) ||
+            !!challengesAndSolutions ? (
+              <Section title="What I changed">
+                {Array.isArray(decisions) && decisions.length ? (
+                  <ul class="prose prose-lg prose-headings:text-white prose-p:text-white/90 list-disc pl-6 text-white/90">
+                    {decisions.map((d: string) => (
+                      <li class="mb-2">{d}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-white/90">
+                    {challengesAndSolutions}
+                  </div>
+                )}
+              </Section>
+            ) : null
+          }
+
+          {/* How it ended */}
+          {
+            (outcome || resultsAchieved) && (
+              <Section title="How it ended">
+                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-white/90">
+                  {outcome ?? resultsAchieved}
+                </div>
+              </Section>
+            )
+          }
+
+          {/* Notes / behind the build */}
+          {
+            notes && (
+              <Section title="Notes">
+                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-white/90">
+                  {notes}
+                </div>
+              </Section>
+            )
+          }
+
+          {/* Gallery */}
+          {
+            Array.isArray(workProjectItem.data.media) &&
+              workProjectItem.data.media.length > 0 && (
+                <Section
+                  title={
+                    projectPage?.data.sectionHeadings?.gallery || 'Gallery'
+                  }
+                >
+                  {(() => {
+                    // Process media items to create gallery images
+                    const galleryImages = workProjectItem.data.media
+                      .filter((item: any) => item?.image)
+                      .map((item: any) => {
+                        let imageUrl: string;
+                        try {
+                          imageUrl = getProjectImageUrl(
+                            workProjectItem.id,
+                            item.image
+                          );
+                        } catch (error) {
+                          console.warn(
+                            `Failed to load media image: ${item.image}`,
+                            error
+                          );
+                          return null;
+                        }
+
+                        return {
+                          src: imageUrl,
+                          alt:
+                            item.alt ??
+                            item.caption ??
+                            workProjectItem.data.title,
+                          caption: item.caption,
+                        };
+                      })
+                      .filter(Boolean);
+
+                    if (!galleryImages || galleryImages.length === 0) {
+                      return null;
+                    }
+
+                    return (
+                      <ImageGallery
+                        images={galleryImages}
+                        columns={3}
+                        showCaptions={true}
+                        client:load
+                      />
+                    );
+                  })()}
+                </Section>
+              )
+          }
+
+          {/* Links */}
+          {
+            Array.isArray(links) && links.length > 0 && (
+              <Section title="Links">
+                <ul class="prose prose-lg prose-headings:text-white prose-p:text-white/90 list-disc pl-6 text-white/90">
+                  {links.map((l: { href: string; label: string }) => (
+                    <li>
+                      <a
+                        href={l.href}
+                        target="_blank"
+                        rel="noopener"
+                        class="text-brand-yellow underline hover:no-underline"
+                      >
+                        {l.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </Section>
+            )
+          }
+
+          {/* Impact */}
+          {
+            Array.isArray(impactTags) && impactTags.length > 0 && (
+              <Section title="Impact">
+                <div class="flex flex-wrap gap-2">
+                  {impactTags.map((tag: string) => (
+                    <span class="pill pill-brand-orange pill-sm">{tag}</span>
+                  ))}
+                </div>
+              </Section>
             )
           }
         </div>
