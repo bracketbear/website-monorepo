@@ -2,7 +2,8 @@ import { forwardRef } from 'react';
 import { Modal, type ModalProps } from './Modal';
 import { Button } from './Button';
 
-export interface ConfirmModalProps extends Omit<ModalProps, 'children' | 'title'> {
+export interface ConfirmModalProps
+  extends Omit<ModalProps, 'children' | 'title'> {
   /** Confirmation title */
   title: string;
   /** Confirmation message */
@@ -12,7 +13,7 @@ export interface ConfirmModalProps extends Omit<ModalProps, 'children' | 'title'
   /** Cancel button text */
   cancelText?: string;
   /** Confirm button variant */
-  confirmVariant?: 'primary' | 'secondary' | 'danger';
+  confirmVariant?: 'primary' | 'secondary' | 'error';
   /** Cancel button variant */
   cancelVariant?: 'primary' | 'secondary';
   /** Callback when confirmed */
@@ -64,12 +65,8 @@ export const ConfirmModal = forwardRef<HTMLDivElement, ConfirmModalProps>(
       >
         <div className="space-y-6">
           <p className="text-brand-dark text-lg">{message}</p>
-          <div className="flex gap-3 justify-end">
-            <Button
-              variant={cancelVariant}
-              size="md"
-              onClick={handleCancel}
-            >
+          <div className="flex justify-end gap-3">
+            <Button variant={cancelVariant} size="md" onClick={handleCancel}>
               {cancelText}
             </Button>
             <Button
