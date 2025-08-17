@@ -93,13 +93,13 @@ export default function AnimationStage({
           {...debugControlsProps}
           manifest={debugControlsProps.manifest}
           className={clsx(
-            'absolute top-4 right-4 z-50',
+            'absolute top-4 right-4 z-30',
             debugControlsClassName
           )}
         />
       )}
       {showResetToast && (
-        <div className="animate-toast-in card fixed bottom-8 left-1/2 z-50 -translate-x-1/2 px-6 py-3 text-lg font-bold shadow-xl">
+        <div className="animate-toast-in card fixed bottom-8 left-1/2 z-30 -translate-x-1/2 px-6 py-3 text-lg font-bold shadow-xl">
           Animation reset
         </div>
       )}

@@ -180,7 +180,7 @@ const { items: navItems, branding, socialLinks } = config;
   <!-- Mobile Menu -->
   <div
     id="mobile-menu"
-    class="border-default bg-background fixed top-0 right-0 z-500 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
+    class="border-default bg-background fixed top-0 right-0 z-40 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
   >
     <div class="p-6">
       <div>
@@ -273,7 +273,7 @@ const { items: navItems, branding, socialLinks } = config;
   <!-- Mobile Menu Overlay -->
   <div
     id="mobile-menu-overlay"
-    class="fixed inset-0 z-40 hidden bg-black/60 opacity-0 transition-opacity duration-300"
+    class="fixed inset-0 z-30 hidden bg-black/60 opacity-0 transition-opacity duration-300"
     style="background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.4) 1px, transparent 1px); background-size: 8px 8px;"
   >
   </div>
@@ -299,18 +299,18 @@ const { items: navItems, branding, socialLinks } = config;
 
     const openMenu = () => {
       mobileMenu.classList.remove('translate-x-full');
-      mobileMenuOverlay.classList.remove('hidden', '-z-40');
+      mobileMenuOverlay.classList.remove('hidden', '-z-30');
       setTimeout(() => {
-        mobileMenuOverlay.classList.add('opacity-50', 'z-40');
+        mobileMenuOverlay.classList.add('opacity-50', 'z-30');
       }, 10);
       document.body.style.overflow = 'hidden';
     };
 
     const closeMenu = () => {
       mobileMenu.classList.add('translate-x-full');
-      mobileMenuOverlay.classList.remove('opacity-50', 'z-40');
+      mobileMenuOverlay.classList.remove('opacity-50', 'z-30');
       setTimeout(() => {
-        mobileMenuOverlay.classList.add('hidden', '-z-40');
+        mobileMenuOverlay.classList.add('hidden', '-z-30');
       }, 300);
       document.body.style.overflow = '';
     };

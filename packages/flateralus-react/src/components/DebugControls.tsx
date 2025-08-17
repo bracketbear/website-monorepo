@@ -292,7 +292,7 @@ const DebugControls = memo<DebugControlsProps>(
           </div>
         )}
         {toastMessage && (
-          <div className="animate-toast-in card fixed bottom-8 left-1/2 z-50 -translate-x-1/2 px-6 py-3 text-lg font-bold shadow-xl">
+          <div className="animate-toast-in card fixed bottom-8 left-1/2 z-30 -translate-x-1/2 px-6 py-3 text-lg font-bold shadow-xl">
             {toastMessage}
           </div>
         )}
