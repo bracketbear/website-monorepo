@@ -1,7 +1,6 @@
 import type { NavigationConfig, NavItem } from '@bracketbear/core';
 
 export const navItems: NavItem[] = [
-  { name: 'Home', href: '/' },
   { name: 'About Me', href: '/about' },
   { name: 'Work History', href: '/work' },
   { name: 'Projects', href: '/projects' },

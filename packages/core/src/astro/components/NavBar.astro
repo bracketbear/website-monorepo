@@ -20,9 +20,7 @@ const { items: navItems, branding, socialLinks } = config;
       : 'border-foreground bg-brand-orange',
   ]}
 >
-  <div
-    class="container mx-auto flex h-full items-center justify-between px-6 py-4"
-  >
+  <div class="container mx-auto flex h-full items-center justify-between py-4">
     <!-- Logo Section -->
     <div class="flex items-center gap-4">
       {
@@ -160,7 +158,7 @@ const { items: navItems, branding, socialLinks } = config;
     <!-- Mobile Menu Button -->
     <Button
       class="p-2 md:hidden"
-      variant="ghostDark"
+      variant="secondary"
       id="mobile-menu-button"
       type="button"
     >
@@ -182,18 +180,23 @@ const { items: navItems, branding, socialLinks } = config;
   <!-- Mobile Menu -->
   <div
     id="mobile-menu"
-    class="border-default bg-background fixed top-0 right-0 z-50 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
+    class="border-default bg-background fixed top-0 right-0 z-500 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
   >
     <div class="p-6">
+      <div>
+        <div class="text-foreground font-heading text-4xl font-black uppercase">
+          Navigation
+        </div>
+      </div>
       <Button
         id="close-menu-button"
         class="absolute top-4 right-4"
-        variant="ghostLight"
+        variant="dark"
         type="button"
         size="sm"
       >
         <svg
-          class="text-foreground h-6 w-6"
+          class="h-6 w-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -206,7 +209,7 @@ const { items: navItems, branding, socialLinks } = config;
         </svg>
       </Button>
 
-      <ul class="mt-8 space-y-4">
+      <ul class="mt-8">
         {
           navItems.map((item) => (
             <li>
@@ -231,11 +234,10 @@ const { items: navItems, branding, socialLinks } = config;
                   </ul>
                 </div>
               ) : (
-                <a
-                  href={item.href}
-                  class="text-foreground block font-black uppercase transition-transform hover:translate-x-1"
-                >
-                  {item.name}
+                <a href={item.href}>
+                  <div class="text-foreground font-heading block py-4 text-2xl font-black uppercase transition-transform hover:translate-x-1">
+                    {item.name}
+                  </div>
                 </a>
               )}
             </li>

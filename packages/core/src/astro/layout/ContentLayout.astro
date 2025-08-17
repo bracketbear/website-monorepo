@@ -21,7 +21,7 @@ const maxWidthClass = contentWidth === 'narrow' ? 'max-w-6xl' : '';
 <LayeredLayout title={title} {...rest}>
   {showHero && (
     <div class="bg-brand-dark relative pb-8">
-      <div class={clsx('container mx-auto px-6 py-12', {
+      <div class={clsx('container mx-auto py-12', {
         'max-w-6xl': contentWidth === 'narrow',
       })}>
         <div
@@ -80,7 +80,7 @@ const maxWidthClass = contentWidth === 'narrow' ? 'max-w-6xl' : '';
   
   <!-- Main Content -->
   <div class="bg-primary/50 min-h-screen py-24">
-    <div class={`container mx-auto ${maxWidthClass} px-6`}>
+          <div class={`container mx-auto ${maxWidthClass}`}>
       <slot />
     </div>
   </div>

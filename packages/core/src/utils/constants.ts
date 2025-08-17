@@ -13,6 +13,6 @@ export const THEME_CONSTANTS = {
 
 // Layout constants
 export const LAYOUT_CONSTANTS = {
-  CONTAINER_CLASS: 'container mx-auto px-6 py-4',
+  CONTAINER_CLASS: 'container mx-auto py-4',
   BRUTALIST_BORDER: 'border-default',
 } as const;

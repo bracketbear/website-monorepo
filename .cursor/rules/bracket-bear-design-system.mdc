@@ -28,7 +28,7 @@ The Bracket Bear design system follows a brutalist aesthetic that prioritizes bo
 ## Layout Patterns
 - **Card System**: Use the `card` utility class for all content containers
 - **Section Spacing**: Use `py-24` for major sections
-- **Container**: Use `container mx-auto px-6` for content wrapping
+- **Container**: Use `container mx-auto` for content wrapping
 - **Grid Layouts**: Use `grid gap-8` with responsive breakpoints (`md:grid-cols-2 lg:grid-cols-3`)
 - **Alternating Backgrounds**: Dark sections should contain light cards, light sections should contain dark cards
 

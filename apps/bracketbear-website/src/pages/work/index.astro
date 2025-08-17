@@ -13,7 +13,7 @@ const workSkillCategories = await getCollection('workSkillCategory');
 <Layout>
   <title>Work | Bracket Bear</title>
   <div class="bg-primary/50 py-24">
-    <div class="container mx-auto px-6">
+    <div class="container mx-auto">
       <div class="border-default bg-background mb-8 inline-block p-8">
         <h1 class="text-foreground text-5xl font-black uppercase">Work</h1>
       </div>
@@ -39,7 +39,7 @@ const workSkillCategories = await getCollection('workSkillCategory');
       </div>
     </div>
 
-    <div class="container mx-auto px-6 py-16">
+    <div class="container mx-auto py-16">
       <WorkSkillFilter
         skills={workSkills}
         skillCategories={workSkillCategories}

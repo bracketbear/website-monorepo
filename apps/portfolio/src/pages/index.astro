@@ -124,7 +124,7 @@ function parseMarkdown(content: string): string {
   {
     indexPage.data.layout.showAboutSection && (
       <section class="bg-brand-dark py-24">
-        <div class="container mx-auto px-6">
+        <div class="container mx-auto">
           <div class="mx-auto max-w-4xl text-center">
             <h2 class="font-heading text-brand-light mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
               {indexPage.data.about.title}
@@ -174,7 +174,7 @@ function parseMarkdown(content: string): string {
     indexPage.data.layout.showFeaturedProjects && (
       <section class="bg-brand-orange relative min-h-[600px] overflow-hidden py-24">
         <FeaturedProjectsWaveBG className="relative w-full" client:load>
-          <div class="relative z-10 container mx-auto px-6">
+          <div class="relative z-10 container mx-auto">
             <div class="mb-16 text-center">
               <h2 class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
                 {indexPage.data.featuredProjects.title}
@@ -218,7 +218,7 @@ function parseMarkdown(content: string): string {
   {
     indexPage.data.layout.showRecentExperience && (
       <section class="bg-brand-dark py-24">
-        <div class="container mx-auto px-6">
+        <div class="container mx-auto">
           <div class="mb-16 text-center">
             <h2 class="font-heading text-brand-light mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
               {indexPage.data.recentExperience.title}
@@ -299,7 +299,7 @@ function parseMarkdown(content: string): string {
   {
     indexPage.data.layout.showContactSection && (
       <section class="bg-brand-dark py-24">
-        <div class="container mx-auto px-6">
+        <div class="container mx-auto">
           <div class="mx-auto max-w-4xl text-center">
             <h2 class="font-heading text-brand-light mb-8 p-6 text-5xl font-black tracking-tight uppercase">
               {indexPage.data.contactCTA.title}
