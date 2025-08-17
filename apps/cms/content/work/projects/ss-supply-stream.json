@@ -8,13 +8,18 @@
   "media": [
     {
       "image": "/work/projects/ss-supply-stream/media/0/image.png",
-      "caption": "Screenshot of the SupplyStream e-commerce app's homepage",
+      "caption": "SupplyStream e-commerce landing page",
       "alt": "A screenshot of the SupplyStream e-commerce app's homepage."
     },
     {
       "image": "/work/projects/ss-supply-stream/media/1/image.png",
-      "caption": "A screenshot of the product page of the SupplyStream e-commerce app",
+      "caption": "SupplyStream Product Page",
       "alt": "A screenshot of the product page of the SupplyStream e-commerce app"
+    },
+    {
+      "image": "/work/projects/ss-supply-stream/media/2/image.png",
+      "caption": "SupplyStream checkout page",
+      "alt": "A screenshot of the SupplyStream e-commerce application's checkout page."
     }
   ],
   "isFeatured": false,
@@ -32,27 +37,32 @@
   "cta": {
     "text": "Need to modernize a storefront without starting over? Let’s map a path.",
     "buttonText": "Start a conversation",
-    "buttonLink": "/reach-out"
+    "buttonLink": "/contact"
   },
   "oneLiner": "Headless e‑commerce front‑end that moved a sales‑led model toward organic online orders.",
-  "problem": "The existing theme wasn’t built for a modern component approach. We needed a cleaner architecture and a path off the template system without breaking the business.",
+  "problem": "Our parent company wanted to create an e-commerce app that was built with modern tooling and custom theming",
   "scope": [
     "Integrated Vue into BigCommerce’s Stencil theme",
     "Migrated to a headless front‑end (Vue 3 / Nuxt 3)",
-    "Styled with TailwindCSS and wired to platform APIs"
+    "Styled with TailwindCSS and wired to platform APIs",
+    "Converted designs into tangible web pages and components"
   ],
   "decisions": [
-    "Went headless to keep the UI fast and the integration straightforward",
-    "Planned an incremental migration so the site could keep selling",
-    "Kept the stack simple—fewer moving parts, easier to hand off"
+    "Introduced team to Typescript concepts and taught them how to integrate them into JSDoc comments, increasing developer experience",
+    "Pitched ideas for reducing tech debt and increasing developer velocity",
+    "Leaned on previous experience porting apps from Vue 2 to Vue 3 to help increase team velocity"
   ],
-  "outcome": "Enabled a shift from purely salesperson‑driven orders to organic online sales.",
-  "notes": "My biggest takeaway from this project was just how much I appreciated Typescript. The experience of going from a TS project to plain ol' Javascript really enforced how valuable developer experience is to moving a project forward and collaborating with your teammates. ",
+  "outcome": "We were able to deliver an e-commerce platform that increased sales and reach for our parent company. This app was powered by a wildly complex management system, and it was able to handle the complexity with grace and simplicity.",
+  "notes": "My biggest takeaway from this project was just how much I appreciated Typescript. The experience of going from a TS project to plain ol' Javascript really enforced how valuable developer experience is that it unlocks—JSDocs can only go so far.",
   "status": "shipped",
   "links": [
     {
       "label": "SupplyStream Website",
       "href": "https://www.supplystream.io/"
+    },
+    {
+      "label": "PR News Wire release announcing launch of SupplyStream",
+      "href": "https://www.prnewswire.com/news-releases/trinity-packaging-supplys-new-e-commerce-software-disrupts-the-200-billion-packaging-industry-301833430.html"
     }
   ],
   "a11y": {

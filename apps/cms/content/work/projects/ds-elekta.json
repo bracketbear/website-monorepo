@@ -1,7 +1,7 @@
 {
   "title": "Elekta Executive Boardroom",
   "job": "ds-experience-developer",
-  "duration": "3 Months",
+  "duration": "4 Months",
   "coverImage": "/work/projects/ds-elekta/coverImage.jpg",
   "summary": "Boardroom app updates: more control, tablet support.",
   "mediaDescription": "Two people walking in front of the Downstream screen.",
@@ -51,7 +51,7 @@
     "Built a reusable menu editor instead of ad‑hoc forms",
     "Kept platform‑specific logic isolated so behavior stayed predictable"
   ],
-  "outcome": "A more customizable app that let sales and executives tailor the experience quickly and take it on the road.",
+  "outcome": "A more customizable app that let sales and executives tailor the experience quickly and display it on screens from executive board room LED walls to portable tablets in remote sales meetings.",
   "notes": "This was an interesting project for a few reasons. First, it was one of my first CMS projects from back when we built CMS apps on a per-project basis, and we injected some new menu building functionality into it. A few years later, I was able to hop into the experience side of the app to add new features, giving me a true experiential \"full-stack\" building experience while bringing things full-circle.",
   "status": "shipped",
   "links": [],

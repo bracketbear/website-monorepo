@@ -41,23 +41,21 @@
     "buttonLink": "/reach-out"
   },
   "oneLiner": "A CMS UI for installs—front‑end on Vue 3 + TypeScript over a Rust back end.",
-  "problem": "Downstream needed a dependable CMS interface for experiential projects. The existing setup was split across versions and tooling, and the UI had to evolve while a Rust back end was taking shape.",
+  "problem": "We wanted to build an experiential content management system that wasn't a \"kit of parts\" solution. Instead, we wanted to have a software service that we could add new installations to via a JSON manifest. This would save thousands of dollars of man hours off of each project.",
   "scope": [
     "Led front‑end development for Bridge UI",
-    "Migrated components from Vue 2 → Vue 3 (during beta)",
+    "Migrated components from Vue 2 → Vue 3",
     "Converted the app to TypeScript",
     "Moved the build from Webpack to Vite",
-    "Implemented service workers for cross‑tab comms and delta polling",
     "Read Rust code to map/validate data shapes in the UI"
   ],
   "decisions": [
     "Adopted Vite for faster, simpler builds",
     "Introduced strict typing to stabilize integration with the Rust API",
-    "Used a service worker to coordinate multiple tabs and background polling",
     "Established patterns for component structure and data flow so future work stayed consistent"
   ],
-  "outcome": "A stable, faster UI layer that played nicely with the Rust services and made day‑to‑day authoring predictable.",
-  "notes": "If I did it again, I’d generate types from the Rust models to remove a class of mapping bugs. This would have been a great way of keeping the two sides of the app in sync.",
+  "outcome": "Downstream was able to deliver a solution that dramatically cut back on the hours needed to prototype a project and start making money as an organization.",
+  "notes": "The project that seeded my belief that there's a market for experiential content management systems out there. Without this project, I wouldn't have worked at Gumband a little over a year later.",
   "status": "shipped",
   "links": [
     {

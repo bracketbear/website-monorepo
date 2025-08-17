@@ -47,10 +47,11 @@
   ],
   "decisions": [
     "Kept the admin simple so staff could update without training",
-    "Unified data so both apps pulled from the same source"
+    "Unified data so both apps pulled from the same source",
+    "Gave insights from previous career as a brewery manager to help in making product decisions"
   ],
   "outcome": "Reliable tools for the tasting room that showed up in press coverage and guest photos.",
-  "notes": "Having worked in craft beer for eight years, this was a great project for me to be able to work on. This was also my first project ever working in experiential, and it was so much fun to be able to work on. Absolutely adore this project.",
+  "notes": "Having worked in craft beer for eight years, this was a great project for me to be able to work on. This was also my first project ever working in experiential, and it was so much fun to be able to work on. Absolutely adore this project. Fun fact: this winery owns the Spruce Goose from The Aviator movie!",
   "status": "shipped",
   "links": [],
   "a11y": {
