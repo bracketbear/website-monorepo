@@ -1,8 +1,39 @@
 {
-  "title": "SupplyStream App",
+  "title": "SupplyStream",
   "job": "ss-front-end-developer",
   "duration": "Nine months",
+  "coverImage": "/work/projects/ss-supply-stream/coverImage.png",
   "summary": "Headless storefront for Trinity Packing Supply.",
+  "mediaDescription": "The desktop view of the SupplyStream e-commerce website.",
+  "media": [
+    {
+      "image": "/work/projects/ss-supply-stream/media/0/image.png",
+      "caption": "Screenshot of the SupplyStream e-commerce app's homepage",
+      "alt": "A screenshot of the SupplyStream e-commerce app's homepage."
+    },
+    {
+      "image": "/work/projects/ss-supply-stream/media/1/image.png",
+      "caption": "A screenshot of the product page of the SupplyStream e-commerce app",
+      "alt": "A screenshot of the product page of the SupplyStream e-commerce app"
+    }
+  ],
+  "isFeatured": false,
+  "category": "saas-platforms",
+  "skills": [
+    "vue",
+    "node",
+    "express",
+    "javascript",
+    "nuxt-3",
+    "tailwind-css",
+    "git",
+    "storybook"
+  ],
+  "cta": {
+    "text": "Need to modernize a storefront without starting over? Let’s map a path.",
+    "buttonText": "Start a conversation",
+    "buttonLink": "/reach-out"
+  },
   "oneLiner": "Headless e‑commerce front‑end that moved a sales‑led model toward organic online orders.",
   "problem": "The existing theme wasn’t built for a modern component approach. We needed a cleaner architecture and a path off the template system without breaking the business.",
   "scope": [
@@ -16,33 +47,23 @@
     "Kept the stack simple—fewer moving parts, easier to hand off"
   ],
   "outcome": "Enabled a shift from purely salesperson‑driven orders to organic online sales.",
-  "notes": "If I revisited this, I’d add basic A/B hooks to measure UX changes more directly.",
+  "notes": "My biggest takeaway from this project was just how much I appreciated Typescript. The experience of going from a TS project to plain ol' Javascript really enforced how valuable developer experience is to moving a project forward and collaborating with your teammates. ",
   "status": "shipped",
+  "links": [
+    {
+      "label": "SupplyStream Website",
+      "href": "https://www.supplystream.io/"
+    }
+  ],
   "a11y": {
     "coverAlt": "Desktop view of the SupplyStream storefront."
   },
-  "mediaDescription": "The desktop view of the SupplyStream e-commerce website.",
-  "media": [],
-  "isFeatured": false,
-  "category": "saas-platforms",
-  "skills": [
-    "vue",
-    "nuxt-3",
-    "tailwind-css",
-    "git",
-    "javascript"
-  ],
-  "impactTags": [
-    "conversion",
-    "maintainability"
-  ],
   "teaser": {
     "headline": "Headless storefront",
     "subline": "Moved from a theme to a modern front‑end without downtime"
   },
-  "cta": {
-    "text": "Need to modernize a storefront without starting over? Let’s map a path.",
-    "buttonText": "Start a conversation",
-    "buttonLink": "/reach-out"
-  }
+  "impactTags": [
+    "conversion",
+    "maintainability"
+  ]
 }

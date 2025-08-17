@@ -2,28 +2,38 @@
   "title": "Bridge",
   "job": "ds-lead-front-end-developer",
   "duration": "18 Months",
-  "coverImage": "/work/projects/ds-bridge/coverImage.webp",
-  "summary": "Front‑end lead on an internal CMS UI for installs.",
+  "coverImage": "/work/projects/ds-bridge/coverImage.png",
+  "summary": "A SaaS content management system for experiences",
   "media": [
     {
       "image": "/work/projects/ds-bridge/media/0/image.png",
-      "caption": "A sneak peek at the tree structure used in Downstream Bridge. Image credit: Downstream",
-      "alt": "Bridge CMS project tree UI"
+      "caption": "A look at the scheduling in Bridge.",
+      "alt": "A screenshot of the scheduling feature in Downstream's Bridge application."
     },
     {
       "image": "/work/projects/ds-bridge/media/1/image.jpg",
-      "caption": "Some of the inputs used in Downstream Bridge.",
-      "alt": "Some of the inputs used in Downstream Bridge."
+      "caption": "A look at some of the inputs used in Bridge",
+      "alt": "A look at some of the web inputs used in Bridge's forms"
+    },
+    {
+      "image": "/work/projects/ds-bridge/media/2/image.webp",
+      "caption": "A admittedly fuzzy look at the media library.",
+      "alt": "An image of the media library in Downstream's Bridge application."
     }
   ],
   "isFeatured": true,
   "category": "experiential-content-management-systems",
   "skills": [
+    "typescript",
     "vue",
     "vite",
+    "tailwind-css",
     "rust",
-    "typescript",
-    "tailwind-css"
+    "git",
+    "docker",
+    "html",
+    "css",
+    "figma"
   ],
   "cta": {
     "text": "Have systems that need to work together? I can help map the problem and build the glue.",
@@ -59,7 +69,7 @@
     "coverAlt": "Bridge CMS UI showing the project tree structure."
   },
   "teaser": {
-    "headline": "A CMS UI for installs",
+    "headline": "A SaaS content management system for experiences",
     "subline": "Led the front‑end and moved the stack to Vue 3 + TypeScript"
   },
   "impactTags": [

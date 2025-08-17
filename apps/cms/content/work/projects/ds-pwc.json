@@ -2,9 +2,35 @@
   "title": "PwC Interactive Installation",
   "job": "ds-experience-developer",
   "duration": "1 Year",
-  "coverImage": "coverImage.jpg",
+  "coverImage": "/work/projects/ds-pwc/coverImage.png",
   "summary": "Unified app powering signage, LED film, a mosaic wall, and an interactive Learning Zone.",
-  "oneLiner": "A multi‑screen installation for PwC built as a single application: elevator signage, LED film, a mosaic wall, and a Learning Zone.",
+  "mediaDescription": "Man standing in front of giant screen with interactive items on it.",
+  "media": [
+    {
+      "image": "/work/projects/ds-pwc/media/0/image.png",
+      "caption": "Screenshot of the PwC Learning Zone",
+      "alt": "A screenshot of the PwC Learning Zone mode, a screen of cartoon buttons made to represent office items and supplies."
+    },
+    {
+      "image": "/work/projects/ds-pwc/media/1/image.jpg",
+      "caption": "Image of the elevator signage",
+      "alt": "An image of a digital sign displaying information in a hallway."
+    }
+  ],
+  "isFeatured": false,
+  "category": "experiential-engineering",
+  "skills": [
+    "c-plus-plus",
+    "illustrator",
+    "photoshop",
+    "git"
+  ],
+  "cta": {
+    "text": "Have a complex install to wrangle? Let’s make the operations simple.",
+    "buttonText": "Talk details",
+    "buttonLink": "/reach-out"
+  },
+  "oneLiner": "A multi‑screen installation for PwC built as a single application",
   "problem": "Previous projects split features across multiple small apps, which made operations harder. PwC needed one application that could drive very different displays and inputs, from LED film with lidar sensors to an interactive learning space.",
   "scope": [
     "Learned C++/Windows/Visual Studio quickly and contributed production code",
@@ -17,31 +43,18 @@
     "Mapped lidar inputs to visual effects with predictable scaling"
   ],
   "outcome": "A dependable installation that people gravitated to. Personal highlight: seeing the app live while looking out at the Capitol during install week.",
-  "notes": "With more time I’d add lightweight telemetry and automated checks for multi‑screen edge cases.",
+  "notes": "This was such a unique project because of the Learning Zone functionality. It was essentially a giant point-and-click animated pegboard of things to teach you about taxes and auditing—yay taxes and auditing! This was a great project to learn C++ in, and that learning eventually did wonders for getting rid of my imposter syndrome.",
   "status": "shipped",
+  "links": [],
   "a11y": {
     "coverAlt": "Person standing in front of a large interactive screen at PwC."
   },
-  "mediaDescription": "Man standing in front of giant screen with interactive items on it.",
-  "isFeatured": false,
-  "category": "experiential-engineering",
-  "skills": [
-    "c-plus-plus",
-    "illustrator",
-    "photoshop",
-    "git"
-  ],
-  "impactTags": [
-    "reliability",
-    "systems"
-  ],
   "teaser": {
     "headline": "One app, many surfaces",
     "subline": "Signage, LED film, mosaic wall, and an interactive Learning Zone"
   },
-  "cta": {
-    "text": "Have a complex install to wrangle? Let’s make the operations simple.",
-    "buttonText": "Talk details",
-    "buttonLink": "/reach-out"
-  }
+  "impactTags": [
+    "reliability",
+    "systems"
+  ]
 }

@@ -1,9 +1,43 @@
 {
-  "title": "Elekta Executive Boardroom CMS",
+  "title": "Elekta Executive Boardroom",
   "job": "ds-experience-developer",
   "duration": "3 Months",
-  "coverImage": "coverImage.jpg",
+  "coverImage": "/work/projects/ds-elekta/coverImage.jpg",
   "summary": "Boardroom app updates: more control, tablet support.",
+  "mediaDescription": "Two people walking in front of the Downstream screen.",
+  "media": [
+    {
+      "image": "/work/projects/ds-elekta/media/0/image.jpg",
+      "caption": "Elekta Welcome Wall. Image credit: Downstream",
+      "alt": "Two employees walking in front of the Elekta Welcome Wall, a wall-sized LED display."
+    },
+    {
+      "image": "/work/projects/ds-elekta/media/1/image.jpg",
+      "caption": "User giving presentation of Elekta application. Image credit: Downstream",
+      "alt": "A person standing in front of a screen, giving presentation on the Elekta application"
+    },
+    {
+      "image": "/work/projects/ds-elekta/media/2/image.jpg",
+      "caption": "The Elekta app. Image credit: Downstream",
+      "alt": "Two people standing in front of an interactive touch screen application."
+    }
+  ],
+  "isFeatured": false,
+  "category": "experiential-engineering",
+  "skills": [
+    "vue",
+    "mysql",
+    "php",
+    "git",
+    "javascript",
+    "html",
+    "css"
+  ],
+  "cta": {
+    "text": "Working on a similar control surface? Happy to talk through options.",
+    "buttonText": "Start a conversation",
+    "buttonLink": "/reach-out"
+  },
   "oneLiner": "Updates to an executive boardroom app: per‑platform customization, custom context menus, and Surface tablet support.",
   "problem": "Elekta needed fine‑grained control of presentations across platforms, plus a way to expose quick actions via context menus and run the experience on Surface 3 tablets.",
   "scope": [
@@ -18,34 +52,18 @@
     "Kept platform‑specific logic isolated so behavior stayed predictable"
   ],
   "outcome": "A more customizable app that let sales and executives tailor the experience quickly and take it on the road.",
-  "notes": "My first time using Vue—happy with how the editor felt. Next time I’d add a tiny test suite around the menu logic.",
+  "notes": "This was an interesting project for a few reasons. First, it was one of my first CMS projects from back when we built CMS apps on a per-project basis, and we injected some new menu building functionality into it. A few years later, I was able to hop into the experience side of the app to add new features, giving me a true experiential \"full-stack\" building experience while bringing things full-circle.",
   "status": "shipped",
+  "links": [],
   "a11y": {
     "coverAlt": "Two people walking in front of a Downstream screen."
   },
-  "mediaDescription": "Two people walking in front of the Downstream screen.",
-  "isFeatured": false,
-  "category": "experiential-engineering",
-  "skills": [
-    "vue",
-    "mysql",
-    "php",
-    "git",
-    "javascript",
-    "html",
-    "css"
-  ],
-  "impactTags": [
-    "usability",
-    "reusability"
-  ],
   "teaser": {
     "headline": "Boardroom control that fits the room",
     "subline": "Custom actions, per‑platform tweaks, and tablet support"
   },
-  "cta": {
-    "text": "Working on a similar control surface? Happy to talk through options.",
-    "buttonText": "Start a conversation",
-    "buttonLink": "/reach-out"
-  }
+  "impactTags": [
+    "usability",
+    "reusability"
+  ]
 }
