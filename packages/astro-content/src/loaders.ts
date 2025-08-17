@@ -62,9 +62,10 @@ function copyImageToPublic(
   );
   const publicPath = join(publicDir, imageName);
 
-  // Create directory if it doesn't exist
-  if (!existsSync(publicDir)) {
-    mkdirSync(publicDir, { recursive: true });
+  // Create directory if it doesn't exist (including nested directories for imageName)
+  const imageDir = dirname(publicPath);
+  if (!existsSync(imageDir)) {
+    mkdirSync(imageDir, { recursive: true });
   }
 
   // Check if destination already exists and is a file
@@ -138,13 +139,25 @@ function discoverAndCopyAllImages(
           const ext = extname(entry.name).toLowerCase().slice(1);
           if (imageExtensions.includes(ext)) {
             // Parse the relative path to extract content type, content ID, and image name
-            // Example: "work/projects/dl-gumband/coverImage.jpg"
+            // Example: "work/projects/dl-gumband/coverImage.jpg" or "work/projects/dl-gumband/media/0/image.jpg"
             const pathParts = newRelPath.split('/');
 
             if (pathParts.length >= 3) {
               const contentType = `${pathParts[0]}/${pathParts[1]}`; // e.g., "work/projects"
               const contentId = pathParts[2]; // e.g., "dl-gumband"
-              const imageName = pathParts[3]; // e.g., "coverImage.jpg"
+
+              // Handle nested media files (e.g., media/0/image.jpg)
+              let imageName: string;
+              if (pathParts[3] === 'media' && pathParts.length >= 6) {
+                // For media files: work/projects/ds-elekta/media/0/image.jpg
+                // Extract the full media path: media/0/image.jpg
+                imageName = pathParts.slice(3).join('/');
+              } else if (pathParts.length >= 4) {
+                // For direct files: work/projects/ds-elekta/coverImage.jpg
+                imageName = pathParts[3];
+              } else {
+                imageName = '';
+              }
 
               if (contentType && contentId && imageName) {
                 copyImageToPublic(fullPath, contentType, contentId, imageName);
@@ -416,18 +429,47 @@ export function getContentImageUrl(
   contentId: string,
   imagePath: string
 ): string {
-  // Extract just the filename from the imagePath, handling both full paths and filenames
-  const imageName = imagePath.includes('/')
-    ? imagePath.split('/').pop()!
-    : imagePath;
+  // Handle both full paths and relative paths from CMS
+  // If it's a full path like /work/projects/ds-elekta/media/0/image.jpg,
+  // extract the relative part: media/0/image.jpg
+  let relativePath = imagePath;
+  if (imagePath.startsWith('/work/projects/')) {
+    // Remove the /work/projects/ prefix and also remove the project ID
+    // since it's already provided as contentId parameter
+    const pathParts = imagePath.split('/');
+    if (pathParts.length >= 4) {
+      // Skip: "", "work", "projects", projectId, and take the rest
+      relativePath = pathParts.slice(4).join('/');
+    }
+  }
 
+  console.log(`[DEBUG] getContentImageUrl:`, {
+    contentType,
+    contentId,
+    imagePath,
+    relativePath,
+  });
+
+  // If it's a relative path like media/0/image.jpg, preserve the full structure
   const publicPath = join(
     findPublicDir(),
     'content-images',
     contentType,
     contentId,
-    imageName
+    relativePath
   );
+
+  console.log(`[DEBUG] Paths:`, {
+    publicPath,
+    cmsContentPath: join(
+      MONOREPO_ROOT,
+      'apps/cms/content',
+      contentType,
+      contentId,
+      relativePath
+    ),
+  });
+
   if (!existsSync(publicPath)) {
     // Try to copy from CMS
     const cmsContentPath = join(
@@ -435,7 +477,7 @@ export function getContentImageUrl(
       'apps/cms/content',
       contentType,
       contentId,
-      imageName
+      relativePath
     );
     if (existsSync(cmsContentPath)) {
       try {
@@ -445,16 +487,23 @@ export function getContentImageUrl(
           mkdirSync(publicDir, { recursive: true });
         }
         copyFileSync(cmsContentPath, publicPath);
+        console.log(
+          `[DEBUG] Successfully copied ${cmsContentPath} to ${publicPath}`
+        );
       } catch (error) {
         console.error(
           `[content-image-loader] Failed on-demand copy ${cmsContentPath} to ${publicPath}:`,
           error
         );
       }
+    } else {
+      console.log(`[DEBUG] CMS path does not exist: ${cmsContentPath}`);
     }
+  } else {
+    console.log(`[DEBUG] Public path already exists: ${publicPath}`);
   }
 
-  return `/content-images/${contentType}/${contentId}/${imageName}`;
+  return `/content-images/${contentType}/${contentId}/${relativePath}`;
 }
 
 /**
