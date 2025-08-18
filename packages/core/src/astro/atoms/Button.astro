@@ -10,6 +10,7 @@ interface Props {
   type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
   size?: ButtonSize;
+  iconButton?: boolean;
   disabled?: boolean;
   class?: string;
   id?: string;
@@ -20,6 +21,7 @@ const {
   type = 'button',
   variant = 'primary',
   size = 'md',
+  iconButton = false,
   disabled = false,
   ...props
 } = Astro.props;
@@ -30,6 +32,7 @@ const {
   class:list={[
     'button',
     disabled ? 'button-disabled' : 'button-interactive',
+    iconButton ? 'button-icon' : '',
     buttonVariantClasses[variant],
     buttonSizeClasses[size],
     className,

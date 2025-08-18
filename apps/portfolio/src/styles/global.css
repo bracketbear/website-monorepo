@@ -84,3 +84,14 @@
     color: var(--color-brand-dark);
   }
 }
+
+/* Prevent layout shifts when mobile nav opens */
+.hero-content {
+  contain: layout style paint;
+  will-change: auto;
+}
+
+/* Ensure mobile nav doesn't affect document flow */
+#mobile-menu {
+  contain: layout style paint;
+}

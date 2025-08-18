@@ -160,7 +160,7 @@ const { items: navItems, branding, socialLinks } = config;
     <!-- Mobile Menu Button -->
     <Button
       class="p-2 md:hidden"
-      variant="secondary"
+      variant="dark"
       id="mobile-menu-button"
       type="button"
     >
@@ -305,7 +305,6 @@ const { items: navItems, branding, socialLinks } = config;
       setTimeout(() => {
         mobileMenuOverlay.classList.add('opacity-50', 'z-30');
       }, 10);
-      document.body.style.overflow = 'hidden';
     };
 
     const closeMenu = () => {
@@ -314,7 +313,6 @@ const { items: navItems, branding, socialLinks } = config;
       setTimeout(() => {
         mobileMenuOverlay.classList.add('hidden', '-z-30');
       }, 300);
-      document.body.style.overflow = '';
     };
 
     // Add event listeners
