@@ -70,11 +70,9 @@ export default function HeaderSection({
     let animation;
     switch (preset) {
       case 'curious-particle-network':
-        console.log('Creating curious particle network animation');
         animation = createCuriousParticleNetworkAnimation();
         break;
       case 'particle-wave':
-        console.log('Creating particle wave animation');
         animation = createParticleWaveAnimation({
           waveCount: 2,
           verticalOffset: 60,
