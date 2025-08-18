@@ -51,11 +51,7 @@ export default function AnimationStage({
   layoutClassName = 'relative flex h-full w-full items-end',
 }: AnimationStageProps) {
   // Main animation stage hook
-  const {
-    containerRef,
-    controlValues: stageControlValues,
-    manifest,
-  } = useAnimationStage({
+  const { containerRef } = useAnimationStage({
     application,
     pauseWhenHidden,
     visibilityThreshold,
@@ -67,8 +63,6 @@ export default function AnimationStage({
     showDebugControls,
     showDownloadButton,
     application: application || ({} as Application), // Provide empty object if null
-    manifest,
-    initialControlValues: stageControlValues,
   });
 
   // Luminance detection hook - only call if application exists

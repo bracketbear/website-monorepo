@@ -1,4 +1,7 @@
-import { type ManifestToControlValues } from '@bracketbear/flateralus';
+import {
+  type ManifestToControlValues,
+  type AnyControlValue,
+} from '@bracketbear/flateralus';
 import { PixiAnimation } from '@bracketbear/flateralus-pixi';
 import * as PIXI from 'pixi.js';
 import { createManifest } from '@bracketbear/flateralus';
@@ -168,8 +171,9 @@ const MANIFEST = createManifest({
     {
       name: 'particleColors',
       type: 'group',
+      value: 'color',
       label: 'Particle Colors',
-      description: 'Colors to use for particles',
+      description: 'Colors for the particles',
       items: [
         {
           name: 'color',
@@ -180,15 +184,14 @@ const MANIFEST = createManifest({
         },
       ],
       defaultValue: [
-        { color: '#fffbe0' },
-        { color: '#ff4b3e' },
-        { color: '#4b9fff' },
-        { color: '#eaeaea' },
-        { color: '#ffe066' },
+        { type: 'color', value: '#fffbe0', metadata: { alpha: 1.0 } },
+        { type: 'color', value: '#ff4b3e', metadata: { alpha: 1.0 } },
+        { type: 'color', value: '#4b9fff', metadata: { alpha: 1.0 } },
+        { type: 'color', value: '#eaeaea', metadata: { alpha: 1.0 } },
+        { type: 'color', value: '#ffe066', metadata: { alpha: 1.0 } },
       ],
       minItems: 1,
       maxItems: 10,
-      static: false,
       debug: true,
       resetsAnimation: true,
     },
@@ -240,13 +243,28 @@ function createParticle(
   isInteraction = false
 ): Particle {
   const graphics = new PIXI.Graphics();
+
+  // Extract color values from discriminated objects
   const colorPalette = Array.isArray(controls.particleColors)
-    ? (controls.particleColors as Array<{ color: string }>)
-    : [];
-  const colorObj = colorPalette[colorIndex % colorPalette.length] || {
+    ? (controls.particleColors as AnyControlValue[])
+        .filter((item) => item.type === 'color')
+        .map((item) => ({
+          color: item.value as string,
+          alpha: (item.metadata?.alpha as number) ?? 1.0,
+        }))
+    : [
+        {
+          color: '#fffbe0',
+          alpha: 1.0,
+        },
+      ];
+
+  const colorData = colorPalette[colorIndex % colorPalette.length] || {
     color: '#fffbe0',
+    alpha: 1.0,
   };
-  const color = colorObj.color;
+  const color = colorData.color;
+  const alpha = colorData.alpha;
   const radius = isInteraction
     ? 0 // invisible
     : Math.random() * Number(controls.particleSizeVariation) +
@@ -282,7 +300,7 @@ function createParticle(
     vy: isInteraction ? 0 : vy,
     radius,
     color,
-    opacity: 0,
+    opacity: alpha, // Use the alpha from the color metadata
     fadeIn: !isInteraction,
     isInteraction,
     debugZeroCount: 0,
@@ -304,6 +322,7 @@ class CuriousParticleNetworkAnimation extends PixiAnimation<
 
   onInit(app: PIXI.Application, controls: ParticleNetworkControlValues): void {
     const particleCount = controls.particleCount;
+
     // Create graphics for lines
     this.linesGraphics = new PIXI.Graphics();
     this.linesGraphics.zIndex = 1;
@@ -321,7 +340,7 @@ class CuriousParticleNetworkAnimation extends PixiAnimation<
     // Always clear interaction particle on reset
     this.interactionParticle = null;
 
-    // Create particles, cycling through colors
+    // Create particles
     for (let i = 0; i < particleCount; i++) {
       const particle = createParticle(
         app,
@@ -430,6 +449,7 @@ class CuriousParticleNetworkAnimation extends PixiAnimation<
         p.opacity += 0.02;
         if (p.opacity > 1) p.opacity = 1;
       }
+
       // Update position (skip for interaction particle)
       if (!p.isInteraction) {
         p.x += p.vx * controls.animationSpeed;

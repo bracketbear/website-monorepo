@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
-    "test": "vitest"
+    "test": "vitest",
+    "test:run": "vitest --run"
   },
   "dependencies": {
     "@bracketbear/core": "file:../core",

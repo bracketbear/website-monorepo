@@ -1,12 +1,9 @@
 import type {
   AnimationManifest,
-  BooleanControl,
-  ColorControl,
-  DefaultableControl,
+  SelectControl,
   ControlValues,
   GroupControl,
-  NumberControl,
-  SelectControl,
+  AnyControlValue,
 } from '../types';
 
 /**
@@ -61,90 +58,117 @@ function randomSelect(options: SelectControl['options']): string {
   return '';
 }
 
-// Type guards for sub-controls in group controls
-function isNumberControl(sub: unknown): sub is NumberControl {
-  return (
-    typeof sub === 'object' &&
-    sub !== null &&
-    (sub as any).type === 'number' &&
-    'name' in sub &&
-    'min' in sub &&
-    'max' in sub
-  );
-}
-function isBooleanControl(sub: unknown): sub is BooleanControl {
-  return (
-    typeof sub === 'object' &&
-    sub !== null &&
-    (sub as any).type === 'boolean' &&
-    'name' in sub
-  );
-}
-function isColorControl(sub: unknown): sub is ColorControl {
-  return (
-    typeof sub === 'object' &&
-    sub !== null &&
-    (sub as any).type === 'color' &&
-    'name' in sub
-  );
-}
-function isSelectControl(sub: unknown): sub is SelectControl {
-  return (
-    typeof sub === 'object' &&
-    sub !== null &&
-    (sub as any).type === 'select' &&
-    'name' in sub &&
-    'options' in sub
-  );
-}
-function isDefaultableControl(sub: unknown): sub is DefaultableControl {
-  return (
-    typeof sub === 'object' &&
-    sub !== null &&
-    'name' in sub &&
-    'defaultValue' in sub
-  );
-}
-
 /**
  * Generate a random group value for a group control.
  */
-function randomizeGroup(control: GroupControl): Record<string, unknown>[] {
+function randomizeGroup(control: GroupControl): AnyControlValue[] {
   const min = typeof control.minItems === 'number' ? control.minItems : 1;
   const max = typeof control.maxItems === 'number' ? control.maxItems : min + 2;
   const count = randomInRange(min, max);
-  // Convert readonly to mutable for iteration
-  const itemsArr = Array.isArray(control.items)
-    ? Array.from(control.items)
-    : [];
-  const items: Record<string, unknown>[] = [];
+
+  const items: AnyControlValue[] = [];
+
   for (let i = 0; i < count; i++) {
-    const item: Record<string, unknown> = {};
-    for (const sub of itemsArr) {
-      // Use type assertions to avoid 'never' errors, as we have type guards above
-      if (isNumberControl(sub)) {
-        item[(sub as { name: string }).name] = randomInRange(
-          (sub as { min: number }).min,
-          (sub as { max: number }).max,
-          (sub as { step?: number }).step ?? 1
-        );
-      } else if (isBooleanControl(sub)) {
-        item[(sub as { name: string }).name] = Math.random() < 0.5;
-      } else if (isColorControl(sub)) {
-        item[(sub as { name: string }).name] = randomColor();
-      } else if (isSelectControl(sub)) {
-        item[(sub as { name: string }).name] = randomSelect(
-          (sub as { options: SelectControl['options'] }).options
-        );
-      } else if (isDefaultableControl(sub)) {
-        // Fallback for other control types
-        item[(sub as { name: string }).name] = (
-          sub as { defaultValue: unknown }
-        ).defaultValue;
+    let controlValue: AnyControlValue;
+
+    if (control.value === 'mixed') {
+      // Mixed groups - randomly choose control type for each item
+      const controlTypes = ['color', 'number', 'boolean', 'select'] as const;
+      const randomType =
+        controlTypes[Math.floor(Math.random() * controlTypes.length)];
+
+      switch (randomType) {
+        case 'color':
+          controlValue = {
+            type: 'color',
+            value: randomColor(),
+            metadata: { alpha: Math.random() },
+          };
+          break;
+        case 'number':
+          controlValue = {
+            type: 'number',
+            value: Math.floor(Math.random() * 100),
+            metadata: { min: 0, max: 100 },
+          };
+          break;
+        case 'boolean':
+          controlValue = {
+            type: 'boolean',
+            value: Math.random() < 0.5,
+            metadata: { description: `Item ${i}` },
+          };
+          break;
+        case 'select':
+          controlValue = {
+            type: 'select',
+            value: `option${Math.floor(Math.random() * 3) + 1}`,
+            metadata: { options: ['option1', 'option2', 'option3'] },
+          };
+          break;
+      }
+    } else {
+      // Homogeneous groups - use the control's value type
+      switch (control.value) {
+        case 'color':
+          controlValue = {
+            type: 'color',
+            value: randomColor(),
+            metadata: { alpha: Math.random() },
+          };
+          break;
+        case 'number':
+          controlValue = {
+            type: 'number',
+            value: Math.floor(Math.random() * 100),
+            metadata: { min: 0, max: 100 },
+          };
+          break;
+        case 'boolean':
+          controlValue = {
+            type: 'boolean',
+            value: Math.random() < 0.5,
+            metadata: { description: `Item ${i}` },
+          };
+          break;
+        case 'select':
+          const firstItem = control.items[0];
+          if (
+            firstItem &&
+            firstItem.type === 'select' &&
+            'options' in firstItem
+          ) {
+            controlValue = {
+              type: 'select',
+              value: randomSelect(firstItem.options),
+              metadata: {
+                options: Array.isArray(firstItem.options)
+                  ? firstItem.options.map((opt) =>
+                      typeof opt === 'string' ? opt : opt.value
+                    )
+                  : firstItem.options,
+              },
+            };
+          } else {
+            controlValue = {
+              type: 'select',
+              value: 'option1',
+              metadata: { options: ['option1', 'option2', 'option3'] },
+            };
+          }
+          break;
+        default:
+          controlValue = {
+            type: 'number',
+            value: Math.floor(Math.random() * 100),
+            metadata: { min: 0, max: 100 },
+          };
       }
     }
-    items.push(item);
+
+    items.push(controlValue);
   }
+
   return items;
 }
 
@@ -178,7 +202,7 @@ export function getRandomControlValues(
         values[control.name] = randomSelect(control.options);
         break;
       case 'group':
-        values[control.name] = randomizeGroup(control);
+        values[control.name] = randomizeGroup(control) as any;
         break;
       default:
         values[control.name] = control.defaultValue;

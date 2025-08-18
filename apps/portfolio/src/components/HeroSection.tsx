@@ -58,15 +58,22 @@ export default function HeroSection({
         cursorAttractionStrength: 0.17500000000000002,
         particleGlowRadius: 5,
         particleColors: [
-          {
-            color: '#9ce8e9',
-          },
+          { type: 'color', value: '#9ce8e9', metadata: { alpha: 1.0 } },
         ],
         keepInBounds: true,
         connectionColor: '#000000',
         glowColor: '#f1880d',
         debugLogging: false,
       });
+
+      // Debug: Log the control values to see what's actually stored
+      console.log('Animation control values:', animation.getControlValues());
+      console.log('Animation manifest:', animation.getManifest());
+      console.log(
+        'particleColors specifically:',
+        JSON.stringify(animation.getControlValues().particleColors, null, 2)
+      );
+
       app.setAnimation(animation);
 
       return app;

@@ -13,10 +13,6 @@ export interface UseDebugControlsOptions {
   showDownloadButton?: boolean;
   /** Application instance */
   application: Application;
-  /** Animation manifest */
-  manifest: AnimationManifest | undefined;
-  /** Initial control values */
-  initialControlValues: ControlValues;
   /** Callback when controls are reset */
   onReset?: () => void;
 }
@@ -44,20 +40,18 @@ export interface UseDebugControlsReturn {
 /**
  * Hook for managing debug controls state and interactions
  */
-export function useDebugControls(
-  options: UseDebugControlsOptions
-): UseDebugControlsReturn {
-  const {
-    showDebugControls = false,
-    showDownloadButton = true,
-    application,
-    manifest,
-    initialControlValues,
-    onReset,
-  } = options;
-
+export function useDebugControls({
+  showDebugControls = false,
+  showDownloadButton = true,
+  application,
+  onReset,
+}: UseDebugControlsOptions): UseDebugControlsReturn {
   // Get the animation from the application
   const animation = application.getAnimation?.() || null;
+
+  // Get manifest and control values directly from the animation
+  const manifest = animation?.getManifest();
+  const initialControlValues = animation?.getControlValues() || {};
 
   const { controlValues, handleControlsChange, showResetToast } = useControls({
     animation,

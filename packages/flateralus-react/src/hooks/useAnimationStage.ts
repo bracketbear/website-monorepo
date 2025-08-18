@@ -85,8 +85,11 @@ export function useAnimationStage(
       const context = application.getContext();
       const animation = application.getAnimation();
       if (context && animation) {
-        setControlValues(animation.getControlValues());
-        setManifest(animation.getManifest());
+        const controlValues = animation.getControlValues();
+        const manifest = animation.getManifest();
+
+        setControlValues(controlValues);
+        setManifest(manifest);
       }
     } catch (error) {
       console.error('Failed to initialize animation stage:', error);

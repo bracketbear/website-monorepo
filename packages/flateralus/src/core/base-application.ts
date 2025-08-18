@@ -1,4 +1,4 @@
-import type { Animation, ControlValues, Application } from '../types';
+import type { Animation, Application } from '../types';
 
 // ============================================================================
 // BASE APPLICATION CLASS
@@ -41,7 +41,7 @@ export interface ApplicationOptions {
  * @template TContext - The rendering context type (e.g., PIXI.Application, Canvas2DContext, etc.)
  */
 export abstract class BaseApplication<TContext = unknown>
-  implements Application<TContext>
+  implements Application<Animation<any, TContext>>
 {
   protected context: TContext | null = null;
   protected animation: Animation<any, TContext> | null = null;
@@ -107,8 +107,8 @@ export abstract class BaseApplication<TContext = unknown>
   /**
    * Get the rendering context
    */
-  public getContext(): TContext | null {
-    return this.context;
+  public getContext(): TContext {
+    return this.context!;
   }
 
   /**
@@ -174,9 +174,7 @@ export abstract class BaseApplication<TContext = unknown>
   /**
    * Set the animation to be rendered
    */
-  public setAnimation<TControlValues extends ControlValues>(
-    animation: Animation<TControlValues, TContext> | null
-  ): void {
+  public setAnimation(animation: Animation<any, TContext> | null): void {
     // Destroy existing animation
     if (this.animation) {
       this.animation.destroy();

@@ -1,15 +1,16 @@
 import { useState, useEffect, useCallback, memo } from 'react';
 import clsx from 'clsx';
 import type {
-  Animation,
   AnimationManifest,
-  ControlValues,
   Control,
+  ControlValues,
+  GroupControl as GroupControlType,
   NumberControl as NumberControlType,
   BooleanControl as BooleanControlType,
   ColorControl as ColorControlType,
   SelectControl as SelectControlType,
-  GroupControl as GroupControlType,
+  AnyControlValue,
+  Animation,
 } from '@bracketbear/flateralus';
 import { getManifestDefaultControlValues } from '@bracketbear/flateralus';
 import { Button } from '@bracketbear/core/react';
@@ -57,9 +58,6 @@ const DebugControls = memo<DebugControlsProps>(
   }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isPanelVisible, setIsPanelVisible] = useState(false);
-    const [collapsedGroups, setCollapsedGroups] = useState<
-      Record<string, boolean>
-    >({});
     const [toastMessage, setToastMessage] = useState<string | null>(null);
     const [toastTimeout, setToastTimeout] = useState<NodeJS.Timeout | null>(
       null
@@ -143,35 +141,31 @@ const DebugControls = memo<DebugControlsProps>(
       if (!control.debug) return null;
 
       if (control.type === 'group') {
-        const groupValue = Array.isArray(controlValues[control.name])
-          ? (controlValues[control.name] as unknown[])
+        // Use manifest default values if the control value is undefined or empty
+        let groupValue = Array.isArray(value)
+          ? (value as AnyControlValue[])
           : [];
-        const minItems = control.minItems ?? 0;
-        const maxItems = control.maxItems ?? Infinity;
-        const isStatic = !!control.static;
-        const isCollapsed = collapsedGroups[control.name] ?? false;
-        const toggleCollapse = () =>
-          setCollapsedGroups((prev) => ({
-            ...prev,
-            [control.name]: !isCollapsed,
-          }));
-        type GroupItem = (typeof groupValue)[number];
-        const GroupControlTyped = GroupControl as unknown as React.FC<
-          React.ComponentProps<typeof GroupControl<GroupItem>>
+
+        // If the group value is empty, use the manifest's default value
+        if (
+          groupValue.length === 0 &&
+          control.defaultValue &&
+          Array.isArray(control.defaultValue)
+        ) {
+          groupValue = control.defaultValue as AnyControlValue[];
+        }
+
+        const GroupControlTyped = GroupControl as React.FC<
+          React.ComponentProps<typeof GroupControl>
         >;
         return (
           <GroupControlTyped
             key={control.name}
             control={control as GroupControlType}
-            value={groupValue as GroupItem[]}
-            onChange={(newValue: GroupItem[]) =>
+            value={groupValue}
+            onControlChange={(key: string, newValue: any) =>
               onControlsChange({ [control.name]: newValue })
             }
-            minItems={minItems}
-            maxItems={maxItems}
-            isStatic={isStatic}
-            isCollapsed={isCollapsed}
-            toggleCollapse={toggleCollapse}
           />
         );
       }

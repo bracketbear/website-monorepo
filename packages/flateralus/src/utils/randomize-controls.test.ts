@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getRandomControlValues } from './randomize-controls';
 import type { AnimationManifest } from '../types';
+import { createManifest } from './create-manifest';
 
 // Mock Math.random to make tests deterministic
 const mockRandom = vi.fn();
@@ -151,58 +152,55 @@ describe('randomize-controls', () => {
     });
 
     it('should generate random group values', () => {
-      const manifest: AnimationManifest = {
-        id: 'test',
-        name: 'Test Animation',
-        description: 'Test description',
+      const manifest = createManifest({
+        id: 'group-test',
+        name: 'Group Test',
+        description: 'Test group controls',
         controls: [
           {
-            name: 'testGroup',
+            name: 'group',
             type: 'group',
-            label: 'Test Group',
-            description: 'A test group',
+            value: 'number',
+            label: 'Number Group',
             items: [
               {
                 name: 'groupNumber',
                 type: 'number',
                 label: 'Group Number',
-                min: 1,
-                max: 10,
+                defaultValue: 0,
+                min: 0,
+                max: 100,
                 step: 1,
-                defaultValue: 5,
-                debug: true,
-              },
-              {
-                name: 'groupColor',
-                type: 'color',
-                label: 'Group Color',
-                defaultValue: '#000000',
-                debug: true,
+                debug: false,
               },
             ],
-            defaultValue: [],
+            defaultValue: [
+              { type: 'number', value: 0, metadata: { min: 0, max: 100 } },
+            ],
             minItems: 1,
             maxItems: 3,
-            debug: true,
+            debug: false,
           },
         ],
-      };
+      });
 
       const result = getRandomControlValues(manifest);
+      expect(result).toBeDefined();
+      expect(result.group).toBeDefined();
 
-      expect(result).toHaveProperty('testGroup');
-      expect(Array.isArray(result.testGroup)).toBe(true);
-      const groupArray = result.testGroup as Record<string, unknown>[];
+      const groupArray = result.group as any[];
+      expect(Array.isArray(groupArray)).toBe(true);
       expect(groupArray.length).toBeGreaterThanOrEqual(1);
       expect(groupArray.length).toBeLessThanOrEqual(3);
 
-      // Check that each group item has the expected properties
-      groupArray.forEach((item) => {
-        expect(item).toHaveProperty('groupNumber');
-        expect(item).toHaveProperty('groupColor');
-        expect(typeof item.groupNumber).toBe('number');
-        expect(typeof item.groupColor).toBe('string');
-        expect(item.groupColor as string).toMatch(/^#[0-9a-f]{6}$/i);
+      // Check that each group item is a discriminated object with number value
+      groupArray.forEach((item: any) => {
+        expect(typeof item).toBe('object');
+        expect(item.type).toBe('number');
+        expect(typeof item.value).toBe('number');
+        expect(item.value).toBeGreaterThanOrEqual(0);
+        expect(item.value).toBeLessThanOrEqual(100); // Based on our randomization logic
+        expect(item.metadata).toBeDefined();
       });
     });
 
@@ -255,8 +253,8 @@ describe('randomize-controls', () => {
             label: 'Select 1',
             options: [
               { value: 'a', label: 'a' },
-              { value: 'b', label: 'b' }, 
-              { value: 'c', label: 'c' }
+              { value: 'b', label: 'b' },
+              { value: 'c', label: 'c' },
             ],
             defaultValue: 'a',
             debug: true,
@@ -312,6 +310,7 @@ describe('randomize-controls', () => {
           {
             name: 'testGroup',
             type: 'group',
+            value: 'number',
             label: 'Test Group',
             items: [
               {
@@ -334,7 +333,7 @@ describe('randomize-controls', () => {
 
       expect(result).toHaveProperty('testGroup');
       expect(Array.isArray(result.testGroup)).toBe(true);
-      const groupArray = result.testGroup as Record<string, unknown>[];
+      const groupArray = result.testGroup as any;
       expect(groupArray.length).toBeGreaterThan(0);
     });
 
@@ -370,6 +369,7 @@ describe('randomize-controls', () => {
           {
             name: 'testGroup',
             type: 'group',
+            value: 'number',
             label: 'Test Group',
             items: [],
             defaultValue: [],

@@ -49,7 +49,66 @@ export interface AnimationManifest
       description: string;
     }> {}
 
-export type ControlValueTypes = string | number | boolean | readonly any[];
+// New hybrid approach types
+export interface ControlValue<T = any> {
+  type: string;
+  value: T;
+  metadata?: Record<string, any>;
+}
+
+export interface ColorControlValue extends ControlValue<string> {
+  type: 'color';
+  value: string;
+  metadata?: {
+    alpha?: number;
+    brightness?: number;
+  };
+}
+
+export interface NumberControlValue extends ControlValue<number> {
+  type: 'number';
+  value: number;
+  metadata?: {
+    min?: number;
+    max?: number;
+    step?: number;
+  };
+}
+
+export interface BooleanControlValue extends ControlValue<boolean> {
+  type: 'boolean';
+  value: boolean;
+  metadata?: {
+    description?: string;
+  };
+}
+
+export interface SelectControlValue extends ControlValue<string> {
+  type: 'select';
+  value: string;
+  metadata?: {
+    options?: string[];
+  };
+}
+
+export type AnyControlValue =
+  | ColorControlValue
+  | NumberControlValue
+  | BooleanControlValue
+  | SelectControlValue;
+
+// Updated control value types to use discriminated objects for groups
+export type ControlValueTypes =
+  | string
+  | number
+  | boolean
+  | readonly AnyControlValue[];
+
+export type AnimationControlValueTypes =
+  | string
+  | number
+  | boolean
+  | readonly AnyControlValue[];
 
 export type ControlValues = Record<string, ControlValueTypes>;
 
@@ -58,7 +117,7 @@ type ControlTypeToValueTypeMap = {
   boolean: boolean;
   color: string;
   select: string;
-  group: Array<Record<string, ControlValueTypes>>;
+  group: AnyControlValue[];
 };
 
 export interface HasControlType extends HasType<ControlType> {}
@@ -68,15 +127,9 @@ export interface HasControls {
 }
 
 export type ControlValueType<C extends HasControlType> =
-  C['type'] extends 'group'
-    ? C extends {
-        items: Array<{ name: string; type: keyof ControlTypeToValueTypeMap }>;
-      }
-      ? Array<{
-          [K in C['items'][number] as K['name']]: ControlTypeToValueTypeMap[K['type']];
-        }>
-      : never
-    : ControlTypeToValueTypeMap[C['type']];
+  C['type'] extends keyof ControlTypeToValueTypeMap
+    ? ControlTypeToValueTypeMap[C['type']]
+    : never;
 
 /**
  * Utility type to extract control value types from a manifest
@@ -90,7 +143,7 @@ export type ManifestToControlValues<TManifest extends AnimationManifest> = {
  * Animation interface that any animation must implement
  */
 export interface Animation<
-  TControlValues extends ControlValues = {},
+  TControlValues extends Record<string, any> = Record<string, any>,
   TContext = unknown,
 > {
   /** Get the animation manifest with control definitions */
@@ -109,7 +162,7 @@ export interface Animation<
   update(): void;
 
   /** Reset the animation to default or specified control values */
-  reset(controls?: TControlValues): void;
+  reset(controls?: Partial<TControlValues>): void;
 
   /** Clean up the animation */
   destroy(): void;
@@ -126,9 +179,11 @@ export type AnimationFactory<TAnimation extends Animation> = (
 /**
  * Application interface that any animation application must implement
  */
-export interface Application<TContext = unknown> {
+export interface Application<TAnimation extends Animation = Animation> {
   /** Get the rendering context */
-  getContext(): TContext | null;
+  getContext(): TAnimation extends Animation<any, infer TContext>
+    ? TContext
+    : unknown;
 
   /** Get the canvas element (if applicable) */
   getCanvas(): HTMLCanvasElement | null;
@@ -137,12 +192,10 @@ export interface Application<TContext = unknown> {
   init(container: HTMLElement | HTMLCanvasElement): Promise<void>;
 
   /** Get the current animation */
-  getAnimation(): Animation<any, TContext> | null;
+  getAnimation(): TAnimation | null;
 
   /** Set the animation to be rendered */
-  setAnimation<TControlValues extends ControlValues>(
-    animation: Animation<TControlValues, TContext> | null
-  ): void;
+  setAnimation(animation: TAnimation | null): void;
 
   /** Start the application */
   start(): void;
