@@ -29,7 +29,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- Narrative Section -->
   {
     aboutPage?.data?.narrative && (
-      <section class="mb-40 px-4">
+      <section class="mb-40 px-content">
         <div class="container mx-auto text-center">
           <h2 class="font-heading mb-6 text-5xl tracking-tight text-white">
             {aboutPage.data.narrative.title}
@@ -49,8 +49,8 @@ const t = aboutPage.data.testimonials[0];
   <!-- Timeline Section (after Narrative) -->
   {
     aboutPage?.data?.timeline && aboutPage.data.timeline.length > 0 && (
-      <section class="mt-24 mb-40">
-        <div class="mx-auto max-w-6xl px-6 lg:px-8">
+      <section class="mt-24 mb-40 px-content">
+        <div class="mx-auto max-w-6xl">
           <h2 class="font-heading mb-10 text-center text-4xl tracking-tight text-white">
             Timeline
           </h2>
@@ -80,7 +80,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- What I Do Now Section -->
   {
     aboutPage?.data?.whatIDoNow && (
-      <section class="mb-40 px-4">
+      <section class="mb-40 px-content">
         <div class="container mx-auto text-center">
           <h2 class="font-heading mb-6 text-5xl tracking-tight text-white">
             {aboutPage.data.whatIDoNow.title}
@@ -98,7 +98,7 @@ const t = aboutPage.data.testimonials[0];
   }
 
   <!-- Mid-page CTA (after What I do now) -->
-  <section class="mb-40 px-4">
+  <section class="mb-40 px-content">
     <div class="mx-auto max-w-4xl">
       <div
         class="rounded-lg bg-white/5 p-8 text-center backdrop-blur-sm md:p-10"
@@ -116,7 +116,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- How I Work/Partner Section -->
   {
     aboutPage?.data?.howIPartner && (
-      <section class="mb-40 px-4">
+      <section class="mb-40 px-content">
         <div class="mx-auto max-w-4xl text-center">
           <h2 class="font-heading mb-8 text-5xl tracking-tight text-white">
             {aboutPage.data.howIPartner.title}
@@ -139,7 +139,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- Testimonials Section (after How I partner) -->
   {
     aboutPage?.data?.testimonials && aboutPage.data.testimonials.length > 0 && (
-      <section class="mt-24 mb-40 px-4">
+      <section class="mt-24 mb-40 px-content">
         <div class=" mx-auto max-w-7xl">
             <Testimonial
               quote={t.quote}
@@ -167,7 +167,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- Stories Section -->
   {
     aboutPage?.data?.stories && aboutPage.data.stories.length > 0 && (
-      <section class="mb-40 px-4">
+      <section class="mb-40 px-content">
         <div class="mx-auto max-w-7xl">
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             {aboutPage.data.stories.map((story: any) => (
@@ -192,7 +192,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- Principles Section -->
   {
     aboutPage?.data?.principles && (
-      <section class="mb-40 px-4">
+      <section class="mb-40 px-content">
         <div class="mx-auto max-w-4xl text-center">
           <h2 class="font-heading mb-8 text-5xl tracking-tight text-white">
             {aboutPage.data.principles.title}
@@ -215,7 +215,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- Fit Section & How to start -->
   {
     aboutPage?.data?.fit && (
-      <section class="mb-40 px-4">
+      <section class="mb-40 px-content">
         <div class="mx-auto max-w-7xl">
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="rounded-lg border border-white/20 bg-white/5 p-6 text-center backdrop-blur-sm md:text-left">

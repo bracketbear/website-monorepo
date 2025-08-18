@@ -60,6 +60,16 @@
   box-shadow: 4px 4px 0 0 var(--color-shadow);
 }
 
+/* Consistent horizontal padding utility for content sections */
+@utility px-content {
+  @apply px-4 lg:px-6;
+}
+
+/* Section with consistent content padding */
+@utility section-content {
+  @apply px-content;
+}
+
 /* Text mode classes that apply appropriate text colors based on background */
 @layer components {
   /* Light text mode - for dark backgrounds */

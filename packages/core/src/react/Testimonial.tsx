@@ -27,7 +27,7 @@ export const Testimonial = ({
   return (
     <section
       className={clsx(
-        'relative isolate overflow-hidden px-6 py-24 sm:py-32 lg:px-8',
+        'px-content relative isolate overflow-hidden py-24 sm:py-32',
         variant === 'dark' && darkClass,
         variant === 'light' && lightClass,
         variant === 'primary' && 'bg-primary/90 text-white',

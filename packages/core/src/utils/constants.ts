@@ -13,8 +13,16 @@ export const LAYOUT_CONSTANTS = {
 
 // Spacing constants for consistent padding across components
 export const SPACING_CONSTANTS = {
-  CONTENT_PADDING: 'px-4 lg:px-6',
+  CONTENT_PADDING: 'px-content',
   SECTION_PADDING: 'px-4',
   MOBILE_PADDING: 'px-4',
   DESKTOP_PADDING: 'lg:px-6',
+  // Utility class names for consistent usage
+  UTILITIES: {
+    PX_CONTENT: 'px-content',
+    SECTION_CONTENT: 'section-content',
+    CONTAINER_CONTENT: 'container-content',
+    PX_CONTENT_TIGHT: 'px-content-tight',
+    PX_CONTENT_WIDE: 'px-content-wide',
+  },
 } as const;

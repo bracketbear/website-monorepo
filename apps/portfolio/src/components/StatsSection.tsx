@@ -39,7 +39,7 @@ export default function StatsSection({
   className = "" 
 }: StatsSectionProps) {
   return (
-    <section className={`mb-40 px-6 ${className}`}>
+    <section className={`mb-40 px-content ${className}`}>
       <div className="container mx-auto">
         <div className="grid gap-8 md:grid-cols-3">
           {stats.map((stat, index) => (

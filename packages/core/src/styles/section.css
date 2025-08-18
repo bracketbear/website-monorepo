@@ -1,3 +1,27 @@
 @utility styled-section {
-  @apply p-8 card;
+  @apply card p-8;
+}
+
+/* Consistent horizontal padding utility for content sections */
+@utility px-content {
+  @apply px-4 lg:px-6;
+}
+
+/* Section with consistent content padding */
+@utility section-content {
+  @apply px-content;
+}
+
+/* Container with consistent content padding */
+@utility container-content {
+  @apply px-content container mx-auto;
+}
+
+/* Responsive padding utilities */
+@utility px-content-tight {
+  @apply px-3 lg:px-4;
+}
+
+@utility px-content-wide {
+  @apply px-6 lg:px-8;
 }
