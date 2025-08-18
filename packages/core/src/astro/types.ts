@@ -7,7 +7,6 @@ export interface ContentLayoutProps extends LayoutProps {
   showHero?: boolean;
   contentWidth?: 'narrow' | 'wide';
   navigation: NavigationConfig;
-  theme?: any;
   contactForm?: any;
   breadcrumbs?: Breadcrumb[];
 }

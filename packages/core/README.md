@@ -210,11 +210,7 @@ interface LayoutProps {
   hideNavigation?: boolean;
 }
 
-interface ThemeConfig {
-  enableSystemPreference?: boolean;
-  defaultTheme?: 'light' | 'dark' | 'system';
-  storageKey?: string;
-}
+
 ```
 
 ## Styling
@@ -223,7 +219,6 @@ The package includes a shared Tailwind configuration with:
 
 - Custom color tokens
 - Brutalist design utilities
-- Dark mode support
 - Responsive utilities
 
 ```css

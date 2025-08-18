@@ -31,11 +31,8 @@ export default function HeroSection({
   // Create application and animation only once
   const application = useMemo(() => {
     if (!isClient) {
-      console.log('HeroSection: Not on client yet');
       return null;
     }
-
-    console.log('HeroSection: Creating application...');
 
     try {
       const app = new PixiApplication({

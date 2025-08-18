@@ -9,9 +9,3 @@ export interface LayoutProps {
   hideContactForm?: boolean;
   hideNavigation?: boolean;
 }
-
-export interface ThemeConfig {
-  enableSystemPreference?: boolean;
-  defaultTheme?: 'light' | 'dark' | 'system';
-  storageKey?: string;
-}

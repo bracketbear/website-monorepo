@@ -442,14 +442,6 @@ export function getContentImageUrl(
       relativePath = pathParts.slice(4).join('/');
     }
   }
-
-  console.log(`[DEBUG] getContentImageUrl:`, {
-    contentType,
-    contentId,
-    imagePath,
-    relativePath,
-  });
-
   // If it's a relative path like media/0/image.jpg, preserve the full structure
   const publicPath = join(
     findPublicDir(),
@@ -458,17 +450,6 @@ export function getContentImageUrl(
     contentId,
     relativePath
   );
-
-  console.log(`[DEBUG] Paths:`, {
-    publicPath,
-    cmsContentPath: join(
-      MONOREPO_ROOT,
-      'apps/cms/content',
-      contentType,
-      contentId,
-      relativePath
-    ),
-  });
 
   if (!existsSync(publicPath)) {
     // Try to copy from CMS
@@ -487,20 +468,13 @@ export function getContentImageUrl(
           mkdirSync(publicDir, { recursive: true });
         }
         copyFileSync(cmsContentPath, publicPath);
-        console.log(
-          `[DEBUG] Successfully copied ${cmsContentPath} to ${publicPath}`
-        );
       } catch (error) {
         console.error(
           `[content-image-loader] Failed on-demand copy ${cmsContentPath} to ${publicPath}:`,
           error
         );
       }
-    } else {
-      console.log(`[DEBUG] CMS path does not exist: ${cmsContentPath}`);
     }
-  } else {
-    console.log(`[DEBUG] Public path already exists: ${publicPath}`);
   }
 
   return `/content-images/${contentType}/${contentId}/${relativePath}`;

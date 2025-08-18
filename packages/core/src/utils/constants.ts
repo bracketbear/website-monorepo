@@ -5,12 +5,6 @@ export const NAVIGATION_CONSTANTS = {
   MOBILE_MENU_TRANSITION: 'translate-x-full',
 } as const;
 
-// Theme switch constants
-export const THEME_CONSTANTS = {
-  SWITCH_TRANSLATE_X: 'translate-x-[2.5rem]',
-  STORAGE_KEY: 'theme',
-} as const;
-
 // Layout constants
 export const LAYOUT_CONSTANTS = {
   CONTAINER_CLASS: 'container mx-auto py-4',

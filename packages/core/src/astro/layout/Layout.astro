@@ -1,12 +1,10 @@
 ---
-import type { LayoutProps, ThemeConfig } from '../../types/layout.js';
+import type { LayoutProps } from '../../types/layout.js';
 import type { NavigationConfig } from '../../types/navigation.js';
 import NavBar from '../components/NavBar.astro';
 import Footer from '../components/Footer.astro';
 
 interface Props extends LayoutProps {
-  navigation: NavigationConfig;
-  theme?: ThemeConfig;
   contactForm?: any; // Allow apps to pass their own ContactForm component
 }
 
@@ -16,57 +14,18 @@ const {
   hideFooter = false,
   hideNavigation = false,
   navigation,
-  theme = {},
   contactForm: ContactFormComponent,
 } = Astro.props;
-
-// Get initial theme from Astro.cookies if available, otherwise default to system preference
-const themeValue =
-  Astro.cookies.get('theme')?.value ?? theme.defaultTheme ?? 'system';
-const isDark = themeValue === 'dark';
 ---
 
 <!doctype html>
-<html lang="en" class:list={[{ dark: isDark }]}>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     {title && <title>{title}</title>}
-    <script is:inline>
-      // Theme initialization
-      function initializeTheme() {
-        const getThemePreference = () => {
-          // Check localStorage first
-          if (localStorage.theme === 'dark') return 'dark';
-          if (localStorage.theme === 'light') return 'light';
-
-          // If no localStorage value, check system preference
-          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            return 'dark';
-          }
-          return 'light';
-        };
-
-        // Set theme based on preference
-        const theme = getThemePreference();
-        document.documentElement.dataset.theme = theme;
-
-        // Watch for system theme changes if no manual preference is set
-        if (!localStorage.theme) {
-          const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-          mediaQuery.addEventListener('change', (e) => {
-            document.documentElement.dataset.theme = e.matches
-              ? 'dark'
-              : 'light';
-          });
-        }
-      }
-
-      // Run initialization
-      initializeTheme();
-    </script>
   </head>
   <body
     class="bg-background text-foreground min-h-screen transition-colors duration-300"

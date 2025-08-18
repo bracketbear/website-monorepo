@@ -1,12 +1,11 @@
 ---
-import type { LayoutProps, ThemeConfig } from '../../types/layout';
+import type { LayoutProps } from '../../types/layout';
 import { LAYERS } from '../../types/layers';
 import NavBar from '../components/NavBar.astro';
 import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 export interface Props extends LayoutProps {
-  theme?: ThemeConfig;
   contactForm?: any;
 }
 
@@ -16,48 +15,19 @@ const {
   hideFooter = false,
   hideNavigation = false,
   navigation,
-  theme = {},
   contactForm: ContactFormComponent,
   breadcrumbs,
 } = Astro.props;
-
-const themeValue =
-  Astro.cookies.get('theme')?.value ?? theme.defaultTheme ?? 'system';
-const isDark = themeValue === 'dark';
 ---
 
 <!doctype html>
-<html lang="en" class:list={[{ dark: isDark }]}>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     {title && <title>{title}</title>}
-    <script is:inline>
-      // Theme initialization
-      function initializeTheme() {
-        const getThemePreference = () => {
-          if (localStorage.theme === 'dark') return 'dark';
-          if (localStorage.theme === 'light') return 'light';
-          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            return 'dark';
-          }
-          return 'light';
-        };
-        const theme = getThemePreference();
-        document.documentElement.dataset.theme = theme;
-        if (!localStorage.theme) {
-          const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-          mediaQuery.addEventListener('change', (e) => {
-            document.documentElement.dataset.theme = e.matches
-              ? 'dark'
-              : 'light';
-          });
-        }
-      }
-      initializeTheme();
-    </script>
   </head>
   <body
     class="bg-brand-orange text-foreground min-h-screen transition-colors duration-300"
