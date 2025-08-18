@@ -344,4 +344,36 @@
   .prose-p\:text-brand-dark\/80 p {
     @apply text-brand-dark/80;
   }
+
+  /* Brand light color modifiers */
+  .prose-headings\:text-brand-light h1,
+  .prose-headings\:text-brand-light h2,
+  .prose-headings\:text-brand-light h3,
+  .prose-headings\:text-brand-light h4 {
+    @apply text-brand-light;
+  }
+
+  .prose-p\:text-brand-light\/80 p {
+    @apply text-brand-light/80;
+  }
+
+  .prose-strong\:text-brand-light strong {
+    @apply text-brand-light;
+  }
+
+  .prose-em\:text-brand-light\/90 em {
+    @apply text-brand-light/90;
+  }
+
+  .prose-ul\:text-brand-light\/80 ul {
+    @apply text-brand-light/80;
+  }
+
+  .prose-ol\:text-brand-light\/80 ol {
+    @apply text-brand-light/80;
+  }
+
+  .prose-li\:text-brand-light\/80 li {
+    @apply text-brand-light/80;
+  }
 }

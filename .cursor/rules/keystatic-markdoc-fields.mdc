@@ -1,0 +1,166 @@
+# Keystatic Markdoc Fields Guide
+
+## Overview
+
+Keystatic's `markdoc` field provides rich markdown editing capabilities in the CMS. Understanding the difference between inline and separate file storage is crucial for proper implementation.
+
+## Field Types
+
+### 1. Standard Markdoc Field
+```typescript
+content: fields.markdoc({
+  label: 'Content',
+  description: 'Rich markdown content with full formatting support',
+})
+```
+
+**Behavior**: Stores content in a separate markdown file
+**Use Case**: When you want content stored separately from the main data file
+**Storage**: Creates `.mdoc` or `.md` files alongside your JSON files
+
+### 2. Inline Markdoc Field
+```typescript
+content: fields.markdoc.inline({
+  label: 'Content', 
+  description: 'Rich markdown content stored inline with JSON',
+})
+```
+
+**Behavior**: Stores content inline within the JSON file
+**Use Case**: When you want all content in one place (recommended for most cases)
+**Storage**: Content appears directly in the JSON file as a string
+
+## Configuration Requirements
+
+### JSON Format Singletons
+When using `format: 'json'` in your singleton configuration, **always use `fields.markdoc.inline()`**:
+
+```typescript
+// ✅ Correct - JSON format with inline markdoc
+export const portfolioIndexPage = singleton({
+  label: 'Portfolio Homepage',
+  path: 'content/sites/portfolio/index-page',
+  schema: portfolioIndexPageSchema,
+  format: 'json', // JSON format requires inline markdoc
+});
+
+// Schema must use inline markdoc
+content: fields.markdoc.inline({
+  label: 'Content',
+  description: 'Full about section content with markdown support',
+}),
+```
+
+### Separate File Format
+If you want to use separate markdown files, change the format:
+
+```typescript
+// Alternative approach - separate markdown files
+export const portfolioIndexPage = singleton({
+  label: 'Portfolio Homepage', 
+  path: 'content/sites/portfolio/index-page',
+  schema: portfolioIndexPageSchema,
+  format: 'content-field', // Allows separate markdown files
+});
+
+// Schema can use standard markdoc
+content: fields.markdoc({
+  label: 'Content',
+  description: 'Full about section content with markdown support',
+}),
+```
+
+## Common Issues and Solutions
+
+### Issue: Content Visible on Website but Blank in CMS
+**Cause**: Using `fields.markdoc()` with `format: 'json'`
+**Solution**: Switch to `fields.markdoc.inline()`
+
+### Issue: CMS Shows Content but Website Can't Read It
+**Cause**: Content stored in separate markdown file that website isn't reading
+**Solution**: Either use `fields.markdoc.inline()` or update website to read markdown files
+
+### Issue: Content Migration Problems
+**Cause**: Switching from text fields to markdoc fields
+**Solution**: Clear and re-enter content after schema change
+
+## Best Practices
+
+### 1. Choose the Right Approach
+- **Use `fields.markdoc.inline()`** for JSON-based content management
+- **Use `fields.markdoc()`** only when you specifically need separate files
+
+### 2. Schema Design
+```typescript
+// ✅ Good - Clear field structure
+about: fields.object({
+  title: fields.text({ label: 'Title' }),
+  content: fields.markdoc.inline({
+    label: 'Content',
+    description: 'Full about section content with markdown support',
+  }),
+  showSkillsTicker: fields.checkbox({ label: 'Show Skills Ticker' }),
+}),
+```
+
+### 3. Content Migration
+When switching from text fields to markdoc:
+1. Update schema to use `fields.markdoc.inline()`
+2. Rebuild CMS
+3. Re-enter content in the new markdown editor
+4. Test both CMS and website
+
+### 4. Prose Styling Integration
+When rendering markdoc content, apply prose classes for consistent typography:
+
+```astro
+<div
+  class="prose prose-lg prose-headings:text-brand-light prose-p:text-brand-light/80 prose-strong:text-brand-light prose-em:text-brand-light/90 prose-ul:text-brand-light/80 prose-ol:text-brand-light/80 prose-li:text-brand-light/80 max-w-none"
+  set:html={parseMarkdown(indexPage.data.about.content)}
+/>
+```
+
+## Examples in This Codebase
+
+### Portfolio Index Page
+- **File**: [apps/cms/src/sites/portfolio/schemas.ts](mdc:apps/cms/src/sites/portfolio/schemas.ts)
+- **Pattern**: Uses `fields.markdoc.inline()` with JSON format
+- **Content**: [apps/cms/content/sites/portfolio/index-page.json](mdc:apps/cms/content/sites/portfolio/index-page.json)
+
+### Website Rendering
+- **File**: [apps/portfolio/src/pages/index.astro](mdc:apps/portfolio/src/pages/index.astro)
+- **Pattern**: Parses markdown and applies prose classes
+
+## Migration Checklist
+
+When converting existing text fields to markdoc:
+
+1. ✅ Update schema to use `fields.markdoc.inline()`
+2. ✅ Ensure singleton uses `format: 'json'`
+3. ✅ Rebuild CMS (`npm run build`)
+4. ✅ Re-enter content in markdown editor
+5. ✅ Test CMS content editing
+6. ✅ Test website rendering
+7. ✅ Verify prose styling works correctly
+
+## Troubleshooting
+
+### CMS Shows Blank Content
+- Check if using correct markdoc field type
+- Verify singleton format configuration
+- Rebuild CMS after schema changes
+- Check browser console for errors
+
+### Website Can't Read Content
+- Verify content is stored in expected location
+- Check if markdown parsing is working
+- Ensure content field path matches schema
+
+### Prose Styling Not Working
+- Verify prose classes are defined in CSS
+- Check if markdown is being parsed correctly
+- Ensure proper class application in template
+description:
+globs:
+alwaysApply: false
+---

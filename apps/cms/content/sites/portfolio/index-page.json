@@ -1,7 +1,6 @@
 {
   "title": "Hi, I'm Harrison",
   "subtitle": "I'm a value-minded full-stack developer with a passion for building great experiences for users",
-  "content": "Give me the messy version. I’ll find the plan, trim what isn’t needed, and make it solid.\n\nCalm process, clear decisions, usable results.",
   "metaDescription": "Harrison Callahan builds full-stack tools for experiential teams. Self-taught developer turning loose ideas into working systems.",
   "canonicalUrl": "https://harrisoncallahan.com/",
   "ogImage": "portfolio-hero.jpg",
@@ -12,14 +11,13 @@
     "buttonLink": "/contact"
   },
   "hero": {
+    "title": "Hi, I'm Harrison",
+    "subtitle": "I'm a value-minded full-stack developer with a passion for building great experiences for users",
     "showParticleBackground": true
   },
   "about": {
     "title": "What I do",
-    "introduction": "I've built a career on being a problem solver that folks can rely on.",
-    "description": "On small teams, I'm the person who figures it out. I'm able to identify problems, collaborate with my team, do some research, and whip together a proof-of-concept to test the MVP.",
-    "experience": "I've spent over twelve years working on the web and I've gotten to see it evolve faster than I could have ever imagined. There's never been a better time to be a software engineer than right now.",
-    "additional": "I'm a big believer in clear communication, collaboration, and constantly asking if you can be doing better than how you have been. ",
+    "content": "## I've built a career on being a problem solver that folks can rely on.\n\nOn small teams, I'm the person who figures it out. I'm able to identify problems, collaborate with my team, do some research, and whip together a proof-of-concept to test the MVP.\n\nI've spent over *twelve years* working on the web and I've gotten to see it evolve faster than I could have ever imagined. There's never been a better time to be a software engineer than right now.\n",
     "showSkillsTicker": false,
     "featuredSkills": [
       "react",

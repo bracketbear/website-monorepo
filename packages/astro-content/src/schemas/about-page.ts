@@ -98,13 +98,18 @@ export type AboutPageData = PortfolioAboutPageData; // Legacy type alias
  * contact, and layout controls.
  */
 export const portfolioIndexPageSchema = makePageSchema({
+  // Hero section content
+  hero: z.object({
+    title: z.string(),
+    subtitle: z.string(),
+    description: z.string().optional(),
+    showParticleBackground: z.boolean().default(true),
+  }),
+
   // About/What I Do section
   about: z.object({
     title: z.string().default('What I Do'),
-    introduction: z.string(),
-    description: z.string(),
-    experience: z.string(),
-    additional: z.string(),
+    content: z.string(), // Markdoc content
     showSkillsTicker: z.boolean().default(true),
     featuredSkills: z.array(z.string()),
   }),
@@ -139,5 +144,12 @@ export const portfolioIndexPageSchema = makePageSchema({
     showFeaturedProjects: z.boolean().default(true),
     showRecentExperience: z.boolean().default(true),
     showContactSection: z.boolean().default(true),
+  }),
+
+  // Contact CTA section
+  contactCTA: z.object({
+    text: z.string(),
+    buttonText: z.string().default('Get in touch'),
+    buttonLink: z.string().default('/contact'),
   }),
 });

@@ -285,21 +285,9 @@ export const portfolioIndexPageSchema = makePageSchema({
       label: 'Title',
       defaultValue: 'What I Do',
     }),
-    introduction: fields.text({
-      label: 'Introduction',
-      multiline: true,
-    }),
-    description: fields.text({
-      label: 'Description',
-      multiline: true,
-    }),
-    experience: fields.text({
-      label: 'Experience',
-      multiline: true,
-    }),
-    additional: fields.text({
-      label: 'Additional Information',
-      multiline: true,
+    content: fields.markdoc.inline({
+      label: 'Content',
+      description: 'Full about section content with markdown support',
     }),
     showSkillsTicker: fields.checkbox({
       label: 'Show Skills Ticker',

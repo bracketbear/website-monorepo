@@ -130,28 +130,10 @@ function parseMarkdown(content: string): string {
               {indexPage.data.about.title}
             </h2>
             <div class="card-dark">
-              {indexPage.data.about.introduction && (
+              {indexPage.data.about.content && (
                 <div
-                  class="text-brand-light mb-6 text-xl leading-relaxed font-bold"
-                  set:html={parseMarkdown(indexPage.data.about.introduction)}
-                />
-              )}
-              {indexPage.data.about.description && (
-                <div
-                  class="text-brand-light/80 text-lg leading-relaxed font-medium"
-                  set:html={parseMarkdown(indexPage.data.about.description)}
-                />
-              )}
-              {indexPage.data.about.experience && (
-                <div
-                  class="text-brand-light/80 text-lg leading-relaxed font-medium"
-                  set:html={parseMarkdown(indexPage.data.about.experience)}
-                />
-              )}
-              {indexPage.data.about.additional && (
-                <div
-                  class="text-brand-light/80 text-lg leading-relaxed font-medium"
-                  set:html={parseMarkdown(indexPage.data.about.additional)}
+                  class="prose prose-lg prose-headings:text-brand-light prose-p:text-brand-light/80 prose-strong:text-brand-light prose-em:text-brand-light/90 prose-ul:text-brand-light/80 prose-ol:text-brand-light/80 prose-li:text-brand-light/80 max-w-none"
+                  set:html={parseMarkdown(indexPage.data.about.content)}
                 />
               )}
               {indexPage.data.about.showSkillsTicker && (
@@ -181,7 +163,7 @@ function parseMarkdown(content: string): string {
               </h2>
               {indexPage.data.featuredProjects.subtitle && (
                 <div
-                  class="text-brand-dark/80 mx-auto max-w-2xl text-xl"
+                  class="prose prose-lg prose-p:text-brand-dark/80 mx-auto max-w-2xl"
                   set:html={parseMarkdown(
                     indexPage.data.featuredProjects.subtitle
                   )}
@@ -225,7 +207,7 @@ function parseMarkdown(content: string): string {
             </h2>
             {indexPage.data.recentExperience.subtitle && (
               <div
-                class="text-brand-dark/80 mx-auto max-w-2xl text-xl"
+                class="prose prose-lg prose-p:text-brand-dark/80 mx-auto max-w-2xl"
                 set:html={parseMarkdown(
                   indexPage.data.recentExperience.subtitle
                 )}
@@ -255,7 +237,7 @@ function parseMarkdown(content: string): string {
                 </div>
                 {job.data.description && (
                   <div
-                    class="text-brand-light mb-4"
+                    class="prose prose-sm prose-p:text-brand-light prose-strong:text-brand-light prose-em:text-brand-light/90 prose-ul:text-brand-light/80 prose-ol:text-brand-light/80 prose-li:text-brand-light/80 mb-4 max-w-none"
                     set:html={parseMarkdown(job.data.description)}
                   />
                 )}
@@ -306,7 +288,7 @@ function parseMarkdown(content: string): string {
             </h2>
             {indexPage.data.contactCTA.text && (
               <div
-                class="text-brand-light/80 mx-auto mb-12 max-w-2xl text-xl"
+                class="prose prose-lg prose-p:text-brand-light/80 mx-auto mb-12 max-w-2xl"
                 set:html={parseMarkdown(indexPage.data.contactCTA.text)}
               />
             )}
