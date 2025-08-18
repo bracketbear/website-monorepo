@@ -123,10 +123,10 @@ function parseMarkdown(content: string): string {
   <!-- What I Do Section -->
   {
     indexPage.data.layout.showAboutSection && (
-      <section class="bg-brand-dark py-24">
+      <section class="bg-brand-orange py-24">
         <div class="container mx-auto">
           <div class="mx-auto max-w-4xl text-center">
-            <h2 class="font-heading text-brand-light mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
+            <h2 class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
               {indexPage.data.about.title}
             </h2>
             <div class="card-dark">
@@ -217,15 +217,15 @@ function parseMarkdown(content: string): string {
   <!-- Recent Experience Section -->
   {
     indexPage.data.layout.showRecentExperience && (
-      <section class="bg-brand-dark py-24">
+      <section class="bg-brand-orange py-24">
         <div class="container mx-auto">
           <div class="mb-16 text-center">
-            <h2 class="font-heading text-brand-light mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
+            <h2 class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
               {indexPage.data.recentExperience.title}
             </h2>
             {indexPage.data.recentExperience.subtitle && (
               <div
-                class="text-brand-light/80 mx-auto max-w-2xl text-xl"
+                class="text-brand-dark/80 mx-auto max-w-2xl text-xl"
                 set:html={parseMarkdown(
                   indexPage.data.recentExperience.subtitle
                 )}

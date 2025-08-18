@@ -5,8 +5,7 @@ import { createCuriousParticleNetworkAnimation } from '@bracketbear/flateralus-a
 import { clsx } from '@bracketbear/core';
 import { useMemo, useState, useEffect } from 'react';
 
-const BACKGROUND_CLASS =
-  'bg-brand-orange from-brand-yellow to-brand-orange/90 bg-radial' as const;
+const BACKGROUND_CLASS = 'bg-brand-orange' as const;
 
 interface HeroSectionProps {
   className?: string;
@@ -58,36 +57,14 @@ export default function HeroSection({
         cursorAttractionRadius: 90,
         cursorAttractionStrength: 0.17500000000000002,
         particleGlowRadius: 5,
-        // @ts-expect-error - TODO: Groups are not typed properly yet.
         particleColors: [
           {
             color: '#9ce8e9',
           },
-          {
-            color: '#db53ce',
-          },
-          {
-            color: '#0dc37a',
-          },
-          {
-            color: '#802ff8',
-          },
-          {
-            color: '#c9d019',
-          },
-          {
-            color: '#9823c7',
-          },
-          {
-            color: '#c1fc2e',
-          },
-          {
-            color: '#33a5e6',
-          },
         ],
         keepInBounds: true,
-        connectionColor: '#06c26c',
-        glowColor: '#147a8c',
+        connectionColor: '#000000',
+        glowColor: '#f1880d',
         debugLogging: false,
       });
       app.setAnimation(animation);
