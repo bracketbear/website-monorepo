@@ -101,15 +101,13 @@ export const portfolioIndexPageSchema = makePageSchema({
   // Hero section content
   hero: z.object({
     title: z.string(),
-    subtitle: z.string(),
-    description: z.string().optional(),
     showParticleBackground: z.boolean().default(true),
   }),
 
   // About/What I Do section
   about: z.object({
     title: z.string().default('What I Do'),
-    content: z.string(), // Markdoc content
+    content: z.string().optional(), // Markdoc content - optional to match CMS schema
     showSkillsTicker: z.boolean().default(true),
     featuredSkills: z.array(z.string()),
   }),

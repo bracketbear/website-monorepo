@@ -2,19 +2,10 @@
   "title": "Project Page Template",
   "metaDescription": "Template for individual project pages",
   "sectionHeadings": {
-    "company": "Company",
-    "duration": "Duration",
-    "role": "Role",
-    "technologies": "Technologies",
     "overview": "About This Project",
     "challenges": "Challenges & Solutions",
     "results": "Results Achieved",
-    "gallery": "Project Gallery",
-    "roleScope": "My Role",
-    "notes": "Notes",
-    "stack": "Stack",
-    "links": "Links",
-    "impact": "Impact"
+    "gallery": "Project Gallery"
   },
   "defaultCTA": {
     "text": "I'd love to discuss how I can help with your project.",

@@ -248,14 +248,6 @@ export const portfolioContactPageSchema = makePageSchema(
         multiline: true,
       }),
     }),
-
-    // Legacy fields (kept for backward compatibility)
-    phone: fields.text({ label: 'Phone' }),
-    address: fields.text({ label: 'Address' }),
-    contactFormId: fields.text({ label: 'Contact Form ID' }),
-    officeHours: fields.text({ label: 'Office Hours' }),
-    availability: fields.text({ label: 'Availability Status' }),
-    responseTime: fields.text({ label: 'Expected Response Time' }),
   },
   { showCta: false }
 ); // Disable CTA for contact page since they're already on the contact page
@@ -271,8 +263,6 @@ export const portfolioIndexPageSchema = makePageSchema({
   // Hero section content
   hero: fields.object({
     title: fields.text({ label: 'Title' }),
-    subtitle: fields.text({ label: 'Subtitle' }),
-    description: fields.text({ label: 'Description' }),
     showParticleBackground: fields.checkbox({
       label: 'Show Particle Background',
       defaultValue: true,
@@ -561,27 +551,6 @@ export const portfolioProjectsPageSchema = makePageSchema({
 export const portfolioProjectPageSchema = makePageSchema({
   // Section headings that can be customized
   sectionHeadings: fields.object({
-    // Top info bar labels
-    company: fields.text({
-      label: 'Company Label',
-      description: 'Label for the company field in the top info bar',
-      defaultValue: 'Company',
-    }),
-    duration: fields.text({
-      label: 'Duration Label',
-      description: 'Label for the duration field in the top info bar',
-      defaultValue: 'Duration',
-    }),
-    role: fields.text({
-      label: 'Role Label',
-      description: 'Label for the role field in the top info bar',
-      defaultValue: 'Role',
-    }),
-    technologies: fields.text({
-      label: 'Technologies Label',
-      description: 'Label for the technologies field in the top info bar',
-      defaultValue: 'Technologies',
-    }),
     // Main content section headings
     overview: fields.text({
       label: 'Overview Section Title',
@@ -602,32 +571,6 @@ export const portfolioProjectPageSchema = makePageSchema({
       label: 'Gallery Section Title',
       description: 'Title for the project gallery section',
       defaultValue: 'Project Gallery',
-    }),
-    // Additional section headings
-    roleScope: fields.text({
-      label: 'Role Scope Section Title',
-      description: 'Title for the role scope section',
-      defaultValue: 'My Role',
-    }),
-    notes: fields.text({
-      label: 'Notes Section Title',
-      description: 'Title for the notes section',
-      defaultValue: 'Notes',
-    }),
-    stack: fields.text({
-      label: 'Stack Section Title',
-      description: 'Title for the technology stack section',
-      defaultValue: 'Stack',
-    }),
-    links: fields.text({
-      label: 'Links Section Title',
-      description: 'Title for the links section',
-      defaultValue: 'Links',
-    }),
-    impact: fields.text({
-      label: 'Impact Section Title',
-      description: 'Title for the impact section',
-      defaultValue: 'Impact',
     }),
   }),
 

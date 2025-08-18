@@ -1,4 +1,4 @@
-import { z } from 'astro:content';
+import { z } from 'zod';
 
 /**
  * Base page schema with common SEO and content fields
@@ -22,7 +22,6 @@ import { z } from 'astro:content';
 export const basePageSchema = z.object({
   title: z.string().optional(),
   subtitle: z.string().optional(),
-  content: z.string().optional(),
   metaDescription: z.string().optional(),
   canonicalUrl: z.string().url().optional(),
   ogImage: z.string().optional(),

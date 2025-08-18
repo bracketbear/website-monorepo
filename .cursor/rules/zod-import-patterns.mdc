@@ -1,0 +1,46 @@
+# Zod Import Patterns
+
+## All Packages: Use Direct Zod Imports
+
+All packages in the monorepo should import Zod directly for framework independence:
+
+```typescript
+// ✅ Correct for all packages
+import { z } from 'zod';
+
+// ❌ Incorrect - don't use framework-specific imports
+import { z } from 'astro:content';
+```
+
+## Package Context Examples
+
+### Core Packages
+- [packages/core/src/**/*.ts](mdc:packages/core/src/**/*.ts)
+- [packages/flateralus/**/*.ts](mdc:packages/flateralus/**/*.ts)
+- [packages/flateralus-react/**/*.ts](mdc:packages/flateralus-react/**/*.ts)
+- [packages/flateralus-pixi/**/*.ts](mdc:packages/flateralus-pixi/**/*.ts)
+
+### Content Packages
+- [packages/astro-content/src/**/*.ts](mdc:packages/astro-content/src/**/*.ts)
+
+## Why This Matters
+
+1. **Framework independence** - Packages can be used in any context (Next.js, Astro, etc.)
+2. **Consistent dependency management** - All packages use the same Zod version
+3. **Easier testing** - No framework-specific imports to mock
+4. **Portability** - Code can be moved between packages without import changes
+5. **Avoids runtime errors** - Prevents issues with framework-specific Zod implementations
+
+## Validation
+
+Always verify imports use direct zod:
+- ✅ `import { z } from 'zod';`
+- ❌ `import { z } from 'astro:content';`
+- ❌ `import { z } from 'next:content';`
+
+## Exception
+
+The only exception is when you specifically need framework-specific content functionality:
+- Use `astro:content` for Astro content collections and config
+- Use `next:content` for Next.js content (if applicable)
+- But always use `zod` for schema definitions and validation
