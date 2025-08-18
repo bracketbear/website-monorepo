@@ -1,9 +1,9 @@
-import { Button } from '@bracketbear/core/react';
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
 import { createCuriousParticleNetworkAnimation } from '@bracketbear/flateralus-animations';
 import { clsx } from '@bracketbear/core';
 import { useMemo, useState, useEffect } from 'react';
+import { HeroContent } from './HeroContent';
 
 const BACKGROUND_CLASS = 'bg-brand-orange' as const;
 
@@ -63,14 +63,6 @@ export default function HeroSection({
         debugLogging: false,
       });
 
-      // Debug: Log the control values to see what's actually stored
-      console.log('Animation control values:', animation.getControlValues());
-      console.log('Animation manifest:', animation.getManifest());
-      console.log(
-        'particleColors specifically:',
-        JSON.stringify(animation.getControlValues().particleColors, null, 2)
-      );
-
       app.setAnimation(animation);
 
       return app;
@@ -79,36 +71,19 @@ export default function HeroSection({
     }
   }, [isClient]);
 
-  // Don't render the animation on the server
+  // Create the hero content once
+  const heroContent = (
+    <HeroContent title={title} subtitle={subtitle} description={description} />
+  );
+
+  // Server-side render (no animation)
   if (!isClient) {
     return (
-      <div className={clsx(BACKGROUND_CLASS, className)}>
-        <div className="relative z-10 mb-8 flex h-full flex-col items-center justify-center">
-          {description && (
-            <p className="text-2xl font-bold tracking-tight text-white/90 uppercase drop-shadow-lg">
-              {description}
-            </p>
-          )}
-          <h1 className="font-heading text-7xl font-black tracking-tight text-white uppercase drop-shadow-lg lg:text-8xl">
-            {title}
-          </h1>
-          <p className="mt-6 text-2xl font-bold tracking-tight text-white/90 uppercase drop-shadow-lg">
-            {subtitle}
-          </p>
-          <a href="/contact">
-            <Button
-              variant="primary"
-              size="lg"
-              className="mt-8 shadow-lg hover:shadow-xl"
-            >
-              Get in touch
-            </Button>
-          </a>
-        </div>
-      </div>
+      <div className={clsx(BACKGROUND_CLASS, className)}>{heroContent}</div>
     );
   }
 
+  // Client-side render (with animation)
   return (
     <AnimationStage
       application={application}
@@ -117,28 +92,7 @@ export default function HeroSection({
       debugControlsClassName="top-32"
       layoutClassName="relative flex h-full w-full items-end"
     >
-      <div className="relative z-10 mb-8 flex h-full flex-col items-center justify-center">
-        {description && (
-          <p className="text-2xl font-bold tracking-tight text-white/90 uppercase drop-shadow-lg">
-            {description}
-          </p>
-        )}
-        <h1 className="font-heading text-7xl font-black tracking-tight text-white uppercase drop-shadow-lg lg:text-8xl">
-          {title}
-        </h1>
-        <p className="mt-6 text-2xl font-bold tracking-tight text-white/90 uppercase drop-shadow-lg">
-          {subtitle}
-        </p>
-        <a href="/contact">
-          <Button
-            variant="primary"
-            size="lg"
-            className="mt-8 shadow-lg hover:shadow-xl"
-          >
-            Get in touch
-          </Button>
-        </a>
-      </div>
+      {heroContent}
     </AnimationStage>
   );
 }
