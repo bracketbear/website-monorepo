@@ -100,7 +100,7 @@ export default function ProjectCard({
 
             {/* Project subline */}
             {project.data.teaser?.subline && (
-              <div className="mb-4 text-base leading-relaxed text-white/70">
+              <div className="text-brand-dark/70 mb-4 text-base leading-relaxed">
                 {project.data.teaser.subline}
               </div>
             )}
