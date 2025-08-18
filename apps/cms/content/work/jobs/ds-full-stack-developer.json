@@ -3,18 +3,14 @@
   "company": "downstream",
   "description": "Bridged the gap between CMS and experience teams, then led front-end development efforts for CMS revision projects using modern technologies",
   "highlights": [
-    "Bridged the gap between the CMS and experience teams by being the first team member to work on both",
-    "Successfully contributed to the development of three generations of CMS frameworks, ensuring the platforms' stability and longevity",
-    "Demonstrated strong teamwork skills by collaborating with design, UX, and account management teams to gather user feedback and implement UI/UX improvements, leading to an overall improved user experience",
-    "Effectively represented Downstream in product demonstrations with clients in the USA, Amsterdam, and England, showcasing our platform's capabilities and building strong client relationships",
     "Led front-end development efforts for a CMS revision project, utilizing Typescript, Vue 3, and Tailwind CSS to improve user experience and streamline workflows",
-    "Worked collaboratively with back-end team to ensure seamless integration of front-end and back-end systems, ensuring data consistency and reliability",
-    "Demonstrated proficiency in understanding Rust code and the ability to translate it into practical front-end solutions",
-    "Successfully delivered high-quality code that met project timelines and exceeded client expectations, resulting in a more efficient and user-friendly CMS"
+    "Successfully contributed to the development of three generations of CMS frameworks, ensuring the platforms' stability and longevity",
+    "Effectively represented Downstream in product demonstrations with clients in the USA, Amsterdam, and England, showcasing our platform's capabilities and building strong client relationships",
+    "Bridged the gap between the CMS and experience teams by being the first team member to work on both",
+    "Demonstrated proficiency in understanding Rust code and the ability to translate it into practical front-end solutions"
   ],
   "startDate": "2020-01-01",
   "endDate": "2022-08-01",
-  "isCurrentJob": false,
   "workSkills": [
     "vue",
     "mysql",
@@ -27,5 +23,6 @@
     "rust",
     "typescript",
     "tailwind-css"
-  ]
+  ],
+  "isCurrentJob": false
 }

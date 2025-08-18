@@ -33,16 +33,25 @@ function groupJobsByCompany(
     return acc;
   }, [] as JobGroup[]);
 
+  // Sort jobs within each company group by end date (most recent first)
+  grouped.forEach((group) => {
+    group.jobs.sort((a, b) => {
+      // Handle current jobs (no end date) by treating them as most recent
+      const aEndDate = a.data.endDate || new Date();
+      const bEndDate = b.data.endDate || new Date();
+      return bEndDate.getTime() - aEndDate.getTime();
+    });
+  });
+
+  // Sort companies by the most recent job end date
   return grouped.sort((a, b) => {
-    const aLatestJob = a.jobs.sort(
-      (x, y) => y.data.startDate.getTime() - x.data.startDate.getTime()
-    )[0];
-    const bLatestJob = b.jobs.sort(
-      (x, y) => y.data.startDate.getTime() - x.data.startDate.getTime()
-    )[0];
-    return (
-      bLatestJob.data.startDate.getTime() - aLatestJob.data.startDate.getTime()
-    );
+    const aLatestJob = a.jobs[0]; // Jobs are already sorted by end date
+    const bLatestJob = b.jobs[0];
+    
+    const aEndDate = aLatestJob.data.endDate || new Date();
+    const bEndDate = bLatestJob.data.endDate || new Date();
+    
+    return bEndDate.getTime() - aEndDate.getTime();
   });
 }
 

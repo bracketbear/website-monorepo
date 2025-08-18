@@ -1,6 +1,6 @@
 {
-  "title": "I build full-stack tools for experiential teams.",
-  "subtitle": "I’m Harrison, a self-taught developer. I turn loose ideas into working systems.",
+  "title": "Hi, I'm Harrison",
+  "subtitle": "I'm a value-minded full-stack developer with a passion for building great experiences for users",
   "content": "Give me the messy version. I’ll find the plan, trim what isn’t needed, and make it solid.\n\nCalm process, clear decisions, usable results.",
   "metaDescription": "Harrison Callahan builds full-stack tools for experiential teams. Self-taught developer turning loose ideas into working systems.",
   "canonicalUrl": "https://harrisoncallahan.com/",
@@ -16,10 +16,10 @@
   },
   "about": {
     "title": "What I do",
-    "introduction": "I like projects with rough edges and moving parts. I listen first, map the constraints, then build the simplest path that holds up.",
-    "description": "My default is practical: start small, make sure it works, add only what earns a place. Clear structure, steady pace, easy to maintain.",
-    "experience": "12+ years on the web. Two experiential management teams. Self-taught. Comfortable when the brief is a little vague.",
-    "additional": "What matters: plain language, honest timelines, maintainable systems, calm collaboration.",
+    "introduction": "I've built a career on being a problem solver that folks can rely on.",
+    "description": "On small teams, I'm the person who figures it out. I'm able to identify problems, collaborate with my team, do some research, and whip together a proof-of-concept to test the MVP.",
+    "experience": "I've spent over twelve years working on the web and I've gotten to see it evolve faster than I could have ever imagined. There's never been a better time to be a software engineer than right now.",
+    "additional": "I'm a big believer in clear communication, collaboration, and constantly asking if you can be doing better than how you have been. ",
     "showSkillsTicker": false,
     "featuredSkills": [
       "react",
@@ -41,13 +41,14 @@
   },
   "recentExperience": {
     "title": "Recent experience",
-    "subtitle": "A quick look at places I’ve contributed. For context, see the full history.",
-    "maxDisplay": 3,
+    "subtitle": "A quick look at places I’ve contributed. For a full look, check out my full work history.",
+    "maxDisplay": 2,
     "showViewAllButton": true,
     "viewAllButtonText": "See full work history →",
     "viewAllButtonLink": "/work",
     "selectedJobs": [
-      "dl-full-stack-software-engineer"
+      "dl-full-stack-software-engineer",
+      "ds-full-stack-developer"
     ]
   },
   "layout": {

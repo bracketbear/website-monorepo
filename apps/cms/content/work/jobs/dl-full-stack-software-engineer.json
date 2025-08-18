@@ -11,17 +11,23 @@
   "startDate": "2024-01-01",
   "endDate": "2025-03-01",
   "workSkills": [
-    "react",
-    "postgresql",
-    "figma",
     "typescript",
+    "react",
+    "node",
+    "express",
+    "postgresql",
     "javascript",
     "vite",
     "redux",
     "mui",
     "storybook",
-    "express",
-    "sequelize"
+    "sequelize",
+    "css",
+    "docker",
+    "git",
+    "html",
+    "python",
+    "figma"
   ],
   "isCurrentJob": false
 }

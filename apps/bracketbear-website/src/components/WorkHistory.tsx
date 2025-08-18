@@ -18,11 +18,7 @@ const groupJobsByCompany = (
   jobs: CollectionEntry<'workJobs'>[],
   companies: CollectionEntry<'workCompany'>[]
 ): GroupedJob[] => {
-  const sortedJobs = [...jobs].sort(
-    (a, b) => b.data.startDate.getTime() - a.data.startDate.getTime()
-  );
-
-  const groupedJobs = sortedJobs.reduce((acc, job) => {
+  const groupedJobs = jobs.reduce((acc, job) => {
     const company = companies.find((c) => c.id === job.data.company);
     if (!company) return acc;
 
@@ -37,7 +33,26 @@ const groupJobsByCompany = (
     return acc;
   }, [] as GroupedJob[]);
 
-  return groupedJobs;
+  // Sort jobs within each company group by end date (most recent first)
+  groupedJobs.forEach((group) => {
+    group.jobs.sort((a, b) => {
+      // Handle current jobs (no end date) by treating them as most recent
+      const aEndDate = a.data.endDate || new Date();
+      const bEndDate = b.data.endDate || new Date();
+      return bEndDate.getTime() - aEndDate.getTime();
+    });
+  });
+
+  // Sort companies by the most recent job end date
+  return groupedJobs.sort((a, b) => {
+    const aLatestJob = a.jobs[0]; // Jobs are already sorted by end date
+    const bLatestJob = b.jobs[0];
+    
+    const aEndDate = aLatestJob.data.endDate || new Date();
+    const bEndDate = bLatestJob.data.endDate || new Date();
+    
+    return bEndDate.getTime() - aEndDate.getTime();
+  });
 };
 
 const formatDate = (date: Date) => {
