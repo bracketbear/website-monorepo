@@ -26,17 +26,23 @@ const workProjects: WorkProjectEntry[] = await getCollection('workProject');
 const workCompanies: WorkCompanyEntry[] = await getCollection('workCompany');
 
 // Get recent experience based on CMS configuration
-let recentJobs = workJobs.sort(
-  (a, b) => b.data.startDate.getTime() - a.data.startDate.getTime()
-);
+let recentJobs: WorkJobEntry[] = [];
 
-// If specific jobs are selected in CMS, use those instead
+// If specific jobs are selected in CMS, use those in the exact order specified
 if (
   indexPage.data.recentExperience.selectedJobs &&
   indexPage.data.recentExperience.selectedJobs.length > 0
 ) {
-  recentJobs = workJobs.filter((job) =>
-    indexPage.data.recentExperience.selectedJobs.includes(job.id)
+  // Map the selected job IDs to actual job entries, preserving the order from CMS
+  recentJobs = indexPage.data.recentExperience.selectedJobs
+    .map((jobId: string) =>
+      workJobs.find((job: WorkJobEntry) => job.id === jobId)
+    )
+    .filter((job: unknown): job is WorkJobEntry => job !== undefined);
+} else {
+  // Fallback to sorting by date if no specific jobs are selected
+  recentJobs = workJobs.sort(
+    (a, b) => b.data.startDate.getTime() - a.data.startDate.getTime()
   );
 }
 
@@ -44,20 +50,26 @@ if (
 recentJobs = recentJobs.slice(0, indexPage.data.recentExperience.maxDisplay);
 
 // Get featured projects based on CMS configuration
-let featuredProjects = workProjects.filter(
-  (project) => project.data.isFeatured
-);
+let featuredProjects: WorkProjectEntry[] = [];
 
-// If specific projects are selected in CMS, use those instead
+// If specific projects are selected in CMS, use those in the exact order specified
 if (
   indexPage.data.featuredProjects.selectedProjects &&
   indexPage.data.featuredProjects.selectedProjects.length > 0
 ) {
-  featuredProjects = workProjects.filter((project) => {
-    const isIncluded =
-      indexPage.data.featuredProjects.selectedProjects.includes(project.id);
-    return isIncluded;
-  });
+  // Map the selected project IDs to actual project entries, preserving the order from CMS
+  featuredProjects = indexPage.data.featuredProjects.selectedProjects
+    .map((projectId: string) =>
+      workProjects.find((project: WorkProjectEntry) => project.id === projectId)
+    )
+    .filter(
+      (project: unknown): project is WorkProjectEntry => project !== undefined
+    );
+} else {
+  // Fallback to filtering by featured flag if no specific projects are selected
+  featuredProjects = workProjects.filter(
+    (project: WorkProjectEntry) => project.data.isFeatured
+  );
 }
 
 // Limit to max display count

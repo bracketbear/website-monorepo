@@ -39,13 +39,14 @@
   "recentExperience": {
     "title": "Recent experience",
     "subtitle": "A quick look at places I’ve contributed. For a full look, check out my full work history.",
-    "maxDisplay": 2,
+    "maxDisplay": 3,
     "showViewAllButton": true,
     "viewAllButtonText": "See full work history →",
     "viewAllButtonLink": "/work",
     "selectedJobs": [
       "dl-full-stack-software-engineer",
-      "ds-full-stack-developer"
+      "ds-full-stack-developer",
+      "ds-experience-developer"
     ]
   },
   "layout": {

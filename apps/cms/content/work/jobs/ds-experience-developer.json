@@ -1,5 +1,5 @@
 {
-  "title": "Experience Developer (C++)",
+  "title": "Experience Developer",
   "company": "downstream",
   "description": "Developed interactive application installments, providing unique and engaging experiences for partners and resulting in increased engagement and user satisfaction",
   "highlights": [
@@ -12,7 +12,6 @@
   ],
   "startDate": "2020-07-01",
   "endDate": "2021-12-01",
-  "isCurrentJob": false,
   "workSkills": [
     "vue",
     "mysql",
@@ -24,5 +23,6 @@
     "c-plus-plus",
     "illustrator",
     "photoshop"
-  ]
+  ],
+  "isCurrentJob": false
 }
