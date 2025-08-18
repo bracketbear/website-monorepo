@@ -30,11 +30,6 @@ interface ContentImageLoaderOptions {
 }
 
 /**
- * Cache for discovered images to avoid repeated file system operations
- */
-const imageCache = new Map<string, string>();
-
-/**
  * Find the nearest public directory up from the current working directory
  */
 function findPublicDir(): string {
@@ -140,21 +135,23 @@ function discoverAndCopyAllImages(
           if (imageExtensions.includes(ext)) {
             // Parse the relative path to extract content type, content ID, and image name
             // Example: "work/projects/dl-gumband/coverImage.jpg" or "work/projects/dl-gumband/media/0/image.jpg"
+            // Or: "sites/portfolio/about-page/testimonials/0/avatar.jpeg"
             const pathParts = newRelPath.split('/');
 
             if (pathParts.length >= 3) {
-              const contentType = `${pathParts[0]}/${pathParts[1]}`; // e.g., "work/projects"
-              const contentId = pathParts[2]; // e.g., "dl-gumband"
+              const contentType = `${pathParts[0]}/${pathParts[1]}`; // e.g., "work/projects" or "sites/portfolio"
+              const contentId = pathParts[2]; // e.g., "dl-gumband" or "about-page"
 
-              // Handle nested media files (e.g., media/0/image.jpg)
+              // Handle nested files (e.g., media/0/image.jpg or testimonials/0/avatar.jpeg)
               let imageName: string;
               if (pathParts[3] === 'media' && pathParts.length >= 6) {
                 // For media files: work/projects/ds-elekta/media/0/image.jpg
                 // Extract the full media path: media/0/image.jpg
                 imageName = pathParts.slice(3).join('/');
               } else if (pathParts.length >= 4) {
-                // For direct files: work/projects/ds-elekta/coverImage.jpg
-                imageName = pathParts[3];
+                // For nested files: sites/portfolio/about-page/testimonials/0/avatar.jpeg
+                // Extract the full nested path: testimonials/0/avatar.jpeg
+                imageName = pathParts.slice(3).join('/');
               } else {
                 imageName = '';
               }
@@ -234,13 +231,26 @@ function watchCmsImages(cmsContentPath: string, imageExtensions: string[]) {
     const ext = extname(file).toLowerCase().slice(1);
     if (imageExtensions.includes(ext)) {
       // Parse the relative path to extract content type, content ID, and image name
-      // Example: "work/projects/dl-gumband/coverImage.jpg"
+      // Example: "work/projects/dl-gumband/coverImage.jpg" or "sites/portfolio/about-page/testimonials/0/avatar.jpeg"
       const pathParts = rel.split('/');
 
       if (pathParts.length >= 3) {
-        const contentType = `${pathParts[0]}/${pathParts[1]}`; // e.g., "work/projects"
-        const contentId = pathParts[2]; // e.g., "dl-gumband"
-        const imageName = pathParts[3]; // e.g., "coverImage.jpg"
+        const contentType = `${pathParts[0]}/${pathParts[1]}`; // e.g., "work/projects" or "sites/portfolio"
+        const contentId = pathParts[2]; // e.g., "dl-gumband" or "about-page"
+
+        // Handle nested files (e.g., media/0/image.jpg or testimonials/0/avatar.jpeg)
+        let imageName: string;
+        if (pathParts[3] === 'media' && pathParts.length >= 6) {
+          // For media files: work/projects/ds-elekta/media/0/image.jpg
+          // Extract the full media path: media/0/image.jpg
+          imageName = pathParts.slice(3).join('/');
+        } else if (pathParts.length >= 4) {
+          // For nested files: sites/portfolio/about-page/testimonials/0/avatar.jpeg
+          // Extract the full nested path: testimonials/0/avatar.jpeg
+          imageName = pathParts.slice(3).join('/');
+        } else {
+          imageName = '';
+        }
 
         if (contentType && contentId && imageName) {
           const eventKey = `cms-${event}-${contentType}/${contentId}/${imageName}`;
@@ -291,55 +301,6 @@ function watchCmsImages(cmsContentPath: string, imageExtensions: string[]) {
 }
 
 /**
- * Discover and copy images for a specific content entry
- */
-function discoverImagesForEntry(
-  entryPath: string,
-  contentType: string,
-  contentId: string,
-  imageExtensions: string[]
-): void {
-  const rootDir = dirname(entryPath);
-
-  if (!existsSync(rootDir)) {
-    return;
-  }
-
-  const walk = (dir: string) => {
-    try {
-      const entries = readdirSync(dir, { withFileTypes: true });
-      for (const entry of entries) {
-        const fullPath = join(dir, entry.name);
-        if (entry.isDirectory()) {
-          walk(fullPath);
-        } else if (entry.isFile()) {
-          const ext = extname(entry.name).toLowerCase().slice(1);
-          if (imageExtensions.includes(ext)) {
-            const cacheKey = `${contentType}/${contentId}/${entry.name}`;
-            if (!imageCache.has(cacheKey)) {
-              const publicUrl = copyImageToPublic(
-                fullPath,
-                contentType,
-                contentId,
-                entry.name
-              );
-              imageCache.set(cacheKey, publicUrl);
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.warn(
-        `[content-image-loader] Failed to scan directory for images: ${dir}`,
-        error
-      );
-    }
-  };
-
-  walk(rootDir);
-}
-
-/**
  * Creates a content image loader that automatically handles images when content is loaded
  *
  * This loader wraps Astro's built-in glob loader and automatically discovers and copies
@@ -384,20 +345,9 @@ export function createContentImageLoader(
         // First, load all content using the base loader
         await baseLoader.load(context);
 
-        // Then, discover and copy images for each entry
-        const entries = context.store.entries();
-
-        for (const [id, entry] of entries) {
-          if (entry.filePath) {
-            // Discover images for this content entry
-            discoverImagesForEntry(
-              entry.filePath,
-              contentType,
-              id,
-              imageExtensions
-            );
-          }
-        }
+        // Note: Images are already discovered and copied by discoverAndCopyAllImages on startup
+        // No need to call discoverImagesForEntry here as it would create duplicates
+        // The file watcher will handle any new/changed images automatically
       },
     };
   };
