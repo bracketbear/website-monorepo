@@ -8,6 +8,7 @@ export interface FieldProps {
   className?: string;
   children: React.ReactNode;
   errorSpace?: boolean; // If true, always reserve space for error
+  required?: boolean; // Whether the field is required
 }
 
 export const Field: React.FC<FieldProps> = ({
@@ -17,16 +18,19 @@ export const Field: React.FC<FieldProps> = ({
   className = '',
   children,
   errorSpace = true,
+  required = false,
 }) => {
   return (
     <div className={`relative mt-6 ${className}`}>
-      <span
+      <label
+        htmlFor={id}
         className={`absolute -top-6 left-0 z-10 flex h-6 items-center rounded-t-sm text-sm font-bold tracking-wide transition-colors duration-200 ${
           error ? 'text-error' : 'text-brand-dark'
         }`}
       >
         {label}
-      </span>
+        {required && <span className="text-error ml-1" aria-label="required">*</span>}
+      </label>
       {children}
       <div
         className={clsx(
@@ -36,7 +40,12 @@ export const Field: React.FC<FieldProps> = ({
         )}
       >
         {error && (
-          <div id={`${id}-error`} className="text-error mt-1 text-xs font-bold">
+          <div 
+            id={`${id}-error`} 
+            className="text-error mt-1 text-xs font-bold"
+            role="alert"
+            aria-live="polite"
+          >
             {error}
           </div>
         )}

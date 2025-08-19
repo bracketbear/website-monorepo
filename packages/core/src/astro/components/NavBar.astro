@@ -21,6 +21,8 @@ const { items: navItems, branding, socialLinks } = config;
       : 'border-brand-dark bg-brand-orange',
     className,
   ]}
+  role="navigation"
+  aria-label="Main navigation"
 >
   <div class="container mx-auto flex h-full items-center justify-between py-4">
     <!-- Logo Section -->
@@ -54,10 +56,10 @@ const { items: navItems, branding, socialLinks } = config;
 
     <!-- Desktop Navigation -->
     <div class="hidden items-center gap-8 md:flex">
-      <ul class="flex items-center gap-8">
+      <ul class="flex items-center gap-8" role="menubar">
         {
           navItems.map((item) => (
-            <li class="group relative flex items-center">
+            <li class="group relative flex items-center" role="none">
               {item.children != null &&
               Array.isArray(item.children) &&
               item.children.length > 0 ? (
@@ -69,6 +71,10 @@ const { items: navItems, branding, socialLinks } = config;
                         ? 'hover:text-brand-light text-white'
                         : 'text-brand-dark hover:text-brand-dark/80',
                     ]}
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    role="menuitem"
+                    aria-label={`${item.name} menu`}
                   >
                     {item.name}
                     <svg
@@ -76,6 +82,7 @@ const { items: navItems, branding, socialLinks } = config;
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path
                         stroke-linecap="round"
@@ -85,7 +92,11 @@ const { items: navItems, branding, socialLinks } = config;
                       />
                     </svg>
                   </button>
-                  <div class="invisible absolute left-0 z-50 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100">
+                  <div
+                    class="invisible absolute left-0 z-50 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100"
+                    role="menu"
+                    aria-label={`${item.name} submenu`}
+                  >
                     <div
                       class:list={[
                         'border-brand-dark py-4 shadow-[8px_8px_0_0_var(--color-brand-dark)]',
@@ -103,6 +114,7 @@ const { items: navItems, branding, socialLinks } = config;
                               ? 'hover:bg-brand-light hover:text-brand-dark text-white'
                               : 'text-brand-dark hover:bg-brand-dark hover:text-brand-light',
                           ]}
+                          role="menuitem"
                         >
                           {child.name}
                         </a>
@@ -119,6 +131,7 @@ const { items: navItems, branding, socialLinks } = config;
                       : 'text-brand-dark hover:text-brand-dark/80',
                   ]}
                   href={item.href}
+                  role="menuitem"
                 >
                   {item.name}
                 </a>
@@ -135,12 +148,16 @@ const { items: navItems, branding, socialLinks } = config;
       variant="dark"
       id="mobile-menu-button"
       type="button"
+      aria-label="Open mobile navigation menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
     >
       <svg
         class="h-6 w-6"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
+        aria-hidden="true"
       >
         <path
           stroke-linecap="round"
@@ -155,10 +172,16 @@ const { items: navItems, branding, socialLinks } = config;
   <div
     id="mobile-menu"
     class="border-brand-dark bg-brand-light fixed top-0 right-0 z-40 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="mobile-menu-title"
+    aria-hidden="true"
+    tabindex="-1"
   >
     <div class="p-6">
       <div>
         <div
+          id="mobile-menu-title"
           class="text-brand-dark font-heading text-4xl font-semibold tracking-wide uppercase"
         >
           Navigation
@@ -170,12 +193,14 @@ const { items: navItems, branding, socialLinks } = config;
         variant="dark"
         type="button"
         size="sm"
+        aria-label="Close mobile navigation menu"
       >
         <svg
           class="h-6 w-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path
             stroke-linecap="round"
@@ -185,40 +210,46 @@ const { items: navItems, branding, socialLinks } = config;
         </svg>
       </Button>
 
-      <ul class="mt-8">
-        {
-          navItems.map((item) => (
-            <li>
-              {item.children != null &&
-              Array.isArray(item.children) &&
-              item.children.length > 0 ? (
-                <div class="space-y-2">
-                  <div class="text-brand-dark font-heading font-semibold tracking-wide uppercase">
-                    {item.name}
+      <nav aria-label="Mobile navigation">
+        <ul class="mt-8" role="menubar">
+          {
+            navItems.map((item) => (
+              <li role="none">
+                {item.children != null &&
+                Array.isArray(item.children) &&
+                item.children.length > 0 ? (
+                  <div class="space-y-2">
+                    <div class="text-brand-dark font-heading font-semibold tracking-wide uppercase">
+                      {item.name}
+                    </div>
+                    <ul
+                      class="space-y-2 pl-4"
+                      role="menu"
+                      aria-label={`${item.name} submenu`}
+                    >
+                      {item.children.map((child) => (
+                        <li role="none">
+                          <a href={child.href} role="menuitem" class="block">
+                            <div class="text-brand-dark font-heading block tracking-widest uppercase transition-transform hover:translate-x-1">
+                              {child.name}
+                            </div>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul class="space-y-2 pl-4">
-                    {item.children.map((child) => (
-                      <li>
-                        <a href={child.href}>
-                          <div class="text-brand-dark font-heading block tracking-widest uppercase transition-transform hover:translate-x-1">
-                            {child.name}
-                          </div>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <a href={item.href}>
-                  <div class="text-brand-dark font-heading block py-4 text-2xl font-semibold tracking-wide uppercase transition-transform hover:translate-x-1">
-                    {item.name}
-                  </div>
-                </a>
-              )}
-            </li>
-          ))
-        }
-      </ul>
+                ) : (
+                  <a href={item.href} role="menuitem">
+                    <div class="text-brand-dark font-heading block py-4 text-2xl font-semibold tracking-wide uppercase transition-transform hover:translate-x-1">
+                      {item.name}
+                    </div>
+                  </a>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
 
       <!-- Mobile Theme and Social Links -->
       <div class="mt-8 flex items-center gap-4">
@@ -227,6 +258,7 @@ const { items: navItems, branding, socialLinks } = config;
             <a
               href={socialLinks.linkedin}
               class="flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_var(--color-brand-dark)]"
+              aria-label="Visit LinkedIn profile"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -235,6 +267,7 @@ const { items: navItems, branding, socialLinks } = config;
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 class="text-brand-dark"
+                aria-hidden="true"
               >
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
               </svg>
@@ -250,6 +283,7 @@ const { items: navItems, branding, socialLinks } = config;
     id="mobile-menu-overlay"
     class="fixed inset-0 z-30 hidden bg-black/60 opacity-0 transition-opacity duration-300"
     style="background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.4) 1px, transparent 1px); background-size: 8px 8px;"
+    aria-hidden="true"
   >
   </div>
 </nav>
@@ -272,17 +306,72 @@ const { items: navItems, branding, socialLinks } = config;
       return;
     }
 
+    // Track menu state for accessibility
+    let isMenuOpen = false;
+
     const openMenu = () => {
+      isMenuOpen = true;
       mobileMenu.classList.remove('translate-x-full');
       mobileMenuOverlay.classList.remove('hidden', '-z-30');
+
+      // Update ARIA attributes
+      mobileMenuButton.setAttribute('aria-expanded', 'true');
+      mobileMenu.setAttribute('aria-hidden', 'false');
+      mobileMenuOverlay.setAttribute('aria-hidden', 'false');
+
+      // Focus management
+      mobileMenu.focus();
+
+      // Trap focus within mobile menu
+      const focusableElements = mobileMenu.querySelectorAll(
+        'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
+      );
+      const firstFocusable = focusableElements[0] as HTMLElement;
+      const lastFocusable = focusableElements[
+        focusableElements.length - 1
+      ] as HTMLElement;
+
+      if (firstFocusable) {
+        firstFocusable.focus();
+      }
+
+      // Handle tab key for focus trapping
+      const handleTabKey = (e: KeyboardEvent) => {
+        if (e.key === 'Tab') {
+          if (e.shiftKey) {
+            if (document.activeElement === firstFocusable) {
+              e.preventDefault();
+              lastFocusable.focus();
+            }
+          } else {
+            if (document.activeElement === lastFocusable) {
+              e.preventDefault();
+              firstFocusable.focus();
+            }
+          }
+        }
+      };
+
+      mobileMenu.addEventListener('keydown', handleTabKey);
+
       setTimeout(() => {
         mobileMenuOverlay.classList.add('opacity-50', 'z-30');
       }, 10);
     };
 
     const closeMenu = () => {
+      isMenuOpen = false;
       mobileMenu.classList.add('translate-x-full');
       mobileMenuOverlay.classList.remove('opacity-50', 'z-30');
+
+      // Update ARIA attributes
+      mobileMenuButton.setAttribute('aria-expanded', 'false');
+      mobileMenu.setAttribute('aria-hidden', 'true');
+      mobileMenuOverlay.setAttribute('aria-hidden', 'true');
+
+      // Return focus to menu button
+      mobileMenuButton.focus();
+
       setTimeout(() => {
         mobileMenuOverlay.classList.add('hidden', '-z-30');
       }, 300);
@@ -302,6 +391,13 @@ const { items: navItems, branding, socialLinks } = config;
     mobileMenuOverlay.addEventListener('click', (e) => {
       e.stopPropagation();
       closeMenu();
+    });
+
+    // Handle escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isMenuOpen) {
+        closeMenu();
+      }
     });
 
     // Only close menu when clicking outside AND menu is open

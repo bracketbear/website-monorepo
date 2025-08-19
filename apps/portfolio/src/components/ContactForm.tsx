@@ -31,6 +31,7 @@ export function ContactForm() {
       animateOnSuccess
       animateOnError
       className="brutalist-form rounded-lg"
+      aria-label="Contact form"
     >
       {({
         values,
@@ -43,7 +44,7 @@ export function ContactForm() {
       }) => (
         <>
           <div className="mb-6 grid gap-2">
-            <Field label="Name" id="name" error={errors.name}>
+            <Field label="Name" id="name" error={errors.name} required>
               <TextInput
                 id="name"
                 name="name"
@@ -53,9 +54,12 @@ export function ContactForm() {
                 disabled={isSubmitting}
                 autoComplete="name"
                 error={errors.name}
+                aria-required="true"
+                aria-invalid={errors.name ? 'true' : 'false'}
+                aria-describedby={errors.name ? 'name-error' : undefined}
               />
             </Field>
-            <Field label="Email" id="email" error={errors.email}>
+            <Field label="Email" id="email" error={errors.email} required>
               <TextInput
                 id="email"
                 name="email"
@@ -66,9 +70,12 @@ export function ContactForm() {
                 disabled={isSubmitting}
                 autoComplete="email"
                 error={errors.email}
+                aria-required="true"
+                aria-invalid={errors.email ? 'true' : 'false'}
+                aria-describedby={errors.email ? 'email-error' : undefined}
               />
             </Field>
-            <Field label="Message" id="message" error={errors.message}>
+            <Field label="Message" id="message" error={errors.message} required>
               <TextareaInput
                 id="message"
                 name="message"
@@ -78,6 +85,9 @@ export function ContactForm() {
                 onBlur={handleBlur}
                 disabled={isSubmitting}
                 error={errors.message}
+                aria-required="true"
+                aria-invalid={errors.message ? 'true' : 'false'}
+                aria-describedby={errors.message ? 'message-error' : undefined}
               />
             </Field>
             <CheckboxField
@@ -97,18 +107,27 @@ export function ContactForm() {
               particleCount={50}
               particleSize={6}
               particleSpeed={2}
-              disabled={true}
+              disabled={isSubmitting}
+              aria-label={isSubmitting ? 'Sending message...' : 'Send message'}
             >
               {isSubmitting ? 'Sending…' : 'Send Message'}
             </ParticleButton>
             {submitError && (
-              <div className="animate-shake text-brand-red mt-2 font-bold">
+              <div 
+                className="animate-shake text-brand-red mt-2 font-bold"
+                role="alert"
+                aria-live="polite"
+              >
                 {submitError}
               </div>
             )}
             {submitSuccess && (
-              <div className="animate-pop text-brand-blue mt-2 font-bold">
-                Message sent! I’ll get back to you soon.
+              <div 
+                className="animate-pop text-brand-blue mt-2 font-bold"
+                role="status"
+                aria-live="polite"
+              >
+                Message sent! I'll get back to you soon.
               </div>
             )}
           </div>
