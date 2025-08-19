@@ -284,9 +284,9 @@ function createParticle(
   graphics.zIndex = 2;
   app.stage.addChild(graphics);
 
-  // Create glow graphics if glow radius is set
+  // Create glow graphics if glow radius is set (but not for interaction particles)
   let glowGraphics: PIXI.Graphics | undefined;
-  if (controls.particleGlowRadius && controls.particleGlowRadius > 0) {
+  if (!isInteraction && controls.particleGlowRadius && controls.particleGlowRadius > 0) {
     glowGraphics = new PIXI.Graphics();
     glowGraphics.zIndex = 1; // Behind the main particle
     app.stage.addChild(glowGraphics);
@@ -516,8 +516,9 @@ class CuriousParticleNetworkAnimation extends PixiAnimation<
         }
       }
 
-      // Draw glow effect if enabled
+      // Draw glow effect if enabled (but not for interaction particles)
       if (
+        !p.isInteraction &&
         p.glowGraphics &&
         controls.particleGlowRadius &&
         controls.particleGlowRadius > 0
