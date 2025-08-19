@@ -1,0 +1,28 @@
+{
+  "name": "@bracketbear/tw-pattern-analyzer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "tw-patterns": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/*.ts --format esm --dts --clean",
+    "dev": "tsx src/cli.ts",
+    "test": "vitest",
+    "init": "tsx src/init.ts",
+    "analyze": "node dist/cli.js"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.2"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.1",
+    "tsx": "^4.16.0",
+    "typescript": "^5.8.0"
+  }
+}
