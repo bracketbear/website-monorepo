@@ -34,7 +34,7 @@ const { items: navItems, branding, socialLinks } = config;
       }
       <div
         class:list={[
-          'font-heading text-2xl leading-5.5 font-black tracking-wider uppercase',
+          'font-heading text-2xl leading-5.5 font-semibold tracking-wider uppercase',
           variant === 'ghost-dark' ? 'text-white' : 'text-brand-dark',
         ]}
       >
@@ -64,7 +64,7 @@ const { items: navItems, branding, socialLinks } = config;
                 <div class="flex items-center">
                   <button
                     class:list={[
-                      'group font-heading relative inline-flex items-center font-black tracking-wide uppercase transition-colors',
+                      'group font-heading relative inline-flex items-center font-semibold tracking-wide uppercase transition-colors',
                       variant === 'ghost-dark'
                         ? 'hover:text-brand-light text-white'
                         : 'text-brand-dark hover:text-brand-dark/80',
@@ -98,7 +98,7 @@ const { items: navItems, branding, socialLinks } = config;
                         <a
                           href={child.href}
                           class:list={[
-                            'font-heading block px-4 py-4 text-sm font-black tracking-wide uppercase transition-colors',
+                            'font-heading block px-4 py-4 text-sm font-semibold tracking-wide uppercase transition-colors',
                             variant === 'ghost-light'
                               ? 'hover:bg-brand-light hover:text-brand-dark text-white'
                               : 'text-brand-dark hover:bg-brand-dark hover:text-brand-light',
@@ -113,7 +113,7 @@ const { items: navItems, branding, socialLinks } = config;
               ) : (
                 <a
                   class:list={[
-                    'group link-underline font-heading relative font-black tracking-wide uppercase transition-all text-shadow-lg',
+                    'group link-underline font-heading relative font-semibold tracking-wide uppercase transition-all text-shadow-lg',
                     variant === 'ghost-dark'
                       ? 'hover:text-brand-light text-white'
                       : 'text-brand-dark hover:text-brand-dark/80',
@@ -127,36 +127,6 @@ const { items: navItems, branding, socialLinks } = config;
           ))
         }
       </ul>
-
-      <!-- Theme and Social Links -->
-      <div class="flex items-center gap-4">
-        {
-          socialLinks?.linkedin && (
-            <a
-              href={socialLinks.linkedin}
-              class:list={[
-                'flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_var(--color-brand-dark)]',
-                variant === 'ghost-dark'
-                  ? 'hover:text-brand-light text-white'
-                  : 'text-brand-dark hover:text-brand-dark/80',
-              ]}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                class:list={[
-                  variant === 'ghost-dark' ? 'text-white' : 'text-brand-dark',
-                ]}
-              >
-                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-              </svg>
-            </a>
-          )
-        }
-      </div>
     </div>
 
     <!-- Mobile Menu Button -->
@@ -189,7 +159,7 @@ const { items: navItems, branding, socialLinks } = config;
     <div class="p-6">
       <div>
         <div
-          class="text-brand-dark font-heading text-4xl font-black tracking-wide uppercase"
+          class="text-brand-dark font-heading text-4xl font-semibold tracking-wide uppercase"
         >
           Navigation
         </div>
@@ -223,17 +193,16 @@ const { items: navItems, branding, socialLinks } = config;
               Array.isArray(item.children) &&
               item.children.length > 0 ? (
                 <div class="space-y-2">
-                  <div class="text-brand-dark font-heading font-black tracking-wide uppercase">
+                  <div class="text-brand-dark font-heading font-semibold tracking-wide uppercase">
                     {item.name}
                   </div>
                   <ul class="space-y-2 pl-4">
                     {item.children.map((child) => (
                       <li>
-                        <a
-                          href={child.href}
-                          class="text-brand-dark font-heading block font-bold tracking-wide uppercase transition-transform hover:translate-x-1"
-                        >
-                          {child.name}
+                        <a href={child.href}>
+                          <div class="text-brand-dark font-heading block tracking-widest uppercase transition-transform hover:translate-x-1">
+                            {child.name}
+                          </div>
                         </a>
                       </li>
                     ))}
@@ -241,7 +210,7 @@ const { items: navItems, branding, socialLinks } = config;
                 </div>
               ) : (
                 <a href={item.href}>
-                  <div class="text-brand-dark font-heading block py-4 text-2xl font-black tracking-wide uppercase transition-transform hover:translate-x-1">
+                  <div class="text-brand-dark font-heading block py-4 text-2xl font-semibold tracking-wide uppercase transition-transform hover:translate-x-1">
                     {item.name}
                   </div>
                 </a>
