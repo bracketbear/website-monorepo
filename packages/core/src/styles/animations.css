@@ -1,0 +1,32 @@
+/* Reusable animation utilities */
+
+/* Trippy pulse animation - slow background movement */
+@keyframes trippy-pulse {
+  0% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+/* Animation utilities */
+@utility animate-trippy-pulse {
+  --pulse-duration: 10s;
+  animation: trippy-pulse var(--pulse-duration) linear infinite;
+}
+
+@utility animate-trippy-pulse-delayed {
+  --pulse-duration: 10s;
+  animation: trippy-pulse var(--pulse-duration) linear infinite;
+  animation-delay: 5s;
+}

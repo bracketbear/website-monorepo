@@ -1,8 +1,8 @@
-/* Button styles for BracketBear applications */
+@import './animations.css';
 
 /* Base button utility - applies all common button styles */
 @utility button {
-  @apply border-default button-interactive tangible tangible-button font-heading transform cursor-pointer rounded-lg font-black tracking-wide uppercase shadow-md outline-amber-500 transition-all hover:shadow-lg active:shadow-sm;
+  @apply button-interactive tangible tangible-button font-heading transform cursor-pointer rounded-lg font-black tracking-wide uppercase shadow-md outline-amber-500 transition-all hover:shadow-lg active:shadow-sm;
 }
 
 /* Button sizes - only modify padding and text size */
@@ -20,27 +20,60 @@
 
 /* Button variants - only modify colors and backgrounds */
 @utility button-primary {
-  @apply bg-primary text-brand-dark;
+  @apply bg-primary text-brand-dark border-brand-dark border-2;
 }
 
 @utility button-secondary {
-  @apply bg-brand-light text-brand-dark;
+  @apply bg-brand-light text-brand-dark border-brand-dark border-2;
+}
+
+@utility button-dark-primary {
+  @apply bg-brand-dark text-primary border-brand-dark border-2;
 }
 
 @utility button-dark {
-  @apply bg-brand-dark text-brand-light;
+  @apply bg-brand-dark text-brand-light border-brand-dark border-2;
 }
 
 @utility button-ghost {
-  @apply text-brand-dark bg-transparent;
+  @apply text-brand-dark border-brand-dark border-2 bg-transparent;
 }
 
 @utility button-error {
-  @apply bg-brand-red text-brand-dark;
+  @apply bg-brand-red text-brand-dark border-brand-red border-2;
 }
 
 @utility button-warning {
-  @apply bg-brand-yellow text-brand-dark;
+  @apply bg-brand-yellow text-brand-dark border-brand-yellow border-2;
+}
+
+/* Trippy button with pulsing/bokeh effects */
+@utility button-trippy {
+  @apply animate-trippy-pulse text-shadow-brand-dark border-brand-dark relative overflow-hidden border-2 text-white/90 text-shadow-lg/30;
+  background: radial-gradient(
+    circle at center,
+    var(--color-brand-blue) 0%,
+    var(--color-brand-green) 50%,
+    var(--color-brand-blue) 100%
+  );
+  background-size: 400% 400%;
+}
+
+/* Animation delay utility for offsetting trippy buttons */
+@utility button-trippy-delayed {
+  @apply button-trippy;
+}
+
+@layer components {
+  .button-trippy:hover,
+  .button-trippy-delayed:hover {
+    @apply text-shadow-lg text-shadow-white/90;
+  }
+
+  .button-trippy:active,
+  .button-trippy-delayed:active {
+    @apply scale-95;
+  }
 }
 
 /* Unstyled button - minimal styling for custom implementations */

@@ -11,6 +11,7 @@
 @import './theme.css';
 
 /* Utility classes for the core components. */
+@import './animations.css';
 @import './border.css';
 @import './box-shadow.css';
 @import './buttons.css';

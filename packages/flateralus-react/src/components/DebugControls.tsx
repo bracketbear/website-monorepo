@@ -38,6 +38,8 @@ interface DebugControlsProps {
   animationRef?: React.RefObject<Animation | null>;
   showDownloadButton?: boolean;
   className?: string;
+  /** Callback when randomization is triggered from external source */
+  onRandomize?: () => void;
 }
 
 /**
@@ -55,6 +57,7 @@ const DebugControls = memo<DebugControlsProps>(
     animationRef,
     showDownloadButton = false,
     className,
+    onRandomize,
   }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isPanelVisible, setIsPanelVisible] = useState(false);
@@ -122,8 +125,9 @@ const DebugControls = memo<DebugControlsProps>(
         }
         onControlsChange(randomValues);
         showToast('Controls randomized!');
+        onRandomize?.();
       }
-    }, [manifest, animationRef, onControlsChange]);
+    }, [manifest, animationRef, onControlsChange, onRandomize]);
 
     const resetToDefaults = () => {
       if (animationRef?.current) {
@@ -220,7 +224,7 @@ const DebugControls = memo<DebugControlsProps>(
       >
         {/* Gear toggle button */}
         <Button
-          variant="secondary"
+          variant="trippy"
           onClick={() => setIsExpanded(!isExpanded)}
           className="mb-2"
           size="sm"

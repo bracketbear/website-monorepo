@@ -15,6 +15,8 @@ export interface UseDebugControlsOptions {
   application: Application;
   /** Callback when controls are reset */
   onReset?: () => void;
+  /** Callback when randomization is triggered from external source */
+  onRandomize?: () => void;
 }
 
 export interface UseDebugControlsReturn {
@@ -34,6 +36,7 @@ export interface UseDebugControlsReturn {
     isVisible: boolean;
     animationRef: { current: any };
     showDownloadButton: boolean;
+    onRandomize?: () => void;
   };
 }
 
@@ -45,6 +48,7 @@ export function useDebugControls({
   showDownloadButton = true,
   application,
   onReset,
+  onRandomize,
 }: UseDebugControlsOptions): UseDebugControlsReturn {
   // Get the animation from the application
   const animation = application.getAnimation?.() || null;
@@ -70,6 +74,7 @@ export function useDebugControls({
       isVisible,
       animationRef: { current: animation },
       showDownloadButton,
+      onRandomize,
     }),
     [
       manifest,
@@ -78,6 +83,7 @@ export function useDebugControls({
       isVisible,
       animation,
       showDownloadButton,
+      onRandomize,
     ]
   );
 

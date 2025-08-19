@@ -2,13 +2,15 @@ export const buttonVariantClasses = {
   primary: 'button-primary',
   secondary: 'button-secondary',
   dark: 'button-dark',
+  darkPrimary: 'button-dark-primary',
   ghost: 'button-ghost',
   error: 'button-error',
   warning: 'button-warning',
   gear: 'button-gear',
   ghostDark: 'button-ghost-dark',
   ghostLight: 'button-ghost-light',
-  unstyled: 'button-unstyled', // Use the unstyled utility class
+  unstyled: 'button-unstyled',
+  trippy: 'button-trippy',
 } as const;
 
 export const buttonSizeClasses = {

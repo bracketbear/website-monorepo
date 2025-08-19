@@ -1,6 +1,7 @@
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
 import { createCuriousParticleNetworkAnimation } from '@bracketbear/flateralus-animations';
+import { getRandomControlValues } from '@bracketbear/flateralus';
 import { clsx } from '@bracketbear/core';
 import { useMemo, useState, useEffect } from 'react';
 import { HeroContent } from './HeroContent';
@@ -71,9 +72,28 @@ export default function HeroSection({
     }
   }, [isClient]);
 
+  // Handle randomization from external source
+  const handleRandomize = () => {
+    if (application?.getAnimation()) {
+      const animation = application.getAnimation();
+      if (animation) {
+        const manifest = animation.getManifest();
+        if (manifest) {
+          const randomValues = getRandomControlValues(manifest);
+          animation.updateControls(randomValues);
+        }
+      }
+    }
+  };
+
   // Create the hero content once
   const heroContent = (
-    <HeroContent title={title} subtitle={subtitle} description={description} />
+    <HeroContent 
+      title={title} 
+      subtitle={subtitle} 
+      description={description} 
+      onGetWeird={handleRandomize}
+    />
   );
 
   // Server-side render (no animation)
@@ -91,6 +111,7 @@ export default function HeroSection({
       showDebugControls
       debugControlsClassName="top-32"
       layoutClassName="relative flex h-full w-full items-end"
+      onRandomize={handleRandomize}
     >
       {heroContent}
     </AnimationStage>

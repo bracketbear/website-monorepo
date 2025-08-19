@@ -28,6 +28,8 @@ interface AnimationStageProps {
   visibilityRootMargin?: string;
   /** Layout classes for the main container (defaults to 'relative flex h-full w-full items-end') */
   layoutClassName?: string;
+  /** Callback when randomization is triggered from external source */
+  onRandomize?: () => void;
 }
 
 /**
@@ -49,6 +51,7 @@ export default function AnimationStage({
   visibilityThreshold = 0.1,
   visibilityRootMargin = '0px',
   layoutClassName = 'relative flex h-full w-full items-end',
+  onRandomize,
 }: AnimationStageProps) {
   // Main animation stage hook
   const { containerRef } = useAnimationStage({
@@ -63,6 +66,7 @@ export default function AnimationStage({
     showDebugControls,
     showDownloadButton,
     application: application || ({} as Application), // Provide empty object if null
+    onRandomize,
   });
 
   // Luminance detection hook - only call if application exists
@@ -86,6 +90,7 @@ export default function AnimationStage({
         <DebugControls
           {...debugControlsProps}
           manifest={debugControlsProps.manifest}
+          onRandomize={onRandomize}
           className={clsx(
             'absolute top-4 right-4 z-30',
             debugControlsClassName
