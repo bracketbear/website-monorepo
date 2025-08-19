@@ -3,9 +3,9 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "astro dev --port 4322",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "astro preview --port 4322",
     "astro": "astro",
     "type-check": "tsc --noEmit",
     "update-job-skills": "node scripts/update-job-skills.js",
