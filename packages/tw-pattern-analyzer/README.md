@@ -245,6 +245,36 @@ if (r.clusters.some(c => c.likelihood >= 80)) {
 - **Performance**: Optimized for large codebases
 - **Configuration**: ES module-based configuration with fallbacks
 
+## Known Limitations & Future Features
+
+### Dynamic Class Variables
+The analyzer currently only detects **static/literal class strings** and does not parse dynamic class variables or template literals with variables.
+
+**Examples of what's NOT detected:**
+```tsx
+// Variable assignments
+const catClass = 'ml-4'
+const buttonClasses = 'px-4 py-2 bg-blue-500'
+
+// Dynamic usage
+className={catClass}
+className={`${catClass} bg-red-500`}
+className={buttonClasses}
+```
+
+**What IS detected:**
+```tsx
+// Static strings
+className="ml-4 bg-red-500"
+className={'ml-4 bg-red-500'}
+className={`ml-4 bg-red-500`}
+```
+
+**Future Enhancement:**
+- Add AST parsing to understand variable definitions and their usage
+- Implement symbol resolution to track dynamic class composition
+- Support template literal analysis with variable interpolation
+
 ## Contributing
 
 The analyzer is designed to be extensible:
@@ -254,6 +284,7 @@ The analyzer is designed to be extensible:
 - Modify the likelihood scoring algorithm
 - Add new clustering strategies
 - Support additional frameworks
+- **Help implement dynamic class variable detection!**
 
 ## License
 
