@@ -18,7 +18,7 @@ const { items: navItems, branding, socialLinks } = config;
     'flex min-h-20 items-center border-y-2 px-4',
     variant === 'ghost-dark'
       ? 'absolute top-0 right-0 left-0 z-50 border-transparent bg-transparent'
-      : 'border-foreground bg-brand-orange',
+      : 'border-brand-dark bg-brand-orange',
     className,
   ]}
 >
@@ -35,13 +35,15 @@ const { items: navItems, branding, socialLinks } = config;
       <div
         class:list={[
           'font-heading text-2xl leading-5.5 font-black tracking-wider uppercase',
-          variant === 'ghost-dark' ? 'text-white' : 'text-foreground',
+          variant === 'ghost-dark' ? 'text-white' : 'text-brand-dark',
         ]}
       >
         <a
           href={branding?.href || '/'}
           class:list={[
-            variant === 'ghost-dark' ? 'hover:text-brand-light' : '',
+            variant === 'ghost-dark'
+              ? 'hover:text-brand-light'
+              : 'hover:text-brand-dark/80',
             'transition-colors',
           ]}
         >
@@ -52,20 +54,20 @@ const { items: navItems, branding, socialLinks } = config;
 
     <!-- Desktop Navigation -->
     <div class="hidden items-center gap-8 md:flex">
-      <ul class="flex gap-8">
+      <ul class="flex items-center gap-8">
         {
           navItems.map((item) => (
-            <li class="group relative">
+            <li class="group relative flex items-center">
               {item.children != null &&
               Array.isArray(item.children) &&
               item.children.length > 0 ? (
-                <div>
+                <div class="flex items-center">
                   <button
                     class:list={[
-                      'group relative inline-flex items-center font-black uppercase transition-colors',
+                      'group font-heading relative inline-flex items-center font-black tracking-wide uppercase transition-colors',
                       variant === 'ghost-dark'
                         ? 'hover:text-brand-light text-white'
-                        : 'text-foreground',
+                        : 'text-brand-dark hover:text-brand-dark/80',
                     ]}
                   >
                     {item.name}
@@ -86,20 +88,20 @@ const { items: navItems, branding, socialLinks } = config;
                   <div class="invisible absolute left-0 z-50 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100">
                     <div
                       class:list={[
-                        'border-default py-4 shadow-[8px_8px_0_0_#111111]',
+                        'border-brand-dark py-4 shadow-[8px_8px_0_0_var(--color-brand-dark)]',
                         variant === 'ghost-dark'
                           ? 'bg-brand-dark'
-                          : NAVIGATION_CONSTANTS.BACKGROUND_COLOR,
+                          : 'bg-brand-light',
                       ]}
                     >
                       {item.children.map((child) => (
                         <a
                           href={child.href}
                           class:list={[
-                            'block px-4 py-4 text-sm font-black uppercase transition-colors',
+                            'font-heading block px-4 py-4 text-sm font-black tracking-wide uppercase transition-colors',
                             variant === 'ghost-light'
                               ? 'hover:bg-brand-light hover:text-brand-dark text-white'
-                              : 'text-foreground hover:bg-foreground hover:text-primary',
+                              : 'text-brand-dark hover:bg-brand-dark hover:text-brand-light',
                           ]}
                         >
                           {child.name}
@@ -111,10 +113,10 @@ const { items: navItems, branding, socialLinks } = config;
               ) : (
                 <a
                   class:list={[
-                    'group link-underline relative font-black uppercase transition-all hover:translate-x-[-1px] hover:translate-y-[-1px]',
+                    'group link-underline font-heading relative font-black tracking-wide uppercase transition-all text-shadow-lg',
                     variant === 'ghost-dark'
                       ? 'hover:text-brand-light text-white'
-                      : 'text-foreground',
+                      : 'text-brand-dark hover:text-brand-dark/80',
                   ]}
                   href={item.href}
                 >
@@ -133,10 +135,10 @@ const { items: navItems, branding, socialLinks } = config;
             <a
               href={socialLinks.linkedin}
               class:list={[
-                'flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px]',
+                'flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_var(--color-brand-dark)]',
                 variant === 'ghost-dark'
                   ? 'hover:text-brand-light text-white'
-                  : '',
+                  : 'text-brand-dark hover:text-brand-dark/80',
               ]}
             >
               <svg
@@ -146,7 +148,7 @@ const { items: navItems, branding, socialLinks } = config;
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 class:list={[
-                  variant === 'ghost-dark' ? 'text-white' : 'text-foreground',
+                  variant === 'ghost-dark' ? 'text-white' : 'text-brand-dark',
                 ]}
               >
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
@@ -182,11 +184,13 @@ const { items: navItems, branding, socialLinks } = config;
   <!-- Mobile Menu -->
   <div
     id="mobile-menu"
-    class="border-default bg-background fixed top-0 right-0 z-40 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
+    class="border-brand-dark bg-brand-light fixed top-0 right-0 z-40 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
   >
     <div class="p-6">
       <div>
-        <div class="text-foreground font-heading text-4xl font-black uppercase">
+        <div
+          class="text-brand-dark font-heading text-4xl font-black tracking-wide uppercase"
+        >
           Navigation
         </div>
       </div>
@@ -219,7 +223,7 @@ const { items: navItems, branding, socialLinks } = config;
               Array.isArray(item.children) &&
               item.children.length > 0 ? (
                 <div class="space-y-2">
-                  <div class="text-foreground font-black uppercase">
+                  <div class="text-brand-dark font-heading font-black tracking-wide uppercase">
                     {item.name}
                   </div>
                   <ul class="space-y-2 pl-4">
@@ -227,7 +231,7 @@ const { items: navItems, branding, socialLinks } = config;
                       <li>
                         <a
                           href={child.href}
-                          class="text-foreground block font-bold uppercase transition-transform hover:translate-x-1"
+                          class="text-brand-dark font-heading block font-bold tracking-wide uppercase transition-transform hover:translate-x-1"
                         >
                           {child.name}
                         </a>
@@ -237,7 +241,7 @@ const { items: navItems, branding, socialLinks } = config;
                 </div>
               ) : (
                 <a href={item.href}>
-                  <div class="text-foreground font-heading block py-4 text-2xl font-black uppercase transition-transform hover:translate-x-1">
+                  <div class="text-brand-dark font-heading block py-4 text-2xl font-black tracking-wide uppercase transition-transform hover:translate-x-1">
                     {item.name}
                   </div>
                 </a>
@@ -253,7 +257,7 @@ const { items: navItems, branding, socialLinks } = config;
           socialLinks?.linkedin && (
             <a
               href={socialLinks.linkedin}
-              class="flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_#111111]"
+              class="flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_var(--color-brand-dark)]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -261,7 +265,7 @@ const { items: navItems, branding, socialLinks } = config;
                 height="16"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                class="text-foreground"
+                class="text-brand-dark"
               >
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
               </svg>
