@@ -49,6 +49,7 @@
     "clean": "rm -rf dist",
     "test": "vitest",
     "test:run": "vitest run",
+    "type-check": "tsc --noEmit",
     "copy:assets:watch": "cpx \"src/assets/**/*.svg\" dist/assets --watch",
     "copy:astro:watch": "cpx \"src/astro/**/*.astro\" dist/astro --watch",
     "copy:styles:watch": "cpx \"src/styles/**/*\" dist/styles --watch",

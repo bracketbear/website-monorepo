@@ -15,7 +15,8 @@
     "dev": "tsx src/cli.ts",
     "test": "vitest",
     "init": "tsx src/init.ts",
-    "analyze": "node dist/cli.js"
+    "analyze": "node dist/cli.js",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "fast-glob": "^3.3.2"

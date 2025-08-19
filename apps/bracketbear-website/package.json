@@ -6,7 +6,8 @@
     "dev": "astro dev --host --port 4321",
     "build": "astro build",
     "preview": "astro preview --host --port 4321",
-    "astro": "astro"
+    "astro": "astro",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@astrojs/markdoc": "^0.13.3",

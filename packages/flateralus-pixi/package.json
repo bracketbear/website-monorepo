@@ -11,7 +11,8 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "echo \"No tests yet\" && exit 0",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "pixi.js": "^8.0.0",

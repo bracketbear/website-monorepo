@@ -11,7 +11,8 @@
     "dev": "tsc --watch",
     "build": "tsc",
     "test": "vitest",
-    "test:run": "vitest --run"
+    "test:run": "vitest --run",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@bracketbear/core": "file:../core",
