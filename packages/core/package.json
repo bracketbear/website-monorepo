@@ -58,8 +58,8 @@
     "copy:utils:watch": "cpx \"src/utils/**/*\" dist/utils --watch"
   },
   "dependencies": {
+    "@fontsource/barlow-condensed": "^5.2.6",
     "@fontsource/fira-sans": "^5.2.6",
-    "@fontsource/oswald": "^5.2.6",
     "@headlessui/react": "^2.2.7",
     "gsap": "^3.13.0",
     "pixi.js": "^8.10.2",

@@ -1,5 +1,5 @@
 @utility font-heading {
-  --heading-font-family: 'Oswald', 'sans-serif';
+  --heading-font-family: 'Barlow Condensed', 'sans-serif';
   font-family: var(--heading-font-family);
 }
 
