@@ -10,9 +10,11 @@ interface Props {
   hideContactForm?: boolean;
   hideFooter?: boolean;
   breadcrumbs?: any;
+  metaDescription?: string;
 }
 
-const { title, hideContactForm, hideFooter, breadcrumbs } = Astro.props;
+const { title, hideContactForm, hideFooter, breadcrumbs, metaDescription } =
+  Astro.props;
 
 const pageTitle = makeTitle(title);
 ---
@@ -24,6 +26,7 @@ const pageTitle = makeTitle(title);
   hideNavigation={true}
   navigation={navigationConfig}
   breadcrumbs={breadcrumbs}
+  metaDescription={metaDescription}
 >
   <!-- Transparent Navigation -->
   <div class="relative z-50">

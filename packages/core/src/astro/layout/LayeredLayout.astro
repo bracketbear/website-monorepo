@@ -7,6 +7,8 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 export interface Props extends LayoutProps {
   contactForm?: any;
+  metaDescription?: string;
+  description?: string;
 }
 
 const {
@@ -17,7 +19,12 @@ const {
   navigation,
   contactForm: ContactFormComponent,
   breadcrumbs,
+  metaDescription,
+  description,
 } = Astro.props;
+
+// Use description if provided, otherwise fall back to metaDescription
+const finalMetaDescription = description || metaDescription;
 ---
 
 <!doctype html>
@@ -28,6 +35,11 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     {title && <title>{title}</title>}
+    {
+      finalMetaDescription && (
+        <meta name="description" content={finalMetaDescription} />
+      )
+    }
   </head>
   <body
     class="bg-brand-orange text-foreground min-h-screen transition-colors duration-300"

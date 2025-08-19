@@ -6,6 +6,8 @@ import Footer from '../components/Footer.astro';
 
 interface Props extends LayoutProps {
   contactForm?: any; // Allow apps to pass their own ContactForm component
+  metaDescription?: string;
+  description?: string;
 }
 
 const {
@@ -15,7 +17,12 @@ const {
   hideNavigation = false,
   navigation,
   contactForm: ContactFormComponent,
+  metaDescription,
+  description,
 } = Astro.props;
+
+// Use description if provided, otherwise fall back to metaDescription
+const finalMetaDescription = description || metaDescription;
 ---
 
 <!doctype html>
@@ -26,6 +33,11 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     {title && <title>{title}</title>}
+    {
+      finalMetaDescription && (
+        <meta name="description" content={finalMetaDescription} />
+      )
+    }
   </head>
   <body
     class="bg-background text-foreground min-h-screen transition-colors duration-300"
