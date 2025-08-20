@@ -147,26 +147,6 @@
     content: '`';
   }
 
-  & pre {
-    @apply overflow-x-auto rounded-md border border-current bg-transparent text-sm font-normal;
-    margin-top: var(--prose-spacing);
-    margin-bottom: var(--prose-spacing);
-    padding: var(--prose-pre-spacing) 1em;
-    line-height: 1.7142857;
-  }
-
-  & pre code {
-    @apply rounded-none border-0 bg-transparent p-0;
-  }
-
-  & pre code::before {
-    content: none;
-  }
-
-  & pre code::after {
-    content: none;
-  }
-
   & table {
     @apply w-full table-auto text-left text-sm;
     margin-top: var(--prose-spacing);
