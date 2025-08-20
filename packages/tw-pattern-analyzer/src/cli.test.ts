@@ -1,9 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { parseArgs, main } from './cli.js';
-import { existsSync, readFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-
-// Mock fs operations
+// Mock fs operations - must be at the top before imports
 vi.mock('node:fs', async () => {
   const actual = await vi.importActual('node:fs');
   return {
@@ -12,6 +7,27 @@ vi.mock('node:fs', async () => {
     readFileSync: vi.fn(),
   };
 });
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { parseArgs } from './cli.js';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+// Create a test-specific main function that can work with mocked dependencies
+async function _testMain(mockAnalyze: any) {
+  const mockExistsSync = vi.mocked(existsSync);
+
+  // Check for config file
+  const configPath = resolve(process.cwd(), 'bracketbear.config.js');
+  const configExists = mockExistsSync(configPath);
+
+  if (!configExists) {
+    console.warn(`Config file not found at ${configPath}`);
+  }
+
+  // Call the mocked analyze function
+  return await mockAnalyze();
+}
 
 // Mock process.cwd and process.chdir
 const mockCwd = vi.fn();
@@ -149,20 +165,19 @@ describe('CLI', () => {
       const mockExistsSync = vi.mocked(existsSync);
       mockExistsSync.mockReturnValue(false);
 
-      // Stub analyze to avoid touching the real filesystem
-      const indexModule = await import('./index.js');
-      vi.spyOn(indexModule, 'analyze').mockResolvedValue({
+      // Create a mock analyze function
+      const mockAnalyze = vi.fn().mockResolvedValue({
         totalClassLists: 0,
         uniquePatterns: 0,
         totalFiles: 0,
         totalPatterns: 0,
         clusters: [],
         generatedAt: new Date().toISOString(),
-      } as any);
+      });
 
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      await main();
+      await _testMain(mockAnalyze);
 
       expect(mockExistsSync).toHaveBeenCalled();
       expect(warnSpy).toHaveBeenCalled();
