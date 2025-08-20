@@ -1,10 +1,12 @@
 ---
+import { type Breadcrumb, Stats } from '@bracketbear/core';
 import { getCollection } from 'astro:content';
-import { Stats } from '@bracketbear/core/react';
-import FilteredWorkHistory from '@/components/FilteredWorkHistory';
 import { getWorkBreadcrumbs } from '@/config/breadcrumbs';
 import HeroLayout from '@/layouts/HeroLayout.astro';
+import FilteredWorkHistory from '@/components/FilteredWorkHistory';
 import { marked } from 'marked';
+
+const breadcrumbs: Breadcrumb[] = getWorkBreadcrumbs();
 
 // Get the work page singleton from CMS
 const workPageEntries = await getCollection('portfolioWorkPage');
@@ -16,7 +18,6 @@ const workSkills = await getCollection('workSkills');
 const workJobs = await getCollection('workJobs');
 const workCompanies = await getCollection('workCompany');
 const workSkillCategories = await getCollection('workSkillCategory');
-const breadcrumbs = getWorkBreadcrumbs();
 
 // Helper function to parse markdown content
 function parseMarkdown(content: string): string {
@@ -25,11 +26,11 @@ function parseMarkdown(content: string): string {
 ---
 
 <HeroLayout
-  pageTitle={workPage.data.title}
+  pageTitle="Work History"
   title={workPage.data.title}
   subtitle={workPage.data.subtitle}
   breadcrumbs={breadcrumbs}
-  animationPreset="curious-particle-network"
+  animationPreset="enhanced-wave"
   contactCTA={workPage.data.contactCTA}
   metaDescription={workPage.data.metaDescription}
 >

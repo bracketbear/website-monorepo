@@ -297,6 +297,18 @@ export const portfolioIndexPageSchema = makePageSchema({
     ),
   }),
 
+  // Meet Flateralus section
+  meetFlateralus: fields.object({
+    title: fields.text({
+      label: 'Title',
+      defaultValue: 'Meet Flateralus',
+    }),
+    content: fields.markdoc.inline({
+      label: 'Content',
+      description: 'Content describing Flateralus with markdown support',
+    }),
+  }),
+
   // Featured Projects section
   featuredProjects: fields.object({
     title: fields.text({
@@ -385,12 +397,16 @@ export const portfolioIndexPageSchema = makePageSchema({
       label: 'Show About Section',
       defaultValue: true,
     }),
+    showMeetFlateralusSection: fields.checkbox({
+      label: 'Show Meet Flateralus Section',
+      defaultValue: true,
+    }),
     showFeaturedProjects: fields.checkbox({
-      label: 'Show Featured Projects',
+      label: 'Show Featured Projects Section',
       defaultValue: true,
     }),
     showRecentExperience: fields.checkbox({
-      label: 'Show Recent Experience',
+      label: 'Show Recent Experience Section',
       defaultValue: true,
     }),
     showContactSection: fields.checkbox({

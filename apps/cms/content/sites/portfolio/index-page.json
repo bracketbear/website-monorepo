@@ -24,6 +24,10 @@
       "astro"
     ]
   },
+  "meetFlateralus": {
+    "title": "Meet Flateralus",
+    "content": "## A powerful schema for connecting experiential apps to everything.\n\nFlateralus is the animation engine powering the interactive elements you see throughout this site and an homage to one of my favorite bands, Tool. In it's purest form, it's just a JSON schema that defines framework, platform, and language-agnostic controls (inputs) and events (outputs) for software, hardware, your cat Muffins—whatever you'd like!\\\n\\\nAll of the animations you see on this website have controls set with things like min and max values, value types, and other configurable parameters. Since we're a schema-first operation around here, you can immediately validate that manifest, validate control values automatically, and infer types to be used within your application. Taken a step further, we can randomize controls without configuration and we can use those values by downloading them onto your computer or into your code base, or [saved to a management system](/project/ds-bridge) via an API call. **Its greatest power is giving you more time to play (or make money) and less time actually programming the boring stuff.**\\\n\\\nln the spirit of \"play,\" all of the animations throughout the app have settings that you can tinker with—go ahead, have fun! Heck, it's your computer that will melt, not mine.\n"
+  },
   "featuredProjects": {
     "title": "Selected projects",
     "subtitle": "Here are the projects that I think really define how I think about building software. Click on any card to learn more about the project and my role on it.",
@@ -53,6 +57,7 @@
     "hideContactForm": false,
     "showHeroSection": true,
     "showAboutSection": true,
+    "showMeetFlateralusSection": true,
     "showFeaturedProjects": true,
     "showRecentExperience": true,
     "showContactSection": true

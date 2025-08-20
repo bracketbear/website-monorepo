@@ -112,6 +112,12 @@ export const portfolioIndexPageSchema = makePageSchema({
     featuredSkills: z.array(z.string()),
   }),
 
+  // Meet Flateralus section
+  meetFlateralus: z.object({
+    title: z.string().default('Meet Flateralus'),
+    content: z.string().optional(), // Markdoc content - optional to match CMS schema
+  }),
+
   // Featured Projects section
   featuredProjects: z.object({
     title: z.string().default('Featured Projects'),
@@ -139,6 +145,7 @@ export const portfolioIndexPageSchema = makePageSchema({
     hideContactForm: z.boolean().default(true),
     showHeroSection: z.boolean().default(true),
     showAboutSection: z.boolean().default(true),
+    showMeetFlateralusSection: z.boolean().default(true),
     showFeaturedProjects: z.boolean().default(true),
     showRecentExperience: z.boolean().default(true),
     showContactSection: z.boolean().default(true),

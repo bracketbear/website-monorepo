@@ -18,14 +18,15 @@ import Layout from './Layout.astro';
 import { clsx, NavBar, type ObjectValues } from '@bracketbear/core';
 import { navigationConfig } from '@/config/navigation';
 import { generatePortfolioMetaTitle } from '@/config/meta-title';
-import HeaderSection from '@/components/HeaderSection';
+import { HeaderSection } from '@/components/HeaderSection';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import type { ControlValues } from '@bracketbear/flateralus';
 
 const presets = {
   'curious-particle-network': 'curious-particle-network',
   'particle-wave': 'particle-wave',
-  'topographic-lines': 'topographic-lines',
+  blob: 'blob',
+  'enhanced-wave': 'enhanced-wave',
 } as const;
 type Preset = ObjectValues<typeof presets>;
 
@@ -55,7 +56,7 @@ export interface Props {
 
 const {
   pageTitle,
-  animationPreset = 'curious-particle-network' as const,
+  animationPreset = 'enhanced-wave' as const,
   container = true,
   contactCTA,
   metaDescription,
@@ -83,7 +84,6 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
       <ErrorBoundary client:load>
         <HeaderSection
           preset={presets[animationPreset]}
-          className="bg-[#5c7c4f] from-brand-red/20 to-[#5c7c4f] bg-radial"
           showDebugControls={true}
           enableLuminanceDetection={true}
           title={props.title}
@@ -92,7 +92,7 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
           ctaText={props.ctaText}
           ctaHref={props.ctaHref}
           stats={props.stats}
-          client:load
+          client:only="react"
         />
       </ErrorBoundary>
     )

@@ -6,7 +6,7 @@ import { clsx } from '@bracketbear/core';
 import { useMemo, useState, useEffect } from 'react';
 import { HeroContent } from './HeroContent';
 
-const BACKGROUND_CLASS = 'bg-brand-orange' as const;
+const BACKGROUND_CLASS = 'bg-brand-orange-light' as const;
 
 interface HeroSectionProps {
   className?: string;
