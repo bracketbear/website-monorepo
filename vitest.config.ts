@@ -4,12 +4,13 @@ import { resolve } from 'path';
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'node',
+    environment: 'jsdom',
     include: [
       'packages/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       'apps/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
-    exclude: ['.astro', '**/*.d.ts', '**/node_modules/**', '**/dist/**'],
+    exclude: ['.astro', '**/*.d.ts', '**/node_modules/**', '**/*.dist/**'],
+    setupFiles: ['./vitest.setup.ts'],
   },
   resolve: {
     alias: {

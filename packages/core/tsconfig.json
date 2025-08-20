@@ -32,6 +32,8 @@
     "node_modules",
     "dist",
     "src/**/*.astro",
-    "src/**/*.svg"
+    "src/**/*.svg",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
   ]
 } 
