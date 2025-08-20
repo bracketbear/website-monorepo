@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
-    "test": "echo \"No tests yet\" && exit 0",
+    "test": "vitest",
+    "test:run": "vitest run",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
