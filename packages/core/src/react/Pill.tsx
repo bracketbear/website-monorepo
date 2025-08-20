@@ -6,7 +6,22 @@ interface PillProps {
   children: ReactNode;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
-  variant?: 'default' | 'skill' | 'selected';
+  variant?:
+    | 'default'
+    | 'skill'
+    | 'selected'
+    | 'brand-orange'
+    | 'brand-red'
+    | 'brand-green'
+    | 'brand-blue'
+    | 'brand-purple'
+    | 'dark'
+    | 'light'
+    | 'outline-dark'
+    | 'featured'
+    | 'category'
+    | 'flat'
+    | 'outline';
   interactive?: boolean;
   onClick?: () => void;
 }
@@ -32,9 +47,25 @@ export function Pill({
       variant="unstyled"
       className={clsx(
         'pill',
+        // Base variants
+        variant === 'default' && 'pill',
         variant === 'skill' && 'pill-skill',
         variant === 'selected' && 'pill-selected',
-        isInteractive && 'pill-skill-interactive',
+        variant === 'brand-orange' && 'pill-brand-orange',
+        variant === 'brand-red' && 'pill-brand-red',
+        variant === 'brand-green' && 'pill-brand-green',
+        variant === 'brand-blue' && 'pill-brand-blue',
+        variant === 'brand-purple' && 'pill-brand-purple',
+        variant === 'dark' && 'pill-dark',
+        variant === 'light' && 'pill-light',
+        variant === 'outline-dark' && 'pill-outline-dark',
+        variant === 'featured' && 'pill-featured',
+        variant === 'category' && 'pill-category',
+        variant === 'flat' && 'pill-flat',
+        variant === 'outline' && 'pill-outline',
+        // Interactive states
+        isInteractive && 'pill-hover',
+        // Size variants
         size === 'sm' && 'pill-sm',
         size === 'md' && 'pill-md',
         size === 'lg' && 'pill-lg',
