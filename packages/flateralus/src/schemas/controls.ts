@@ -6,7 +6,7 @@ import z from 'zod';
 export const BaseControlSchema = z.object({
   name: z.string(),
   type: z.enum(['number', 'boolean', 'color', 'select', 'group']),
-  label: z.string(),
+  label: z.string().optional(),
   description: z.string().optional(),
   debug: z.boolean().default(false).optional(),
   resetsAnimation: z.boolean().default(false).optional(),
