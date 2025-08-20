@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
 import { clsx } from 'clsx';
+import { Button } from './Button';
 
 interface PillProps {
   children: ReactNode;
@@ -21,9 +22,14 @@ export function Pill({
   // Automatically set interactive to true if onClick is provided
   const isInteractive = interactive || !!onClick;
 
+  // Map pill sizes to button sizes
+  const buttonSize = size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md';
+
   return (
-    <button
-      onClick={() => onClick?.()}
+    <Button
+      onClick={onClick}
+      size={buttonSize}
+      variant="unstyled"
       className={clsx(
         'pill',
         variant === 'skill' && 'pill-skill',
@@ -36,6 +42,6 @@ export function Pill({
       )}
     >
       {children}
-    </button>
+    </Button>
   );
 }
