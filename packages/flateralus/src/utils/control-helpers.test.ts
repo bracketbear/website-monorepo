@@ -240,7 +240,6 @@ describe('Control Helper Functions', () => {
           {
             name: 'size',
             type: 'number',
-            label: 'size',
             defaultValue: 5,
             min: 1,
             max: 20,
@@ -249,7 +248,6 @@ describe('Control Helper Functions', () => {
           {
             name: 'alpha',
             type: 'number',
-            label: 'alpha',
             defaultValue: 0.8,
             min: 0,
             max: 1,
@@ -271,7 +269,6 @@ describe('Control Helper Functions', () => {
           {
             name: 'size',
             type: 'number',
-            label: 'size',
             defaultValue: 5,
             min: 1,
             max: 20,
@@ -280,7 +277,6 @@ describe('Control Helper Functions', () => {
           {
             name: 'alpha',
             type: 'number',
-            label: 'alpha',
             defaultValue: 0.8,
             min: 0,
             max: 1,
@@ -303,7 +299,6 @@ describe('Control Helper Functions', () => {
           {
             name: 'intensity',
             type: 'number',
-            label: 'intensity',
             defaultValue: 0.5,
             min: 0,
             max: 1,
@@ -312,19 +307,16 @@ describe('Control Helper Functions', () => {
           {
             name: 'enabled',
             type: 'boolean',
-            label: 'enabled',
             defaultValue: true,
           },
           {
             name: 'color',
             type: 'color',
-            label: 'color',
             defaultValue: '#ff0000',
           },
           {
             name: 'style',
             type: 'select',
-            label: 'style',
             defaultValue: 'subtle',
             options: [
               { value: 'subtle', label: 'subtle' },
@@ -350,7 +342,6 @@ describe('Control Helper Functions', () => {
           {
             name: 'intensity',
             type: 'number',
-            label: 'intensity',
             defaultValue: 0.5,
             min: 0,
             max: 1,
@@ -359,19 +350,16 @@ describe('Control Helper Functions', () => {
           {
             name: 'enabled',
             type: 'boolean',
-            label: 'enabled',
             defaultValue: true,
           },
           {
             name: 'color',
             type: 'color',
-            label: 'color',
             defaultValue: '#ff0000',
           },
           {
             name: 'style',
             type: 'select',
-            label: 'style',
             defaultValue: 'subtle',
             options: [
               { value: 'subtle', label: 'subtle' },
@@ -397,8 +385,8 @@ describe('Control Helper Functions', () => {
         ],
       });
 
-      expect(control.items[0].label).toBe('lineWidth');
-      expect(control.items[1].label).toBe('isVisible');
+      expect(control.items[0].name).toBe('lineWidth');
+      expect(control.items[1].name).toBe('isVisible');
     });
 
     it('should handle empty items array', () => {
@@ -766,9 +754,9 @@ describe('Control Helper Functions', () => {
       ];
 
       expect(particleControls).toHaveLength(5);
-      expect(particleControls[0].min).toBe(10);
-      expect(particleControls[0].max).toBe(1000);
-      expect(particleControls[4].options).toHaveLength(4);
+      expect((particleControls[0] as any).min).toBe(10);
+      expect((particleControls[0] as any).max).toBe(1000);
+      expect((particleControls[4] as any).options).toHaveLength(4);
     });
 
     it('should handle visual effect control patterns', () => {
@@ -807,8 +795,8 @@ describe('Control Helper Functions', () => {
 
       expect(effectControls).toHaveLength(5);
       expect(effectControls[4].type).toBe('group');
-      expect(effectControls[4].items).toHaveLength(3);
-      expect(effectControls[4].static).toBe(true);
+      expect((effectControls[4] as any).items).toHaveLength(3);
+      expect((effectControls[4] as any).static).toBe(true);
     });
   });
 

@@ -204,6 +204,92 @@ describe('randomize-controls', () => {
       });
     });
 
+    it('should generate random group values with constrained number ranges', () => {
+      const manifest = createManifest({
+        id: 'constrained-group-test',
+        name: 'Constrained Group Test',
+        description: 'Test group controls with constrained number ranges',
+        controls: [
+          {
+            name: 'layers',
+            type: 'group',
+            value: 'number',
+            label: 'Layer Spacings',
+            items: [
+              {
+                name: 'layer1',
+                type: 'number',
+                label: 'Layer 1',
+                defaultValue: 8,
+                min: 4,
+                max: 32,
+                step: 1,
+                debug: false,
+              },
+              {
+                name: 'layer2',
+                type: 'number',
+                label: 'Layer 2',
+                defaultValue: 14,
+                min: 6,
+                max: 32,
+                step: 1,
+                debug: false,
+              },
+              {
+                name: 'layer3',
+                type: 'number',
+                label: 'Layer 3',
+                defaultValue: 22,
+                min: 10,
+                max: 32,
+                step: 1,
+                debug: false,
+              },
+            ],
+            defaultValue: [
+              { type: 'number', value: 8 },
+              { type: 'number', value: 14 },
+              { type: 'number', value: 22 },
+            ],
+            minItems: 1,
+            maxItems: 6,
+            debug: false,
+          },
+        ],
+      });
+
+      const result = getRandomControlValues(manifest);
+      expect(result).toBeDefined();
+      expect(result.layers).toBeDefined();
+
+      const groupArray = result.layers as any[];
+      expect(Array.isArray(groupArray)).toBe(true);
+      expect(groupArray.length).toBeGreaterThanOrEqual(1);
+      expect(groupArray.length).toBeLessThanOrEqual(6);
+
+      // Check that each group item respects the min/max constraints
+      groupArray.forEach((item: any) => {
+        expect(typeof item).toBe('object');
+        expect(item.type).toBe('number');
+        expect(typeof item.value).toBe('number');
+        
+        // Find the corresponding item definition to check constraints
+        const itemDef = manifest.controls[0].items?.find(
+          (def) => def.name === item.name
+        );
+        if (
+          itemDef &&
+          itemDef.type === 'number' &&
+          typeof itemDef.min === 'number' &&
+          typeof itemDef.max === 'number'
+        ) {
+          expect(item.value).toBeGreaterThanOrEqual(itemDef.min);
+          expect(item.value).toBeLessThanOrEqual(itemDef.max);
+        }
+      });
+    });
+
     it('should handle empty manifest', () => {
       const manifest: AnimationManifest = {
         id: 'test',
@@ -416,6 +502,97 @@ describe('randomize-controls', () => {
 
       // With our mock, we should get different values
       expect(result1.testNumber).not.toBe(result2.testNumber);
+    });
+
+    it('should handle flowfield manifest constraints correctly', () => {
+      // This test simulates the actual flowfield manifest structure
+      const flowfieldManifest = createManifest({
+        id: 'flowfield',
+        name: 'Flowfield',
+        description: 'Flowfield animation with constrained layers',
+        controls: [
+          {
+            name: 'lineSpacing',
+            type: 'number',
+            label: 'Base spacing',
+            min: 4,
+            max: 32,
+            step: 1,
+            defaultValue: 10,
+            debug: false,
+          },
+          {
+            name: 'layers',
+            type: 'group',
+            value: 'number',
+            label: 'Layer spacings',
+            items: [
+              {
+                name: 'layer1',
+                type: 'number',
+                label: 'Layer 1',
+                min: 4,
+                max: 32,
+                step: 1,
+                defaultValue: 8,
+                debug: false,
+              },
+              {
+                name: 'layer2',
+                type: 'number',
+                label: 'Layer 2',
+                min: 6,
+                max: 32,
+                step: 1,
+                defaultValue: 14,
+                debug: false,
+              },
+              {
+                name: 'layer3',
+                type: 'number',
+                label: 'Layer 3',
+                min: 10,
+                max: 32,
+                step: 1,
+                defaultValue: 22,
+                debug: false,
+              },
+            ],
+            defaultValue: [
+              { type: 'number', value: 8 },
+              { type: 'number', value: 14 },
+              { type: 'number', value: 22 },
+            ],
+            minItems: 1,
+            maxItems: 6,
+            debug: false,
+          },
+        ],
+      });
+
+      // Generate random values multiple times to ensure consistency
+      for (let i = 0; i < 10; i++) {
+        const result = getRandomControlValues(flowfieldManifest);
+        
+        // Check lineSpacing is within bounds
+        expect(result.lineSpacing).toBeGreaterThanOrEqual(4);
+        expect(result.lineSpacing).toBeLessThanOrEqual(32);
+        
+        // Check layers group
+        expect(result.layers).toBeDefined();
+        const layers = result.layers as any[];
+        expect(Array.isArray(layers)).toBe(true);
+        expect(layers.length).toBeGreaterThanOrEqual(1);
+        expect(layers.length).toBeLessThanOrEqual(6);
+        
+        // Check each layer respects constraints
+        layers.forEach((layer: any) => {
+          expect(layer.type).toBe('number');
+          expect(typeof layer.value).toBe('number');
+          expect(layer.value).toBeGreaterThanOrEqual(4);
+          expect(layer.value).toBeLessThanOrEqual(32);
+        });
+      }
     });
   });
 });

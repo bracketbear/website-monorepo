@@ -118,11 +118,31 @@ function randomizeGroup(control: GroupControl): AnyControlValue[] {
           };
           break;
         case 'number':
-          controlValue = {
-            type: 'number',
-            value: Math.floor(Math.random() * 100),
-            metadata: { min: 0, max: 100 },
-          };
+          // For homogeneous number groups, respect the individual item constraints
+          if (control.items && control.items.length > 0) {
+            const firstNumberItem = control.items.find(item => item.type === 'number');
+            if (firstNumberItem && typeof firstNumberItem.min === 'number' && typeof firstNumberItem.max === 'number') {
+              controlValue = {
+                type: 'number',
+                value: randomInRange(firstNumberItem.min, firstNumberItem.max),
+                metadata: { min: firstNumberItem.min, max: firstNumberItem.max },
+              };
+            } else {
+              // Fallback to default range if no constraints found
+              controlValue = {
+                type: 'number',
+                value: Math.floor(Math.random() * 100),
+                metadata: { min: 0, max: 100 },
+              };
+            }
+          } else {
+            // Fallback to default range if no items defined
+            controlValue = {
+              type: 'number',
+              value: Math.floor(Math.random() * 100),
+              metadata: { min: 0, max: 100 },
+            };
+          }
           break;
         case 'boolean':
           controlValue = {

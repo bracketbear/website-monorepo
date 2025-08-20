@@ -4,24 +4,44 @@ import type {
   ColorControl,
   SelectControl,
   GroupControl,
+  Control,
 } from '../types';
+
+/**
+ * Base options that are common to all control types
+ */
+interface BaseControlOptions {
+  label?: string;
+  description?: string;
+  debug?: boolean;
+  resetsAnimation?: boolean;
+}
+
+type BaseControlHelper<
+  TOptions extends BaseControlOptions,
+  TControl extends Control,
+> = (name: string, options: TOptions) => TControl;
 
 /**
  * Helper function to create a number control
  */
-export function slider(
-  name: string,
-  options: {
+export const slider: BaseControlHelper<
+  BaseControlOptions & {
     min?: number;
     max?: number;
     step?: number;
     defaultValue: number;
-    label?: string;
-    description?: string;
-    debug?: boolean;
-    resetsAnimation?: boolean;
+  },
+  NumberControl
+> = (
+  name: string,
+  options: BaseControlOptions & {
+    min?: number;
+    max?: number;
+    step?: number;
+    defaultValue: number;
   }
-): NumberControl {
+) => {
   return {
     name,
     type: 'number',
@@ -39,16 +59,17 @@ export function slider(
 /**
  * Helper function to create a boolean control
  */
-export function toggle(
-  name: string,
-  options: {
+export const toggle: BaseControlHelper<
+  BaseControlOptions & {
     defaultValue: boolean;
-    label?: string;
-    description?: string;
-    debug?: boolean;
-    resetsAnimation?: boolean;
+  },
+  BooleanControl
+> = (
+  name: string,
+  options: BaseControlOptions & {
+    defaultValue: boolean;
   }
-): BooleanControl {
+) => {
   return {
     name,
     type: 'boolean',
@@ -63,16 +84,17 @@ export function toggle(
 /**
  * Helper function to create a color control
  */
-export function color(
-  name: string,
-  options: {
+export const color: BaseControlHelper<
+  BaseControlOptions & {
     defaultValue: string;
-    label?: string;
-    description?: string;
-    debug?: boolean;
-    resetsAnimation?: boolean;
+  },
+  ColorControl
+> = (
+  name: string,
+  options: BaseControlOptions & {
+    defaultValue: string;
   }
-): ColorControl {
+) => {
   return {
     name,
     type: 'color',
@@ -87,17 +109,19 @@ export function color(
 /**
  * Helper function to create a select control
  */
-export function select(
-  name: string,
-  options: {
+export const select: BaseControlHelper<
+  BaseControlOptions & {
     options: Array<{ value: string; label: string }> | string[];
     defaultValue: string;
-    label?: string;
-    description?: string;
-    debug?: boolean;
-    resetsAnimation?: boolean;
+  },
+  SelectControl
+> = (
+  name: string,
+  options: BaseControlOptions & {
+    options: Array<{ value: string; label: string }> | string[];
+    defaultValue: string;
   }
-): SelectControl {
+) => {
   let selectOptions: Array<{ value: string; label: string }>;
 
   if (
@@ -122,72 +146,86 @@ export function select(
     debug: options.debug ?? false,
     resetsAnimation: options.resetsAnimation ?? false,
   };
-}
+};
 
 /**
  * Helper function to create a group control
  */
 export function group(
   name: string,
-  options: {
+  options: BaseControlOptions & {
     value: 'number' | 'boolean' | 'color' | 'select';
     items: Array<{
       name: string;
       type: 'number' | 'boolean' | 'color' | 'select';
-      defaultValue: any;
+      label?: string;
+      defaultValue: string | number | boolean;
       min?: number;
       max?: number;
       step?: number;
       options?: Array<{ value: string; label: string }> | string[];
     }>;
-    defaultValue?: any[];
+    defaultValue?: Array<{
+      type: string;
+      value: string | number | boolean;
+      metadata?: Record<string, unknown>;
+    }>;
     minItems?: number;
     maxItems?: number;
     static?: boolean;
-    label?: string;
-    description?: string;
-    debug?: boolean;
-    resetsAnimation?: boolean;
   }
 ): GroupControl {
-  // For now, return a basic group control structure
-  // This is a simplified version that works with the current schema
+  const items = options.items.map((item) => {
+    const baseItem: {
+      name: string;
+      type: 'number' | 'boolean' | 'color' | 'select';
+      defaultValue: string | number | boolean;
+      label?: string;
+      min?: number;
+      max?: number;
+      step?: number;
+      options?: Array<{ value: string; label: string }>;
+    } = {
+      name: item.name,
+      type: item.type,
+      defaultValue: item.defaultValue,
+    };
+
+    // Only add label if explicitly provided
+    if (item.label !== undefined) {
+      baseItem.label = item.label;
+    }
+
+    if (item.type === 'number') {
+      return {
+        ...baseItem,
+        min: item.min,
+        max: item.max,
+        step: item.step,
+      };
+    }
+
+    if (item.type === 'select') {
+      const selectOptions =
+        Array.isArray(item.options) && typeof item.options[0] === 'string'
+          ? item.options.map((opt) => ({ value: opt, label: opt }))
+          : (item.options as Array<{ value: string; label: string }>);
+      return {
+        ...baseItem,
+        options: selectOptions,
+      };
+    }
+
+    return baseItem;
+  });
+
   return {
     name,
     type: 'group',
     value: options.value,
     label: options.label ?? name,
     description: options.description,
-    items: options.items.map((item) => {
-      const baseItem = {
-        name: item.name,
-        type: item.type,
-        label: item.name,
-        defaultValue: item.defaultValue,
-      };
-
-      if (item.type === 'number') {
-        return {
-          ...baseItem,
-          min: item.min,
-          max: item.max,
-          step: item.step,
-        };
-      }
-
-      if (item.type === 'select') {
-        const selectOptions =
-          Array.isArray(item.options) && typeof item.options[0] === 'string'
-            ? item.options.map((opt) => ({ value: opt, label: opt }))
-            : (item.options as Array<{ value: string; label: string }>);
-        return {
-          ...baseItem,
-          options: selectOptions,
-        };
-      }
-
-      return baseItem;
-    }) as any, // Type assertion to avoid complex type issues
+    items: items as any, // Type assertion needed due to complex discriminated union
     defaultValue: options.defaultValue ?? [],
     minItems: options.minItems,
     maxItems: options.maxItems,
