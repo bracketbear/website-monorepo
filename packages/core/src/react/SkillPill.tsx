@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { clsx } from 'clsx';
+import { Pill } from './Pill';
 
 interface SkillPillProps {
   children: ReactNode;
@@ -9,7 +9,7 @@ interface SkillPillProps {
   onClick?: () => void;
 }
 
-export default function SkillPill({
+export function SkillPill({
   children,
   size = 'md',
   className,
@@ -17,19 +17,14 @@ export default function SkillPill({
   onClick,
 }: SkillPillProps) {
   return (
-    <button
-      onClick={() => onClick?.()}
-      className={clsx(
-        'pill',
-        selected ? 'pill-selected' : 'pill-skill',
-        onClick && 'pill-skill-interactive',
-        size === 'sm' && 'pill-sm',
-        size === 'md' && 'pill-md',
-        size === 'lg' && 'pill-lg',
-        className
-      )}
+    <Pill
+      size={size}
+      className={className}
+      variant={selected ? 'selected' : 'skill'}
+      interactive={!!onClick}
+      onClick={onClick}
     >
       {children}
-    </button>
+    </Pill>
   );
 }
