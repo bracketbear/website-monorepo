@@ -337,8 +337,7 @@ const calculateParticleForces = (
 
   if (distanceFromCenter > currentRadius) {
     const centerForce =
-      (distanceFromCenter - currentRadius) *
-      controls.centerAttractionStrength;
+      (distanceFromCenter - currentRadius) * controls.centerAttractionStrength;
     forceX += (dx / distanceFromCenter) * centerForce;
     forceY += (dy / distanceFromCenter) * centerForce;
   }
@@ -486,7 +485,11 @@ class BlobAnimation extends BaseAnimation<typeof MANIFEST, BlobControlValues> {
     });
   }
 
-  onUpdate(app: PIXI.Application, controls: BlobControlValues, deltaTime: number): void {
+  onUpdate(
+    app: PIXI.Application,
+    controls: BlobControlValues,
+    deltaTime: number
+  ): void {
     if (!this.blobSystem || !this.getContext()) {
       return;
     }
