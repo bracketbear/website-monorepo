@@ -7,10 +7,92 @@ Whenever you are working with Tailwind CSS in this project, you must:
 - For Tailwind v4, use **pure CSS/PostCSS** to add custom styles, theme variables, and utilities.
 - Always reference the official documentation for Tailwind 4 custom styles: [Tailwind v4: Adding Custom Styles](https://tailwindcss.com/docs/adding-custom-styles)
 - Use the `@theme`, `@utility`, and `@layer` directives in your CSS as described in the docs for any customizations.
-- Use arbitrary value syntax (e.g., `bg-[#fdf0d5]`) for one-off custom values, ensuring the class is present in your code so Tailwind generates the CSS.
+
+## CRITICAL: NO ARBITRARY VALUES
+
+**NEVER use arbitrary value syntax (e.g., `bg-[#fdf0d5]`, `text-[var(--color-primary)]`) in this project if there's an associated Tailwind Utility class.**
+
+### ❌ ALMOST FORBIDDEN - Arbitrary values
+```tsx
+// NEVER do this
+<button class="bg-[var(--color-primary)] text-[var(--color-primary-foreground)]">
+  Button
+</button>
+
+<div class="bg-[var(--color-card)] text-[var(--color-card-foreground)]">
+  Card content
+</div>
+
+// NEVER use hardcoded colors
+<div class="bg-[#ff4b3e] text-[#ffffff]">
+  Content
+</div>
+
+// NEVER use px values
+<div class="p-[16px] m-[8px]">
+  Content
+</div>
+```
+
+## ✅ CORRECT - Use predefined Tailwind utilities
+
+### **Standard Usage Patterns**
+- **Canvas**: `bg-background text-foreground`
+- **Card**: `bg-card text-card-foreground border border-border`
+- **Primary Button**: `bg-primary text-primary-foreground hover:bg-primary-hover`
+- **Secondary Button**: `bg-secondary text-secondary-foreground hover:bg-secondary-hover`
+- **Muted**: `bg-muted text-muted-foreground`
+- **Borders**: `border-border`
+- **Shadows**: `shadow-md` (or create custom shadow utilities)
+- **Focus Rings**: `focus:ring-2 focus:ring-ring`
+
+### **Brand Color Utilities**
+- **Brand Dark**: `bg-brand-dark text-brand-dark border-brand-dark`
+- **Brand Red**: `bg-brand-red text-brand-red border-brand-red`
+- **Brand Orange**: `bg-brand-orange text-brand-orange border-brand-orange`
+- **Brand Blue**: `bg-brand-blue text-brand-blue border-brand-blue`
+- **Brand Green**: `bg-brand-green text-brand-green border-brand-green`
+- **Brand Yellow**: `bg-brand-yellow text-brand-yellow border-brand-yellow`
+- **Brand Purple**: `bg-brand-purple text-brand-purple border-brand-purple`
+- **Brand Light**: `bg-brand-light text-brand-light border-brand-light`
+
+## **Responsive Design Requirements**
+
+- **NEVER use px values** - always use Tailwind's spacing scale (rem-based)
+- **Use responsive utilities**: `p-4 md:p-6 lg:p-8` instead of arbitrary spacing
+- **Use semantic spacing**: `space-y-4`, `gap-4`, `p-4`, `m-4` etc.
+
+## **When You Need Custom Values**
+
+If you absolutely need a custom value that doesn't exist in our theme:
+
+1. **First**: Check if it can be achieved with existing utilities + modifiers
+2. **Second**: Add it to the theme system in `packages/core/src/styles/theme.css`
+3. **Third**: Create a custom utility using `@utility` directive
+4. **Last resort**: Use CSS custom properties in component styles (not in class attributes)
+
+### **Example of adding new theme values**
+```css
+/* In packages/core/src/styles/theme.css */
+@theme {
+  --color-accent: #6366f1;
+  --color-accent-foreground: #ffffff;
+}
+
+/* Then use in components */
+<button class="bg-accent text-accent-foreground">
+  Accent Button
+</button>
+```
+
+## **File Locations**
+
+- **Theme definitions**: `packages/core/src/styles/theme.css`
+- **Custom utilities**: `packages/core/src/styles/` (create new files as needed)
+- **Component styles**: Use Tailwind utilities, avoid custom CSS unless necessary
 
 **Never** assume a `tailwind.config.js` file is present or used in Tailwind v4 projects.
 description:
-globs:
+globs: "*.css"
 alwaysApply: false
 ---
