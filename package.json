@@ -18,7 +18,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:check": "eslint . --max-warnings 0",
-    "type-check": "npm run type-check --workspace=@bracketbear/core --workspace=@bracketbear/flateralus --workspace=@bracketbear/flateralus-animations --workspace=@bracketbear/flateralus-react --workspace=@bracketbear/flateralus-pixi --workspace=@bracketbear/tw-pattern-analyzer --workspace=@bracketbear/portfolio"
+    "type-check": "npm run type-check --workspace=@bracketbear/core --workspace=@bracketbear/flateralus --workspace=@bracketbear/flateralus-animations --workspace=@bracketbear/flateralus-react --workspace=@bracketbear/flateralus-pixi --workspace=@bracketbear/tw-pattern-analyzer --workspace=@bracketbear/portfolio",
+    "scan:css": "node scripts/find-arbitrary-css.js"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.8.0",
