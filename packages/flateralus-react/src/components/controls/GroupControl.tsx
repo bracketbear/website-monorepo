@@ -168,7 +168,7 @@ export default function GroupControl({
         )}
       </div>
       {control.description && (
-        <div className="mt-0.5 ml-6 text-[11px] leading-tight text-white/40">
+        <div className="mt-0.5 ml-6 text-xs leading-tight text-white/40">
           {control.description}
         </div>
       )}

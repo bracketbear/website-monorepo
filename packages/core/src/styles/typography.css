@@ -273,65 +273,46 @@
 
 /* Prose color modifiers */
 @layer components {
-  .prose-headings\:text-white h1,
-  .prose-headings\:text-white h2,
-  .prose-headings\:text-white h3,
-  .prose-headings\:text-white h4 {
-    @apply text-white;
+  /* Prose color utilities */
+  .prose-headings\:text-foreground h1,
+  .prose-headings\:text-foreground h2,
+  .prose-headings\:text-foreground h3,
+  .prose-headings\:text-foreground h4 {
+    @apply text-foreground;
   }
 
-  .prose-p\:text-white\/90 p {
-    @apply text-white/90;
+  .prose-p\:text-foreground\/90 p {
+    @apply text-foreground/90;
   }
 
-  .prose-p\:text-white\/80 p {
-    @apply text-white/80;
+  .prose-p\:text-foreground\/80 p {
+    @apply text-foreground/80;
   }
 
-  .prose-headings\:text-brand-dark h1,
-  .prose-headings\:text-brand-dark h2,
-  .prose-headings\:text-brand-dark h3,
-  .prose-headings\:text-brand-dark h4 {
-    @apply text-brand-dark;
+  .prose-headings\:text-muted-foreground h1,
+  .prose-headings\:text-muted-foreground h2,
+  .prose-headings\:text-muted-foreground h3,
+  .prose-headings\:text-muted-foreground h4 {
+    @apply text-muted-foreground;
   }
 
-  .prose-p\:text-brand-dark\/90 p {
-    @apply text-brand-dark/90;
+  .prose-p\:text-muted-foreground\/80 p {
+    @apply text-muted-foreground/80;
   }
 
-  .prose-p\:text-brand-dark\/80 p {
-    @apply text-brand-dark/80;
+  .prose-strong\:text-muted-foreground strong {
+    @apply text-muted-foreground;
   }
 
-  /* Brand light color modifiers */
-  .prose-headings\:text-brand-light h1,
-  .prose-headings\:text-brand-light h2,
-  .prose-headings\:text-brand-light h3,
-  .prose-headings\:text-brand-light h4 {
-    @apply text-brand-light;
+  .prose-ul\:text-muted-foreground\/80 ul {
+    @apply text-muted-foreground/80;
   }
 
-  .prose-p\:text-brand-light\/80 p {
-    @apply text-brand-light/80;
+  .prose-ol\:text-muted-foreground\/80 ol {
+    @apply text-muted-foreground/80;
   }
 
-  .prose-strong\:text-brand-light strong {
-    @apply text-brand-light;
-  }
-
-  .prose-em\:text-brand-light\/90 em {
-    @apply text-brand-light/90;
-  }
-
-  .prose-ul\:text-brand-light\/80 ul {
-    @apply text-brand-light/80;
-  }
-
-  .prose-ol\:text-brand-light\/80 ol {
-    @apply text-brand-light/80;
-  }
-
-  .prose-li\:text-brand-light\/80 li {
-    @apply text-brand-light/80;
+  .prose-li\:text-muted-foreground\/80 li {
+    @apply text-muted-foreground/80;
   }
 }

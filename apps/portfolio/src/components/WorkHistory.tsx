@@ -47,10 +47,10 @@ function groupJobsByCompany(
   return grouped.sort((a, b) => {
     const aLatestJob = a.jobs[0]; // Jobs are already sorted by end date
     const bLatestJob = b.jobs[0];
-    
+
     const aEndDate = aLatestJob.data.endDate || new Date();
     const bEndDate = bLatestJob.data.endDate || new Date();
-    
+
     return bEndDate.getTime() - aEndDate.getTime();
   });
 }
@@ -122,7 +122,7 @@ export default function WorkHistory({
                   )}
                   {/* Skills row */}
                   {job.data.workSkills && job.data.workSkills.length > 0 && (
-                    <div className="flex flex-wrap gap-2 border-t-2 border-[var(--color-brand-dark)] pt-3">
+                    <div className="border-brand-dark flex flex-wrap gap-2 border-t-2 pt-3">
                       {job.data.workSkills?.map((skillId: string) => {
                         const isSelected = selectedSkills.includes(skillId);
                         return (
@@ -176,8 +176,8 @@ export default function WorkHistory({
         <div
           className={clsx(
             'relative transition-transform duration-300',
-            'bg-[var(--color-background)]',
-            'border-2 border-[var(--color-brand-orange)]',
+            'bg-background',
+            'border-brand-orange border-2',
             'shadow-[4px_4px_0_0_var(--color-brand-red)]',
             'p-6'
           )}

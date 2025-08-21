@@ -17,24 +17,113 @@
 
   --color-error: var(--color-brand-red);
 
-  /* Theme Tokens - Light Mode Defaults */
-  --color-primary: var(--color-brand-orange);
-  --color-secondary: var(--color-brand-red);
+  /* Light Theme Tokens (Default) */
   --color-tertiary: var(--color-brand-green);
-  --color-background: var(--color-brand-light);
-  --color-foreground: var(--color-brand-dark);
-  --color-border: var(--color-dark);
-  --color-shadow: var(--color-dark);
+
+  /* Canvas */
+  --color-background: var(--color-brand-orange-light); /* warm canvas */
+  --color-foreground: hsl(0 0% 10%); /* near-black ink */
+
+  /* Surfaces (tint/shade of canvas) */
+  --color-card: color-mix(in srgb, var(--color-background) 85%, white 15%);
+  --color-card-foreground: var(--color-foreground);
+  --color-muted: color-mix(in srgb, var(--color-background) 85%, black 15%);
+  --color-muted-foreground: color-mix(
+    in srgb,
+    var(--color-foreground) 75%,
+    transparent
+  );
+
+  /* Borders/Depth */
+  --color-border: color-mix(in srgb, var(--color-foreground) 18%, transparent);
+  --color-shadow: hsl(0 0% 0% / 0.2);
+
+  /* Actions */
+  --color-primary: hsl(0 0% 10%); /* near-black button */
+  --color-primary-hover: color-mix(
+    in srgb,
+    var(--color-primary) 85%,
+    white 15%
+  );
+  --color-primary-foreground: #fff;
+
+  --color-secondary: color-mix(in srgb, var(--color-background) 92%, white 8%);
+  --color-secondary-hover: color-mix(
+    in srgb,
+    var(--color-background) 88%,
+    white 12%
+  );
+  --color-secondary-foreground: var(--color-foreground);
+
+  /* Chrome */
+  --color-ring: color-mix(
+    in srgb,
+    var(--color-foreground) 80%,
+    var(--color-background) 20%
+  );
+
+  /* Interaction/support tokens */
+  --color-overlay: hsl(0 0% 0% / 0.6); /* modal scrim */
+
+  /* Text helpers */
   --color-text-primary: var(--color-foreground);
-  --color-text-secondary: var(--color-foreground-muted);
-  --color-foreground-muted: color-mix(
+  --color-text-secondary: var(--color-muted-foreground);
+  --color-foreground-muted: var(--color-muted-foreground);
+  --color-background-muted: var(--color-muted);
+
+  /* Legacy brand color mappings for backward compatibility */
+  /* --color-brand-orange-light: var(--color-background); */ /* Removed circular reference */
+  /* --color-brand-dark: var(--color-foreground); */ /* Removed circular reference */
+  /* --color-brand-light: var(--color-background); */ /* Removed circular reference */
+}
+
+/* Mobile Menu Visibility Control */
+#mobile-menu-drawer.hidden {
+  display: none !important;
+}
+
+#mobile-menu-drawer:not(.hidden) {
+  display: block;
+}
+
+/* Mobile Menu Drawer Positioning */
+#mobile-menu-drawer {
+  transition: right 0.3s ease-in-out;
+}
+
+/* Mobile Menu Overlay Opacity */
+#mobile-menu-overlay {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+#mobile-menu-overlay.opacity-100 {
+  opacity: 1;
+}
+
+/* Ensure mobile menu is completely hidden on desktop */
+@media (min-width: 768px) {
+  #mobile-menu-drawer,
+  #mobile-menu-overlay {
+    display: none !important;
+  }
+}
+
+/* Dark theme variables (for future use) - Currently disabled */
+/* @theme dark {
+  --color-background: var(--color-brand-dark);
+  --color-foreground: var(--color-brand-light);
+  --color-card: color-mix(in srgb, var(--color-background) 95%, white 5%);
+  --color-card-foreground: var(--color-foreground);
+  --color-muted: color-mix(in srgb, var(--color-background) 80%, white 20%);
+  --color-muted-foreground: color-mix(
     in srgb,
     var(--color-foreground) 80%,
     transparent
   );
-  --color-background-muted: color-mix(
-    in srgb,
-    var(--color-background) 80%,
-    transparent
-  );
-}
+  --color-border: color-mix(in srgb, var(--color-foreground) 18%, transparent);
+  --color-text-primary: var(--color-foreground);
+  --color-text-secondary: var(--color-muted-foreground);
+  --color-foreground-muted: var(--color-muted-foreground);
+  --color-background-muted: var(--color-muted);
+} */

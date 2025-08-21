@@ -8,7 +8,9 @@ const { title, className = '' } = Astro.props;
 ---
 
 <div class={`${className}`}>
-  <h2 class="font-heading mb-8 text-3xl font-black tracking-tight text-white uppercase">
+  <h2
+    class="font-heading text-text-primary mb-8 text-3xl font-black tracking-tight uppercase"
+  >
     {title}
   </h2>
   <slot />

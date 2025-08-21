@@ -19,14 +19,14 @@ export function HeroContent({
   return (
     <div className="relative z-10 mb-8 flex h-full flex-col items-center justify-center p-4">
       {description && (
-        <p className="text-2xl font-bold tracking-tight text-white/90 uppercase drop-shadow-lg">
+        <p className="foreground/90 text-2xl font-bold tracking-tight uppercase drop-shadow-lg">
           {description}
         </p>
       )}
-      <h1 className="font-heading text-center text-6xl font-black tracking-tight text-white uppercase text-shadow-lg lg:text-8xl">
+      <h1 className="font-heading text-foreground text-center text-6xl font-black tracking-tight uppercase text-shadow-lg lg:text-8xl">
         {title}
       </h1>
-      <p className="mt-6 text-center text-xl font-bold tracking-tight text-white/90 uppercase text-shadow-lg lg:text-2xl">
+      <p className="text-foreground/90 mt-6 text-center text-xl font-bold tracking-tight uppercase text-shadow-lg lg:text-2xl">
         {subtitle}
       </p>
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:gap-6">

@@ -23,7 +23,6 @@ const snakeText = [
 const jobs: WorkJobEntry[] = await getCollection('workJobs');
 const companies: WorkCompanyEntry[] = await getCollection('workCompany');
 const skills: WorkSkillEntry[] = await getCollection('workSkills');
-const services: ServiceEntry[] = await getCollection('services');
 ---
 
 <Layout>
@@ -81,7 +80,7 @@ const services: ServiceEntry[] = await getCollection('services');
       </div>
     </div>
     <!-- Service Ticker -->
-    <ServiceTicker services={services} client:load />
+    <!-- <ServiceTicker services={services} client:load /> -->
   </header>
 
   <main class="bg-background">

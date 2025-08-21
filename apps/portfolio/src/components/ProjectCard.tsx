@@ -50,7 +50,7 @@ export default function ProjectCard({
       >
         {/* Cover Image */}
         {showImage && (
-          <div className="border-brand-dark/30 inset-shadow-default-2xl aspect-[4/3] w-full overflow-hidden border-b">
+          <div className="inset-shadow-default-2xl border-border/30 aspect-[4/3] w-full overflow-hidden border-b">
             {coverImage ? (
               <img
                 src={coverImage}
@@ -59,7 +59,7 @@ export default function ProjectCard({
               />
             ) : (
               <div className="flex h-full items-center justify-center">
-                <span className="text-brand-yellow font-mono text-xs opacity-60">
+                <span className="text-muted font-mono text-xs opacity-60">
                   [No Cover Image]
                 </span>
               </div>
@@ -100,7 +100,7 @@ export default function ProjectCard({
 
             {/* Project subline */}
             {project.data.teaser?.subline && (
-              <div className="text-brand-dark/70 mb-4 text-base leading-relaxed">
+              <div className="text-foreground/70 mb-4 text-base leading-relaxed">
                 {project.data.teaser.subline}
               </div>
             )}

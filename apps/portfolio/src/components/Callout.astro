@@ -8,15 +8,17 @@ interface Props {
 const { title, tone = 'neutral', className = '' } = Astro.props;
 
 const toneClasses = {
-  neutral: 'border-brand-dark/40 bg-brand-dark/50',
-  info: 'border-brand-blue/40 bg-brand-blue/10',
-  warning: 'border-brand-orange/40 bg-brand-orange/10',
-  success: 'border-brand-green/40 bg-brand-green/10',
+  neutral: 'border-border/40 bg-muted/50',
+  info: 'border-border/40 bg-card/10',
+  warning: 'border-border/40 bg-primary/10',
+  success: 'border-border/40 bg-muted/10',
 };
 ---
 
 <div class={`border rounded-md p-6 ${toneClasses[tone]} ${className}`}>
-  <h3 class="font-heading mb-4 text-xl font-black tracking-tight text-white uppercase">
+  <h3
+    class="font-heading text-foreground mb-4 text-xl font-black tracking-tight uppercase"
+  >
     {title}
   </h3>
   <slot />

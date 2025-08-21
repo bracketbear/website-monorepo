@@ -19,10 +19,10 @@ export const Testimonial = ({
   variant = 'dark',
   className,
 }: TestimonialProps) => {
-  const darkClass = 'bg-brand-dark text-white';
+  const darkClass = 'bg-brand-dark text-text-primary';
   const lightClass = 'text-brand-dark bg-white';
   const textLightClass = 'text-gray-900';
-  const textDarkClass = 'text-white';
+  const textDarkClass = 'text-text-primary';
 
   return (
     <section
@@ -30,7 +30,7 @@ export const Testimonial = ({
         'px-content relative isolate overflow-hidden py-24 sm:py-32',
         variant === 'dark' && darkClass,
         variant === 'light' && lightClass,
-        variant === 'primary' && 'bg-primary/90 text-white',
+        variant === 'primary' && 'bg-primary/90 text-text-primary',
         className
       )}
     >
@@ -63,7 +63,7 @@ export const Testimonial = ({
               <div
                 className={clsx(
                   'font-semibold',
-                  variant === 'dark' && 'text-white',
+                  variant === 'dark' && 'text-text-primary',
                   variant === 'light' && 'text-gray-900'
                 )}
               >

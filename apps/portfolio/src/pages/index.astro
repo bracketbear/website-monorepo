@@ -140,19 +140,19 @@ function parseMarkdown(content: string): string {
       <section class="px-content py-24">
         <div class="container mx-auto">
           <div class="mx-auto max-w-4xl text-center">
-            <h2 class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
+            <h2 class="font-heading text-foreground mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
               {indexPage.data.about.title}
             </h2>
             <div class="card-dark">
               {indexPage.data.about.content && (
                 <div
-                  class="prose prose-xl prose-headings:text-brand-light prose-p:text-brand-light/80 prose-strong:text-brand-light prose-em:text-brand-light/90 prose-ul:text-brand-light/80 prose-ol:text-brand-light/80 prose-li:text-brand-light/80 max-w-none"
+                  class="prose prose-xl prose-headings:text-foreground prose-p:text-foreground/80 prose-strong:text-foreground prose-em:text-foreground/90 prose-ul:text-foreground/80 prose-ol:text-foreground/80 prose-li:text-foreground/80 max-w-none"
                   set:html={parseMarkdown(indexPage.data.about.content)}
                 />
               )}
               {indexPage.data.about.showSkillsTicker && (
                 <>
-                  <h3 class="text-brand-light mt-8 text-2xl font-bold">
+                  <h3 class="text-foreground mt-8 text-2xl font-bold">
                     Featured Skills:
                   </h3>
                   <SkillsTicker skills={featuredSkills} client:load />
@@ -191,16 +191,16 @@ function parseMarkdown(content: string): string {
   <!-- Featured Projects Section -->
   {
     indexPage.data.layout.showFeaturedProjects && (
-      <section class="px-content relative min-h-[600px] overflow-hidden pt-12 pb-24">
+      <section class="px-content relative min-h-[37.5rem] overflow-hidden pt-12 pb-24">
         <FeaturedProjectsWaveBG className="relative w-full" client:load>
           <div class="relative z-10 container mx-auto">
             <div class="mb-8 text-center">
-              <h2 class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
+              <h2 class="font-heading text-foreground mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
                 {indexPage.data.featuredProjects.title}
               </h2>
               {indexPage.data.featuredProjects.subtitle && (
                 <div
-                  class="prose prose-xl prose-p:text-brand-dark/80 mx-auto max-w-2xl"
+                  class="prose prose-xl prose-p:text-foreground/80 mx-auto max-w-2xl"
                   set:html={parseMarkdown(
                     indexPage.data.featuredProjects.subtitle
                   )}
@@ -239,12 +239,12 @@ function parseMarkdown(content: string): string {
       <section class="px-content py-24">
         <div class="container mx-auto">
           <div class="mb-8 text-center">
-            <h2 class="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
+            <h2 class="font-heading text-foreground mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
               {indexPage.data.recentExperience.title}
             </h2>
             {indexPage.data.recentExperience.subtitle && (
               <div
-                class="prose prose-xl prose-p:text-brand-dark/80 mx-auto max-w-2xl"
+                class="prose prose-xl prose-p:text-foreground/80 mx-auto max-w-2xl"
                 set:html={parseMarkdown(
                   indexPage.data.recentExperience.subtitle
                 )}
@@ -256,15 +256,15 @@ function parseMarkdown(content: string): string {
               <div class="card-dark">
                 <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
                   <div>
-                    <h3 class="font-heading text-brand-light text-2xl font-black uppercase">
+                    <h3 class="font-heading text-foreground text-2xl font-black uppercase">
                       {job.data.title}
                     </h3>
-                    <p class="text-brand-light/80 text-xl">
+                    <p class="text-foreground/80 text-xl">
                       {getCompanyName(job.data.company, workCompanies)}
                     </p>
                   </div>
                   <div class="mt-2 text-right md:mt-0">
-                    <p class="text-brand-light/60 font-bold">
+                    <p class="text-foreground/60 font-bold">
                       {formatDate(job.data.startDate)} -
                       {job.data.endDate
                         ? formatDate(job.data.endDate)
@@ -274,7 +274,7 @@ function parseMarkdown(content: string): string {
                 </div>
                 {job.data.description && (
                   <div
-                    class="prose prose-sm prose-p:text-brand-light prose-strong:text-brand-light prose-em:text-brand-light/90 prose-ul:text-brand-light/80 prose-ol:text-brand-light/80 prose-li:text-brand-light/80 mb-4 max-w-none"
+                    class="prose prose-sm prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground/90 prose-ul:text-foreground/80 prose-ol:text-foreground/80 prose-li:text-foreground/80 mb-4 max-w-none"
                     set:html={parseMarkdown(job.data.description)}
                   />
                 )}
@@ -283,7 +283,7 @@ function parseMarkdown(content: string): string {
                     {job.data.highlights
                       .slice(0, 3)
                       .map((highlight: string) => (
-                        <li class="text-brand-light/80">{highlight}</li>
+                        <li class="text-foreground/80">{highlight}</li>
                       ))}
                   </ul>
                 )}
@@ -320,17 +320,17 @@ function parseMarkdown(content: string): string {
       <section class="px-content py-24">
         <div class="container mx-auto">
           <div class="mx-auto max-w-4xl text-center">
-            <h2 class="font-heading text-brand-light mb-8 p-6 text-5xl font-black tracking-tight uppercase">
+            <h2 class="font-heading text-foreground mb-8 p-6 text-5xl font-black tracking-tight uppercase">
               {indexPage.data.contactCTA.title}
             </h2>
             {indexPage.data.contactCTA.text && (
               <div
-                class="prose prose-lg prose-p:text-brand-light/80 mx-auto mb-12 max-w-2xl"
+                class="prose prose-lg prose-p:text-foreground/80 mx-auto mb-12 max-w-2xl"
                 set:html={parseMarkdown(indexPage.data.contactCTA.text)}
               />
             )}
             {indexPage.data.contactCTA && (
-              <div class="card bg-brand-light">
+              <div class="card bg-card">
                 <ContactForm client:load />
               </div>
             )}

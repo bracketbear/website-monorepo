@@ -27,14 +27,15 @@ const pageTitle = makeTitle(title);
   navigation={navigationConfig}
   breadcrumbs={breadcrumbs}
   metaDescription={metaDescription}
+  class="bg-background text-text-primary"
 >
   <!-- Transparent Navigation -->
   <div class="relative z-50">
-    <NavBar config={navigationConfig} variant="ghost-dark" />
+    <NavBar config={navigationConfig} variant="glass" />
   </div>
 
   <!-- Main content with consistent background -->
-  <div class="bg-brand-orange-light min-h-screen">
+  <div class="min-h-screen">
     <slot />
   </div>
 </LayeredLayout>

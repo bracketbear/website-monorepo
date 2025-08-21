@@ -9,6 +9,8 @@ export interface Props extends LayoutProps {
   contactForm?: any;
   metaDescription?: string;
   description?: string;
+  class?: string;
+  navigationVariant?: 'default' | 'ghost-dark' | 'ghost-light' | 'glass';
 }
 
 const {
@@ -21,6 +23,8 @@ const {
   breadcrumbs,
   metaDescription,
   description,
+  class: className,
+  navigationVariant,
 } = Astro.props;
 
 // Use description if provided, otherwise fall back to metaDescription
@@ -41,9 +45,7 @@ const finalMetaDescription = description || metaDescription;
       )
     }
   </head>
-  <body
-    class="bg-brand-orange text-foreground min-h-screen transition-colors duration-300"
-  >
+  <body class="min-h-screen transition-colors duration-300">
     <!-- Background Layer -->
     <div
       style={`z-index: ${LAYERS.background}; position: fixed; inset: 0; pointer-events: none;`}
@@ -52,11 +54,22 @@ const finalMetaDescription = description || metaDescription;
     </div>
 
     <!-- Content Layer (default slot) -->
-    <div style={`z-index: ${LAYERS.content}; position: relative;`}>
-      {!hideNavigation && <NavBar config={navigation} />}
+    <div
+      style={`z-index: ${LAYERS.content}; position: relative;`}
+      class={className}
+    >
+      {
+        !hideNavigation && (
+          <NavBar config={navigation} variant={navigationVariant} />
+        )
+      }
       {
         breadcrumbs && breadcrumbs.length > 0 && (
-          <Breadcrumbs breadcrumbs={breadcrumbs} />
+          <Breadcrumbs
+            breadcrumbs={breadcrumbs}
+            hideNavigation={hideNavigation}
+            variant={navigationVariant}
+          />
         )
       }
       <slot />
@@ -80,6 +93,7 @@ const finalMetaDescription = description || metaDescription;
       body {
         margin: 0;
         width: 100%;
+        overflow-x: hidden; /* Prevent horizontal scrollbar */
       }
     </style>
   </body>

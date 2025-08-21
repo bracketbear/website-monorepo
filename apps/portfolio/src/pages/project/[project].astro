@@ -197,7 +197,7 @@ const stats = [
                   fit="cover"
                 />
                 {workProjectItem.data.mediaDescription && (
-                  <figcaption class="mt-2 text-sm text-white/70">
+                  <figcaption class="text-text-primary/70 mt-2 text-sm">
                     {workProjectItem.data.mediaDescription}
                   </figcaption>
                 )}
@@ -220,7 +220,7 @@ const stats = [
           {
             (problem || description) && (
               <Section title="Problem">
-                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-white/90">
+                <div class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90">
                   {problem ?? description}
                 </div>
               </Section>
@@ -231,7 +231,7 @@ const stats = [
           {
             Array.isArray(scope) && scope.length > 0 && (
               <Section title="My role">
-                <ul class="prose prose-lg prose-headings:text-white prose-p:text-white/90 list-disc pl-6 text-white/90">
+                <ul class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90 list-disc pl-6">
                   {scope.map((item: string) => (
                     <li>{item}</li>
                   ))}
@@ -246,13 +246,13 @@ const stats = [
             !!challengesAndSolutions ? (
               <Section title="My Contributions">
                 {Array.isArray(decisions) && decisions.length ? (
-                  <ul class="prose prose-lg prose-headings:text-white prose-p:text-white/90 list-disc pl-6 text-white/90">
+                  <ul class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90 list-disc pl-6">
                     {decisions.map((d: string) => (
                       <li class="mb-2">{d}</li>
                     ))}
                   </ul>
                 ) : (
-                  <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-white/90">
+                  <div class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90">
                     {challengesAndSolutions}
                   </div>
                 )}
@@ -264,7 +264,7 @@ const stats = [
           {
             (outcome || resultsAchieved) && (
               <Section title="How it ended">
-                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-white/90">
+                <div class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90">
                   {outcome ?? resultsAchieved}
                 </div>
               </Section>
@@ -275,7 +275,7 @@ const stats = [
           {
             notes && (
               <Section title="Notes">
-                <div class="prose prose-lg prose-headings:text-white prose-p:text-white/90 text-white/90">
+                <div class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90">
                   {notes}
                 </div>
               </Section>
@@ -342,7 +342,7 @@ const stats = [
           {
             Array.isArray(links) && links.length > 0 && (
               <Section title="Links">
-                <ul class="prose prose-lg prose-headings:text-white prose-p:text-white/90 list-disc pl-6 text-white/90">
+                <ul class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90 list-disc pl-6">
                   {links.map((l: { href: string; label: string }) => (
                     <li>
                       <a

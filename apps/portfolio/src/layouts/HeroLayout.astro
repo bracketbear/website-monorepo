@@ -69,15 +69,12 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
 
 <Layout
   {...props}
-  hideNavigation={true}
+  hideNavigation={false}
   title={metaTitle}
   description={metaDescription}
+  class="bg-background"
+  navigationVariant="glass"
 >
-  <!-- Transparent Navigation -->
-  <div class="relative z-50">
-    <NavBar config={navigationConfig} variant="ghost-dark" />
-  </div>
-
   <!-- Header Section with Flateralus Animation -->
   {
     props.title && (
@@ -101,7 +98,7 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
   <!-- Page Content -->
   <div
     class={clsx(
-      'bg-brand-dark relative ',
+      'relative',
       props.title ? 'py-32' : 'py-24',
       props.hideFooter && 'pb-0'
     )}
@@ -114,10 +111,10 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
   <!-- Contact CTA Section -->
   {
     contactCTA && (
-      <div class="bg-brand-dark py-24">
+      <div class="bg-muted py-24">
         <div class="container mx-auto">
           <div class="mx-auto max-w-4xl text-center">
-            <p class="mb-8 text-xl leading-relaxed font-medium text-white/90">
+            <p class="text-muted-foreground/90 mb-8 text-xl leading-relaxed font-medium">
               {contactCTA.text}
             </p>
             <a

@@ -1,11 +1,10 @@
 ---
 import type { NavigationConfig } from '../../types/navigation.js';
-import { NAVIGATION_CONSTANTS } from '../../utils/constants.js';
 import Button from '../atoms/Button.astro';
 
 interface Props {
   config: NavigationConfig;
-  variant?: 'default' | 'ghost-dark' | 'ghost-light';
+  variant?: 'default' | 'ghost-dark' | 'ghost-light' | 'glass';
   class?: string;
 }
 
@@ -17,35 +16,48 @@ const { items: navItems, branding, socialLinks } = config;
   class:list={[
     'flex min-h-20 items-center border-y-2',
     variant === 'ghost-dark'
-      ? 'absolute top-0 right-0 left-0 z-50 border-transparent bg-transparent'
-      : 'border-brand-dark bg-brand-orange',
+      ? 'absolute top-0 right-0 left-0 z-40 border-transparent bg-transparent'
+      : variant === 'glass'
+        ? 'absolute top-0 right-0 left-0 z-40 border-transparent bg-white/10 shadow-lg backdrop-blur-md'
+        : 'border-border bg-primary',
     className,
   ]}
   role="navigation"
   aria-label="Main navigation"
 >
+  <!-- z-40: Main navigation bar -->
   <div class="container mx-auto flex h-full items-center justify-between p-4">
     <!-- Logo Section -->
     <div class="flex items-center gap-4">
       {
         branding?.logo && (
           <div class="flex h-16 w-16 items-center justify-center">
-            <img src={branding.logo} alt={branding.name} class="text-white" />
+            <img
+              src={branding.logo}
+              alt={branding.name}
+              class="text-text-primary"
+            />
           </div>
         )
       }
       <div
         class:list={[
           'font-heading text-2xl leading-5.5 font-semibold tracking-wider uppercase',
-          variant === 'ghost-dark' ? 'text-white' : 'text-brand-dark',
+          variant === 'ghost-dark'
+            ? 'text-text-primary'
+            : variant === 'glass'
+              ? 'text-text-primary'
+              : 'text-primary-foreground',
         ]}
       >
         <a
           href={branding?.href || '/'}
           class:list={[
             variant === 'ghost-dark'
-              ? 'hover:text-brand-light'
-              : 'hover:text-brand-dark/80',
+              ? 'hover:text-text-primary/80'
+              : variant === 'glass'
+                ? 'hover:text-text-primary/80'
+                : 'hover:text-primary-foreground/80',
             'transition-colors',
           ]}
         >
@@ -56,12 +68,9 @@ const { items: navItems, branding, socialLinks } = config;
 
     <!-- Desktop Navigation -->
     <div class="hidden items-center gap-8 md:flex">
-      <ul
-        class="bg-brand-orange-light relative flex items-center gap-8"
-        role="menubar"
-      >
+      <ul class="bg-card relative flex items-center gap-8" role="menubar">
         <li
-          class="bg-brand-orange-light absolute top-0 right-0 h-full w-full rounded-full blur-xl"
+          class="bg-card absolute top-0 right-0 h-full w-full rounded-full blur-xl"
         >
         </li>
         {
@@ -75,8 +84,10 @@ const { items: navItems, branding, socialLinks } = config;
                     class:list={[
                       'group font-heading relative inline-flex items-center font-semibold tracking-wide uppercase transition-colors',
                       variant === 'ghost-dark'
-                        ? 'hover:text-brand-light text-white'
-                        : 'text-brand-dark hover:text-brand-dark/80',
+                        ? 'hover:text-text-primary/80 text-text-primary'
+                        : variant === 'glass'
+                          ? 'hover:text-text-primary/80 text-text-primary'
+                          : 'text-primary-foreground hover:text-primary-foreground/80',
                     ]}
                     aria-haspopup="true"
                     aria-expanded="false"
@@ -100,16 +111,19 @@ const { items: navItems, branding, socialLinks } = config;
                     </svg>
                   </button>
                   <div
-                    class="invisible absolute left-0 z-50 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100"
+                    class="invisible absolute left-0 z-30 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100"
                     role="menu"
                     aria-label={`${item.name} submenu`}
                   >
+                    <!-- z-30: Dropdown submenu (below main navigation) -->
                     <div
                       class:list={[
-                        'border-brand-dark py-4 shadow-[8px_8px_0_0_var(--color-brand-dark)]',
+                        'border-border py-4 shadow-[8px_8px_0_0_var(--color-border)]',
                         variant === 'ghost-dark'
-                          ? 'bg-brand-dark'
-                          : 'bg-brand-light',
+                          ? 'bg-muted'
+                          : variant === 'glass'
+                            ? 'bg-white/20 backdrop-blur-md'
+                            : 'bg-card',
                       ]}
                     >
                       {item.children.map((child) => (
@@ -118,8 +132,10 @@ const { items: navItems, branding, socialLinks } = config;
                           class:list={[
                             'font-heading block px-4 py-4 text-sm font-semibold tracking-wide uppercase transition-colors',
                             variant === 'ghost-light'
-                              ? 'hover:bg-brand-light hover:text-brand-dark text-white'
-                              : 'text-brand-dark hover:bg-brand-dark hover:text-brand-light',
+                              ? 'hover:bg-card hover:text-text-primary text-text-primary'
+                              : variant === 'glass'
+                                ? 'text-text-primary hover:text-text-primary hover:bg-white/20'
+                                : 'text-primary-foreground hover:bg-muted hover:text-muted-foreground',
                           ]}
                           role="menuitem"
                         >
@@ -134,8 +150,10 @@ const { items: navItems, branding, socialLinks } = config;
                   class:list={[
                     'group link-underline font-heading relative font-semibold tracking-wide uppercase transition-all text-shadow-lg',
                     variant === 'ghost-dark'
-                      ? 'hover:text-brand-light text-white'
-                      : 'text-brand-dark hover:text-brand-dark/80',
+                      ? 'hover:text-text-primary/80 text-text-primary'
+                      : variant === 'glass'
+                        ? 'hover:text-text-primary/80 text-text-primary'
+                        : 'text-text-primary hover:text-text-primary/80',
                   ]}
                   href={item.href}
                   role="menuitem"
@@ -151,8 +169,11 @@ const { items: navItems, branding, socialLinks } = config;
 
     <!-- Mobile Menu Button -->
     <Button
-      class="p-2 md:hidden"
-      variant="dark"
+      class:list={[
+        'p-2 md:hidden',
+        variant === 'glass' ? 'button-transparent-dark' : '',
+      ]}
+      variant={variant === 'glass' ? 'unstyled' : 'dark'}
       id="mobile-menu-button"
       type="button"
       aria-label="Open mobile navigation menu"
@@ -174,255 +195,326 @@ const { items: navItems, branding, socialLinks } = config;
       </svg>
     </Button>
   </div>
+</nav>
 
-  <!-- Mobile Menu -->
+<!-- Mobile Menu Overlay - OUTSIDE nav to prevent overflow clipping -->
+<!-- z-[60]: Mobile menu overlay and drawer (above hero section z-50) -->
+<div
+  id="mobile-menu-overlay"
+  class:list={[
+    'fixed inset-0 z-[60] hidden transition-opacity duration-300 overflow-hidden',
+    variant === 'glass'
+      ? 'bg-black/60 backdrop-blur-md'
+      : 'bg-black/50 backdrop-blur-sm',
+  ]}
+  aria-hidden="true"
+>
+</div>
+
+<!-- Mobile Menu Drawer - OUTSIDE nav to prevent overflow clipping -->
+<!-- z-[60]: Mobile menu drawer (same level as overlay) -->
+<div
+  id="mobile-menu-drawer"
+  class:list={[
+    'fixed top-0 right-0 z-[60] h-full transition-all duration-300 ease-in-out overflow-hidden hidden shadow-2xl',
+    'w-96 max-w-[90vw]', // Larger width
+    variant === 'glass'
+      ? 'bg-white/30 backdrop-blur-xl border-l border-white/40'
+      : 'bg-white',
+  ]}
+  style="right: -100%;"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="mobile-menu-title"
+  aria-hidden="true"
+  tabindex="-1"
+>
+  <!-- Header -->
   <div
-    id="mobile-menu"
-    class="border-brand-dark bg-brand-light fixed top-0 right-0 z-40 h-screen w-4/5 max-w-sm translate-x-full transform overflow-y-auto transition-transform duration-300"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="mobile-menu-title"
-    aria-hidden="true"
-    tabindex="-1"
+    class:list={[
+      'flex h-16 items-center justify-between border-b px-6',
+      variant === 'glass'
+        ? 'border-white/30'
+        : 'border-gray-200',
+    ]}
   >
-    <div class="p-6">
-      <div>
-        <div
-          id="mobile-menu-title"
-          class="text-brand-dark font-heading text-4xl font-semibold tracking-wide uppercase"
-        >
-          Navigation
-        </div>
-      </div>
-      <Button
-        id="close-menu-button"
-        class="absolute top-4 right-4"
-        variant="dark"
-        type="button"
-        size="sm"
-        aria-label="Close mobile navigation menu"
+    <h2
+      id="mobile-menu-title"
+      class:list={[
+        'font-heading text-xl font-semibold tracking-wide uppercase',
+        variant === 'glass'
+          ? 'text-white'
+          : 'text-gray-900',
+      ]}
+    >
+      Navigation
+    </h2>
+    <Button
+      id="mobile-menu-close"
+      variant={variant === 'glass' ? 'ghostLight' : 'ghost'}
+      size="icon"
+      aria-label="Close mobile navigation menu"
+    >
+      <svg
+        class="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
       >
-        <svg
-          class="h-6 w-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </Button>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </Button>
+  </div>
 
-      <nav aria-label="Mobile navigation">
-        <ul class="mt-8" role="menubar">
-          {
-            navItems.map((item) => (
-              <li role="none">
-                {item.children != null &&
-                Array.isArray(item.children) &&
-                item.children.length > 0 ? (
-                  <div class="space-y-2">
-                    <div class="text-brand-dark font-heading font-semibold tracking-wide uppercase">
-                      {item.name}
-                    </div>
-                    <ul
-                      class="space-y-2 pl-4"
-                      role="menu"
-                      aria-label={`${item.name} submenu`}
-                    >
-                      {item.children.map((child) => (
-                        <li role="none">
-                          <a href={child.href} role="menuitem" class="block">
-                            <div class="text-brand-dark font-heading block tracking-widest uppercase transition-transform hover:translate-x-1">
-                              {child.name}
-                            </div>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <a href={item.href} role="menuitem">
-                    <div class="text-brand-dark font-heading block py-4 text-2xl font-semibold tracking-wide uppercase transition-transform hover:translate-x-1">
-                      {item.name}
-                    </div>
-                  </a>
-                )}
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-
-      <!-- Mobile Theme and Social Links -->
-      <div class="mt-8 flex items-center gap-4">
-        {
-          socialLinks?.linkedin && (
-            <a
-              href={socialLinks.linkedin}
-              class="flex h-10 w-10 items-center justify-center transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_0_var(--color-brand-dark)]"
-              aria-label="Visit LinkedIn profile"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                class="text-brand-dark"
-                aria-hidden="true"
+  <!-- Navigation Items -->
+  <nav
+    class="flex-1 overflow-y-auto px-6 py-4"
+    aria-label="Mobile navigation"
+  >
+    <ul class="space-y-2" role="menubar">
+      {
+        navItems.map((item) => (
+          <li role="none">
+            {item.children != null &&
+            Array.isArray(item.children) &&
+            item.children.length > 0 ? (
+              <div class="space-y-2">
+                <div
+                  class:list={[
+                    'font-heading font-semibold tracking-wide uppercase',
+                    variant === 'glass'
+                      ? 'text-white'
+                      : 'text-gray-900',
+                  ]}
+                >
+                  {item.name}
+                </div>
+                <ul
+                  class="space-y-1 pl-4"
+                  role="menu"
+                  aria-label={`${item.name} submenu`}
+                >
+                  {item.children.map((child) => (
+                    <li role="none">
+                      <a
+                        href={child.href}
+                        role="menuitem"
+                        class:list={[
+                          'block rounded-md px-3 py-2 text-sm transition-colors',
+                          variant === 'glass'
+                            ? 'text-white/80 hover:bg-white/10 hover:text-white'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                        ]}
+                      >
+                        {child.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <a
+                href={item.href}
+                role="menuitem"
+                class:list={[
+                  'block rounded-md px-3 py-3 text-lg font-semibold transition-colors',
+                  variant === 'glass'
+                    ? 'text-white hover:bg-white/10'
+                    : 'text-gray-900 hover:bg-gray-50',
+                ]}
               >
-                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-              </svg>
-            </a>
-          )
-        }
-      </div>
+                {item.name}
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <!-- Footer with Social Links -->
+  <div
+    class:list={[
+      'border-t px-6 py-4',
+      variant === 'glass'
+        ? 'border-white/30'
+        : 'border-gray-200',
+    ]}
+  >
+    <div class="flex items-center justify-center space-x-4">
+      {
+        socialLinks?.linkedin && (
+          <a
+            href={socialLinks.linkedin}
+            class:list={[
+              'button button-ghost button-icon-rounded',
+              variant === 'glass' ? 'button-ghost-light' : 'button-ghost',
+            ]}
+            aria-label="Visit LinkedIn profile"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+            </svg>
+          </a>
+        )
+      }
     </div>
   </div>
-
-  <!-- Mobile Menu Overlay -->
-  <div
-    id="mobile-menu-overlay"
-    class="fixed inset-0 z-30 hidden bg-black/60 opacity-0 transition-opacity duration-300"
-    style="background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.4) 1px, transparent 1px); background-size: 8px 8px;"
-    aria-hidden="true"
-  >
-  </div>
-</nav>
+</div>
 
 <script>
   function setupMobileMenu() {
-    const mobileMenu = document.getElementById('mobile-menu');
     const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const closeMenuButton = document.getElementById('close-menu-button');
+    const mobileMenuDrawer = document.getElementById('mobile-menu-drawer');
     const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
 
-    // Only proceed if we have the required elements
     if (
-      !mobileMenu ||
       !mobileMenuButton ||
-      !closeMenuButton ||
-      !mobileMenuOverlay
+      !mobileMenuDrawer ||
+      !mobileMenuOverlay ||
+      !mobileMenuClose
     ) {
       console.warn('Mobile menu elements not found');
       return;
     }
 
-    // Track menu state for accessibility
-    let isMenuOpen = false;
+    let isOpen = false;
+    let isAnimating = false;
 
-    const openMenu = () => {
-      isMenuOpen = true;
-      mobileMenu.classList.remove('translate-x-full');
-      mobileMenuOverlay.classList.remove('hidden', '-z-30');
+    function openMenu() {
+      if (isAnimating || isOpen) return;
+
+      isAnimating = true;
+      isOpen = true;
+
+      // Show overlay first
+      mobileMenuOverlay!.classList.remove('hidden');
+      mobileMenuOverlay!.classList.add('opacity-100');
+
+      // Then show drawer
+      mobileMenuDrawer!.classList.remove('hidden');
+
+      // Use requestAnimationFrame for smooth animation
+      requestAnimationFrame(() => {
+        mobileMenuDrawer!.style.right = '0'; // Use right: 0 for smooth transition
+      });
 
       // Update ARIA attributes
-      mobileMenuButton.setAttribute('aria-expanded', 'true');
-      mobileMenu.setAttribute('aria-hidden', 'false');
-      mobileMenuOverlay.setAttribute('aria-hidden', 'false');
+      mobileMenuButton!.setAttribute('aria-expanded', 'true');
+      mobileMenuDrawer!.setAttribute('aria-hidden', 'false');
+      mobileMenuOverlay!.setAttribute('aria-hidden', 'false');
 
       // Focus management
-      mobileMenu.focus();
+      mobileMenuDrawer!.focus();
 
-      // Trap focus within mobile menu
-      const focusableElements = mobileMenu.querySelectorAll(
-        'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
-      );
-      const firstFocusable = focusableElements[0] as HTMLElement;
-      const lastFocusable = focusableElements[
-        focusableElements.length - 1
-      ] as HTMLElement;
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden';
 
-      if (firstFocusable) {
-        firstFocusable.focus();
-      }
-
-      // Handle tab key for focus trapping
-      const handleTabKey = (e: KeyboardEvent) => {
-        if (e.key === 'Tab') {
-          if (e.shiftKey) {
-            if (document.activeElement === firstFocusable) {
-              e.preventDefault();
-              lastFocusable.focus();
-            }
-          } else {
-            if (document.activeElement === lastFocusable) {
-              e.preventDefault();
-              firstFocusable.focus();
-            }
-          }
-        }
-      };
-
-      mobileMenu.addEventListener('keydown', handleTabKey);
-
+      // Animation complete
       setTimeout(() => {
-        mobileMenuOverlay.classList.add('opacity-50', 'z-30');
-      }, 10);
-    };
+        isAnimating = false;
+      }, 300);
+    }
 
-    const closeMenu = () => {
-      isMenuOpen = false;
-      mobileMenu.classList.add('translate-x-full');
-      mobileMenuOverlay.classList.remove('opacity-50', 'z-30');
+    function closeMenu() {
+      if (isAnimating || !isOpen) return;
+
+      isAnimating = true;
+      isOpen = false;
+
+      // Start slide-out animation
+      mobileMenuDrawer!.style.right = '-100%'; // Use right: -100% for smooth transition
+      mobileMenuOverlay!.classList.remove('opacity-100');
 
       // Update ARIA attributes
-      mobileMenuButton.setAttribute('aria-expanded', 'false');
-      mobileMenu.setAttribute('aria-hidden', 'true');
-      mobileMenuOverlay.setAttribute('aria-hidden', 'true');
+      mobileMenuButton!.setAttribute('aria-expanded', 'false');
+      mobileMenuDrawer!.setAttribute('aria-hidden', 'true');
+      mobileMenuOverlay!.setAttribute('aria-hidden', 'true');
+
+      // Restore body scroll
+      document.body.style.overflow = '';
 
       // Return focus to menu button
-      mobileMenuButton.focus();
+      mobileMenuButton!.focus();
 
+      // Hide elements after animation completes
       setTimeout(() => {
-        mobileMenuOverlay.classList.add('hidden', '-z-30');
-      }, 300);
-    };
+        mobileMenuDrawer!.classList.add('hidden');
+        mobileMenuOverlay!.classList.add('hidden');
 
-    // Add event listeners
+        // Reset transform to prevent layout issues
+        mobileMenuDrawer!.style.right = ''; // Reset right
+
+        isAnimating = false;
+      }, 300);
+    }
+
+    // Event listeners
     mobileMenuButton.addEventListener('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
       openMenu();
     });
 
-    closeMenuButton.addEventListener('click', (e) => {
+    mobileMenuClose.addEventListener('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
       closeMenu();
     });
 
     mobileMenuOverlay.addEventListener('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
       closeMenu();
     });
 
-    // Handle escape key
+    // Close on escape key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && isMenuOpen) {
+      if (e.key === 'Escape' && isOpen && !isAnimating) {
         closeMenu();
       }
     });
 
-    // Only close menu when clicking outside AND menu is open
-    document.addEventListener('click', (e) => {
-      const target = e.target as Node;
-      const isMenuOpen = !mobileMenu.classList.contains('translate-x-full');
-
-      if (
-        isMenuOpen &&
-        !mobileMenu.contains(target) &&
-        !mobileMenuButton.contains(target)
-      ) {
+    // Close on window resize (desktop)
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768 && isOpen && !isAnimating) {
         closeMenu();
       }
     });
+
+    // Close on navigation (if user clicks a link)
+    const mobileMenuLinks = mobileMenuDrawer!.querySelectorAll('a[href]');
+    mobileMenuLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        if (isOpen && !isAnimating) {
+          closeMenu();
+        }
+      });
+    });
+
+    // Initialize state - ensure menu is hidden
+    mobileMenuDrawer!.classList.add('hidden');
+    mobileMenuOverlay!.classList.add('hidden');
+    mobileMenuDrawer!.style.right = ''; // Reset right
+    mobileMenuButton!.setAttribute('aria-expanded', 'false');
+    mobileMenuDrawer!.setAttribute('aria-hidden', 'true');
+    mobileMenuOverlay!.setAttribute('aria-hidden', 'true');
   }
 
-  // Run setup when the DOM is ready
+  // Setup when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setupMobileMenu);
   } else {

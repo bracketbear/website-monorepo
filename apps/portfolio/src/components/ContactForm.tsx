@@ -113,8 +113,8 @@ export function ContactForm() {
               {isSubmitting ? 'Sending…' : 'Send Message'}
             </ParticleButton>
             {submitError && (
-              <div 
-                className="animate-shake text-brand-red mt-2 font-bold"
+              <div
+                className="animate-shake text-secondary mt-2 font-bold"
                 role="alert"
                 aria-live="polite"
               >
@@ -122,8 +122,8 @@ export function ContactForm() {
               </div>
             )}
             {submitSuccess && (
-              <div 
-                className="animate-pop text-brand-blue mt-2 font-bold"
+              <div
+                className="animate-pop text-muted mt-2 font-bold"
                 role="status"
                 aria-live="polite"
               >

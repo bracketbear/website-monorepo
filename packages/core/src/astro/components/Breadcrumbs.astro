@@ -3,20 +3,25 @@ import clsx from 'clsx';
 import type { Breadcrumb } from '../../types/breadcrumb';
 
 const SEPARATOR = '/' as const;
-const BREADCRUMB_CLASS = 'text-brand-yellow font-bold tracking-wide' as const;
+const BREADCRUMB_CLASS =
+  'text-text-primary/70 font-medium tracking-wide hover:text-text-primary transition-colors' as const;
 
 interface Props {
   breadcrumbs: Breadcrumb[];
+  hideNavigation?: boolean;
+  variant?: 'default' | 'ghost-dark' | 'ghost-light' | 'glass';
 }
 
-const { breadcrumbs } = Astro.props;
+const { breadcrumbs, hideNavigation = false, variant } = Astro.props;
 ---
 
 {
   breadcrumbs.length > 0 && (
-    <div class="bg-brand-dark">
-      <div class="container mx-auto px-4 py-4">
-        <nav class="anton text-sm">
+    <div
+      class={`px-content py-4 ${variant === 'glass' ? 'border-transparent bg-white/10 shadow-lg backdrop-blur-md' : 'border-border/20 border-b'}`}
+    >
+      <div class="container mx-auto">
+        <nav class="text-sm">
           <ol class="breadcrumbs flex items-center space-x-2">
             {breadcrumbs.map((crumb, idx) => (
               <>
@@ -27,7 +32,7 @@ const { breadcrumbs } = Astro.props;
                       aria-label={crumb.label}
                       title={crumb.label}
                       class={clsx(
-                        'hover:text-brand-yellow/80 link-underline transition-colors',
+                        'hover:text-text-primary transition-colors',
                         BREADCRUMB_CLASS
                       )}
                     >
@@ -38,7 +43,10 @@ const { breadcrumbs } = Astro.props;
                   )}
                 </li>
                 {idx < breadcrumbs.length - 1 && (
-                  <li class="text-brand-red font-black"> {SEPARATOR} </li>
+                  <li class="text-text-primary/40 font-medium">
+                    {' '}
+                    {SEPARATOR}{' '}
+                  </li>
                 )}
               </>
             ))}

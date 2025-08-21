@@ -20,7 +20,7 @@ const maxWidthClass = contentWidth === 'narrow' ? 'max-w-6xl' : '';
 
 <LayeredLayout title={title} {...rest}>
   {showHero && (
-    <div class="bg-brand-dark relative pb-8">
+    <div class="bg-muted relative pb-8">
       <div class={clsx('container mx-auto py-12', {
         'max-w-6xl': contentWidth === 'narrow',
       })}>
@@ -35,7 +35,7 @@ const maxWidthClass = contentWidth === 'narrow' ? 'max-w-6xl' : '';
             
             <!-- Main Title -->
             <h1
-              class="font-heading text-brand-orange mb-2 text-4xl leading-none uppercase md:text-6xl"
+              class="font-heading mb-2 text-4xl leading-none text-primary uppercase md:text-6xl"
             >
               {title}
             </h1>
@@ -51,9 +51,9 @@ const maxWidthClass = contentWidth === 'narrow' ? 'max-w-6xl' : '';
             <slot name="cover-image">
               <!-- Default placeholder -->
               <div
-                class="border-brand-orange flex h-48 w-48 items-center justify-center border-2 bg-black"
+                class="flex h-48 w-48 items-center justify-center border-2 border-primary bg-muted"
               >
-                <span class="text-brand-orange font-mono text-xs opacity-60"
+                                  <span class="font-mono text-xs text-primary opacity-60"
                   >[Cover Image]</span
                 >
               </div>
@@ -79,7 +79,7 @@ const maxWidthClass = contentWidth === 'narrow' ? 'max-w-6xl' : '';
   )}
   
   <!-- Main Content -->
-  <div class="bg-primary/50 min-h-screen py-24">
+      <div class="bg-background/50 min-h-screen py-24">
           <div class={`container mx-auto ${maxWidthClass}`}>
       <slot />
     </div>

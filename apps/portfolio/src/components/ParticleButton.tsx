@@ -85,8 +85,8 @@ class ButtonParticleBackground {
   }
 
   private createParticle(): Particle {
-    // Brand colors: dark (#111) and brand red (#bb4430)
-    const colors = [0x111111, 0xbb4430];
+    // Theme colors: primary and secondary
+    const colors = [0x111111, 0xff4b3e]; // Using theme-compatible colors
     return {
       x: Math.random() * (this.app?.screen.width || 300),
       y: Math.random() * (this.app?.screen.height || 60),

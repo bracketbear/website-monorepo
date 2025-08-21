@@ -120,7 +120,7 @@ export function HeaderSection({
         break;
       case 'blob':
         animation = createBlobAnimation({
-          radius: 180,
+          scaleFactor: 0.4,
           surfaceTension: 1.2,
           centerAttractionStrength: 0.025,
           mouseInfluenceRadius: 160,
@@ -169,14 +169,14 @@ export function HeaderSection({
   const getBackgroundClasses = () => {
     switch (preset) {
       case 'curious-particle-network':
-        return 'bg-gradient-to-br from-brand-dark via-brand-dark/95 to-brand-red/20 bg-header-pattern';
+        return 'bg-gradient-to-br from-muted via-muted/95 to-secondary/20 bg-header-pattern';
       case 'particle-wave':
-        return 'bg-gradient-to-br from-brand-dark via-brand-dark/90 to-brand-blue/15 bg-header-pattern';
+        return 'bg-gradient-to-br from-muted via-muted/90 to-muted/15 bg-header-pattern';
       case 'blob':
-        return 'bg-gradient-to-br from-brand-dark via-brand-dark/95 to-brand-orange/20 bg-header-pattern';
+        return 'bg-gradient-to-br from-muted via-muted/95 to-primary/20 bg-header-pattern';
       case 'enhanced-wave':
       default:
-        return 'bg-gradient-to-br from-brand-dark via-brand-dark/90 to-brand-green/20 bg-header-pattern';
+        return 'bg-gradient-to-br from-muted via-muted/90 to-muted/15 bg-header-pattern';
     }
   };
 
@@ -198,7 +198,7 @@ export function HeaderSection({
       <div className="bg-header-glow absolute inset-0" />
 
       {/* Gradient overlay for better text contrast */}
-      <div className="from-brand-dark/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
+      <div className="from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
 
       <AnimationStage
         application={createApplication()}
@@ -212,17 +212,17 @@ export function HeaderSection({
           <div className="px-content relative z-10 flex h-full flex-col items-center justify-center py-24 text-center">
             <div className="mx-auto max-w-4xl">
               {title && (
-                <h1 className="font-heading text-shadow-header text-4xl font-bold tracking-tight text-white uppercase sm:text-6xl lg:text-7xl">
+                <h1 className="font-heading text-shadow-header text-text-primary text-4xl font-bold tracking-tight uppercase sm:text-6xl lg:text-7xl">
                   {title}
                 </h1>
               )}
               {subtitle && (
-                <p className="mt-6 text-lg leading-8 font-medium text-white text-shadow-lg sm:text-xl lg:text-2xl">
+                <p className="text-text-primary mt-6 text-lg leading-8 font-medium text-shadow-lg sm:text-xl lg:text-2xl">
                   {subtitle}
                 </p>
               )}
               {description && (
-                <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/80 md:text-xl lg:text-2xl">
+                <p className="text-text-primary/80 mx-auto mt-6 max-w-2xl text-lg leading-relaxed md:text-xl lg:text-2xl">
                   {description}
                 </p>
               )}
@@ -230,7 +230,7 @@ export function HeaderSection({
                 <div className="mt-10">
                   <a
                     href={ctaHref}
-                    className="text-brand-dark inline-flex transform items-center justify-center rounded-md bg-white px-8 py-3 text-lg font-semibold shadow-[4px_4px_0_rgba(0,0,0,0.3)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[6px_6px_0_rgba(0,0,0,0.4)] focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white"
+                    className="bg-card text-card-foreground hover:bg-card/90 inline-flex transform items-center justify-center rounded-md px-8 py-3 text-lg font-semibold shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white"
                   >
                     {ctaText}
                   </a>

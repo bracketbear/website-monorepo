@@ -33,13 +33,13 @@ describe('Pill', () => {
   it('renders as interactive when onClick is provided', () => {
     render(<Pill onClick={() => {}}>Interactive Pill</Pill>);
     const button = screen.getByRole('button');
-    expect(button).toHaveClass('pill-skill-interactive');
+    expect(button).toHaveClass('pill-hover');
   });
 
   it('renders as interactive when interactive prop is true', () => {
     render(<Pill interactive>Interactive Pill</Pill>);
     const button = screen.getByRole('button');
-    expect(button).toHaveClass('pill-skill-interactive');
+    expect(button).toHaveClass('pill-hover');
   });
 
   it('applies custom className', () => {

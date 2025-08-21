@@ -37,12 +37,12 @@ function parseMarkdown(content: string): string {
   <!-- Introduction Section -->
   <section class="px-content mb-40">
     <div class="container mx-auto text-center">
-      <h2 class="font-heading mb-6 text-4xl tracking-tight text-white">
+      <h2 class="font-heading text-text-primary mb-6 text-4xl tracking-tight">
         {workPage.data.introduction.title}
       </h2>
     </div>
     <div
-      class="prose-2xl mx-auto max-w-prose text-center text-white/90"
+      class="prose-2xl text-text-primary/90 mx-auto max-w-prose text-center"
       set:html={parseMarkdown(workPage.data.introduction.content)}
     />
   </section>
@@ -57,11 +57,11 @@ function parseMarkdown(content: string): string {
   <!-- Tool Description Section -->
   <div class="px-content mb-8">
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
-      <h2 class="font-heading mb-4 text-4xl tracking-tight text-white">
+      <h2 class="font-heading text-text-primary mb-4 text-4xl tracking-tight">
         {workPage.data.toolDescription.title}
       </h2>
       <div
-        class="prose-xl max-w-prose text-white/80"
+        class="prose-xl text-text-primary/80 max-w-prose"
         set:html={parseMarkdown(workPage.data.toolDescription.content)}
       />
     </div>

@@ -101,13 +101,13 @@ const statsData =
   <!-- Introduction Section -->
   <section class="px-content mb-40">
     <div class="container mx-auto text-center">
-      <h2 class="font-heading mb-6 text-4xl tracking-tight text-white">
+      <h2 class="font-heading text-text-primary mb-6 text-4xl tracking-tight">
         {projectsPage.data.introduction.title}
       </h2>
     </div>
     <div class="container mx-auto mt-8">
       <div
-        class="prose-2xl mx-auto max-w-prose text-center text-white/90"
+        class="prose-2xl text-text-primary/90 mx-auto max-w-prose text-center"
         set:html={parseMarkdown(projectsPage.data.introduction.content)}
       />
     </div>
@@ -126,11 +126,11 @@ const statsData =
               <section>
                 {/* Section Title */}
                 <div class="py-12">
-                  <h2 class="font-heading inline-block text-4xl font-black tracking-tight text-white uppercase">
+                  <h2 class="font-heading text-text-primary inline-block text-4xl font-black tracking-tight uppercase">
                     {category.data.title}
                   </h2>
                   {category.data.description && (
-                    <p class="prose-lg mt-4 max-w-prose text-white/70">
+                    <p class="prose-lg text-text-primary/70 mt-4 max-w-prose">
                       {category.data.description}
                     </p>
                   )}

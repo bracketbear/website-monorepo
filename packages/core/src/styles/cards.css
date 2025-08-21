@@ -1,9 +1,9 @@
 @utility card {
-  @apply tangible tangible-card border-brand-dark/50 bg-brand-light rounded-xl border border-solid p-6;
+  @apply tangible tangible-card border-border bg-card rounded-xl border border-solid p-6;
 }
 
 @utility card-dark {
-  @apply card tangible-inverse bg-brand-dark text-brand-light border-brand-light/30;
+  @apply card tangible-inverse border-border bg-muted text-muted-foreground;
 }
 
 @utility card-interactive {

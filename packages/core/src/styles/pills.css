@@ -1,6 +1,6 @@
 /* Base pill utility */
 @utility pill {
-  @apply tangible tangible-pill min-h-9 min-w-10 rounded-md border-2 border-solid px-4 py-2 text-sm font-bold tracking-wide uppercase transition-all duration-150 ease-in-out;
+  @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium;
 }
 
 /* Color variants */
@@ -35,11 +35,11 @@
 }
 
 @utility pill-dark {
-  @apply bg-brand-dark border-brand-dark text-white;
+  @apply border-border bg-muted text-muted-foreground;
 }
 
 @utility pill-light {
-  @apply text-brand-dark border-white bg-white;
+  @apply border-card bg-card text-foreground;
 }
 
 @utility pill-outline-dark {
@@ -77,16 +77,19 @@
 
 /* Status variants */
 @utility pill-featured {
-  @apply pill-brand-red;
-  font-weight: 900;
+  @apply border-secondary bg-secondary text-secondary-foreground;
 }
 
 @utility pill-category {
-  @apply pill-brand-orange;
+  @apply border-primary bg-primary text-primary-foreground;
 }
 
 @utility pill-skill {
-  @apply pill-dark;
+  @apply border-muted bg-muted text-muted-foreground;
+}
+
+@utility pill-company {
+  @apply border-muted bg-muted text-muted-foreground;
 }
 
 /* Alternative styles */
@@ -96,8 +99,7 @@
 }
 
 @utility pill-outline {
-  background-color: transparent;
-  border-width: 2px;
+  @apply border-border text-foreground;
 }
 
 /* Composed utilities for common use cases */

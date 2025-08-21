@@ -24,7 +24,7 @@ const BaseControlWrapper: React.FC<BaseControlWrapperProps> = ({
       {children}
     </div>
     {description && (
-      <div className="mt-0.5 ml-0.5 text-[11px] leading-tight text-white/40">
+      <div className="mt-0.5 ml-0.5 text-xs leading-tight text-white/40">
         {description}
       </div>
     )}

@@ -24,7 +24,7 @@
 
 /* Halftone pattern text with double shadow for headings */
 @utility halftone-text-shadow {
-  --halftone-foreground-color: var(--color-brand-dark);
+  --halftone-foreground-color: var(--color-foreground);
   /* Making the middle color transparent so you can add a color to the middle if you want. See halftone-text-shadow-middle-* below. */
   --halftone-middle-color: rgb(0, 0, 0, 0);
   --halftone-background-size: 0.067em;
@@ -76,18 +76,24 @@
   /* Light text mode - for dark backgrounds */
   .text-mode-light {
     /* Use light text colors for dark backgrounds */
+    .text-theme-primary,
+    .text-theme-secondary,
     .text-brand-dark,
     .text-foreground,
     .text-black {
       color: var(--color-brand-light);
     }
 
+    .text-theme-primary\/80,
+    .text-theme-secondary\/80,
     .text-brand-dark\/80,
     .text-foreground\/80,
     .text-black\/80 {
       color: color-mix(in srgb, var(--color-brand-light) 80%, transparent);
     }
 
+    .text-theme-primary\/60,
+    .text-theme-secondary\/60,
     .text-brand-dark\/60,
     .text-foreground\/60,
     .text-black\/60 {
@@ -103,16 +109,22 @@
   /* Dark text mode - for light backgrounds */
   .text-mode-dark {
     /* Use dark text colors for light backgrounds */
+    .text-theme-primary,
+    .text-theme-secondary,
     .text-brand-light,
     .text-white {
       color: var(--color-brand-dark);
     }
 
+    .text-theme-primary\/80,
+    .text-theme-secondary\/80,
     .text-brand-light\/80,
     .text-white\/80 {
       color: color-mix(in srgb, var(--color-brand-dark) 80%, transparent);
     }
 
+    .text-theme-primary\/60,
+    .text-theme-secondary\/60,
     .text-brand-light\/60,
     .text-white\/60 {
       color: color-mix(in srgb, var(--color-brand-dark) 60%, transparent);
@@ -139,7 +151,7 @@
 
   /* Comic Book Panel Styles */
   .comic-panel {
-    @apply comic-book-shadow bg-background border-foreground border-2 p-6;
+    @apply comic-book-shadow border-border bg-card border-2 p-6;
     position: relative;
   }
 
@@ -175,4 +187,213 @@
   .link-underline:focus-visible::after {
     width: 100%;
   }
+}
+
+/* Color Utility Classes - Replace arbitrary CSS values */
+@utility bg-background {
+  background-color: var(--color-background);
+}
+
+@utility bg-card {
+  background-color: var(--color-card);
+}
+
+@utility bg-muted {
+  background-color: var(--color-muted);
+}
+
+@utility bg-primary {
+  background-color: var(--color-primary);
+}
+
+@utility bg-primary-hover {
+  background-color: var(--color-primary-hover);
+}
+
+@utility bg-secondary {
+  background-color: var(--color-secondary);
+}
+
+@utility bg-secondary-hover {
+  background-color: var(--color-secondary-hover);
+}
+
+@utility bg-border {
+  background-color: var(--color-border);
+}
+
+@utility bg-ring {
+  background-color: var(--color-ring);
+}
+
+@utility bg-overlay {
+  background-color: var(--color-overlay);
+}
+
+@utility text-foreground {
+  color: var(--color-foreground);
+}
+
+@utility text-text-primary {
+  color: var(--color-text-primary);
+}
+
+@utility text-card-foreground {
+  color: var(--color-card-foreground);
+}
+
+@utility text-muted-foreground {
+  color: var(--color-muted-foreground);
+}
+
+@utility text-primary-foreground {
+  color: var(--color-primary-foreground);
+}
+
+@utility text-secondary-foreground {
+  color: var(--color-secondary-foreground);
+}
+
+@utility border-border {
+  border-color: var(--color-border);
+}
+
+@utility border-primary {
+  border-color: var(--color-primary);
+}
+
+@utility border-secondary {
+  border-color: var(--color-secondary);
+}
+
+@utility border-muted {
+  border-color: var(--color-muted);
+}
+
+@utility border-card {
+  border-color: var(--color-card);
+}
+
+@utility ring-ring {
+  --tw-ring-color: var(--color-ring);
+}
+
+@utility bg-brand-dark {
+  background-color: var(--color-brand-dark);
+}
+
+@utility bg-brand-dark-muted {
+  background-color: var(--color-brand-dark-muted);
+}
+
+@utility bg-brand-red {
+  background-color: var(--color-brand-red);
+}
+
+@utility bg-brand-orange {
+  background-color: var(--color-brand-orange);
+}
+
+@utility bg-brand-orange-light {
+  background-color: var(--color-brand-orange-light);
+}
+
+@utility bg-brand-blue {
+  background-color: var(--color-brand-blue);
+}
+
+@utility bg-brand-green {
+  background-color: var(--color-brand-green);
+}
+
+@utility bg-brand-yellow {
+  background-color: var(--color-brand-yellow);
+}
+
+@utility bg-brand-purple {
+  background-color: var(--color-brand-purple);
+}
+
+@utility bg-brand-light {
+  background-color: var(--color-brand-light);
+}
+
+@utility text-brand-dark {
+  color: var(--color-brand-dark);
+}
+
+@utility text-brand-dark-muted {
+  color: var(--color-brand-dark-muted);
+}
+
+@utility text-brand-red {
+  color: var(--color-brand-red);
+}
+
+@utility text-brand-orange {
+  color: var(--color-brand-orange);
+}
+
+@utility text-brand-orange-light {
+  color: var(--color-brand-orange-light);
+}
+
+@utility text-brand-blue {
+  color: var(--color-brand-blue);
+}
+
+@utility text-brand-green {
+  color: var(--color-brand-green);
+}
+
+@utility text-brand-yellow {
+  color: var(--color-brand-yellow);
+}
+
+@utility text-brand-purple {
+  color: var(--color-brand-purple);
+}
+
+@utility text-brand-light {
+  color: var(--color-brand-light);
+}
+
+@utility border-brand-dark {
+  border-color: var(--color-brand-dark);
+}
+
+@utility border-brand-dark-muted {
+  border-color: var(--color-brand-dark-muted);
+}
+
+@utility border-brand-red {
+  border-color: var(--color-brand-red);
+}
+
+@utility border-brand-orange {
+  border-color: var(--color-brand-orange);
+}
+
+@utility border-brand-orange-light {
+  border-color: var(--color-brand-orange-light);
+}
+
+@utility border-brand-blue {
+  border-color: var(--color-brand-blue);
+}
+
+@utility border-brand-green {
+  border-color: var(--color-brand-green);
+}
+
+@utility border-brand-yellow {
+  border-color: var(--color-brand-yellow);
+}
+
+@utility border-brand-purple {
+  border-color: var(--color-brand-purple);
+}
+
+@utility border-brand-light {
+  border-color: var(--color-brand-light);
 }

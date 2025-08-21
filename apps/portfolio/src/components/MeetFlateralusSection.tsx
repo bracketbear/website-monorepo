@@ -27,7 +27,7 @@ export function MeetFlateralusSection({
     });
 
     const animation = createBlobAnimation({
-      radius: 90,
+      scaleFactor: 0.4,
       surfaceTension: 0.2,
       centerAttractionStrength: 0.008,
       mouseInfluenceRadius: 50,
@@ -35,7 +35,7 @@ export function MeetFlateralusSection({
       particleCount: 225,
       particleBaseSize: 2.5,
       particleSizeVariation: 0.6,
-      animationSpeed: 2.8000000000000003,
+      animationSpeed: 2.8,
       showTrails: true,
       trailLength: 4,
       particleColor: '#47200a',
@@ -58,7 +58,7 @@ export function MeetFlateralusSection({
               {title}
             </Pill>
             <div
-              className="prose prose-lg lg:prose-xl prose-p:text-brand-dark/80 max-w-prose drop-shadow-[0_2px_4px_var(--color-brand-orange-light)]"
+              className="prose prose-lg lg:prose-xl prose-p:text-foreground/80 max-w-prose drop-shadow-lg"
               dangerouslySetInnerHTML={{
                 __html: content ? marked.parse(content) : '',
               }}

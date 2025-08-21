@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { vi } from 'vitest';
 import { SkillPill } from './SkillPill';
 
 describe('SkillPill', () => {
@@ -25,7 +26,7 @@ describe('SkillPill', () => {
   it('renders as interactive when onClick is provided', () => {
     render(<SkillPill onClick={() => {}}>Interactive Skill</SkillPill>);
     const button = screen.getByRole('button');
-    expect(button).toHaveClass('pill-skill-interactive');
+    expect(button).toHaveClass('pill-hover');
   });
 
   it('renders with different sizes', () => {

@@ -6,7 +6,7 @@ import { clsx } from '@bracketbear/core';
 import { useMemo, useState, useEffect } from 'react';
 import { HeroContent } from './HeroContent';
 
-const BACKGROUND_CLASS = 'bg-brand-orange-light' as const;
+const BACKGROUND_CLASS = 'bg-background' as const;
 
 interface HeroSectionProps {
   className?: string;
@@ -88,10 +88,10 @@ export default function HeroSection({
 
   // Create the hero content once
   const heroContent = (
-    <HeroContent 
-      title={title} 
-      subtitle={subtitle} 
-      description={description} 
+    <HeroContent
+      title={title}
+      subtitle={subtitle}
+      description={description}
       onGetWeird={handleRandomize}
     />
   );

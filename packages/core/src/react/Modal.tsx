@@ -121,7 +121,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
               )}
 
               {/* Scrollable Content Area */}
-              <div className="max-h-[calc(90vh-120px)] overflow-y-auto p-0 sm:max-h-[calc(85vh-120px)]">
+              <div className="max-h-[calc(90vh-7.5rem)] overflow-y-auto p-0 sm:max-h-[calc(85vh-7.5rem)]">
                 {children}
               </div>
             </DialogPanel>

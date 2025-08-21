@@ -11,6 +11,8 @@ interface Props {
   hideNavigation?: boolean;
   breadcrumbs?: any;
   description?: string;
+  class?: string;
+  navigationVariant?: 'default' | 'ghost-dark' | 'ghost-light' | 'glass';
 }
 
 const {
@@ -20,6 +22,8 @@ const {
   hideNavigation,
   breadcrumbs,
   description,
+  class: className,
+  navigationVariant,
 } = Astro.props;
 
 const pageTitle = makeTitle(title);
@@ -33,6 +37,8 @@ const pageTitle = makeTitle(title);
   hideNavigation={hideNavigation}
   navigation={navigationConfig}
   breadcrumbs={breadcrumbs}
+  navigationVariant={navigationVariant}
+  class="bg-brand-orange-light text-text-primary"
 >
   <slot />
 </LayeredLayout>

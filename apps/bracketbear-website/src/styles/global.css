@@ -1,4 +1,4 @@
-@import '@bracketbear/core/styles';
+@import '@bracketbear/core/styles/bracketbear.tailwind.css';
 @source '../../../../node_modules/@bracketbear/core/dist';
 
 /* Utility Classes */

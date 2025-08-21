@@ -44,14 +44,14 @@ export default function StatsSection({
         <div className="grid gap-8 md:grid-cols-3">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
-              <div className="font-heading mb-2 text-4xl font-black text-white">
+              <div className="font-heading mb-2 text-4xl font-black text-text-primary">
                 {stat.value}
               </div>
-              <div className="mb-1 text-xl font-bold text-white/90">
+                              <div className="mb-1 text-xl font-bold text-text-primary/90">
                 {stat.label}
               </div>
               {stat.description && (
-                <div className="text-white/70">{stat.description}</div>
+                <div className="text-text-primary/70">{stat.description}</div>
               )}
             </div>
           ))}
