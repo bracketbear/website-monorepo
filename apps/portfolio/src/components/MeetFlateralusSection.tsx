@@ -30,16 +30,16 @@ export function MeetFlateralusSection({
       radius: 120,
       surfaceTension: 0.2,
       centerAttractionStrength: 0.008,
-      mouseInfluenceRadius: 100,
+      mouseInfluenceRadius: 50,
       mouseRepulsionStrength: 4.3,
-      particleCount: 400,
+      particleCount: 225,
       particleBaseSize: 2.5,
       particleSizeVariation: 0.6,
       animationSpeed: 2.8000000000000003,
       showTrails: true,
       trailLength: 4,
-      particleColor: '#93d912',
-      interactiveColor: '#796bb6',
+      particleColor: '#47200a',
+      interactiveColor: '#1f0e05',
     });
 
     app.setAnimation(animation);
