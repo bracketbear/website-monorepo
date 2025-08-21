@@ -8,9 +8,15 @@ export default defineConfig({
     include: [
       'packages/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       'apps/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'scripts/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
     exclude: ['.astro', '**/*.d.ts', '**/node_modules/**', '**/*.dist/**'],
     setupFiles: ['./vitest.setup.ts'],
+    silent: true,
+    onConsoleLog(log, type) {
+      if (type === 'stderr') return false;
+      return true;
+    },
   },
   resolve: {
     alias: {
