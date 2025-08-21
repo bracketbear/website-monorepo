@@ -27,7 +27,7 @@ export function MeetFlateralusSection({
     });
 
     const animation = createBlobAnimation({
-      radius: 120,
+      radius: 90,
       surfaceTension: 0.2,
       centerAttractionStrength: 0.008,
       mouseInfluenceRadius: 50,
