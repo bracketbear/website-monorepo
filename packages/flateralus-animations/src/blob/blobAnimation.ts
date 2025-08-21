@@ -15,8 +15,8 @@ const PARTICLE_COUNT = 200;
 const PARTICLE_BASE_SIZE = 2.5;
 /** Particle size variation */
 const PARTICLE_SIZE_VARIATION = 1.5;
-/** Blob radius */
-const BLOB_RADIUS = 200;
+/** Blob scale factor relative to stage size (0.0 to 1.0) */
+const BLOB_SCALE_FACTOR = 0.4;
 /** Surface tension strength */
 const SURFACE_TENSION = 0.8;
 /** Center attraction strength */
@@ -73,14 +73,14 @@ const MANIFEST = createManifest({
     'A spherical blob that maintains its shape while responding to mouse interaction',
   controls: [
     {
-      name: 'radius',
+      name: 'scaleFactor',
       type: 'number',
-      label: 'Blob Radius',
-      description: 'Radius of the blob sphere',
-      min: 50,
-      max: 400,
-      step: 10,
-      defaultValue: BLOB_RADIUS,
+      label: 'Blob Scale Factor',
+      description: 'Size of the blob relative to stage (0.1 = 10%, 1.0 = 100%)',
+      min: 0.1,
+      max: 1.0,
+      step: 0.05,
+      defaultValue: BLOB_SCALE_FACTOR,
       debug: true,
     },
     {
@@ -247,6 +247,14 @@ const createParticleTexture = (): PIXI.Texture => {
 };
 
 /**
+ * Get the current blob radius based on stage size and scale factor
+ */
+const getBlobRadius = (app: PIXI.Application, scaleFactor: number): number => {
+  const stageSize = Math.min(app.screen.width, app.screen.height);
+  return stageSize * scaleFactor * 0.5; // 0.5 to make it fit nicely within the stage
+};
+
+/**
  * Create a blob particle positioned on a sphere surface
  */
 const createBlobParticle = (
@@ -254,7 +262,7 @@ const createBlobParticle = (
   texture: PIXI.Texture,
   centerX: number,
   centerY: number,
-  radius: number,
+  scaleFactor: number,
   controls: BlobControlValues
 ): Particle => {
   const sprite = new PIXI.Sprite(texture);
@@ -264,6 +272,9 @@ const createBlobParticle = (
     Math.random() * Number(controls.particleSizeVariation) +
     Number(controls.particleBaseSize);
   sprite.scale.set(size);
+
+  // Get current radius based on stage size
+  const radius = getBlobRadius(app, scaleFactor);
 
   // Position particle on sphere surface using spherical coordinates
   const phi = Math.acos(2 * Math.random() - 1); // Latitude
@@ -310,19 +321,23 @@ const createBlobParticle = (
 const calculateParticleForces = (
   particle: Particle,
   blob: BlobSystem,
-  controls: BlobControlValues
+  controls: BlobControlValues,
+  app: PIXI.Application
 ) => {
   let forceX = 0;
   let forceY = 0;
+
+  // Get current radius based on stage size
+  const currentRadius = getBlobRadius(app, controls.scaleFactor);
 
   // 1. Center attraction (keeps blob together)
   const dx = blob.centerX - particle.x;
   const dy = blob.centerY - particle.y;
   const distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
 
-  if (distanceFromCenter > controls.radius) {
+  if (distanceFromCenter > currentRadius) {
     const centerForce =
-      (distanceFromCenter - controls.radius) *
+      (distanceFromCenter - currentRadius) *
       controls.centerAttractionStrength;
     forceX += (dx / distanceFromCenter) * centerForce;
     forceY += (dy / distanceFromCenter) * centerForce;
@@ -454,7 +469,7 @@ class BlobAnimation extends BaseAnimation<typeof MANIFEST, BlobControlValues> {
         this.particleTexture,
         this.blobSystem.centerX,
         this.blobSystem.centerY,
-        this.getControls().radius,
+        this.getControls().scaleFactor,
         this.getControls()
       );
       this.blobSystem.particles.push(particle);
@@ -484,7 +499,8 @@ class BlobAnimation extends BaseAnimation<typeof MANIFEST, BlobControlValues> {
       const forces = calculateParticleForces(
         particle,
         this.blobSystem!,
-        controls
+        controls,
+        app
       );
 
       // Apply forces
@@ -531,7 +547,7 @@ class BlobAnimation extends BaseAnimation<typeof MANIFEST, BlobControlValues> {
         this.particleTexture!,
         this.blobSystem!.centerX,
         this.blobSystem!.centerY,
-        controls.radius,
+        controls.scaleFactor,
         controls
       );
       this.blobSystem.particles.push(particle);
