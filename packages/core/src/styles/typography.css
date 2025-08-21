@@ -16,28 +16,6 @@
   }
 }
 
-@utility typography {
-  & h1 {
-    @apply text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl;
-  }
-
-  & h2 {
-    @apply text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl;
-  }
-
-  & h3 {
-    @apply text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl;
-  }
-
-  & h4 {
-    @apply text-xl font-bold tracking-tight sm:text-2xl lg:text-3xl;
-  }
-
-  & p {
-    @apply text-lg leading-relaxed font-medium;
-  }
-}
-
 /* Base prose utility - replicates Tailwind's typography plugin */
 @utility prose {
   /* Base prose variables - these will be overridden by size variants */
@@ -58,13 +36,13 @@
   --prose-h4-size: 1em;
 
   & h1 {
-    @apply mt-0 mb-[0.8888889em] font-extrabold;
+    @apply font-heading mt-0 mb-[0.8888889em] font-extrabold uppercase;
     font-size: var(--prose-h1-size);
     line-height: 1.1111111;
   }
 
   & h2 {
-    @apply mt-8 mb-4 font-bold;
+    @apply font-heading mt-8 mb-4 font-bold uppercase;
     font-size: var(--prose-h2-size);
     line-height: 1.3333333;
   }

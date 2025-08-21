@@ -2,6 +2,7 @@ import React from 'react';
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
 import { createBlobAnimation } from '@bracketbear/flateralus-animations';
+import { Pill } from '@bracketbear/core/react';
 import { marked } from 'marked';
 
 interface MeetFlateralusSectionProps {
@@ -11,7 +12,7 @@ interface MeetFlateralusSectionProps {
 
 export function MeetFlateralusSection({
   title = 'Meet Flateralus',
-  content = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+  content = '## A powerful schema for connecting experiential apps to everything.',
 }: MeetFlateralusSectionProps) {
   // Create the application and animation on the client side
   const createApplication = () => {
@@ -26,19 +27,19 @@ export function MeetFlateralusSection({
     });
 
     const animation = createBlobAnimation({
-      radius: 140,
-      surfaceTension: 1.5000000000000002,
-      centerAttractionStrength: 0.089,
-      mouseInfluenceRadius: 160,
-      mouseRepulsionStrength: 1.8000000000000003,
+      radius: 120,
+      surfaceTension: 0.2,
+      centerAttractionStrength: 0.008,
+      mouseInfluenceRadius: 100,
+      mouseRepulsionStrength: 4.3,
       particleCount: 400,
-      particleBaseSize: 1.4,
-      particleSizeVariation: 0.9,
-      animationSpeed: 2.2,
+      particleBaseSize: 2.5,
+      particleSizeVariation: 0.6,
+      animationSpeed: 2.8000000000000003,
       showTrails: true,
-      trailLength: 1,
-      particleColor: '#17517c',
-      interactiveColor: '#6a5ee8',
+      trailLength: 4,
+      particleColor: '#93d912',
+      interactiveColor: '#796bb6',
     });
 
     app.setAnimation(animation);
@@ -46,27 +47,36 @@ export function MeetFlateralusSection({
   };
 
   return (
-    <section className="px-content pt-24 pb-12">
-      <div className="relative z-10 mx-auto mb-8 max-w-4xl text-center">
-        <h2 className="font-heading text-brand-dark mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
-          {title}
-        </h2>
-        <div
-          className="prose prose-xl prose-p:text-brand-dark/80 mx-auto max-w-2xl drop-shadow-[0_2px_4px_var(--color-brand-orange-light)]"
-          dangerouslySetInnerHTML={{
-            __html: content ? marked.parse(content) : '',
-          }}
-        />
-      </div>
-
-      <div className="relative -mt-[12.5rem] h-[50rem] w-full">
-        <AnimationStage
-          application={createApplication()}
-          showDebugControls={true}
-          enableLuminanceDetection={false}
-          layoutClassName="absolute inset-0"
-          debugControlsClassName="container-content top-[12rem] right-4 z-50 max-w-none"
-        />
+    <section className="px-content py-12 lg:py-16">
+      <div className="container mx-auto">
+        {/* Content and Animation - side by side */}
+        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+          {/* Text Content - left side */}
+          <div className="order-2 lg:order-1">
+            {/* Pill above title */}
+            <Pill variant="brand-green" size="sm" className="mb-4">
+              {title}
+            </Pill>
+            <div
+              className="prose prose-lg lg:prose-xl prose-p:text-brand-dark/80 max-w-prose drop-shadow-[0_2px_4px_var(--color-brand-orange-light)]"
+              dangerouslySetInnerHTML={{
+                __html: content ? marked.parse(content) : '',
+              }}
+            />
+          </div>
+          {/* Animation Stage - right side */}
+          <div className="order-1 lg:order-2">
+            <div className="relative h-[30rem] w-full lg:h-[40rem]">
+              <AnimationStage
+                application={createApplication()}
+                showDebugControls={true}
+                enableLuminanceDetection={false}
+                layoutClassName="absolute inset-0"
+                debugControlsClassName="absolute top-4 right-4 z-50 max-w-none"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
