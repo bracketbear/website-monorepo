@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import type {
   ControlValues,
   AnimationManifest,
@@ -36,6 +36,16 @@ export function useControls<
   const [controlValues, setControlValues] =
     useState<ControlValues>(initialControlValues);
   const [showResetToast, setShowResetToast] = useState(false);
+
+  // Sync local state with animation's current control values
+  useEffect(() => {
+    if (animation) {
+      const currentValues = animation.getControlValues();
+      if (currentValues && Object.keys(currentValues).length > 0) {
+        setControlValues(currentValues);
+      }
+    }
+  }, [animation]);
 
   /**
    * Handle control changes from debug panel

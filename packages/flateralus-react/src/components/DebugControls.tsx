@@ -13,7 +13,7 @@ import type {
   Animation,
 } from '@bracketbear/flateralus';
 import { getManifestDefaultControlValues } from '@bracketbear/flateralus';
-import { Button } from '@bracketbear/core/react';
+import { Button, Accordion } from '@bracketbear/core/react';
 import {
   NumberControl,
   BooleanControl,
@@ -21,12 +21,7 @@ import {
   SelectControl,
   GroupControl,
 } from './controls';
-import {
-  GearIcon,
-  DiceIcon,
-  DownloadIcon,
-  ResetIcon,
-} from '@bracketbear/core/assets';
+import { DiceIcon, DownloadIcon, ResetIcon } from '@bracketbear/core/assets';
 import { getRandomControlValues } from '@bracketbear/flateralus';
 import type { DeepReadonly } from '@bracketbear/core';
 
@@ -40,6 +35,22 @@ interface DebugControlsProps {
   className?: string;
   /** Callback when randomization is triggered from external source */
   onRandomize?: () => void;
+  /** Stage controls to display in accordion at the top */
+  stageControls?: {
+    manifest: {
+      id: string;
+      name: string;
+      description: string;
+      controls: readonly Control[];
+    };
+    controlValues: Record<string, any>;
+  } | null;
+  /** Callback when stage controls change */
+  onStageControlsChange?: (values: Record<string, any>) => void;
+  /** Function to randomize stage controls */
+  randomizeStageControls?: () => void;
+  /** Function to randomize both animation and stage controls */
+  randomizeAllControls?: () => void;
 }
 
 /**
@@ -58,6 +69,9 @@ const DebugControls = memo<DebugControlsProps>(
     showDownloadButton = false,
     className,
     onRandomize,
+    stageControls,
+    onStageControlsChange,
+    randomizeStageControls,
   }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isPanelVisible, setIsPanelVisible] = useState(false);
@@ -124,10 +138,22 @@ const DebugControls = memo<DebugControlsProps>(
           animationRef.current.updateControls(randomValues);
         }
         onControlsChange(randomValues);
+
+        // Also randomize stage controls if the function is available
+        if (randomizeStageControls) {
+          randomizeStageControls();
+        }
+
         showToast('Controls randomized!');
         onRandomize?.();
       }
-    }, [manifest, animationRef, onControlsChange, onRandomize]);
+    }, [
+      manifest,
+      animationRef,
+      onControlsChange,
+      onRandomize,
+      randomizeStageControls,
+    ]);
 
     const resetToDefaults = () => {
       if (animationRef?.current) {
@@ -290,6 +316,90 @@ const DebugControls = memo<DebugControlsProps>(
             <div className="mb-3 text-xs text-white/50">
               {manifest.description}
             </div>
+
+            {/* Stage Controls Accordion */}
+            {stageControls && (
+              <div className="mb-4">
+                <Accordion
+                  items={[
+                    {
+                      id: 'stage-controls',
+                      title: `🎨 ${stageControls.manifest.name}`,
+                      content: (
+                        <div className="space-y-2">
+                          {stageControls.manifest.controls.map((control) => {
+                            const value =
+                              stageControls.controlValues[control.name];
+                            if (value === undefined) return null;
+
+                            switch (control.type) {
+                              case 'number':
+                                return (
+                                  <NumberControl
+                                    key={control.name}
+                                    control={control as NumberControlType}
+                                    value={value as number}
+                                    onControlChange={(key, value) => {
+                                      onStageControlsChange?.({
+                                        [control.name]: value,
+                                      });
+                                    }}
+                                  />
+                                );
+                              case 'boolean':
+                                return (
+                                  <BooleanControl
+                                    key={control.name}
+                                    control={control as BooleanControlType}
+                                    value={value as boolean}
+                                    onControlChange={(key, value) => {
+                                      onStageControlsChange?.({
+                                        [control.name]: value,
+                                      });
+                                    }}
+                                  />
+                                );
+                              case 'color':
+                                return (
+                                  <ColorControl
+                                    key={control.name}
+                                    control={control as ColorControlType}
+                                    value={value as string}
+                                    onControlChange={(key, value) => {
+                                      onStageControlsChange?.({
+                                        [control.name]: value,
+                                      });
+                                    }}
+                                  />
+                                );
+                              case 'select':
+                                return (
+                                  <SelectControl
+                                    key={control.name}
+                                    control={control as SelectControlType}
+                                    value={value as string}
+                                    onControlChange={(key, value) => {
+                                      onStageControlsChange?.({
+                                        [control.name]: value,
+                                      });
+                                    }}
+                                  />
+                                );
+                              default:
+                                return null;
+                            }
+                          })}
+                        </div>
+                      ),
+                      defaultOpen: true,
+                    },
+                  ]}
+                  variant="bordered"
+                />
+              </div>
+            )}
+
+            {/* Animation Controls */}
             <div className="max-h-96 space-y-2 overflow-y-auto pr-1">
               {manifest.controls.map(renderControl)}
             </div>

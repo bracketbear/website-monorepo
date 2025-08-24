@@ -13,6 +13,7 @@ export { SkillPill } from './SkillPill';
 export { Stats, type StatsProps } from './Stats';
 export { Slider } from './Slider';
 export { ContactIcon } from './ContactIcon';
+export { Accordion, type AccordionProps, type AccordionItem } from './Accordion';
 export * from './hooks';
 export { Testimonial, type TestimonialProps } from './Testimonial';
 

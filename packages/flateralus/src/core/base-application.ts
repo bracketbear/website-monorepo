@@ -1,4 +1,9 @@
-import type { Animation, Application } from '../types';
+import type {
+  Animation,
+  Application,
+  StageControlValues,
+  StageControlsManifest,
+} from '../types';
 
 // ============================================================================
 // BASE APPLICATION CLASS
@@ -32,6 +37,8 @@ export interface ApplicationOptions {
   visibilityThreshold?: number;
   /** Whether to enable luminance detection */
   enableLuminanceDetection?: boolean;
+  /** Initial stage control values */
+  stageControls?: Partial<StageControlValues>;
 }
 
 /**
@@ -49,6 +56,7 @@ export abstract class BaseApplication<TContext = unknown>
   protected canvas: HTMLCanvasElement | null = null;
   protected config: ApplicationConfig;
   protected options: ApplicationOptions;
+  protected stageControls: StageControlValues;
   protected _isInitialized = false;
   protected _isRunning = false;
   protected resizeObserver: ResizeObserver | null = null;
@@ -71,6 +79,22 @@ export abstract class BaseApplication<TContext = unknown>
       visibilityThreshold: 0.1,
       enableLuminanceDetection: true,
       ...options,
+    };
+
+    // Initialize stage controls with defaults
+    this.stageControls = {
+      backgroundColor: this.config.backgroundColor || 'transparent',
+      backgroundAlpha: this.config.backgroundAlpha || 0,
+      stageWidth: this.config.width || 800,
+      stageHeight: this.config.height || 600,
+      enableGrid: false,
+      gridColor: '#ffffff',
+      gridOpacity: 0.1,
+      gridSize: 50,
+      enableShadows: false,
+      shadowColor: '#000000',
+      shadowOpacity: 0.3,
+      ...options.stageControls,
     };
   }
 
@@ -261,6 +285,41 @@ export abstract class BaseApplication<TContext = unknown>
     this._isInitialized = false;
     this._isRunning = false;
   }
+
+  // ============================================================================
+  // STAGE CONTROLS
+  // ============================================================================
+
+  /**
+   * Get stage controls manifest (must be implemented by subclass)
+   */
+  public abstract getStageControlsManifest(): StageControlsManifest;
+
+  /**
+   * Get current stage control values
+   */
+  public getStageControlValues(): StageControlValues {
+    return { ...this.stageControls };
+  }
+
+  /**
+   * Update stage control values
+   */
+  public updateStageControls(values: Partial<StageControlValues>): void {
+    const previousControls = { ...this.stageControls };
+    this.stageControls = { ...this.stageControls, ...values };
+
+    // Apply changes to rendering context
+    this.onStageControlsChange(this.stageControls, previousControls);
+  }
+
+  /**
+   * Handle stage control changes (must be implemented by subclass)
+   */
+  protected abstract onStageControlsChange(
+    controls: StageControlValues,
+    previousControls: StageControlValues
+  ): void;
 
   // ============================================================================
   // PROTECTED METHODS

@@ -8,6 +8,18 @@ import type {
   SelectControlSchema,
   GroupControlSchema,
 } from '../schemas';
+import type {
+  StageControlsManifest,
+  StageControlValues,
+} from './stage-controls';
+
+// Export stage control types
+export type {
+  StageControl,
+  StageControlValues,
+  StageControlsManifest,
+  ManifestToStageControlValues,
+} from './stage-controls';
 
 export interface HasType<T extends string> {
   type: T;
@@ -217,6 +229,15 @@ export interface Application<TAnimation extends Animation = Animation> {
 
   /** Destroy the application and clean up resources */
   destroy(): void;
+
+  /** Get stage controls manifest */
+  getStageControlsManifest(): StageControlsManifest;
+
+  /** Get current stage control values */
+  getStageControlValues(): StageControlValues;
+
+  /** Update stage control values */
+  updateStageControls(values: Partial<StageControlValues>): void;
 }
 
 export type ApplicationFactory<TApplication extends Application> = (

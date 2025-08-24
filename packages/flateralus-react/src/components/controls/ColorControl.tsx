@@ -22,6 +22,7 @@ const ColorControl = memo<ColorControlProps>(
     return (
       <BaseControlWrapper
         label={control.label}
+        name={control.name}
         description={control.description}
       >
         <input

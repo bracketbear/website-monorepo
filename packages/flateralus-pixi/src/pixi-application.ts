@@ -2,6 +2,8 @@ import { Application as PixiApp } from 'pixi.js';
 import {
   BaseApplication,
   type ApplicationConfig,
+  type StageControlValues,
+  type StageControlsManifest,
 } from '@bracketbear/flateralus';
 
 /**
@@ -72,6 +74,61 @@ export class PixiApplication extends BaseApplication<PixiApp> {
    */
   public getPixiApp(): PixiApp | null {
     return this.pixiApp;
+  }
+
+  /**
+   * Get stage controls manifest for PIXI
+   */
+  public getStageControlsManifest(): StageControlsManifest {
+    return {
+      id: 'pixi-stage-controls',
+      name: 'PIXI Stage Controls',
+      description: 'Controls for PIXI.js stage properties',
+      controls: [
+        {
+          name: 'backgroundColor',
+          type: 'color',
+          label: 'Background Color',
+          description: 'Stage background color',
+          defaultValue: '#ff6b35',
+          debug: true,
+          isStageControl: true,
+          category: 'background',
+        },
+        {
+          name: 'backgroundAlpha',
+          type: 'number',
+          label: 'Background Alpha',
+          description: 'Background transparency (0-1)',
+          defaultValue: 0,
+          min: 0,
+          max: 1,
+          step: 0.01,
+          debug: true,
+          isStageControl: true,
+          category: 'background',
+        } as any,
+      ],
+    };
+  }
+
+  /**
+   * Handle stage control changes for PIXI
+   */
+  protected onStageControlsChange(
+    controls: StageControlValues,
+    previousControls: StageControlValues
+  ): void {
+    if (!this.pixiApp) return;
+
+    // Update background
+    if (controls.backgroundColor !== previousControls.backgroundColor ||
+        controls.backgroundAlpha !== previousControls.backgroundAlpha) {
+      // Convert hex color to number for PIXI
+      const bgColor = controls.backgroundColor || '#ff6b35';
+      this.pixiApp.renderer.background.color = parseInt(bgColor.replace('#', ''), 16);
+      this.pixiApp.renderer.background.alpha = controls.backgroundAlpha || 0;
+    }
   }
 
   /**

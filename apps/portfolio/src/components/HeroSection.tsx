@@ -89,6 +89,73 @@ export default function HeroSection({
     }
   };
 
+  // Handle randomization of all controls (both animation and stage)
+  const handleRandomizeAll = () => {
+    if (application) {
+      // Randomize animation controls
+      if (application.getAnimation()) {
+        const animation = application.getAnimation();
+        if (animation) {
+          const manifest = animation.getManifest();
+          if (manifest) {
+            const randomValues = getRandomControlValues(manifest);
+            animation.updateControls(randomValues);
+          }
+        }
+      }
+
+      // Randomize stage controls
+      if (
+        application.getStageControlsManifest &&
+        application.updateStageControls
+      ) {
+        const stageManifest = application.getStageControlsManifest();
+        if (stageManifest) {
+          const randomStageValues: Record<string, any> = {};
+
+          stageManifest.controls.forEach((control: any) => {
+            switch (control.type) {
+              case 'number':
+                const min = (control as any).min || 0;
+                const max = (control as any).max || 1;
+                randomStageValues[control.name] =
+                  Math.random() * (max - min) + min;
+                break;
+              case 'boolean':
+                randomStageValues[control.name] = Math.random() < 0.5;
+                break;
+              case 'color':
+                const randomHex =
+                  '#' +
+                  Math.floor(Math.random() * 16777215)
+                    .toString(16)
+                    .padStart(6, '0');
+                randomStageValues[control.name] = randomHex;
+                break;
+              case 'select':
+                if (
+                  (control as any).options &&
+                  Array.isArray((control as any).options)
+                ) {
+                  const randomIndex = Math.floor(
+                    Math.random() * (control as any).options.length
+                  );
+                  randomStageValues[control.name] = (control as any).options[
+                    randomIndex
+                  ].value;
+                }
+                break;
+              default:
+                randomStageValues[control.name] = (control as any).defaultValue;
+            }
+          });
+
+          application.updateStageControls(randomStageValues);
+        }
+      }
+    }
+  };
+
   // Create the hero content once
   const heroContent = (
     <HeroContent
@@ -96,6 +163,7 @@ export default function HeroSection({
       subtitle={subtitle}
       description={description}
       onGetWeird={handleRandomize}
+      onRandomizeAll={handleRandomizeAll}
     />
   );
 

@@ -19,7 +19,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       min: 10,
       max: 150,
       step: 1,
-      defaultValue: 20,
+      defaultValue: 50,
       debug: true,
       resetsAnimation: true,
     },
@@ -31,7 +31,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       min: 4,
       max: 20,
       step: 1,
-      defaultValue: 8,
+      defaultValue: 6,
       debug: true,
       resetsAnimation: true,
     },
@@ -81,7 +81,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       type: 'color',
       label: 'Square Color',
       description: 'Color of the grid squares',
-      defaultValue: '#ff69b4',
+      defaultValue: '#ffdb8f',
       debug: true,
       resetsAnimation: false,
     },
@@ -93,7 +93,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       min: 0,
       max: 20,
       step: 1,
-      defaultValue: 0,
+      defaultValue: 1,
       debug: true,
       resetsAnimation: true,
     },
@@ -105,7 +105,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       min: -45,
       max: 45,
       step: 1,
-      defaultValue: 0,
+      defaultValue: 3,
       debug: true,
       resetsAnimation: true,
     },
@@ -129,7 +129,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       min: -0.5,
       max: 0.5,
       step: 0.01,
-      defaultValue: 0,
+      defaultValue: 0.15,
       debug: true,
       resetsAnimation: true,
     },
@@ -157,7 +157,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
         { value: 'triangle', label: 'Triangle' },
         { value: 'cross', label: 'Cross' },
       ],
-      defaultValue: 'square',
+      defaultValue: 'circle',
       debug: true,
       resetsAnimation: true,
     },
@@ -169,7 +169,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       min: 0,
       max: 1,
       step: 0.1,
-      defaultValue: 0,
+      defaultValue: 0.3,
       debug: true,
       resetsAnimation: true,
     },
@@ -199,7 +199,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       min: 0.1,
       max: 1.0,
       step: 0.1,
-      defaultValue: 0.8,
+      defaultValue: 0.9,
       debug: true,
       resetsAnimation: false,
     },
@@ -211,7 +211,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       min: 0,
       max: 1,
       step: 0.1,
-      defaultValue: 0.5,
+      defaultValue: 0.7,
       debug: true,
       resetsAnimation: false,
     },
@@ -223,7 +223,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       min: 0.1,
       max: 2.0,
       step: 0.1,
-      defaultValue: 0.8,
+      defaultValue: 0.6,
       debug: true,
       resetsAnimation: false,
     },
@@ -235,7 +235,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       min: 0.1,
       max: 3.0,
       step: 0.1,
-      defaultValue: 1.5,
+      defaultValue: 1.2,
       debug: true,
       resetsAnimation: false,
     },
@@ -247,7 +247,7 @@ export const RETRO_GRID_MANIFEST = createManifest({
       min: 0.1,
       max: 5.0,
       step: 0.1,
-      defaultValue: 2.0,
+      defaultValue: 1.8,
       debug: true,
       resetsAnimation: false,
     },
@@ -359,8 +359,6 @@ export class RetroGridAnimation extends BaseAnimation<
     context: PIXI.Application,
     controls: RetroGridControlValues
   ): void {
-    console.log('🔄 RetroGrid: onReset called - recreating entire grid');
-
     // Clear existing grid
     this.gridContainer.removeChildren();
     this.gridLinesContainer.removeChildren();
@@ -370,8 +368,6 @@ export class RetroGridAnimation extends BaseAnimation<
     this.createGrid(context, controls);
     this.setupGridRotation(controls);
     this.updateGridPosition(context);
-
-    console.log('✅ RetroGrid: Grid reset complete');
   }
 
   protected onDynamicControlsChange(
@@ -379,8 +375,6 @@ export class RetroGridAnimation extends BaseAnimation<
     previousControls: RetroGridControlValues,
     changedControls: string[]
   ): void {
-    console.log('🎛️ RetroGrid: Dynamic controls changed:', changedControls);
-
     // Only handle controls that don't reset the animation
     // Controls with resetsAnimation: true are handled by onReset
 
@@ -715,7 +709,6 @@ export class RetroGridAnimation extends BaseAnimation<
   }
 
   private updateSquareColors(color: string): void {
-    console.log('🎨 RetroGrid: Updating square colors to', color);
     this.squares.forEach((square) => {
       square.sprite.clear();
       // Redraw the particle with its original shape but new color
@@ -727,7 +720,6 @@ export class RetroGridAnimation extends BaseAnimation<
         color
       );
     });
-    console.log('✅ RetroGrid: Color update complete');
   }
 
   private updateOpacity(opacity: number): void {

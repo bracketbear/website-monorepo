@@ -1,12 +1,43 @@
 import { type ReactNode } from 'react';
 import { clsx } from '@bracketbear/core';
-import type { Application } from '@bracketbear/flateralus';
+import type { Application, StageControlValues } from '@bracketbear/flateralus';
 import {
   useAnimationStage,
   useDebugControls,
   useLuminanceDetection,
 } from '../hooks/index';
 import DebugControls from './DebugControls';
+import { useCallback } from 'react';
+
+/**
+ * Usage Example:
+ * 
+ * ```tsx
+ * function MyAnimationComponent() {
+ *   const [stageControls, setStageControls] = useState({
+ *     backgroundColor: '#000000',
+ *     backgroundAlpha: 0.5,
+ *     enableGrid: true,
+ *     gridColor: '#ffffff',
+ *     gridOpacity: 0.2,
+ *   });
+ *   
+ *   const handleStageControlsChange = (newControls: StageControlValues) => {
+ *     setStageControls(newControls);
+ *   };
+ *   
+ *   return (
+ *     <AnimationStage
+ *       application={application}
+ *       showDebugControls={true}
+ *       stageControls={stageControls}
+ *       onStageControlsChange={handleStageControlsChange}
+ *       className="h-96 w-full"
+ *     />
+ *   );
+ * }
+ * ```
+ */
 
 interface AnimationStageProps {
   /** Whether to show debug controls */
@@ -30,6 +61,10 @@ interface AnimationStageProps {
   layoutClassName?: string;
   /** Callback when randomization is triggered from external source */
   onRandomize?: () => void;
+  /** Stage control values to show in debug menu */
+  stageControls?: Partial<StageControlValues>;
+  /** Callback when stage controls change */
+  onStageControlsChange?: (values: StageControlValues) => void;
 }
 
 /**
@@ -38,6 +73,7 @@ interface AnimationStageProps {
  * A stage that hosts a pre-configured application and displays debug controls.
  * Can automatically adjust text colors based on background luminance for accessibility.
  * Completely framework-agnostic - works with any Application implementation.
+ * Supports stage-level controls like background color, grid, and effects.
  */
 export default function AnimationStage({
   showDebugControls = false,
@@ -52,6 +88,8 @@ export default function AnimationStage({
   visibilityRootMargin = '0px',
   layoutClassName = 'relative flex h-full w-full items-end',
   onRandomize,
+  stageControls,
+  onStageControlsChange,
 }: AnimationStageProps) {
   // Main animation stage hook
   const { containerRef } = useAnimationStage({
@@ -61,12 +99,14 @@ export default function AnimationStage({
     visibilityRootMargin,
   });
 
-  // Debug controls hook - only call if application exists
+  // Debug controls hook - now includes stage controls
   const { debugControlsProps, showResetToast } = useDebugControls({
     showDebugControls,
     showDownloadButton,
     application: application || ({} as Application), // Provide empty object if null
     onRandomize,
+    stageControls, // Pass stage controls here
+    onStageControlsChange, // Pass callback here
   });
 
   // Luminance detection hook - only call if application exists
@@ -75,6 +115,14 @@ export default function AnimationStage({
     enabled: enableLuminanceDetection,
     containerElement: containerRef.current,
   });
+
+  // Function to randomize all controls (both animation and stage)
+  const handleRandomizeAll = useCallback(() => {
+    if (debugControlsProps.randomizeAllControls) {
+      debugControlsProps.randomizeAllControls();
+    }
+    onRandomize?.();
+  }, [debugControlsProps.randomizeAllControls, onRandomize]);
 
   return (
     <div className={clsx(layoutClassName, className)}>
@@ -90,7 +138,7 @@ export default function AnimationStage({
         <DebugControls
           {...debugControlsProps}
           manifest={debugControlsProps.manifest}
-          onRandomize={onRandomize}
+          onRandomize={handleRandomizeAll}
           className={clsx(
             'absolute top-4 right-4 z-30',
             debugControlsClassName

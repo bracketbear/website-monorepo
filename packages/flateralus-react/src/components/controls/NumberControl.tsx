@@ -23,6 +23,7 @@ const NumberControl = memo<NumberControlProps>(
     return (
       <BaseControlWrapper
         label={control.label}
+        name={control.name}
         description={control.description}
       >
         <Slider

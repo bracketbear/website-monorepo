@@ -16,7 +16,7 @@ interface BooleanControlProps {
  */
 const BooleanControl = memo<BooleanControlProps>(
   ({ control, value, onControlChange }) => (
-    <BaseControlWrapper label={control.label} description={control.description}>
+    <BaseControlWrapper label={control.label} name={control.name} description={control.description}>
       <CheckboxInput
         checked={Boolean(value)}
         onChange={(e) => onControlChange(control.name, e.target.checked)}

@@ -15,7 +15,7 @@ interface SelectControlProps {
  */
 const SelectControl = memo<SelectControlProps>(
   ({ control, value, onControlChange }) => (
-    <BaseControlWrapper label={control.label} description={control.description}>
+    <BaseControlWrapper label={control.label} name={control.name} description={control.description}>
       <select
         value={value}
         onChange={(e) => onControlChange(control.name, e.target.value)}

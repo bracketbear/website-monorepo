@@ -15,7 +15,9 @@
   },
   "dependencies": {
     "@bracketbear/core": "file:../core",
-    "@bracketbear/flateralus": "file:../flateralus",
+    "@bracketbear/flateralus": "file:../flateralus"
+  },
+  "peerDependencies": {
     "react": "^19.0.0"
   },
   "keywords": [],

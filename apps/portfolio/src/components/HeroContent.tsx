@@ -5,6 +5,7 @@ interface HeroContentProps {
   subtitle: string;
   description?: string;
   onGetWeird?: () => void;
+  onRandomizeAll?: () => void;
 }
 
 /**
@@ -15,6 +16,7 @@ export function HeroContent({
   subtitle,
   description,
   onGetWeird,
+  onRandomizeAll,
 }: HeroContentProps) {
   return (
     <div className="relative z-10 mb-8 flex h-full flex-col items-center justify-center p-4">
@@ -39,11 +41,11 @@ export function HeroContent({
             Get in touch
           </Button>
         </a>
-        {onGetWeird && (
+        {(onGetWeird || onRandomizeAll) && (
           <Button
             variant="trippy"
             size="lg"
-            onClick={onGetWeird}
+            onClick={onRandomizeAll || onGetWeird}
             className="shadow-lg [--pulse-duration:6s] hover:shadow-xl"
           >
             Get Weird
