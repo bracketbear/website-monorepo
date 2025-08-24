@@ -165,29 +165,6 @@ function parseMarkdown(content: string): string {
     )
   }
 
-  <!-- Meet Flateralus Section -->
-  {
-    (() => {
-      console.log('Debug - Full indexPage.data:', indexPage.data);
-      console.log('Debug - Layout object:', indexPage.data.layout);
-      console.log(
-        'Debug - showMeetFlateralusSection:',
-        indexPage.data.layout.showMeetFlateralusSection
-      );
-      console.log(
-        'Debug - meetFlateralus object:',
-        indexPage.data.meetFlateralus
-      );
-      return indexPage.data.layout.showMeetFlateralusSection;
-    })() && (
-      <MeetFlateralusSection
-        title={indexPage.data.meetFlateralus?.title}
-        content={indexPage.data.meetFlateralus?.content}
-        client:only="react"
-      />
-    )
-  }
-
   <!-- Featured Projects Section -->
   {
     indexPage.data.layout.showFeaturedProjects && (
@@ -230,6 +207,29 @@ function parseMarkdown(content: string): string {
           </div>
         </FeaturedProjectsWaveBG>
       </section>
+    )
+  }
+
+  <!-- Meet Flateralus Section -->
+  {
+    (() => {
+      console.log('Debug - Full indexPage.data:', indexPage.data);
+      console.log('Debug - Layout object:', indexPage.data.layout);
+      console.log(
+        'Debug - showMeetFlateralusSection:',
+        indexPage.data.layout.showMeetFlateralusSection
+      );
+      console.log(
+        'Debug - meetFlateralus object:',
+        indexPage.data.meetFlateralus
+      );
+      return indexPage.data.layout.showMeetFlateralusSection;
+    })() && (
+      <MeetFlateralusSection
+        title={indexPage.data.meetFlateralus?.title}
+        content={indexPage.data.meetFlateralus?.content}
+        client:only="react"
+      />
     )
   }
 

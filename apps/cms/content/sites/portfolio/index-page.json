@@ -1,6 +1,6 @@
 {
   "title": "Hi, I'm Harrison",
-  "subtitle": "I'm a value-minded full-stack developer with a passion for building great experiences for users",
+  "subtitle": "I'm a product-minded full-stack engineer with a passion for experiential technology",
   "metaDescription": "Harrison Callahan builds full-stack tools for experiential teams. Self-taught developer turning loose ideas into working systems.",
   "canonicalUrl": "https://harrisoncallahan.com/",
   "ogImage": "portfolio-hero.jpg",
@@ -15,8 +15,8 @@
     "showParticleBackground": true
   },
   "about": {
-    "title": "What I do",
-    "content": "## I've built a career on being a problem solver that folks can rely on.\n\nOn small teams, I'm the person who figures it out. I'm able to identify problems, collaborate with my team, do some research, and whip together a proof-of-concept to test the MVP.\n\nI've spent over *twelve years* working on the web and I've gotten to see it evolve faster than I could have ever imagined. There's never been a better time to be a software engineer than right now.\n",
+    "title": "I love building tools that give folks the power to make the world more more rad",
+    "content": "Since my first web job at an art foundry over 20 years ago, I've always enjoyed creating software that augments the physical space in some way. After working in the shadows of 50 foot art, you become slightly numb to things that don't take your breath away. Luckily for me, I fell into the experiential industry over five years ago and immediately fell in love, and since then I've been driven to build software for creative developers and designers to make the world more rad.\\\n\\\nI'm a full-stack software engineer who's been programming for over a decade. I started as a self-taught PHP developer, then dipped my toes in C++ experiential Windows apps (something I still can't believe I can say), and I've settled into being a well-seasoned Typescript engineer. I've been all over the map with the types of programs that I've built, and this has given me a wide breadth of experiences to pull from and reference. Instead of thinking of programming as a language-first subject, I instead focus on clean software architecture, modularity, and developer experience as the core pieces and then sprinkle languages and frameworks into the mix.\n\nBeyond my programming experience, I've also got years of professional experience in marketing, print design, business development, and high-volume restaurant management. While I wouldn't necessarily suggest this path for most people, myself included, these experiences have given me a very business and product focused mindset that I lean on to make myself a more well-rounded software engineer and leader. I feel that my understanding of value helps make me a hyper-efficient and reliable employee and partner. I also believe in Radical Candor and believe that not being candid is equivalent to not being honest. That said, I also try not to take myself too seriously, either—focus on what needs to be focused on.\\\n\\\nFinally, I'm a big believer in community. When I worked at North Country Brewing early on, I got to see first-hand how a company could leverage itself to produce cleaner sidewalks, better-funded fire departments, and host huge events that brought our neighborhood together. I also love meetups—I attend Futurespaces every week virtually and Fireside Meetup in Portland every other month—and at this point in my career I feel fortunate because I can be the person giving advice and sharing the lessons I've learned.\n",
     "showSkillsTicker": false,
     "featuredSkills": [
       "react",
@@ -25,12 +25,12 @@
     ]
   },
   "meetFlateralus": {
-    "title": "Meet Flateralus",
-    "content": "## A powerful schema for connecting experiential apps to everything.\n\nFlateralus is an animation engine that defines framework-agnostic controls and events. It handles the boring stuff so you can focus on creating immersive, interactive experiences.\n\n**Its greatest power? Giving you more time to play and less time programming.**\n"
+    "title": "Flateralus",
+    "content": "## Recently, I've been exploring Flateralus, a schema-first methodology for building experiential apps.\n\nInstead of hammering an experience management system integration into an existing app, you define a contract that everything adheres to—the experiential app, your rendering layer, your state manager, your CMS—literally everything. This automatically unlocks:\n\n- Automatic mode and control registration in your renderer or in your management system\n- Seeded randomness for controls without configuration\n- Mode configurations that can be saved locally, in a code base, or in a remote CMS\n\n### Its greatest power: giving you more time to play, prototype, and make money and less time putzing.\n"
   },
   "featuredProjects": {
-    "title": "Selected projects",
-    "subtitle": "Here are the projects that I think really define how I think about building software. Click on any card to learn more about the project and my role on it.",
+    "title": "Project Highlights",
+    "subtitle": "Here are the two biggest systems that I've worked on recently—Deeplocal's Gumband and Downstream's Bridge. These SaaS applications taught me so much about software and systems architecture, product management and ownership, and more. Check out my full project collection to see everything I've worked on recently.",
     "maxDisplay": 3,
     "showViewAllButton": true,
     "viewAllButtonText": "See all projects →",
@@ -42,7 +42,7 @@
   },
   "recentExperience": {
     "title": "Recent experience",
-    "subtitle": "A quick look at places I’ve contributed. For a full look, check out my full work history.",
+    "subtitle": "Here are a few of the roles that I tend to refer to the most. For a full look, check out my full work history.",
     "maxDisplay": 3,
     "showViewAllButton": true,
     "viewAllButtonText": "See full work history →",
