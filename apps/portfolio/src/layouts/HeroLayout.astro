@@ -18,7 +18,7 @@ import Layout from './Layout.astro';
 import { clsx, NavBar, type ObjectValues } from '@bracketbear/core';
 import { navigationConfig } from '@/config/navigation';
 import { generatePortfolioMetaTitle } from '@/config/meta-title';
-import { HeaderSection } from '@/components/HeaderSection';
+import { HeroSection } from '@/components/HeroSection';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import type { ControlValues } from '@bracketbear/flateralus';
 
@@ -79,15 +79,13 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
   {
     props.title && (
       <ErrorBoundary client:load>
-        <HeaderSection
+        <HeroSection
           preset={presets[animationPreset]}
           showDebugControls={true}
           enableLuminanceDetection={true}
           title={props.title}
           subtitle={props.subtitle}
           description={props.description}
-          ctaText={props.ctaText}
-          ctaHref={props.ctaHref}
           stats={props.stats}
           client:only="react"
         />

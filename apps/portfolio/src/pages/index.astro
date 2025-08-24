@@ -10,7 +10,7 @@ import type {
   WorkProjectEntry,
   WorkCompanyEntry,
 } from '@bracketbear/astro-content';
-import HeroSection from '@/components/HeroSection';
+import { HeroSection } from '@/components/HeroSection';
 import FeaturedProjectsWaveBG from '@/components/FeaturedProjectsWaveBG';
 import SkillsTicker from '@/components/SkillsTicker';
 import { marked } from 'marked';
@@ -131,7 +131,6 @@ function parseMarkdown(content: string): string {
     title={indexPage.data.title}
     subtitle={indexPage.data.subtitle}
     description={indexPage.data.hero?.description}
-    showParticleBackground={indexPage.data.hero?.showParticleBackground}
   />
 
   <!-- What I Do Section -->
