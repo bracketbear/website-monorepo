@@ -1,6 +1,6 @@
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
-import { createCuriousParticleNetworkAnimation } from '@bracketbear/flateralus-animations';
+import { createRetroGridAnimation } from '@bracketbear/flateralus-animations';
 import { getRandomControlValues } from '@bracketbear/flateralus';
 import { clsx } from '@bracketbear/core';
 import { useMemo, useState, useEffect } from 'react';
@@ -44,24 +44,27 @@ export default function HeroSection({
         },
       });
 
-      const animation = createCuriousParticleNetworkAnimation({
-        particleCount: 190,
-        connectionDistance: 60,
-        lineThickness: 2.3000000000000003,
-        particleBaseSize: 2,
-        particleSizeVariation: 0.8,
-        animationSpeed: 0.65,
-        attractionStrength: 0.011,
-        cursorAttractionRadius: 90,
-        cursorAttractionStrength: 0.17500000000000002,
-        particleGlowRadius: 5,
-        particleColors: [
-          { type: 'color', value: '#9ce8e9', metadata: { alpha: 1.0 } },
-        ],
-        keepInBounds: true,
-        connectionColor: '#000000',
-        glowColor: '#f1880d',
-        debugLogging: false,
+      const animation = createRetroGridAnimation({
+        gridSize: 50,
+        squareSize: 6,
+        gridAngle: 15,
+        gap: 1,
+        skewX: 3,
+        skewY: 0,
+        perspectiveX: 0.15,
+        perspectiveY: 0,
+        particleShape: 'circle',
+        cornerRoundness: 0.3,
+        animationSpeed: 1.0,
+        pattern: 'wave',
+        squareColor: '#ff69b4',
+        showGridLines: true,
+        gridLineColor: '#ff1493',
+        opacity: 0.9,
+        waveAmplitude: 0.7,
+        waveFrequency: 0.6,
+        rippleSpeed: 1.2,
+        scanlineSpeed: 1.8,
       });
 
       app.setAnimation(animation);

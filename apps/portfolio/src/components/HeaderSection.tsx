@@ -5,6 +5,7 @@ import {
   createCuriousParticleNetworkAnimation,
   createParticleWaveAnimation,
   createBlobAnimation,
+  createRetroGridAnimation,
 } from '@bracketbear/flateralus-animations';
 import { clsx, Stats, type LabelValue } from '@bracketbear/core';
 
@@ -16,7 +17,8 @@ export interface HeaderSectionProps {
     | 'curious-particle-network'
     | 'particle-wave'
     | 'blob'
-    | 'enhanced-wave';
+    | 'enhanced-wave'
+    | 'retro-grid';
   /** Additional CSS classes */
   className?: string;
   /** Whether to show debug controls */
@@ -46,7 +48,7 @@ export interface HeaderSectionProps {
  * across different pages and applications. Based on Tailwind CSS header with stats design.
  */
 export function HeaderSection({
-  preset = 'enhanced-wave',
+  preset = 'retro-grid',
   className = '',
   showDebugControls = true,
   enableLuminanceDetection = true,
@@ -76,24 +78,22 @@ export function HeaderSection({
     switch (preset) {
       case 'curious-particle-network':
         animation = createCuriousParticleNetworkAnimation({
-          particleCount: 80,
-          connectionDistance: 100,
-          lineThickness: 1.5,
-          particleBaseSize: 2.5,
-          particleSizeVariation: 1.0,
-          particleGlowRadius: 20,
-          attractionStrength: 0.02,
-          cursorAttractionRadius: 140,
-          cursorAttractionStrength: 0.12,
-          animationSpeed: 1.2,
+          particleCount: 190,
+          connectionDistance: 60,
+          lineThickness: 2.3000000000000003,
+          particleBaseSize: 2,
+          particleSizeVariation: 0.8,
+          animationSpeed: 0.65,
+          attractionStrength: 0.011,
+          cursorAttractionRadius: 90,
+          cursorAttractionStrength: 0.17500000000000002,
+          particleGlowRadius: 5,
           particleColors: [
-            { type: 'color', value: '#ffffff', metadata: { alpha: 1.0 } },
-            { type: 'color', value: '#ff4b3e', metadata: { alpha: 1.0 } },
-            { type: 'color', value: '#4b9fff', metadata: { alpha: 1.0 } },
+            { type: 'color', value: '#9ce8e9', metadata: { alpha: 1.0 } },
           ],
           keepInBounds: true,
-          connectionColor: '#ffffff',
-          glowColor: '#ffffff',
+          connectionColor: '#000000',
+          glowColor: '#f1880d',
           debugLogging: false,
         });
         break;
@@ -135,6 +135,30 @@ export function HeaderSection({
           interactiveColor: '#ff4b3e',
         });
         break;
+      case 'retro-grid':
+        animation = createRetroGridAnimation({
+          gridSize: 40,
+          squareSize: 8,
+          gridAngle: 15,
+          gap: 2,
+          skewX: 5,
+          skewY: 0,
+          perspectiveX: 0.1,
+          perspectiveY: 0,
+          particleShape: 'square',
+          cornerRoundness: 0.2,
+          animationSpeed: 1.2,
+          pattern: 'wave',
+          squareColor: '#ff69b4',
+          showGridLines: true,
+          gridLineColor: '#ff1493',
+          opacity: 0.8,
+          waveAmplitude: 0.6,
+          waveFrequency: 0.8,
+          rippleSpeed: 1.5,
+          scanlineSpeed: 2.0,
+        });
+        break;
       case 'enhanced-wave':
       default:
         // Enhanced particle wave with better visual appeal
@@ -174,6 +198,8 @@ export function HeaderSection({
         return 'bg-gradient-to-br from-muted via-muted/90 to-muted/15 bg-header-pattern';
       case 'blob':
         return 'bg-gradient-to-br from-muted via-muted/95 to-primary/20 bg-header-pattern';
+      case 'retro-grid':
+        return 'bg-gradient-to-br from-muted via-muted/95 to-muted/20 bg-header-pattern';
       case 'enhanced-wave':
       default:
         return 'bg-gradient-to-br from-muted via-muted/90 to-muted/15 bg-header-pattern';
