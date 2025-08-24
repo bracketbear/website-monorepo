@@ -86,13 +86,13 @@ export const toggle: BaseControlHelper<
  */
 export const color: BaseControlHelper<
   BaseControlOptions & {
-    defaultValue: string;
+    defaultValue: string | number; // Changed from string to string | number
   },
   ColorControl
 > = (
   name: string,
   options: BaseControlOptions & {
-    defaultValue: string;
+    defaultValue: string | number; // Changed from string to string | number
   }
 ) => {
   return {

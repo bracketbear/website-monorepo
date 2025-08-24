@@ -14,6 +14,7 @@ export default function FeaturedProjectsWaveBG({
   children,
 }: FeaturedProjectsWaveBGProps) {
   const [isClient, setIsClient] = useState(false);
+  const [isAnimationReady, setIsAnimationReady] = useState(false);
 
   // Ensure we're on the client before rendering
   useEffect(() => {
@@ -35,24 +36,26 @@ export default function FeaturedProjectsWaveBG({
     const animation = createParticleWaveAnimation();
     app.setAnimation(animation);
 
+    // Mark animation as ready after a short delay to ensure smooth mounting
+    setTimeout(() => setIsAnimationReady(true), 100);
+
     return app;
   }, [isClient]);
 
-  // Don't render anything on the server
-  if (!isClient) {
-    return <div className={clsx('relative w-full', className)} />;
-  }
-
-  if (!application) return null;
-
+  // Always render the container to prevent layout jumping
   return (
     <div className={clsx('relative w-full', className)}>
-      <AnimationStage
-        application={application}
-        className={clsx('absolute inset-0 h-full w-full pointer-events-none')}
-        layoutClassName="absolute inset-0"
-      />
+      {/* Render children immediately to prevent jumping */}
       <div className="relative z-10">{children}</div>
+      
+      {/* Animation stage - only render when ready */}
+      {isClient && isAnimationReady && application && (
+        <AnimationStage
+          application={application}
+          className={clsx('absolute inset-0 h-full w-full pointer-events-none')}
+          layoutClassName="absolute inset-0"
+        />
+      )}
     </div>
   );
 }

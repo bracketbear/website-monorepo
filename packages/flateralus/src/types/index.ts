@@ -68,9 +68,9 @@ export interface ControlValue<T = any> {
   metadata?: Record<string, any>;
 }
 
-export interface ColorControlValue extends ControlValue<string> {
+export interface ColorControlValue extends ControlValue<string | number> {
   type: 'color';
-  value: string;
+  value: string | number;
   metadata?: {
     alpha?: number;
     brightness?: number;

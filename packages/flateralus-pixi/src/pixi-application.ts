@@ -87,10 +87,10 @@ export class PixiApplication extends BaseApplication<PixiApp> {
       controls: [
         {
           name: 'backgroundColor',
-          type: 'color',
+          type: 'color', // Keep as 'color' for UI, but handle numeric values
           label: 'Background Color',
           description: 'Stage background color',
-          defaultValue: '#ff6b35',
+          defaultValue: 0xff6b35, // Changed from '#ff6b35' to hex number
           debug: true,
           isStageControl: true,
           category: 'background',
@@ -126,12 +126,11 @@ export class PixiApplication extends BaseApplication<PixiApp> {
       controls.backgroundColor !== previousControls.backgroundColor ||
       controls.backgroundAlpha !== previousControls.backgroundAlpha
     ) {
-      // Convert hex color to number for PIXI
-      const bgColor = controls.backgroundColor || '#ff6b35';
-      this.pixiApp.renderer.background.color = parseInt(
-        bgColor.replace('#', ''),
-        16
-      );
+      // Handle both string and numeric colors
+      const bgColor = typeof controls.backgroundColor === 'string'
+        ? parseInt(controls.backgroundColor.replace('#', ''), 16)
+        : controls.backgroundColor || 0xff6b35;
+      this.pixiApp.renderer.background.color = bgColor;
       this.pixiApp.renderer.background.alpha = controls.backgroundAlpha || 0;
     }
   }

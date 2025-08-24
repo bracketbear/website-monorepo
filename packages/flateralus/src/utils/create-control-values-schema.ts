@@ -29,7 +29,7 @@ function controlToZodSchema(control: Mutable<Control>): ZodTypeAny {
     case 'boolean':
       return z.boolean();
     case 'color':
-      return z.string(); // Could add regex for color if needed
+      return z.union([z.string(), z.number()]); // Changed from z.string() to accept both
     case 'select': {
       // Now options is mutable
       const options = control.options;
@@ -63,7 +63,7 @@ function controlToZodSchema(control: Mutable<Control>): ZodTypeAny {
               case 'color':
                 return z.object({
                   type: z.literal('color'),
-                  value: z.string(),
+                  value: z.union([z.string(), z.number()]), // Changed from z.string() to accept both
                   metadata: z.record(z.any()).optional(),
                 });
               case 'select':
@@ -116,7 +116,7 @@ function controlToZodSchema(control: Mutable<Control>): ZodTypeAny {
               case 'color':
                 return z.object({
                   type: z.literal('color'),
-                  value: z.string(),
+                  value: z.union([z.string(), z.number()]), // Changed from z.string() to accept both
                   metadata: z.record(z.any()).optional(),
                 });
               case 'select': {

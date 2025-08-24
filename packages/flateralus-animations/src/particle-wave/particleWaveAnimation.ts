@@ -9,8 +9,8 @@ const WAVE_AMPLITUDE = 32;
 const WAVE_FREQUENCY = 0.18;
 const WAVE_SPEED = 1.0;
 const LINE_THICKNESS = 1.2;
-const PARTICLE_COLOR = '#151515';
-const BG_COLOR = '#000000'; // Changed from 'transparent' to valid hex
+const PARTICLE_COLOR = 0x151515; // Changed from '#151515' to hex number
+const BG_COLOR = 0x000000; // Changed from '#000000' to hex number
 const WAVE_COUNT = 3;
 const VERTICAL_OFFSET = 40;
 const PHASE_OFFSET = 6.28;
@@ -23,7 +23,7 @@ interface WaveParticle {
   x: number;
   y: number;
   baseY: number;
-  color: string;
+  color: number; // Changed from string to number
   size: number;
   waveIndex: number;
   depth: number;
@@ -208,7 +208,7 @@ const MANIFEST = createManifest({
     },
     {
       name: 'particleColor',
-      type: 'color',
+      type: 'color', // Keep as 'color' for UI, but handle numeric values
       label: 'Particle Color',
       description: 'Color of the particles',
       defaultValue: PARTICLE_COLOR,
@@ -216,7 +216,7 @@ const MANIFEST = createManifest({
     },
     {
       name: 'lineColor',
-      type: 'color',
+      type: 'color', // Keep as 'color' for UI, but handle numeric values
       label: 'Line Color',
       description:
         'Color of the connecting line. Lines do not currently work. TODO: Fix',
@@ -225,7 +225,7 @@ const MANIFEST = createManifest({
     },
     {
       name: 'backgroundColor',
-      type: 'color',
+      type: 'color', // Keep as 'color' for UI, but handle numeric values
       label: 'Background Color',
       description: 'Background color of the animation',
       defaultValue: BG_COLOR,
@@ -241,7 +241,7 @@ function createWaveParticle(
   app: PIXI.Application,
   x: number,
   y: number,
-  color: string,
+  color: number, // Changed from string to number
   size: number,
   waveIndex: number,
   depth: number
@@ -410,12 +410,13 @@ class ParticleWaveAnimation extends PixiAnimation<
 
       // Draw connecting line for this wave with individual stroke style
       const currentWaveGraphics = waveGraphics[waveIndex];
-      const lineThickness = controls.lineThickness; // Use raw line thickness, not multiplied by sizeMultiplier
-      const lineColor = new PIXI.Color(controls.lineColor).toNumber();
+      const lineThickness = controls.lineThickness;
+      const lineColor = typeof controls.lineColor === 'string' 
+        ? new PIXI.Color(controls.lineColor).toNumber() 
+        : controls.lineColor;
 
       // Only draw lines if thickness > 0 and we have particles
       if (waveParticles.length > 1) {
-        // if (lineThickness > 0 && waveParticles.length > 1) {
         currentWaveGraphics.stroke({
           width: lineThickness,
           color: lineColor,
@@ -432,7 +433,9 @@ class ParticleWaveAnimation extends PixiAnimation<
         p.graphics.clear();
         p.graphics.circle(0, 0, controls.particleSize * sizeMultiplier);
         p.graphics.fill({
-          color: new PIXI.Color(controls.particleColor).toNumber(),
+          color: typeof controls.particleColor === 'string' 
+            ? new PIXI.Color(controls.particleColor).toNumber() 
+            : controls.particleColor,
           alpha: depthOpacity,
         });
         p.graphics.x = p.x;
@@ -441,11 +444,10 @@ class ParticleWaveAnimation extends PixiAnimation<
     });
 
     // Set background color if needed
-    const bgColor =
-      controls.backgroundColor === 'transparent'
-        ? '#000000'
-        : controls.backgroundColor;
-    app.renderer.background.color = new PIXI.Color(bgColor).toNumber();
+    const bgColor = typeof controls.backgroundColor === 'string'
+      ? new PIXI.Color(controls.backgroundColor).toNumber()
+      : controls.backgroundColor;
+    app.renderer.background.color = bgColor;
   }
 
   onDestroy(): void {

@@ -39,6 +39,8 @@ export interface HeroSectionProps {
   stats?: HeaderStat[];
   /** Custom content to render over the animation */
   children?: ReactNode;
+  /** Whether to show action buttons (defaults to false for non-index pages) */
+  showActions?: boolean;
 }
 
 /**
@@ -59,8 +61,10 @@ export function HeroSection({
   description,
   stats,
   children,
+  showActions = false,
 }: HeroSectionProps) {
   const [isClient, setIsClient] = useState(false);
+  const [isAnimationReady, setIsAnimationReady] = useState(false);
 
   // Ensure we're on the client before rendering
   useEffect(() => {
@@ -193,6 +197,10 @@ export function HeroSection({
       }
 
       app.setAnimation(animation);
+
+      // Mark animation as ready after a short delay to ensure smooth mounting
+      setTimeout(() => setIsAnimationReady(true), 100);
+
       return app;
     } catch {
       return null;
@@ -305,6 +313,7 @@ export function HeroSection({
       description={description}
       onGetWeird={handleRandomize}
       onRandomizeAll={handleRandomizeAll}
+      showActions={showActions}
     />
   );
 
@@ -336,29 +345,34 @@ export function HeroSection({
       {/* Gradient overlay for better text contrast */}
       <div className="from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
 
-      <AnimationStage
-        application={application}
-        showDebugControls={showDebugControls}
-        enableLuminanceDetection={enableLuminanceDetection}
-        debugControlsClassName="top-24 right-4 z-50"
-        layoutClassName="absolute inset-0"
-        onRandomize={handleRandomize}
-      >
-        {/* Content positioned as overlay */}
-        <div className="relative z-10 h-full w-full">{heroContent}</div>
-
-        {/* Stats section - positioned as overlay */}
-        {stats && stats.length > 0 && (
-          <div className="absolute inset-x-0 bottom-0 z-20 container mx-auto w-full">
-            <div className="relative -mb-16">
-              <Stats
-                stats={stats}
-                className="drop-shadow-xl drop-shadow-black/30"
-              />
-            </div>
+      {/* Animation stage - only render when ready */}
+      {isAnimationReady && application && (
+        <AnimationStage
+          application={application}
+          showDebugControls={showDebugControls}
+          enableLuminanceDetection={enableLuminanceDetection}
+          debugControlsClassName="top-24 right-4 z-50"
+          layoutClassName="absolute inset-0"
+          onRandomize={handleRandomize}
+        >
+          {/* Render text content immediately to prevent jumping */}
+          <div className="relative z-10 flex h-full w-full items-center justify-center">
+            {heroContent}
           </div>
-        )}
-      </AnimationStage>
+        </AnimationStage>
+      )}
+
+      {/* Stats section - positioned as overlay */}
+      {stats && stats.length > 0 && (
+        <div className="absolute inset-x-0 bottom-0 z-20 container mx-auto w-full">
+          <div className="relative -mb-16">
+            <Stats
+              stats={stats}
+              className="drop-shadow-xl drop-shadow-black/30"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

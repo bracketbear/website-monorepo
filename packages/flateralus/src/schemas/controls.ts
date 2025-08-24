@@ -36,7 +36,7 @@ export const BooleanControlSchema = BaseControlSchema.extend({
  */
 export const ColorControlSchema = BaseControlSchema.extend({
   type: z.literal('color'),
-  defaultValue: z.string(),
+  defaultValue: z.union([z.string(), z.number()]), // Changed from z.string() to accept both
 });
 
 /**

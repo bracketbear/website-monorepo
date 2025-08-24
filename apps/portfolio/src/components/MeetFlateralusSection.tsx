@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
 import { createBlobAnimation } from '@bracketbear/flateralus-animations';
@@ -14,9 +14,17 @@ export function MeetFlateralusSection({
   title = 'Meet Flateralus',
   content = '## A powerful schema for connecting experiential apps to everything.',
 }: MeetFlateralusSectionProps) {
-  // Create the application and animation on the client side
-  const createApplication = () => {
-    if (typeof window === 'undefined') return null;
+  const [isClient, setIsClient] = useState(false);
+  const [isAnimationReady, setIsAnimationReady] = useState(false);
+
+  // Ensure we're on the client before rendering
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Create the application and animation only once
+  const application = useMemo(() => {
+    if (!isClient) return null;
 
     const app = new PixiApplication({
       config: {
@@ -43,8 +51,12 @@ export function MeetFlateralusSection({
     });
 
     app.setAnimation(animation);
+
+    // Mark animation as ready after a short delay to ensure smooth mounting
+    setTimeout(() => setIsAnimationReady(true), 100);
+
     return app;
-  };
+  }, [isClient]);
 
   return (
     <section className="px-content py-12 lg:py-16">
@@ -67,13 +79,16 @@ export function MeetFlateralusSection({
           {/* Animation Stage - right side */}
           <div className="order-1 lg:order-2">
             <div className="relative h-[30rem] w-full lg:h-[40rem]">
-              <AnimationStage
-                application={createApplication()}
-                showDebugControls={true}
-                enableLuminanceDetection={false}
-                layoutClassName="absolute inset-0"
-                debugControlsClassName="absolute top-4 right-4 z-50 max-w-none"
-              />
+              {/* Animation stage - only render when ready */}
+              {isClient && isAnimationReady && application && (
+                <AnimationStage
+                  application={application}
+                  showDebugControls={true}
+                  enableLuminanceDetection={false}
+                  layoutClassName="absolute inset-0"
+                  debugControlsClassName="absolute top-4 right-4 z-50 max-w-none"
+                />
+              )}
             </div>
           </div>
         </div>

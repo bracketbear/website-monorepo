@@ -31,7 +31,7 @@ interface Particle {
   vx: number;
   vy: number;
   radius: number;
-  color: string;
+  color: number; // Changed from string to number
   opacity: number;
   fadeIn: boolean;
   isInteraction?: boolean;
@@ -249,18 +249,20 @@ function createParticle(
     ? (controls.particleColors as AnyControlValue[])
         .filter((item) => item.type === 'color')
         .map((item) => ({
-          color: item.value as string,
+          color: typeof item.value === 'string' 
+            ? parseInt(item.value.replace('#', ''), 16) 
+            : item.value,
           alpha: (item.metadata?.alpha as number) ?? 1.0,
         }))
     : [
         {
-          color: '#fffbe0',
+          color: 0xfffbe0, // Changed from '#fffbe0' to hex number
           alpha: 1.0,
         },
       ];
 
   const colorData = colorPalette[colorIndex % colorPalette.length] || {
-    color: '#fffbe0',
+    color: 0xfffbe0, // Changed from '#fffbe0' to hex number
     alpha: 1.0,
   };
   const color = colorData.color;
@@ -549,7 +551,7 @@ class CuriousParticleNetworkAnimation extends PixiAnimation<
         if (mouseDist < 40) highlight = true;
       }
       p.graphics.fill({
-        color: highlight ? 0xffffff : new PIXI.Color(p.color).toNumber(),
+        color: highlight ? 0xffffff : p.color, // Direct use, no conversion needed
         alpha: p.opacity,
       });
       p.graphics.x = p.x;
