@@ -3,7 +3,6 @@ import type { LayoutProps } from '../../types/layout';
 import { LAYERS } from '../../types/layers';
 import NavBar from '../components/NavBar.astro';
 import Footer from '../components/Footer.astro';
-import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 export interface Props extends LayoutProps {
   contactForm?: any;
@@ -60,14 +59,11 @@ const finalMetaDescription = description || metaDescription;
     >
       {
         !hideNavigation && (
-          <NavBar config={navigation} variant={navigationVariant} />
-        )
-      }
-      {
-        breadcrumbs && breadcrumbs.length > 0 && (
-          <Breadcrumbs
-            breadcrumbs={breadcrumbs}
-            hideNavigation={hideNavigation}
+          <NavBar
+            config={{
+              ...navigation,
+              breadcrumbs: breadcrumbs,
+            }}
             variant={navigationVariant}
           />
         )

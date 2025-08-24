@@ -1,3 +1,5 @@
+import type { Breadcrumb } from './breadcrumb.js';
+
 export interface NavItem {
   name: string;
   href: string;
@@ -21,4 +23,5 @@ export interface NavigationConfig {
     github?: string;
     twitter?: string;
   };
+  breadcrumbs?: Breadcrumb[];
 }

@@ -143,23 +143,6 @@
   pointer-events: auto;
 }
 
-/* Custom ordered list styling - desktop only */
-@media (min-width: 1024px) {
-  ol:not(.breadcrumbs) {
-    counter-reset: item;
-  }
-
-  ol:not(.breadcrumbs) > li {
-    counter-increment: item;
-  }
-
-  ol:not(.breadcrumbs) > li::marker {
-    content: counter(item, decimal-leading-zero);
-    font-weight: bold;
-    color: var(--color-brand-dark);
-  }
-}
-
 /* Prevent layout shifts when mobile nav opens */
 .hero-content {
   contain: layout style paint;

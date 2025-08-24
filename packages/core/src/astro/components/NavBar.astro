@@ -9,193 +9,266 @@ interface Props {
 }
 
 const { config, variant = 'default', class: className } = Astro.props;
-const { items: navItems, branding, socialLinks } = config;
+const { items: navItems, branding, socialLinks, breadcrumbs } = config;
 ---
 
-<nav
+<div
   class:list={[
-    'flex min-h-20 items-center border-y-2',
     variant === 'ghost-dark'
-      ? 'absolute top-0 right-0 left-0 z-40 border-transparent bg-transparent'
+      ? 'absolute top-0 right-0 left-0 z-40'
       : variant === 'glass'
-        ? 'absolute top-0 right-0 left-0 z-40 border-transparent bg-white/10 shadow-lg backdrop-blur-md'
-        : 'border-border bg-primary',
+        ? 'absolute top-0 right-0 left-0 z-40'
+        : 'relative',
     className,
   ]}
-  role="navigation"
-  aria-label="Main navigation"
+  data-has-breadcrumbs={breadcrumbs && breadcrumbs.length > 0}
 >
-  <!-- z-40: Main navigation bar -->
-  <div class="container mx-auto flex h-full items-center justify-between p-4">
-    <!-- Logo Section -->
-    <div class="flex items-center gap-4">
-      {
-        branding?.logo && (
-          <div class="flex h-16 w-16 items-center justify-center">
-            <img
-              src={branding.logo}
-              alt={branding.name}
-              class="text-text-primary"
-            />
-          </div>
-        )
-      }
-      <div
-        class:list={[
-          'font-heading text-2xl leading-5.5 font-semibold tracking-wider uppercase',
-          variant === 'ghost-dark'
-            ? 'text-text-primary'
-            : variant === 'glass'
-              ? 'text-text-primary'
-              : 'text-primary-foreground',
-        ]}
-      >
-        <a
-          href={branding?.href || '/'}
+  <nav
+    class:list={[
+      'flex min-h-20 items-center border-y-2',
+      variant === 'ghost-dark'
+        ? 'border-transparent bg-transparent'
+        : variant === 'glass'
+          ? 'border-transparent glass-bg glass-shadow'
+          : 'border-border bg-primary',
+    ]}
+    role="navigation"
+    aria-label="Main navigation"
+  >
+    <!-- z-40: Main navigation bar -->
+    <div class="container mx-auto flex h-full items-center justify-between p-4">
+      <!-- Logo Section -->
+      <div class="flex items-center gap-4">
+        {
+          branding?.logo && (
+            <div class="flex h-16 w-16 items-center justify-center">
+              <img
+                src={branding.logo}
+                alt={branding.name}
+                class="text-text-primary"
+              />
+            </div>
+          )
+        }
+        <div
           class:list={[
+            'font-heading text-2xl leading-5.5 font-semibold tracking-wider uppercase',
             variant === 'ghost-dark'
-              ? 'hover:text-text-primary/80'
+              ? 'text-text-primary'
               : variant === 'glass'
-                ? 'hover:text-text-primary/80'
-                : 'hover:text-primary-foreground/80',
-            'transition-colors',
+                ? 'text-text-primary'
+                : 'text-primary-foreground',
           ]}
         >
-          {branding?.name || 'Brand'}
-        </a>
+          <a
+            href={branding?.href || '/'}
+            class:list={[
+              variant === 'ghost-dark'
+                ? 'hover:text-text-primary/80'
+                : variant === 'glass'
+                  ? 'hover:text-text-primary/80'
+                  : 'hover:text-primary-foreground/80',
+              'transition-colors',
+            ]}
+          >
+            {branding?.name || 'Brand'}
+          </a>
+        </div>
       </div>
-    </div>
 
-    <!-- Desktop Navigation -->
-    <div class="hidden items-center gap-8 md:flex">
-      <ul class="bg-card relative flex items-center gap-8" role="menubar">
-        <li
-          class="bg-card absolute top-0 right-0 h-full w-full rounded-full blur-xl"
-        >
-        </li>
-        {
-          navItems.map((item) => (
-            <li class="group relative flex items-center" role="none">
-              {item.children != null &&
-              Array.isArray(item.children) &&
-              item.children.length > 0 ? (
-                <div class="flex items-center">
-                  <button
+      <!-- Desktop Navigation -->
+      <div class="hidden items-center gap-8 md:flex">
+        <ul class="relative flex items-center gap-8" role="menubar">
+          </li>
+          {
+            navItems.map((item) => (
+              <li class="group relative flex items-center" role="none">
+                {item.children != null &&
+                Array.isArray(item.children) &&
+                item.children.length > 0 ? (
+                  <div class="flex items-center">
+                    <button
+                      class:list={[
+                        'group font-heading relative inline-flex items-center font-semibold tracking-wide uppercase transition-colors',
+                        variant === 'ghost-dark'
+                          ? 'hover:text-text-primary/80 text-text-primary'
+                          : variant === 'glass'
+                            ? 'hover:text-text-primary/80 text-text-primary'
+                            : 'text-primary-foreground hover:text-primary-foreground/80',
+                      ]}
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                      role="menuitem"
+                      aria-label={`${item.name} menu`}
+                    >
+                      {item.name}
+                      <svg
+                        class="ml-1 h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    <div
+                      class="invisible absolute left-0 z-30 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100"
+                      role="menu"
+                      aria-label={`${item.name} submenu`}
+                    >
+                      <!-- z-30: Dropdown submenu (below main navigation) -->
+                      <div
+                        class:list={[
+                          'border-border py-4 shadow-[8px_8px_0_0_var(--color-border)]',
+                          variant === 'ghost-dark'
+                            ? 'bg-muted'
+                            : variant === 'glass'
+                              ? 'glass-bg-light'
+                              : 'bg-card',
+                        ]}
+                      >
+                        {item.children.map((child) => (
+                          <a
+                            href={child.href}
+                            class:list={[
+                              'font-heading block px-4 py-4 text-sm font-semibold tracking-wide uppercase transition-colors',
+                              variant === 'ghost-light'
+                                ? 'hover:bg-card hover:text-text-primary text-text-primary'
+                                : variant === 'glass'
+                                  ? 'text-text-primary hover:text-text-primary glass-hover'
+                                  : 'text-primary-foreground hover:bg-muted hover:text-muted-foreground',
+                            ]}
+                            role="menuitem"
+                          >
+                            {child.name}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <a
                     class:list={[
-                      'group font-heading relative inline-flex items-center font-semibold tracking-wide uppercase transition-colors',
+                      'group link-underline font-heading relative font-semibold tracking-wide uppercase transition-all text-shadow-lg',
                       variant === 'ghost-dark'
                         ? 'hover:text-text-primary/80 text-text-primary'
                         : variant === 'glass'
                           ? 'hover:text-text-primary/80 text-text-primary'
-                          : 'text-primary-foreground hover:text-primary-foreground/80',
+                          : 'text-text-primary hover:text-text-primary/80',
                     ]}
-                    aria-haspopup="true"
-                    aria-expanded="false"
+                    href={item.href}
                     role="menuitem"
-                    aria-label={`${item.name} menu`}
                   >
                     {item.name}
-                    <svg
-                      class="ml-1 h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </button>
-                  <div
-                    class="invisible absolute left-0 z-30 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100"
-                    role="menu"
-                    aria-label={`${item.name} submenu`}
-                  >
-                    <!-- z-30: Dropdown submenu (below main navigation) -->
-                    <div
-                      class:list={[
-                        'border-border py-4 shadow-[8px_8px_0_0_var(--color-border)]',
-                        variant === 'ghost-dark'
-                          ? 'bg-muted'
-                          : variant === 'glass'
-                            ? 'bg-white/20 backdrop-blur-md'
-                            : 'bg-card',
-                      ]}
-                    >
-                      {item.children.map((child) => (
-                        <a
-                          href={child.href}
-                          class:list={[
-                            'font-heading block px-4 py-4 text-sm font-semibold tracking-wide uppercase transition-colors',
-                            variant === 'ghost-light'
-                              ? 'hover:bg-card hover:text-text-primary text-text-primary'
-                              : variant === 'glass'
-                                ? 'text-text-primary hover:text-text-primary hover:bg-white/20'
-                                : 'text-primary-foreground hover:bg-muted hover:text-muted-foreground',
-                          ]}
-                          role="menuitem"
-                        >
-                          {child.name}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <a
-                  class:list={[
-                    'group link-underline font-heading relative font-semibold tracking-wide uppercase transition-all text-shadow-lg',
-                    variant === 'ghost-dark'
-                      ? 'hover:text-text-primary/80 text-text-primary'
-                      : variant === 'glass'
-                        ? 'hover:text-text-primary/80 text-text-primary'
-                        : 'text-text-primary hover:text-text-primary/80',
-                  ]}
-                  href={item.href}
-                  role="menuitem"
-                >
-                  {item.name}
-                </a>
-              )}
-            </li>
-          ))
-        }
-      </ul>
-    </div>
+                  </a>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
 
-    <!-- Mobile Menu Button -->
-    <Button
-      class:list={[
-        'p-2 md:hidden',
-        variant === 'glass' ? 'button-transparent-dark' : '',
-      ]}
-      variant={variant === 'glass' ? 'unstyled' : 'dark'}
-      id="mobile-menu-button"
-      type="button"
-      aria-label="Open mobile navigation menu"
-      aria-expanded="false"
-      aria-controls="mobile-menu"
-    >
-      <svg
-        class="h-6 w-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
+      <!-- Mobile Menu Button -->
+      <Button
+        class:list={[
+          'p-2 md:hidden',
+          variant === 'glass' ? 'button-transparent-dark' : '',
+        ]}
+        variant={variant === 'glass' ? 'unstyled' : 'dark'}
+        id="mobile-menu-button"
+        type="button"
+        aria-label="Open mobile navigation menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 6h16M4 12h16M4 18h16"></path>
-      </svg>
-    </Button>
-  </div>
-</nav>
+        <svg
+          class="h-6 w-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </Button>
+    </div>
+  </nav>
+
+  <!-- Breadcrumbs Section -->
+  {
+    breadcrumbs && breadcrumbs.length > 0 && (
+      <div
+        class:list={[
+          'min-h-8 border-b transition-all duration-300',
+          variant === 'glass'
+            ? 'bg-white/20 backdrop-blur-md border-white/30 shadow-lg'
+            : 'border-border/20 bg-muted/30',
+        ]}
+      >
+        <div class="container mx-auto px-4 py-2">
+          <nav class="text-sm" aria-label="Breadcrumb navigation">
+            <ol class="flex items-center space-x-2">
+              {breadcrumbs.map((crumb, idx) => (
+                <>
+                  <li>
+                    {crumb.href ? (
+                      <a
+                        href={crumb.href}
+                        aria-label={crumb.label}
+                        title={crumb.label}
+                        class:list={[
+                          'font-medium tracking-wide transition-colors',
+                          variant === 'glass'
+                            ? 'text-text-primary/70 hover:text-text-primary'
+                            : 'text-muted-foreground hover:text-foreground',
+                        ]}
+                      >
+                        {crumb.label}
+                      </a>
+                    ) : (
+                      <span
+                        class:list={[
+                          'font-medium tracking-wide',
+                          variant === 'glass'
+                            ? 'text-text-primary'
+                            : 'text-muted-foreground',
+                        ]}
+                      >
+                        {crumb.label}
+                      </span>
+                    )}
+                  </li>
+                  {idx < breadcrumbs.length - 1 && (
+                    <li
+                      class:list={[
+                        'font-medium',
+                        variant === 'glass'
+                          ? 'text-text-primary/40'
+                          : 'text-muted-foreground/60',
+                        ]}
+                      >
+                        /
+                      </li>
+                  )}
+                </>
+              ))}
+            </ol>
+          </nav>
+        </div>
+      </div>
+    )
+  }
+</div>
 
 <!-- Mobile Menu Overlay - OUTSIDE nav to prevent overflow clipping -->
 <!-- z-[60]: Mobile menu overlay and drawer (above hero section z-50) -->
@@ -219,7 +292,7 @@ const { items: navItems, branding, socialLinks } = config;
     'fixed top-0 right-0 z-[60] h-full transition-all duration-300 ease-in-out overflow-hidden hidden shadow-2xl',
     'w-96 max-w-[90vw]', // Larger width
     variant === 'glass'
-      ? 'bg-white/30 backdrop-blur-xl border-l border-white/40'
+      ? 'glass-bg-light glass-border glass-shadow-lg'
       : 'bg-white',
   ]}
   style="right: -100%;"
@@ -234,7 +307,7 @@ const { items: navItems, branding, socialLinks } = config;
     class:list={[
       'flex h-16 items-center justify-between border-b px-6',
       variant === 'glass'
-        ? 'border-white/30'
+        ? 'glass-border'
         : 'border-gray-200',
     ]}
   >
@@ -243,7 +316,7 @@ const { items: navItems, branding, socialLinks } = config;
       class:list={[
         'font-heading text-xl font-semibold tracking-wide uppercase',
         variant === 'glass'
-          ? 'text-white'
+          ? 'glass-text'
           : 'text-gray-900',
       ]}
     >
@@ -288,7 +361,7 @@ const { items: navItems, branding, socialLinks } = config;
                   class:list={[
                     'font-heading font-semibold tracking-wide uppercase',
                     variant === 'glass'
-                      ? 'text-white'
+                      ? 'glass-text'
                       : 'text-gray-900',
                   ]}
                 >
@@ -307,7 +380,7 @@ const { items: navItems, branding, socialLinks } = config;
                         class:list={[
                           'block rounded-md px-3 py-2 text-sm transition-colors',
                           variant === 'glass'
-                            ? 'text-white/80 hover:bg-white/10 hover:text-white'
+                            ? 'glass-text-muted hover:glass-hover hover:glass-text'
                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                         ]}
                       >
@@ -324,7 +397,7 @@ const { items: navItems, branding, socialLinks } = config;
                 class:list={[
                   'block rounded-md px-3 py-3 text-lg font-semibold transition-colors',
                   variant === 'glass'
-                    ? 'text-white hover:bg-white/10'
+                    ? 'glass-text hover:glass-hover'
                     : 'text-gray-900 hover:bg-gray-50',
                 ]}
               >
@@ -342,7 +415,7 @@ const { items: navItems, branding, socialLinks } = config;
     class:list={[
       'border-t px-6 py-4',
       variant === 'glass'
-        ? 'border-white/30'
+        ? 'glass-border'
         : 'border-gray-200',
     ]}
   >

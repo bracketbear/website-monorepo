@@ -18,14 +18,14 @@ const { breadcrumbs, hideNavigation = false, variant } = Astro.props;
 {
   breadcrumbs.length > 0 && (
     <div
-      class={`px-content py-4 ${variant === 'glass' ? 'border-transparent bg-white/10 shadow-lg backdrop-blur-md' : 'border-border/20 border-b'}`}
+      class={`px-content py-4 ${variant === 'glass' ? 'glass-bg glass-shadow border-transparent' : 'border-border/20 border-b'}`}
     >
       <div class="container mx-auto">
         <nav class="text-sm">
-          <ol class="breadcrumbs flex items-center space-x-2">
+          <ol class="breadcrumbs flex list-none items-center space-x-2">
             {breadcrumbs.map((crumb, idx) => (
               <>
-                <li>
+                <li class="list-none">
                   {crumb.href ? (
                     <a
                       href={crumb.href}
@@ -43,7 +43,7 @@ const { breadcrumbs, hideNavigation = false, variant } = Astro.props;
                   )}
                 </li>
                 {idx < breadcrumbs.length - 1 && (
-                  <li class="text-text-primary/40 font-medium">
+                  <li class="text-text-primary/40 list-none font-medium">
                     {' '}
                     {SEPARATOR}{' '}
                   </li>
