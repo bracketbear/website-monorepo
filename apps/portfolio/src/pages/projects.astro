@@ -3,7 +3,6 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { getBreadcrumbs } from '@/config/breadcrumbs';
 import HeroLayout from '@/layouts/HeroLayout.astro';
 import ProjectCard from '@/components/ProjectCard';
-import StatsSection from '@/components/StatsSection';
 import { marked } from 'marked';
 
 // Type definitions
@@ -56,37 +55,10 @@ const projectsByCategory: CategoryWithProjects[] =
 // Get skills for project cards
 const workSkills = await getCollection('workSkills');
 
-// Calculate dynamic stats
-const totalProjects = workProject.length;
-const featuredProjects = workProject.filter((p) => p.data.isFeatured).length;
-const totalSkills = workSkills.length;
-
 // Helper function to parse markdown content
 function parseMarkdown(content: string): string {
   return marked.parse(content) as string;
 }
-
-// Prepare stats data
-const statsData =
-  projectsPage.data.stats?.map(
-    (stat: { label: string; value: string; description?: string }) => {
-      // Replace dynamic values
-      let displayValue = stat.value;
-      if (stat.label === 'Total Projects') {
-        displayValue = totalProjects.toString();
-      } else if (stat.label === 'Featured Projects') {
-        displayValue = featuredProjects.toString();
-      } else if (stat.label === 'Technologies') {
-        displayValue = `${totalSkills}+`;
-      }
-
-      return {
-        label: stat.label,
-        value: displayValue,
-        description: stat.description,
-      };
-    }
-  ) || [];
 ---
 
 <HeroLayout
@@ -112,9 +84,6 @@ const statsData =
       />
     </div>
   </section>
-
-  <!-- Stats Section -->
-  {statsData.length > 0 && <StatsSection stats={statsData} />}
 
   <!-- Projects by Category Section -->
   <div class="px-content mb-40">
