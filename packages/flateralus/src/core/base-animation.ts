@@ -34,13 +34,20 @@ export abstract class BaseAnimation<
   protected lastUpdateTime = 0;
   protected manifest: TManifest;
   protected isResetting = false;
+  private onControlsUpdated?: (values: TControlValues) => void;
 
   /**
    * @param manifest The animation manifest (type-safe, deeply readonly)
    * @param initialControls The initial control values
+   * @param onControlsUpdated Optional callback when controls are updated
    */
-  constructor(manifest: TManifest, initialControls?: Partial<TControlValues>) {
+  constructor(
+    manifest: TManifest,
+    initialControls?: Partial<TControlValues>,
+    onControlsUpdated?: (values: TControlValues) => void
+  ) {
     this.manifest = manifest;
+    this.onControlsUpdated = onControlsUpdated;
     const schema = createControlValuesSchema(manifest);
     const merged = {
       ...getManifestDefaultControlValues(manifest),
@@ -140,6 +147,13 @@ export abstract class BaseAnimation<
   }
 
   /**
+   * Set the controls updated callback
+   */
+  setOnControlsUpdated(callback?: (values: TControlValues) => void): void {
+    this.onControlsUpdated = callback;
+  }
+
+  /**
    * Update control values and trigger lifecycle hooks
    */
   updateControls(values: Partial<TControlValues>): void {
@@ -164,6 +178,11 @@ export abstract class BaseAnimation<
 
     // Call lifecycle hook if implemented
     this.onControlsChange(this.controlValues, this.previousControlValues);
+
+    // Notify callback after controls are updated
+    if (this.onControlsUpdated) {
+      this.onControlsUpdated(this.controlValues);
+    }
   }
 
   /**
@@ -219,6 +238,11 @@ export abstract class BaseAnimation<
     this.isResetting = true;
     this.onReset(this.context, this.controlValues);
     this.isResetting = false;
+
+    // Notify callback after reset
+    if (this.onControlsUpdated) {
+      this.onControlsUpdated(this.controlValues);
+    }
   }
 
   /**

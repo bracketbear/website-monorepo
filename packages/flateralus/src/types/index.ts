@@ -167,6 +167,9 @@ export interface Animation<
   /** Update control values */
   updateControls(values: Partial<TControlValues>): void;
 
+  /** Set callback for when controls are updated */
+  setOnControlsUpdated(callback?: (values: TControlValues) => void): void;
+
   /** Initialize the animation with a rendering context */
   init(context: TContext): void;
 

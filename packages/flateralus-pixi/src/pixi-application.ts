@@ -82,7 +82,7 @@ export class PixiApplication extends BaseApplication<PixiApp> {
   public getStageControlsManifest(): StageControlsManifest {
     return {
       id: 'pixi-stage-controls',
-      name: 'PIXI Stage Controls',
+      name: 'Stage Controls',
       description: 'Controls for PIXI.js stage properties',
       controls: [
         {
@@ -122,11 +122,16 @@ export class PixiApplication extends BaseApplication<PixiApp> {
     if (!this.pixiApp) return;
 
     // Update background
-    if (controls.backgroundColor !== previousControls.backgroundColor ||
-        controls.backgroundAlpha !== previousControls.backgroundAlpha) {
+    if (
+      controls.backgroundColor !== previousControls.backgroundColor ||
+      controls.backgroundAlpha !== previousControls.backgroundAlpha
+    ) {
       // Convert hex color to number for PIXI
       const bgColor = controls.backgroundColor || '#ff6b35';
-      this.pixiApp.renderer.background.color = parseInt(bgColor.replace('#', ''), 16);
+      this.pixiApp.renderer.background.color = parseInt(
+        bgColor.replace('#', ''),
+        16
+      );
       this.pixiApp.renderer.background.alpha = controls.backgroundAlpha || 0;
     }
   }

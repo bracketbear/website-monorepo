@@ -79,6 +79,7 @@ const DebugControls = memo<DebugControlsProps>(
     const [toastTimeout, setToastTimeout] = useState<NodeJS.Timeout | null>(
       null
     );
+    const [localControlValues, setLocalControlValues] = useState(controlValues);
 
     // Handle panel mount/unmount for animation
     useEffect(() => {
@@ -89,6 +90,39 @@ const DebugControls = memo<DebugControlsProps>(
         return () => clearTimeout(timeout);
       }
     }, [isExpanded]);
+
+    // Hook into the animation's control update callback
+    useEffect(() => {
+      if (!animationRef?.current) return;
+
+      const animation = animationRef.current;
+
+      // Set up the callback to sync local state with animation state
+      const handleControlsUpdated = (updatedControls: any) => {
+        setLocalControlValues(updatedControls);
+      };
+
+      // Set the callback on the animation using the new method
+      if (typeof animation.setOnControlsUpdated === 'function') {
+        animation.setOnControlsUpdated(handleControlsUpdated);
+      }
+
+      // Fallback: manually sync control values periodically
+      const interval = setInterval(() => {
+        const currentValues = animation.getControlValues();
+        if (currentValues && Object.keys(currentValues).length > 0) {
+          setLocalControlValues(currentValues);
+        }
+      }, 100);
+
+      return () => {
+        clearInterval(interval);
+        // Clean up callback if possible
+        if (typeof animation.setOnControlsUpdated === 'function') {
+          animation.setOnControlsUpdated(undefined);
+        }
+      };
+    }, [animationRef]);
 
     const handleControlChange = useCallback(
       (key: string, value: number | boolean | string) => {
@@ -102,13 +136,21 @@ const DebugControls = memo<DebugControlsProps>(
       const defaultValues = getManifestDefaultControlValues(manifest);
 
       // Merge current values with defaults to ensure completeness
-      const completeValues = { ...defaultValues, ...controlValues };
+      const completeValues = { ...defaultValues, ...localControlValues };
 
-      // Create a clean object with only the control values
-      const settingsToDownload = {
+      // Create a clean object with animation control values
+      const settingsToDownload: any = {
         manifestId: manifest.id,
         controlValues: completeValues,
       };
+
+      // Include stage controls if they exist
+      if (stageControls) {
+        settingsToDownload.stageControls = {
+          manifestId: stageControls.manifest.id,
+          controlValues: stageControls.controlValues,
+        };
+      }
 
       // Create and download the JSON file
       const blob = new Blob([JSON.stringify(settingsToDownload, null, 2)], {
@@ -122,7 +164,7 @@ const DebugControls = memo<DebugControlsProps>(
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    }, [manifest, controlValues]);
+    }, [manifest, localControlValues, stageControls]);
 
     const showToast = (message: string) => {
       setToastMessage(message);
@@ -165,7 +207,7 @@ const DebugControls = memo<DebugControlsProps>(
     };
 
     const renderControl = (control: DeepReadonly<Control>) => {
-      const value = controlValues[control.name];
+      const value = localControlValues[control.name];
 
       // Skip controls that shouldn't be shown in debug
       if (!control.debug) return null;
@@ -324,7 +366,7 @@ const DebugControls = memo<DebugControlsProps>(
                   items={[
                     {
                       id: 'stage-controls',
-                      title: `🎨 ${stageControls.manifest.name}`,
+                      title: stageControls.manifest.name,
                       content: (
                         <div className="space-y-2">
                           {stageControls.manifest.controls.map((control) => {

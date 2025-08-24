@@ -14,13 +14,11 @@ describe('Stage Controls Types', () => {
       description: 'Stage background color',
       defaultValue: '#000000',
       debug: true,
-      isStageControl: true,
-      category: 'background',
     };
 
     expect(stageControl.name).toBe('backgroundColor');
-    expect(stageControl.isStageControl).toBe(true);
-    expect(stageControl.category).toBe('background');
+    expect(stageControl.type).toBe('color');
+    expect(stageControl.debug).toBe(true);
   });
 
   it('should define valid stage control values', () => {
@@ -50,8 +48,6 @@ describe('Stage Controls Types', () => {
           description: 'Stage background color',
           defaultValue: '#000000',
           debug: true,
-          isStageControl: true,
-          category: 'background',
         },
       ],
     };
@@ -74,8 +70,6 @@ describe('Stage Controls Types', () => {
           description: 'Stage background color',
           defaultValue: '#000000',
           debug: true,
-          isStageControl: true,
-          category: 'background',
         },
         {
           name: 'backgroundAlpha',
@@ -84,8 +78,6 @@ describe('Stage Controls Types', () => {
           description: 'Background transparency',
           defaultValue: 0.5,
           debug: true,
-          isStageControl: true,
-          category: 'background',
         },
         {
           name: 'enableGrid',
@@ -94,8 +86,6 @@ describe('Stage Controls Types', () => {
           description: 'Show grid',
           defaultValue: false,
           debug: true,
-          isStageControl: true,
-          category: 'grid',
         },
       ],
     };
