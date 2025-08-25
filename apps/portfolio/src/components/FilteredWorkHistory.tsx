@@ -76,13 +76,11 @@ function FilteredWorkHistoryContent({
 
         if (isAdding) {
           showToast(
-            `${skillName} added to filters\nshowing ${visibleJobs} jobs`,
-            { type: 'info' }
+            `${skillName} added to filters\nshowing ${visibleJobs} jobs`
           );
         } else {
           showToast(
-            `${skillName} removed from filters\nshowing ${visibleJobs} jobs`,
-            { type: 'info' }
+            `${skillName} removed from filters\nshowing ${visibleJobs} jobs`
           );
         }
       }, 0);
@@ -91,7 +89,7 @@ function FilteredWorkHistoryContent({
     });
   };
 
-  // Filter jobs and projects based on selected skills
+  // Filter jobs based on selected skills
   const filteredJobs = jobs.map((job) => {
     const jobSkills = job.data.workSkills || [];
     const hasMatchingSkills =
@@ -128,9 +126,7 @@ function FilteredWorkHistoryContent({
             <Button
               onClick={() => {
                 setSelectedSkills([]);
-                showToast('Filters cleared\nshowing all jobs', {
-                  type: 'info',
-                });
+                showToast('Filters cleared\nshowing all jobs');
               }}
               disabled={selectedSkills.length === 0}
               className="w-full"
@@ -141,7 +137,7 @@ function FilteredWorkHistoryContent({
 
           {/* Skills by Category */}
           <>
-            {skillCategories.map((category, index) => {
+            {skillCategories.map((category) => {
               // Get skills that belong to this category
               const categorySkills = skills.filter(
                 (skill) => skill.data.category === category.id

@@ -227,8 +227,8 @@ export function HeroSection({
 
       app.setAnimation(animation);
 
-      // Mark animation as ready after a short delay to ensure smooth mounting
-      setTimeout(() => setIsAnimationReady(true), 100);
+      // Mark animation as ready immediately to prevent flicker
+      setIsAnimationReady(true);
 
       return app;
     } catch {
@@ -334,6 +334,16 @@ export function HeroSection({
     }
   };
 
+  // Calculate negative margin to go underneath navbar/breadcrumbs
+  const getNegativeMargin = () => {
+    if (accountForNavigation && accountForBreadcrumbs) {
+      return '-6.5rem'; // -pt-30
+    } else if (accountForNavigation) {
+      return '-5rem'; // -pt-24
+    }
+    return '0'; // No negative margin needed
+  };
+
   // Create the hero content once
   const heroContent = children || (
     <HeroContent
@@ -346,10 +356,34 @@ export function HeroSection({
     />
   );
 
-  // Server-side render (no animation)
+  // Server-side render (no animation) - match client-side styles exactly
   if (!isClient) {
     return (
-      <div className={clsx(BACKGROUND_CLASS, className)}>{heroContent}</div>
+      <div
+        className={clsx(
+          'relative h-screen w-full',
+          getBackgroundClasses(),
+          className
+        )}
+        style={{ marginTop: getNegativeMargin() }}
+      >
+        {/* Combined background container with multiple layers - same as client */}
+        <div className="bg-noise bg-header-glow from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent opacity-100" />
+
+        {/* Render text content with same positioning */}
+        <div
+          className={clsx(
+            'z-10 flex h-full w-full items-center justify-center',
+            accountForNavigation && accountForBreadcrumbs
+              ? 'pt-30'
+              : accountForNavigation
+                ? 'pt-24'
+                : ''
+          )}
+        >
+          {heroContent}
+        </div>
+      </div>
     );
   }
 
@@ -357,37 +391,56 @@ export function HeroSection({
   return (
     <div
       className={clsx(
-        'h-[70vh] min-h-120 w-full',
+        'relative h-screen w-full',
         getBackgroundClasses(),
         className
       )}
+      style={{ marginTop: getNegativeMargin() }}
     >
       {/* Combined background container with multiple layers */}
-      <div className="absolute inset-0 bg-noise bg-animated-grid bg-header-glow bg-gradient-to-t from-muted/50 via-transparent to-transparent opacity-100" />
+      <div className="bg-noise bg-header-glow from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent opacity-100" />
 
-      {/* Animation stage - only render when ready */}
-      {isAnimationReady && application && (
-        <AnimationStage
-          application={application}
-          showDebugControls={showDebugControls}
-          enableLuminanceDetection={enableLuminanceDetection}
-          debugControlsClassName={clsx(
-            'z-50 container-content',
-            accountForNavigation && accountForBreadcrumbs
-              ? 'top-32'
-              : accountForNavigation
-                ? 'top-24'
-                : ''
-          )}
-          layoutClassName="absolute inset-0"
-          onRandomize={handleRandomize}
-        >
-          {/* Render text content immediately to prevent jumping */}
+      {/* Animation stage - always render container to prevent layout shift */}
+      <div className="absolute inset-0">
+        {isAnimationReady && application && (
+          <AnimationStage
+            application={application}
+            showDebugControls={showDebugControls}
+            enableLuminanceDetection={enableLuminanceDetection}
+            debugControlsClassName={clsx(
+              'z-50 container-content',
+              accountForNavigation && accountForBreadcrumbs
+                ? 'top-32'
+                : accountForNavigation
+                  ? 'top-24'
+                  : ''
+            )}
+            layoutClassName="absolute inset-0"
+            onRandomize={handleRandomize}
+          >
+            {/* Render text content immediately to prevent jumping */}
+            <div
+              className={clsx(
+                'z-10 flex h-full w-full items-center justify-center',
+                // Base margin for navigation bar (5rem) + extra margin for debug menu (1rem)
+                // Additional margin for breadcrumbs when both are present
+                accountForNavigation && accountForBreadcrumbs
+                  ? 'pt-30'
+                  : accountForNavigation
+                    ? 'pt-24'
+                    : ''
+              )}
+            >
+              {heroContent}
+            </div>
+          </AnimationStage>
+        )}
+        
+        {/* Always render text content to prevent layout shift */}
+        {(!isAnimationReady || !application) && (
           <div
             className={clsx(
               'z-10 flex h-full w-full items-center justify-center',
-              // Base margin for navigation bar (5rem) + extra margin for debug menu (1rem)
-              // Additional margin for breadcrumbs when both are present
               accountForNavigation && accountForBreadcrumbs
                 ? 'pt-30'
                 : accountForNavigation
@@ -397,8 +450,8 @@ export function HeroSection({
           >
             {heroContent}
           </div>
-        </AnimationStage>
-      )}
+        )}
+      </div>
 
       {/* Stats section - positioned as overlay */}
       {stats && stats.length > 0 && (
