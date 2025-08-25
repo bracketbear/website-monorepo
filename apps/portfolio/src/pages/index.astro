@@ -144,7 +144,7 @@ function parseMarkdown(content: string): string {
             <h2 class="font-heading text-foreground mb-8 inline-block p-6 text-5xl font-black tracking-tight uppercase">
               {indexPage.data.about.title}
             </h2>
-            <div class="card-dark">
+            <div class="card">
               {indexPage.data.about.content && (
                 <div
                   class="prose prose-xl prose-headings:text-foreground prose-p:text-foreground/80 prose-strong:text-foreground prose-em:text-foreground/90 prose-ul:text-foreground/80 prose-ol:text-foreground/80 prose-li:text-foreground/80 max-w-none"
@@ -192,7 +192,6 @@ function parseMarkdown(content: string): string {
                   skills={workSkills}
                   variant="light"
                   showBadges={false}
-                  className=""
                 />
               ))}
             </div>
@@ -242,7 +241,7 @@ function parseMarkdown(content: string): string {
           </div>
           <div class="mx-auto max-w-4xl space-y-8">
             {recentJobs.map((job) => (
-              <div class="card-dark">
+              <div class="card">
                 <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
                   <div>
                     <h3 class="font-heading text-foreground text-2xl font-black uppercase">
@@ -319,7 +318,7 @@ function parseMarkdown(content: string): string {
               />
             )}
             {indexPage.data.contactCTA && (
-              <div class="card bg-card">
+              <div class="card">
                 <ContactForm client:load />
               </div>
             )}

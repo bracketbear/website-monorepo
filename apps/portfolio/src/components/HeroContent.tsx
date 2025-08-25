@@ -1,4 +1,5 @@
 import { Button } from '@bracketbear/core/react';
+import { clsx } from 'clsx';
 
 interface HeroContentProps {
   title: string;
@@ -22,9 +23,14 @@ export function HeroContent({
   showActions = false,
 }: HeroContentProps) {
   return (
-    <div className="relative z-10 flex h-full w-full flex-col items-center justify-center p-4">
+    <div
+      className={clsx(
+        'relative z-10 flex h-full w-full flex-col items-center justify-center p-4',
+        showActions ? 'pt-20' : 'pt-0'
+      )}
+    >
       {description && (
-        <p className="foreground/90 text-2xl font-bold tracking-tight uppercase drop-shadow-lg text-center">
+        <p className="foreground/90 center text-2xl font-bold tracking-tight uppercase drop-shadow-lg">
           {description}
         </p>
       )}

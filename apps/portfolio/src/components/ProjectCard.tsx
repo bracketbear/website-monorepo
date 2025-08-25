@@ -34,6 +34,7 @@ export default function ProjectCard({
     ? getProjectImageUrl(project.id, project.data.coverImage)
     : undefined;
 
+  // Use default card color (now off-white) for better visual appeal
   const cardClass = variant === 'dark' ? 'card-dark' : 'card';
 
   const projectUrl = getProjectUrl(project.id);

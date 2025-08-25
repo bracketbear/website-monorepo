@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import { Disclosure, Transition } from '@headlessui/react';
 import { clsx } from '@bracketbear/core';
 
@@ -21,10 +20,10 @@ export interface AccordionProps {
  * A collapsible content component built on Headless UI.
  * Supports multiple variants and customizable styling.
  */
-export function Accordion({ 
-  items, 
+export function Accordion({
+  items,
   className,
-  variant = 'default' 
+  variant = 'default',
 }: AccordionProps) {
   const baseClasses = clsx(
     'w-full',
@@ -34,7 +33,8 @@ export function Accordion({
 
   const itemClasses = clsx(
     'overflow-hidden',
-    variant === 'bordered' && 'rounded-lg border border-neutral-600 bg-neutral-800/50',
+    variant === 'bordered' &&
+      'rounded-lg border border-neutral-600 bg-neutral-800/50',
     variant === 'minimal' && 'border-b border-neutral-700 last:border-b-0'
   );
 
@@ -46,7 +46,8 @@ export function Accordion({
 
   const contentClasses = clsx(
     'transition-all duration-200 ease-in-out',
-    variant === 'bordered' && 'border-t border-neutral-600 bg-neutral-800/30 p-3',
+    variant === 'bordered' &&
+      'border-t border-neutral-600 bg-neutral-800/30 p-3',
     variant === 'minimal' && 'pb-2'
   );
 
@@ -75,7 +76,7 @@ export function Accordion({
                   />
                 </svg>
               </Disclosure.Button>
-              
+
               <Transition
                 enter="transition duration-200 ease-out"
                 enterFrom="transform scale-95 opacity-0"

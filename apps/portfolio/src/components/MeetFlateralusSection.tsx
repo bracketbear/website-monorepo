@@ -86,7 +86,7 @@ export function MeetFlateralusSection({
                   showDebugControls={true}
                   enableLuminanceDetection={false}
                   layoutClassName="absolute inset-0"
-                  debugControlsClassName="absolute top-4 right-4 z-50 max-w-none"
+                  debugControlsClassName="absolute top-20 right-4 z-50 max-w-none"
                 />
               )}
             </div>

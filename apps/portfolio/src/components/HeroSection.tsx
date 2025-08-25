@@ -328,7 +328,7 @@ export function HeroSection({
   return (
     <div
       className={clsx(
-        'relative min-h-[60vh] w-full lg:min-h-[70vh]',
+        'relative h-[70vh] min-h-120 w-full',
         getBackgroundClasses(),
         className
       )}

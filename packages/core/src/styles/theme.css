@@ -25,9 +25,9 @@
   --color-foreground: hsl(0 0% 10%); /* near-black ink */
 
   /* Surfaces (tint/shade of canvas) */
-  --color-card: color-mix(in srgb, var(--color-background) 85%, white 15%);
+  --color-card: color-mix(in srgb, var(--color-foreground) 2%, white 98%);
   --color-card-foreground: var(--color-foreground);
-  --color-muted: color-mix(in srgb, var(--color-background) 85%, black 15%);
+  --color-muted: color-mix(in srgb, var(--color-background) 88%, white 12%);
   --color-muted-foreground: color-mix(
     in srgb,
     var(--color-foreground) 75%,
@@ -75,6 +75,32 @@
   /* --color-brand-orange-light: var(--color-background); */ /* Removed circular reference */
   /* --color-brand-dark: var(--color-foreground); */ /* Removed circular reference */
   /* --color-brand-light: var(--color-background); */ /* Removed circular reference */
+
+  /* Enhanced Card Variants - Off-white theme */
+  --color-card-vibrant: color-mix(
+    in srgb,
+    var(--color-foreground) 3%,
+    white 97%
+  );
+  --color-card-warm: color-mix(
+    in srgb,
+    var(--color-brand-orange) 2%,
+    white 98%
+  );
+  --color-card-cool: color-mix(in srgb, var(--color-brand-blue) 2%, white 98%);
+  --color-card-accent: color-mix(
+    in srgb,
+    var(--color-brand-purple) 2%,
+    white 98%
+  );
+
+  /* Neutral variants - Clean off-white */
+  --color-card-neutral: color-mix(
+    in srgb,
+    var(--color-foreground) 2%,
+    white 98%
+  );
+  --color-card-muted: color-mix(in srgb, var(--color-foreground) 4%, white 96%);
 }
 
 /* Mobile Menu Visibility Control */

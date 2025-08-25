@@ -5,12 +5,19 @@ import { getProjectImageUrl } from '@bracketbear/astro-content';
 import { getKeyedCollection } from '@/utils/content';
 import { getBreadcrumbs } from '@/config/breadcrumbs';
 import { generatePortfolioMetaTitle } from '@/config/meta-title';
-import HeroLayout from '@/layouts/HeroLayout.astro';
+import ProjectHeaderLayout from '@/layouts/ProjectHeaderLayout.astro';
 import { Picture } from 'astro:assets';
 import Section from '@/components/Section.astro';
 import Callout from '@/components/Callout.astro';
-import SkillsAccordion from '@/components/SkillsAccordion.astro';
+
 import { ImageGallery } from '@bracketbear/core/react';
+
+// Type definitions
+interface SkillData {
+  data: {
+    title: string;
+  };
+}
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const workProjects = await getCollection('workProject');
@@ -46,7 +53,7 @@ const category = projectCategories.find(
 );
 const projectSkills = (workProjectItem.data.skills ?? [])
   .map((skillId: string) => workSkills.find((s) => s.id === skillId))
-  .filter(Boolean);
+  .filter((skill: any): skill is SkillData => skill !== undefined);
 
 const companyTitle =
   job !== undefined ? workCompanies[job.data.company].data.title : 'Unknown';
@@ -163,13 +170,14 @@ const stats = [
 ];
 ---
 
-<HeroLayout
+<ProjectHeaderLayout
   pageTitle={workProjectItem.data.title}
   title={workProjectItem.data.title}
   subtitle={category?.data.title}
   description={subline}
+  coverImage={_coverImage}
+  coverAlt={heroAlt}
   breadcrumbs={breadcrumbs}
-  animationPreset="curious-particle-network"
   stats={stats}
   contactCTA={{
     text: ctaText,
@@ -183,36 +191,18 @@ const stats = [
     <div class="container mx-auto">
       <div class="mx-auto max-w-4xl">
         <div class="space-y-16">
-          {/* Cover Image Band */}
-          {
-            _coverImage && (
-              <figure class="overflow-hidden rounded-lg border border-white/10">
-                <Picture
-                  src={_coverImage}
-                  alt={heroAlt}
-                  width={1280}
-                  height={720}
-                  formats={['avif', 'webp']}
-                  layout="full-width"
-                  fit="cover"
-                />
-                {workProjectItem.data.mediaDescription && (
-                  <figcaption class="text-text-primary/70 mt-2 text-sm">
-                    {workProjectItem.data.mediaDescription}
-                  </figcaption>
-                )}
-              </figure>
-            )
-          }
-
           {/* Stack */}
           {
             Array.isArray(skills) && skills.length > 0 && (
-              <SkillsAccordion
-                skills={projectSkills}
-                defaultOpen={true}
-                title="Tech Stack"
-              />
+              <Section title="Tech Stack">
+                <div class="flex flex-wrap gap-2">
+                  {projectSkills.map((skill: SkillData) => (
+                    <span class="pill pill-brand-green">
+                      {skill.data.title}
+                    </span>
+                  ))}
+                </div>
+              </Section>
             )
           }
 
@@ -376,4 +366,4 @@ const stats = [
       </div>
     </div>
   </section>
-</HeroLayout>
+</ProjectHeaderLayout>

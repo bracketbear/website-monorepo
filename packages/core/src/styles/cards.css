@@ -9,3 +9,55 @@
 @utility card-interactive {
   @apply tangible-hover;
 }
+
+/* Enhanced card variants with more vibrant colors */
+@utility card-vibrant {
+  @apply tangible tangible-card border-border bg-card-vibrant rounded-xl border border-solid p-6;
+}
+
+@utility card-warm {
+  @apply tangible tangible-card border-border bg-card-warm rounded-xl border border-solid p-6;
+}
+
+@utility card-cool {
+  @apply tangible tangible-card border-border bg-card-cool rounded-xl border border-solid p-6;
+}
+
+@utility card-accent {
+  @apply tangible tangible-card border-border bg-card-accent rounded-xl border border-solid p-6;
+}
+
+/* Interactive variants */
+@utility card-vibrant-interactive {
+  @apply card-vibrant tangible-hover;
+}
+
+@utility card-warm-interactive {
+  @apply card-warm tangible-hover;
+}
+
+@utility card-cool-interactive {
+  @apply card-cool tangible-hover;
+}
+
+@utility card-accent-interactive {
+  @apply card-accent tangible-hover;
+}
+
+/* Neutral card variants */
+@utility card-neutral {
+  @apply tangible tangible-card border-border bg-card-neutral rounded-xl border border-solid p-6;
+}
+
+@utility card-muted {
+  @apply tangible tangible-card border-border bg-card-muted rounded-xl border border-solid p-6;
+}
+
+/* Interactive neutral variants */
+@utility card-neutral-interactive {
+  @apply card-neutral tangible-hover;
+}
+
+@utility card-muted-interactive {
+  @apply card-muted tangible-hover;
+}
