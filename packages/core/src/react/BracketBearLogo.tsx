@@ -1,10 +1,10 @@
 import React from 'react';
 
-interface BracketBearLogoProps {
+export interface BracketBearLogoProps {
   className?: string;
 }
 
-export default function BracketBearLogo({
+export function BracketBearLogo({
   className = '',
 }: BracketBearLogoProps) {
   return (

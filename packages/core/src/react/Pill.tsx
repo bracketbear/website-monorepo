@@ -2,7 +2,7 @@ import { type ReactNode } from 'react';
 import { clsx } from 'clsx';
 import { Button } from './Button';
 
-interface PillProps {
+export interface PillProps {
   children: ReactNode;
   size?: 'sm' | 'md' | 'lg';
   className?: string;

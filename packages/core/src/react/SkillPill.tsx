@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { Pill } from './Pill';
 
-interface SkillPillProps {
+export interface SkillPillProps {
   children: ReactNode;
   size?: 'sm' | 'md' | 'lg';
   className?: string;

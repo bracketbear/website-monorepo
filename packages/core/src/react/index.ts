@@ -1,42 +1,49 @@
-export { default as BracketBearLogo } from './BracketBearLogo';
-export { default as PointerFX } from './PointerFX';
-export { default as Ticker, type TickerItem } from './Ticker';
-export { Button, type ButtonProps } from './Button';
-export { ValidatedForm } from './ValidatedForm';
+// React Components
+export { Accordion } from './Accordion';
+export { AlertModal } from './AlertModal';
+export { BracketBearLogo } from './BracketBearLogo';
+export { Button } from './Button';
+export { CheckboxField } from './CheckboxField';
+export { CheckboxInput } from './CheckboxInput';
+export { ContactIcon } from './ContactIcon';
+export { Field } from './Field';
+export { ImageGallery } from './ImageGallery';
+export { ImageViewerModal } from './ImageViewerModal';
+export { Modal } from './Modal';
+export { Pill } from './Pill';
+export { PointerFX } from './PointerFX';
+export { Popover } from './Popover';
+export { Slider } from './Slider';
+export { SkillPill } from './SkillPill';
+export { Stats } from './Stats';
+export { Testimonial } from './Testimonial';
 export { TextInput } from './TextInput';
 export { TextareaInput } from './TextareaInput';
-export { CheckboxInput } from './CheckboxInput';
-export { Field } from './Field';
-export { CheckboxField } from './CheckboxField';
-export { Pill } from './Pill';
-export { SkillPill } from './SkillPill';
-export { Stats, type StatsProps } from './Stats';
-export { Slider } from './Slider';
-export { ContactIcon } from './ContactIcon';
-export {
-  Accordion,
-  type AccordionProps,
-  type AccordionItem,
-} from './Accordion';
+export { Ticker } from './Ticker';
+export { ValidatedForm } from './ValidatedForm';
 
-// Popover component
-export { Popover, type PopoverProps } from './Popover';
-
+// Hooks
 export * from './hooks';
-export { Testimonial, type TestimonialProps } from './Testimonial';
 
-// Modal system
-export { Modal, type ModalProps } from './Modal';
-export { AlertModal, type AlertModalProps } from './AlertModal';
-export {
-  ImageViewerModal,
-  type ImageViewerModalProps,
-  type ImageItem,
-} from './ImageViewerModal';
-
-// Gallery
-export {
-  ImageGallery,
-  type ImageGalleryProps,
-  type GalleryImage,
-} from './ImageGallery';
+// Types
+export type { AccordionProps, AccordionItem } from './Accordion';
+export type { AlertModalProps } from './AlertModal';
+export type { BracketBearLogoProps } from './BracketBearLogo';
+export type { ButtonProps } from './Button';
+export type { CheckboxFieldProps } from './CheckboxField';
+export type { CheckboxInputProps } from './CheckboxInput';
+export type { ContactIconProps } from './ContactIcon';
+export type { FieldProps } from './Field';
+export type { ImageGalleryProps, GalleryImage } from './ImageGallery';
+export type { ImageViewerModalProps, ImageItem } from './ImageViewerModal';
+export type { ModalProps } from './Modal';
+export type { PillProps } from './Pill';
+export type { PopoverProps } from './Popover';
+export type { SliderProps } from './Slider';
+export type { SkillPillProps } from './SkillPill';
+export type { StatsProps } from './Stats';
+export type { TestimonialProps } from './Testimonial';
+export type { TextInputProps } from './TextInput';
+export type { TextareaInputProps } from './TextareaInput';
+export type { TickerProps, TickerItem } from './Ticker';
+export type { ValidatedFormProps } from './ValidatedForm';

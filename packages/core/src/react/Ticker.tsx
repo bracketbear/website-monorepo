@@ -11,7 +11,7 @@ export interface TickerItem {
   link?: string;
 }
 
-interface TickerProps {
+export interface TickerProps {
   items: TickerItem[];
   className?: string;
   itemClassName?: string;
@@ -21,7 +21,7 @@ interface TickerProps {
   onItemClick?: (item: TickerItem) => void;
 }
 
-export default function Ticker({
+export function Ticker({
   items,
   className = '',
   itemClassName = '',

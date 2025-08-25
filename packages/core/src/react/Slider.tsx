@@ -40,5 +40,3 @@ export const Slider: FC<SliderProps> = ({
     />
   );
 };
-
-export default Slider;

@@ -470,4 +470,4 @@ const PointerFX: FC = () => {
   );
 };
 
-export default PointerFX;
+export { PointerFX };

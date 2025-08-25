@@ -5,7 +5,7 @@ import { z } from 'zod';
  * Props for the ValidatedForm component.
  * @template TSchema - The Zod schema type for the form.
  */
-interface ValidatedFormProps<TSchema extends z.ZodTypeAny> {
+export interface ValidatedFormProps<TSchema extends z.ZodTypeAny> {
   schema: TSchema;
   onSubmit: (values: z.infer<TSchema>) => Promise<void> | void;
   children: (props: {
