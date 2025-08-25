@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import type { ColorControl as ColorControlType } from '@bracketbear/flateralus';
 import { BaseControlWrapper } from './BaseControlWrapper';
 
