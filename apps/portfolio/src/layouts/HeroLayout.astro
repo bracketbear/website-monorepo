@@ -88,6 +88,8 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
           description={props.description}
           stats={props.stats}
           showActions={false}
+          accountForNavigation={true}
+          accountForBreadcrumbs={true}
           client:load
         />
       </ErrorBoundary>

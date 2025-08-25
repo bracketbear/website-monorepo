@@ -41,6 +41,10 @@ export interface HeroSectionProps {
   children?: ReactNode;
   /** Whether to show action buttons (defaults to false for non-index pages) */
   showActions?: boolean;
+  /** Whether to account for navigation bar (defaults to false since nav is usually absolutely positioned) */
+  accountForNavigation?: boolean;
+  /** Whether to account for breadcrumbs (defaults to true) */
+  accountForBreadcrumbs?: boolean;
 }
 
 /**
@@ -62,6 +66,8 @@ export function HeroSection({
   stats,
   children,
   showActions = false,
+  accountForNavigation = false,
+  accountForBreadcrumbs = true,
 }: HeroSectionProps) {
   const [isClient, setIsClient] = useState(false);
   const [isAnimationReady, setIsAnimationReady] = useState(false);
@@ -351,12 +357,30 @@ export function HeroSection({
           application={application}
           showDebugControls={showDebugControls}
           enableLuminanceDetection={enableLuminanceDetection}
-          debugControlsClassName="top-24 right-4 z-50"
+          debugControlsClassName={clsx(
+            'z-50 container-content',
+            accountForNavigation && accountForBreadcrumbs
+              ? 'top-32'
+              : accountForNavigation
+                ? 'top-24'
+                : ''
+          )}
           layoutClassName="absolute inset-0"
           onRandomize={handleRandomize}
         >
           {/* Render text content immediately to prevent jumping */}
-          <div className="relative z-10 flex h-full w-full items-center justify-center">
+          <div
+            className={clsx(
+              'relative z-10 flex h-full w-full items-center justify-center',
+              // Base margin for navigation bar (5rem) + extra margin for debug menu (1rem)
+              // Additional margin for breadcrumbs when both are present
+              accountForNavigation && accountForBreadcrumbs
+                ? 'pt-30'
+                : accountForNavigation
+                  ? 'pt-24'
+                  : ''
+            )}
+          >
             {heroContent}
           </div>
         </AnimationStage>
