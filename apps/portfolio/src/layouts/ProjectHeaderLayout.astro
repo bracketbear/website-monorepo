@@ -71,15 +71,12 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
   <!-- Project Header Section -->
   {
     props.title && (
-      <section class="relative w-full bg-gradient-to-br from-muted via-muted/95 to-secondary/20">
-        <!-- Background patterns -->
-        <div class="bg-noise absolute inset-0 opacity-5"></div>
-        <div class="bg-animated-grid absolute inset-0 opacity-10"></div>
-        <div class="bg-header-glow absolute inset-0"></div>
-        <div class="from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent"></div>
+      <section class="w-full bg-gradient-to-br from-muted via-muted/95 to-secondary/20">
+        <!-- Combined background patterns -->
+        <div class="absolute inset-0 bg-noise bg-animated-grid bg-header-glow bg-gradient-to-t from-muted/50 via-transparent to-transparent opacity-100"></div>
         
         <!-- Content container -->
-        <div class="relative z-10 container mx-auto h-full flex items-center">
+        <div class="z-10 container mx-auto h-full flex items-center">
           <div class="flex flex-col lg:flex-row w-full items-center justify-center">
             <!-- Left side: Text content -->
             <div class="flex-1 px-4 py-16 lg:py-40 order-2 lg:order-1">

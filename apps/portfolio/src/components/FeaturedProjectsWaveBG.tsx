@@ -44,8 +44,8 @@ export default function FeaturedProjectsWaveBG({
 
   // Always render the container to prevent layout jumping
   return (
-    <div className={clsx('relative w-full', className)}>
-      {/* Render children immediately to prevent jumping */}
+    <div className={clsx('w-full', className)}>
+      {/* Background wave animation */}
       <div className="relative z-10">{children}</div>
       
       {/* Animation stage - only render when ready */}

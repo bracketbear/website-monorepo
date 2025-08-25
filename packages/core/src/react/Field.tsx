@@ -29,7 +29,11 @@ export const Field: React.FC<FieldProps> = ({
         }`}
       >
         {label}
-        {required && <span className="text-error ml-1" aria-label="required">*</span>}
+        {required && (
+          <span className="text-error ml-1" aria-label="required">
+            *
+          </span>
+        )}
       </label>
       {children}
       <div
@@ -40,8 +44,8 @@ export const Field: React.FC<FieldProps> = ({
         )}
       >
         {error && (
-          <div 
-            id={`${id}-error`} 
+          <div
+            id={`${id}-error`}
             className="text-error mt-1 text-xs font-bold"
             role="alert"
             aria-live="polite"

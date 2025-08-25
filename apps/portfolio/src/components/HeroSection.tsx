@@ -357,22 +357,13 @@ export function HeroSection({
   return (
     <div
       className={clsx(
-        'relative h-[70vh] min-h-120 w-full',
+        'h-[70vh] min-h-120 w-full',
         getBackgroundClasses(),
         className
       )}
     >
-      {/* Enhanced background overlay with subtle texture */}
-      <div className="bg-noise absolute inset-0 opacity-5" />
-
-      {/* Animated grid pattern for subtle movement */}
-      <div className="bg-animated-grid absolute inset-0 opacity-10" />
-
-      {/* Enhanced glow effect */}
-      <div className="bg-header-glow absolute inset-0" />
-
-      {/* Gradient overlay for better text contrast */}
-      <div className="from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
+      {/* Combined background container with multiple layers */}
+      <div className="absolute inset-0 bg-noise bg-animated-grid bg-header-glow bg-gradient-to-t from-muted/50 via-transparent to-transparent opacity-100" />
 
       {/* Animation stage - only render when ready */}
       {isAnimationReady && application && (
@@ -394,7 +385,7 @@ export function HeroSection({
           {/* Render text content immediately to prevent jumping */}
           <div
             className={clsx(
-              'relative z-10 flex h-full w-full items-center justify-center',
+              'z-10 flex h-full w-full items-center justify-center',
               // Base margin for navigation bar (5rem) + extra margin for debug menu (1rem)
               // Additional margin for breadcrumbs when both are present
               accountForNavigation && accountForBreadcrumbs
@@ -412,7 +403,7 @@ export function HeroSection({
       {/* Stats section - positioned as overlay */}
       {stats && stats.length > 0 && (
         <div className="absolute inset-x-0 bottom-0 z-20 container mx-auto w-full">
-          <div className="relative -mb-16">
+          <div className="-mb-16">
             <Stats
               stats={stats}
               className="drop-shadow-xl drop-shadow-black/30"

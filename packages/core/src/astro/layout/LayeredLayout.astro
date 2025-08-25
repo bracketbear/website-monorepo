@@ -46,17 +46,12 @@ const finalMetaDescription = description || metaDescription;
   </head>
   <body class="min-h-screen transition-colors duration-300">
     <!-- Background Layer -->
-    <div
-      style={`z-index: ${LAYERS.background}; position: fixed; inset: 0; pointer-events: none;`}
-    >
+    <div style={`z-index: ${LAYERS.background};`} class="pointer-events-none">
       <slot name="background" />
     </div>
 
     <!-- Content Layer (default slot) -->
-    <div
-      style={`z-index: ${LAYERS.content}; position: relative;`}
-      class={className}
-    >
+    <div style={`z-index: ${LAYERS.content};`} class={className}>
       {
         !hideNavigation && (
           <NavBar
@@ -71,16 +66,14 @@ const finalMetaDescription = description || metaDescription;
       <slot />
       {
         !hideContactForm && ContactFormComponent && (
-          <ContactFormComponent class="bg-primary relative z-10 py-36" />
+          <ContactFormComponent class="bg-primary z-10 py-36" />
         )
       }
       {!hideFooter && <Footer config={navigation} />}
     </div>
 
     <!-- Foreground Layer (mouse effects, overlays) -->
-    <div
-      style={`z-index: ${LAYERS.foreground}; position: fixed; inset: 0; pointer-events: none;`}
-    >
+    <div style={`z-index: ${LAYERS.foreground};`} class="pointer-events-none">
       <slot name="foreground" />
     </div>
 

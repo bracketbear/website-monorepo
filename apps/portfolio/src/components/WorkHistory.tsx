@@ -175,7 +175,7 @@ export default function WorkHistory({
       {showFilteredPlaceholder && jobs.length === 0 && (
         <div
           className={clsx(
-            'relative transition-transform duration-300',
+            'transition-transform duration-300',
             'bg-background',
             'border-brand-orange border-2',
             'shadow-[4px_4px_0_0_var(--color-brand-red)]',

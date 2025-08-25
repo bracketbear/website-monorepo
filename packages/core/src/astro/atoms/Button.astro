@@ -14,6 +14,7 @@ interface Props {
   disabled?: boolean;
   class?: string;
   id?: string;
+  role?: string;
 }
 
 const {
@@ -23,6 +24,7 @@ const {
   size = 'md',
   iconButton = false,
   disabled = false,
+  role = 'button',
   ...props
 } = Astro.props;
 ---

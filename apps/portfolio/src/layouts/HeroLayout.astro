@@ -98,11 +98,7 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
 
   <!-- Page Content -->
   <div
-    class={clsx(
-      'relative',
-      props.title ? 'py-32' : 'py-24',
-      props.hideFooter && 'pb-0'
-    )}
+    class={clsx(props.title ? 'py-32' : 'py-24', props.hideFooter && 'pb-0')}
   >
     <div class={clsx(container && 'container mx-auto')}>
       <slot />

@@ -20,7 +20,7 @@ const maxWidthClass = contentWidth === 'narrow' ? 'max-w-6xl' : '';
 
 <LayeredLayout title={title} {...rest}>
   {showHero && (
-    <div class="bg-muted relative pb-8">
+    <div class="bg-muted pb-8">
       <div class={clsx('container mx-auto py-12', {
         'max-w-6xl': contentWidth === 'narrow',
       })}>
@@ -66,7 +66,7 @@ const maxWidthClass = contentWidth === 'narrow' ? 'max-w-6xl' : '';
         
         <!-- Halftone Pattern -->
         <div
-          class="pointer-events-none absolute bottom-0 left-0 flex w-full justify-center select-none"
+          class="pointer-events-none bottom-0 left-0 flex w-full justify-center select-none"
         >
           <div
             class="h-4 w-2/3 bg-repeat-x"
