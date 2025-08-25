@@ -224,14 +224,6 @@
 }
 
 .button-icon {
-  /* width: 2rem;
-  height: 2rem;
-  min-width: 2rem;
-  min-height: 2rem;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center; */
   @apply flex h-8 min-h-8 w-8 min-w-8 items-center justify-center p-1;
 }
 

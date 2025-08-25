@@ -13,7 +13,15 @@ export { SkillPill } from './SkillPill';
 export { Stats, type StatsProps } from './Stats';
 export { Slider } from './Slider';
 export { ContactIcon } from './ContactIcon';
-export { Accordion, type AccordionProps, type AccordionItem } from './Accordion';
+export {
+  Accordion,
+  type AccordionProps,
+  type AccordionItem,
+} from './Accordion';
+
+// Popover component
+export { Popover, type PopoverProps } from './Popover';
+
 export * from './hooks';
 export { Testimonial, type TestimonialProps } from './Testimonial';
 

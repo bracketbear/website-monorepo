@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 
 /**
  * Usage Example:
- * 
+ *
  * ```tsx
  * function MyAnimationComponent() {
  *   const [stageControls, setStageControls] = useState({
@@ -21,11 +21,11 @@ import { useCallback } from 'react';
  *     gridColor: '#ffffff',
  *     gridOpacity: 0.2,
  *   });
- *   
+ *
  *   const handleStageControlsChange = (newControls: StageControlValues) => {
  *     setStageControls(newControls);
  *   };
- *   
+ *
  *   return (
  *     <AnimationStage
  *       application={application}
@@ -140,7 +140,7 @@ export default function AnimationStage({
           manifest={debugControlsProps.manifest}
           onRandomize={handleRandomizeAll}
           className={clsx(
-            'absolute top-4 right-4 z-30',
+            'absolute top-0 right-0 z-30',
             debugControlsClassName
           )}
         />
