@@ -53,8 +53,8 @@ const ANIMATION_CONTROLS = {
     waveFrequency: 0.15,
     waveSpeed: 0.8,
     lineThickness: 1.8,
-    particleColor: 'hsl(200, 0%, 15%)',
-    lineColor: 'hsl(200, 0%, 15%)',
+    particleColor: '#262626',
+    lineColor: '#262626',
     backgroundColor: '#000000',
   },
   blob: {
@@ -109,8 +109,8 @@ const ANIMATION_CONTROLS = {
     waveFrequency: 0.12,
     waveSpeed: 0.6,
     lineThickness: 2.0,
-    particleColor: 'hsl(200, 0%, 15%)',
-    lineColor: 'hsl(200, 0%, 15%)',
+    particleColor: '#262626',
+    lineColor: '#262626',
     backgroundColor: '#000000',
   },
 };

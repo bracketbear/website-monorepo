@@ -199,9 +199,7 @@ export function DebugControls({
 
     if (control.type === 'group') {
       // Use manifest default values if the control value is undefined or empty
-      let groupValue = Array.isArray(value)
-        ? (value as AnyControlValue[])
-        : [];
+      let groupValue = Array.isArray(value) ? (value as AnyControlValue[]) : [];
 
       // If the group value is empty, use the manifest's default value
       if (
