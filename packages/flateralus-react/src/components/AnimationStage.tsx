@@ -6,7 +6,7 @@ import {
   useDebugControls,
   useLuminanceDetection,
 } from '../hooks/index';
-import DebugControls from './DebugControls';
+import { DebugControls } from './DebugControls';
 import { useCallback } from 'react';
 
 /**
@@ -75,7 +75,7 @@ interface AnimationStageProps {
  * Completely framework-agnostic - works with any Application implementation.
  * Supports stage-level controls like background color, grid, and effects.
  */
-export default function AnimationStage({
+export function AnimationStage({
   showDebugControls = false,
   showDownloadButton = true,
   application,

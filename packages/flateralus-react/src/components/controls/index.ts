@@ -1,6 +1,6 @@
-export { default as BaseControlWrapper } from './BaseControlWrapper';
-export { default as BooleanControl } from './BooleanControl';
-export { default as ColorControl } from './ColorControl';
-export { default as GroupControl } from './GroupControl';
-export { default as NumberControl } from './NumberControl';
-export { default as SelectControl } from './SelectControl';
+export { BaseControlWrapper } from './BaseControlWrapper';
+export { BooleanControl } from './BooleanControl';
+export { ColorControl } from './ColorControl';
+export { GroupControl } from './GroupControl';
+export { NumberControl } from './NumberControl';
+export { SelectControl } from './SelectControl';

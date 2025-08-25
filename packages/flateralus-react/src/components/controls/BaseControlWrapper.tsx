@@ -13,13 +13,13 @@ interface BaseControlWrapperProps {
  *
  * Provides consistent layout, label, and description for all controls.
  */
-const BaseControlWrapper: React.FC<BaseControlWrapperProps> = ({
+export function BaseControlWrapper({
   label,
   name,
   description,
   className = '',
   children,
-}) => {
+}: BaseControlWrapperProps) {
   // Use label if provided, otherwise fall back to name, or show "Control"
   const displayLabel = label || name || 'Control';
   
@@ -36,6 +36,4 @@ const BaseControlWrapper: React.FC<BaseControlWrapperProps> = ({
       )}
     </div>
   );
-};
-
-export default BaseControlWrapper;
+}

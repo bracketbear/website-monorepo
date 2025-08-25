@@ -1,6 +1,5 @@
-import { memo } from 'react';
 import type { SelectControl as SelectControlType } from '@bracketbear/flateralus';
-import BaseControlWrapper from './BaseControlWrapper';
+import { BaseControlWrapper } from './BaseControlWrapper';
 
 interface SelectControlProps {
   control: SelectControlType;
@@ -13,8 +12,8 @@ interface SelectControlProps {
  *
  * Renders a dropdown select for animation parameters with predefined options
  */
-const SelectControl = memo<SelectControlProps>(
-  ({ control, value, onControlChange }) => (
+export function SelectControl({ control, value, onControlChange }: SelectControlProps) {
+  return (
     <BaseControlWrapper label={control.label} name={control.name} description={control.description}>
       <select
         value={value}
@@ -28,9 +27,5 @@ const SelectControl = memo<SelectControlProps>(
         ))}
       </select>
     </BaseControlWrapper>
-  )
-);
-
-SelectControl.displayName = 'SelectControl';
-
-export default SelectControl;
+  );
+}

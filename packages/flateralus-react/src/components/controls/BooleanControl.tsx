@@ -1,7 +1,6 @@
-import { memo } from 'react';
 import { CheckboxInput } from '@bracketbear/core/react';
 import type { BooleanControl as BooleanControlType } from '@bracketbear/flateralus';
-import BaseControlWrapper from './BaseControlWrapper';
+import { BaseControlWrapper } from './BaseControlWrapper';
 
 interface BooleanControlProps {
   control: BooleanControlType;
@@ -14,8 +13,8 @@ interface BooleanControlProps {
  *
  * Renders a checkbox for boolean animation parameters
  */
-const BooleanControl = memo<BooleanControlProps>(
-  ({ control, value, onControlChange }) => (
+export function BooleanControl({ control, value, onControlChange }: BooleanControlProps) {
+  return (
     <BaseControlWrapper label={control.label} name={control.name} description={control.description}>
       <CheckboxInput
         checked={Boolean(value)}
@@ -24,9 +23,5 @@ const BooleanControl = memo<BooleanControlProps>(
         size="sm"
       />
     </BaseControlWrapper>
-  )
-);
-
-BooleanControl.displayName = 'BooleanControl';
-
-export default BooleanControl;
+  );
+}
