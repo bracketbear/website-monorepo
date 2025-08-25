@@ -1,7 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { useRef, useState } from 'react';
 import WorkHistory from './WorkHistory';
-import { SkillPill } from '@bracketbear/core';
+import { SkillPill, ToastProvider, useToast, Button } from '@bracketbear/core';
 
 export interface FilteredWorkHistoryProps {
   skills: CollectionEntry<'workSkills'>[];
@@ -21,15 +21,75 @@ export default function FilteredWorkHistory({
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const toggleSkill = (skillId: string) => {
-    setSelectedSkills((prev) =>
-      prev.includes(skillId)
-        ? prev.filter((id) => id !== skillId)
-        : [...prev, skillId]
-    );
-  };
+  // Wrap the component with ToastProvider
+  return (
+    <ToastProvider defaultDuration={2000} maxToasts={2}>
+      <FilteredWorkHistoryContent
+        skills={skills}
+        skillCategories={skillCategories}
+        jobs={jobs}
+        projects={projects}
+        companies={companies}
+        selectedSkills={selectedSkills}
+        setSelectedSkills={setSelectedSkills}
+        containerRef={containerRef}
+      />
+    </ToastProvider>
+  );
+}
 
-  const hasActiveFilters = selectedSkills.length > 0;
+function FilteredWorkHistoryContent({
+  skills,
+  skillCategories,
+  jobs,
+  projects,
+  companies,
+  selectedSkills,
+  setSelectedSkills,
+  containerRef,
+}: FilteredWorkHistoryProps & {
+  selectedSkills: string[];
+  setSelectedSkills: React.Dispatch<React.SetStateAction<string[]>>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  const { showToast } = useToast();
+
+  const toggleSkill = (skillId: string) => {
+    const skill = skills.find((s) => s.id === skillId);
+    const skillName = skill?.data.title || skillId;
+
+    setSelectedSkills((prev) => {
+      const isAdding = !prev.includes(skillId);
+      const newSelection = isAdding
+        ? [...prev, skillId]
+        : prev.filter((id) => id !== skillId);
+
+      // Show toast message with updated count
+      setTimeout(() => {
+        const visibleJobs = jobs.filter((job) => {
+          const jobSkills = job.data.workSkills || [];
+          return (
+            newSelection.length === 0 ||
+            newSelection.some((skillId) => jobSkills.includes(skillId))
+          );
+        }).length;
+
+        if (isAdding) {
+          showToast(
+            `${skillName} added to filters\nshowing ${visibleJobs} jobs`,
+            { type: 'info' }
+          );
+        } else {
+          showToast(
+            `${skillName} removed from filters\nshowing ${visibleJobs} jobs`,
+            { type: 'info' }
+          );
+        }
+      }, 0);
+
+      return newSelection;
+    });
+  };
 
   // Filter jobs and projects based on selected skills
   const filteredJobs = jobs.map((job) => {
@@ -57,35 +117,32 @@ export default function FilteredWorkHistory({
     };
   });
 
-  const hiddenJobsCount = filteredJobs.filter((job) => job.isHidden).length;
-  const hiddenProjectsCount = filteredProjects.filter(
-    (project) => project.isHidden
-  ).length;
-
   // Responsive grid: sidebar (filters) and main (results)
   return (
-    <div
-      className="flex flex-col gap-8 lg:flex-row lg:gap-0"
-      ref={containerRef}
-    >
+    <div className="flex flex-col gap-8 lg:flex-row" ref={containerRef}>
       {/* Sidebar: Filters */}
-      <aside className="w-full flex-shrink-0 py-4 lg:sticky lg:top-0 lg:mr-6 lg:w-1/3 lg:self-start">
+      <aside className="h-full w-full flex-shrink-0 py-4 lg:sticky lg:top-0 lg:w-1/3 lg:self-start">
         <div className="card overflow-y-auto lg:flex lg:max-h-[calc(100vh-2rem)] lg:flex-col">
+          {/* Clear Filters Button */}
+          <div className="mb-4">
+            <Button
+              onClick={() => {
+                setSelectedSkills([]);
+                showToast('Filters cleared\nshowing all jobs', {
+                  type: 'info',
+                });
+              }}
+              disabled={selectedSkills.length === 0}
+              className="w-full"
+            >
+              Clear Filters
+            </Button>
+          </div>
+
           {/* Skills by Category */}
           <>
-            {/* Filter Status Message */}
-            {hasActiveFilters && (
-              <div className="card-dark mb-6 font-bold">
-                <p className="text-xs">
-                  Showing {jobs.length - hiddenJobsCount} job
-                  {jobs.length - hiddenJobsCount !== 1 ? 's' : ''} and{' '}
-                  {projects.length - hiddenProjectsCount} project
-                  {projects.length - hiddenProjectsCount !== 1 ? 's' : ''}{' '}
-                  matching your selected skills
-                </p>
-              </div>
-            )}
-            {skillCategories.map((category) => {
+            {skillCategories.map((category, index) => {
+              // Get skills that belong to this category
               const categorySkills = skills.filter(
                 (skill) => skill.data.category === category.id
               );
@@ -118,8 +175,8 @@ export default function FilteredWorkHistory({
       </aside>
       {/* Main Content: Jobs/Projects - no container */}
       <main className="min-w-0 flex-1 space-y-12 py-4">
-        {/* Jobs */}
         <section>
+          {/* Jobs */}
           <WorkHistory
             jobs={filteredJobs}
             companies={companies}

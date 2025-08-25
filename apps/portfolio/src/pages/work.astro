@@ -17,7 +17,28 @@ const workProjects = await getCollection('workProject');
 const workSkills = await getCollection('workSkills');
 const workJobs = await getCollection('workJobs');
 const workCompanies = await getCollection('workCompany');
-const workSkillCategories = await getCollection('workSkillCategory');
+
+// Get skill categories from the work page singleton and fetch their full data
+const skillCategorySlugs = workPage.data.skillCategories || [];
+const skillCategories = await getCollection('workSkillCategory');
+
+// Create ordered skill categories with their associated skills
+const orderedSkillCategories = skillCategorySlugs
+  .map((slug: string) => {
+    const category = skillCategories.find((cat) => cat.id === slug);
+    if (!category) return null;
+
+    // Get skills that belong to this category
+    const categorySkills = workSkills.filter(
+      (skill) => skill.data.category === category.id
+    );
+
+    return {
+      ...category,
+      skills: categorySkills,
+    };
+  })
+  .filter(Boolean); // Remove any undefined entries
 
 // Helper function to parse markdown content
 function parseMarkdown(content: string): string {
@@ -35,16 +56,13 @@ function parseMarkdown(content: string): string {
   metaDescription={workPage.data.metaDescription}
 >
   <!-- Introduction Section -->
-  <section class="px-content mb-40">
+  <section class="px-content mb-20">
     <div class="container mx-auto text-center">
-      <h2 class="font-heading text-text-primary mb-6 text-4xl tracking-tight">
-        {workPage.data.introduction.title}
-      </h2>
+      <div
+        class="prose prose-xl prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90 mx-auto max-w-prose text-center"
+        set:html={parseMarkdown(workPage.data.introduction)}
+      />
     </div>
-    <div
-      class="prose-2xl text-text-primary/90 mx-auto max-w-prose text-center"
-      set:html={parseMarkdown(workPage.data.introduction.content)}
-    />
   </section>
 
   <!-- Stats Section (if available) -->
@@ -54,24 +72,11 @@ function parseMarkdown(content: string): string {
     )
   }
 
-  <!-- Tool Description Section -->
-  <div class="px-content mb-8">
-    <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
-      <h2 class="font-heading text-text-primary mb-4 text-4xl tracking-tight">
-        {workPage.data.toolDescription.title}
-      </h2>
-      <div
-        class="prose-xl text-text-primary/80 max-w-prose"
-        set:html={parseMarkdown(workPage.data.toolDescription.content)}
-      />
-    </div>
-  </div>
-
   <!-- Work History Section -->
   <div class="px-content mb-40">
     <FilteredWorkHistory
       skills={workSkills}
-      skillCategories={workSkillCategories}
+      skillCategories={orderedSkillCategories}
       jobs={workJobs}
       projects={workProjects}
       companies={workCompanies}

@@ -188,18 +188,11 @@ export const portfolioAboutPageSchema = makePageSchema({
  */
 export const portfolioContactPageSchema = makePageSchema(
   {
-    // Introduction section
-    introduction: fields.object({
-      title: fields.text({
-        label: 'Introduction Title',
-        description: 'Title for the introduction section',
-        defaultValue: 'Ready to Ship?',
-      }),
-      content: fields.text({
-        label: 'Introduction Content',
-        description: 'Content describing your availability and approach',
-        multiline: true,
-      }),
+    // Introduction section - now a single markdown field
+    introduction: fields.markdoc.inline({
+      label: 'Introduction',
+      description:
+        'Introduction content with markdown support (title and content combined)',
     }),
 
     // Contact methods section - now using relationship field
@@ -423,32 +416,11 @@ export const portfolioIndexPageSchema = makePageSchema({
  * It includes sections for introducing the work history and filtering tools.
  */
 export const portfolioWorkPageSchema = makePageSchema({
-  // Introduction section
-  introduction: fields.object({
-    title: fields.text({
-      label: 'Introduction Title',
-      description: 'Title for the introduction section',
-      defaultValue: 'My Experience',
-    }),
-    content: fields.text({
-      label: 'Introduction Content',
-      description: 'Content describing your work experience and approach',
-      multiline: true,
-    }),
-  }),
-
-  // Tool description section
-  toolDescription: fields.object({
-    title: fields.text({
-      label: 'Tool Description Title',
-      description: 'Title explaining the filtering tool',
-      defaultValue: 'Explore My Work',
-    }),
-    content: fields.text({
-      label: 'Tool Description Content',
-      description: 'Content explaining how to use the filtering tool',
-      multiline: true,
-    }),
+  // Introduction section - now a single markdown field
+  introduction: fields.markdoc.inline({
+    label: 'Introduction',
+    description:
+      'Introduction content with markdown support (title and content combined)',
   }),
 
   // Optional stats section
@@ -475,6 +447,21 @@ export const portfolioWorkPageSchema = makePageSchema({
         'New Stat',
     }
   ),
+
+  // Skill Categories section
+  skillCategories: fields.array(
+    fields.relationship({
+      label: 'Skill Category',
+      collection: 'workSkillCategory',
+      description: 'Select skill categories to display on the work page',
+    }),
+    {
+      label: 'Skill Categories',
+      description:
+        'Select and order skill categories to display (drag to reorder)',
+      itemLabel: (props) => props.value || 'New Category',
+    }
+  ),
 });
 
 /**
@@ -484,18 +471,11 @@ export const portfolioWorkPageSchema = makePageSchema({
  * It includes sections for introducing the projects and displaying them by category.
  */
 export const portfolioProjectsPageSchema = makePageSchema({
-  // Introduction section
-  introduction: fields.object({
-    title: fields.text({
-      label: 'Introduction Title',
-      description: 'Title for the introduction section',
-      defaultValue: 'Project Portfolio',
-    }),
-    content: fields.text({
-      label: 'Introduction Content',
-      description: 'Content describing your projects and approach',
-      multiline: true,
-    }),
+  // Introduction section - now a single markdown field
+  introduction: fields.markdoc.inline({
+    label: 'Introduction',
+    description:
+      'Introduction content with markdown support (title and content combined)',
   }),
 
   // Optional stats section

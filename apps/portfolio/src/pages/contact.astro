@@ -62,8 +62,8 @@ const metaTitle = generatePortfolioMetaTitle(contactPage.data.title);
           {
             contactPage.data.introduction && (
               <div
-                class="prose prose-lg prose-headings:text-muted-foreground prose-p:text-muted-foreground/90 text-muted-foreground/90"
-                set:html={parseMarkdown(contactPage.data.introduction.content)}
+                class="prose prose-xl prose-headings:text-muted-foreground prose-p:text-muted-foreground/90 text-muted-foreground/90"
+                set:html={parseMarkdown(contactPage.data.introduction)}
               />
             )
           }

@@ -1,4 +1,7 @@
 {
   "title": "Back-End Development",
-  "description": "Back-End Development"
+  "description": "Server-side technologies and infrastructure",
+  "isActive": true,
+  "icon": "server",
+  "color": "purple"
 }

@@ -1,4 +1,7 @@
 {
   "title": "Front-End Development",
-  "description": "Front-End Development"
+  "description": "User interface and client-side technologies",
+  "isActive": true,
+  "icon": "monitor",
+  "color": "green"
 }

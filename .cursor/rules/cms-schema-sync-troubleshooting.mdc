@@ -1,0 +1,56 @@
+# CMS Schema Sync Troubleshooting
+
+## When to Delete the .astro Directory
+
+Sometimes, even when all CMS content and schemas are correct, and the astro-content package schemas are also correct, content synchronization issues persist. In these cases, deleting the `.astro` directory in the Astro app can resolve the issue.
+
+## When This Step is Needed
+
+Delete the `.astro` directory when:
+- ✅ CMS content files have the correct data structure
+- ✅ CMS schemas are properly defined and validated
+- ✅ astro-content package schemas match the CMS schemas
+- ✅ `npx astro sync` runs successfully without errors
+- ❌ Content still doesn't appear or is not properly recognized
+- ❌ TypeScript types are not updated with new schema fields
+
+## Why This Works
+
+The `.astro` directory contains cached content types and generated TypeScript definitions. Sometimes these cached types become stale or corrupted, preventing proper content synchronization even when all schemas are correct.
+
+## How to Apply This Fix
+
+1. **Stop the dev server** if it's running
+2. **Delete the `.astro` directory** from the Astro app root:
+   ```bash
+   rm -rf .astro
+   ```
+3. **Run content sync** to regenerate types:
+   ```bash
+   npx astro sync
+   ```
+4. **Restart the dev server**:
+   ```bash
+   npm run dev
+   ```
+
+## Example Scenario
+
+In the portfolio app, when skill categories weren't appearing despite:
+- Correct `skillCategories` field in `work-page.json`
+- Proper `portfolioWorkPageSchema` in CMS
+- Updated `portfolioWorkPageSchema` in astro-content package
+- Successful `npx astro sync`
+
+Deleting `apps/portfolio/.astro` and re-running `npx astro sync` resolved the issue.
+
+## Prevention
+
+To minimize the need for this step:
+- Always run `npx astro sync` after schema changes
+- Ensure CMS and astro-content schemas are in sync
+- Consider this step as a last resort when content sync issues persist
+description:
+globs:
+alwaysApply: false
+---

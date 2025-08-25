@@ -78,6 +78,7 @@ export const workCollections = {
     label: 'Work Skills',
     slugField: 'title',
     path: workPath('skills'),
+    columns: ['title', 'category', 'isFeatured'],
     schema: {
       title: fields.slug({
         name: {
@@ -85,10 +86,9 @@ export const workCollections = {
           validation: { isRequired: true, length: { max: 20 } },
         },
       }),
-      description: fields.text({ label: 'Description' }),
-      isFeatured: fields.checkbox({
-        label: 'Is Featured?',
-        defaultValue: false,
+      description: fields.text({
+        label: 'Description',
+        description: 'Brief description of this skill',
       }),
       category: fields.relationship({
         label: 'Category',
@@ -96,18 +96,55 @@ export const workCollections = {
         collection: 'workSkillCategory',
         validation: { isRequired: true },
       }),
+      isFeatured: fields.checkbox({
+        label: 'Is Featured?',
+        description: 'Whether this skill should be highlighted',
+        defaultValue: false,
+      }),
     },
     format: 'json',
   }),
 
   workSkillCategory: collection({
-    label: 'Work Skill Category',
+    label: 'Work Skill Categories',
     slugField: 'title',
     format: 'json',
     path: workPath('skill-categories'),
+    columns: ['title', 'isActive'],
     schema: {
-      title: fields.slug({ name: { label: 'Title' } }),
-      description: fields.text({ label: 'Description' }),
+      title: fields.slug({
+        name: {
+          label: 'Title',
+          validation: { isRequired: true },
+        },
+      }),
+      description: fields.text({
+        label: 'Description',
+        description: 'Brief description of this skill category',
+      }),
+      isActive: fields.checkbox({
+        label: 'Is Active?',
+        description: 'Whether this category should be displayed on the site',
+        defaultValue: true,
+      }),
+      icon: fields.text({
+        label: 'Icon',
+        description:
+          'Optional icon identifier for this category (e.g., "code", "design", "database")',
+      }),
+      color: fields.select({
+        label: 'Accent Color',
+        description: 'Optional accent color for this category',
+        options: [
+          { label: 'Default', value: 'default' },
+          { label: 'Blue', value: 'blue' },
+          { label: 'Green', value: 'green' },
+          { label: 'Purple', value: 'purple' },
+          { label: 'Orange', value: 'orange' },
+          { label: 'Red', value: 'red' },
+        ],
+        defaultValue: 'default',
+      }),
     },
   }),
 

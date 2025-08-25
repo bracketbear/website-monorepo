@@ -20,6 +20,8 @@ export { Testimonial } from './Testimonial';
 export { TextInput } from './TextInput';
 export { TextareaInput } from './TextareaInput';
 export { Ticker } from './Ticker';
+export { Toast } from './Toast';
+export { ToastProvider } from './ToastProvider';
 export { ValidatedForm } from './ValidatedForm';
 
 // Hooks
@@ -46,4 +48,6 @@ export type { TestimonialProps } from './Testimonial';
 export type { TextInputProps } from './TextInput';
 export type { TextareaInputProps } from './TextareaInput';
 export type { TickerProps, TickerItem } from './Ticker';
+export type { ToastProps } from './Toast';
+export type { ToastProviderProps, ToastMessage } from './ToastProvider';
 export type { ValidatedFormProps } from './ValidatedForm';

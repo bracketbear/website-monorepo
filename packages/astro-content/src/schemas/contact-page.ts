@@ -9,11 +9,8 @@ import { makePageSchema } from './page';
  */
 export const portfolioContactPageSchema = makePageSchema(
   {
-    // Introduction section
-    introduction: z.object({
-      title: z.string(),
-      content: z.string(),
-    }),
+    // Introduction section - now a single markdown field
+    introduction: z.string(), // Markdown content with title and content combined
 
     // Contact methods section - now using relationship field
     contactMethods: z.array(z.string()), // Array of contact method IDs

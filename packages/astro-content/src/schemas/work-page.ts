@@ -8,17 +8,8 @@ import { makePageSchema } from './page';
  * It includes sections for introducing the work history and filtering tools.
  */
 export const portfolioWorkPageSchema = makePageSchema({
-  // Introduction section
-  introduction: z.object({
-    title: z.string(),
-    content: z.string(),
-  }),
-
-  // Tool description section
-  toolDescription: z.object({
-    title: z.string(),
-    content: z.string(),
-  }),
+  // Introduction section - now a single markdown field
+  introduction: z.string(), // Markdown content with title and content combined
 
   // Optional stats section
   stats: z
@@ -37,6 +28,9 @@ export const portfolioWorkPageSchema = makePageSchema({
     buttonText: z.string().default('Get In Touch'),
     buttonLink: z.string().default('/contact'),
   }),
+
+  // Skill Categories section
+  skillCategories: z.array(z.string()).optional(),
 });
 
 /**

@@ -1,4 +1,7 @@
 {
   "title": "Programming Languages",
-  "description": "Programming Languages"
+  "description": "Core programming languages and their ecosystems",
+  "isActive": true,
+  "icon": "code",
+  "color": "blue"
 }

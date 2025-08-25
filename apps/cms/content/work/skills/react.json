@@ -2,5 +2,8 @@
   "title": "React",
   "description": "If you don't know what React is, what are you doing here?",
   "isFeatured": true,
-  "category": "front-end"
+  "category": "front-end",
+  "order": 1,
+  "isActive": true,
+  "proficiency": "expert"
 }

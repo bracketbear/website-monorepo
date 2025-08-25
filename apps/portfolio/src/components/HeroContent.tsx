@@ -37,9 +37,11 @@ export function HeroContent({
       <h1 className="font-heading text-foreground text-center text-6xl font-black tracking-tight uppercase text-shadow-lg lg:text-8xl">
         {title}
       </h1>
-      <p className="text-foreground/90 mt-6 text-center text-xl font-bold tracking-tight uppercase text-shadow-lg lg:text-2xl">
-        {subtitle}
-      </p>
+      {subtitle && (
+        <p className="text-foreground/90 mt-6 text-center text-xl font-bold tracking-tight uppercase text-shadow-lg lg:text-2xl">
+          {subtitle}
+        </p>
+      )}
       {/* Only show action buttons when explicitly requested */}
       {showActions && (
         <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:gap-6">

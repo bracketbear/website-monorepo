@@ -9,11 +9,8 @@ import { makePageSchema } from './page';
  */
 export const portfolioProjectsPageSchema = makePageSchema({
 
-  // Introduction section
-  introduction: z.object({
-    title: z.string(),
-    content: z.string(),
-  }),
+  // Introduction section - now a single markdown field
+  introduction: z.string(), // Markdown content with title and content combined
 
   // Optional stats section
   stats: z
