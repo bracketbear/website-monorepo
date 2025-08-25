@@ -158,17 +158,25 @@ export function GroupControl({
             )}
           </div>
           {!isStatic && safeValue.length < maxItems && (
-            <button
-              type="button"
-              className="rounded bg-white/10 px-2 py-1 text-xs text-white hover:bg-white/20"
+            <span
+              role="button"
+              tabIndex={0}
+              className="cursor-pointer rounded bg-white/10 px-2 py-1 text-xs text-white select-none hover:bg-white/20"
               onClick={(e) => {
                 e.stopPropagation();
                 handleAdd();
               }}
-              disabled={safeValue.length >= maxItems}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleAdd();
+                }
+              }}
+              aria-label="Add new item"
             >
               + Add
-            </button>
+            </span>
           )}
         </div>
       ),
