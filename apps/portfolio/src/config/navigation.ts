@@ -1,11 +1,11 @@
 import type { NavigationConfig, NavItem } from '@bracketbear/core';
 
 export const navItems: NavItem[] = [
-  { name: 'Home', href: '/', desktop: false },
-  { name: 'About Me', href: '/about' },
-  { name: 'Work History', href: '/work' },
-  { name: 'Projects', href: '/projects' },
-  { name: 'Reach Out', href: '/contact' },
+  { name: 'Home', href: '/', desktop: false, key: 'home' },
+  { name: 'About Me', href: '/about', key: 'about' },
+  { name: 'Work History', href: '/work', key: 'work' },
+  { name: 'Projects', href: '/projects', key: 'project' },
+  { name: 'Reach Out', href: '/contact', key: 'contact' },
 ] as const;
 
 export const navigationConfig: NavigationConfig = {

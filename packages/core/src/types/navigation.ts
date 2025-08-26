@@ -13,6 +13,8 @@ export interface NavItem {
   desktop?: boolean;
   /** Whether to show this item on mobile navigation (defaults to true) */
   mobile?: boolean;
+  /** Optional key for active page detection - can be exact match or category prefix */
+  key?: string;
 }
 
 export interface NavigationConfig {
@@ -28,4 +30,6 @@ export interface NavigationConfig {
     twitter?: string;
   };
   breadcrumbs?: Breadcrumb[];
+  /** Current page key for active navigation highlighting */
+  currentPage?: string;
 }

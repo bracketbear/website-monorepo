@@ -51,6 +51,7 @@ export interface Props {
     buttonLink: string;
   };
   metaDescription?: string;
+  currentPage?: string;
 }
 
 const {
@@ -59,6 +60,7 @@ const {
   container = true,
   contactCTA,
   metaDescription,
+  currentPage,
   ...props
 } = Astro.props;
 
@@ -73,6 +75,7 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
   description={metaDescription}
   class="bg-background"
   navigationVariant="glass"
+  currentPage={currentPage}
 >
   <!-- Header Section with Flateralus Animation -->
   {

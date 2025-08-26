@@ -13,6 +13,7 @@ interface Props {
   description?: string;
   class?: string;
   navigationVariant?: 'default' | 'ghost-dark' | 'ghost-light' | 'glass';
+  currentPage?: string;
 }
 
 const {
@@ -22,7 +23,7 @@ const {
   hideNavigation,
   breadcrumbs,
   description,
-
+  currentPage,
   navigationVariant,
 } = Astro.props;
 
@@ -35,7 +36,10 @@ const pageTitle = makeTitle(title);
   hideContactForm={hideContactForm}
   hideFooter={hideFooter}
   hideNavigation={hideNavigation}
-  navigation={navigationConfig}
+  navigation={{
+    ...navigationConfig,
+    currentPage,
+  }}
   breadcrumbs={breadcrumbs}
   navigationVariant={navigationVariant}
   class="bg-brand-orange-light text-text-primary"

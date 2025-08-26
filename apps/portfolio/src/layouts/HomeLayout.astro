@@ -11,10 +11,17 @@ interface Props {
   hideFooter?: boolean;
   breadcrumbs?: any;
   metaDescription?: string;
+  currentPage?: string;
 }
 
-const { title, hideContactForm, hideFooter, breadcrumbs, metaDescription } =
-  Astro.props;
+const {
+  title,
+  hideContactForm,
+  hideFooter,
+  breadcrumbs,
+  metaDescription,
+  currentPage,
+} = Astro.props;
 
 const pageTitle = makeTitle(title);
 ---
@@ -24,13 +31,22 @@ const pageTitle = makeTitle(title);
   hideContactForm={hideContactForm}
   hideFooter={hideFooter}
   hideNavigation={true}
-  navigation={navigationConfig}
+  navigation={{
+    ...navigationConfig,
+    currentPage,
+  }}
   breadcrumbs={breadcrumbs}
   metaDescription={metaDescription}
   class="bg-background text-text-primary"
 >
   <!-- Transparent Navigation -->
-  <NavBar config={navigationConfig} variant="glass" />
+  <NavBar
+    config={{
+      ...navigationConfig,
+      currentPage,
+    }}
+    variant="glass"
+  />
 
   <!-- Main content with consistent background -->
   <div class="min-h-screen">

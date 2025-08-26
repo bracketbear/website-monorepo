@@ -10,7 +10,13 @@ interface Props {
 }
 
 const { config, variant = 'default', class: className } = Astro.props;
-const { items: navItems, branding, socialLinks, breadcrumbs } = config;
+const {
+  items: navItems,
+  branding,
+  socialLinks,
+  breadcrumbs,
+  currentPage,
+} = config;
 
 // Filter navigation items based on platform visibility
 const desktopNavItems = navItems.filter((item) => item.desktop !== false);
@@ -23,13 +29,31 @@ function filterVisibleChildren(children: NavItem[], isMobile: boolean) {
   );
 }
 
+// Helper function to check if a nav item is active
+function isNavItemActive(item: NavItem, currentPage?: string): boolean {
+  if (!currentPage || !item.key) return false;
+
+  // Exact match
+  if (item.key === currentPage) return true;
+
+  // Category match (e.g., "project" matches "project/some-project")
+  if (currentPage.startsWith(item.key + '/')) return true;
+
+  return false;
+}
+
 // Helper function to get consistent menu item styles
-function getMenuItemStyles(variant: string, isMobile = false) {
+function getMenuItemStyles(
+  variant: string,
+  isMobile = false,
+  isActive = false
+) {
   if (isMobile) {
     return {
       base: 'block rounded-lg px-3 py-3 text-lg font-semibold transition-all',
-      variant:
-        variant === 'glass'
+      variant: isActive
+        ? 'bg-primary text-primary-foreground'
+        : variant === 'glass'
           ? 'glass-text hover:glass-hover hover:bg-black/10 hover:backdrop-blur-sm'
           : 'text-gray-900 hover:bg-gray-50',
     };
@@ -37,8 +61,9 @@ function getMenuItemStyles(variant: string, isMobile = false) {
 
   return {
     base: 'group font-heading relative font-semibold tracking-wide uppercase transition-all px-4 py-2 rounded-lg',
-    variant:
-      variant === 'ghost-dark'
+    variant: isActive
+      ? 'bg-primary text-primary-foreground'
+      : variant === 'ghost-dark'
         ? 'hover:text-text-primary/80 text-text-primary hover:bg-black/20 hover:backdrop-blur-sm'
         : variant === 'glass'
           ? 'hover:text-text-primary/80 text-text-primary hover:bg-black/20 hover:backdrop-blur-sm'
@@ -141,69 +166,72 @@ function getDropdownBackgroundStyles(variant: string) {
       <div class="hidden items-center gap-8 md:flex">
         <ul class="flex items-center" role="menubar">
           {
-            desktopNavItems.map((item) => (
-              <li class="group flex items-center" role="none">
-                {item.children != null &&
-                Array.isArray(item.children) &&
-                item.children.length > 0 &&
-                filterVisibleChildren(item.children, false).length > 0 ? (
-                  <div class="flex items-center">
-                    <Button
-                      variant="ghost"
-                      class:list={[
-                        getMenuItemStyles(variant).base,
-                        getMenuItemStyles(variant).variant,
-                      ]}
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                      role="menuitem"
-                      aria-label={`${item.name} menu`}
-                    >
-                      {item.name}
-                    </Button>
-                    <div
-                      class="invisible absolute left-0 z-30 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100"
-                      role="menu"
-                      aria-label={`${item.name} submenu`}
-                    >
-                      <div
+            desktopNavItems.map((item) => {
+              const isActive = isNavItemActive(item, currentPage);
+              return (
+                <li class="group flex items-center" role="none">
+                  {item.children != null &&
+                  Array.isArray(item.children) &&
+                  item.children.length > 0 &&
+                  filterVisibleChildren(item.children, false).length > 0 ? (
+                    <div class="flex items-center">
+                      <Button
+                        variant="ghost"
                         class:list={[
-                          getDropdownBackgroundStyles(variant).base,
-                          getDropdownBackgroundStyles(variant).variant,
+                          getMenuItemStyles(variant, false, isActive).base,
+                          getMenuItemStyles(variant, false, isActive).variant,
                         ]}
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        role="menuitem"
+                        aria-label={`${item.name} menu`}
                       >
-                        {filterVisibleChildren(item.children, false).map(
-                          (child) => (
-                            <a
-                              href={child.href}
-                              class:list={[
-                                getDropdownChildStyles(variant).base,
-                                getDropdownChildStyles(variant).variant,
-                              ]}
-                              role="menuitem"
-                            >
-                              {child.name}
-                            </a>
-                          )
-                        )}
+                        {item.name}
+                      </Button>
+                      <div
+                        class="invisible absolute left-0 z-30 mt-2 w-48 opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100"
+                        role="menu"
+                        aria-label={`${item.name} submenu`}
+                      >
+                        <div
+                          class:list={[
+                            getDropdownBackgroundStyles(variant).base,
+                            getDropdownBackgroundStyles(variant).variant,
+                          ]}
+                        >
+                          {filterVisibleChildren(item.children, false).map(
+                            (child) => (
+                              <a
+                                href={child.href}
+                                class:list={[
+                                  getDropdownChildStyles(variant).base,
+                                  getDropdownChildStyles(variant).variant,
+                                ]}
+                                role="menuitem"
+                              >
+                                {child.name}
+                              </a>
+                            )
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  // Desktop navigation item
-                  <a
-                    href={item.href}
-                    class:list={[
-                      getMenuItemStyles(variant).base,
-                      getMenuItemStyles(variant).variant,
-                    ]}
-                    role="menuitem"
-                  >
-                    {item.name}
-                  </a>
-                )}
-              </li>
-            ))
+                  ) : (
+                    // Desktop navigation item
+                    <a
+                      href={item.href}
+                      class:list={[
+                        getMenuItemStyles(variant, false, isActive).base,
+                        getMenuItemStyles(variant, false, isActive).variant,
+                      ]}
+                      role="menuitem"
+                    >
+                      {item.name}
+                    </a>
+                  )}
+                </li>
+              );
+            })
           }
         </ul>
       </div>
@@ -320,58 +348,61 @@ function getDropdownBackgroundStyles(variant: string) {
   <nav class="flex-1 overflow-y-auto px-6 py-4" aria-label="Mobile navigation">
     <ul class="space-y-2" role="menubar">
       {
-        mobileNavItems.map((item) => (
-          <li role="none">
-            {item.children != null &&
-            Array.isArray(item.children) &&
-            item.children.length > 0 &&
-            filterVisibleChildren(item.children, true).length > 0 ? (
-              <div class="space-y-2">
-                <div
+        mobileNavItems.map((item) => {
+          const isActive = isNavItemActive(item, currentPage);
+          return (
+            <li role="none">
+              {item.children != null &&
+              Array.isArray(item.children) &&
+              item.children.length > 0 &&
+              filterVisibleChildren(item.children, true).length > 0 ? (
+                <div class="space-y-2">
+                  <div
+                    class:list={[
+                      getMenuItemStyles(variant, true, isActive).base,
+                      getMenuItemStyles(variant, true, isActive).variant,
+                    ]}
+                  >
+                    {item.name}
+                  </div>
+                  <ul
+                    class="space-y-1 pl-4"
+                    role="menu"
+                    aria-label={`${item.name} submenu`}
+                  >
+                    {filterVisibleChildren(item.children, true).map((child) => (
+                      <li role="none">
+                        <a
+                          href={child.href}
+                          role="menuitem"
+                          class:list={[
+                            'block rounded-lg px-3 py-2 text-sm transition-all',
+                            variant === 'glass'
+                              ? 'glass-text-muted hover:glass-hover hover:glass-text hover:bg-black/10 hover:backdrop-blur-sm'
+                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                          ]}
+                        >
+                          {child.name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <a
+                  href={item.href}
+                  role="menuitem"
                   class:list={[
-                    getMenuItemStyles(variant, true).base,
-                    getMenuItemStyles(variant, true).variant,
+                    getMenuItemStyles(variant, true, isActive).base,
+                    getMenuItemStyles(variant, true, isActive).variant,
                   ]}
                 >
                   {item.name}
-                </div>
-                <ul
-                  class="space-y-1 pl-4"
-                  role="menu"
-                  aria-label={`${item.name} submenu`}
-                >
-                  {filterVisibleChildren(item.children, true).map((child) => (
-                    <li role="none">
-                      <a
-                        href={child.href}
-                        role="menuitem"
-                        class:list={[
-                          'block rounded-lg px-3 py-2 text-sm transition-all',
-                          variant === 'glass'
-                            ? 'glass-text-muted hover:glass-hover hover:glass-text hover:bg-black/10 hover:backdrop-blur-sm'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                        ]}
-                      >
-                        {child.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <a
-                href={item.href}
-                role="menuitem"
-                class:list={[
-                  getMenuItemStyles(variant, true).base,
-                  getMenuItemStyles(variant, true).variant,
-                ]}
-              >
-                {item.name}
-              </a>
-            )}
-          </li>
-        ))
+                </a>
+              )}
+            </li>
+          );
+        })
       }
     </ul>
   </nav>
