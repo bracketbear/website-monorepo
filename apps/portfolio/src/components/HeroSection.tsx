@@ -435,7 +435,7 @@ export function HeroSection({
             </div>
           </AnimationStage>
         )}
-        
+
         {/* Always render text content to prevent layout shift */}
         {(!isAnimationReady || !application) && (
           <div

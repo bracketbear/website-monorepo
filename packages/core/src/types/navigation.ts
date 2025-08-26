@@ -9,6 +9,10 @@ export interface NavItem {
   target?: string;
   /** Optional property for link relationship (noopener, noreferrer, etc.) */
   rel?: string;
+  /** Whether to show this item on desktop navigation (defaults to true) */
+  desktop?: boolean;
+  /** Whether to show this item on mobile navigation (defaults to true) */
+  mobile?: boolean;
 }
 
 export interface NavigationConfig {
