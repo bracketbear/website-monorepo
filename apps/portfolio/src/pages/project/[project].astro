@@ -8,7 +8,7 @@ import { generatePortfolioMetaTitle } from '@/config/meta-title';
 import ProjectHeaderLayout from '@/layouts/ProjectHeaderLayout.astro';
 import Section from '@/components/Section.astro';
 
-import { ImageGallery } from '@bracketbear/core/react';
+import { ImageGallery, Pill } from '@bracketbear/core/react';
 
 // Type definitions
 interface SkillData {
@@ -189,9 +189,9 @@ const stats = [
               <Section title="Tech Stack">
                 <div class="flex flex-wrap gap-2">
                   {projectSkills.map((skill: SkillData) => (
-                    <span class="pill pill-brand-green">
+                    <Pill variant="glass-frosted" size="sm">
                       {skill.data.title}
-                    </span>
+                    </Pill>
                   ))}
                 </div>
               </Section>

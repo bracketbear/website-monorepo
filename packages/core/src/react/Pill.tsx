@@ -21,7 +21,9 @@ export interface PillProps {
     | 'featured'
     | 'category'
     | 'flat'
-    | 'outline';
+    | 'outline'
+    | 'glass'
+    | 'glass-frosted';
   interactive?: boolean;
   onClick?: () => void;
 }
@@ -63,6 +65,8 @@ export function Pill({
         variant === 'category' && 'pill-category',
         variant === 'flat' && 'pill-flat',
         variant === 'outline' && 'pill-outline',
+        variant === 'glass' && 'pill-glass',
+        variant === 'glass-frosted' && 'pill-glass-frosted',
         // Interactive states
         isInteractive && 'pill-hover',
         // Size variants

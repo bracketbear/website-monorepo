@@ -12,7 +12,7 @@
 
 /* Off-white frosted glass background */
 @utility glass-bg-frosted {
-  @apply bg-white/60 backdrop-blur-md;
+  @apply bg-white/80 backdrop-blur-md;
 }
 
 /* Warm frosted glass background */
@@ -43,7 +43,7 @@
 
 /* Frosted glass border */
 @utility glass-border-frosted {
-  @apply border-white/40;
+  @apply border-white/60;
 }
 
 /* Warm frosted glass border */
@@ -68,6 +68,32 @@
 /* Glass hover effects */
 @utility glass-hover {
   @apply backdrop-blur-lg;
+}
+
+/* Glass hover variants */
+@utility glass-bg-hover {
+  @apply bg-white/20 backdrop-blur-lg;
+}
+
+@utility glass-bg-frosted-hover {
+  @apply bg-white/80 backdrop-blur-lg;
+}
+
+@utility glass-bg-warm-hover {
+  @apply backdrop-blur-lg;
+  background-color: color-mix(in srgb, white 50%, #ffc15e 25%);
+}
+
+@utility glass-border-hover {
+  @apply border-white/30;
+}
+
+@utility glass-border-frosted-hover {
+  @apply border-white/60;
+}
+
+@utility glass-border-warm-hover {
+  border-color: color-mix(in srgb, white 60%, #ffc15e 20%);
 }
 
 /* Glass button variants */

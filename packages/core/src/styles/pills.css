@@ -102,6 +102,15 @@
   @apply border-border text-foreground;
 }
 
+/* Glass variants */
+@utility pill-glass {
+  @apply glass-bg glass-border glass-shadow hover:glass-bg-hover hover:glass-border-hover text-text-primary transition-all;
+}
+
+@utility pill-glass-frosted {
+  @apply glass-bg-frosted glass-border-frosted glass-shadow hover:glass-bg-frosted-hover hover:glass-border-frosted-hover text-text-primary transition-all;
+}
+
 /* Composed utilities for common use cases */
 @utility pill-category-interactive {
   @apply pill pill-category pill-hover;
@@ -113,4 +122,12 @@
 
 @utility pill-skill-interactive {
   @apply pill pill-skill pill-hover;
+}
+
+@utility pill-glass-interactive {
+  @apply pill pill-glass pill-hover;
+}
+
+@utility pill-glass-frosted-interactive {
+  @apply pill pill-glass-frosted pill-hover;
 }
