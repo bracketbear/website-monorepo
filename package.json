@@ -53,6 +53,9 @@
     "*.{ts,tsx,js,jsx,astro,css,json,md}": [
       "prettier --write",
       "eslint --fix"
+    ],
+    "*.{test,spec}.{ts,tsx,js,jsx}": [
+      "vitest run --reporter=verbose"
     ]
   }
 }
