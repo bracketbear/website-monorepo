@@ -145,6 +145,8 @@ export interface HeroSectionProps {
   accountForNavigation?: boolean;
   /** Whether to account for breadcrumbs (defaults to true) */
   accountForBreadcrumbs?: boolean;
+  /** Whether this is the index page (affects height - full screen vs compact) */
+  isIndexPage?: boolean;
 }
 
 /**
@@ -168,6 +170,7 @@ export function HeroSection({
   showActions = false,
   accountForNavigation = false,
   accountForBreadcrumbs = true,
+  isIndexPage = false,
 }: HeroSectionProps) {
   const [isClient, setIsClient] = useState(false);
   const [isAnimationReady, setIsAnimationReady] = useState(false);
@@ -332,6 +335,11 @@ export function HeroSection({
     }
   };
 
+  // Get height classes based on whether this is an index page
+  const getHeightClasses = () => {
+    return isIndexPage ? 'h-screen' : 'h-[60vh] min-h-[500px]';
+  };
+
   // Calculate negative margin to go underneath navbar/breadcrumbs
   const getNegativeMargin = () => {
     if (accountForNavigation && accountForBreadcrumbs) {
@@ -359,7 +367,8 @@ export function HeroSection({
     return (
       <div
         className={clsx(
-          'relative h-screen w-full',
+          'relative w-full',
+          getHeightClasses(),
           getBackgroundClasses(),
           className
         )}
@@ -389,7 +398,8 @@ export function HeroSection({
   return (
     <div
       className={clsx(
-        'relative h-screen w-full',
+        'relative w-full',
+        getHeightClasses(),
         getBackgroundClasses(),
         className
       )}

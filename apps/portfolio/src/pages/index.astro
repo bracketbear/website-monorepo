@@ -127,7 +127,7 @@ function parseMarkdown(content: string): string {
 >
   <!-- Hero Section with Particle Galaxy Background -->
   <HeroSection
-    className="h-screen w-full"
+    className="w-full"
     client:load
     preset="curious-particle-network"
     title={indexPage.data.title}
@@ -136,6 +136,7 @@ function parseMarkdown(content: string): string {
     showActions={true}
     accountForNavigation={true}
     accountForBreadcrumbs={false}
+    isIndexPage={true}
   />
 
   <!-- What I Do Section -->
