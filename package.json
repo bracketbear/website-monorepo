@@ -55,7 +55,7 @@
       "eslint --fix"
     ],
     "*.{test,spec}.{ts,tsx,js,jsx}": [
-      "vitest run --reporter=verbose"
+      "npm run test:run"
     ]
   }
 }

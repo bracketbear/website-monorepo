@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🧪 Running full test suite before push..."
+npm run test:run
+
+if [ $? -eq 0 ]; then
+    echo "✅ All tests passed! Safe to push."
+    exit 0
+else
+    echo "❌ Tests failed. Please fix them before pushing."
+    echo "💡 Use 'git push --no-verify' to bypass tests in emergencies."
+    exit 1
+fi
