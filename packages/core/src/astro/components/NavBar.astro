@@ -238,10 +238,7 @@ function getDropdownBackgroundStyles(variant: string) {
 
       <!-- Mobile Menu Button -->
       <Button
-        class:list={[
-          'p-2 md:hidden',
-          variant === 'glass' ? 'button-transparent-dark' : '',
-        ]}
+        class:list={['p-2 md:hidden']}
         variant={variant === 'glass' ? 'unstyled' : 'dark'}
         id="mobile-menu-button"
         type="button"
