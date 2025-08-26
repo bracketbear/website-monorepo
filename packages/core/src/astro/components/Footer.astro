@@ -13,7 +13,7 @@ const thisYear = new Date().getFullYear();
 ---
 
 <footer
-  class="bg-brand-dark text-background relative z-10 py-40 transition-colors duration-300"
+  class="bg-primary text-background relative z-10 py-40 transition-colors duration-300"
   class:list={[className]}
 >
   <div class="container mx-auto px-4">
@@ -21,11 +21,11 @@ const thisYear = new Date().getFullYear();
       <!-- Logo/Brand -->
       {
         branding?.logo ? (
-          <div class="bg-background flex h-32 w-32 items-center justify-center">
+          <div class="bg-card border-border flex h-32 w-32 items-center justify-center border-2">
             <img
               src={branding.logo}
               alt={branding.name}
-              class="text-foreground h-1/2 transition-colors duration-300"
+              class="text-card-foreground h-1/2 transition-colors duration-300"
             />
           </div>
         ) : (
@@ -47,7 +47,7 @@ const thisYear = new Date().getFullYear();
               <li>
                 <a
                   href={item.href}
-                  class="group text-background link-underline relative text-xl font-black uppercase transition-colors duration-300"
+                  class="group font-heading text-background hover:text-background/80 relative text-xl font-semibold tracking-wide uppercase transition-colors duration-300"
                 >
                   {item.name}
                 </a>
@@ -66,7 +66,7 @@ const thisYear = new Date().getFullYear();
                 href={socialLinks.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="border-default flex h-12 w-12 items-center justify-center transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-lg"
+                class="border-border bg-card text-card-foreground flex h-12 w-12 items-center justify-center border-2 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[2px_2px_0_0_var(--color-border)]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -85,7 +85,7 @@ const thisYear = new Date().getFullYear();
                 href={socialLinks.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="border-default flex h-12 w-12 items-center justify-center transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-lg"
+                class="border-border bg-card text-card-foreground flex h-12 w-12 items-center justify-center border-2 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[2px_2px_0_0_var(--color-border)]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -105,7 +105,7 @@ const thisYear = new Date().getFullYear();
 
       <!-- Copyright -->
       <div
-        class="text-background/80 mt-16 text-sm font-black transition-colors duration-300"
+        class="font-heading text-background/80 mt-16 text-sm font-semibold tracking-wide uppercase transition-colors duration-300"
       >
         {
           copyrightText ||
