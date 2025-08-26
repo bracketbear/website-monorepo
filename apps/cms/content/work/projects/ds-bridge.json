@@ -70,9 +70,5 @@
     "headline": "A SaaS content management system for experiences",
     "subline": "Led the front‑end and moved the stack to Vue 3 + TypeScript"
   },
-  "impactTags": [
-    "maintainability",
-    "developer-experience",
-    "performance"
-  ]
+  "impactTags": ["maintainability", "developer-experience", "performance"]
 }

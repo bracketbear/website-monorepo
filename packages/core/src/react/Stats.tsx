@@ -31,10 +31,10 @@ export const Stats = ({
           key={index}
           className="flex flex-grow-1 flex-col border-solid border-white/20 px-8 py-6 not-last:border-b not-last:md:border-r not-last:md:border-b-0"
         >
-          <h4 className="font-heading mb-1 text-sm font-black tracking-widest text-text-primary/70 uppercase">
+          <h4 className="font-heading text-text-primary/70 mb-1 text-sm font-black tracking-widest uppercase">
             {stat.label}
           </h4>
-          <div className="font-heading mt-2 text-2xl font-bold tracking-tight text-text-primary">
+          <div className="font-heading text-text-primary mt-2 text-2xl font-bold tracking-tight">
             {stat.value}
           </div>
         </div>

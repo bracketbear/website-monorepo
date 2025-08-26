@@ -119,4 +119,3 @@ export function useHeaderSpacing(options: HeaderSpacingOptions = {}) {
     responsive,
   };
 }
-

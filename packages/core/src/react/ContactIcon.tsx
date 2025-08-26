@@ -14,7 +14,8 @@ type ContactIconName =
   | 'twitter'
   | 'website';
 
-export interface ContactIconProps extends Omit<ComponentProps<'svg'>, 'children'> {
+export interface ContactIconProps
+  extends Omit<ComponentProps<'svg'>, 'children'> {
   name: ContactIconName;
 }
 

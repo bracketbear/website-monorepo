@@ -19,68 +19,54 @@ const maxWidthClass = contentWidth === 'narrow' ? 'max-w-6xl' : '';
 ---
 
 <LayeredLayout title={title} {...rest}>
-  {showHero && (
-    <div class="bg-muted pb-8">
-      <div class={clsx('container mx-auto py-12', {
-        'max-w-6xl': contentWidth === 'narrow',
-      })}>
+  {
+    showHero && (
+      <div class="bg-muted pb-8">
         <div
-          class="flex flex-col gap-8 md:flex-row md:items-end md:justify-between"
+          class={clsx('container mx-auto py-12', {
+            'max-w-6xl': contentWidth === 'narrow',
+          })}
         >
-          <div class="flex-1">
-            <!-- Title Pills -->
-            <div class="mb-4 flex items-center gap-4">
-              <slot name="title-pills" />
-            </div>
-            
-            <!-- Main Title -->
-            <h1
-              class="font-heading mb-2 text-4xl leading-none text-primary uppercase md:text-6xl"
-            >
-              {title}
-            </h1>
-            
-            <!-- Detail Blocks -->
-            <div class="mt-8 flex items-start gap-12 md:flex-row">
-              <slot name="detail-blocks" />
-            </div>
-          </div>
-          
-          <!-- Cover Image/Art -->
-          <div class="flex flex-shrink-0 flex-col items-end gap-2">
-            <slot name="cover-image">
-              <!-- Default placeholder -->
-              <div
-                class="flex h-48 w-48 items-center justify-center border-2 border-primary bg-muted"
-              >
-                                  <span class="font-mono text-xs text-primary opacity-60"
-                  >[Cover Image]</span
-                >
+          <div class="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+            <div class="flex-1">
+              <div class="mb-4 flex items-center gap-4">
+                <slot name="title-pills" />
               </div>
-            </slot>
+
+              <h1 class="font-heading text-primary mb-2 text-4xl leading-none uppercase md:text-6xl">
+                {title}
+              </h1>
+
+              <div class="mt-8 flex items-start gap-12 md:flex-row">
+                <slot name="detail-blocks" />
+              </div>
+            </div>
+
+            <div class="flex flex-shrink-0 flex-col items-end gap-2">
+              <slot name="cover-image">
+                <div class="border-primary bg-muted flex h-48 w-48 items-center justify-center border-2">
+                  <span class="text-primary font-mono text-xs opacity-60">
+                    [Cover Image]
+                  </span>
+                </div>
+              </slot>
+            </div>
           </div>
-        </div>
-        
-        <!-- Summary Block -->
-        <slot name="summary" />
-        
-        <!-- Halftone Pattern -->
-        <div
-          class="pointer-events-none bottom-0 left-0 flex w-full justify-center select-none"
-        >
-          <div
-            class="h-4 w-2/3 bg-repeat-x"
-            style="background-image: url('/patterns/halftone.svg'); opacity: 0.12;"
-          >
+
+          <slot name="summary" />
+          <div class="pointer-events-none bottom-0 left-0 flex w-full justify-center select-none">
+            <div
+              class="h-4 w-2/3 bg-repeat-x"
+              style="background-image: url('/patterns/halftone.svg'); opacity: 0.12;"
+            />
           </div>
         </div>
       </div>
-    </div>
-  )}
-  
-  <!-- Main Content -->
-      <div class="bg-background/50 min-h-screen py-24">
-          <div class={`container mx-auto ${maxWidthClass}`}>
+    )
+  }
+
+  <div class="bg-background/50 min-h-screen py-24">
+    <div class={`container mx-auto ${maxWidthClass}`}>
       <slot />
     </div>
   </div>

@@ -19,4 +19,4 @@ Each directory contains an `index.ts` (or `index.tsx`) file to provide clean exp
 
 ---
 
-This pattern should be followed for all future additions to the package. 
+This pattern should be followed for all future additions to the package.

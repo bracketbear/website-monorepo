@@ -273,7 +273,7 @@ describe('randomize-controls', () => {
         expect(typeof item).toBe('object');
         expect(item.type).toBe('number');
         expect(typeof item.value).toBe('number');
-        
+
         // Find the corresponding item definition to check constraints
         const itemDef = manifest.controls[0].items?.find(
           (def) => def.name === item.name
@@ -573,18 +573,18 @@ describe('randomize-controls', () => {
       // Generate random values multiple times to ensure consistency
       for (let i = 0; i < 10; i++) {
         const result = getRandomControlValues(flowfieldManifest);
-        
+
         // Check lineSpacing is within bounds
         expect(result.lineSpacing).toBeGreaterThanOrEqual(4);
         expect(result.lineSpacing).toBeLessThanOrEqual(32);
-        
+
         // Check layers group
         expect(result.layers).toBeDefined();
         const layers = result.layers as any[];
         expect(Array.isArray(layers)).toBe(true);
         expect(layers.length).toBeGreaterThanOrEqual(1);
         expect(layers.length).toBeLessThanOrEqual(6);
-        
+
         // Check each layer respects constraints
         layers.forEach((layer: any) => {
           expect(layer.type).toBe('number');

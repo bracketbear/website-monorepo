@@ -1,6 +1,7 @@
 # Portfolio
 
 ## Overview
+
 Personal portfolio website built with Astro, showcasing projects, work history, and skills. Features a brutalist design aesthetic with interactive elements and modern web technologies.
 
 ## Table of Contents
@@ -94,7 +95,8 @@ The portfolio uses Keystatic CMS for content management. Content is stored in JS
 ## Design System
 
 The portfolio uses the shared design system from `@bracketbear/core`, including:
+
 - Brutalist card components
 - Custom Tailwind utilities
 - Tangible design effects
-- Halftone patterns and shadows 
+- Halftone patterns and shadows

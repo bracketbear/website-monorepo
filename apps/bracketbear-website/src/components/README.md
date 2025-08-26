@@ -25,6 +25,7 @@ The system consists of three parts:
 ### Usage
 
 #### Astro Component
+
 ```astro
 ---
 import ParticleLogoBackground from '@/components/ParticleLogoBackground.astro';
@@ -37,6 +38,7 @@ import ParticleLogoBackground from '@/components/ParticleLogoBackground.astro';
 ```
 
 #### React Component
+
 ```tsx
 import ParticleLogoBackground from '@/components/ParticleLogoBackground';
 
@@ -51,6 +53,7 @@ export default function MyComponent() {
 ```
 
 #### Direct Usage
+
 ```tsx
 import { ParticleLogoManager } from '@/utils/particleLogo';
 
@@ -90,4 +93,4 @@ The `ParticleLogoManager` accepts these configuration options:
 - Optimized particle count for smooth 60fps performance
 - Efficient WebGL rendering with PixiJS
 - Proper memory management and cleanup
-- Responsive design that adapts to screen size 
+- Responsive design that adapts to screen size

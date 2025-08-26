@@ -127,9 +127,10 @@ export class PixiApplication extends BaseApplication<PixiApp> {
       controls.backgroundAlpha !== previousControls.backgroundAlpha
     ) {
       // Handle both string and numeric colors
-      const bgColor = typeof controls.backgroundColor === 'string'
-        ? parseInt(controls.backgroundColor.replace('#', ''), 16)
-        : controls.backgroundColor || 0xff6b35;
+      const bgColor =
+        typeof controls.backgroundColor === 'string'
+          ? parseInt(controls.backgroundColor.replace('#', ''), 16)
+          : controls.backgroundColor || 0xff6b35;
       this.pixiApp.renderer.background.color = bgColor;
       this.pixiApp.renderer.background.alpha = controls.backgroundAlpha || 0;
     }

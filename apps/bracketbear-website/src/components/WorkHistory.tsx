@@ -47,10 +47,10 @@ const groupJobsByCompany = (
   return groupedJobs.sort((a, b) => {
     const aLatestJob = a.jobs[0]; // Jobs are already sorted by end date
     const bLatestJob = b.jobs[0];
-    
+
     const aEndDate = aLatestJob.data.endDate || new Date();
     const bEndDate = bLatestJob.data.endDate || new Date();
-    
+
     return bEndDate.getTime() - aEndDate.getTime();
   });
 };

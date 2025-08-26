@@ -8,7 +8,6 @@ import { makePageSchema } from './page';
  * It includes sections for introducing the projects and displaying them by category.
  */
 export const portfolioProjectsPageSchema = makePageSchema({
-
   // Introduction section - now a single markdown field
   introduction: z.string(), // Markdown content with title and content combined
 

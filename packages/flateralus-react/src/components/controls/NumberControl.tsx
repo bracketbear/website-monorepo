@@ -13,7 +13,11 @@ interface NumberControlProps {
  *
  * Renders a slider and number input for numeric animation parameters
  */
-export function NumberControl({ control, value, onControlChange }: NumberControlProps) {
+export function NumberControl({
+  control,
+  value,
+  onControlChange,
+}: NumberControlProps) {
   // Provide default value if undefined
   const defaultValue = control.defaultValue ?? 0;
   const currentValue = value ?? defaultValue;
@@ -40,9 +44,7 @@ export function NumberControl({ control, value, onControlChange }: NumberControl
         max={control.max}
         step={control.step}
         value={currentValue}
-        onChange={(e) =>
-          onControlChange(control.name, Number(e.target.value))
-        }
+        onChange={(e) => onControlChange(control.name, Number(e.target.value))}
         className="w-20 overflow-x-auto text-right"
         size="sm"
       />

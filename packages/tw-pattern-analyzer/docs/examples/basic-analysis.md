@@ -17,6 +17,7 @@ npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns
 ```
 
 **Output:**
+
 ```
 🔍 Analyzing Tailwind CSS patterns...
 📁 Found 150 files to analyze
@@ -72,11 +73,7 @@ export default {
     'apps/**/*.{tsx,jsx,astro,html,mdx,vue,svelte}',
     'packages/**/*.{tsx,jsx,astro,html,mdx,vue,svelte}',
   ],
-  ignoreGlobs: [
-    '**/node_modules/**',
-    '**/dist/**',
-    '**/.next/**',
-  ],
+  ignoreGlobs: ['**/node_modules/**', '**/dist/**', '**/.next/**'],
   similarityThreshold: 0.75,
   minOccurrences: 2,
   minVariants: 1,
@@ -89,10 +86,7 @@ Analyze only component files:
 
 ```javascript
 export default {
-  globs: [
-    'src/components/**/*.{tsx,jsx,astro}',
-    'src/ui/**/*.{tsx,jsx,astro}',
-  ],
+  globs: ['src/components/**/*.{tsx,jsx,astro}', 'src/ui/**/*.{tsx,jsx,astro}'],
   ignoreGlobs: [
     '**/node_modules/**',
     '**/*.test.{tsx,jsx}',
@@ -103,8 +97,8 @@ export default {
   minVariants: 2,
   output: {
     console: { enabled: true, top: 15 },
-    json: { enabled: true, path: 'reports/component-patterns.json' }
-  }
+    json: { enabled: true, path: 'reports/component-patterns.json' },
+  },
 };
 ```
 
@@ -114,22 +108,15 @@ Analyze only page files:
 
 ```javascript
 export default {
-  globs: [
-    'src/pages/**/*.{tsx,jsx,astro}',
-    'src/routes/**/*.{tsx,jsx,astro}',
-  ],
-  ignoreGlobs: [
-    '**/node_modules/**',
-    '**/api/**',
-    '**/*.test.{tsx,jsx}',
-  ],
+  globs: ['src/pages/**/*.{tsx,jsx,astro}', 'src/routes/**/*.{tsx,jsx,astro}'],
+  ignoreGlobs: ['**/node_modules/**', '**/api/**', '**/*.test.{tsx,jsx}'],
   similarityThreshold: 0.7,
   minOccurrences: 2,
   minVariants: 1,
   output: {
     console: { enabled: true, top: 20 },
-    json: { enabled: true, path: 'reports/page-patterns.json' }
-  }
+    json: { enabled: true, path: 'reports/page-patterns.json' },
+  },
 };
 ```
 
@@ -194,6 +181,7 @@ npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns \
 ```
 
 **Column meanings:**
+
 - **`(index)`**: Cluster ID
 - **`occurrences`**: Total times this pattern appears
 - **`variants`**: Number of different variations
@@ -202,22 +190,24 @@ npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns \
 
 ### Likelihood Score Interpretation
 
-| Score Range | Meaning | Action |
-|-------------|---------|---------|
+| Score Range | Meaning             | Action                        |
+| ----------- | ------------------- | ----------------------------- |
 | **80-100%** | Excellent candidate | Extract component immediately |
-| **70-79%** | Strong candidate | Plan extraction soon |
-| **50-69%** | Good candidate | Consider extraction |
-| **30-49%** | Moderate candidate | Monitor for growth |
-| **<30%** | Weak candidate | Focus on higher scores |
+| **70-79%**  | Strong candidate    | Plan extraction soon          |
+| **50-69%**  | Good candidate      | Consider extraction           |
+| **30-49%**  | Moderate candidate  | Monitor for growth            |
+| **<30%**    | Weak candidate      | Focus on higher scores        |
 
 ### Example Pattern Analysis
 
 **Pattern:** `container mx-auto px-4`
+
 - **Occurrences:** 25
 - **Variants:** 4
 - **Likelihood:** 49%
 
 **Variants found:**
+
 - `container mx-auto px-4`
 - `container mx-auto px-6`
 - `container mx-auto px-8`
@@ -310,7 +300,7 @@ npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns --no-console |
     "**High Priority (70%+):** \(.clusters | map(select(.likelihood >= 70)) | length)\n" +
     "**Medium Priority (40-69%):** \(.clusters | map(select(.likelihood >= 40 and .likelihood < 70)) | length)\n\n" +
     "### Top Patterns\n" +
-    (.clusters | sort_by(.likelihood) | reverse | .[0:5] | 
+    (.clusters | sort_by(.likelihood) | reverse | .[0:5] |
      map("- \(.sample) (\(.likelihood)%)") | join("\n"))
   ' > pattern-summary.md
 ```
@@ -321,12 +311,12 @@ npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns --no-console |
 # Count patterns by category
 npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns --no-console | \
   jq -r '
-    .clusters[] | 
-    .sample | 
-    if contains("flex") then "layout" 
-    elif contains("text-") then "typography" 
-    elif contains("bg-") or contains("text-") then "colors" 
-    elif contains("p-") or contains("m-") then "spacing" 
+    .clusters[] |
+    .sample |
+    if contains("flex") then "layout"
+    elif contains("text-") then "typography"
+    elif contains("bg-") or contains("text-") then "colors"
+    elif contains("p-") or contains("m-") then "spacing"
     else "other" end
   ' | sort | uniq -c
 ```
@@ -404,7 +394,7 @@ if [ -f reports/tw-patterns.json ]; then
     const r = require('./reports/tw-patterns.json');
     console.log(r.clusters.filter(c => c.likelihood >= 80).length);
   ")
-  
+
   if [ $critical_count -gt 0 ]; then
     echo "⚠️  Found $critical_count critical patterns. Consider extracting components."
     echo "Run 'npm run analyze:tw:review' for details."

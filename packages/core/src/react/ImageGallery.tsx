@@ -61,12 +61,12 @@ export const ImageGallery = forwardRef<HTMLDivElement, ImageGalleryProps>(
         {(title || description) && (
           <div className="space-y-2 text-center">
             {title && (
-              <h3 className="font-heading text-2xl font-bold text-text-primary">
+              <h3 className="font-heading text-text-primary text-2xl font-bold">
                 {title}
               </h3>
             )}
             {description && (
-              <p className="text-lg text-text-primary/90">{description}</p>
+              <p className="text-text-primary/90 text-lg">{description}</p>
             )}
           </div>
         )}
@@ -94,7 +94,7 @@ export const ImageGallery = forwardRef<HTMLDivElement, ImageGalleryProps>(
 
               {/* Caption */}
               {showCaptions && image.caption && (
-                <figcaption className="mt-2 text-center text-sm text-text-primary/70">
+                <figcaption className="text-text-primary/70 mt-2 text-center text-sm">
                   {image.caption}
                 </figcaption>
               )}

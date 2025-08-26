@@ -7,4 +7,3 @@ This package provides a PixiAnimation class that extends the rendering-agnostic 
 ## Usage
 
 Import `PixiAnimation` and extend it to create PIXI-powered, schema-driven animations with full control value management.
-

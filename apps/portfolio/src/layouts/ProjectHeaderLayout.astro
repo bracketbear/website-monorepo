@@ -68,89 +68,71 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
   navigationVariant="glass"
   breadcrumbs={props.breadcrumbs}
 >
-  <!-- Project Header Section -->
   {
     props.title && (
-      <section class="w-full bg-gradient-to-br from-muted via-muted/95 to-secondary/20">
-        <!-- Combined background patterns -->
-        <div class="absolute inset-0 bg-noise bg-header-glow bg-gradient-to-t from-muted/50 via-transparent to-transparent opacity-100"></div>
-        
-        <!-- Content container -->
-        <div class="z-10 container mx-auto h-full flex items-center">
-          <div class="flex flex-col lg:flex-row w-full items-center justify-center">
-            <!-- Left side: Text content -->
-            <div class="flex-1 px-4 py-16 lg:py-40 order-2 lg:order-1">
+      <section class="from-muted via-muted/95 to-secondary/20 w-full bg-gradient-to-br">
+        <div class="bg-noise bg-header-glow from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent opacity-100" />
+        <div class="z-10 container mx-auto flex h-full items-center">
+          <div class="flex w-full flex-col items-center justify-center lg:flex-row">
+            <div class="order-2 flex-1 px-4 py-16 lg:order-1 lg:py-40">
               <div class="max-w-2xl">
-                <!-- Description (if provided) -->
-                {
-                  props.description && (
-                    <p class="text-text-primary/90 text-lg lg:text-2xl font-bold tracking-tight uppercase drop-shadow-lg mb-6">
-                      {props.description}
-                    </p>
-                  )
-                }
-                
-                <!-- Title -->
-                <h1 class="font-heading text-text-primary text-4xl lg:text-6xl xl:text-8xl font-black tracking-tight uppercase text-shadow-lg mb-6">
+                {props.description && (
+                  <p class="text-text-primary/90 mb-6 text-lg font-bold tracking-tight uppercase drop-shadow-lg lg:text-2xl">
+                    {props.description}
+                  </p>
+                )}
+
+                <h1 class="font-heading text-text-primary mb-6 text-4xl font-black tracking-tight uppercase text-shadow-lg lg:text-6xl xl:text-8xl">
                   {props.title}
                 </h1>
-                
-                <!-- Subtitle -->
-                {
-                  props.subtitle && (
-                    <p class="text-text-primary/90 text-lg lg:text-xl xl:text-2xl font-bold tracking-tight uppercase text-shadow-lg">
-                      {props.subtitle}
-                    </p>
-                  )
-                }
+
+                {props.subtitle && (
+                  <p class="text-text-primary/90 text-lg font-bold tracking-tight uppercase text-shadow-lg lg:text-xl xl:text-2xl">
+                    {props.subtitle}
+                  </p>
+                )}
               </div>
             </div>
-            
-            <!-- Right side: Cover image -->
-            {
-              props.coverImage && (
-                <div class="flex-1 flex items-center justify-center px-4 py-8 lg:py-40 order-1 lg:order-2">
-                  <div class="relative max-w-lg w-full">
-                    <div class="overflow-hidden rounded-lg border-2 border-white/20 shadow-2xl shadow-black/30">
-                      <Picture
-                        src={props.coverImage}
-                        alt={props.coverAlt || props.title || 'Project cover image'}
-                        width={640}
-                        height={480}
-                        formats={['avif', 'webp']}
-                        layout="constrained"
-                        fit="cover"
-                        class="w-full h-auto max-w-sm lg:max-w-lg"
-                      />
-                    </div>
-                    <!-- Decorative elements -->
-                    <div class="absolute -top-2 -right-2 w-4 h-4 bg-brand-yellow rounded-full shadow-lg hidden lg:block"></div>
-                    <div class="absolute -bottom-2 -left-2 w-3 h-3 bg-brand-orange rounded-full shadow-lg hidden lg:block"></div>
+
+            {props.coverImage && (
+              <div class="order-1 flex flex-1 items-center justify-center px-4 py-8 lg:order-2 lg:py-40">
+                <div class="relative w-full max-w-lg">
+                  <div class="overflow-hidden rounded-lg border-2 border-white/20 shadow-2xl shadow-black/30">
+                    <Picture
+                      src={props.coverImage}
+                      alt={
+                        props.coverAlt || props.title || 'Project cover image'
+                      }
+                      width={640}
+                      height={480}
+                      formats={['avif', 'webp']}
+                      layout="constrained"
+                      fit="cover"
+                      class="h-auto w-full max-w-sm lg:max-w-lg"
+                    />
                   </div>
+                  <div class="bg-brand-yellow absolute -top-2 -right-2 hidden h-4 w-4 rounded-full shadow-lg lg:block" />
+                  <div class="bg-brand-orange absolute -bottom-2 -left-2 hidden h-3 w-3 rounded-full shadow-lg lg:block" />
                 </div>
-              )
-            }
+              </div>
+            )}
           </div>
         </div>
-        
-        <!-- Stats section - positioned as overlay at bottom -->
-        {
-          props.stats && props.stats.length > 0 && (
-            <div class="absolute inset-x-0 bottom-0 z-20 container mx-auto w-full">
-              <div class="relative -mb-8">
-                <Stats
-                  stats={props.stats}
-                  className="drop-shadow-xl drop-shadow-black/30"
-                />
-              </div>
+
+        {props.stats && props.stats.length > 0 && (
+          <div class="absolute inset-x-0 bottom-0 z-20 container mx-auto w-full">
+            <div class="relative -mb-8">
+              <Stats
+                stats={props.stats}
+                className="drop-shadow-xl drop-shadow-black/30"
+              />
             </div>
-          )
-        }
+          </div>
+        )}
       </section>
     )
   }
 
-  <!-- Page Content -->
   <div
     class={clsx(
       'relative',
@@ -163,7 +145,6 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
     </div>
   </div>
 
-  <!-- Contact CTA Section -->
   {
     contactCTA && (
       <div class="bg-muted py-24">

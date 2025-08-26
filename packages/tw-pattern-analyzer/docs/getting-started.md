@@ -6,7 +6,7 @@ Get up and running with the Tailwind CSS Pattern Analyzer in minutes.
 
 ### 1. Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 - A project with Tailwind CSS classes
 
@@ -22,6 +22,7 @@ npm run analyze:tw
 ```
 
 That's it! The analyzer will:
+
 - Scan your codebase for Tailwind classes
 - Group similar patterns together
 - Display results in a console table
@@ -38,11 +39,7 @@ export default {
     'apps/**/*.{tsx,jsx,astro,html,mdx,vue,svelte}',
     'packages/**/*.{tsx,jsx,astro,html,mdx,vue,svelte}',
   ],
-  ignoreGlobs: [
-    '**/node_modules/**',
-    '**/dist/**',
-    '**/.next/**',
-  ],
+  ignoreGlobs: ['**/node_modules/**', '**/dist/**', '**/.next/**'],
   similarityThreshold: 0.75,
   minOccurrences: 2,
   minVariants: 1,
@@ -64,6 +61,7 @@ After running the analyzer, you'll see output like this:
 ```
 
 **What each column means:**
+
 - **occurrences**: How many times this pattern appears
 - **variants**: How many different variations exist
 - **likelihood**: How good a candidate for component extraction (0-100%)
@@ -72,16 +70,19 @@ After running the analyzer, you'll see output like this:
 ## 🎯 What to Look For
 
 ### High Priority (70%+ likelihood)
+
 - **Strong candidates** for component extraction
 - Multiple variants with high frequency
 - Good opportunity to reduce duplication
 
 ### Medium Priority (40-70% likelihood)
+
 - **Good candidates** with room for improvement
 - Some variants, moderate frequency
 - Consider extracting if you see more variants
 
 ### Low Priority (<40% likelihood)
+
 - **Specific patterns** that may not need extraction
 - Low frequency or few variants
 - Focus on higher-scoring patterns first
@@ -101,7 +102,7 @@ After running the analyzer, you'll see output like this:
 # More aggressive clustering (fewer, broader groups)
 npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns --threshold 0.7
 
-# Stricter clustering (more, precise groups)  
+# Stricter clustering (more, precise groups)
 npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns --threshold 0.85
 ```
 
@@ -118,16 +119,19 @@ npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns --min-variants
 ## 🆘 Common Issues
 
 ### "No patterns found"
+
 - Check your `globs` configuration
 - Ensure files contain Tailwind classes
 - Verify file extensions are supported
 
 ### "Too many patterns"
+
 - Increase `similarityThreshold` (e.g., 0.8-0.85)
-- Increase `minOccurrences` 
+- Increase `minOccurrences`
 - Add more specific `ignoreGlobs`
 
 ### "Patterns seem wrong"
+
 - Review regex patterns in configuration
 - Check file parsing strategy for your framework
 - Verify class attribute syntax

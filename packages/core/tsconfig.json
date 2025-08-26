@@ -17,17 +17,9 @@
     "sourceMap": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "types": [
-      "astro/client",
-      "./types/astro",
-      "./types/svg"
-    ],
+    "types": ["astro/client", "./types/astro", "./types/svg"]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "types/**/*"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "types/**/*"],
   "exclude": [
     "node_modules",
     "dist",
@@ -36,4 +28,4 @@
     "src/**/*.test.ts",
     "src/**/*.test.tsx"
   ]
-} 
+}

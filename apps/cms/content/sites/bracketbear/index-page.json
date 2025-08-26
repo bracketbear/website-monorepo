@@ -14,11 +14,7 @@
     "experience": "With years of experience in the experiential marketing industry, we understand what it takes to create moments that matter.",
     "additional": "We specialize in **interactive installations**, **digital experiences**, and **immersive environments**.",
     "showSkillsTicker": true,
-    "featuredSkills": [
-      "react",
-      "typescript",
-      "pixi"
-    ]
+    "featuredSkills": ["react", "typescript", "pixi"]
   },
   "featuredProjects": {
     "title": "Featured Work",
@@ -27,10 +23,7 @@
     "showViewAllButton": true,
     "viewAllButtonText": "View All Work →",
     "viewAllButtonLink": "/work",
-    "selectedProjects": [
-      "ds-elekta",
-      "ds-pwc"
-    ]
+    "selectedProjects": ["ds-elekta", "ds-pwc"]
   },
   "recentExperience": {
     "title": "Our Services",
@@ -60,4 +53,4 @@
     "enableAnalytics": true,
     "preloadCriticalAssets": true
   }
-} 
+}

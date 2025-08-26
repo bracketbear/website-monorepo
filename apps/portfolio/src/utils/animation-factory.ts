@@ -7,4 +7,4 @@ import type { Application } from '@bracketbear/flateralus';
  */
 export const createPixiApplication = (options?: any): Application => {
   return new PixiApplication(options);
-}; 
+};

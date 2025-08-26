@@ -12,35 +12,35 @@ tw-patterns [options]
 
 ### Configuration
 
-| Option | Short | Description | Default |
-|--------|-------|-------------|---------|
-| `--config <path>` | `-c` | Custom config file path | `tw-pattern-analyzer.config.js` |
-| `--help` | `-h` | Show help information | - |
-| `--version` | `-v` | Show version information | - |
+| Option            | Short | Description              | Default                         |
+| ----------------- | ----- | ------------------------ | ------------------------------- |
+| `--config <path>` | `-c`  | Custom config file path  | `tw-pattern-analyzer.config.js` |
+| `--help`          | `-h`  | Show help information    | -                               |
+| `--version`       | `-v`  | Show version information | -                               |
 
 ### Analysis Settings
 
-| Option | Short | Description | Default |
-|--------|-------|-------------|---------|
-| `--threshold <number>` | `-t` | Similarity threshold (0.0-1.0) | From config |
-| `--min-occurrences <number>` | `-m` | Minimum occurrences to include | From config |
-| `--min-variants <number>` | `-v` | Minimum variants in cluster | From config |
+| Option                       | Short | Description                    | Default     |
+| ---------------------------- | ----- | ------------------------------ | ----------- |
+| `--threshold <number>`       | `-t`  | Similarity threshold (0.0-1.0) | From config |
+| `--min-occurrences <number>` | `-m`  | Minimum occurrences to include | From config |
+| `--min-variants <number>`    | `-v`  | Minimum variants in cluster    | From config |
 
 ### Output Control
 
-| Option | Short | Description | Default |
-|--------|-------|-------------|---------|
-| `--out <path>` | `-o` | Output JSON file path | From config |
-| `--top <number>` | - | Number of top patterns to display | From config |
-| `--no-console` | - | Disable console output | false |
-| `--no-json` | - | Disable JSON output | false |
-| `--format <format>` | `-f` | Console output format (table/json) | table |
+| Option              | Short | Description                        | Default     |
+| ------------------- | ----- | ---------------------------------- | ----------- |
+| `--out <path>`      | `-o`  | Output JSON file path              | From config |
+| `--top <number>`    | -     | Number of top patterns to display  | From config |
+| `--no-console`      | -     | Disable console output             | false       |
+| `--no-json`         | -     | Disable JSON output                | false       |
+| `--format <format>` | `-f`  | Console output format (table/json) | table       |
 
 ### File Filtering
 
-| Option | Short | Description | Default |
-|--------|-------|-------------|---------|
-| `--ignore <pattern>` | `-i` | Additional ignore patterns | From config |
+| Option               | Short | Description                | Default     |
+| -------------------- | ----- | -------------------------- | ----------- |
+| `--ignore <pattern>` | `-i`  | Additional ignore patterns | From config |
 
 ## 🔧 Option Details
 
@@ -355,6 +355,7 @@ tw-patterns -h
 ```
 
 **Output:**
+
 ```
 Usage: tw-patterns [options]
 
@@ -390,6 +391,7 @@ tw-patterns -v
 ```
 
 **Output:**
+
 ```
 @bracketbear/tw-pattern-analyzer v0.1.0
 ```
@@ -448,24 +450,28 @@ tw-patterns --no-console | jq '.clusters | map(select(.likelihood >= 70)) | leng
 ### Common Error Messages
 
 **"Configuration file not found"**
+
 ```bash
 # Solution: Create config file or specify custom path
 tw-patterns --config ./my-config.js
 ```
 
 **"Invalid similarity threshold"**
+
 ```bash
 # Solution: Use value between 0.0 and 1.0
 tw-patterns --threshold 0.75
 ```
 
 **"No patterns found"**
+
 ```bash
 # Solution: Check file patterns and ignore settings
 tw-patterns --config ./debug-config.js
 ```
 
 **"Output directory not writable"**
+
 ```bash
 # Solution: Check permissions or use different path
 tw-patterns --out ./results.json
@@ -511,9 +517,9 @@ if [ -f reports/analysis.json ]; then
     const r = require('./reports/analysis.json');
     console.log(r.clusters.filter(c => c.likelihood >= 70).length);
   ")
-  
+
   echo "Found $high_priority high-priority patterns"
-  
+
   if [ $high_priority -gt 10 ]; then
     echo "⚠️  Too many high-priority patterns found"
     exit 1

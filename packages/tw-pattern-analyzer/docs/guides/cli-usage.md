@@ -29,10 +29,10 @@ npm run dev
 
 ### Configuration
 
-| Option | Short | Description | Default |
-|--------|-------|-------------|---------|
-| `--config` | `-c` | Custom config file path | `tw-pattern-analyzer.config.js` |
-| `--help` | `-h` | Show help information | - |
+| Option     | Short | Description             | Default                         |
+| ---------- | ----- | ----------------------- | ------------------------------- |
+| `--config` | `-c`  | Custom config file path | `tw-pattern-analyzer.config.js` |
+| `--help`   | `-h`  | Show help information   | -                               |
 
 ```bash
 # Use custom config file
@@ -44,11 +44,11 @@ npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns --help
 
 ### Analysis Settings
 
-| Option | Short | Description | Default |
-|--------|-------|-------------|---------|
-| `--threshold` | `-t` | Similarity threshold (0.0-1.0) | From config |
-| `--min-occurrences` | `-m` | Minimum occurrences to include | From config |
-| `--min-variants` | `-v` | Minimum variants in cluster | From config |
+| Option              | Short | Description                    | Default     |
+| ------------------- | ----- | ------------------------------ | ----------- |
+| `--threshold`       | `-t`  | Similarity threshold (0.0-1.0) | From config |
+| `--min-occurrences` | `-m`  | Minimum occurrences to include | From config |
+| `--min-variants`    | `-v`  | Minimum variants in cluster    | From config |
 
 ```bash
 # Adjust similarity threshold
@@ -69,12 +69,12 @@ npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns \
 
 ### Output Control
 
-| Option | Short | Description | Default |
-|--------|-------|-------------|---------|
-| `--out` | `-o` | Output JSON file path | From config |
-| `--top` | - | Number of top patterns to display | From config |
-| `--no-console` | - | Disable console output | false |
-| `--no-json` | - | Disable JSON output | false |
+| Option         | Short | Description                       | Default     |
+| -------------- | ----- | --------------------------------- | ----------- |
+| `--out`        | `-o`  | Output JSON file path             | From config |
+| `--top`        | -     | Number of top patterns to display | From config |
+| `--no-console` | -     | Disable console output            | false       |
+| `--no-json`    | -     | Disable JSON output               | false       |
 
 ```bash
 # Custom output path
@@ -95,9 +95,9 @@ npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns --no-json --to
 
 ### File Filtering
 
-| Option | Short | Description | Default |
-|--------|-------|-------------|---------|
-| `--ignore` | `-i` | Additional ignore patterns | From config |
+| Option     | Short | Description                | Default     |
+| ---------- | ----- | -------------------------- | ----------- |
+| `--ignore` | `-i`  | Additional ignore patterns | From config |
 
 ```bash
 # Ignore additional patterns
@@ -190,7 +190,9 @@ if (r.clusters.some(c => c.likelihood >= 80)) {
 {
   "metadata": {
     "timestamp": "2024-01-15T10:30:00.000Z",
-    "config": { /* configuration used */ },
+    "config": {
+      /* configuration used */
+    },
     "stats": {
       "filesAnalyzed": 150,
       "patternsFound": 89,
@@ -258,6 +260,7 @@ npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns --no-console |
 ### Common Issues
 
 **"Command not found"**
+
 ```bash
 # Ensure package is built
 npm run build --workspace=@bracketbear/tw-pattern-analyzer
@@ -267,6 +270,7 @@ ls -la packages/tw-pattern-analyzer/dist/cli.js
 ```
 
 **"No patterns found"**
+
 ```bash
 # Check file patterns
 npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns --config ./debug-config.js
@@ -276,6 +280,7 @@ find . -name "*.tsx" -o -name "*.astro" | head -10
 ```
 
 **"Too many patterns"**
+
 ```bash
 # Increase threshold for stricter clustering
 npm exec --workspace=@bracketbear/tw-pattern-analyzer tw-patterns --threshold 0.85

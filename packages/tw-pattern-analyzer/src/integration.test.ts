@@ -29,7 +29,7 @@ async function testAnalyze(
   // This is a simplified version for testing that bypasses the file system
   const { default: fastGlob } = await import('fast-glob');
   const files = await fastGlob(options.globs || ['**/*.{tsx,jsx,ts,js}']);
-  
+
   const patternCounts = new Map<string, number>();
   const fileResults: any[] = [];
 
@@ -40,10 +40,13 @@ async function testAnalyze(
       const result = findClassesInSource(src, file, {
         parsing: {
           patterns: {
-            react: /(?:className\s*=\s*)(?:(?:{`([^`]+)`})|(?:{"([^"]+)"})|(?:'([^']+)')|(?:"([^"]+)"))/g,
-            astro: /(?:class\s*=\s*|class:list\s*=\s*)(?:(?:{`([^`]+)`})|(?:{"([^"]+)"})|(?:'([^']+)')|(?:"([^"]+)"))|(?:class:list\s*=\s*\{([^}]+)\})/g,
+            react:
+              /(?:className\s*=\s*)(?:(?:{`([^`]+)`})|(?:{"([^"]+)"})|(?:'([^']+)')|(?:"([^"]+)"))/g,
+            astro:
+              /(?:class\s*=\s*|class:list\s*=\s*)(?:(?:{`([^`]+)`})|(?:{"([^"]+)"})|(?:'([^']+)')|(?:"([^"]+)"))|(?:class:list\s*=\s*\{([^}]+)\})/g,
             vue: /(?:class\s*=\s*|:class\s*=\s*)(?:(?:{`([^`]+)`})|(?:{"([^"]+)"})|(?:'([^']+)')|(?:"([^"]+)"))/g,
-            svelte: /(?:class\s*=\s*|class:name\s*=\s*)(?:(?:{`([^`]+)`})|(?:{"([^"]+)"})|(?:'([^']+)')|(?:"([^"]+)"))/g,
+            svelte:
+              /(?:class\s*=\s*|class:name\s*=\s*)(?:(?:{`([^`]+)`})|(?:{"([^"]+)"})|(?:'([^']+)')|(?:"([^"]+)"))/g,
           },
           fileTypes: {
             '.tsx': ['react'],
@@ -72,13 +75,18 @@ async function testAnalyze(
     }
   }
 
-  const totalClassLists = [...patternCounts.values()].reduce((a, b) => a + b, 0);
+  const totalClassLists = [...patternCounts.values()].reduce(
+    (a, b) => a + b,
+    0
+  );
 
   const stats = [...patternCounts.entries()]
     .map(([pattern, occurrences]) => ({
       pattern,
       occurrences,
-      percent: totalClassLists ? +((occurrences / totalClassLists) * 100).toFixed(2) : 0,
+      percent: totalClassLists
+        ? +((occurrences / totalClassLists) * 100).toFixed(2)
+        : 0,
       variants: [pattern],
     }))
     .filter((s) => s.occurrences >= (options.minOccurrences || 1))
@@ -92,10 +100,12 @@ async function testAnalyze(
       // Simple similarity check - if patterns share common classes, cluster them
       const pattern1 = s.pattern.split(' ');
       const pattern2 = c.rep.split(' ');
-      const common = pattern1.filter(p => pattern2.includes(p));
-      const similarity = common.length / Math.max(pattern1.length, pattern2.length);
-      
-      if (similarity >= 0.5) { // 50% similarity threshold for testing
+      const common = pattern1.filter((p) => pattern2.includes(p));
+      const similarity =
+        common.length / Math.max(pattern1.length, pattern2.length);
+
+      if (similarity >= 0.5) {
+        // 50% similarity threshold for testing
         c.members.push(s.pattern);
         c.occurrences += s.occurrences;
         attached = true;
@@ -119,7 +129,9 @@ async function testAnalyze(
     c.variants = c.members.length;
   }
 
-  const filteredClusters = clusters.filter(c => c.variants >= (options.minVariants || 1));
+  const filteredClusters = clusters.filter(
+    (c) => c.variants >= (options.minVariants || 1)
+  );
 
   // Write output if specified
   if (options.out) {
@@ -128,7 +140,15 @@ async function testAnalyze(
     if (outputDir && outputDir !== '.') {
       mockMkdir(outputDir, { recursive: true });
     }
-    mockWriteFile(outputPath, JSON.stringify({ totalFiles: files.length, totalPatterns: totalClassLists, clusters }, null, 2), 'utf8');
+    mockWriteFile(
+      outputPath,
+      JSON.stringify(
+        { totalFiles: files.length, totalPatterns: totalClassLists, clusters },
+        null,
+        2
+      ),
+      'utf8'
+    );
   }
 
   return {
@@ -137,7 +157,6 @@ async function testAnalyze(
     clusters: filteredClusters,
   };
 }
-
 
 describe('Integration Tests', () => {
   beforeEach(() => {
@@ -195,11 +214,16 @@ describe('Integration Tests', () => {
           </div>
         `);
 
-      const result = await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        top: 10,
-        out: 'reports/react-analysis.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const result = await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          top: 10,
+          out: 'reports/react-analysis.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
 
       expect(result.totalFiles).toBe(4);
       expect(result.totalPatterns).toBeGreaterThan(0);
@@ -264,11 +288,16 @@ describe('Integration Tests', () => {
           </Layout>
         `);
 
-      const result = await testAnalyze({
-        globs: ['**/*.astro'],
-        top: 10,
-        out: 'reports/astro-analysis.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const result = await testAnalyze(
+        {
+          globs: ['**/*.astro'],
+          top: 10,
+          out: 'reports/astro-analysis.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
 
       expect(result.totalFiles).toBe(3);
       expect(result.totalPatterns).toBeGreaterThan(0);
@@ -318,11 +347,16 @@ describe('Integration Tests', () => {
           </div>
         `);
 
-      const result = await testAnalyze({
-        globs: ['**/*.{tsx,astro,vue,svelte}'],
-        top: 10,
-        out: 'reports/mixed-analysis.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const result = await testAnalyze(
+        {
+          globs: ['**/*.{tsx,astro,vue,svelte}'],
+          top: 10,
+          out: 'reports/mixed-analysis.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
 
       expect(result.totalFiles).toBe(4);
       expect(result.totalPatterns).toBeGreaterThan(0);
@@ -352,17 +386,27 @@ describe('Integration Tests', () => {
         .mockReturnValueOnce('className="flex gap-4 justify-center"')
         .mockReturnValueOnce('className="text-center font-bold"');
 
-      const highThresholdResult = await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        similarityThreshold: 0.9,
-        out: 'reports/high-threshold.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const highThresholdResult = await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          similarityThreshold: 0.9,
+          out: 'reports/high-threshold.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
 
-      const lowThresholdResult = await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        similarityThreshold: 0.5,
-        out: 'reports/low-threshold.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const lowThresholdResult = await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          similarityThreshold: 0.5,
+          out: 'reports/low-threshold.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
 
       // Higher threshold should result in fewer clusters
       expect(highThresholdResult.clusters.length).toBeGreaterThanOrEqual(
@@ -386,11 +430,16 @@ describe('Integration Tests', () => {
         .mockReturnValueOnce('className="common-pattern"')
         .mockReturnValueOnce('className="common-pattern"');
 
-      const result = await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        minOccurrences: 2,
-        out: 'reports/min-occurrences.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const result = await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          minOccurrences: 2,
+          out: 'reports/min-occurrences.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
 
       // Should only include patterns that appear at least twice
       expect(result.clusters.every((c) => c.occurrences >= 2)).toBe(true);
@@ -410,11 +459,16 @@ describe('Integration Tests', () => {
         .mockReturnValueOnce('className="pattern-b"')
         .mockReturnValueOnce('className="pattern-c"');
 
-      const result = await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        minVariants: 2,
-        out: 'reports/min-variants.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const result = await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          minVariants: 2,
+          out: 'reports/min-variants.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
 
       // Should only include clusters with at least 2 variants
       expect(result.clusters.every((c) => c.variants >= 2)).toBe(true);
@@ -431,10 +485,15 @@ describe('Integration Tests', () => {
 
       mockReadFile.mockReturnValue('className="flex gap-4 items-center"');
 
-      await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        out: 'reports/test-output.json',
-      }, mockReadFile, mockWriteFile, vi.mocked(mkdirSync));
+      await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          out: 'reports/test-output.json',
+        },
+        mockReadFile,
+        mockWriteFile,
+        vi.mocked(mkdirSync)
+      );
 
       expect(mockWriteFile).toHaveBeenCalledWith(
         expect.stringContaining('reports/test-output.json'),
@@ -452,10 +511,15 @@ describe('Integration Tests', () => {
 
       mockReadFile.mockReturnValue('className="flex gap-4 items-center"');
 
-      await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        out: null, // Disable output
-      }, mockReadFile, mockWriteFile, vi.mocked(mkdirSync));
+      await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          out: null, // Disable output
+        },
+        mockReadFile,
+        mockWriteFile,
+        vi.mocked(mkdirSync)
+      );
 
       expect(mockWriteFile).not.toHaveBeenCalled();
     });
@@ -469,10 +533,15 @@ describe('Integration Tests', () => {
 
       mockReadFile.mockReturnValue('className="flex gap-4 items-center"');
 
-      await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        out: 'reports/new-directory/analysis.json',
-      }, mockReadFile, vi.mocked(writeFileSync), mockMkdir);
+      await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          out: 'reports/new-directory/analysis.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        mockMkdir
+      );
 
       expect(mockMkdir).toHaveBeenCalledWith(
         expect.stringContaining('reports/new-directory'),
@@ -498,10 +567,15 @@ describe('Integration Tests', () => {
         })
         .mockReturnValueOnce('className="another-valid-pattern"');
 
-      const result = await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        out: 'reports/error-handling.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const result = await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          out: 'reports/error-handling.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
 
       // Should still process valid files
       expect(result.totalFiles).toBe(3);
@@ -517,10 +591,15 @@ describe('Integration Tests', () => {
         .mockReturnValueOnce('') // Empty file
         .mockReturnValueOnce('className="flex gap-4 items-center"');
 
-      const result = await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        out: 'reports/empty-files.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const result = await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          out: 'reports/empty-files.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
 
       expect(result.totalFiles).toBe(2);
       expect(result.totalPatterns).toBeGreaterThan(0);
@@ -545,10 +624,15 @@ describe('Integration Tests', () => {
         )
         .mockReturnValueOnce('className="flex gap-4 items-center"');
 
-      const result = await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        out: 'reports/no-classes.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const result = await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          out: 'reports/no-classes.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
 
       expect(result.totalFiles).toBe(2);
       expect(result.totalPatterns).toBeGreaterThan(0);
@@ -569,10 +653,15 @@ describe('Integration Tests', () => {
       });
 
       const startTime = Date.now();
-      const result = await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        out: 'reports/performance-test.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const result = await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          out: 'reports/performance-test.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
       const endTime = Date.now();
 
       expect(result.totalFiles).toBe(100);
@@ -596,10 +685,15 @@ describe('Integration Tests', () => {
 
       mockReadFile.mockReturnValue(patterns);
 
-      const result = await testAnalyze({
-        globs: ['**/*.{tsx,jsx,ts,js}'],
-        out: 'reports/large-patterns.json',
-      }, mockReadFile, vi.mocked(writeFileSync), vi.mocked(mkdirSync));
+      const result = await testAnalyze(
+        {
+          globs: ['**/*.{tsx,jsx,ts,js}'],
+          out: 'reports/large-patterns.json',
+        },
+        mockReadFile,
+        vi.mocked(writeFileSync),
+        vi.mocked(mkdirSync)
+      );
 
       expect(result.totalFiles).toBe(1);
       expect(result.totalPatterns).toBeGreaterThanOrEqual(50);

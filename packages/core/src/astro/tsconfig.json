@@ -1,13 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [
-    "**/*"
-  ],
+  "include": ["**/*"],
   "compilerOptions": {
-    "types": [
-      "astro/client",
-      "../../types/astro",
-      "../../types/svg"
-    ],
+    "types": ["astro/client", "../../types/astro", "../../types/svg"]
   }
 }

@@ -55,7 +55,7 @@ The script detects various types of arbitrary CSS values:
 
 The script calculates replacement likelihood based on:
 
-- **High (70-100%)**: 
+- **High (70-100%)**:
   - Multiple instances of same value in file (should be utility)
   - PX units (critical for responsive design)
   - Known CSS variables with direct Tailwind equivalents
@@ -87,6 +87,7 @@ Found 22 arbitrary CSS values across the codebase.
 ### Configuration
 
 The script automatically excludes common directories:
+
 - `node_modules`
 - `.git`
 - `dist`
@@ -97,6 +98,7 @@ The script automatically excludes common directories:
 ### Customization
 
 You can modify the script to:
+
 - Add new file extensions to scan
 - Include/exclude specific directories
 - Add new Tailwind utility mappings
@@ -105,6 +107,7 @@ You can modify the script to:
 ### Integration
 
 This script is perfect for:
+
 - **Code Reviews**: Identify arbitrary CSS values before merging
 - **Refactoring**: Plan systematic replacements of arbitrary values
 - **Quality Assurance**: Ensure consistent use of Tailwind utilities

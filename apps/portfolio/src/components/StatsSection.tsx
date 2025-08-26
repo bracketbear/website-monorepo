@@ -19,35 +19,35 @@ export interface StatsSectionProps {
 
 /**
  * StatsSection Component
- * 
+ *
  * A reusable component for displaying statistics in a grid layout.
  * Used across multiple pages to show key metrics and achievements.
- * 
+ *
  * @example
  * ```tsx
- * <StatsSection 
+ * <StatsSection
  *   stats={[
  *     { label: "Total Projects", value: "6", description: "Completed work" },
  *     { label: "Featured Projects", value: "2", description: "Highlighted work" },
  *     { label: "Technologies", value: "30+", description: "Skills utilized" }
- *   ]} 
+ *   ]}
  * />
  * ```
  */
-export default function StatsSection({ 
-  stats, 
-  className = "" 
+export default function StatsSection({
+  stats,
+  className = '',
 }: StatsSectionProps) {
   return (
-    <section className={`mb-40 px-content ${className}`}>
+    <section className={`px-content mb-40 ${className}`}>
       <div className="container mx-auto">
         <div className="grid gap-8 md:grid-cols-3">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
-              <div className="font-heading mb-2 text-4xl font-black text-text-primary">
+              <div className="font-heading text-text-primary mb-2 text-4xl font-black">
                 {stat.value}
               </div>
-                              <div className="mb-1 text-xl font-bold text-text-primary/90">
+              <div className="text-text-primary/90 mb-1 text-xl font-bold">
                 {stat.label}
               </div>
               {stat.description && (
@@ -59,4 +59,4 @@ export default function StatsSection({
       </div>
     </section>
   );
-} 
+}

@@ -54,7 +54,7 @@ export const slider: BaseControlHelper<
     debug: options.debug ?? false,
     resetsAnimation: options.resetsAnimation ?? false,
   };
-}
+};
 
 /**
  * Helper function to create a boolean control
@@ -79,7 +79,7 @@ export const toggle: BaseControlHelper<
     debug: options.debug ?? false,
     resetsAnimation: options.resetsAnimation ?? false,
   };
-}
+};
 
 /**
  * Helper function to create a color control
@@ -104,7 +104,7 @@ export const color: BaseControlHelper<
     debug: options.debug ?? false,
     resetsAnimation: options.resetsAnimation ?? false,
   };
-}
+};
 
 /**
  * Helper function to create a select control

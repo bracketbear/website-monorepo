@@ -47,12 +47,12 @@ export default function FeaturedProjectsWaveBG({
     <div className={clsx('w-full', className)}>
       {/* Background wave animation */}
       <div className="relative z-10">{children}</div>
-      
+
       {/* Animation stage - only render when ready */}
       {isClient && isAnimationReady && application && (
         <AnimationStage
           application={application}
-          className={clsx('absolute inset-0 h-full w-full pointer-events-none')}
+          className={clsx('pointer-events-none absolute inset-0 h-full w-full')}
           layoutClassName="absolute inset-0"
         />
       )}

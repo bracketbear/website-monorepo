@@ -330,8 +330,8 @@ class ParticleWaveAnimation extends PixiAnimation<
           app,
           x,
           y,
-          typeof particleColor === 'string' 
-            ? new PIXI.Color(particleColor).toNumber() 
+          typeof particleColor === 'string'
+            ? new PIXI.Color(particleColor).toNumber()
             : particleColor,
           particleSize,
           waveIndex,
@@ -413,9 +413,10 @@ class ParticleWaveAnimation extends PixiAnimation<
       // Draw connecting line for this wave with individual stroke style
       const currentWaveGraphics = waveGraphics[waveIndex];
       const lineThickness = controls.lineThickness;
-      const lineColor = typeof controls.lineColor === 'string' 
-        ? new PIXI.Color(controls.lineColor).toNumber() 
-        : controls.lineColor;
+      const lineColor =
+        typeof controls.lineColor === 'string'
+          ? new PIXI.Color(controls.lineColor).toNumber()
+          : controls.lineColor;
 
       // Only draw lines if thickness > 0 and we have particles
       if (waveParticles.length > 1) {
@@ -435,9 +436,10 @@ class ParticleWaveAnimation extends PixiAnimation<
         p.graphics.clear();
         p.graphics.circle(0, 0, controls.particleSize * sizeMultiplier);
         p.graphics.fill({
-          color: typeof controls.particleColor === 'string' 
-            ? new PIXI.Color(controls.particleColor).toNumber() 
-            : controls.particleColor,
+          color:
+            typeof controls.particleColor === 'string'
+              ? new PIXI.Color(controls.particleColor).toNumber()
+              : controls.particleColor,
           alpha: depthOpacity,
         });
         p.graphics.x = p.x;
@@ -446,9 +448,10 @@ class ParticleWaveAnimation extends PixiAnimation<
     });
 
     // Set background color if needed
-    const bgColor = typeof controls.backgroundColor === 'string'
-      ? new PIXI.Color(controls.backgroundColor).toNumber()
-      : controls.backgroundColor;
+    const bgColor =
+      typeof controls.backgroundColor === 'string'
+        ? new PIXI.Color(controls.backgroundColor).toNumber()
+        : controls.backgroundColor;
     app.renderer.background.color = bgColor;
   }
 

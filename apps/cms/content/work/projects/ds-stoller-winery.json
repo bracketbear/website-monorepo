@@ -24,15 +24,7 @@
   ],
   "isFeatured": false,
   "category": "experiential-engineering",
-  "skills": [
-    "vue",
-    "mysql",
-    "php",
-    "git",
-    "javascript",
-    "html",
-    "css"
-  ],
+  "skills": ["vue", "mysql", "php", "git", "javascript", "html", "css"],
   "cta": {
     "text": "Have a venue app with messy data? I can help tidy the source of truth.",
     "buttonText": "Talk details",
@@ -61,8 +53,5 @@
     "headline": "Cool little for learning about wine while wining and dining",
     "subline": "One source of truth feeding two on‑site apps"
   },
-  "impactTags": [
-    "content-ops",
-    "reliability"
-  ]
+  "impactTags": ["content-ops", "reliability"]
 }

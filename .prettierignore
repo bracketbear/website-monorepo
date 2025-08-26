@@ -1,0 +1,29 @@
+# Build outputs
+dist/
+.next/
+.astro/
+node_modules/
+
+# Generated files
+*.schema.json
+content-assets.mjs
+content-modules.mjs
+content.d.ts
+data-store.json
+settings.json
+types.d.ts
+
+# Documentation with code examples that cause parsing issues
+docs/pixijs/pixijs-v8-reference.md
+packages/astro-content/README.md
+packages/flateralus/src/schemas/README.md
+packages/tw-pattern-analyzer/docs/api/core.md
+packages/tw-pattern-analyzer/docs/best-practices.md
+packages/tw-pattern-analyzer/docs/concepts.md
+packages/tw-pattern-analyzer/docs/guides/configuration.md
+packages/tw-pattern-analyzer/docs/troubleshooting.md
+packages/tw-pattern-analyzer/README.md
+POSITIONING_CLEANUP_ANALYSIS.md
+
+# Reports
+reports/

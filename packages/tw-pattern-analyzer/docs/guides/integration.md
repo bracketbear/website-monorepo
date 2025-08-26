@@ -28,8 +28,8 @@ export default {
   minVariants: 1,
   output: {
     console: { enabled: true, top: 20 },
-    json: { enabled: true, path: 'reports/tw-patterns.json' }
-  }
+    json: { enabled: true, path: 'reports/tw-patterns.json' },
+  },
 };
 ```
 
@@ -60,29 +60,29 @@ on:
 jobs:
   analyze:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Analyze Tailwind patterns
         run: npm run analyze:tw:ci
-        
+
       - name: Upload analysis report
         uses: actions/upload-artifact@v4
         with:
           name: tw-pattern-analysis
           path: reports/tw-patterns.json
-          
+
       - name: Check for critical patterns
         run: |
           if [ -f reports/tw-patterns.json ]; then
@@ -181,6 +181,7 @@ workflows:
 ```
 
 **Usage:**
+
 ```bash
 # Run analysis as part of build pipeline
 npx turbo run analyze:tw
@@ -208,6 +209,7 @@ npx turbo run build analyze:tw
 ```
 
 **Usage:**
+
 ```bash
 # Run analysis
 npx nx run-many --target=analyze:tw
@@ -228,6 +230,7 @@ npx nx run-many --target=build,analyze:tw
 ```
 
 **Usage:**
+
 ```bash
 # Run analysis across all packages
 npx lerna run analyze:tw
@@ -258,46 +261,51 @@ const fs = require('fs');
 async function sendSlackNotification() {
   const token = process.env.SLACK_BOT_TOKEN;
   const channel = process.env.SLACK_CHANNEL;
-  
+
   if (!token || !channel) return;
-  
+
   const client = new WebClient(token);
-  const report = JSON.parse(fs.readFileSync('reports/tw-patterns.json', 'utf8'));
-  
-  const critical = report.clusters.filter(c => c.likelihood >= 80);
-  const high = report.clusters.filter(c => c.likelihood >= 70 && c.likelihood < 80);
-  
+  const report = JSON.parse(
+    fs.readFileSync('reports/tw-patterns.json', 'utf8')
+  );
+
+  const critical = report.clusters.filter((c) => c.likelihood >= 80);
+  const high = report.clusters.filter(
+    (c) => c.likelihood >= 70 && c.likelihood < 80
+  );
+
   const message = {
     channel,
     text: `🔍 Tailwind Pattern Analysis Complete`,
     blocks: [
       {
-        type: "section",
+        type: 'section',
         text: {
-          type: "mrkdwn",
-          text: `*Tailwind Pattern Analysis Complete*\n\n` +
-                `📊 *Summary:*\n` +
-                `• Files analyzed: ${report.metadata.stats.filesAnalyzed}\n` +
-                `• Patterns found: ${report.metadata.stats.patternsFound}\n` +
-                `• Clusters created: ${report.metadata.stats.clustersCreated}\n\n` +
-                `🎯 *Priority Patterns:*\n` +
-                `• Critical (80%+): ${critical.length}\n` +
-                `• High (70%+): ${high.length}`
-        }
-      }
-    ]
+          type: 'mrkdwn',
+          text:
+            `*Tailwind Pattern Analysis Complete*\n\n` +
+            `📊 *Summary:*\n` +
+            `• Files analyzed: ${report.metadata.stats.filesAnalyzed}\n` +
+            `• Patterns found: ${report.metadata.stats.patternsFound}\n` +
+            `• Clusters created: ${report.metadata.stats.clustersCreated}\n\n` +
+            `🎯 *Priority Patterns:*\n` +
+            `• Critical (80%+): ${critical.length}\n` +
+            `• High (70%+): ${high.length}`,
+        },
+      },
+    ],
   };
-  
+
   if (critical.length > 0) {
     message.blocks.push({
-      type: "section",
+      type: 'section',
       text: {
-        type: "mrkdwn",
-        text: `🚨 *Critical Patterns Found:*\n${critical.map(c => `• \`${c.sample}\` (${c.likelihood}%)`).join('\n')}`
-      }
+        type: 'mrkdwn',
+        text: `🚨 *Critical Patterns Found:*\n${critical.map((c) => `• \`${c.sample}\` (${c.likelihood}%)`).join('\n')}`,
+      },
     });
   }
-  
+
   await client.chat.postMessage(message);
 }
 
@@ -318,13 +326,15 @@ async function sendEmailReport() {
     secure: true,
     auth: {
       user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
+      pass: process.env.SMTP_PASS,
+    },
   });
-  
-  const report = JSON.parse(fs.readFileSync('reports/tw-patterns.json', 'utf8'));
-  const highPriority = report.clusters.filter(c => c.likelihood >= 70);
-  
+
+  const report = JSON.parse(
+    fs.readFileSync('reports/tw-patterns.json', 'utf8')
+  );
+  const highPriority = report.clusters.filter((c) => c.likelihood >= 70);
+
   const html = `
     <h2>Tailwind Pattern Analysis Report</h2>
     <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
@@ -337,19 +347,23 @@ async function sendEmailReport() {
     </ul>
     
     <h3>High Priority Patterns (70%+)</h3>
-    ${highPriority.map(c => `
+    ${highPriority
+      .map(
+        (c) => `
       <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd;">
         <strong>${c.sample}</strong><br>
         Likelihood: ${c.likelihood}% | Occurrences: ${c.occurrences} | Variants: ${c.variants}
       </div>
-    `).join('')}
+    `
+      )
+      .join('')}
   `;
-  
+
   await transporter.sendMail({
     from: process.env.FROM_EMAIL,
     to: process.env.TO_EMAIL,
     subject: 'Tailwind Pattern Analysis Report',
-    html
+    html,
   });
 }
 
@@ -369,9 +383,7 @@ sendEmailReport().catch(console.error);
     }
   },
   "lint-staged": {
-    "*.{tsx,jsx,astro,html,mdx,vue,svelte}": [
-      "npm run analyze:tw:strict"
-    ]
+    "*.{tsx,jsx,astro,html,mdx,vue,svelte}": ["npm run analyze:tw:strict"]
   }
 }
 ```
@@ -405,9 +417,9 @@ module.exports = {
       enabled: process.env.NODE_ENV === 'development',
       outputPath: 'reports/webpack-patterns.json',
       include: ['src/**/*.{tsx,jsx}'],
-      exclude: ['**/node_modules/**', '**/*.test.{tsx,jsx}']
-    })
-  ]
+      exclude: ['**/node_modules/**', '**/*.test.{tsx,jsx}'],
+    }),
+  ],
 };
 ```
 
@@ -442,13 +454,13 @@ npm run analyze:tw:ci --cache-only
 // tw-pattern-analyzer.config.js
 export default {
   // ... other config
-  
+
   // Only analyze changed files
   incremental: {
     enabled: true,
     cacheFile: '.tw-patterns-cache.json',
-    baseBranch: 'main'
-  }
+    baseBranch: 'main',
+  },
 };
 ```
 
@@ -493,7 +505,7 @@ const path = require('path');
 function extractComponent(pattern, outputDir) {
   const componentName = generateComponentName(pattern.sample);
   const componentPath = path.join(outputDir, `${componentName}.tsx`);
-  
+
   const componentCode = `
 import React from 'react';
 
@@ -510,16 +522,16 @@ export function ${componentName}({ className = '', children, ...props }: ${compo
   );
 }
 `;
-  
+
   fs.writeFileSync(componentPath, componentCode);
   console.log(`✅ Extracted component: ${componentPath}`);
 }
 
 // Extract all high-likelihood patterns
 const report = JSON.parse(fs.readFileSync('reports/tw-patterns.json', 'utf8'));
-const highPriority = report.clusters.filter(c => c.likelihood >= 70);
+const highPriority = report.clusters.filter((c) => c.likelihood >= 70);
 
-highPriority.forEach(pattern => {
+highPriority.forEach((pattern) => {
   extractComponent(pattern, 'src/components/extracted');
 });
 ```

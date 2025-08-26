@@ -5,6 +5,7 @@ A modular, type-safe content management system built with Keystatic and Astro.
 ## 🏗️ **Architecture**
 
 ### **Modular Structure**
+
 ```
 apps/cms/
 ├── src/
@@ -23,6 +24,7 @@ apps/cms/
 ### **Reusable Schema System**
 
 #### **Base Page Schema**
+
 ```typescript
 // Create base page fields
 const baseFields = makeBasePageFields();
@@ -35,6 +37,7 @@ const contactPageSchema = makePageSchema({
 ```
 
 #### **Homepage Schema**
+
 ```typescript
 // Uses nested objects for better organization
 const indexPageSchema = makeIndexPageSchema();
@@ -44,16 +47,19 @@ const indexPageSchema = makeIndexPageSchema();
 ## 🎯 **Key Features**
 
 ### **1. Relationship Fields**
+
 - **Featured Skills**: Select specific skills to highlight in the about section
 - **Selected Projects**: Choose specific projects to feature (overrides auto-selection)
 - **Selected Jobs**: Choose specific jobs to feature (overrides auto-selection)
 
 ### **2. Modular Collections**
+
 - **Work Collections**: Companies, jobs, skills, projects
 - **Content Collections**: Blog posts, pages, services
 - **Singletons**: Homepage, contact info, site settings
 
 ### **3. Type Safety**
+
 - Full TypeScript support
 - Schema validation at runtime
 - Consistent field naming across Astro and CMS
@@ -61,16 +67,19 @@ const indexPageSchema = makeIndexPageSchema();
 ## 📝 **Usage**
 
 ### **Adding New Page Types**
+
 1. Create schema in `src/schemas/`
 2. Add to singletons in `src/singletons/index.ts`
 3. Content automatically available in Astro apps
 
 ### **Using Relationship Fields**
+
 1. **Featured Skills**: Select skills from the work skills collection
 2. **Selected Projects**: Choose specific projects to feature
 3. **Selected Jobs**: Choose specific jobs to feature
 
 ### **Content Structure**
+
 ```json
 {
   "about": {
@@ -88,16 +97,19 @@ const indexPageSchema = makeIndexPageSchema();
 ## 🔧 **Development**
 
 ### **Adding New Collections**
+
 1. Create collection in appropriate file (`work.ts` or `content.ts`)
 2. Export from the file
 3. Import in `keystatic.config.tsx`
 
 ### **Adding New Singletons**
+
 1. Create schema function in `src/schemas/`
 2. Add to `src/singletons/index.ts`
 3. Use `makePageSchema()` for consistency
 
 ### **Schema Patterns**
+
 ```typescript
 // Base page with custom fields
 const customPageSchema = makePageSchema({
@@ -106,13 +118,16 @@ const customPageSchema = makePageSchema({
 
 // Nested object structure
 const complexSchema = makePageSchema({
-  section: fields.object({
-    title: fields.text({ label: 'Title' }),
-    content: fields.text({ label: 'Content', multiline: true }),
-  }, {
-    label: 'Section',
-    description: 'Section description',
-  }),
+  section: fields.object(
+    {
+      title: fields.text({ label: 'Title' }),
+      content: fields.text({ label: 'Content', multiline: true }),
+    },
+    {
+      label: 'Section',
+      description: 'Section description',
+    }
+  ),
 });
 ```
 

@@ -25,7 +25,7 @@ export function Header({
   subtitle,
   description,
   autoSpacing = true,
-  spacingOptions = {}
+  spacingOptions = {},
 }: HeaderProps) {
   const headerRef = useRef<HTMLElement>(null);
   const { adjustSpacing, getSpacingClass } = useHeaderSpacing(spacingOptions);
@@ -34,11 +34,11 @@ export function Header({
     if (autoSpacing && headerRef.current) {
       // Automatically adjust spacing on mount
       adjustSpacing(headerRef.current);
-      
+
       // Also adjust on window resize for responsive behavior
       const handleResize = () => adjustSpacing(headerRef.current!);
       window.addEventListener('resize', handleResize);
-      
+
       return () => window.removeEventListener('resize', handleResize);
     }
   }, [autoSpacing, adjustSpacing]);
@@ -49,23 +49,25 @@ export function Header({
       <header
         ref={headerRef}
         className="header-content-responsive-with-breadcrumbs"
-        style={{
-          // CSS custom properties will be set automatically
-          '--header-spacing': '6rem',
-          '--header-spacing-with-breadcrumbs': '7rem'
-        } as React.CSSProperties}
+        style={
+          {
+            // CSS custom properties will be set automatically
+            '--header-spacing': '6rem',
+            '--header-spacing-with-breadcrumbs': '7rem',
+          } as React.CSSProperties
+        }
       >
         <div className="container mx-auto px-4 text-center">
-          <h1 className="font-heading text-5xl md:text-7xl font-bold tracking-tight mb-6">
+          <h1 className="font-heading mb-6 text-5xl font-bold tracking-tight md:text-7xl">
             {title}
           </h1>
           {subtitle && (
-            <h2 className="font-heading text-2xl md:text-3xl font-semibold tracking-wide mb-4 text-muted-foreground">
+            <h2 className="font-heading text-muted-foreground mb-4 text-2xl font-semibold tracking-wide md:text-3xl">
               {subtitle}
             </h2>
           )}
           {description && (
-            <p className="text-lg md:text-xl text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-muted-foreground/80 mx-auto max-w-3xl text-lg leading-relaxed md:text-xl">
               {description}
             </p>
           )}
@@ -78,19 +80,19 @@ export function Header({
   return (
     <header className={getSpacingClass()}>
       <div className="container mx-auto px-4 text-center">
-        <h1 className="font-heading text-5xl md:text-7xl font-bold tracking-tight mb-6">
+        <h1 className="font-heading mb-6 text-5xl font-bold tracking-tight md:text-7xl">
           {title}
         </h1>
         {subtitle && (
-          <h2 className="font-heading text-2xl md:text-3xl font-semibold tracking-wide mb-4 text-muted-foreground">
+          <h2 className="font-heading text-muted-foreground mb-4 text-2xl font-semibold tracking-wide md:text-3xl">
             {subtitle}
           </h2>
         )}
         {description && (
-          <p className="text-lg md:text-xl text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-muted-foreground/80 mx-auto max-w-3xl text-lg leading-relaxed md:text-xl">
             {description}
           </p>
-          )}
+        )}
       </div>
     </header>
   );
@@ -103,21 +105,21 @@ export function Header({
 export function HeaderCSSOnly({
   title,
   subtitle,
-  description
+  description,
 }: Omit<HeaderProps, 'autoSpacing' | 'spacingOptions'>) {
   return (
     <header className="header-content-responsive-with-breadcrumbs">
       <div className="container mx-auto px-4 text-center">
-        <h1 className="font-heading text-5xl md:text-7xl font-bold tracking-tight mb-6">
+        <h1 className="font-heading mb-6 text-5xl font-bold tracking-tight md:text-7xl">
           {title}
         </h1>
         {subtitle && (
-          <h2 className="font-heading text-2xl md:text-3xl font-semibold tracking-wide mb-4 text-muted-foreground">
+          <h2 className="font-heading text-muted-foreground mb-4 text-2xl font-semibold tracking-wide md:text-3xl">
             {subtitle}
           </h2>
         )}
         {description && (
-          <p className="text-lg md:text-xl text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-muted-foreground/80 mx-auto max-w-3xl text-lg leading-relaxed md:text-xl">
             {description}
           </p>
         )}
@@ -125,4 +127,3 @@ export function HeaderCSSOnly({
     </header>
   );
 }
-

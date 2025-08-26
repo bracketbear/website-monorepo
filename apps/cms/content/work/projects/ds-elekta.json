@@ -24,15 +24,7 @@
   ],
   "isFeatured": false,
   "category": "experiential-engineering",
-  "skills": [
-    "vue",
-    "mysql",
-    "php",
-    "git",
-    "javascript",
-    "html",
-    "css"
-  ],
+  "skills": ["vue", "mysql", "php", "git", "javascript", "html", "css"],
   "cta": {
     "text": "Working on a similar control surface? Happy to talk through options.",
     "buttonText": "Start a conversation",
@@ -62,8 +54,5 @@
     "headline": "Boardroom control that fits the room",
     "subline": "Custom actions, per‑platform tweaks, and tablet support"
   },
-  "impactTags": [
-    "usability",
-    "reusability"
-  ]
+  "impactTags": ["usability", "reusability"]
 }

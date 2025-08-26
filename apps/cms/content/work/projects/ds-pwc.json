@@ -19,12 +19,7 @@
   ],
   "isFeatured": false,
   "category": "experiential-engineering",
-  "skills": [
-    "c-plus-plus",
-    "illustrator",
-    "photoshop",
-    "git"
-  ],
+  "skills": ["c-plus-plus", "illustrator", "photoshop", "git"],
   "cta": {
     "text": "Have a complex install to wrangle? Let’s make the operations simple.",
     "buttonText": "Talk details",
@@ -53,8 +48,5 @@
     "headline": "One app, many surfaces",
     "subline": "Signage, LED film, mosaic wall, and an interactive Learning Zone"
   },
-  "impactTags": [
-    "reliability",
-    "systems"
-  ]
+  "impactTags": ["reliability", "systems"]
 }

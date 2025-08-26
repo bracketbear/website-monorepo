@@ -1,6 +1,7 @@
 # Bracket Bear Website
 
 ## Overview
+
 Main company website for Bracket Bear, built with Astro. Showcases services, company information, and client work with a modern, brutalist design aesthetic.
 
 ## Table of Contents
@@ -90,6 +91,7 @@ apps/bracketbear-website/
 ## Design System
 
 The website uses the shared design system from `@bracketbear/core`, including:
+
 - Brutalist card components
 - Custom Tailwind utilities
 - Tangible design effects

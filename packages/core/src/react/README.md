@@ -5,22 +5,19 @@ A comprehensive modal system built with React that provides alert, confirmation,
 ## Components
 
 ### Modal
+
 The base modal component that provides the foundation for all modal types.
 
 ```tsx
 import { Modal } from '@bracketbear/core/react';
 
-<Modal
-  isOpen={isOpen}
-  onClose={handleClose}
-  title="Modal Title"
-  size="lg"
->
+<Modal isOpen={isOpen} onClose={handleClose} title="Modal Title" size="lg">
   <p>Modal content goes here</p>
-</Modal>
+</Modal>;
 ```
 
 **Props:**
+
 - `isOpen`: Whether the modal is open
 - `onClose`: Callback when modal should close
 - `title`: Optional modal title
@@ -30,6 +27,7 @@ import { Modal } from '@bracketbear/core/react';
 - `closeOnEscape`: Whether pressing escape closes modal (default: true)
 
 ### AlertModal
+
 A simple alert modal for displaying messages with a single action button.
 
 ```tsx
@@ -43,10 +41,11 @@ import { AlertModal } from '@bracketbear/core/react';
   type="success"
   buttonText="OK"
   onConfirm={handleConfirm}
-/>
+/>;
 ```
 
 **Props:**
+
 - `title`: Alert title
 - `message`: Alert message
 - `type`: Alert type ('info', 'success', 'warning', 'error')
@@ -54,6 +53,7 @@ import { AlertModal } from '@bracketbear/core/react';
 - `onConfirm`: Callback when button is clicked
 
 ### ConfirmModal
+
 A confirmation modal with two buttons for yes/no decisions.
 
 ```tsx
@@ -70,10 +70,11 @@ import { ConfirmModal } from '@bracketbear/core/react';
   isDestructive={true}
   onConfirm={handleDelete}
   onCancel={handleCancel}
-/>
+/>;
 ```
 
 **Props:**
+
 - `title`: Confirmation title
 - `message`: Confirmation message
 - `confirmText`: Confirm button text (default: 'Confirm')
@@ -85,6 +86,7 @@ import { ConfirmModal } from '@bracketbear/core/react';
 - `onCancel`: Callback when cancelled
 
 ### ImageViewerModal
+
 A full-featured image viewer modal with navigation, thumbnails, and fullscreen support.
 
 ```tsx
@@ -99,10 +101,11 @@ import { ImageViewerModal } from '@bracketbear/core/react';
   ]}
   initialIndex={0}
   title="Project Gallery"
-/>
+/>;
 ```
 
 **Props:**
+
 - `images`: Array of image objects
 - `initialIndex`: Starting image index (default: 0)
 - `showNavigation`: Whether to show navigation controls (default: true)
@@ -112,18 +115,20 @@ import { ImageViewerModal } from '@bracketbear/core/react';
 ## Hooks
 
 ### useModal
+
 A custom hook that provides convenient methods for showing different types of modals.
 
 ```tsx
 import { useModal } from '@bracketbear/core/react';
 
 function MyComponent() {
-  const { showAlert, showConfirm, showImageViewer, closeModal, isModalOpen } = useModal();
+  const { showAlert, showConfirm, showImageViewer, closeModal, isModalOpen } =
+    useModal();
 
   const handleShowAlert = () => {
     showAlert('Info', 'This is an informational message', {
       type: 'info',
-      onConfirm: () => console.log('Alert confirmed')
+      onConfirm: () => console.log('Alert confirmed'),
     });
   };
 
@@ -131,7 +136,7 @@ function MyComponent() {
     showConfirm('Delete', 'Are you sure?', {
       isDestructive: true,
       onConfirm: () => console.log('Confirmed'),
-      onCancel: () => console.log('Cancelled')
+      onCancel: () => console.log('Cancelled'),
     });
   };
 
@@ -152,6 +157,7 @@ function MyComponent() {
 ## Provider
 
 ### ModalProvider
+
 A provider component that renders the appropriate modal based on the modal state.
 
 ```tsx
@@ -171,6 +177,7 @@ function App() {
 ## Image Gallery
 
 ### ImageGallery
+
 A responsive image gallery component that opens images in the ImageViewerModal when clicked.
 
 ```tsx
@@ -185,10 +192,11 @@ import { ImageGallery } from '@bracketbear/core/react';
   description="A collection of project images"
   columns={3}
   showCaptions={true}
-/>
+/>;
 ```
 
 **Props:**
+
 - `images`: Array of gallery images
 - `title`: Gallery title
 - `description`: Gallery description
@@ -199,16 +207,18 @@ import { ImageGallery } from '@bracketbear/core/react';
 ## Usage Examples
 
 ### Basic Alert
+
 ```tsx
 const { showAlert } = useModal();
 
 showAlert('Success', 'Operation completed successfully!', {
   type: 'success',
-  onConfirm: () => console.log('User acknowledged')
+  onConfirm: () => console.log('User acknowledged'),
 });
 ```
 
 ### Confirmation Dialog
+
 ```tsx
 const { showConfirm } = useModal();
 
@@ -217,23 +227,25 @@ showConfirm('Delete Project', 'This action cannot be undone.', {
   cancelText: 'Keep Project',
   isDestructive: true,
   onConfirm: () => deleteProject(),
-  onCancel: () => console.log('User cancelled')
+  onCancel: () => console.log('User cancelled'),
 });
 ```
 
 ### Image Viewer
+
 ```tsx
 const { showImageViewer } = useModal();
 
 showImageViewer(projectImages, {
   initialIndex: 2,
-  title: 'Project Screenshots'
+  title: 'Project Screenshots',
 });
 ```
 
 ## Styling
 
 The modal system uses the Bracket Bear design system with:
+
 - Comic book style shadows
 - Brand colors (orange headers, dark borders)
 - Responsive design

@@ -72,8 +72,5 @@
     "headline": "Headless storefront",
     "subline": "Moved from a theme to a modern front‑end without downtime"
   },
-  "impactTags": [
-    "conversion",
-    "maintainability"
-  ]
+  "impactTags": ["conversion", "maintainability"]
 }

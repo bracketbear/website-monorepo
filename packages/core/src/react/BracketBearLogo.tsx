@@ -4,9 +4,7 @@ export interface BracketBearLogoProps {
   className?: string;
 }
 
-export function BracketBearLogo({
-  className = '',
-}: BracketBearLogoProps) {
+export function BracketBearLogo({ className = '' }: BracketBearLogoProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

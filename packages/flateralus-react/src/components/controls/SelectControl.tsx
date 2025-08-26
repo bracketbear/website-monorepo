@@ -12,9 +12,17 @@ interface SelectControlProps {
  *
  * Renders a dropdown select for animation parameters with predefined options
  */
-export function SelectControl({ control, value, onControlChange }: SelectControlProps) {
+export function SelectControl({
+  control,
+  value,
+  onControlChange,
+}: SelectControlProps) {
   return (
-    <BaseControlWrapper label={control.label} name={control.name} description={control.description}>
+    <BaseControlWrapper
+      label={control.label}
+      name={control.name}
+      description={control.description}
+    >
       <select
         value={value}
         onChange={(e) => onControlChange(control.name, e.target.value)}

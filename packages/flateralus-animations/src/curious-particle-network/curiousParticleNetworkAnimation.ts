@@ -249,9 +249,10 @@ function createParticle(
     ? (controls.particleColors as AnyControlValue[])
         .filter((item) => item.type === 'color')
         .map((item) => ({
-          color: typeof item.value === 'string' 
-            ? parseInt(item.value.replace('#', ''), 16) 
-            : item.value,
+          color:
+            typeof item.value === 'string'
+              ? parseInt(item.value.replace('#', ''), 16)
+              : item.value,
           alpha: (item.metadata?.alpha as number) ?? 1.0,
         }))
     : [

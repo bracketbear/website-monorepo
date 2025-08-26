@@ -12,25 +12,26 @@ Main configuration interface for the analyzer.
 interface AnalyzerConfig {
   // Required
   globs: string[];
-  
+
   // Optional with defaults
   ignoreGlobs?: string[];
   similarityThreshold?: number;
   minOccurrences?: number;
   minVariants?: number;
-  
+
   // Output configuration
   output?: OutputConfig;
-  
+
   // Parsing configuration
   parsing?: ParsingConfig;
-  
+
   // Clustering configuration
   clustering?: ClusteringConfig;
 }
 ```
 
 **Default Values:**
+
 - `ignoreGlobs`: `['**/node_modules/**', '**/.next/**', '**/dist/**', '**/.astro/**', '**/build/**', '**/.output/**', '**/coverage/**', '**/.turbo/**']`
 - `similarityThreshold`: `0.75`
 - `minOccurrences`: `2`
@@ -53,9 +54,9 @@ Console output configuration.
 
 ```typescript
 interface ConsoleOutputConfig {
-  enabled?: boolean;        // Default: true
-  top?: number;            // Default: 20
-  showDetails?: boolean;   // Default: false
+  enabled?: boolean; // Default: true
+  top?: number; // Default: 20
+  showDetails?: boolean; // Default: false
   format?: 'table' | 'json'; // Default: 'table'
 }
 ```
@@ -66,11 +67,11 @@ JSON output configuration.
 
 ```typescript
 interface JsonOutputConfig {
-  enabled?: boolean;              // Default: true
-  path?: string;                  // Default: 'reports/tw-patterns.json'
-  pretty?: boolean;               // Default: true
-  includeMetadata?: boolean;      // Default: true
-  includeRawPatterns?: boolean;   // Default: false
+  enabled?: boolean; // Default: true
+  path?: string; // Default: 'reports/tw-patterns.json'
+  pretty?: boolean; // Default: true
+  includeMetadata?: boolean; // Default: true
+  includeRawPatterns?: boolean; // Default: false
 }
 ```
 
@@ -101,8 +102,8 @@ Likelihood scoring weights.
 
 ```typescript
 interface ScoringConfig {
-  variants?: number;    // Default: 60
-  frequency?: number;   // Default: 40
+  variants?: number; // Default: 60
+  frequency?: number; // Default: 40
 }
 ```
 
@@ -335,10 +336,10 @@ Custom error class for analyzer-specific errors.
 ```typescript
 class AnalyzerError extends Error {
   constructor(message: string, code: string, details?: any);
-  
+
   code: string;
   details?: any;
-  
+
   static isAnalyzerError(error: any): error is AnalyzerError;
 }
 ```
@@ -348,7 +349,7 @@ class AnalyzerError extends Error {
 Error code enumeration.
 
 ```typescript
-type ErrorCode = 
+type ErrorCode =
   | 'INVALID_CONFIG'
   | 'FILE_READ_ERROR'
   | 'PARSE_ERROR'
@@ -386,7 +387,14 @@ type GlobPattern = string;
 Supported file extension.
 
 ```typescript
-type FileExtension = '.tsx' | '.jsx' | '.astro' | '.html' | '.mdx' | '.vue' | '.svelte';
+type FileExtension =
+  | '.tsx'
+  | '.jsx'
+  | '.astro'
+  | '.html'
+  | '.mdx'
+  | '.vue'
+  | '.svelte';
 ```
 
 ### `ParsingStrategy`
@@ -584,7 +592,7 @@ export type {
   PatternCluster,
   Analyzer,
   AnalyzerError,
-  ErrorCode
+  ErrorCode,
 };
 
 // Configuration types
@@ -594,7 +602,7 @@ export type {
   JsonOutputConfig,
   ParsingConfig,
   ClusteringConfig,
-  ScoringConfig
+  ScoringConfig,
 };
 
 // Analysis types
@@ -604,7 +612,7 @@ export type {
   AnalyzerStats,
   FileInfo,
   ParsedFile,
-  PatternMatch
+  PatternMatch,
 };
 
 // Clustering types
@@ -613,7 +621,7 @@ export type {
   ClusterCandidate,
   ClusterGroup,
   LikelihoodScore,
-  ScoreBreakdown
+  ScoreBreakdown,
 };
 
 // Utility types
@@ -624,7 +632,7 @@ export type {
   OutputFormat,
   Result,
   AsyncResult,
-  ConfigOverride
+  ConfigOverride,
 };
 
 // Function types
@@ -632,7 +640,7 @@ export type {
   SimilarityFunction,
   PatternExtractor,
   ClusterValidator,
-  OutputFormatter
+  OutputFormatter,
 };
 
 // Report types
@@ -641,7 +649,7 @@ export type {
   FormattedReport,
   ThemeConfig,
   CacheConfig,
-  CacheEntry
+  CacheEntry,
 };
 ```
 
@@ -658,18 +666,18 @@ const config: AnalyzerConfig = {
   minOccurrences: 3,
   output: {
     console: { enabled: true, top: 10 },
-    json: { enabled: true, path: 'reports/patterns.json' }
-  }
+    json: { enabled: true, path: 'reports/patterns.json' },
+  },
 };
 ```
 
 ### Custom Types
 
 ```typescript
-import type { 
-  AnalyzerConfig, 
-  ParsingConfig, 
-  SimilarityFunction 
+import type {
+  AnalyzerConfig,
+  ParsingConfig,
+  SimilarityFunction,
 } from '@bracketbear/tw-pattern-analyzer';
 
 // Custom similarity function
@@ -681,29 +689,32 @@ const customSimilarity: SimilarityFunction = (patternA, patternB) => {
 // Custom parsing configuration
 const customParsing: ParsingConfig = {
   patterns: {
-    custom: /(?:data-tw\s*=\s*)(?:"([^"]+)")/g
+    custom: /(?:data-tw\s*=\s*)(?:"([^"]+)")/g,
   },
   fileTypes: {
-    '.custom': ['custom']
-  }
+    '.custom': ['custom'],
+  },
 };
 
 const config: AnalyzerConfig = {
   globs: ['src/**/*.custom'],
   parsing: customParsing,
-  similarityThreshold: 0.8
+  similarityThreshold: 0.8,
 };
 ```
 
 ### Type Guards
 
 ```typescript
-import type { AnalyzerError, ErrorCode } from '@bracketbear/tw-pattern-analyzer';
+import type {
+  AnalyzerError,
+  ErrorCode,
+} from '@bracketbear/tw-pattern-analyzer';
 
 function handleError(error: unknown): void {
   if (AnalyzerError.isAnalyzerError(error)) {
     console.error(`Analyzer error (${error.code}):`, error.message);
-    
+
     switch (error.code as ErrorCode) {
       case 'INVALID_CONFIG':
         console.error('Configuration error');

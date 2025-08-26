@@ -5,11 +5,11 @@
 }
 
 .form-label {
-  @apply text-foreground text-lg font-black uppercase group-focus-within:text-primary transition-colors;
+  @apply text-foreground group-focus-within:text-primary text-lg font-black uppercase transition-colors;
 }
 
 .form-input {
-  @apply bg-background text-foreground w-full transition-all transform hover:-translate-y-0.5 px-4 py-2;
+  @apply bg-background text-foreground w-full transform px-4 py-2 transition-all hover:-translate-y-0.5;
   border: 2px solid var(--color-foreground);
 }
 
@@ -20,9 +20,9 @@
 }
 
 .form-button {
-  @apply bg-foreground text-background border-background px-8 py-4 text-xl font-black uppercase transition-all transform hover:scale-105 hover:rotate-1 active:scale-95;
+  @apply bg-foreground text-background border-background transform px-8 py-4 text-xl font-black uppercase transition-all hover:scale-105 hover:rotate-1 active:scale-95;
 }
 
 .form-required {
   @apply text-brand-red;
-} 
+}

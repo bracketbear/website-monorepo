@@ -1,6 +1,7 @@
 # @bracketbear/core
 
 ## Overview
+
 Shared components, layouts, and utilities for Bracket Bear applications. Provides a consistent design system, layout components, and type definitions across all projects.
 
 ## Table of Contents
@@ -43,7 +44,7 @@ import { Layout, portfolioNavigation } from '@bracketbear/core/astro';
 import ContactForm from '@/components/ContactForm.astro';
 ---
 
-<Layout 
+<Layout
   title="My Page"
   navigation={portfolioNavigation}
   contactForm={ContactForm}
@@ -59,6 +60,7 @@ import ContactForm from '@/components/ContactForm.astro';
 ### Layout
 
 The main layout component that provides:
+
 - HTML structure with theme initialization
 - Configurable navigation
 - Configurable footer
@@ -77,7 +79,7 @@ interface Props {
 }
 ---
 
-<Layout 
+<Layout
   title="Page Title"
   hideContactForm={false}
   hideFooter={false}
@@ -93,6 +95,7 @@ interface Props {
 ### NavBar
 
 Configurable navigation component with:
+
 - Responsive design (mobile menu)
 - Dropdown support
 - Theme switching
@@ -111,6 +114,7 @@ import { portfolioNavigation } from '@bracketbear/core/config';
 ### Footer
 
 Configurable footer component with:
+
 - Navigation links
 - Social links
 - Branding
@@ -122,10 +126,7 @@ import { Footer } from '@bracketbear/core/astro';
 import { portfolioNavigation } from '@bracketbear/core/config';
 ---
 
-<Footer 
-  config={portfolioNavigation} 
-  copyrightText="Custom copyright text"
-/>
+<Footer config={portfolioNavigation} copyrightText="Custom copyright text" />
 ```
 
 ## Configuration
@@ -138,36 +139,36 @@ import type { NavigationConfig } from '@bracketbear/core/types';
 const navigation: NavigationConfig = {
   items: [
     { name: 'Home', href: '/' },
-    { 
-      name: 'About', 
+    {
+      name: 'About',
       href: '/about',
       children: [
         { name: 'About Me', href: '/about/me' },
-        { name: 'About Company', href: '/about/company' }
-      ]
+        { name: 'About Company', href: '/about/company' },
+      ],
     },
-    { name: 'Contact', href: '/contact' }
+    { name: 'Contact', href: '/contact' },
   ],
   branding: {
     name: 'My Brand',
     href: '/',
-    logo: '/logo.svg' // Optional
+    logo: '/logo.svg', // Optional
   },
   socialLinks: {
     linkedin: 'https://linkedin.com/in/username',
     github: 'https://github.com/username',
-    twitter: 'https://twitter.com/username'
-  }
+    twitter: 'https://twitter.com/username',
+  },
 };
 ```
 
 ### Pre-built Configurations
 
 ```typescript
-import { 
+import {
   defaultNavigation,
-  portfolioNavigation, 
-  bracketBearNavigation 
+  portfolioNavigation,
+  bracketBearNavigation,
 } from '@bracketbear/core/config';
 ```
 
@@ -209,8 +210,6 @@ interface LayoutProps {
   hideFooter?: boolean;
   hideNavigation?: boolean;
 }
-
-
 ```
 
 ## Styling
@@ -255,7 +254,7 @@ import { Layout, portfolioNavigation } from '@bracketbear/core/astro';
 import ContactForm from '@/components/ContactForm.astro';
 ---
 
-<Layout 
+<Layout
   title="Harrison Callahan - Portfolio"
   navigation={portfolioNavigation}
   contactForm={ContactForm}
@@ -274,7 +273,7 @@ import { Layout, bracketBearNavigation } from '@bracketbear/core/astro';
 import ContactForm from '@/components/ContactForm.astro';
 ---
 
-<Layout 
+<Layout
   title="Bracket Bear - Software Development"
   navigation={bracketBearNavigation}
   contactForm={ContactForm}

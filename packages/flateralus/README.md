@@ -20,4 +20,4 @@ Each directory contains an `index.ts` file to provide clean exports. The package
 
 ---
 
-This pattern should be followed for all future additions to the package. 
+This pattern should be followed for all future additions to the package.

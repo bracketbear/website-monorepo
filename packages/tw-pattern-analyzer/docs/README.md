@@ -5,33 +5,39 @@ Welcome to the comprehensive documentation for the Tailwind CSS Pattern Analyzer
 ## 📚 Documentation Sections
 
 ### 🚀 [Getting Started](./getting-started.md)
+
 - Quick installation and setup
 - First analysis run
 - Basic configuration
 
 ### 🧠 [Core Concepts](./concepts.md)
+
 - Pattern detection fundamentals
 - Similarity algorithms explained
 - Clustering strategies
 - Likelihood scoring
 
 ### 📖 [User Guides](./guides/)
+
 - [Configuration Guide](./guides/configuration.md) - Detailed config options
 - [CLI Usage](./guides/cli-usage.md) - Command line interface
 - [Integration Guide](./guides/integration.md) - CI/CD and build tools
 - [Advanced Usage](./guides/advanced-usage.md) - Custom patterns and tuning
 
 ### 🔧 [API Reference](./api/)
+
 - [Core API](./api/core.md) - Main analyzer functions
 - [Types](./api/types.md) - TypeScript interfaces
 - [CLI Options](./api/cli.md) - Command line parameters
 
 ### 📊 [Examples](./examples/)
+
 - [Basic Analysis](./examples/basic-analysis.md) - Simple usage examples
 - [Custom Patterns](./examples/custom-patterns.md) - Framework-specific examples
 - [Output Interpretation](./examples/output-interpretation.md) - Understanding results
 
 ### 🎯 [Best Practices](./best-practices.md)
+
 - Configuration recommendations
 - Performance optimization
 - Result interpretation

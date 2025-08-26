@@ -13,12 +13,14 @@ const { config, variant = 'default', class: className } = Astro.props;
 const { items: navItems, branding, socialLinks, breadcrumbs } = config;
 
 // Filter navigation items based on platform visibility
-const desktopNavItems = navItems.filter(item => item.desktop !== false);
-const mobileNavItems = navItems.filter(item => item.mobile !== false);
+const desktopNavItems = navItems.filter((item) => item.desktop !== false);
+const mobileNavItems = navItems.filter((item) => item.mobile !== false);
 
 // Helper function to filter children based on platform visibility
 function filterVisibleChildren(children: NavItem[], isMobile: boolean) {
-  return children.filter(child => isMobile ? child.mobile !== false : child.desktop !== false);
+  return children.filter((child) =>
+    isMobile ? child.mobile !== false : child.desktop !== false
+  );
 }
 
 // Helper function to get consistent menu item styles
@@ -26,19 +28,21 @@ function getMenuItemStyles(variant: string, isMobile = false) {
   if (isMobile) {
     return {
       base: 'block rounded-lg px-3 py-3 text-lg font-semibold transition-all',
-      variant: variant === 'glass'
-        ? 'glass-text hover:glass-hover hover:bg-black/10 hover:backdrop-blur-sm'
-        : 'text-gray-900 hover:bg-gray-50'
+      variant:
+        variant === 'glass'
+          ? 'glass-text hover:glass-hover hover:bg-black/10 hover:backdrop-blur-sm'
+          : 'text-gray-900 hover:bg-gray-50',
     };
   }
-  
+
   return {
     base: 'group font-heading relative font-semibold tracking-wide uppercase transition-all px-4 py-2 rounded-lg',
-    variant: variant === 'ghost-dark'
-      ? 'hover:text-text-primary/80 text-text-primary hover:bg-black/20 hover:backdrop-blur-sm'
-      : variant === 'glass'
+    variant:
+      variant === 'ghost-dark'
         ? 'hover:text-text-primary/80 text-text-primary hover:bg-black/20 hover:backdrop-blur-sm'
-        : 'text-text-primary hover:text-text-primary hover:bg-black/20 hover:backdrop-blur-sm'
+        : variant === 'glass'
+          ? 'hover:text-text-primary/80 text-text-primary hover:bg-black/20 hover:backdrop-blur-sm'
+          : 'text-text-primary hover:text-text-primary hover:bg-black/20 hover:backdrop-blur-sm',
   };
 }
 
@@ -46,11 +50,12 @@ function getMenuItemStyles(variant: string, isMobile = false) {
 function getDropdownChildStyles(variant: string) {
   return {
     base: 'font-heading block px-4 py-4 text-sm font-semibold tracking-wide uppercase transition-all rounded-md mx-2',
-    variant: variant === 'ghost-light'
-      ? 'hover:bg-card hover:text-text-primary text-text-primary'
-      : variant === 'glass'
-        ? 'text-text-primary hover:text-text-primary hover:bg-black/10 hover:backdrop-blur-sm'
-        : 'text-primary-foreground hover:bg-muted hover:text-muted-foreground'
+    variant:
+      variant === 'ghost-light'
+        ? 'hover:bg-card hover:text-text-primary text-text-primary'
+        : variant === 'glass'
+          ? 'text-text-primary hover:text-text-primary hover:bg-black/10 hover:backdrop-blur-sm'
+          : 'text-primary-foreground hover:bg-muted hover:text-muted-foreground',
   };
 }
 
@@ -58,11 +63,12 @@ function getDropdownChildStyles(variant: string) {
 function getDropdownBackgroundStyles(variant: string) {
   return {
     base: 'border-border py-4 shadow-[8px_8px_0_0_var(--color-border)]',
-    variant: variant === 'ghost-dark'
-      ? 'bg-muted'
-      : variant === 'glass'
-        ? 'glass-bg-light'
-        : 'bg-card'
+    variant:
+      variant === 'ghost-dark'
+        ? 'bg-muted'
+        : variant === 'glass'
+          ? 'glass-bg-light'
+          : 'bg-card',
   };
 }
 ---
@@ -84,7 +90,7 @@ function getDropdownBackgroundStyles(variant: string) {
       variant === 'ghost-dark'
         ? 'border-transparent bg-transparent'
         : variant === 'glass'
-          ? 'border-transparent glass-bg glass-shadow'
+          ? 'glass-bg glass-shadow border-transparent'
           : 'border-border bg-primary',
     ]}
     role="navigation"
@@ -160,25 +166,26 @@ function getDropdownBackgroundStyles(variant: string) {
                       role="menu"
                       aria-label={`${item.name} submenu`}
                     >
-                      <!-- z-30: Dropdown submenu (below main navigation) -->
                       <div
                         class:list={[
                           getDropdownBackgroundStyles(variant).base,
                           getDropdownBackgroundStyles(variant).variant,
                         ]}
                       >
-                        {filterVisibleChildren(item.children, false).map((child) => (
-                          <a
-                            href={child.href}
-                            class:list={[
-                              getDropdownChildStyles(variant).base,
-                              getDropdownChildStyles(variant).variant,
-                            ]}
-                            role="menuitem"
-                          >
-                            {child.name}
-                          </a>
-                        ))}
+                        {filterVisibleChildren(item.children, false).map(
+                          (child) => (
+                            <a
+                              href={child.href}
+                              class:list={[
+                                getDropdownChildStyles(variant).base,
+                                getDropdownChildStyles(variant).variant,
+                              ]}
+                              role="menuitem"
+                            >
+                              {child.name}
+                            </a>
+                          )
+                        )}
                       </div>
                     </div>
                   </div>
@@ -244,7 +251,7 @@ function getDropdownBackgroundStyles(variant: string) {
 <div
   id="mobile-menu-overlay"
   class:list={[
-    'fixed inset-0 z-[60] hidden transition-opacity duration-300 overflow-hidden',
+    'fixed inset-0 z-[60] hidden overflow-hidden transition-opacity duration-300',
     variant === 'glass'
       ? 'bg-black/60 backdrop-blur-md'
       : 'bg-black/50 backdrop-blur-sm',
@@ -258,7 +265,7 @@ function getDropdownBackgroundStyles(variant: string) {
 <div
   id="mobile-menu-drawer"
   class:list={[
-    'fixed top-0 right-0 z-[60] h-full transition-all duration-300 ease-in-out overflow-hidden hidden shadow-2xl',
+    'fixed top-0 right-0 z-[60] hidden h-full overflow-hidden shadow-2xl transition-all duration-300 ease-in-out',
     'w-96 max-w-[90vw]', // Larger width
     variant === 'glass'
       ? 'glass-bg-light glass-border glass-shadow-lg'
@@ -275,18 +282,14 @@ function getDropdownBackgroundStyles(variant: string) {
   <div
     class:list={[
       'flex h-16 items-center justify-between border-b px-6',
-      variant === 'glass'
-        ? 'glass-border'
-        : 'border-gray-200',
+      variant === 'glass' ? 'glass-border' : 'border-gray-200',
     ]}
   >
     <h2
       id="mobile-menu-title"
       class:list={[
         'font-heading text-xl font-semibold tracking-wide uppercase',
-        variant === 'glass'
-          ? 'glass-text'
-          : 'text-gray-900',
+        variant === 'glass' ? 'glass-text' : 'text-gray-900',
       ]}
     >
       Navigation
@@ -314,10 +317,7 @@ function getDropdownBackgroundStyles(variant: string) {
   </div>
 
   <!-- Navigation Items -->
-  <nav
-    class="flex-1 overflow-y-auto px-6 py-4"
-    aria-label="Mobile navigation"
-  >
+  <nav class="flex-1 overflow-y-auto px-6 py-4" aria-label="Mobile navigation">
     <ul class="space-y-2" role="menubar">
       {
         mobileNavItems.map((item) => (
@@ -380,9 +380,7 @@ function getDropdownBackgroundStyles(variant: string) {
   <div
     class:list={[
       'border-t px-6 py-4',
-      variant === 'glass'
-        ? 'glass-border'
-        : 'border-gray-200',
+      variant === 'glass' ? 'glass-border' : 'border-gray-200',
     ]}
   >
     <div class="flex items-center justify-center space-x-4">
@@ -416,9 +414,7 @@ function getDropdownBackgroundStyles(variant: string) {
   <div
     class:list={[
       'border-t px-6 py-4',
-      variant === 'glass'
-        ? 'glass-border'
-        : 'border-gray-200',
+      variant === 'glass' ? 'glass-border' : 'border-gray-200',
     ]}
   >
     <div class="flex items-center justify-center">
@@ -438,7 +434,7 @@ function getDropdownBackgroundStyles(variant: string) {
         ) : (
           <a
             href={branding?.href || '/'}
-            class="font-heading text-xl font-semibold tracking-wide uppercase transition-colors hover:opacity-80 text-brand-orange"
+            class="font-heading text-brand-orange text-xl font-semibold tracking-wide uppercase transition-colors hover:opacity-80"
             aria-label={`Go to ${branding?.name || 'home'}`}
           >
             {branding?.name || 'Brand'}

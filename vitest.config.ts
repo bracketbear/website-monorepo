@@ -21,7 +21,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@bracketbear/core': resolve(__dirname, './packages/core/src'),
-      '@bracketbear/core/react': resolve(__dirname, './packages/core/src/react'),
+      '@bracketbear/core/react': resolve(
+        __dirname,
+        './packages/core/src/react'
+      ),
       '@bracketbear/astro-content': resolve(
         __dirname,
         './packages/astro-content'

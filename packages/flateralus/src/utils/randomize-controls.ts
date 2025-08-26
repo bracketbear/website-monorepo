@@ -120,12 +120,21 @@ function randomizeGroup(control: GroupControl): AnyControlValue[] {
         case 'number':
           // For homogeneous number groups, respect the individual item constraints
           if (control.items && control.items.length > 0) {
-            const firstNumberItem = control.items.find(item => item.type === 'number');
-            if (firstNumberItem && typeof firstNumberItem.min === 'number' && typeof firstNumberItem.max === 'number') {
+            const firstNumberItem = control.items.find(
+              (item) => item.type === 'number'
+            );
+            if (
+              firstNumberItem &&
+              typeof firstNumberItem.min === 'number' &&
+              typeof firstNumberItem.max === 'number'
+            ) {
               controlValue = {
                 type: 'number',
                 value: randomInRange(firstNumberItem.min, firstNumberItem.max),
-                metadata: { min: firstNumberItem.min, max: firstNumberItem.max },
+                metadata: {
+                  min: firstNumberItem.min,
+                  max: firstNumberItem.max,
+                },
               };
             } else {
               // Fallback to default range if no constraints found

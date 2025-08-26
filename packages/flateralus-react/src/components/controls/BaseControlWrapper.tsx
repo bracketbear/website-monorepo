@@ -22,11 +22,13 @@ export function BaseControlWrapper({
 }: BaseControlWrapperProps) {
   // Use label if provided, otherwise fall back to name, or show "Control"
   const displayLabel = label || name || 'Control';
-  
+
   return (
     <div className={`flex flex-col gap-0.5 py-2 ${className}`}>
       <div className="flex items-center gap-2">
-        <label className="w-32 shrink-0 text-xs text-white/70">{displayLabel}</label>
+        <label className="w-32 shrink-0 text-xs text-white/70">
+          {displayLabel}
+        </label>
         {children}
       </div>
       {description && (
