@@ -44,7 +44,7 @@ export function useLuminanceDetection(
       const pixiApp = (application as any).getPixiApp?.();
       if (!pixiApp) return;
 
-      const luminance = averageLuminanceFromPixi(pixiApp, undefined, false);
+      const luminance = averageLuminanceFromPixi(pixiApp, undefined);
 
       // Determine if we need light or dark text based on background luminance
       const lightTextContrast = (luminance + 0.05) / 0.05;
