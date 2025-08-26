@@ -93,7 +93,7 @@ export function Popover({
       case 'bottom-start':
         return 'bottom-full left-6 border-b-neutral-600 border-l-transparent border-r-transparent border-t-transparent';
       case 'bottom-end':
-        return 'bottom-full right-6 border-b-neutral-600 border-l-transparent border-r-transparent border-t-transparent';
+        return 'bottom-full right-2 border-b-neutral-600 border-l-transparent border-r-transparent border-t-transparent';
       case 'left':
         return 'left-full top-1/2 -translate-y-1/2 border-l-neutral-600 border-t-transparent border-b-transparent border-r-transparent';
       case 'left-start':
@@ -146,7 +146,7 @@ export function Popover({
                   )}
                 />
               )}
-              <div className="p-4">{children}</div>
+              <div>{children}</div>
             </div>
           </HeadlessPopover.Panel>
         </Transition>

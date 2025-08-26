@@ -271,7 +271,7 @@ export function DebugControls({
 
   // Gear button trigger
   const gearTrigger = (
-    <Button variant="trippy" size="sm">
+    <Button variant="trippy" size="icon">
       <svg
         width="16"
         height="16"
@@ -291,10 +291,10 @@ export function DebugControls({
       <Popover
         trigger={gearTrigger}
         placement="bottom-end"
-        offset={8}
+        offset={2}
         showArrow={true}
       >
-        <div className="max-h-[80vh] w-96 overflow-y-auto">
+        <div className="max-h-[80vh] w-96 overflow-y-auto p-4">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-white/90">
@@ -303,9 +303,9 @@ export function DebugControls({
             </div>
             <div className="flex items-center gap-2">
               <Button
-                variant="secondary"
+                variant="trippy"
                 onClick={randomizeSettings}
-                size="sm"
+                size="icon"
                 aria-label="Randomize"
               >
                 <img src={DiceIcon.src} alt="Randomize" className="h-4 w-4" />
@@ -313,10 +313,11 @@ export function DebugControls({
 
               {showDownloadButton && (
                 <Button
-                  variant="secondary"
+                  variant="unstyled"
                   onClick={downloadSettings}
-                  size="sm"
+                  size="icon"
                   aria-label="Download"
+                  className="bg-brand-green hover:bg-brand-green/90 text-white"
                 >
                   <img
                     src={DownloadIcon.src}
@@ -327,10 +328,11 @@ export function DebugControls({
               )}
 
               <Button
-                variant="error"
+                variant="unstyled"
                 onClick={resetToDefaults}
-                size="sm"
+                size="icon"
                 aria-label="Reset"
+                className="bg-brand-yellow hover:bg-brand-yellow/90 text-black"
               >
                 <img src={ResetIcon.src} alt="Reset" className="h-4 w-4" />
               </Button>
