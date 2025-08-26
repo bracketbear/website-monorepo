@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { adjustHeaderSpacing, useHeaderSpacing } from './header-spacing';
+import { useHeaderSpacing } from './header-spacing';
 
 interface HeaderProps {
   title: string;

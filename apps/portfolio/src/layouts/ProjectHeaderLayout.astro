@@ -20,11 +20,9 @@
  * </ProjectHeaderLayout>
  */
 import Layout from './Layout.astro';
-import { clsx, Stats, type ObjectValues } from '@bracketbear/core';
-import { navigationConfig } from '@/config/navigation';
+import { clsx, Stats } from '@bracketbear/core';
 import { generatePortfolioMetaTitle } from '@/config/meta-title';
 import { Picture } from 'astro:assets';
-import ErrorBoundary from '@/components/ErrorBoundary';
 
 export interface Props {
   pageTitle?: string;

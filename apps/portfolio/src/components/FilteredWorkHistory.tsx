@@ -102,19 +102,6 @@ function FilteredWorkHistoryContent({
     };
   });
 
-  const filteredProjects = projects.map((project) => {
-    const hasMatchingSkills =
-      selectedSkills.length === 0 ||
-      selectedSkills.some(
-        (skillId) => project.data.skills?.includes(skillId) || false
-      );
-
-    return {
-      ...project,
-      isHidden: !hasMatchingSkills,
-    };
-  });
-
   // Responsive grid: sidebar (filters) and main (results)
   return (
     <div className="flex flex-col gap-8 lg:flex-row" ref={containerRef}>

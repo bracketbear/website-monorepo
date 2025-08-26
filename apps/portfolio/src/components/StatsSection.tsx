@@ -1,5 +1,3 @@
-import type { ComponentProps } from 'react';
-
 /**
  * Stats item interface for the stats section
  */

@@ -11,8 +11,6 @@ import { clsx, Stats, type LabelValue } from '@bracketbear/core';
 import { useMemo, useState, useEffect, type ReactNode } from 'react';
 import { HeroContent } from './HeroContent';
 
-const BACKGROUND_CLASS = 'bg-background' as const;
-
 // Animation control value constants
 const ANIMATION_CONTROLS = {
   curiousParticleNetwork: {

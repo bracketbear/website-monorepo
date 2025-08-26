@@ -6,9 +6,7 @@ import { getKeyedCollection } from '@/utils/content';
 import { getBreadcrumbs } from '@/config/breadcrumbs';
 import { generatePortfolioMetaTitle } from '@/config/meta-title';
 import ProjectHeaderLayout from '@/layouts/ProjectHeaderLayout.astro';
-import { Picture } from 'astro:assets';
 import Section from '@/components/Section.astro';
-import Callout from '@/components/Callout.astro';
 
 import { ImageGallery } from '@bracketbear/core/react';
 
@@ -111,7 +109,7 @@ const {
   teaser,
   summary,
   a11y,
-  coverImage,
+
   problem,
   description,
   scope,
@@ -124,18 +122,11 @@ const {
   links,
   impactTags,
   skills,
-  cta,
 } = workProjectItem.data;
 
 // Fallback logic for story-first layout
 const subline = oneLiner ?? teaser?.headline ?? teaser?.subline ?? summary;
 const heroAlt = a11y?.coverAlt ?? title;
-const statusTone =
-  status === 'shipped'
-    ? 'positive'
-    : status === 'prototype'
-      ? 'info'
-      : 'neutral';
 
 // Define stats data
 const stats = [

@@ -101,7 +101,7 @@ function parseMarkdown(content: string): string {
                 </div>
 
                 <div class="grid gap-8 lg:grid-cols-2 xl:grid-cols-3">
-                  {projects.map((project: WorkProjectEntry, index: number) => {
+                  {projects.map((project: WorkProjectEntry) => {
                     // Use default card color (off-white) for consistency
                     return (
                       <ProjectCard

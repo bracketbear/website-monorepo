@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { z } from 'zod';
+
 import { contentPath, workPath } from './utils';
 import {
   workCompanySchema,
@@ -12,7 +12,6 @@ import {
   pageSchema,
   serviceSchema,
   contactMethodSchema,
-  makePageSchema,
   portfolioAboutPageSchema,
   portfolioContactPageSchema,
   portfolioIndexPageSchema,

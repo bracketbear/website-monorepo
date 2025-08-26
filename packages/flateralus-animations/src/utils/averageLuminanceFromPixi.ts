@@ -9,8 +9,7 @@ import { Application, Container } from 'pixi.js';
  */
 export function averageLuminanceFromPixi(
   app: Application,
-  target?: Container,
-  debug: boolean = false
+  target?: Container
 ): number {
   // Use the target container or the app stage if no target provided
   const container = target || app.stage;
@@ -25,14 +24,11 @@ export function averageLuminanceFromPixi(
 
   let sumL = 0;
   let sampleCount = 0;
-  let transparentCount = 0;
-  let totalSampled = 0;
 
   // Sample every 4th pixel to improve performance
   const sampleStep = 4;
 
   for (let i = 0; i < pixels.length; i += sampleStep * 4) {
-    totalSampled++;
     const r = pixels[i];
     const g = pixels[i + 1];
     const b = pixels[i + 2];
@@ -40,7 +36,6 @@ export function averageLuminanceFromPixi(
 
     // Skip fully transparent pixels (alpha = 0)
     if (a === 0) {
-      transparentCount++;
       continue;
     }
 

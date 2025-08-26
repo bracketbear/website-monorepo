@@ -331,7 +331,7 @@ async function main() {
         const { mkdirSync } = await import('node:fs');
         mkdirSync(reportsDir, { recursive: true });
         console.log(`📁 Created reports directory: ${reportsDir}`);
-      } catch (error) {
+      } catch {
         console.log(`⚠️  Could not create reports directory: ${reportsDir}`);
       }
     }
