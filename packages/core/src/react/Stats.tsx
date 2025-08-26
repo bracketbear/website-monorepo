@@ -29,13 +29,16 @@ export const Stats = ({
       {stats.map((stat, index) => (
         <div
           key={index}
-          className="flex flex-grow-1 flex-col border-solid border-white/20 px-8 py-6 not-last:border-b not-last:md:border-r not-last:md:border-b-0"
+          className="flex flex-grow-1 flex-col border-solid border-white/20 px-3 py-3 not-last:border-b not-last:md:border-r not-last:md:border-b-0 lg:px-4 lg:py-3"
         >
-          <h4 className="font-heading text-text-primary/70 mb-1 text-sm font-black tracking-widest uppercase">
+          <h4 className="font-heading text-brand-yellow/70 mb-0 text-xs font-black tracking-widest uppercase lg:mb-0 lg:text-sm">
             {stat.label}
           </h4>
-          <div className="font-heading text-text-primary mt-2 text-2xl font-bold tracking-tight">
-            {stat.value}
+          <div className="font-heading text-brand-yellow mt-0.5 text-lg font-bold tracking-tight lg:mt-0.5 lg:text-2xl">
+            {stat.label.toLowerCase() === 'status'
+              ? stat.value.charAt(0).toUpperCase() +
+                stat.value.slice(1).toLowerCase()
+              : stat.value}
           </div>
         </div>
       ))}

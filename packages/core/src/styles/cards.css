@@ -3,7 +3,7 @@
 }
 
 @utility card-dark {
-  @apply card tangible-inverse border-border bg-muted text-muted-foreground;
+  @apply card tangible-inverse border-border bg-brand-dark text-brand-yellow;
 }
 
 @utility card-interactive {
