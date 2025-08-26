@@ -33,6 +33,7 @@ import { useCallback } from 'react';
  *       stageControls={stageControls}
  *       onStageControlsChange={handleStageControlsChange}
  *       className="h-96 w-full"
+ *       canvasClassName="rounded-2xl"
  *     />
  *   );
  * }
@@ -49,6 +50,8 @@ interface AnimationStageProps {
   children?: ReactNode;
   className?: string;
   debugControlsClassName?: string;
+  /** Classes to apply to the canvas/background container element */
+  canvasClassName?: string;
   /** Whether to enable automatic text color adjustment based on background luminance */
   enableLuminanceDetection?: boolean;
   /** Whether to pause animation when not visible (defaults to true) */
@@ -82,6 +85,7 @@ export function AnimationStage({
   children,
   className,
   debugControlsClassName,
+  canvasClassName,
   enableLuminanceDetection = true,
   pauseWhenHidden = true,
   visibilityThreshold = 0.1,
@@ -97,6 +101,7 @@ export function AnimationStage({
     pauseWhenHidden,
     visibilityThreshold,
     visibilityRootMargin,
+    canvasClassName,
   });
 
   // Debug controls hook - now includes stage controls

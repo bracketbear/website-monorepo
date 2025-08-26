@@ -39,6 +39,8 @@ export interface ApplicationOptions {
   enableLuminanceDetection?: boolean;
   /** Initial stage control values */
   stageControls?: Partial<StageControlValues>;
+  /** CSS classes to apply to the canvas element */
+  canvasClassName?: string;
 }
 
 /**
@@ -57,6 +59,7 @@ export abstract class BaseApplication<TContext = unknown>
   protected config: ApplicationConfig;
   protected options: ApplicationOptions;
   protected stageControls: StageControlValues;
+  protected canvasClassName?: string;
   protected _isInitialized = false;
   protected _isRunning = false;
   protected resizeObserver: ResizeObserver | null = null;
@@ -80,6 +83,7 @@ export abstract class BaseApplication<TContext = unknown>
       enableLuminanceDetection: true,
       ...options,
     };
+    this.canvasClassName = options.canvasClassName;
 
     // Initialize stage controls with defaults
     this.stageControls = {
@@ -344,6 +348,11 @@ export abstract class BaseApplication<TContext = unknown>
     canvas.style.width = '100%';
     canvas.style.height = '100%';
     canvas.style.pointerEvents = 'none';
+
+    // Apply canvas classes if provided
+    if (this.canvasClassName) {
+      canvas.className = this.canvasClassName;
+    }
   }
 
   /**

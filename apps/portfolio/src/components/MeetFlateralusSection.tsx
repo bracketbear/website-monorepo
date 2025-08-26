@@ -78,7 +78,7 @@ export function MeetFlateralusSection({
           </div>
           {/* Animation Stage - right side */}
           <div className="order-1 lg:order-2">
-            <div className="relative h-[30rem] w-full lg:h-[40rem]">
+            <div className="relative h-[30rem] w-full rounded-2xl lg:h-[40rem]">
               {/* Animation stage - only render when ready */}
               {isClient && isAnimationReady && application && (
                 <AnimationStage
@@ -86,7 +86,8 @@ export function MeetFlateralusSection({
                   showDebugControls={true}
                   enableLuminanceDetection={false}
                   layoutClassName="absolute inset-0"
-                  debugControlsClassName="absolute top-20 right-4 z-50 max-w-none"
+                  canvasClassName="rounded-2xl"
+                  debugControlsClassName="absolute top-20 right-4 z-50 max-w-none rounded-2xl"
                 />
               )}
             </div>

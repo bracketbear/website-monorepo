@@ -15,6 +15,8 @@ export interface UseAnimationStageOptions {
   visibilityThreshold?: number;
   /** Root margin for visibility detection (defaults to '0px') */
   visibilityRootMargin?: string;
+  /** CSS classes to apply to the canvas element */
+  canvasClassName?: string;
 }
 
 export interface UseAnimationStageReturn {
@@ -45,6 +47,7 @@ export function useAnimationStage(
     pauseWhenHidden = true,
     visibilityThreshold = 0.1,
     visibilityRootMargin = '0px',
+    canvasClassName,
   } = options;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -81,6 +84,14 @@ export function useAnimationStage(
       setIsInitialized(application.isInitialized());
       setIsRunning(application.isRunning());
 
+      // Apply canvas classes if provided
+      if (canvasClassName) {
+        const canvas = application.getCanvas();
+        if (canvas) {
+          canvas.className = canvasClassName;
+        }
+      }
+
       // If application has an animation, get its control values and manifest
       const context = application.getContext();
       const animation = application.getAnimation();
@@ -94,7 +105,7 @@ export function useAnimationStage(
     } catch (error) {
       console.error('Failed to initialize animation stage:', error);
     }
-  }, [application]);
+  }, [application, canvasClassName]);
 
   // Initialize the stage
   useEffect(() => {
