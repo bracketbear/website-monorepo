@@ -178,7 +178,7 @@ export default function WorkHistory({
             'transition-transform duration-300',
             'bg-background',
             'border-brand-orange border-2',
-            'shadow-[4px_4px_0_0_var(--color-brand-red)]',
+
             'p-6'
           )}
         >

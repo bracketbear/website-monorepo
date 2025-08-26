@@ -87,7 +87,7 @@ function getDropdownChildStyles(variant: string) {
 // Helper function for dropdown background styles
 function getDropdownBackgroundStyles(variant: string) {
   return {
-    base: 'border-border py-4 shadow-[8px_8px_0_0_var(--color-border)]',
+    base: 'border-border py-4 shadow-[2px_2px_0_0_var(--color-border)]',
     variant:
       variant === 'ghost-dark'
         ? 'bg-muted'
@@ -164,7 +164,7 @@ function getDropdownBackgroundStyles(variant: string) {
 
       <!-- Desktop Navigation -->
       <div class="hidden items-center gap-8 md:flex">
-        <ul class="flex items-center" role="menubar">
+        <ul class="flex items-center gap-2" role="menubar">
           {
             desktopNavItems.map((item) => {
               const isActive = isNavItemActive(item, currentPage);
@@ -375,7 +375,7 @@ function getDropdownBackgroundStyles(variant: string) {
                           class:list={[
                             'block rounded-lg px-3 py-2 text-sm transition-all',
                             variant === 'glass'
-                              ? 'glass-text-muted hover:glass-hover hover:glass-text hover:bg-black/10 hover:backdrop-blur-sm'
+                              ? 'glass-text-muted hover:glass-hover hover:glass-text hover:bg-black/10'
                               : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                           ]}
                         >

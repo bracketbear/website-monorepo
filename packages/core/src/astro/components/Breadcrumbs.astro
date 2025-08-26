@@ -4,7 +4,7 @@ import type { Breadcrumb } from '../../types/breadcrumb';
 
 const SEPARATOR = '/' as const;
 const BREADCRUMB_CLASS =
-  'text-text-primary/70 font-medium tracking-wide hover:text-text-primary transition-colors' as const;
+  'text-text-primary/80 font-medium tracking-wide hover:text-text-primary transition-colors' as const;
 
 interface Props {
   breadcrumbs: Breadcrumb[];
@@ -19,7 +19,7 @@ const { breadcrumbs, variant } = Astro.props;
   breadcrumbs.length > 0 && (
     <div class="bg-brand-dark/5">
       <div
-        class={`py-2 ${variant === 'glass' ? 'glass-bg glass-shadow border-transparent' : 'border-border/20 border-b'}`}
+        class={`py-2 ${variant === 'glass' ? 'glass-bg-subtle glass-border-subtle glass-shadow' : 'border-border/20 border-b'}`}
       >
         <div class="container-content">
           <nav class="text-sm">
@@ -44,7 +44,7 @@ const { breadcrumbs, variant } = Astro.props;
                     )}
                   </li>
                   {idx < breadcrumbs.length - 1 && (
-                    <li class="text-text-primary/40 list-none font-medium">
+                    <li class="text-text-primary/60 list-none font-medium">
                       {' '}
                       {SEPARATOR}{' '}
                     </li>

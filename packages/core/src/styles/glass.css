@@ -1,54 +1,86 @@
-/* Glass morphism styles for navigation and UI elements */
+/* Glass morphism utilities for navigation and UI elements */
 
 /* Base glass background with backdrop blur */
-.glass-bg {
+@utility glass-bg {
   @apply bg-white/10 backdrop-blur-md;
 }
 
 /* Light glass background variant */
-.glass-bg-light {
+@utility glass-bg-light {
   @apply bg-white/20 backdrop-blur-sm;
 }
 
-/* Glass shadow effects */
-.glass-shadow {
-  @apply shadow-[0_8px_32px_0_rgba(31,38,135,0.37)];
+/* Off-white frosted glass background */
+@utility glass-bg-frosted {
+  @apply bg-white/60 backdrop-blur-md;
 }
 
-.glass-shadow-lg {
-  @apply shadow-[0_8px_32px_0_rgba(31,38,135,0.37),0_4px_16px_0_rgba(31,38,135,0.37)];
+/* Warm frosted glass background */
+@utility glass-bg-warm {
+  @apply backdrop-blur-md;
+  background-color: color-mix(in srgb, white 30%, #ffc15e 16%);
+}
+
+/* Subtle glass background - very low opacity */
+@utility glass-bg-subtle {
+  @apply backdrop-blur-sm;
+  background-color: color-mix(in srgb, white 15%, #ffc15e 3%);
+}
+
+/* Glass shadow effects */
+@utility glass-shadow {
+  @apply shadow-[0_2px_8px_0_rgba(31,38,135,0.15)];
+}
+
+@utility glass-shadow-lg {
+  @apply shadow-[0_4px_16px_0_rgba(31,38,135,0.2)];
 }
 
 /* Glass border styles */
-.glass-border {
+@utility glass-border {
   @apply border-white/20;
 }
 
+/* Frosted glass border */
+@utility glass-border-frosted {
+  @apply border-white/40;
+}
+
+/* Warm frosted glass border */
+@utility glass-border-warm {
+  border-color: color-mix(in srgb, white 40%, #ffc15e 10%);
+}
+
+/* Subtle glass border */
+@utility glass-border-subtle {
+  border-color: color-mix(in srgb, white 15%, #ffc15e 3%);
+}
+
 /* Glass text styles */
-.glass-text {
+@utility glass-text {
   @apply text-white/90;
 }
 
-.glass-text-muted {
+@utility glass-text-muted {
   @apply text-white/70;
 }
 
 /* Glass hover effects */
-.glass-hover {
+@utility glass-hover {
   @apply backdrop-blur-lg;
 }
 
 /* Glass button variants */
-.button-transparent-dark {
+@utility button-transparent-dark {
   @apply bg-black/20 text-white/90 hover:bg-black/30 hover:backdrop-blur-md;
 }
 
 /* Glass navigation specific styles */
-.nav-glass {
+@utility nav-glass {
   @apply border-white/20 bg-white/10 backdrop-blur-md;
 }
 
 /* Glass dropdown styles */
-.dropdown-glass {
+@utility dropdown-glass {
   @apply border-white/20 bg-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] backdrop-blur-md;
 }

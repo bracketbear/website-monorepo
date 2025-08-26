@@ -27,6 +27,8 @@ export interface ModalProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
   /** Whether to show backdrop */
   showBackdrop?: boolean;
+  /** Whether to use glass styling */
+  glass?: boolean;
 }
 
 const sizeClasses = {
@@ -49,6 +51,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       className,
       size = 'md',
       showBackdrop = true,
+      glass = false,
     },
     ref
   ) => {
@@ -66,7 +69,12 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
         {showBackdrop && (
           <DialogBackdrop
             transition
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+            className={clsx(
+              'fixed inset-0 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in',
+              glass
+                ? 'bg-black/60 backdrop-blur-md'
+                : 'bg-black/50 backdrop-blur-sm'
+            )}
           />
         )}
 
@@ -76,27 +84,41 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
             <DialogPanel
               transition
               className={clsx(
-                'card tangible relative transform overflow-hidden p-0 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full data-closed:sm:translate-y-0 data-closed:sm:scale-95',
+                'relative transform overflow-hidden p-0 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full data-closed:sm:translate-y-0 data-closed:sm:scale-95',
                 // Max height constraints for tall content
                 'max-h-[90vh] sm:max-h-[85vh]',
                 sizeClasses[size],
+                // Glass or card styling
+                glass
+                  ? 'glass-bg-light glass-shadow-lg glass-border rounded-lg border-2'
+                  : 'card tangible',
                 className
               )}
             >
               {/* Sticky Header */}
               {(title || showCloseButton) && (
-                <div className="border-brand-dark bg-brand-orange sticky top-0 z-10 flex items-center justify-between border-b-2 p-4">
+                <div
+                  className={clsx(
+                    'sticky top-0 z-10 flex items-center justify-between border-b-2 p-4',
+                    glass
+                      ? 'glass-border glass-text'
+                      : 'border-brand-dark bg-brand-orange'
+                  )}
+                >
                   {title && (
                     <DialogTitle
                       as="h2"
-                      className="text-brand-dark font-heading text-xl font-bold"
+                      className={clsx(
+                        'font-heading text-xl font-bold',
+                        glass ? 'glass-text' : 'text-brand-dark'
+                      )}
                     >
                       {title}
                     </DialogTitle>
                   )}
                   {showCloseButton && (
                     <Button
-                      variant="secondary"
+                      variant={glass ? 'ghostLight' : 'secondary'}
                       size="icon"
                       onClick={onClose}
                       aria-label="Close modal"

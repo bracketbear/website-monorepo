@@ -331,7 +331,7 @@ const stats = [
                         href={l.href}
                         target="_blank"
                         rel="noopener"
-                        class="text-brand-yellow underline hover:no-underline"
+                        class="text-brand-orange hover:text-brand-orange/80 underline transition-colors hover:no-underline"
                       >
                         {l.label}
                       </a>
@@ -346,9 +346,28 @@ const stats = [
           {
             Array.isArray(impactTags) && impactTags.length > 0 && (
               <Section title="Impact">
-                <div class="flex flex-wrap gap-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {impactTags.map((tag: string) => (
-                    <span class="pill pill-brand-orange pill-sm">{tag}</span>
+                    <div class="glass-bg-frosted glass-border-frosted glass-shadow flex items-center gap-3 rounded-lg border p-4 transition-all">
+                      <div class="bg-brand-orange flex h-8 w-8 items-center justify-center rounded-full">
+                        <svg
+                          class="h-4 w-4 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                          />
+                        </svg>
+                      </div>
+                      <span class="text-text-primary font-heading text-sm font-semibold tracking-wide uppercase">
+                        {tag}
+                      </span>
+                    </div>
                   ))}
                 </div>
               </Section>
