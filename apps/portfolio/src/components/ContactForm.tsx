@@ -18,10 +18,31 @@ const contactSchema = z.object({
 type ContactFormValues = z.infer<typeof contactSchema>;
 
 export function ContactForm() {
-  const handleSubmit = async (_values: ContactFormValues) => {
-    await new Promise((res) => setTimeout(res, 1200));
-    // Simulate success (throw for error)
-    // throw new Error('Simulated error');
+  const handleSubmit = async (values: ContactFormValues) => {
+    try {
+      // Create URLSearchParams for Netlify submission
+      const formData = new URLSearchParams();
+      formData.append('form-name', 'contact');
+      formData.append('name', values.name);
+      formData.append('email', values.email);
+      formData.append('message', values.message);
+      if (values.resume) {
+        formData.append('resume', 'true');
+      }
+
+      // Submit to Netlify Forms endpoint
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData.toString(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit form');
+      }
+    } catch {
+      throw new Error('Failed to send message. Please try again.');
+    }
   };
 
   return (
@@ -43,6 +64,14 @@ export function ContactForm() {
         submitSuccess,
       }) => (
         <>
+          {/* Hidden form for Netlify to detect */}
+          <form name="contact" method="POST" data-netlify="true" hidden>
+            <input type="text" name="name" />
+            <input type="email" name="email" />
+            <textarea name="message"></textarea>
+            <input type="checkbox" name="resume" />
+          </form>
+
           <div className="mb-6 grid gap-2">
             <Field label="Name" id="name" error={errors.name} required>
               <TextInput
@@ -136,5 +165,3 @@ export function ContactForm() {
     </ValidatedForm>
   );
 }
-
-export default ContactForm;

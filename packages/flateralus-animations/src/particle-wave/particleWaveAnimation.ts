@@ -330,7 +330,9 @@ class ParticleWaveAnimation extends PixiAnimation<
           app,
           x,
           y,
-          particleColor,
+          typeof particleColor === 'string' 
+            ? new PIXI.Color(particleColor).toNumber() 
+            : particleColor,
           particleSize,
           waveIndex,
           depth

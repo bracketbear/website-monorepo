@@ -308,7 +308,9 @@ const createBlobParticle = (
     particle.lastUpdateTime = 0;
   }
 
-  sprite.tint = particle.color;
+  sprite.tint = typeof particle.color === 'string' 
+    ? new PIXI.Color(particle.color).toNumber() 
+    : particle.color;
   sprite.alpha = particle.alpha;
 
   app.stage.addChild(sprite);
@@ -381,7 +383,9 @@ const calculateParticleForces = (
         particle.isInteractive = true;
         particle.color = controls.interactiveColor;
         particle.targetAlpha = 0.9;
-        particle.sprite.tint = particle.color;
+        particle.sprite.tint = typeof particle.color === 'string' 
+          ? new PIXI.Color(particle.color).toNumber() 
+          : particle.color;
       }
     } else {
       // Return to normal state
@@ -389,7 +393,9 @@ const calculateParticleForces = (
         particle.isInteractive = false;
         particle.color = controls.particleColor;
         particle.targetAlpha = 0.6 + Math.random() * 0.3;
-        particle.sprite.tint = particle.color;
+        particle.sprite.tint = typeof particle.color === 'string' 
+          ? new PIXI.Color(particle.color).toNumber() 
+          : particle.color;
       }
     }
   }

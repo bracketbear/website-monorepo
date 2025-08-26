@@ -1,0 +1,54 @@
+/* Glass morphism styles for navigation and UI elements */
+
+/* Base glass background with backdrop blur */
+.glass-bg {
+  @apply bg-white/10 backdrop-blur-md;
+}
+
+/* Light glass background variant */
+.glass-bg-light {
+  @apply bg-white/20 backdrop-blur-sm;
+}
+
+/* Glass shadow effects */
+.glass-shadow {
+  @apply shadow-[0_8px_32px_0_rgba(31,38,135,0.37)];
+}
+
+.glass-shadow-lg {
+  @apply shadow-[0_8px_32px_0_rgba(31,38,135,0.37),0_4px_16px_0_rgba(31,38,135,0.37)];
+}
+
+/* Glass border styles */
+.glass-border {
+  @apply border-white/20;
+}
+
+/* Glass text styles */
+.glass-text {
+  @apply text-white/90;
+}
+
+.glass-text-muted {
+  @apply text-white/70;
+}
+
+/* Glass hover effects */
+.glass-hover {
+  @apply backdrop-blur-lg;
+}
+
+/* Glass button variants */
+.button-transparent-dark {
+  @apply bg-black/20 text-white/90 hover:bg-black/30 hover:backdrop-blur-md;
+}
+
+/* Glass navigation specific styles */
+.nav-glass {
+  @apply border-white/20 bg-white/10 backdrop-blur-md;
+}
+
+/* Glass dropdown styles */
+.dropdown-glass {
+  @apply border-white/20 bg-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] backdrop-blur-md;
+}
