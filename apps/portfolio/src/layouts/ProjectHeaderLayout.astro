@@ -71,24 +71,24 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
 >
   {
     props.title && (
-      <section class="from-muted via-muted/95 to-secondary/20 w-full bg-gradient-to-br">
+      <section class="from-muted via-muted/95 to-secondary/20 relative w-full bg-gradient-to-br">
         <div class="bg-noise bg-header-glow from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent opacity-100" />
-        <div class="z-10 container mx-auto flex h-full items-center">
+        <div class="z-10 container mx-auto flex min-h-[60vh] items-center">
           <div class="flex w-full flex-col items-center justify-center lg:flex-row">
-            <div class="order-2 flex-1 px-4 py-16 lg:order-1 lg:py-40">
+            <div class="order-2 flex-1 px-4 py-8 lg:order-1 lg:py-24">
               <div class="max-w-2xl">
                 {props.description && (
-                  <p class="text-text-primary/90 mb-6 text-lg font-bold tracking-tight uppercase drop-shadow-lg lg:text-2xl">
+                  <p class="text-text-primary mb-4 text-base font-bold tracking-tight uppercase drop-shadow-lg lg:mb-6 lg:text-2xl">
                     {props.description}
                   </p>
                 )}
 
-                <h1 class="font-heading text-text-primary mb-6 text-4xl font-black tracking-tight uppercase text-shadow-lg lg:text-6xl xl:text-8xl">
+                <h1 class="font-heading text-text-primary mb-4 text-3xl font-black tracking-tight uppercase text-shadow-lg lg:mb-6 lg:text-6xl xl:text-8xl">
                   {props.title}
                 </h1>
 
                 {props.subtitle && (
-                  <p class="text-text-primary/90 text-lg font-bold tracking-tight uppercase text-shadow-lg lg:text-xl xl:text-2xl">
+                  <p class="text-text-primary text-base font-bold tracking-tight uppercase text-shadow-lg lg:text-xl xl:text-2xl">
                     {props.subtitle}
                   </p>
                 )}
@@ -96,8 +96,8 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
             </div>
 
             {props.coverImage && (
-              <div class="order-1 flex flex-1 items-center justify-center px-4 py-8 lg:order-2 lg:py-40">
-                <div class="relative w-full max-w-lg">
+              <div class="order-1 flex flex-1 items-center justify-center px-4 py-4 lg:order-2 lg:py-24">
+                <div class="relative w-full max-w-md lg:max-w-lg">
                   <div class="overflow-hidden rounded-lg border-2 border-white/20 shadow-2xl shadow-black/30">
                     <Picture
                       src={props.coverImage}
@@ -109,11 +109,9 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
                       formats={['avif', 'webp']}
                       layout="constrained"
                       fit="cover"
-                      class="h-auto w-full max-w-sm lg:max-w-lg"
+                      class="h-auto w-full"
                     />
                   </div>
-                  <div class="bg-brand-yellow absolute -top-2 -right-2 hidden h-4 w-4 rounded-full shadow-lg lg:block" />
-                  <div class="bg-brand-orange absolute -bottom-2 -left-2 hidden h-3 w-3 rounded-full shadow-lg lg:block" />
                 </div>
               </div>
             )}
@@ -121,8 +119,8 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
         </div>
 
         {props.stats && props.stats.length > 0 && (
-          <div class="absolute inset-x-0 bottom-0 z-20 container mx-auto w-full">
-            <div class="relative -mb-8">
+          <div class="relative z-20 container mx-auto mt-8 w-full lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0">
+            <div class="relative mb-4 lg:-mb-16">
               <Stats
                 stats={props.stats}
                 className="drop-shadow-xl drop-shadow-black/30"
@@ -137,7 +135,11 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
   <div
     class={clsx(
       'relative',
-      props.title ? 'py-32' : 'py-24',
+      props.title && props.stats && props.stats.length > 0
+        ? 'pt-8 pb-8 lg:pt-24 lg:pb-12'
+        : props.title
+          ? 'py-12 lg:py-16'
+          : 'py-12',
       props.hideFooter && 'pb-0'
     )}
   >
@@ -148,7 +150,7 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
 
   {
     contactCTA && (
-      <div class="bg-muted py-24">
+      <div class="bg-muted py-12">
         <div class="container mx-auto">
           <div class="mx-auto max-w-4xl text-center">
             <p class="text-muted-foreground/90 mb-8 text-xl leading-relaxed font-medium">

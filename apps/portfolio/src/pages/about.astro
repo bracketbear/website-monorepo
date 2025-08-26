@@ -28,7 +28,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- Narrative Section -->
   {
     aboutPage?.data?.narrative && (
-      <section class="px-content mb-40">
+      <section class="px-content mb-8">
         <div class="container mx-auto text-center">
           <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight">
             {aboutPage.data.narrative.title}
@@ -48,7 +48,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- Timeline Section (after Narrative) -->
   {
     aboutPage?.data?.timeline && aboutPage.data.timeline.length > 0 && (
-      <section class="px-content mt-24 mb-40">
+      <section class="px-content mt-24 mb-8">
         <div class="mx-auto max-w-6xl">
           <h2 class="font-heading text-foreground mb-10 text-center text-4xl tracking-tight">
             Timeline
@@ -79,7 +79,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- What I Do Now Section -->
   {
     aboutPage?.data?.whatIDoNow && (
-      <section class="px-content mb-40">
+      <section class="px-content mb-8">
         <div class="container mx-auto text-center">
           <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight">
             {aboutPage.data.whatIDoNow.title}
@@ -97,7 +97,7 @@ const t = aboutPage.data.testimonials[0];
   }
 
   <!-- Mid-page CTA (after What I do now) -->
-  <section class="px-content mb-40">
+  <section class="px-content mb-8">
     <div class="mx-auto max-w-4xl">
       <div
         class="bg-card/5 rounded-lg p-8 text-center backdrop-blur-sm md:p-10"
@@ -115,7 +115,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- How I Work/Partner Section -->
   {
     aboutPage?.data?.howIPartner && (
-      <section class="px-content mb-40">
+      <section class="px-content mb-8">
         <div class="mx-auto max-w-4xl text-center">
           <h2 class="font-heading text-foreground mb-8 text-5xl tracking-tight">
             {aboutPage.data.howIPartner.title}
@@ -144,7 +144,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- Testimonials Section (after How I partner) -->
   {
     aboutPage?.data?.testimonials && aboutPage.data.testimonials.length > 0 && (
-      <section class="px-content mt-24 mb-40">
+      <section class="px-content mt-24 mb-8">
         <div class="mx-auto max-w-7xl">
           <Testimonial
             quote={t.quote}
@@ -167,7 +167,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- Stories Section -->
   {
     aboutPage?.data?.stories && aboutPage.data.stories.length > 0 && (
-      <section class="px-content mb-40">
+      <section class="px-content mb-8">
         <div class="mx-auto max-w-7xl">
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             {aboutPage.data.stories.map((story: any) => (
@@ -192,7 +192,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- Principles Section -->
   {
     aboutPage?.data?.principles && (
-      <section class="px-content mb-40">
+      <section class="px-content mb-8">
         <div class="mx-auto max-w-4xl text-center">
           <h2 class="font-heading text-foreground mb-8 text-5xl tracking-tight">
             {aboutPage.data.principles.title}
@@ -215,7 +215,7 @@ const t = aboutPage.data.testimonials[0];
   <!-- Fit Section & How to start -->
   {
     aboutPage?.data?.fit && (
-      <section class="px-content mb-40">
+      <section class="px-content mb-8">
         <div class="mx-auto max-w-7xl">
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="border-border/20 bg-card/5 rounded-lg border p-6 text-center backdrop-blur-sm md:text-left">

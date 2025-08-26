@@ -100,7 +100,7 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
 
   <!-- Page Content -->
   <div
-    class={clsx(props.title ? 'py-32' : 'py-24', props.hideFooter && 'pb-0')}
+    class={clsx(props.title ? 'py-16' : 'py-12', props.hideFooter && 'pb-0')}
   >
     <div class={clsx(container && 'container mx-auto')}>
       <slot />
@@ -110,7 +110,7 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
   <!-- Contact CTA Section -->
   {
     contactCTA && (
-      <div class="bg-muted py-24">
+      <div class="bg-muted py-12">
         <div class="container mx-auto">
           <div class="mx-auto max-w-4xl text-center">
             <p class="text-muted-foreground/90 mb-8 text-xl leading-relaxed font-medium">

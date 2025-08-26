@@ -57,7 +57,7 @@ function parseMarkdown(content: string): string {
   currentPage="work"
 >
   <!-- Introduction Section -->
-  <section class="px-content mb-20">
+  <section class="px-content mb-8">
     <div class="container mx-auto text-center">
       <div
         class="prose prose-xl prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90 mx-auto max-w-prose text-center"
@@ -69,12 +69,12 @@ function parseMarkdown(content: string): string {
   <!-- Stats Section (if available) -->
   {
     workPage.data.stats && workPage.data.stats.length > 0 && (
-      <Stats stats={workPage.data.stats} className="mb-40 mx-2 md:mx-0" />
+      <Stats stats={workPage.data.stats} className="mb-8 mx-2 md:mx-0" />
     )
   }
 
   <!-- Work History Section -->
-  <div class="px-content mb-40">
+  <div class="px-content mb-8">
     <FilteredWorkHistory
       skills={workSkills}
       skillCategories={orderedSkillCategories}
