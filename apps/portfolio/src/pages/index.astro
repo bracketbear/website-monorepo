@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import { AstroButton } from '@bracketbear/core/astro';
 import { SkillPill } from '@bracketbear/core/react';
 import HomeLayout from '@/layouts/HomeLayout.astro';
-import { ContactForm } from '@/components/ContactForm';
+import { ContactSection } from '@/components/ContactSection';
 import ProjectCard from '@/components/ProjectCard';
 import type {
   WorkJobEntry,
@@ -310,26 +310,15 @@ function parseMarkdown(content: string): string {
   <!-- Let's Connect Section -->
   {
     indexPage.data.layout.showContactSection && (
-      <section class="px-content py-12">
-        <div class="container mx-auto">
-          <div class="mx-auto max-w-4xl text-center">
-            <h2 class="font-heading text-foreground mb-8 p-6 text-5xl font-black tracking-tight uppercase">
-              {indexPage.data.contactCTA.title}
-            </h2>
-            {indexPage.data.contactCTA.text && (
-              <div
-                class="prose prose-lg prose-p:text-foreground/80 mx-auto mb-12 max-w-2xl"
-                set:html={parseMarkdown(indexPage.data.contactCTA.text)}
-              />
-            )}
-            {indexPage.data.contactCTA && (
-              <div class="card">
-                <ContactForm client:load />
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
+      <ContactSection
+        title={indexPage.data.contactCTA.title}
+        text={
+          indexPage.data.contactCTA.text
+            ? parseMarkdown(indexPage.data.contactCTA.text)
+            : undefined
+        }
+        client:load
+      />
     )
   }
 </HomeLayout>

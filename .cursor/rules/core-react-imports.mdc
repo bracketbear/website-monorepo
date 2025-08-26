@@ -1,0 +1,76 @@
+---
+globs: *.ts,*.tsx,*.astro
+description: Import React components and hooks from the core package using the correct path
+---
+
+# Core Package React Imports
+
+When importing React components, hooks, or utilities from the `@bracketbear/core` package, always use the `/react` subpath import.
+
+## ✅ Correct Imports
+
+```typescript
+// React components
+import { Button, ValidatedForm, Field } from '@bracketbear/core/react';
+
+// React hooks
+import { useVisibilityObserver, useToast } from '@bracketbear/core/react';
+
+// Utility functions
+import { clsx } from '@bracketbear/core/react';
+```
+
+## ❌ Incorrect Imports
+
+```typescript
+// Don't import directly from the root
+import { Button } from '@bracketbear/core';
+import { useVisibilityObserver } from '@bracketbear/core';
+
+// Don't use deep subpath imports
+import { Button } from '@bracketbear/core/react/Button';
+import { useVisibilityObserver } from '@bracketbear/core/react/hooks/useVisibilityObserver';
+```
+
+## Examples in Codebase
+
+### Current Pattern (Correct)
+- [packages/flateralus-react/src/hooks/useAnimationStage.ts](mdc:packages/flateralus-react/src/hooks/useAnimationStage.ts) - Uses `import { useVisibilityObserver } from '@bracketbear/core/react';`
+- [apps/portfolio/src/components/ContactForm.tsx](mdc:apps/portfolio/src/components/ContactForm.tsx) - Uses `import { ValidatedForm, Field, TextInput, TextareaInput, CheckboxField } from '@bracketbear/core/react';`
+
+### What to Import from Core React
+
+**Components:**
+- `Button`, `ValidatedForm`, `Field`, `TextInput`, `TextareaInput`
+- `CheckboxField`, `CheckboxInput`, `Modal`, `Toast`, `ToastProvider`
+- `Accordion`, `AlertModal`, `BracketBearLogo`, `ContactIcon`
+- `ImageGallery`, `ImageViewerModal`, `Pill`, `PointerFX`, `Popover`
+- `Slider`, `SkillPill`, `Stats`, `Testimonial`, `Ticker`
+
+**Hooks:**
+- `useVisibilityObserver`, `useIntersectionObserver`, `useDebounce`, `useToast`
+
+**Utilities:**
+- `clsx` (class name utility)
+
+## Benefits
+
+1. **Consistent API**: All React-related exports are available from a single import path
+2. **Better Tree-shaking**: Bundlers can optimize imports more effectively
+3. **Clearer Dependencies**: Makes it obvious what's coming from the core React package
+4. **Future-proof**: If the core package structure changes, this pattern will remain stable
+
+## Migration Pattern
+
+### Before
+```typescript
+import { Button } from '@bracketbear/core';
+import { useVisibilityObserver } from '@bracketbear/core';
+```
+
+### After
+```typescript
+import { Button, useVisibilityObserver } from '@bracketbear/core/react';
+```
+
+This rule ensures consistent and optimal imports when working with React components and hooks from the core package.

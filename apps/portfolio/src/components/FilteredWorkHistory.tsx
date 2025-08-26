@@ -1,7 +1,12 @@
 import type { CollectionEntry } from 'astro:content';
 import { useRef, useState } from 'react';
 import WorkHistory from './WorkHistory';
-import { SkillPill, ToastProvider, useToast, Button } from '@bracketbear/core';
+import {
+  SkillPill,
+  ToastProvider,
+  useToast,
+  Button,
+} from '@bracketbear/core/react';
 
 export interface FilteredWorkHistoryProps {
   skills: CollectionEntry<'workSkills'>[];
