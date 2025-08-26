@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { AstroButton } from '@bracketbear/core/astro';
+import { SkillPill } from '@bracketbear/core/react';
 import HomeLayout from '@/layouts/HomeLayout.astro';
 import { ContactForm } from '@/components/ContactForm';
 import ProjectCard from '@/components/ProjectCard';
@@ -284,7 +285,7 @@ function parseMarkdown(content: string): string {
                     {job.data.workSkills.map((skillKey: string) => {
                       const skill = workSkills.find((s) => s.id === skillKey);
                       return skill ? (
-                        <span class="pill pill-skill">{skill.data.title}</span>
+                        <SkillPill size="sm">{skill.data.title}</SkillPill>
                       ) : null;
                     })}
                   </div>
