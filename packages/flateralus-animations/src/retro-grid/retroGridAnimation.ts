@@ -556,7 +556,7 @@ export class RetroGridAnimation extends BaseAnimation<
     graphics: PIXI.Graphics,
     shape: string,
     size: number,
-    color: string
+    color: string | number
   ): void {
     const colorNumber = this.hexToNumber(color);
     const halfSize = size / 2;
@@ -708,7 +708,7 @@ export class RetroGridAnimation extends BaseAnimation<
     });
   }
 
-  private updateSquareColors(color: string): void {
+  private updateSquareColors(color: string | number): void {
     this.squares.forEach((square) => {
       square.sprite.clear();
       // Redraw the particle with its original shape but new color
@@ -729,7 +729,7 @@ export class RetroGridAnimation extends BaseAnimation<
     });
   }
 
-  private updateGridLineColors(color: string): void {
+  private updateGridLineColors(color: string | number): void {
     const colorNumber = this.hexToNumber(color);
     this.gridLinesContainer.children.forEach((line) => {
       if (line instanceof PIXI.Graphics) {
@@ -783,8 +783,20 @@ export class RetroGridAnimation extends BaseAnimation<
     this.updateGridPosition(context);
   }
 
-  private hexToNumber(hex: string): number {
-    return parseInt(hex.replace('#', ''), 16);
+  private hexToNumber(hex: string | number): number {
+    // If it's already a number, return it directly
+    if (typeof hex === 'number') {
+      return hex;
+    }
+
+    // If it's a string, parse it as hex
+    if (typeof hex === 'string') {
+      return parseInt(hex.replace('#', ''), 16);
+    }
+
+    // Fallback for unexpected types
+    console.warn('hexToNumber received unexpected type:', typeof hex, hex);
+    return 0xffffff; // Default to white
   }
 }
 

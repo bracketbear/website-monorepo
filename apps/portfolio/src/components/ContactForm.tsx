@@ -60,7 +60,7 @@ export function ContactForm() {
         onSubmit={handleSubmit}
         animateOnSuccess
         animateOnError
-        className="brutalist-form rounded-lg"
+        className="space-y-6"
         aria-label="Contact form"
       >
         {({
@@ -73,7 +73,8 @@ export function ContactForm() {
           submitSuccess,
         }) => (
           <>
-            <div className="mb-6 grid gap-2">
+            {/* Form fields */}
+            <div className="grid gap-4">
               <Field label="Name" id="name" error={errors.name} required>
                 <TextInput
                   id="name"
@@ -87,6 +88,7 @@ export function ContactForm() {
                   aria-required="true"
                   aria-invalid={errors.name ? 'true' : 'false'}
                   aria-describedby={errors.name ? 'name-error' : undefined}
+                  className="glass-bg-subtle glass-border-subtle focus:glass-bg-warm focus:glass-border-warm rounded-xl border-2 px-4 py-3 transition-all duration-300"
                 />
               </Field>
               <Field label="Email" id="email" error={errors.email} required>
@@ -103,6 +105,7 @@ export function ContactForm() {
                   aria-required="true"
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'email-error' : undefined}
+                  className="glass-bg-subtle glass-border-subtle focus:glass-bg-warm focus:glass-border-warm rounded-xl border-2 px-4 py-3 transition-all duration-300"
                 />
               </Field>
               <Field
@@ -114,7 +117,7 @@ export function ContactForm() {
                 <TextareaInput
                   id="message"
                   name="message"
-                  rows={6}
+                  rows={4}
                   value={values.message || ''}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -125,6 +128,7 @@ export function ContactForm() {
                   aria-describedby={
                     errors.message ? 'message-error' : undefined
                   }
+                  className="glass-bg-subtle glass-border-subtle focus:glass-bg-warm focus:glass-border-warm resize-none rounded-xl border-2 px-4 py-3 transition-all duration-300"
                 />
               </Field>
               <CheckboxField
@@ -135,12 +139,15 @@ export function ContactForm() {
                 disabled={isSubmitting}
                 label="Request my resume"
                 error={errors.resume}
+                className="glass-bg-subtle glass-border-subtle rounded-xl border-2 p-4"
               />
             </div>
-            <div className="flex flex-col items-center gap-4">
+
+            {/* Submit section */}
+            <div className="flex flex-col items-center gap-4 pt-2">
               <ParticleButton
                 type="submit"
-                className="px-8 py-4 text-xl"
+                className="glass-bg-warm glass-border-warm glass-shadow-lg text-brand-dark hover:glass-bg-warm-hover hover:glass-border-warm-hover transform rounded-xl border-2 px-12 py-4 text-xl font-bold transition-all duration-300 hover:scale-105"
                 particleCount={50}
                 particleSize={6}
                 particleSpeed={2}
@@ -153,7 +160,7 @@ export function ContactForm() {
               </ParticleButton>
               {submitError && (
                 <div
-                  className="animate-shake text-secondary mt-2 font-bold"
+                  className="glass-bg-subtle glass-border-subtle animate-shake text-brand-red rounded-xl border-2 px-6 py-3 text-center font-bold"
                   role="alert"
                   aria-live="polite"
                 >
@@ -162,7 +169,7 @@ export function ContactForm() {
               )}
               {submitSuccess && (
                 <div
-                  className="animate-pop text-muted mt-2 font-bold"
+                  className="glass-bg-warm glass-border-warm animate-pop text-brand-dark rounded-xl border-2 px-6 py-3 text-center font-bold"
                   role="status"
                   aria-live="polite"
                 >

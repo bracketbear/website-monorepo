@@ -42,24 +42,26 @@ export function ContactSection({
       });
 
       const animation = createRetroGridAnimation({
-        gridSize: 25, // Smaller for subtle background
-        squareSize: 6, // Slightly larger to be more visible
-        gridAngle: 12, // More visible angle
-        animationSpeed: 0.8, // More noticeable animation
-        pattern: 'wave',
-        squareColor: '#ffdb8f', // Warm yellow matching brand
-        gap: 1,
-        skewX: 2, // More visible skew
-        skewY: 0,
-        perspectiveX: 0.1, // More visible perspective
+        gridSize: 78,
+        squareSize: 9,
+        gridAngle: 0,
+        animationSpeed: 2.4,
+        pattern: 'random',
+        squareColor: '#000000',
+        gap: 8,
+        skewX: 0,
+        skewY: 45,
+        perspectiveX: 0,
         perspectiveY: 0,
-        particleShape: 'circle',
-        cornerRoundness: 0.3,
+        particleShape: 'square',
+        cornerRoundness: 0.7,
         showGridLines: true,
-        gridLineColor: '#ff1493', // Bright pink for contrast
-        opacity: 0.4, // More visible background
-        waveAmplitude: 0.6, // More visible wave
-        waveFrequency: 0.4, // More noticeable wave frequency
+        gridLineColor: '#ad9bb9',
+        opacity: 1,
+        waveAmplitude: 1,
+        waveFrequency: 1.1,
+        rippleSpeed: 2.3,
+        scanlineSpeed: 4.5,
       });
 
       app.setAnimation(animation);
@@ -79,19 +81,25 @@ export function ContactSection({
       <section
         className={`px-content relative min-h-[600px] overflow-hidden py-12 ${className}`}
       >
-        {/* Content - matches original design */}
+        {/* Content - glass morphism design */}
         <div className="relative z-10 container mx-auto">
-          <div className="mx-auto max-w-4xl text-center">
-            <h2 className="font-heading text-foreground mb-8 p-6 text-5xl font-black tracking-tight uppercase">
-              {title}
-            </h2>
-            {text && (
-              <div
-                className="prose prose-lg prose-p:text-foreground/80 mx-auto mb-12 max-w-2xl"
-                dangerouslySetInnerHTML={{ __html: text }}
-              />
-            )}
-            <div className="card">
+          <div className="mx-auto max-w-4xl">
+            {/* Single glass container with title, text, and form */}
+            <div className="glass-bg-frosted glass-border-frosted glass-shadow-lg rounded-2xl border-2 p-6">
+              {/* Title and text */}
+              <div className="mb-6 text-center">
+                <h2 className="font-heading text-brand-dark mb-3 text-4xl leading-tight font-black tracking-tight uppercase md:text-5xl">
+                  {title}
+                </h2>
+                {text && (
+                  <div
+                    className="prose prose-lg prose-p:text-brand-dark/80 mx-auto max-w-2xl"
+                    dangerouslySetInnerHTML={{ __html: text }}
+                  />
+                )}
+              </div>
+
+              {/* Contact form */}
               <ContactForm />
             </div>
           </div>
@@ -111,7 +119,7 @@ export function ContactSection({
           <AnimationStage
             application={application}
             className="absolute inset-0 h-full w-full"
-            canvasClassName="opacity-60 pointer-events-none"
+            canvasClassName="pointer-events-none"
             enableLuminanceDetection={false}
             pauseWhenHidden={false}
             showDebugControls={true}
@@ -120,19 +128,25 @@ export function ContactSection({
         )}
       </div>
 
-      {/* Content - matches original design */}
+      {/* Content - glass morphism design */}
       <div className="relative z-10 container mx-auto">
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="font-heading text-foreground mb-8 p-6 text-5xl font-black tracking-tight uppercase">
-            {title}
-          </h2>
-          {text && (
-            <div
-              className="prose prose-lg prose-p:text-foreground/80 mx-auto mb-12 max-w-2xl"
-              dangerouslySetInnerHTML={{ __html: text }}
-            />
-          )}
-          <div className="card">
+        <div className="mx-auto max-w-4xl">
+          {/* Single glass container with title, text, and form */}
+          <div className="glass-bg-frosted glass-border-frosted glass-shadow-lg rounded-2xl border-2 p-6">
+            {/* Title and text */}
+            <div className="mb-6 text-center">
+              <h2 className="font-heading text-brand-dark mb-3 text-4xl leading-tight font-black tracking-tight uppercase md:text-5xl">
+                {title}
+              </h2>
+              {text && (
+                <div
+                  className="prose prose-lg prose-p:text-brand-dark/80 mx-auto max-w-2xl"
+                  dangerouslySetInnerHTML={{ __html: text }}
+                />
+              )}
+            </div>
+
+            {/* Contact form */}
             <ContactForm />
           </div>
         </div>
