@@ -46,13 +46,20 @@ export const Button = forwardRef<
 
     // If href is provided, render as anchor tag
     if (href) {
+      // For anchor tags, we can't use disabled attribute, but we can apply disabled styling
+      const anchorClasses = clsx(
+        buttonClasses,
+        disabled && 'pointer-events-none opacity-50'
+      );
+
       return (
         <a
           ref={ref as React.Ref<HTMLAnchorElement>}
-          href={href}
+          href={disabled ? undefined : href}
           target={target}
           rel={rel}
-          className={buttonClasses}
+          className={anchorClasses}
+          aria-disabled={disabled}
           {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
         >
           {children}
@@ -67,6 +74,7 @@ export const Button = forwardRef<
         type={type}
         disabled={disabled}
         className={buttonClasses}
+        aria-disabled={disabled}
         {...props}
       >
         {children}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { z } from 'zod';
 
 /**
@@ -20,6 +20,7 @@ export interface ValidatedFormProps<TSchema extends z.ZodTypeAny> {
     isSubmitting: boolean;
     submitError: string | null;
     submitSuccess: boolean;
+    isValid: boolean;
   }) => React.ReactNode;
   initialValues?: Partial<z.infer<TSchema>>;
   submitLabel?: string;
@@ -48,6 +49,12 @@ export function ValidatedForm<TSchema extends z.ZodTypeAny>({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  const isValid = useMemo(() => {
+    // Validate the entire form against the schema
+    const result = schema.safeParse(values);
+    return result.success;
+  }, [schema, values]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -64,7 +71,16 @@ export function ValidatedForm<TSchema extends z.ZodTypeAny>({
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    const result = schema.safeParse({ ...values, [name]: value });
+    const checked = (e.target as HTMLInputElement).checked;
+
+    // Get the current value (checkbox or text)
+    const currentValue = e.target.type === 'checkbox' ? checked : value;
+
+    // Create updated values object with current field value
+    const updatedValues = { ...values, [name]: currentValue };
+
+    // Validate the updated values
+    const result = schema.safeParse(updatedValues);
     if (
       !result.success &&
       result.error.formErrors.fieldErrors[name as keyof Values]
@@ -125,6 +141,7 @@ export function ValidatedForm<TSchema extends z.ZodTypeAny>({
         isSubmitting,
         submitError,
         submitSuccess,
+        isValid,
       })}
     </form>
   );

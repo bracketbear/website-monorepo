@@ -5,8 +5,8 @@ import {
   TextInput,
   TextareaInput,
   CheckboxField,
+  Button,
 } from '@bracketbear/core/react';
-import { ParticleButton } from '@/components/ParticleButton';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -58,6 +58,12 @@ export function ContactForm() {
       <ValidatedForm
         schema={contactSchema}
         onSubmit={handleSubmit}
+        initialValues={{
+          name: '',
+          email: '',
+          message: '',
+          resume: false,
+        }}
         animateOnSuccess
         animateOnError
         className="space-y-6"
@@ -69,6 +75,7 @@ export function ContactForm() {
           handleChange,
           handleBlur,
           isSubmitting,
+          isValid,
           submitError,
           submitSuccess,
         }) => (
@@ -88,7 +95,6 @@ export function ContactForm() {
                   aria-required="true"
                   aria-invalid={errors.name ? 'true' : 'false'}
                   aria-describedby={errors.name ? 'name-error' : undefined}
-                  className="glass-bg-subtle glass-border-subtle focus:glass-bg-warm focus:glass-border-warm rounded-xl border-2 px-4 py-3 transition-all duration-300"
                 />
               </Field>
               <Field label="Email" id="email" error={errors.email} required>
@@ -105,7 +111,6 @@ export function ContactForm() {
                   aria-required="true"
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'email-error' : undefined}
-                  className="glass-bg-subtle glass-border-subtle focus:glass-bg-warm focus:glass-border-warm rounded-xl border-2 px-4 py-3 transition-all duration-300"
                 />
               </Field>
               <Field
@@ -128,7 +133,6 @@ export function ContactForm() {
                   aria-describedby={
                     errors.message ? 'message-error' : undefined
                   }
-                  className="glass-bg-subtle glass-border-subtle focus:glass-bg-warm focus:glass-border-warm resize-none rounded-xl border-2 px-4 py-3 transition-all duration-300"
                 />
               </Field>
               <CheckboxField
@@ -137,27 +141,24 @@ export function ContactForm() {
                 checked={!!values.resume}
                 onChange={handleChange}
                 disabled={isSubmitting}
-                label="Request my resume"
+                label="Request résumé with response"
                 error={errors.resume}
-                className="glass-bg-subtle glass-border-subtle rounded-xl border-2 p-4"
               />
             </div>
 
             {/* Submit section */}
             <div className="flex flex-col items-center gap-4 pt-2">
-              <ParticleButton
+              <Button
                 type="submit"
-                className="glass-bg-warm glass-border-warm glass-shadow-lg text-brand-dark hover:glass-bg-warm-hover hover:glass-border-warm-hover transform rounded-xl border-2 px-12 py-4 text-xl font-bold transition-all duration-300 hover:scale-105"
-                particleCount={50}
-                particleSize={6}
-                particleSpeed={2}
-                disabled={isSubmitting}
+                variant="primary"
+                size="lg"
+                disabled={isSubmitting || !isValid}
                 aria-label={
                   isSubmitting ? 'Sending message...' : 'Send message'
                 }
               >
                 {isSubmitting ? 'Sending…' : 'Send Message'}
-              </ParticleButton>
+              </Button>
               {submitError && (
                 <div
                   className="glass-bg-subtle glass-border-subtle animate-shake text-brand-red rounded-xl border-2 px-6 py-3 text-center font-bold"

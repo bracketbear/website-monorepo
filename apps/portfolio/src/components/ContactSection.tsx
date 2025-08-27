@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
 import { createRetroGridAnimation } from '@bracketbear/flateralus-animations';
-import { ContactForm } from './ContactForm';
+import { ContactContent } from './ContactContent';
 
 interface ContactSectionProps {
   title: string;
@@ -22,6 +22,8 @@ export function ContactSection({
 }: ContactSectionProps) {
   const [isClient, setIsClient] = useState(false);
   const [isAnimationReady, setIsAnimationReady] = useState(false);
+  const [isApplicationInitialized, setIsApplicationInitialized] =
+    useState(false);
 
   // Ensure we're on the client before rendering
   useEffect(() => {
@@ -68,12 +70,30 @@ export function ContactSection({
 
       // Mark animation as ready immediately to prevent flicker
       setIsAnimationReady(true);
+      setIsApplicationInitialized(true);
 
       return app;
-    } catch {
+    } catch (error) {
+      console.error('Failed to create PIXI application:', error);
       return null;
     }
   }, [isClient]);
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (application) {
+        try {
+          application.destroy();
+        } catch (error) {
+          console.error('Error destroying PIXI application:', error);
+        }
+      }
+      // Reset state on cleanup
+      setIsAnimationReady(false);
+      setIsApplicationInitialized(false);
+    };
+  }, [application]);
 
   // Server-side render (no animation) - match client-side styles exactly
   if (!isClient) {
@@ -81,29 +101,7 @@ export function ContactSection({
       <section
         className={`px-content relative min-h-[600px] overflow-hidden py-12 ${className}`}
       >
-        {/* Content - glass morphism design */}
-        <div className="relative z-10 container mx-auto">
-          <div className="mx-auto max-w-4xl">
-            {/* Single glass container with title, text, and form */}
-            <div className="glass-bg-frosted glass-border-frosted glass-shadow-lg rounded-2xl border-2 p-6">
-              {/* Title and text */}
-              <div className="mb-6 text-center">
-                <h2 className="font-heading text-brand-dark mb-3 text-4xl leading-tight font-black tracking-tight uppercase md:text-5xl">
-                  {title}
-                </h2>
-                {text && (
-                  <div
-                    className="prose prose-lg prose-p:text-brand-dark/80 mx-auto max-w-2xl"
-                    dangerouslySetInnerHTML={{ __html: text }}
-                  />
-                )}
-              </div>
-
-              {/* Contact form */}
-              <ContactForm />
-            </div>
-          </div>
-        </div>
+        <ContactContent title={title} text={text} />
       </section>
     );
   }
@@ -115,42 +113,21 @@ export function ContactSection({
     >
       {/* Animation stage - always render container to prevent layout shift */}
       <div className="absolute inset-0">
-        {isAnimationReady && application && (
+        {isAnimationReady && isApplicationInitialized && application && (
           <AnimationStage
             application={application}
             className="absolute inset-0 h-full w-full"
             canvasClassName="pointer-events-none"
             enableLuminanceDetection={false}
-            pauseWhenHidden={false}
+            pauseWhenHidden={true}
+            visibilityThreshold={0.1}
             showDebugControls={true}
             debugControlsClassName="z-50 container-content top-4 right-4"
           />
         )}
       </div>
 
-      {/* Content - glass morphism design */}
-      <div className="relative z-10 container mx-auto">
-        <div className="mx-auto max-w-4xl">
-          {/* Single glass container with title, text, and form */}
-          <div className="glass-bg-frosted glass-border-frosted glass-shadow-lg rounded-2xl border-2 p-6">
-            {/* Title and text */}
-            <div className="mb-6 text-center">
-              <h2 className="font-heading text-brand-dark mb-3 text-4xl leading-tight font-black tracking-tight uppercase md:text-5xl">
-                {title}
-              </h2>
-              {text && (
-                <div
-                  className="prose prose-lg prose-p:text-brand-dark/80 mx-auto max-w-2xl"
-                  dangerouslySetInnerHTML={{ __html: text }}
-                />
-              )}
-            </div>
-
-            {/* Contact form */}
-            <ContactForm />
-          </div>
-        </div>
-      </div>
+      <ContactContent title={title} text={text} />
     </section>
   );
 }
