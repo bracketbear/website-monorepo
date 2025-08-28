@@ -1,10 +1,10 @@
 {
   "title": "Reach Out",
-  "subtitle": "Tell me what you’re building.",
   "metaDescription": "Contact Harrison Callahan — talk through a role or project. Short call, clear next steps, and a reply within a day.",
   "noIndex": false,
-  "introduction": "# Let's talk details\n\nI build full‑stack tools for experiential teams. If you've got a role or a project in mind, I'm happy to walk through it and outline options. Short calls or async is fine.\n\nIf you have one, send a repo, problem statement, or Figma. I usually reply within a day.",
-  "contactMethods": ["linkedin", "email", "github"],
+  "contactCTA": {},
+  "introduction": "# Let's talk shop\n\nI love building cool, performant, and engaging software. If you've got a role or a project in mind, I'm happy to walk through it and see if we're on the same page.\n\nThe more info you can share, the better I'll be able to help you. If forms aren't your jam, feel free to reach out using one of the methods below.\n",
+  "contactMethods": ["linkedin", "email"],
   "quickInfo": [
     {
       "label": "Response time",
