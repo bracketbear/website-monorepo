@@ -1,6 +1,6 @@
 {
-  "title": "MUI (Material-UI)",
+  "title": "Material UI",
   "description": "Material-UI (now known as MUI) is a popular React UI framework that implements Google's Material Design, providing a robust set of components for building modern web applications.",
-  "isFeatured": false,
-  "category": "front-end"
+  "category": "front-end",
+  "isFeatured": false
 }

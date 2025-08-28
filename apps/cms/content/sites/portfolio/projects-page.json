@@ -12,7 +12,7 @@
   "projectCategories": [
     {
       "title": "SaaS Experiential Content Management Systems",
-      "description": "My bread and butter. I'm on a crusade to make the most designer, developer, and content-manager friendly system out there. I think that there's a ton of untapped potential in this market, and I'm the only person I know who's worked on two or more of these systems.",
+      "description": "My bread and butter. I'm focused on building the most designer-, developer-, and content-manager-friendly systems I can. There's a lot of untapped potential here, and I've shipped multiple experiential CMSs end-to-end.",
       "projects": ["dl-gumband", "ds-bridge"]
     },
     {

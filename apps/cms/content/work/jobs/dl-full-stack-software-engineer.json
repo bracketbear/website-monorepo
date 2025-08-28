@@ -1,7 +1,7 @@
 {
   "title": "Full-Stack Software Engineer",
   "company": "deeplocal",
-  "description": "As a Full-Stack Software Engineer on the Gumband team at Deeplocal, I built and maintained software that powered interactive experiences for clients in experiential marketing, interactive exhibits, or installations. I specialized in TypeScript, React, and Node, and had recently ventured into Python to explore new integration possibilities. My work streamlined development cycles for large-scale installations, enabling faster deployment and more immersive experiences for end users",
+  "description": "Built features for Gumband (TypeScript/React/Node), prototyped a Python↔TouchDesigner SDK integration, and improved delivery velocity for large installations.",
   "highlights": [
     "Led a proof of concept to merge a Python SDK with TouchDesigner, directly influencing our product roadmap and opening new business development opportunities",
     "Spearheaded a culture of pragmatic coding and iterative reviews, ensuring our team could quickly adapt to new challenges without sacrificing code quality",

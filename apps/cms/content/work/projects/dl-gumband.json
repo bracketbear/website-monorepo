@@ -29,19 +29,19 @@
     "buttonText": "Start a conversation",
     "buttonLink": "/contact"
   },
-  "oneLiner": "A service-based CMS for experiential teams—built to be dependable, not flashy.",
+  "oneLiner": "A service-based CMS for experiential teams",
   "problem": "Experiential agencies tend to invest as little as they can into their content management systems, either because they have to out of business necessity, or because they don't understand that their CMS is part of the experience. With Gumband, we wanted to deliver a solution that end users, software engineers, and high-level stakeholders all loved to use.",
   "scope": [
     "Full-stack engineering on the core platform",
-    "In the last three months before team-wide layoffs, I had been working under Chief Technical Officer on what would have been a Technical Product Manager role"
+    "In the last three months before company-wide layoffs affected our team, I had been working under Chief Technical Officer on what would have been a Technical Product Manager role"
   ],
   "decisions": [
-    "Prototyped, pitched, and got stakeholder approval on a very cool TouchDesigner integration that would have made building no-code Gumband-integrated apps a reality for the first time",
-    "Worked with principle software engineer to develop patterns that drastically reduced our technical debt and introduced new modularity patterns into our projects",
+    "Prototyped, pitched, and got stakeholder approval on a novel TouchDesigner integration that would have made building no-code Gumband-integrated apps a reality for the first time",
+    "Worked with principal software engineer to develop patterns that drastically reduced our technical debt and introduced new modularity patterns into our projects",
     "Introduced fix into our front-end service that completely eliminated git merge issues that we were constantly running into with our icon system",
     "Leaned on years of experiential tech experience to work with product team on delivering features tailored to our clients needs"
   ],
-  "outcome": "In the end, we built a system that went well beyond what a traditional experiential content management system does—our UI was a pleasure to use, our service was super reliable, and we were making good progress on addressing our issues. Unfortunately, the elimination of our team means that Gumband will probably never live up to the promise it once had. However, this project reignited my love for experience management, so hell yeah to that.",
+  "outcome": "We delivered a dependable, well-liked system that pushed beyond a typical experiential CMS. After company changes paused the team, the work still reignited my love for experience management.",
   "notes": "This taught me the value of all of your interfaces, and in an app like Gumband where we're trying to help platform users and software developers, both users are just as important. You've got to meet developers where they are, not get them to adapt to you.",
   "status": "paused",
   "links": [],
@@ -49,8 +49,7 @@
     "coverAlt": "Gumband CMS interface for experiential installations."
   },
   "teaser": {
-    "headline": "A powerful experience management platform that went beyond content management",
-    "subline": "Built the unglamorous parts so teams could move without worry."
+    "headline": "A powerful experience management platform that went beyond content management"
   },
   "impactTags": ["reliability", "maintainability", "developer-experience"]
 }

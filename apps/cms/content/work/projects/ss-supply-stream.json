@@ -51,12 +51,12 @@
     "Converted designs into tangible web pages and components"
   ],
   "decisions": [
-    "Introduced team to Typescript concepts and taught them how to integrate them into JSDoc comments, increasing developer experience",
+    "Introduced team to TypeScript concepts and taught them how to integrate them into JSDoc comments, increasing developer experience",
     "Pitched ideas for reducing tech debt and increasing developer velocity",
     "Leaned on previous experience porting apps from Vue 2 to Vue 3 to help increase team velocity"
   ],
   "outcome": "We were able to deliver an e-commerce platform that increased sales and reach for our parent company. This app was powered by a wildly complex management system, and it was able to handle the complexity with grace and simplicity.",
-  "notes": "My biggest takeaway from this project was just how much I appreciated Typescript. The experience of going from a TS project to plain ol' Javascript really enforced how valuable developer experience is that it unlocks—JSDocs can only go so far.",
+  "notes": "My biggest takeaway from this project was just how much I appreciated TypeScript. The experience of going from a TS project to plain ol' Javascript really enforced how valuable developer experience is that it unlocks—JSDocs can only go so far.",
   "status": "shipped",
   "links": [
     {

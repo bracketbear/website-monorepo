@@ -1,5 +1,5 @@
 {
-  "title": "PostgreSQL (Postgres)",
-  "isFeatured": false,
-  "category": "back-end"
+  "title": "PostgreSQL",
+  "category": "back-end",
+  "isFeatured": false
 }

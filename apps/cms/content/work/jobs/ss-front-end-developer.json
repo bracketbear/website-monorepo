@@ -1,7 +1,7 @@
 {
   "title": "Front-End Developer",
   "company": "supply-stream-inc",
-  "description": "During my tenure, I contributed to both Vue 2 and Vue 3 e-commerce applications, driving a successful conversion to Vue 3 and Nuxt",
+  "description": "Contributed across Vue 2/3 e-commerce apps, led a Vue 2→3 + Nuxt migration, and helped standardize styling with Tailwind.",
   "highlights": [
     "Worked on both Vue 2 and Vue 3 applications during tenure, contributing to the conversion of a Vue 2 e-commerce application to Vue 3 and Nuxt, as well as developing features for a single-page e-commerce admin application using Vue 3",
     "Participated in the migration of the company's front-end codebase from Bootstrap to Tailwind CSS, which resulted in a more streamlined and flexible styling system for the Vue applications",
