@@ -1,6 +1,5 @@
 {
-  "title": "About",
-  "subtitle": "I build full-stack tools for experiential teams.",
+  "title": "About Me",
   "metaDescription": "About Harrison Callahan — self-taught developer building full-stack tools for experiential teams; practical, collaborative, and reliability-focused.",
   "noIndex": false,
   "contactCTA": {
@@ -9,41 +8,63 @@
     "buttonLink": "/contact"
   },
   "narrative": {
-    "title": "My Story",
-    "content": "I'm Harrison. I've been working on the web in some form or another since high school. My first real break was at Polich Art Works—an art foundry that took a chance on a kid who's only selling point was that he could use a computer. That path moved me from Dreamweaver and Photoshop to Flash and ActionScript, and eventually into building things because someone needed them.\n\nLater, working at a brewery, we needed a monthly newsletter. I taught myself PHP, built a very rough sender, and then moved us to Mailchimp. I wrote a WordPress theme and a couple of plugins to manage menus. None of it was glamorous, but it worked—and it taught me that good software starts with a real need and gets better in public.\n\nFeeling stuck a few years in, I took a three-month Laravel contract with an experiential shop. Seeing a museum app driving content on a wall flipped a switch: this wasn't just websites—it was the systems that let creative teams do their jobs without fighting the tools. I pushed for the full-time role, got it, and never looked back. Since then I've spent years in experiential—Downstream, Deeplocal—building management software, smoothing handoffs, and making the unglamorous parts dependable. I'm self-taught, practical, and happiest when the work helps a team breathe easier."
+    "title": "Hey! I'm Harrison.",
+    "content": "I've been working on the web in some form or another since high school. My first opportunity was at Polich Art Works—an art foundry that took a chance on a kid who's only selling point was that he could use a computer. There I was introduced to two concepts that would stay with me throughout my career: web technologies and art.\n\nLater, while working at a brewery, I was tasked with figuring out how to collect emails for and send a newsletter. Any sane or experienced person would have gone straight to MailChimp, but instead I taught myself PHP, built a form to collect emails on our website and send them to a database, and then another form to send the emails. That led to writing a WordPress theme and a couple of plugins to manage menus, and from there my software development journey started.\n\nFlash forward a few years later and 3,500 miles away. Feeling stuck a few years into my career, I took a three-month Laravel contract with an experiential shop in Portland, OR. Seeing a museum app driving content on a wall for the first time flipped a switch in my head: I could get paid to write code that made the world a cooler place. I pushed for the full-time role, got it, and have never looked back. Since then, I've spent years in experiential—Downstream, Deeplocal—building management software, going on virtual and in-person installs, and learning as much as I can learning about the industry I love."
   },
   "whatIDoNow": {
-    "title": "What I do now",
-    "content": "I design and build the systems behind interactive work: content and device management, scheduling, tooling, and the small frameworks that keep everything sane. I like projects with clear ownership and a real outcome attached.\n\nI'm open to full-time roles, and I also partner with agencies and collaborators. Either way, the goal is the same: make the work easier to run tomorrow than it was today."
+    "title": "What I'm up to now",
+    "content": "I lean on my experiences and pair it with generative A.I. to produce quality work that delivers real value to my partners and clients. I spend time to tackle some of the pain points I've seen in the experiential industry to come up with solutions that help, not hinder, our users. I document, test, and CI/CD myself to sleep to make sure that I'm not shipping a dud.\n\n#### In short, I try to be a one-person team that feels like a ten-person team."
   },
   "howIPartner": {
     "title": "How I Work",
     "items": [
-      "Agree on the problem, decision-makers, and timeline up front.",
-      "Write things down: short docs, in-code notes, shared checklists.",
-      "Build the smallest useful version, then add what earns its place.",
-      "Organize projects so they help you later: modular code, a shared core, sensible boundaries.",
-      "Communicate candidly and respectfully. If something's unclear, I'll ask early.",
-      "Prefer in-person when possible; otherwise async is fine. Pacific time, flexible."
+      {
+        "title": "Listen, ask questions, and take notes",
+        "content": "Start by understanding the problem deeply. Ask clarifying questions and document everything to ensure we're aligned on goals and constraints."
+      },
+      {
+        "title": "Weigh options and strengths of each",
+        "content": "Evaluate different approaches objectively. Consider technical feasibility, timeline, and long-term maintainability to choose the best path forward."
+      },
+      {
+        "title": "Prototype, prototype, prototype",
+        "content": "Build quick iterations to test assumptions and gather feedback. Rapid prototyping helps validate ideas before committing to full development."
+      },
+      {
+        "title": "Present work and collect feedback",
+        "content": "Share progress regularly and actively seek input. Early feedback prevents going down the wrong path and ensures stakeholder alignment."
+      },
+      {
+        "title": "Reflect, learn lessons, and clean up the code",
+        "content": "After each iteration, review what worked and what didn't. Refactor and document the code to make it maintainable for the future."
+      },
+      {
+        "title": "Drive on",
+        "content": "Keep momentum going while maintaining quality. Balance speed with thoroughness to deliver value consistently."
+      }
     ]
   },
   "stories": [
     {
-      "headline": "Keeping the promise",
-      "content": "A client-promised feature was drifting. I asked to own the priorities for a week and wrote a short plan: what actually had to ship, what could wait, and who made the final call. We re-sequenced work so integration and QA happened earlier, and cut two nice-to-haves that weren’t on the critical path.\n\nI ran a 15-minute daily check-in, kept notes visible to the whole team, and made decisions where ownership was fuzzy. We delivered on the date with no late-night scrambles—and the team got their weekend back."
-    },
-    {
       "headline": "Prototype to direction",
-      "content": "A partner team couldn’t get our platform talking to their TouchDesigner pipeline. After a few circular threads, I flew out, sat with them, and mapped a minimal path. On the flight home I wrote a rough TD plugin in Python that mapped content cues to operators—ugly but alive.\n\nThat demo unblocked their team and gave leadership a clear next step. We shifted the quarter to building the plugin properly and made integrations straightforward after that."
+      "content": "A partner team couldn't get our platform talking to their TouchDesigner pipeline. After a few circular threads, I flew out, sat with them, and mapped a minimal path. On the flight home I wrote a rough TD plugin in Python that mapped content cues to operators—ugly but alive.\n\nThat demo unblocked their team and gave leadership a clear next step. We shifted the quarter to building the plugin properly and made integrations straightforward after that."
     }
   ],
   "principles": {
-    "title": "What I care about",
+    "title": "Values",
     "items": [
-      "Clear communication",
-      "Pragmatic decision making",
-      "Modularity",
-      "Working smarter"
+      {
+        "title": "Clear communication",
+        "content": "I believe in transparent, honest communication that builds trust and ensures everyone is aligned on goals and expectations."
+      },
+      {
+        "title": "Pragmatic decision making",
+        "content": "I focus on practical solutions that deliver real value, balancing idealism with the constraints of time, budget, and technical reality."
+      },
+      {
+        "title": "Modularity, scalability, and developer experience",
+        "content": "I build systems that are easy to understand, maintain, and extend. Good architecture today prevents technical debt tomorrow."
+      }
     ]
   },
   "timeline": [
@@ -65,7 +86,7 @@
   ],
   "testimonials": [
     {
-      "quote": "In a short time, [Harrison] took on projects that were ambiguous and challenging, but he approached these projects with the determination to learn as much and he could and ultimately succeeded. We deemed him the \"swiss army knife\" because that's exactly what he was.",
+      "quote": "In a short time, **[Harrison] took on projects that were ambiguous and challenging**, but he approached these projects with the determination to learn as much and he could and ultimately succeeded.\n\nWe deemed him the **\"swiss army knife\"** because that's exactly what he was.",
       "name": "Tessa Ribisch",
       "role": "Former Producer",
       "org": "Downstream",
@@ -78,9 +99,18 @@
   "howToStart": {
     "title": "How to start",
     "items": [
-      "Send me a message to chat",
-      "One 25-minute call to align",
-      "I return a short plan with options"
+      {
+        "title": "Send me a message to chat",
+        "content": "Reach out with a brief description of your project or problem. I'll respond within 24 hours to schedule our first conversation."
+      },
+      {
+        "title": "One 25-minute call to align",
+        "content": "We'll discuss your goals, timeline, and budget to ensure we're a good fit for each other. This helps me understand your needs better."
+      },
+      {
+        "title": "I return a short plan with options",
+        "content": "Based on our conversation, I'll provide a concise plan with different approaches, estimated timelines, and investment ranges."
+      }
     ]
   }
 }

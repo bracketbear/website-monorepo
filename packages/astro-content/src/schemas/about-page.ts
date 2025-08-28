@@ -9,12 +9,17 @@ const richSection = z.object({
 
 const bulletSection = z.object({
   title: z.string(),
-  items: z.array(z.string()),
+  items: z.array(
+    z.object({
+      title: z.string(),
+      content: z.string(), // markdown supported
+    })
+  ),
 });
 
 const storyItem = z.object({
   headline: z.string(),
-  content: z.string(), // 1–3 short paragraphs, markdown
+  content: z.string(), // markdown supported
 });
 
 // Timeline and Testimonials
@@ -25,7 +30,7 @@ const timelineItem = z.object({
 });
 
 const testimonialItem = z.object({
-  quote: z.string(),
+  quote: z.string(), // markdown supported
   name: z.string(),
   role: z.string().optional(),
   org: z.string().optional(),
@@ -38,8 +43,8 @@ export const portfolioAboutPageSchema = makePageSchema({
   whatIDoNow: richSection, // "What I do now"
   howIPartner: bulletSection, // bullets
 
-  // Two short vignettes
-  stories: z.array(storyItem).min(2).max(3),
+  // One or two short vignettes
+  stories: z.array(storyItem).min(1).max(2),
 
   // Principles
   principles: bulletSection, // "What I care about"

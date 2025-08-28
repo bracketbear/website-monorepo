@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { marked } from 'marked';
 
 export interface TestimonialProps {
   quote: string | React.ReactNode;
@@ -22,7 +23,7 @@ export const Testimonial = ({
   const darkClass = 'bg-brand-dark text-text-primary';
   const lightClass = 'text-brand-dark bg-white';
   const textLightClass = 'text-gray-900';
-  const textDarkClass = 'text-text-primary';
+  const textDarkClass = 'text-white';
 
   return (
     <section
@@ -50,9 +51,8 @@ export const Testimonial = ({
               variant === 'dark' && textDarkClass,
               variant === 'light' && textLightClass
             )}
-          >
-            {quote}
-          </blockquote>
+            dangerouslySetInnerHTML={{ __html: marked.parse(quote as string) }}
+          />
           <figcaption className="mt-10">
             <img
               alt=""
@@ -63,7 +63,7 @@ export const Testimonial = ({
               <div
                 className={clsx(
                   'font-semibold',
-                  variant === 'dark' && 'text-text-primary',
+                  variant === 'dark' && 'text-white',
                   variant === 'light' && 'text-gray-900'
                 )}
               >
@@ -73,14 +73,18 @@ export const Testimonial = ({
                   height={3}
                   viewBox="0 0 2 2"
                   aria-hidden="true"
-                  className="fill-gray-900"
+                  className={clsx(
+                    'fill-current',
+                    variant === 'dark' && 'text-white',
+                    variant === 'light' && 'text-gray-900'
+                  )}
                 >
                   <circle r={1} cx={1} cy={1} />
                 </svg>
                 <div
                   className={clsx(
                     'text-gray-400',
-                    variant === 'dark' && 'text-gray-200'
+                    variant === 'dark' && 'text-gray-300'
                   )}
                 >
                   {role} {org && `at ${org}`}

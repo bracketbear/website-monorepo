@@ -1,0 +1,206 @@
+# CMS Markdown Integration Rule
+
+## Overview
+
+When working with markdown content in the CMS, use `fields.markdoc.inline()` for content fields and ensure proper markdown parsing in templates. This rule covers the complete workflow from CMS schema definition to template rendering.
+
+## CMS Schema Patterns
+
+### ✅ Use Markdoc Inline for Content Fields
+
+**When to use `fields.markdoc.inline()`:**
+- Content that will be rendered as HTML with markdown support
+- Long-form content (narratives, descriptions, introductions)
+- Content that needs rich formatting (headers, lists, links, emphasis)
+- Fields that currently use `fields.text({ multiline: true })` with markdown content
+
+**When to keep `fields.text()`:**
+- Short, single-line content (titles, labels, names)
+- Content that won't be rendered as HTML
+- Simple text that doesn't need formatting
+
+### Schema Examples
+
+```typescript
+// ✅ Good - Content that needs markdown support
+narrative: fields.object({
+  title: fields.text({ label: 'Title' }), // Keep as text - no markdown needed
+  content: fields.markdoc.inline({
+    label: 'Content',
+    description: 'Content for the story section (markdown supported)',
+  }),
+}),
+
+// ✅ Good - Simple text fields
+howIPartner: fields.object({
+  title: fields.text({ label: 'Title' }),
+  items: fields.array(
+    fields.text({ 
+      label: 'Partnering Item',
+      multiline: true, // Keep as text - simple list items
+    }),
+    { label: 'How I Partner Items' }
+  ),
+}),
+
+// ❌ Avoid - Using text fields for markdown content
+content: fields.text({
+  label: 'Content',
+  description: 'Content with markdown support', // Wrong - use markdoc.inline
+  multiline: true,
+}),
+```
+
+## Template Rendering Patterns
+
+### ✅ Use Marked Parser for Markdoc Content
+
+**Always use `marked.parse()` for markdoc fields:**
+
+```astro
+<!-- ✅ Correct - Parse markdown content -->
+<div class="prose prose-lg text-foreground/90">
+  <Fragment set:html={marked.parse(aboutPage.data.narrative.content)} />
+</div>
+
+<!-- ✅ Correct - Parse markdown in arrays -->
+{aboutPage.data.stories.map((story: any) => (
+  <div class="prose-lg text-foreground/90">
+    <Fragment set:html={marked.parse(story.content)} />
+  </div>
+))}
+
+<!-- ❌ Incorrect - Don't render markdown as plain text -->
+<div>{aboutPage.data.narrative.content}</div>
+```
+
+### ✅ Apply Prose Classes for Typography
+
+**Use Tailwind prose classes for consistent markdown styling:**
+
+```astro
+<!-- ✅ Good - Full prose styling -->
+<div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 max-w-none">
+  <Fragment set:html={marked.parse(content)} />
+</div>
+
+<!-- ✅ Good - Simplified prose -->
+<div class="prose prose-lg text-foreground/90 max-w-none">
+  <Fragment set:html={marked.parse(content)} />
+</div>
+
+<!-- ✅ Good - Custom prose with brand colors -->
+<div class="prose prose-lg prose-headings:text-brand-light prose-p:text-brand-light/80 prose-strong:text-brand-light prose-em:text-brand-light/90 max-w-none">
+  <Fragment set:html={marked.parse(content)} />
+</div>
+```
+
+## Migration Pattern
+
+### Step 1: Update CMS Schema
+
+**Change from text fields to markdoc.inline:**
+
+```typescript
+// Before
+content: fields.text({
+  label: 'Content',
+  description: 'Content with markdown support',
+  multiline: true,
+}),
+
+// After
+content: fields.markdoc.inline({
+  label: 'Content',
+  description: 'Content with markdown support',
+}),
+```
+
+### Step 2: Rebuild CMS
+
+```bash
+cd apps/cms
+npm run build
+```
+
+### Step 3: Re-enter Content
+
+After schema changes, content must be re-entered in the CMS markdown editor.
+
+### Step 4: Verify Template Rendering
+
+Ensure templates use `marked.parse()` for the updated fields.
+
+## Examples in This Codebase
+
+### Current Pattern (Needs Migration)
+- [apps/cms/src/sites/portfolio/schemas.ts](mdc:apps/cms/src/sites/portfolio/schemas.ts) - Uses `fields.text({ multiline: true })` for markdown content
+- [apps/cms/content/sites/portfolio/about-page.json](mdc:apps/cms/content/sites/portfolio/about-page.json) - Contains markdown formatting in text fields
+
+### Correct Pattern (Already Following)
+- [apps/cms/src/sites/portfolio/schemas.ts](mdc:apps/cms/src/sites/portfolio/schemas.ts) - Uses `fields.markdoc.inline()` for introduction fields
+- [apps/portfolio/src/pages/about.astro](mdc:apps/portfolio/src/pages/about.astro) - Uses `marked.parse()` for content rendering
+
+### Template Rendering Examples
+- [apps/portfolio/src/pages/index.astro](mdc:apps/portfolio/src/pages/index.astro) - Parses markdown with prose classes
+- [apps/portfolio/src/components/MeetFlateralusSection.tsx](mdc:apps/portfolio/src/components/MeetFlateralusSection.tsx) - Parses markdown in React components
+
+## Content Field Mapping
+
+### Fields to Convert to Markdoc Inline
+```typescript
+// About page
+narrative.content: fields.markdoc.inline()
+whatIDoNow.content: fields.markdoc.inline()
+stories[].content: fields.markdoc.inline()
+contactCTA.text: fields.markdoc.inline()
+
+// Other pages
+introduction: fields.markdoc.inline()
+content: fields.markdoc.inline()
+description: fields.markdoc.inline()
+```
+
+### Fields to Keep as Text
+```typescript
+// Simple text fields
+title: fields.text()
+name: fields.text()
+label: fields.text()
+buttonText: fields.text()
+items: fields.array(fields.text()) // Simple list items
+```
+
+## Benefits of Markdoc Inline
+
+1. **Rich Editing**: CMS provides markdown editor with preview
+2. **Type Safety**: Better TypeScript support for markdown content
+3. **Validation**: Built-in markdown validation
+4. **Consistency**: Unified approach across all content types
+5. **Maintenance**: Easier to manage markdown content in one place
+
+## Troubleshooting
+
+### CMS Shows Blank Content After Schema Change
+- Rebuild CMS after schema changes
+- Re-enter content in the new markdown editor
+- Check browser console for errors
+
+### Markdown Not Rendering in Templates
+- Verify `marked.parse()` is being used
+- Check if content field path matches schema
+- Ensure prose classes are applied correctly
+
+### Content Migration Issues
+- Export content before schema changes
+- Use find/replace to convert simple markdown to proper format
+- Test both CMS editing and website rendering
+
+## Best Practices
+
+1. **Always use `fields.markdoc.inline()`** for content that needs markdown support
+2. **Always use `marked.parse()`** in templates for markdoc fields
+3. **Apply prose classes** for consistent typography
+4. **Test both CMS and website** after schema changes
+5. **Document field purposes** clearly in schema descriptions
+6. **Use consistent naming** for markdown content fields across schemas

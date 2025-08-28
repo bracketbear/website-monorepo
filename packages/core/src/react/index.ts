@@ -23,6 +23,7 @@ export { Ticker } from './Ticker';
 export { Toast } from './Toast';
 export { ToastProvider } from './ToastProvider';
 export { ValidatedForm } from './ValidatedForm';
+export { BulletList } from './BulletList';
 
 // Hooks
 export * from './hooks';
@@ -51,3 +52,4 @@ export type { TickerProps, TickerItem } from './Ticker';
 export type { ToastProps } from './Toast';
 export type { ToastProviderProps, ToastMessage } from './ToastProvider';
 export type { ValidatedFormProps } from './ValidatedForm';
+export type { BulletListProps } from './BulletList';

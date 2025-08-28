@@ -42,16 +42,20 @@ export const portfolioAboutPageSchema = makePageSchema({
       description: 'Title for the "How I partner" section',
     }),
     items: fields.array(
-      fields.text({
-        label: 'Partnering Item',
-        description: 'How you partner with teams and clients',
-        multiline: true,
+      fields.object({
+        title: fields.text({
+          label: 'Item Title',
+          description: 'Short title for this step',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Item Content',
+          description: 'Detailed description of this step (markdown supported)',
+        }),
       }),
       {
         label: 'How I Partner Items',
         description: 'List of how you partner (clarity first approach)',
-        itemLabel: (props) =>
-          props.value?.substring(0, 50) + '...' || 'New Item',
+        itemLabel: (props) => props.fields.title.value || 'New Item',
       }
     ),
   }),
@@ -63,15 +67,14 @@ export const portfolioAboutPageSchema = makePageSchema({
         label: 'Story Headline',
         description: 'Headline for the story vignette',
       }),
-      content: fields.text({
+      content: fields.markdoc.inline({
         label: 'Story Content',
-        description: 'Content for the story vignette (markdown)',
-        multiline: true,
+        description: 'Content for the story vignette (markdown supported)',
       }),
     }),
     {
       label: 'Stories',
-      description: 'Two short story vignettes (2-3 items)',
+      description: 'One or two short story vignettes (1-2 items)',
       itemLabel: (props) => props.fields.headline.value || 'New Story',
     }
   ),
@@ -83,14 +86,21 @@ export const portfolioAboutPageSchema = makePageSchema({
       description: 'Title for the "What I care about" section',
     }),
     items: fields.array(
-      fields.text({
-        label: 'Principle Item',
-        description: 'What you care about and value',
+      fields.object({
+        title: fields.text({
+          label: 'Principle Title',
+          description: 'Short title for this principle',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Principle Content',
+          description:
+            'Detailed description of this principle (markdown supported)',
+        }),
       }),
       {
         label: 'Principles',
         description: 'List of what you care about',
-        itemLabel: (props) => props.value || 'New Principle',
+        itemLabel: (props) => props.fields.title.value || 'New Principle',
       }
     ),
   }),
@@ -124,7 +134,10 @@ export const portfolioAboutPageSchema = makePageSchema({
   // Testimonials
   testimonials: fields.array(
     fields.object({
-      quote: fields.text({ label: 'Quote', multiline: true }),
+      quote: fields.markdoc.inline({
+        label: 'Quote',
+        description: 'Testimonial quote with markdown support',
+      }),
       name: fields.text({ label: 'Name' }),
       role: fields.text({ label: 'Role (optional)' }),
       org: fields.text({ label: 'Organization (optional)' }),
@@ -153,11 +166,20 @@ export const portfolioAboutPageSchema = makePageSchema({
       defaultValue: 'How to start',
     }),
     items: fields.array(
-      fields.text({ label: 'Step', description: 'Short actionable step' }),
+      fields.object({
+        title: fields.text({
+          label: 'Step Title',
+          description: 'Short title for this step',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Step Content',
+          description: 'Detailed description of this step (markdown supported)',
+        }),
+      }),
       {
         label: 'Steps',
         description: '2–3 steps to get started',
-        itemLabel: (props) => props.value || 'New Step',
+        itemLabel: (props) => props.fields.title.value || 'New Step',
       }
     ),
   }),
