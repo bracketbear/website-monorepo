@@ -12,17 +12,19 @@
   "startDate": "2020-01-01",
   "endDate": "2022-08-01",
   "workSkills": [
+    "typescript",
     "vue",
+    "node",
+    "git",
     "mysql",
     "php",
-    "git",
     "javascript",
     "html",
     "css",
     "vite",
     "rust",
-    "typescript",
-    "tailwind-css"
+    "tailwind-css",
+    "docker"
   ],
   "isCurrentJob": false
 }

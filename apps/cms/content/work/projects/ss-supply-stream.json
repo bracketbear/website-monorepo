@@ -31,6 +31,9 @@
     "javascript",
     "nuxt-3",
     "tailwind-css",
+    "css",
+    "node",
+    "html",
     "git",
     "storybook"
   ],

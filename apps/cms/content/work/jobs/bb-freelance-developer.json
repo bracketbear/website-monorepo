@@ -14,10 +14,13 @@
     "react",
     "typescript",
     "laravel",
+    "node",
     "php",
     "mysql",
     "docker",
     "git",
-    "tailwind-css"
+    "tailwind-css",
+    "css",
+    "html"
   ]
 }
