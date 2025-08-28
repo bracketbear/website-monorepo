@@ -82,7 +82,10 @@ export const workSkillSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
   isFeatured: z.boolean().default(false),
-  category: z.string(), // references "workSkillCategories"
+  category: z.string(), // references "workSkillCategories" by slug
+  order: z.number().optional(),
+  isActive: z.boolean().optional(),
+  proficiency: z.string().optional(),
 });
 
 /**

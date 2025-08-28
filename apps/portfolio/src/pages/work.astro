@@ -19,26 +19,7 @@ const workJobs = await getCollection('workJobs');
 const workCompanies = await getCollection('workCompany');
 
 // Get skill categories from the work page singleton and fetch their full data
-const skillCategorySlugs = workPage.data.skillCategories || [];
 const skillCategories = await getCollection('workSkillCategory');
-
-// Create ordered skill categories with their associated skills
-const orderedSkillCategories = skillCategorySlugs
-  .map((slug: string) => {
-    const category = skillCategories.find((cat) => cat.id === slug);
-    if (!category) return null;
-
-    // Get skills that belong to this category
-    const categorySkills = workSkills.filter(
-      (skill) => skill.data.category === category.id
-    );
-
-    return {
-      ...category,
-      skills: categorySkills,
-    };
-  })
-  .filter(Boolean); // Remove any undefined entries
 
 // Helper function to parse markdown content
 function parseMarkdown(content: string): string {
@@ -77,7 +58,7 @@ function parseMarkdown(content: string): string {
   <div class="px-content mb-8">
     <FilteredWorkHistory
       skills={workSkills}
-      skillCategories={orderedSkillCategories}
+      skillCategories={skillCategories}
       jobs={workJobs}
       projects={workProjects}
       companies={workCompanies}

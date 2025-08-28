@@ -23,7 +23,7 @@
   "cta": {
     "text": "Have a complex install to wrangle? Let’s make the operations simple.",
     "buttonText": "Talk details",
-    "buttonLink": "/reach-out"
+    "buttonLink": "/contact"
   },
   "oneLiner": "A multi‑screen installation for PwC built as a single application",
   "problem": "Previous projects split features across multiple small apps, which made operations harder. PwC needed one application that could drive very different displays and inputs, from LED film with lidar sensors to an interactive learning space.",

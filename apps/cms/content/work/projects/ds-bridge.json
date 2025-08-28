@@ -38,7 +38,7 @@
   "cta": {
     "text": "Have systems that need to work together? I can help map the problem and build the glue.",
     "buttonText": "Talk details",
-    "buttonLink": "/reach-out"
+    "buttonLink": "/contact"
   },
   "oneLiner": "A CMS UI for installs—front‑end on Vue 3 + TypeScript over a Rust back end.",
   "problem": "We wanted to build an experiential content management system that wasn't a \"kit of parts\" solution. Instead, we wanted to have a software service that we could add new installations to via a JSON manifest. This would save thousands of dollars of man hours off of each project.",

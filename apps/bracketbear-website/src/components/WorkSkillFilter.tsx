@@ -80,7 +80,8 @@ export default function WorkSkillFilter({
   };
 
   const filteredSkills = skills.filter((skill) => {
-    if (selectedCategories.length === 0) return false;
+    // Always show all skills initially
+    if (selectedCategories.length === 0) return true;
     return skill.data.categories?.some((category) =>
       selectedCategories.includes(category)
     );

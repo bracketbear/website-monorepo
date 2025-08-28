@@ -65,7 +65,7 @@ export const portfolioAboutPageSchema = makePageSchema({
   contactCTA: z.object({
     text: z.string(),
     buttonText: z.string().default('Reach Out'),
-    buttonLink: z.string().default('/reach-out'),
+    buttonLink: z.string().default('/contact'),
   }),
 });
 
