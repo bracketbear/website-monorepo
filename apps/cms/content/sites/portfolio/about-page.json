@@ -20,34 +20,34 @@
     "items": [
       {
         "title": "Listen, ask questions, and take notes",
-        "content": "Start by understanding the problem deeply. Ask clarifying questions and document everything to ensure we're aligned on goals and constraints."
+        "content": "Start by understanding the problem deeply. Ask clarifying questions and document everything to ensure we're aligned on goals and constraints.\n"
       },
       {
         "title": "Weigh options and strengths of each",
-        "content": "Evaluate different approaches objectively. Consider technical feasibility, timeline, and long-term maintainability to choose the best path forward."
+        "content": "Evaluate different approaches objectively. Consider technical feasibility, timeline, and long-term maintainability to choose the best path forward.\n"
       },
       {
         "title": "Prototype, prototype, prototype",
-        "content": "Build quick iterations to test assumptions and gather feedback. Rapid prototyping helps validate ideas before committing to full development."
+        "content": "Build quick iterations to test assumptions and gather feedback. Rapid prototyping helps validate ideas before committing to full development.\n"
       },
       {
         "title": "Present work and collect feedback",
-        "content": "Share progress regularly and actively seek input. Early feedback prevents going down the wrong path and ensures stakeholder alignment."
+        "content": "Share progress regularly and actively seek input. Early feedback prevents going down the wrong path and ensures stakeholder alignment.\n"
       },
       {
         "title": "Reflect, learn lessons, and clean up the code",
-        "content": "After each iteration, review what worked and what didn't. Refactor and document the code to make it maintainable for the future."
+        "content": "After each iteration, review what worked and what didn't. Refactor and document the code to make it maintainable for the future.\n"
       },
       {
         "title": "Drive on",
-        "content": "Keep momentum going while maintaining quality. Balance speed with thoroughness to deliver value consistently."
+        "content": "Keep momentum going while maintaining quality. Balance speed with thoroughness to deliver value consistently.\n"
       }
     ]
   },
   "stories": [
     {
-      "headline": "Prototype to direction",
-      "content": "A partner team couldn't get our platform talking to their TouchDesigner pipeline. After a few circular threads, I flew out, sat with them, and mapped a minimal path. On the flight home I wrote a rough TD plugin in Python that mapped content cues to operators—ugly but alive.\n\nThat demo unblocked their team and gave leadership a clear next step. We shifted the quarter to building the plugin properly and made integrations straightforward after that."
+      "headline": "TouchDesigner Prototype",
+      "content": "A partner of ours—my former teammates— were having an issue integrating with our system. After hearing this, I convinced our team to let me go to the partner's studio so I could work with them on the issue. When I saw that their biggest pain point was integrating with TouchDesigner, I had an idea.\\\n\\\nI went back to our team and pitched a drop-in TouchDesigner integration. I took it from an idea to a functional proof-of-concept, and then presented it to leadership. The pitch worked and it change company priorities in the upcoming quarter. This would have made it possible to build apps with our management system without having to write a single line of code.\n"
     }
   ],
   "principles": {
@@ -55,38 +55,38 @@
     "items": [
       {
         "title": "Clear communication",
-        "content": "I believe in transparent, honest communication that builds trust and ensures everyone is aligned on goals and expectations."
+        "content": "I believe in transparent, honest communication that builds trust and ensures everyone is aligned on goals and expectations.\n"
       },
       {
         "title": "Pragmatic decision making",
-        "content": "I focus on practical solutions that deliver real value, balancing idealism with the constraints of time, budget, and technical reality."
+        "content": "I focus on practical solutions that deliver real value, balancing idealism with the constraints of time, budget, and technical reality.\n"
       },
       {
         "title": "Modularity, scalability, and developer experience",
-        "content": "I build systems that are easy to understand, maintain, and extend. Good architecture today prevents technical debt tomorrow."
+        "content": "I build systems that are easy to understand, maintain, and extend. Good architecture today prevents technical debt tomorrow.\n"
       }
     ]
   },
   "timeline": [
     {
       "label": "Polich Art Works",
-      "sublabel": "first real break",
-      "description": "Hired on the strength of \"I can use a computer.\" From Dreamweaver/Photoshop to Flash/ActionScript—learned to build because someone needed it."
+      "sublabel": "First Real Break",
+      "description": "Hired mostly because I could ‘use a computer.’ Went from Dreamweaver/Photoshop to Flash/ActionScript and started my journey"
     },
     {
-      "label": "Brewery tools",
-      "sublabel": "self-taught builder",
-      "description": "Wrote a PHP newsletter sender, moved the team to Mailchimp, and built a WordPress theme with plugins for menus. Not glamorous—reliable."
+      "label": "Brewery Tools",
+      "sublabel": "Self-Taught PHP Developer",
+      "description": "Wrote a PHP newsletter sender and built custom Wordpress plugins to help the restaurant run smoother"
     },
     {
-      "label": "Experiential",
-      "sublabel": "Downstream → Deeplocal",
-      "description": "Took a three month contract at an experiential agency and fell in love with the industry"
+      "label": "Experiential Tech",
+      "sublabel": "Downstream & Deeplocal",
+      "description": "Took a three month contract at an experiential agency and fell in love with the industry, and now try to help make it grow however I can"
     }
   ],
   "testimonials": [
     {
-      "quote": "In a short time, **[Harrison] took on projects that were ambiguous and challenging**, but he approached these projects with the determination to learn as much and he could and ultimately succeeded.\n\nWe deemed him the **\"swiss army knife\"** because that's exactly what he was.",
+      "quote": "In a short time, **[Harrison] took on projects that were ambiguous and challenging**, but he approached these projects with the determination to learn as much and he could and ultimately succeeded.\n\nWe deemed him the **\"swiss army knife\"** because that's exactly what he was.\n",
       "name": "Tessa Ribisch",
       "role": "Former Producer",
       "org": "Downstream",
@@ -94,22 +94,22 @@
     }
   ],
   "fit": {
-    "bestFit": "Teams that know the outcome they need and value candid, respectful communication. Clear ownership, realistic timelines, and steady progress."
+    "bestFit": "Ideal partners and teammates bring a defined outcome and straight talk; I bring structure, momentum, and a cadence you can rely on.\n"
   },
   "howToStart": {
     "title": "How to start",
     "items": [
       {
         "title": "Send me a message to chat",
-        "content": "Reach out with a brief description of your project or problem. I'll respond within 24 hours to schedule our first conversation."
+        "content": "Reach out with a brief description of your project or problem. I'll respond within 24 hours to schedule our first conversation.\n"
       },
       {
         "title": "One 25-minute call to align",
-        "content": "We'll discuss your goals, timeline, and budget to ensure we're a good fit for each other. This helps me understand your needs better."
+        "content": "We'll discuss your goals, timeline, and budget to ensure we're a good fit for each other. This helps me understand your needs better.\n"
       },
       {
         "title": "I return a short plan with options",
-        "content": "Based on our conversation, I'll provide a concise plan with different approaches, estimated timelines, and investment ranges."
+        "content": "Based on our conversation, I'll provide a concise plan with different approaches, estimated timelines, and investment ranges.\n"
       }
     ]
   }

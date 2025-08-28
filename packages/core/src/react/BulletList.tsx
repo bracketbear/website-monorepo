@@ -29,7 +29,7 @@ export function BulletList({
   return (
     <section className={clsx('px-content mt-40 mb-8', className)}>
       <div className="mx-auto max-w-4xl text-center">
-        <h2 className="font-heading text-foreground mb-8 text-5xl tracking-tight">
+        <h2 className="font-heading text-foreground mb-8 text-5xl tracking-tight uppercase">
           {title}
         </h2>
       </div>
@@ -52,7 +52,7 @@ export function BulletList({
 
                 {/* Right column: Content */}
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-heading text-foreground mb-3 text-xl font-semibold tracking-tight md:text-2xl">
+                  <h3 className="font-heading text-foreground mb-3 text-xl font-semibold tracking-tight uppercase md:text-2xl">
                     {item.title}
                   </h3>
                   <div className="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/80 prose-strong:text-foreground prose-em:text-foreground/90 max-w-prose">

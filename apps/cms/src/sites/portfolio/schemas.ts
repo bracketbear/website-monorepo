@@ -152,10 +152,9 @@ export const portfolioAboutPageSchema = makePageSchema({
 
   // Fit
   fit: fields.object({
-    bestFit: fields.text({
+    bestFit: fields.markdoc.inline({
       label: 'Best Fit',
-      description: 'Description of who you work best with',
-      multiline: true,
+      description: 'Description of who you work best with (markdown supported)',
     }),
   }),
 

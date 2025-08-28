@@ -53,9 +53,9 @@ export const portfolioAboutPageSchema = makePageSchema({
   timeline: z.array(timelineItem).min(3).max(6),
   testimonials: z.array(testimonialItem).max(3).optional(),
 
-  // Fit (single plain-text block)
+  // Fit (single markdown block)
   fit: z.object({
-    bestFit: z.string(),
+    bestFit: z.string(), // markdown supported
   }),
 
   // NEW: How to start
