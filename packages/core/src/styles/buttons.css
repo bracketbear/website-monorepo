@@ -33,9 +33,7 @@
   @apply border-border bg-brand-dark/90 border-2 text-white shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md;
 }
 
-@utility button-dark:hover {
-  @apply bg-brand-dark text-white shadow-[0_6px_20px_0_rgba(0,0,0,0.4)] backdrop-blur-lg;
-}
+/* Hover state for button-dark - applied via CSS */
 
 @utility button-light {
   @apply border-border bg-muted text-muted-foreground border-2;
@@ -90,6 +88,11 @@
 }
 
 @layer components {
+  /* Hover state for button-dark */
+  .button-dark:hover {
+    @apply bg-brand-dark text-white shadow-[0_6px_20px_0_rgba(0,0,0,0.4)] backdrop-blur-lg;
+  }
+
   /* Enhanced hover and active states for trippy buttons */
   .button-trippy::before {
     content: '';
