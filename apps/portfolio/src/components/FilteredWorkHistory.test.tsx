@@ -45,7 +45,6 @@ describe('FilteredWorkHistory', () => {
   const mockSkills: CollectionEntry<'workSkills'>[] = [
     {
       id: 'react',
-      slug: 'react',
       body: '',
       collection: 'workSkills',
       data: {
@@ -60,7 +59,6 @@ describe('FilteredWorkHistory', () => {
     },
     {
       id: 'typescript',
-      slug: 'typescript',
       body: '',
       collection: 'workSkills',
       data: {
@@ -75,7 +73,6 @@ describe('FilteredWorkHistory', () => {
     },
     {
       id: 'node',
-      slug: 'node',
       body: '',
       collection: 'workSkills',
       data: {
@@ -93,7 +90,6 @@ describe('FilteredWorkHistory', () => {
   const mockSkillCategories: CollectionEntry<'workSkillCategory'>[] = [
     {
       id: 'front-end',
-      slug: 'front-end',
       body: '',
       collection: 'workSkillCategory',
       data: {
@@ -103,7 +99,6 @@ describe('FilteredWorkHistory', () => {
     },
     {
       id: 'programming-languages',
-      slug: 'programming-languages',
       body: '',
       collection: 'workSkillCategory',
       data: {
@@ -113,7 +108,6 @@ describe('FilteredWorkHistory', () => {
     },
     {
       id: 'back-end',
-      slug: 'back-end',
       body: '',
       collection: 'workSkillCategory',
       data: {
@@ -126,7 +120,6 @@ describe('FilteredWorkHistory', () => {
   const mockJobs: CollectionEntry<'workJobs'>[] = [
     {
       id: 'job-1',
-      slug: 'job-1',
       body: '',
       collection: 'workJobs',
       data: {
@@ -145,7 +138,6 @@ describe('FilteredWorkHistory', () => {
   const mockProjects: CollectionEntry<'workProject'>[] = [
     {
       id: 'project-1',
-      slug: 'project-1',
       body: '',
       collection: 'workProject',
       data: {
@@ -162,7 +154,6 @@ describe('FilteredWorkHistory', () => {
   const mockCompanies: CollectionEntry<'workCompany'>[] = [
     {
       id: 'company-1',
-      slug: 'company-1',
       body: '',
       collection: 'workCompany',
       data: {
