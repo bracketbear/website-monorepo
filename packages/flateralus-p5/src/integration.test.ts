@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { P5Application } from './p5-application';
 import { P5Animation } from './p5-animation';
 import { createManifest } from '@bracketbear/flateralus';
+import type p5 from 'p5';
 
 // Mock p5
 const mockP5 = {
@@ -96,7 +97,7 @@ class IntegrationTestAnimation extends P5Animation<typeof testManifest> {
   public resetCalled = false;
   public destroyCalled = false;
 
-  onInit(p: any, controls: any): void {
+  onInit(p: p5, controls: any): void {
     this.initCalled = true;
     this.particles = [];
 
@@ -111,7 +112,7 @@ class IntegrationTestAnimation extends P5Animation<typeof testManifest> {
     }
   }
 
-  onUpdate(p: any, controls: any, deltaTime: number): void {
+  onUpdate(p: p5, controls: any, deltaTime: number): void {
     this.updateCalled = true;
 
     // Update particle positions
@@ -134,7 +135,7 @@ class IntegrationTestAnimation extends P5Animation<typeof testManifest> {
     });
   }
 
-  protected onReset(p: any, controls: any): void {
+  protected onReset(p: p5, controls: any): void {
     this.resetCalled = true;
     this.onInit(p, controls);
   }

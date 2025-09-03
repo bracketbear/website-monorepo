@@ -1,0 +1,25 @@
+{
+  "name": "@bracketbear/flateralus-p5-animations",
+  "version": "1.0.0",
+  "description": "p5.js animations for Flateralus framework",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "test": "vitest --config ../../vitest.config.ts",
+    "test:run": "vitest --config ../../vitest.config.ts --run",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bracketbear/flateralus": "file:../flateralus",
+    "@bracketbear/flateralus-p5": "file:../flateralus-p5"
+  },
+  "keywords": [],
+  "author": "Bracket Bear",
+  "license": "ISC"
+}

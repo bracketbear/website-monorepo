@@ -5,7 +5,7 @@ import {
   createParticleWaveAnimation,
   createBlobAnimation,
   createRetroGridAnimation,
-} from '@bracketbear/flateralus-animations';
+} from '@bracketbear/flateralus-pixi-animations';
 import { getRandomControlValues } from '@bracketbear/flateralus';
 import { clsx, Stats, type LabelValue } from '@bracketbear/core';
 import { useMemo, useState, useEffect, type ReactNode } from 'react';
@@ -127,8 +127,6 @@ export interface HeroSectionProps {
   className?: string;
   /** Whether to show debug controls */
   showDebugControls?: boolean;
-  /** Whether to enable luminance detection */
-  enableLuminanceDetection?: boolean;
   /** Hero title */
   title?: string;
   /** Hero subtitle */
@@ -161,7 +159,6 @@ export function HeroSection({
   preset = 'retro-grid',
   className = '',
   showDebugControls = true,
-  enableLuminanceDetection = true,
   title = 'Page Title',
   subtitle = '',
   description,
@@ -414,7 +411,6 @@ export function HeroSection({
           <AnimationStage
             application={application}
             showDebugControls={showDebugControls}
-            enableLuminanceDetection={enableLuminanceDetection}
             debugControlsClassName={clsx(
               'z-50 container-content',
               accountForNavigation && accountForBreadcrumbs

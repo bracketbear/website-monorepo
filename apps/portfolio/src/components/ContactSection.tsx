@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
-import { createRetroGridAnimation } from '@bracketbear/flateralus-animations';
+import { createRetroGridAnimation } from '@bracketbear/flateralus-pixi-animations';
 import { ContactContent } from './ContactContent';
 
 interface ContactSectionProps {
@@ -118,7 +118,6 @@ export function ContactSection({
             application={application}
             className="absolute inset-0 h-full w-full"
             canvasClassName="pointer-events-none"
-            enableLuminanceDetection={false}
             pauseWhenHidden={true}
             visibilityThreshold={0.1}
             showDebugControls={true}

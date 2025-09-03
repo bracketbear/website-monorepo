@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RandomWalkerStage from '../components/RandomWalkerStage.tsx';
+
+const title = 'Flateralus Animations';
+const description = 'Interactive animations powered by Flateralus framework';
+---
+
+<Layout title={title} description={description}>
+  <main class="container mx-auto px-4 py-8">
+    <h1 class="heading mb-8 text-4xl">Flateralus Animations</h1>
+
+    <div class="grid gap-8">
+      <!-- Random Walker Animation -->
+      <section class="card p-6">
+        <h2 class="heading mb-4 text-2xl">Random Walker</h2>
+        <p class="text-muted mb-6">
+          A particle system that demonstrates random walk behavior. Each walker
+          moves in random directions, leaving trails behind them. Use the
+          controls to adjust the number of walkers, their appearance, and
+          movement patterns.
+        </p>
+
+        <div class="h-96 w-full">
+          <RandomWalkerStage client:only="react" />
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>

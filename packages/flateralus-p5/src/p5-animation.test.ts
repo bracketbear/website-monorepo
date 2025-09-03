@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { P5Animation } from './p5-animation';
 import { createManifest } from '@bracketbear/flateralus';
+import type p5 from 'p5';
 
 // Mock p5
 const mockP5 = {
@@ -68,24 +69,24 @@ class TestP5Animation extends P5Animation<typeof testManifest> {
   public updateCalled = false;
   public resetCalled = false;
   public destroyCalled = false;
-  public lastContext: any = null;
+  public lastContext: p5 | null = null;
   public lastControls: any = null;
   public lastDeltaTime = 0;
 
-  onInit(context: any, controls: any): void {
+  onInit(context: p5, controls: any): void {
     this.initCalled = true;
     this.lastContext = context;
     this.lastControls = controls;
   }
 
-  onUpdate(context: any, controls: any, deltaTime: number): void {
+  onUpdate(context: p5, controls: any, deltaTime: number): void {
     this.updateCalled = true;
     this.lastContext = context;
     this.lastControls = controls;
     this.lastDeltaTime = deltaTime;
   }
 
-  protected onReset(context: any, controls: any): void {
+  protected onReset(context: p5, controls: any): void {
     this.resetCalled = true;
     this.lastContext = context;
     this.lastControls = controls;
@@ -142,7 +143,7 @@ describe('P5Animation', () => {
 
   describe('lifecycle methods', () => {
     it('should call onInit when init is called', () => {
-      animation.init(mockP5 as any);
+      animation.init(mockP5 as unknown as p5);
 
       expect(animation.initCalled).toBe(true);
       expect(animation.lastContext).toBe(mockP5);
@@ -153,7 +154,7 @@ describe('P5Animation', () => {
     });
 
     it('should call onUpdate when update is called', () => {
-      animation.init(mockP5 as any);
+      animation.init(mockP5 as unknown as p5);
       animation.update();
 
       expect(animation.updateCalled).toBe(true);
@@ -165,7 +166,7 @@ describe('P5Animation', () => {
     });
 
     it('should call onReset when reset is called', () => {
-      animation.init(mockP5 as any);
+      animation.init(mockP5 as unknown as p5);
       animation.reset();
 
       expect(animation.resetCalled).toBe(true);
@@ -212,7 +213,7 @@ describe('P5Animation', () => {
 
     it('should reset to default values when reset is called without parameters', () => {
       // Initialize the animation first
-      animation.init(mockP5 as any);
+      animation.init(mockP5 as unknown as p5);
 
       animation.updateControls({
         circleSize: 100,
@@ -229,7 +230,7 @@ describe('P5Animation', () => {
 
     it('should reset to specified values when reset is called with parameters', () => {
       // Initialize the animation first
-      animation.init(mockP5 as any);
+      animation.init(mockP5 as unknown as p5);
 
       animation.reset({
         circleSize: 25,

@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
-import { createBlobAnimation } from '@bracketbear/flateralus-animations';
+import { createBlobAnimation } from '@bracketbear/flateralus-pixi-animations';
 import { Pill } from '@bracketbear/core/react';
 import { marked } from 'marked';
 
@@ -84,7 +84,6 @@ export function MeetFlateralusSection({
                 <AnimationStage
                   application={application}
                   showDebugControls={true}
-                  enableLuminanceDetection={false}
                   layoutClassName="absolute inset-0"
                   canvasClassName="rounded-2xl"
                   debugControlsClassName="absolute top-20 right-4 z-50 max-w-none rounded-2xl"
