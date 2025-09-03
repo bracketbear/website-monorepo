@@ -21,7 +21,7 @@
     "lint:fix": "eslint . --fix",
     "lint:check": "eslint . --max-warnings 0",
     "scan:css": "node scripts/find-arbitrary-css.js",
-    "test": "vitest",
+    "test": "vitest --run",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "type-check": "npm run type-check --workspace=@bracketbear/core --workspace=@bracketbear/flateralus --workspace=@bracketbear/flateralus-pixi-animations --workspace=@bracketbear/flateralus-p5-animations --workspace=@bracketbear/flateralus-react --workspace=@bracketbear/flateralus-pixi --workspace=@bracketbear/flateralus-p5 --workspace=@bracketbear/tw-pattern-analyzer --workspace=@bracketbear/portfolio",
