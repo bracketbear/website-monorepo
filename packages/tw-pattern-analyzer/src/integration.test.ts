@@ -38,6 +38,15 @@ async function testAnalyze(
       // Use the mock instead of real readFileSync
       const src = mockReadFile(file, 'utf8');
       const result = findClassesInSource(src, file, {
+        globs: options.globs || ['**/*.{tsx,jsx,ts,js}'],
+        ignoreGlobs: options.ignoreGlobs || [],
+        similarityThreshold: options.similarityThreshold || 0.75,
+        minOccurrences: options.minOccurrences || 1,
+        minVariants: options.minVariants || 1,
+        output: {
+          console: { enabled: false, top: 20 },
+          json: { enabled: false, path: 'reports/test.json' },
+        },
         parsing: {
           patterns: {
             react:
@@ -93,7 +102,14 @@ async function testAnalyze(
     .sort((a, b) => b.occurrences - a.occurrences);
 
   // Simple clustering for testing
-  const clusters = [];
+  const clusters: Array<{
+    rep: string;
+    members: string[];
+    occurrences: number;
+    variants: number;
+    similarity: number;
+    likelihood: number;
+  }> = [];
   for (const s of stats) {
     let attached = false;
     for (const c of clusters) {

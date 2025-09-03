@@ -1,11 +1,7 @@
 import { type ReactNode } from 'react';
 import { clsx } from '@bracketbear/core';
 import type { Application, StageControlValues } from '@bracketbear/flateralus';
-import {
-  useAnimationStage,
-  useDebugControls,
-  useLuminanceDetection,
-} from '../hooks/index';
+import { useAnimationStage, useDebugControls } from '../hooks/index';
 import { DebugControls } from './DebugControls';
 import { useCallback } from 'react';
 
@@ -52,8 +48,6 @@ interface AnimationStageProps {
   debugControlsClassName?: string;
   /** Classes to apply to the canvas/background container element */
   canvasClassName?: string;
-  /** Whether to enable automatic text color adjustment based on background luminance */
-  enableLuminanceDetection?: boolean;
   /** Whether to pause animation when not visible (defaults to true) */
   pauseWhenHidden?: boolean;
   /** Threshold for visibility detection (0-1, defaults to 0.1) */
@@ -86,7 +80,6 @@ export function AnimationStage({
   className,
   debugControlsClassName,
   canvasClassName,
-  enableLuminanceDetection = true,
   pauseWhenHidden = true,
   visibilityThreshold = 0.1,
   visibilityRootMargin = '0px',
@@ -112,13 +105,6 @@ export function AnimationStage({
     onRandomize,
     stageControls, // Pass stage controls here
     onStageControlsChange, // Pass callback here
-  });
-
-  // Luminance detection hook - only call if application exists
-  useLuminanceDetection({
-    application: application || ({} as Application), // Provide empty object if null
-    enabled: enableLuminanceDetection,
-    containerElement: containerRef.current,
   });
 
   // Function to randomize all controls (both animation and stage)
