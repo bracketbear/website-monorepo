@@ -19,7 +19,7 @@
   .skill-pill:hover {
     transform: rotate(1deg) translate(-2px, -2px);
     box-shadow: var(--shadow-md) var(--color-shadow);
-    /* @apply bg-brand-dark text-brand-yellow; */
+    /* @apply bg-brand-dark text-primary; */
   }
 
   .skill-pill-selected {

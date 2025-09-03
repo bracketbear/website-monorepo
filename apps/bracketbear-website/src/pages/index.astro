@@ -1,187 +1,24 @@
 ---
-import { getCollection } from 'astro:content';
-import Layout from '@/layouts/Layout.astro';
-import ProjectCardList from '@/components/ProjectCardList.astro';
-import AboutSection from '@/components/AboutSection.astro';
-import ChooseUsSection from '@/components/ChooseUsSection.astro';
-import ServicesSection from '@/components/ServicesSection.astro';
-import WorkHistory from '@/components/WorkHistory';
-import type {
-  WorkJobEntry,
-  WorkCompanyEntry,
-  WorkSkillEntry,
-} from '@bracketbear/astro-content';
-
-const snakeText = [
-  'Software Engineer.',
-  'Problem Solver.',
-  'Creative Developer.',
-] as const;
-
-const jobs: WorkJobEntry[] = await getCollection('workJobs');
-const companies: WorkCompanyEntry[] = await getCollection('workCompany');
-const skills: WorkSkillEntry[] = await getCollection('workSkills');
+import { BracketBearLogo } from '@bracketbear/core/react';
 ---
 
-<Layout>
-  <header class="bg-brand-red relative z-0 overflow-hidden pt-24">
-    <div class="relative z-10 container mx-auto">
-      <div class="mb-16 max-w-4xl">
-        <div class="inline-block">
-          <h1
-            class="text-brand-light text-8xl font-black tracking-tight uppercase"
-          >
-            Experiential<br />
-            Full-Stack<br />
-            Pressure Relief Valve
-          </h1>
-        </div>
-        <div class="snake-text-container mt-8">
-          {
-            snakeText.map((text, index) => (
-              <p
-                class="snake-text text-foreground hover:text-primary text-2xl font-bold tracking-tight uppercase"
-                style={`--index: ${index}`}
-              >
-                {text}
-              </p>
-            ))
-          }
-        </div>
-      </div>
-      <!-- Availability Announcement -->
-      <div
-        class="mt-16 w-full lg:absolute lg:top-24 lg:right-6 lg:mt-0 lg:w-96"
-      >
-        <div
-          class="availability-box border-default bg-tertiary text-background transform p-6 lg:rotate-2"
-        >
-          <h2 class="mb-2 text-4xl font-black tracking-tight uppercase">
-            Available Now!
-          </h2>
-          <p class="mb-4 text-xl font-bold">
-            Open to <span class="text-foreground bg-background px-2 py-1"
-              >full-time</span
-            >
-            and <span class="text-foreground bg-background px-2 py-1"
-              >contract</span
-            > full-stack roles.<br />
-            Let's build something amazing together.
-          </p>
-          <a
-            href="mailto:contact@bracketbear.com"
-            class="border-default text-foreground bg-background border-background inline-block px-6 py-3 text-lg font-black transition-transform hover:scale-105"
-          >
-            Let's Talk →
-          </a>
-        </div>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Bracket Bear - Coming Soon</title>
+    <style is:global>
+      @import '@bracketbear/core/styles/bracketbear.tailwind.css';
+      @source '../../../../node_modules/@bracketbear/core/dist';
+    </style>
+  </head>
+  <body class="bg-brand-dark flex min-h-screen items-center justify-center">
+    <div class="text-center">
+      <div class="mb-8">
+        <BracketBearLogo className="text-brand-orange mx-auto h-48 w-48" />
       </div>
     </div>
-    <!-- Service Ticker -->
-    <!-- <ServiceTicker services={services} client:load /> -->
-  </header>
-
-  <main class="bg-background">
-    <AboutSection className="bg-primary" />
-    <ServicesSection className="bg-secondary" />
-    <ChooseUsSection className="bg-tertiary" />
-
-    <!-- Projects Section -->
-    <section id="projects" class="bg-brand-green relative py-24">
-      <div class="relative z-10 container mx-auto">
-        <h2
-          class="border-default bg-background text-foreground mb-16 inline-block p-6 text-5xl font-black tracking-tight uppercase"
-        >
-          Project Showcase
-        </h2>
-        <ProjectCardList variant="simple" />
-      </div>
-    </section>
-
-    <!-- Work History Section -->
-    <section
-      id="history"
-      class="bg-brand-purple relative overflow-hidden py-24"
-    >
-      <div class="relative z-10 container mx-auto">
-        <h2
-          class="border-default bg-background text-foreground mb-16 inline-block p-6 text-5xl font-black tracking-tight uppercase"
-        >
-          Work History
-        </h2>
-        <WorkHistory jobs={jobs} companies={companies} skills={skills} />
-      </div>
-    </section>
-  </main>
-</Layout>
-
-<style>
-  @keyframes shake {
-    0%,
-    100% {
-      transform: rotate(2deg) translate(0, 0) scale(1);
-    }
-    25% {
-      transform: rotate(3deg) translate(-2px, -2px) scale(1.02);
-    }
-    50% {
-      transform: rotate(1deg) translate(2px, 2px) scale(1.05);
-    }
-    75% {
-      transform: rotate(3deg) translate(-2px, 2px) scale(1.02);
-    }
-  }
-
-  .shake-animation {
-    animation: shake 0.5s ease-in-out;
-    transform-style: preserve-3d;
-    perspective: 1000px;
-  }
-
-  .availability-box {
-    transform-style: preserve-3d;
-    transition: transform 0.3s ease;
-  }
-
-  .snake-text-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .snake-text {
-    position: relative;
-    transform-origin: left;
-  }
-</style>
-
-<script>
-  // Shake animation for the availability box
-  document.addEventListener('DOMContentLoaded', () => {
-    const announcementBox = document.querySelector('.availability-box');
-
-    if (!announcementBox) return;
-
-    const shakeInterval = () => {
-      announcementBox.classList.add('shake-animation');
-      setTimeout(() => {
-        announcementBox.classList.remove('shake-animation');
-      }, 500);
-    };
-
-    // Initial shake
-    setTimeout(shakeInterval, 2000);
-
-    // Repeat every 8-12 seconds
-    const repeatShake = () => {
-      const randomDelay = Math.floor(Math.random() * 4000) + 8000; // 8-12 seconds
-      setTimeout(() => {
-        shakeInterval();
-        repeatShake();
-      }, randomDelay);
-    };
-
-    repeatShake();
-  });
-</script>
+  </body>
+</html>
