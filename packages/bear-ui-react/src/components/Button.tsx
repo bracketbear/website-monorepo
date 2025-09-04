@@ -5,7 +5,7 @@ import {
   buttonSizeClasses,
   type ButtonVariant,
   type ButtonSize,
-} from '../utils/button-classes';
+} from '@bracketbear/bear-ui';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {

@@ -10,7 +10,14 @@ export default defineConfig({
       'apps/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       'scripts/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
-    exclude: ['.astro', '**/*.d.ts', '**/node_modules/**', '**/*.dist/**'],
+    exclude: [
+      '.astro',
+      '**/*.d.ts',
+      '**/node_modules/**',
+      '**/*.dist/**',
+      '**/*.astro',
+      'packages/core/src/astro/**/*',
+    ],
     setupFiles: ['./vitest.setup.ts'],
     silent: true,
     onConsoleLog(log, type) {

@@ -2,7 +2,7 @@
   "name": "@bracketbear/core",
   "type": "module",
   "version": "0.0.1",
-  "description": "Shared components for BracketBear applications",
+  "description": "Core utilities and Astro components for BracketBear applications",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -20,10 +20,6 @@
       "import": "./dist/astro/index.js",
       "types": "./dist/astro/index.d.ts"
     },
-    "./react": {
-      "import": "./dist/react/index.js",
-      "types": "./dist/react/index.d.ts"
-    },
     "./types": {
       "import": "./dist/types/index.js",
       "types": "./dist/types/index.d.ts"
@@ -36,38 +32,35 @@
       "import": "./dist/utils/index.js",
       "types": "./dist/utils/index.d.ts"
     },
-    "./styles": "./dist/styles/bracketbear.tailwind.css",
-    "./styles/*": "./dist/styles/*",
     "./public/*": "./public/*"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc && cpx \"src/styles/**/*\" dist/styles && cpx \"src/types/**/*\" dist/types && cpx \"src/config/**/*\" dist/config && cpx \"src/utils/**/*\" dist/utils && cpx \"src/assets/**/*.svg\" dist/assets && cpx \"src/astro/**/*.astro\" dist/astro",
-    "dev": "concurrently \"tsc --watch\" \"npm run copy:astro:watch\" \"npm run copy:styles:watch\" \"npm run copy:types:watch\" \"npm run copy:config:watch\" \"npm run copy:utils:watch\" \"npm run copy:assets:watch\"",
+    "build": "tsc && cpx \"src/types/**/*\" dist/types && cpx \"src/config/**/*\" dist/config && cpx \"src/utils/**/*\" dist/utils && cpx \"src/assets/**/*.svg\" dist/assets && cpx \"src/astro/**/*.astro\" dist/astro",
+    "dev": "concurrently \"tsc --watch\" \"npm run copy:astro:watch\" \"npm run copy:types:watch\" \"npm run copy:config:watch\" \"npm run copy:utils:watch\" \"npm run copy:assets:watch\"",
     "clean": "rm -rf dist",
     "test": "vitest",
     "test:run": "vitest run",
     "type-check": "tsc --noEmit",
     "copy:assets:watch": "cpx \"src/assets/**/*.svg\" dist/assets --watch",
     "copy:astro:watch": "cpx \"src/astro/**/*.astro\" dist/astro --watch",
-    "copy:styles:watch": "cpx \"src/styles/**/*\" dist/styles --watch",
     "copy:types:watch": "cpx \"src/types/**/*\" dist/types --watch",
     "copy:config:watch": "cpx \"src/config/**/*\" dist/config --watch",
     "copy:utils:watch": "cpx \"src/utils/**/*\" dist/utils --watch"
   },
   "dependencies": {
+    "@bracketbear/bear-ui": "file:../bear-ui",
+    "@bracketbear/bear-ui-tailwind": "file:../bear-ui-tailwind",
+    "@bracketbear/bear-ui-react": "file:../bear-ui-react",
     "@fontsource/barlow-condensed": "^5.2.6",
     "@fontsource/fira-sans": "^5.2.6",
-    "@headlessui/react": "^2.2.7",
     "gsap": "^3.13.0",
     "pixi.js": "^8.10.2",
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
     "astro": "^5.6.0",
     "clsx": "^2.1.1",
     "concurrently": "^8.2.0",
@@ -76,8 +69,6 @@
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "tailwindcss": "^4.1.0"
   }
 }

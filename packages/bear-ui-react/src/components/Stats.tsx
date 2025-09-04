@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { LabelValue } from '../types';
+import type { LabelValue } from '@bracketbear/bear-ui/types';
 
 export type Stat = LabelValue;
 

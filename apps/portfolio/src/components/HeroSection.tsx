@@ -7,7 +7,8 @@ import {
   createRetroGridAnimation,
 } from '@bracketbear/flateralus-pixi-animations';
 import { getRandomControlValues } from '@bracketbear/flateralus';
-import { clsx, Stats, type LabelValue } from '@bracketbear/core';
+import { clsx, type LabelValue } from '@bracketbear/bear-ui';
+import { Stats } from '@bracketbear/bear-ui-react';
 import { useMemo, useState, useEffect, type ReactNode } from 'react';
 import { HeroContent } from './HeroContent';
 

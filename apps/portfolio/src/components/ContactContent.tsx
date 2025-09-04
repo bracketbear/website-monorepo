@@ -1,5 +1,5 @@
 import { ContactForm } from './ContactForm';
-import { Button } from '@bracketbear/core/react';
+import { Button } from '@bracketbear/bear-ui-react';
 
 interface ContactContentProps {
   title: string;

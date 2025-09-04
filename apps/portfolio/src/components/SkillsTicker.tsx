@@ -3,7 +3,7 @@ import {
   Ticker,
   type TickerItem,
   BracketBearLogo,
-} from '@bracketbear/core/react';
+} from '@bracketbear/bear-ui-react';
 
 interface SkillsTickerProps {
   skills: CollectionEntry<'workSkills'>[];

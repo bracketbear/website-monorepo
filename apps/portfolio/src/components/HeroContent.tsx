@@ -1,4 +1,4 @@
-import { Button } from '@bracketbear/core/react';
+import { Button } from '@bracketbear/bear-ui-react';
 import { clsx } from 'clsx';
 
 interface HeroContentProps {

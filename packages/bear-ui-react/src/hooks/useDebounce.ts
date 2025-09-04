@@ -1,4 +1,4 @@
-import { debounce } from '../../utils';
+import { debounce } from '@bracketbear/bear-ui';
 import { useCallback } from 'react';
 
 /**

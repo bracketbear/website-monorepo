@@ -13,7 +13,7 @@ import type {
   Animation,
 } from '@bracketbear/flateralus';
 import { getManifestDefaultControlValues } from '@bracketbear/flateralus';
-import { Button, Accordion, Popover } from '@bracketbear/core/react';
+import { Button, Accordion, Popover } from '@bracketbear/bear-ui-react';
 import {
   NumberControl,
   BooleanControl,
@@ -21,9 +21,9 @@ import {
   SelectControl,
   GroupControl,
 } from './controls';
-import { DiceIcon, DownloadIcon, ResetIcon } from '@bracketbear/core/assets';
+import { DiceIcon, DownloadIcon, ResetIcon } from './icons';
 import { getRandomControlValues } from '@bracketbear/flateralus';
-import type { DeepReadonly } from '@bracketbear/core';
+import type { DeepReadonly } from '@bracketbear/bear-ui';
 
 interface DebugControlsProps {
   manifest: AnimationManifest;
@@ -316,7 +316,7 @@ export const DebugControls = memo(function DebugControls({
                 size="icon"
                 aria-label="Randomize"
               >
-                <img src={DiceIcon.src} alt="Randomize" className="h-4 w-4" />
+                <DiceIcon className="h-4 w-4" />
               </Button>
 
               {showDownloadButton && (
@@ -327,11 +327,7 @@ export const DebugControls = memo(function DebugControls({
                   aria-label="Download"
                   className="bg-brand-green hover:bg-brand-green/90 text-white"
                 >
-                  <img
-                    src={DownloadIcon.src}
-                    alt="Download"
-                    className="h-4 w-4"
-                  />
+                  <DownloadIcon className="h-4 w-4" />
                 </Button>
               )}
 
@@ -342,7 +338,7 @@ export const DebugControls = memo(function DebugControls({
                 aria-label="Reset"
                 className="bg-brand-yellow hover:bg-brand-yellow/90 text-black"
               >
-                <img src={ResetIcon.src} alt="Reset" className="h-4 w-4" />
+                <ResetIcon className="h-4 w-4" />
               </Button>
             </div>
           </div>

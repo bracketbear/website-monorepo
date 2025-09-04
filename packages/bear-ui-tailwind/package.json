@@ -1,0 +1,40 @@
+{
+  "name": "@bracketbear/bear-ui-tailwind",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Tailwind CSS styles and utilities for BracketBear UI components",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./dist/styles/bracketbear.tailwind.css",
+    "./styles/*": "./dist/styles/*"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && cpx \"src/styles/**/*\" dist/styles",
+    "dev": "concurrently \"tsc --watch\" \"npm run copy:styles:watch\"",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "copy:styles:watch": "cpx \"src/styles/**/*\" dist/styles --watch"
+  },
+  "dependencies": {
+    "@fontsource/barlow-condensed": "^5.2.6",
+    "@fontsource/fira-sans": "^5.2.6"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "cpx": "^1.5.0",
+    "tailwindcss": "^4.1.12",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^4.1.0"
+  }
+}

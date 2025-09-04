@@ -1,4 +1,4 @@
-import { ToastProvider } from '@bracketbear/core';
+import { ToastProvider } from '@bracketbear/bear-ui-react';
 
 export interface ToastWrapperProps {
   children: React.ReactNode;

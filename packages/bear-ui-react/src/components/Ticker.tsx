@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useIntersectionObserver } from './hooks';
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 
 const DEFAULT_SCROLL_SPEED = 0.5 as const;
 const DEFAULT_REFRESH_INTERVAL = 20 as const;

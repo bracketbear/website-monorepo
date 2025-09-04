@@ -1,4 +1,5 @@
-import { getProjectUrl, SkillPill } from '@bracketbear/core';
+import { getProjectUrl } from '@bracketbear/bear-ui';
+import { SkillPill } from '@bracketbear/bear-ui-react';
 import type { CollectionEntry } from 'astro:content';
 import clsx from 'clsx';
 

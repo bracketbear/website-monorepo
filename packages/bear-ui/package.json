@@ -1,0 +1,43 @@
+{
+  "name": "@bracketbear/bear-ui",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Core UI system for BracketBear applications",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && cpx \"src/types/**/*\" dist/types && cpx \"src/utils/**/*\" dist/utils",
+    "dev": "concurrently \"tsc --watch\" \"npm run copy:types:watch\" \"npm run copy:utils:watch\"",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "copy:types:watch": "cpx \"src/types/**/*\" dist/types --watch",
+    "copy:utils:watch": "cpx \"src/utils/**/*\" dist/utils --watch"
+  },
+  "dependencies": {
+    "@bracketbear/bear-ui-tailwind": "file:../bear-ui-tailwind",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "cpx": "^1.5.0",
+    "typescript": "^5.0.0"
+  }
+}

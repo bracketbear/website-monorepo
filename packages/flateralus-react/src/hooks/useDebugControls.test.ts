@@ -17,7 +17,7 @@ const createMockAnimation = (initialValues: ControlValues = {}) => {
     getControlValues: vi.fn(() => currentValues),
     getManifest: vi.fn(() => mockManifest),
     updateControls: vi.fn((newValues: Partial<ControlValues>) => {
-      currentValues = { ...currentValues, ...newValues };
+      currentValues = { ...currentValues, ...newValues } as ControlValues;
       onControlsUpdated?.(currentValues);
     }),
     reset: vi.fn((values?: ControlValues) => {

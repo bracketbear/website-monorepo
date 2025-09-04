@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
 import { createBlobAnimation } from '@bracketbear/flateralus-pixi-animations';
-import { Pill } from '@bracketbear/core/react';
+import { Pill } from '@bracketbear/bear-ui-react';
 import { marked } from 'marked';
 
 interface MeetFlateralusSectionProps {

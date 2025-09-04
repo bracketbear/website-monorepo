@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
-import { clsx, getProjectUrl, SkillPill } from '@bracketbear/core';
+import { clsx, getProjectUrl } from '@bracketbear/bear-ui';
+import { SkillPill } from '@bracketbear/bear-ui-react';
 import { getProjectImageUrl } from '@bracketbear/astro-content';
 
 export interface ProjectCardProps {

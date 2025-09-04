@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Accordion } from '@bracketbear/core/react';
+import { Accordion } from '@bracketbear/bear-ui-react';
 import { ColorControl } from './ColorControl';
 import { NumberControl } from './NumberControl';
 import { BooleanControl } from './BooleanControl';

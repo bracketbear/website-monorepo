@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useVisibilityObserver } from '@bracketbear/core/react';
+import { useVisibilityObserver } from '@bracketbear/bear-ui-react';
 import type {
   Application,
   ControlValues,

@@ -7,8 +7,8 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace=@bracketbear/core\" \"npm run dev --workspace=@bracketbear/flateralus\" \"npm run dev --workspace=@bracketbear/flateralus-pixi-animations\" \"npm run dev --workspace=@bracketbear/flateralus-p5-animations\" \"npm run dev --workspace=@bracketbear/flateralus-react\"  \"npm run dev --workspace=@bracketbear/flateralus-pixi\"  \"npm run dev --workspace=@bracketbear/flateralus-p5\"  \"npm run dev --workspace=@bracketbear/cms\"  \"npm run dev --workspace=@bracketbear/bracketbear-website\" \"npm run dev --workspace=@bracketbear/portfolio\"",
-    "build": "npm run build --workspace=@bracketbear/core --workspace=@bracketbear/flateralus --workspace=@bracketbear/flateralus-pixi-animations --workspace=@bracketbear/flateralus-p5-animations --workspace=@bracketbear/flateralus-react --workspace=@bracketbear/flateralus-pixi --workspace=@bracketbear/flateralus-p5 --workspace=@bracketbear/tw-pattern-analyzer --workspace=@bracketbear/bracketbear-website --workspace=@bracketbear/portfolio",
+    "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace=@bracketbear/bear-ui\" \"npm run dev --workspace=@bracketbear/bear-ui-tailwind\" \"npm run dev --workspace=@bracketbear/bear-ui-react\" \"npm run dev --workspace=@bracketbear/core\" \"npm run dev --workspace=@bracketbear/flateralus\" \"npm run dev --workspace=@bracketbear/flateralus-pixi-animations\" \"npm run dev --workspace=@bracketbear/flateralus-p5-animations\" \"npm run dev --workspace=@bracketbear/flateralus-react\"  \"npm run dev --workspace=@bracketbear/flateralus-pixi\"  \"npm run dev --workspace=@bracketbear/flateralus-p5\"  \"npm run dev --workspace=@bracketbear/cms\"  \"npm run dev --workspace=@bracketbear/bracketbear-website\" \"npm run dev --workspace=@bracketbear/portfolio\"",
+    "build": "npm run build --workspace=@bracketbear/bear-ui --workspace=@bracketbear/bear-ui-tailwind --workspace=@bracketbear/bear-ui-react --workspace=@bracketbear/core --workspace=@bracketbear/flateralus --workspace=@bracketbear/flateralus-pixi-animations --workspace=@bracketbear/flateralus-p5-animations --workspace=@bracketbear/flateralus-react --workspace=@bracketbear/flateralus-pixi --workspace=@bracketbear/flateralus-p5 --workspace=@bracketbear/tw-pattern-analyzer --workspace=@bracketbear/bracketbear-website --workspace=@bracketbear/portfolio",
     "preview:bracketbear": "npm run preview --workspace=@bracketbear/bracketbear-website",
     "preview:portfolio": "npm run preview --workspace=@bracketbear/portfolio",
     "analyze:tw": "npm run build --workspace=@bracketbear/tw-pattern-analyzer && npm run analyze --workspace=@bracketbear/tw-pattern-analyzer",
@@ -24,7 +24,7 @@
     "test": "vitest --run",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
-    "type-check": "npm run type-check --workspace=@bracketbear/core --workspace=@bracketbear/flateralus --workspace=@bracketbear/flateralus-pixi-animations --workspace=@bracketbear/flateralus-p5-animations --workspace=@bracketbear/flateralus-react --workspace=@bracketbear/flateralus-pixi --workspace=@bracketbear/flateralus-p5 --workspace=@bracketbear/tw-pattern-analyzer --workspace=@bracketbear/portfolio",
+    "type-check": "npm run type-check --workspace=@bracketbear/bear-ui --workspace=@bracketbear/bear-ui-tailwind --workspace=@bracketbear/bear-ui-react --workspace=@bracketbear/core --workspace=@bracketbear/flateralus --workspace=@bracketbear/flateralus-pixi-animations --workspace=@bracketbear/flateralus-p5-animations --workspace=@bracketbear/flateralus-react --workspace=@bracketbear/flateralus-pixi --workspace=@bracketbear/flateralus-p5 --workspace=@bracketbear/tw-pattern-analyzer --workspace=@bracketbear/portfolio",
     "prepare": "husky"
   },
   "devDependencies": {

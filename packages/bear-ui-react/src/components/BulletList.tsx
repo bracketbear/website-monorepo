@@ -1,5 +1,5 @@
 import React from 'react';
-import { clsx } from '../utils';
+import { clsx } from 'clsx';
 import { marked } from 'marked';
 
 export interface BulletListItem {

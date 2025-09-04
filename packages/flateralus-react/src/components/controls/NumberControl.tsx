@@ -1,4 +1,4 @@
-import { Slider, TextInput } from '@bracketbear/core/react';
+import { Slider, TextInput } from '@bracketbear/bear-ui-react';
 import type { NumberControl as NumberControlType } from '@bracketbear/flateralus';
 import { BaseControlWrapper } from './BaseControlWrapper';
 

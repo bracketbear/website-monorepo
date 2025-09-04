@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { clsx } from '@bracketbear/core';
+import { clsx } from '@bracketbear/bear-ui';
 import type { Application, StageControlValues } from '@bracketbear/flateralus';
 import { useAnimationStage, useDebugControls } from '../hooks/index';
 import { DebugControls } from './DebugControls';

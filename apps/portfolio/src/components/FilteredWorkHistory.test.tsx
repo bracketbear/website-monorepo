@@ -4,7 +4,7 @@ import FilteredWorkHistory from './FilteredWorkHistory';
 import type { CollectionEntry } from 'astro:content';
 
 // Mock the core components
-vi.mock('@bracketbear/core/react', () => ({
+vi.mock('@bracketbear/bear-ui-react', () => ({
   SkillPill: ({ children, onClick, selected }: any) => (
     <button
       onClick={onClick}

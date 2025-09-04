@@ -14,7 +14,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@bracketbear/core": "file:../core",
+    "@bracketbear/bear-ui": "file:../bear-ui",
+    "@bracketbear/bear-ui-react": "file:../bear-ui-react",
     "@bracketbear/flateralus": "file:../flateralus"
   },
   "peerDependencies": {
