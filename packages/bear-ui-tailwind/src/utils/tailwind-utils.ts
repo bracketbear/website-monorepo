@@ -1,2 +1,2 @@
 // Tailwind-specific utility functions
-export * from './cn.js';
+// Note: Use clsx from @bracketbear/bear-ui for class name utilities

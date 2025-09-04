@@ -13,24 +13,28 @@ npm install @bracketbear/bear-ui
 Import shared types and utilities:
 
 ```typescript
-import { ButtonProps, FormFieldProps } from '@bracketbear/bear-ui/types';
-import { cn, validateForm } from '@bracketbear/bear-ui/utils';
+import {
+  BreadcrumbItem,
+  LabelValue,
+  LayoutConfig,
+} from '@bracketbear/bear-ui/types';
+import { clsx, debounce, generateMetaTitle } from '@bracketbear/bear-ui/utils';
 ```
 
-## Available Exports
+## What's Included
 
 ### Types
 
-- `ButtonProps` - Button component interface
-- `FormFieldProps` - Form field interface
-- `ModalProps` - Modal component interface
-- `ToastProps` - Toast notification interface
+Navigation, layout, and form-related TypeScript interfaces and types.
 
 ### Utils
 
-- `cn` - Class name utility function
-- `validateForm` - Form validation utilities
-- `formatDate` - Date formatting utilities
+- Class name utilities (`clsx`) - Single source of truth for class name handling
+- Form validation and meta title generation
+- Button styling utilities
+- Header spacing calculations
+- Navigation helpers
+- Shared constants
 
 ## Development
 
@@ -38,6 +42,7 @@ import { cn, validateForm } from '@bracketbear/bear-ui/utils';
 npm run dev    # Watch mode for development
 npm run build  # Build for production
 npm run clean  # Clean build artifacts
+npm run type-check  # Type checking
 ```
 
 ## Dependencies

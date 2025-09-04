@@ -22,11 +22,6 @@ export function hasObjectKey<T extends Record<string, any>, K extends string>(
   return key in obj;
 }
 
-// Class name utility (similar to clsx/cn)
-export function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(' ');
-}
-
 export type DeepReadonly<T> = T extends (...args: any[]) => any
   ? T
   : T extends Array<infer U>

@@ -23,51 +23,26 @@ import { Button } from '@bracketbear/bear-ui-react/components';
 import { useToast } from '@bracketbear/bear-ui-react/hooks';
 ```
 
-## Available Components
+## What's Included
 
-### Basic Components
+### Components
 
-- `Button` - Primary button component
-- `Pill` - Pill/badge component
-- `SkillPill` - Specialized skill pill
-- `BracketBearLogo` - Logo component
+- **Basic**: Button, Pill, SkillPill, BracketBearLogo
+- **Forms**: ValidatedForm, TextInput, TextareaInput, CheckboxInput, Field, CheckboxField
+- **Layout**: Accordion, Modal, AlertModal, Popover, ImageGallery, ImageViewerModal
+- **Feedback**: Toast, ToastProvider, Testimonial, Stats
+- **Interactive**: Slider, Ticker, PointerFX, BulletList, ContactIcon
 
-### Form Components
+### Hooks
 
-- `ValidatedForm` - Form with validation
-- `TextInput` - Text input field
-- `TextareaInput` - Textarea input field
-- `CheckboxInput` - Checkbox input field
-- `Field` - Generic form field wrapper
-- `CheckboxField` - Checkbox field wrapper
+- `useToast` - Toast management
+- `useVisibilityObserver` - Visibility observation
+- `useIntersectionObserver` - Intersection observation
+- `useDebounce` - Debounce utility
 
-### Layout Components
+### Types
 
-- `Accordion` - Collapsible accordion
-- `Modal` - Modal dialog
-- `AlertModal` - Alert modal
-- `Popover` - Popover component
-- `ImageGallery` - Image gallery
-- `ImageViewerModal` - Image viewer modal
-
-### Feedback Components
-
-- `Toast` - Toast notification
-- `ToastProvider` - Toast context provider
-- `Testimonial` - Testimonial component
-- `Stats` - Statistics display
-
-### Interactive Components
-
-- `Slider` - Slider component
-- `Ticker` - Scrolling ticker
-- `PointerFX` - Pointer effects
-- `BulletList` - Bullet list component
-- `ContactIcon` - Contact icon component
-
-## Hooks
-
-- `useToast` - Toast management hook
+Component prop interfaces for all exported components.
 
 ## Dependencies
 
@@ -75,6 +50,15 @@ This package depends on:
 
 - `@bracketbear/bear-ui` - Core types and utilities
 - `@bracketbear/bear-ui-tailwind` - Tailwind CSS styles
+- `@headlessui/react` - Headless UI components
+- `clsx` - Class name utility
+- `gsap` - Animation library
+- `pixi.js` - Graphics library
+
+## Peer Dependencies
+
+- `react` ^19.0.0
+- `react-dom` ^19.0.0
 
 ## Development
 
@@ -83,4 +67,5 @@ npm run dev    # Watch mode for development
 npm run build  # Build for production
 npm run clean  # Clean build artifacts
 npm run test   # Run tests
+npm run type-check  # Type checking
 ```
