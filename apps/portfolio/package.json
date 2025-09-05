@@ -16,6 +16,7 @@
     "@astrojs/markdoc": "^0.15.0",
     "@astrojs/react": "^4.3.0",
     "@bracketbear/astro-content": "file:../../packages/astro-content",
+    "@bracketbear/bear-ui-react": "file:../../packages/bear-ui-react",
     "@bracketbear/core": "file:../../packages/core",
     "@bracketbear/flateralus": "file:../../packages/flateralus",
     "@bracketbear/flateralus-p5": "file:../../packages/flateralus-p5",

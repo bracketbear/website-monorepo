@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { analyze } from './index.js';
+import { analyze } from './index';
 import { resolve, dirname } from 'node:path';
 import { existsSync } from 'node:fs';
 

@@ -16,8 +16,8 @@ vi.mock('fast-glob', () => ({
 }));
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { findClassesInSource, canonicalize } from './index.js';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { findClassesInSource, canonicalize } from './index';
 
 // Create a test-specific analyze function that works with mocked dependencies
 async function testAnalyze(

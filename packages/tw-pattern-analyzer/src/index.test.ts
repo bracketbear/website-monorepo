@@ -18,11 +18,11 @@ vi.mock('fast-glob', () => ({
 
 // Now import the functions after mocking
 const { tokenize, canonicalize, jaccard, findClassesInSource } = await import(
-  './index.js'
+  './index'
 );
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import type { AnalyzerConfig } from './types.js';
+import type { AnalyzerConfig } from './types';
 
 // Create a test-specific analyze function that works with mocked dependencies
 async function testAnalyze(

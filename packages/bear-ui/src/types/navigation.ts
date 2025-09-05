@@ -1,4 +1,4 @@
-import type { Breadcrumb } from './breadcrumb.js';
+import type { Breadcrumb } from './breadcrumb';
 
 export interface NavItem {
   name: string;

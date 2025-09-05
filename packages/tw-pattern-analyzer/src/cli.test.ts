@@ -9,7 +9,7 @@ vi.mock('node:fs', async () => {
 });
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { parseArgs } from './cli.js';
+import { parseArgs } from './cli';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 

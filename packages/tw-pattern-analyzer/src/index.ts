@@ -8,7 +8,7 @@ import type {
   PatternStats,
   Report,
   FileParseResult,
-} from './types.js';
+} from './types';
 
 function defaultConfig(): AnalyzerConfig {
   return {
