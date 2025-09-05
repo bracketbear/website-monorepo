@@ -25,7 +25,11 @@
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "type-check": "npm run type-check --workspace=@bracketbear/bear-ui --workspace=@bracketbear/bear-ui-tailwind --workspace=@bracketbear/bear-ui-react --workspace=@bracketbear/core --workspace=@bracketbear/flateralus --workspace=@bracketbear/flateralus-pixi-animations --workspace=@bracketbear/flateralus-p5-animations --workspace=@bracketbear/flateralus-react --workspace=@bracketbear/flateralus-pixi --workspace=@bracketbear/flateralus-p5 --workspace=@bracketbear/tw-pattern-analyzer --workspace=@bracketbear/portfolio",
-    "prepare": "husky"
+    "prepare": "husky",
+    "deploy:portfolio": "./scripts/deploy.sh portfolio",
+    "deploy:bracketbear": "./scripts/deploy.sh bracketbear",
+    "deploy:all": "./scripts/deploy.sh all",
+    "test:deploy": "./scripts/test-deploy.sh"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.8.0",
@@ -44,6 +48,7 @@
     "jsdom": "^26.1.0",
     "jsonc-eslint-parser": "^2.4.0",
     "lint-staged": "^16.1.5",
+    "netlify-cli": "^23.5.0",
     "prettier": "^3.6.2",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.6.14",
