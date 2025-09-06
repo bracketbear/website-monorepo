@@ -9,9 +9,9 @@ const meta: Meta<typeof Stats> = {
   },
   tags: ['autodocs'],
   argTypes: {
-    orientation: {
+    variant: {
       control: { type: 'select' },
-      options: ['horizontal', 'vertical'],
+      options: ['light', 'dark', 'glass'],
     },
   },
 };
@@ -35,14 +35,14 @@ export const Default: Story = {
 export const Horizontal: Story = {
   args: {
     stats: sampleStats,
-    orientation: 'horizontal',
+    variant: 'dark',
   },
 };
 
 export const Vertical: Story = {
   args: {
     stats: sampleStats,
-    orientation: 'vertical',
+    variant: 'light',
   },
 };
 
