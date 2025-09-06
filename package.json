@@ -31,7 +31,16 @@
     "deploy:all": "./scripts/deploy.sh all",
     "test:deploy": "./scripts/test-deploy.sh",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "check:all": "./scripts/pre-merge-check.sh",
+    "check:format": "npm run format:check",
+    "check:lint": "npm run lint:check",
+    "check:types": "npm run type-check",
+    "check:tests": "npm run test:run",
+    "check:build": "npm run build",
+    "check:deps": "npm audit --audit-level=high",
+    "check:quick": "npm run format:check && npm run lint:check && npm run type-check",
+    "check:ci": "npm run check:format && npm run check:lint && npm run check:types && npm run check:tests && npm run check:build"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^9.1.5",

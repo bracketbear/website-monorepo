@@ -1,0 +1,107 @@
+name: Comprehensive CI Checks
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [dev, main]
+  merge_group:
+
+jobs:
+  comprehensive-checks:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Code Formatting Check
+        run: npm run check:format
+
+      - name: Linting Check
+        run: npm run check:lint
+
+      - name: TypeScript Type Check
+        run: npm run check:types
+
+      - name: Test Suite
+        run: npm run check:tests
+
+      - name: Build Check
+        run: npm run check:build
+
+      - name: Dependency Security Audit
+        run: npm run check:deps
+
+      - name: CSS Pattern Analysis
+        run: npm run scan:css
+        continue-on-error: true
+
+      - name: Storybook Build
+        run: npm run build-storybook
+        continue-on-error: true
+
+      - name: Upload Storybook Build Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: storybook-build
+          path: storybook-static/
+          retention-days: 7
+
+  deploy-preview:
+    runs-on: ubuntu-latest
+    needs: comprehensive-checks
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Portfolio
+        run: npm run build --workspace=@bracketbear/portfolio
+
+      - name: Build BracketBear Website
+        run: npm run build --workspace=@bracketbear/bracketbear-website
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            apps/portfolio/dist/
+            apps/bracketbear-website/dist/
+          retention-days: 7
+
+  notify-on-failure:
+    runs-on: ubuntu-latest
+    needs: [comprehensive-checks]
+    if: failure()
+
+    steps:
+      - name: Notify on Failure
+        run: |
+          echo "❌ CI checks failed! Please review the logs and fix the issues."
+          echo "🔍 Check the workflow logs for detailed error information."

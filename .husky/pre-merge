@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Pre-merge hook: Run comprehensive checks before merging into dev
+# This hook runs when attempting to merge or rebase into dev branch
+
+echo "🔒 Pre-merge check: Ensuring code quality before merging into dev..."
+
+# Check if we're merging into dev branch
+current_branch=$(git branch --show-current)
+target_branch=$(git rev-parse --abbrev-ref HEAD@{upstream} 2>/dev/null || echo "")
+
+# Check if this is a merge/rebase operation targeting dev
+if [ "$target_branch" = "dev" ] || [ "$1" = "dev" ] || [ "$2" = "dev" ]; then
+    echo "🎯 Detected merge/rebase into dev branch - running comprehensive checks..."
+    
+    # Run the comprehensive pre-merge check script
+    ./scripts/pre-merge-check.sh
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Pre-merge checks passed! Proceeding with merge/rebase..."
+        exit 0
+    else
+        echo "❌ Pre-merge checks failed! Aborting merge/rebase."
+        echo "💡 Fix the issues above and try again."
+        exit 1
+    fi
+else
+    echo "ℹ️  Not merging into dev branch - skipping comprehensive checks"
+    exit 0
+fi
