@@ -17,6 +17,7 @@ function workspaceDirs(base: string) {
     .filter((d) => !d.name.startsWith('.')) // Exclude hidden directories
     .filter((d) => d.name !== 'dist') // Exclude dist directories
     .filter((d) => d.name !== 'node_modules') // Exclude node_modules
+    .filter((d) => d.name !== 'astro-content') // Exclude astro-content package
     .map((d) => ({
       name: d.name,
       src: path.join(full, d.name, 'src'),
@@ -75,25 +76,36 @@ const config: StorybookConfig = {
       'import.meta.env.SSR': false,
     };
 
-    // Exclude Astro files from dependency optimization
+    // Exclude Astro files and content from dependency optimization
     config.optimizeDeps = {
       ...(config.optimizeDeps ?? {}),
-      exclude: ['*.astro'],
+      exclude: ['*.astro', 'astro:content', '@bracketbear/astro-content'],
     };
 
-    // Add custom plugin to ignore Astro files
+    // Add custom plugin to ignore Astro files and content imports
     config.plugins = [
       ...(config.plugins ?? []),
       {
         name: 'ignore-astro-files',
         resolveId(id) {
-          if (id.endsWith('.astro')) {
+          if (
+            id.endsWith('.astro') ||
+            id.startsWith('astro:content') ||
+            id === '@bracketbear/astro-content'
+          ) {
             return id;
           }
         },
         load(id) {
-          if (id.endsWith('.astro')) {
+          if (id.endsWith('.astro') || id.startsWith('astro:content')) {
             return 'export default {}';
+          }
+          if (id === '@bracketbear/astro-content') {
+            return `
+              export const getProjectImageUrl = (projectId, imageName) => {
+                return \`/content-images/\${projectId}/\${imageName}\`;
+              };
+            `;
           }
         },
       },
