@@ -1,0 +1,156 @@
+@import '../packages/bear-ui-tailwind/src/styles/bracketbear.tailwind.css';
+@source '../../../../node_modules/@bracketbear/bear-ui-tailwind';
+@source '../../../../node_modules/@bracketbear/bear-ui-react';
+@source '../../../../node_modules/@bracketbear/core';
+
+/* Custom gradient backgrounds */
+@utility bg-gradient-radial {
+  background: radial-gradient(circle at center, var(--tw-gradient-stops));
+}
+
+@utility from-brand-orange {
+  --tw-gradient-from: #ffc15e;
+  --tw-gradient-to: rgb(255 193 94 / 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+@utility via-brand-yellow {
+  --tw-gradient-via: #98ce00;
+  --tw-gradient-stops:
+    var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to);
+}
+
+@utility to-brand-red {
+  --tw-gradient-to: #bb4430;
+}
+
+/* Enhanced header background patterns */
+@utility bg-header-pattern {
+  background-image:
+    radial-gradient(
+      circle at 20% 80%,
+      rgba(255, 75, 62, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(152, 206, 0, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 40%,
+      rgba(255, 193, 94, 0.05) 0%,
+      transparent 50%
+    );
+}
+
+@utility bg-header-glow {
+  background-image: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.03) 0%,
+    transparent 70%
+  );
+}
+
+@utility bg-animated-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: grid-move 20s linear infinite;
+}
+
+@keyframes grid-move {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+/* Section utilities for consistent spacing */
+@utility section {
+  @apply my-14 w-full scroll-mt-24 px-4 lg:my-20 lg:px-6;
+}
+
+@utility section-wide {
+  @apply section mx-auto max-w-7xl;
+}
+
+@utility section-narrow {
+  @apply section mx-auto max-w-prose;
+}
+
+/* Consistent horizontal padding utility */
+@utility px-content {
+  @apply px-4 lg:px-6;
+}
+
+/* Background texture utilities */
+@utility bg-paper {
+  background: url('/textures/paper.png') repeat;
+}
+
+@utility bg-diag-stripes {
+  background: repeating-linear-gradient(
+    45deg,
+    hsl(var(--brand-light) / 0.15) 0 8px,
+    transparent 8px 16px
+  );
+}
+
+@utility bg-noise {
+  background-image: url('/textures/noise.svg');
+  background-repeat: repeat;
+}
+
+@utility bg-charcoal {
+  background-color: hsl(var(--brand-dark) / 0.95);
+}
+
+/* Shadow utilities */
+@utility shadow-card {
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* Enhanced text shadows for headers */
+@utility text-shadow-header {
+  text-shadow:
+    0 4px 4px rgba(0, 0, 0, 0.8),
+    0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+@utility text-shadow-subtitle {
+  text-shadow:
+    0 2px 2px rgba(0, 0, 0, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+@utility text-shadow-subtitle-enhanced {
+  text-shadow:
+    0 2px 2px rgba(0, 0, 0, 0.8),
+    0 4px 8px rgba(0, 0, 0, 0.6),
+    0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Debug controls positioning and overflow handling */
+@utility debug-controls-container {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+/* Prevent layout shifts when mobile nav opens */
+.hero-content {
+  contain: layout style paint;
+  will-change: auto;
+}
+
+/* Ensure mobile nav doesn't affect document flow */
+#mobile-menu {
+  contain: layout style paint;
+}

@@ -29,5 +29,7 @@ export { ValidatedForm } from './ValidatedForm';
 export type { ButtonProps } from './Button';
 export type { FieldProps } from './Field';
 export type { ModalProps } from './Modal';
+export type { PillProps } from './Pill';
+export type { SkillPillProps } from './SkillPill';
 export type { ToastProps } from './Toast';
 export type { ValidatedFormProps } from './ValidatedForm';
