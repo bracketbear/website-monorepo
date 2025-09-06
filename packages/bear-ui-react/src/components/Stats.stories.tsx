@@ -11,7 +11,7 @@ const meta: Meta<typeof Stats> = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['light', 'dark', 'glass'],
+      options: ['dark', 'light', 'glass'],
     },
   },
 };
@@ -32,17 +32,17 @@ export const Default: Story = {
   },
 };
 
-export const Horizontal: Story = {
-  args: {
-    stats: sampleStats,
-    variant: 'dark',
-  },
-};
-
-export const Vertical: Story = {
+export const Light: Story = {
   args: {
     stats: sampleStats,
     variant: 'light',
+  },
+};
+
+export const Glass: Story = {
+  args: {
+    stats: sampleStats,
+    variant: 'glass',
   },
 };
 
@@ -98,6 +98,25 @@ export const LongValues: Story = {
       { label: 'Technologies', value: '20+ Mastered' },
     ],
   },
+};
+
+export const ResponsiveLayout: Story = {
+  render: () => (
+    <div className="space-y-8">
+      <div>
+        <h3 className="mb-4 text-lg font-semibold">Mobile (Vertical)</h3>
+        <div className="w-64">
+          <Stats stats={sampleStats} variant="dark" />
+        </div>
+      </div>
+      <div>
+        <h3 className="mb-4 text-lg font-semibold">Desktop (Horizontal)</h3>
+        <div className="w-full">
+          <Stats stats={sampleStats} variant="dark" />
+        </div>
+      </div>
+    </div>
+  ),
 };
 
 export const WithCustomStyling: Story = {
