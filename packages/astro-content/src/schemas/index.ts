@@ -32,3 +32,4 @@ export * from './contact-page';
 export * from './work-page';
 export * from './projects-page';
 export * from './project-page';
+export * from './source-code-page';

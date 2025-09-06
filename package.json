@@ -12,6 +12,7 @@
     "preview:bracketbear": "npm run preview --workspace=@bracketbear/bracketbear-website",
     "preview:portfolio": "npm run preview --workspace=@bracketbear/portfolio",
     "analyze:tw": "npm run build --workspace=@bracketbear/tw-pattern-analyzer && npm run analyze --workspace=@bracketbear/tw-pattern-analyzer",
+    "generate:repo-map": "node scripts/generate-repo-map.js",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:staged": "prettier --write --ignore-unknown",

@@ -1,0 +1,143 @@
+{
+  "title": "Source Code",
+  "metaDescription": "Technical architecture and implementation details of the portfolio site. Learn about the tech stack, design decisions, and development practices.",
+  "canonicalUrl": "https://harrisoncallahan.com/source-code",
+  "noIndex": false,
+  "contactCTA": {},
+  "tldr": {
+    "title": "TL;DR",
+    "points": [
+      {
+        "label": "Architecture",
+        "bullets": [
+          "Astro 5 with React islands where interactivity matters",
+          "Static first; hydrate only what needs it"
+        ]
+      },
+      {
+        "label": "Styling",
+        "bullets": [
+          "Tailwind v4 using `@theme` tokens",
+          "Avoid arbitrary values; use intentionally when needed (e.g., layered shadows/backdrop)",
+          "Utilities keep the design consistent and measurable"
+        ]
+      },
+      {
+        "label": "Content",
+        "bullets": [
+          "Keystatic + Zod for typed content end-to-end",
+          "Builds fail fast on bad data"
+        ]
+      },
+      {
+        "label": "Animations",
+        "bullets": [
+          "Flateralus (PIXI.js 8) with typed controls",
+          "Visibility-based pausing",
+          "Guardrails (caps) to keep frames smooth"
+        ]
+      },
+      {
+        "label": "Storybook",
+        "bullets": [
+          "Single Storybook instance across apps and packages",
+          "Titles show where each component lives"
+        ]
+      },
+      {
+        "label": "Philosophy",
+        "bullets": [
+          "Prefer constraints and clear boundaries",
+          "Keep the toolchain boring, the types strong, and the pages fast"
+        ]
+      }
+    ]
+  },
+  "repoMap": {
+    "title": "Repo map (auto-generated)",
+    "description": "I'm a firm believer in mono-repos. Until the bird is ready to fly on its own, it should stay in the nest. This methodology keeps your features contained in one project's PRs and keeps everything in lock-step.\n\nApps and packages are separated and linked to each other in the respective `package.json` files. Here's an auto-generated list of apps and packages:\n"
+  },
+  "tailwindSection": {
+    "title": "Tailwind (and how I use it)",
+    "content": "Tailwind gets a lot of heat. I like it because utility-first development enforces a design system. With tokens, spacing and color stay consistent; with utilities, usage is analyzable. I also compose **custom utilities** (e.g., `button`, `px-content`, glass variants) with `@apply` so the markup stays clean and consistent across the app.\n",
+    "rules": [
+      "No arbitrary values unless there's truly no other option.",
+      "All color/spacing/radius come from `@theme` tokens.",
+      "Compose utilities instead of overriding styles."
+    ],
+    "tokenExcerpt": "/* Utilities built from tokens using @apply */\n@utility button {\n  @apply inline-flex items-center justify-center gap-2 rounded-lg border-2 border-solid px-4 py-2 text-sm font-bold tracking-wide uppercase transition-all duration-150 ease-in-out;\n}\n\n@utility button-lg {\n  @apply rounded-xl px-8 py-4 text-xl;\n}\n\n@utility button-primary {\n  @apply border-border bg-primary text-primary-foreground border-2;\n}\n\n/* Layout utility shared across pages */\n@utility px-content {\n  @apply px-4 lg:px-6;\n}",
+    "usageExample": "<button class=\"button button-primary button-lg\">Primary Action</button>\n<a class=\"button button-outline button-sm\" href=\"#\">Secondary Link</a>"
+  },
+  "dataAssistedStyling": {
+    "title": "Data-assisted styling",
+    "content": "Because utilities are structured, I can analyze them. I track class usage and palette choices, then run small scripts to:\n\n- Flag near-duplicate spacing stacks.\n- Detect color drift (e.g., \"too much orange last month\").\n- Check contrast automatically.\n\nI also have an early-stage tool, `@bracketbear/tw-pattern-analyzer`, that clusters frequently co-occurring utilities to suggest potential reusable utilities and components. It’s light data science: useful signals, not gospel—still early days.\n",
+    "codeExample": "{\n  \"totalClassLists\": 966,\n  \"uniquePatterns\": 549,\n  \"totalFiles\": 129,\n  \"totalPatterns\": 966,\n  \"clusters\": [\n    {\n      \"rep\": \"flex gap-2 items-center\",\n      \"members\": [\n        \"flex gap-2 items-center\",\n        \"flex flex-col gap-2 items-center\",\n        \"flex font-medium gap-2 items-center\"\n      ],\n      \"occurrences\": 17,\n      \"variants\": 3,\n      \"similarity\": 0.8333333333333334,\n      \"likelihood\": 37\n    },\n    {\n      \"rep\": \"container mx-auto text-center\",\n      \"members\": [\n        \"container mx-auto text-center\",\n        \"container mx-auto px-4 text-center\"\n      ],\n      \"occurrences\": 10,\n      \"variants\": 2,\n      \"similarity\": 0.875,\n      \"likelihood\": 19\n    },\n...\n}"
+  },
+  "architecture": {
+    "title": "Architecture (at a glance)",
+    "content": "- **Static first.** Pages render statically in Astro; islands mount React only where interaction or animation adds value.\n- **Typed content.** Content shapes live in Zod. The build fails on bad content rather than shipping surprises to production.\n- **Clear boundaries.** Apps depend \"down\" on packages; packages don't reach back into apps.\n- **Assets.** Images get width hints and sensible defaults; fonts are subset.\n",
+    "mermaidDiagram": "flowchart LR\n  U[User] --> CDN\n  CDN --> Astro[Astro Static Pages]\n  Astro -->|hydrate as needed| Islands[React Islands]\n  Astro --> Content[Keystatic Build (Zod typed)]\n  Islands --> Anim[Flateralus Runtime (PIXI 8)]\n  Astro --> Assets[Image/Asset Pipeline]"
+  },
+  "contentModel": {
+    "title": "Content model (Keystatic + Zod)",
+    "content": "I keep content inside the type system. Editors work in Keystatic; Zod validates at build; components consume typed props.",
+    "codeExample": "import { z } from \"zod\";\n\nexport const WorkProject = z.object({\n  id: z.string().uuid(),\n  title: z.string().min(1),\n  company: z.string(),\n  heroImage: z.string().url(),\n  skills: z.array(z.string()).min(1),\n  status: z.enum([\"draft\", \"live\"]),\n});\n\nexport type WorkProject = z.infer<typeof WorkProject>;"
+  },
+  "typescript": {
+    "title": "TypeScript (Type-first across apps and packages)",
+    "content": "We are TypeScript-first. Apps and packages expose explicit, well-documented types. We depend on interfaces, generics, and factory types to keep implementation details decoupled from contracts. We never use `any`; we strengthen types to fix errors.\n",
+    "patterns": [
+      {
+        "title": "Interface-first contracts",
+        "description": "Define interfaces for public APIs; keep implementations behind them. This enables framework-agnostic cores and multiple adapters (e.g., PIXI, p5).\n",
+        "codeExample": "export interface Application<TContext = unknown> {\n  getContext(): TContext | null;\n  init(container: HTMLElement): Promise<void>;\n  start(): void;\n  stop(): void;\n  destroy(): void;\n}\n\nexport type ApplicationFactory<TApp extends Application> = (options?: unknown) => TApp;"
+      },
+      {
+        "title": "Generics for control surfaces",
+        "description": "Animations and hooks accept generic control types so UIs get end-to-end type safety without casting.\n",
+        "codeExample": "export function useAnimationStage<TControlValues>(options: { factory: (controls: TControlValues) => unknown }) {\n  // ...\n  return {} as { controls: TControlValues };\n}"
+      },
+      {
+        "title": "Schema-driven content",
+        "description": "Keystatic schemas mirror Zod schemas in `@bracketbear/astro-content` so content is validated at edit-time and build-time.\n",
+        "codeExample": "// CMS (Keystatic)\nfields.text({ label: 'Title' })\n\n// Astro (Zod)\nz.object({ title: z.string() })"
+      }
+    ]
+  },
+  "storybook": {
+    "title": "Storybook (single instance, multi-directory)",
+    "content": "I run one Storybook that aggregates stories from apps and packages. Each story shows where it lives. This makes reviews faster and keeps ownership clear: if a component belongs in the shared UI, it moves there and inherits tokens.\n\n- One place to exercise states and edge cases.\n- Easy visual QA during refactors.\n- Encourages reuse without policing it manually.\n"
+  },
+  "flateralus": {
+    "title": "Flateralus (generative backgrounds without meltdown)",
+    "content": "Generative visuals are great until they eat the frame budget. I keep them in bounds with typed controls, visibility-based pausing, and guardrails (caps) that step complexity down before the UI suffers.\n",
+    "codeExample": "export const ParticleNetworkControls = {\n  particleCount: { type: \"int\", min: 100, max: 800, default: 400 },\n  linkDistance:  { type: \"float\", min: 20,  max: 180, default: 100 },\n  speed:         { type: \"float\", min: 0.1, max: 2.0, default: 0.6 },\n  theme:         { type: \"select\", options: [\"brand\",\"neutral\",\"warning\"], default: \"brand\" },\n} as const;"
+  },
+  "performanceAccessibility": {
+    "title": "Performance & accessibility",
+    "targets": "Targets (page-type dependent):\n\n- **LCP ≤ 2.0s** (desktop), **INP ≤ 200ms** on interactive sections, **CLS \\~ 0**.\n",
+    "howToGetThere": "How I get there:\n\n- Static by default; selective hydration.\n- Width hints on images; sub-set fonts.\n- Visibility-based animation pausing.\n"
+  },
+  "testingDx": {
+    "title": "Testing & DX",
+    "content": "- Type-check, lint, and unit tests for utilities.\n- Storybook for component states; snapshot/regression where it earns its keep.\n",
+    "loggingFormat": "Simple logging format for scripts and small services:\n```\n%(asctime)s - %(name)s - %(levelname)s - %(message)s\n```"
+  },
+  "securityOps": {
+    "title": "Security & ops",
+    "content": "- Secrets stay server-side.\n- Security headers via Netlify (`X-Frame-Options`, `X-XSS-Protection`, `X-Content-Type-Options`, `Referrer-Policy`).\n- CSP with nonces is on the list.\n- Tagged releases and a quick rollback to the previous tag if something looks wrong.\n"
+  },
+  "futureChanges": {
+    "title": "What I'd change next",
+    "items": [
+      "Replace the quick OKLCH threshold with **APCA** scoring across the board.\n",
+      "Add a token audit that flags unused tokens and over-used utility combos.\n",
+      "Ship an image modal/gallery that supports deep-linking directly to a specific image.\n",
+      "Script performance traces for animation presets so regressions are obvious.\n"
+    ]
+  },
+  "closing": {
+    "title": "Closing",
+    "content": "If you want to see something specific—content shapes, token usage, or animation controls—reach out and I'll point you to a tight, focused example.\n"
+  }
+}

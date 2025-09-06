@@ -1,5 +1,6 @@
 import { fields } from '@keystatic/core';
 import { makePageSchema } from '../../schemas/page';
+import { sourceCodePageSchema as baseSourceCodePageSchema } from '../../schemas/source-code-page';
 
 /**
  * Portfolio About Page Schema
@@ -609,3 +610,11 @@ export const portfolioProjectPageSchema = makePageSchema({
     }),
   }),
 });
+
+/**
+ * Portfolio Source Code Page Schema
+ *
+ * This schema defines the source-code page structure for the portfolio site.
+ * It explains the technical architecture and implementation details.
+ */
+export const portfolioSourceCodePageSchema = baseSourceCodePageSchema;

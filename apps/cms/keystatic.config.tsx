@@ -25,6 +25,7 @@ export default config({
         'portfolioWorkPage',
         'portfolioProjectsPage',
         'portfolioProjectPage',
+        'portfolioSourceCodePage',
         'portfolioContactMethods',
       ],
       'Work Content': [

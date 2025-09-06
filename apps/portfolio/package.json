@@ -3,7 +3,8 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev --port 4322",
+    "dev": "node ../../scripts/generate-repo-map.js && astro dev --port 4322",
+    "prebuild": "node ../../scripts/generate-repo-map.js",
     "build": "astro build",
     "preview": "astro preview --port 4322",
     "deploy": "netlify deploy --prod",
@@ -13,7 +14,6 @@
     "sync": "npx astro sync"
   },
   "dependencies": {
-    "@astrojs/markdoc": "^0.15.0",
     "@astrojs/react": "^4.3.0",
     "@bracketbear/astro-content": "file:../../packages/astro-content",
     "@bracketbear/bear-ui-react": "file:../../packages/bear-ui-react",

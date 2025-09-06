@@ -4,6 +4,7 @@ import {
   type CollectionEntry,
 } from 'astro:content';
 import type { PortfolioAboutPageData } from '@bracketbear/astro-content';
+import { renderMarkdoc } from './markdoc-renderer';
 
 type GetCollectionParams<
   C extends keyof AnyEntryMap,
@@ -51,3 +52,6 @@ export async function getAboutPageData(): Promise<PortfolioAboutPageData | null>
     return null;
   }
 }
+
+// Re-export renderMarkdoc for convenience
+export { renderMarkdoc };

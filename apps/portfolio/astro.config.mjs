@@ -2,14 +2,13 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
-import markdoc from '@astrojs/markdoc';
 import svgr from 'vite-plugin-svgr';
 
 const bracketbearCss = '/packages/core/dist/styles/bracketbear.tailwind.css';
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [react(), markdoc()],
+  integrations: [react()],
   vite: {
     plugins: [
       // @ts-expect-error: Bug with TailwindCSS Vite plugin type definition
