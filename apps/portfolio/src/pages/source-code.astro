@@ -36,60 +36,55 @@ const sections = [
     title: sourceCodePage.data.tldr.title,
     eyebrow: 'Overview',
   },
-  sourceCodePage?.data?.repoMap && {
-    id: 'monorepo',
-    title: sourceCodePage.data.repoMap.title,
-    eyebrow: 'Architecture',
-  },
-  sourceCodePage?.data?.typescript && {
-    id: 'typescript',
-    title: sourceCodePage.data.typescript.title,
-    eyebrow: 'Type System',
-  },
-  sourceCodePage?.data?.tailwindSection && {
-    id: 'tailwind',
-    title: sourceCodePage.data.tailwindSection.title,
-    eyebrow: 'Styling',
-  },
-  sourceCodePage?.data?.dataAssistedStyling && {
-    id: 'data-assisted',
-    title: sourceCodePage.data.dataAssistedStyling.title,
-    eyebrow: 'Styling',
-  },
   sourceCodePage?.data?.architecture && {
     id: 'architecture',
     title: sourceCodePage.data.architecture.title,
-    eyebrow: 'System',
-  },
-  sourceCodePage?.data?.contentModel && {
-    id: 'content-model',
-    title: sourceCodePage.data.contentModel.title,
-    eyebrow: 'Data',
-  },
-  sourceCodePage?.data?.storybook && {
-    id: 'storybook',
-    title: sourceCodePage.data.storybook.title,
-    eyebrow: 'Development',
-  },
-  sourceCodePage?.data?.flateralus && {
-    id: 'flateralus',
-    title: sourceCodePage.data.flateralus.title,
-    eyebrow: 'Performance',
+    eyebrow: 'Architecture',
   },
   sourceCodePage?.data?.performanceAccessibility && {
     id: 'performance-accessibility',
     title: sourceCodePage.data.performanceAccessibility.title,
-    eyebrow: 'Quality',
+    eyebrow: 'Performance',
+  },
+  sourceCodePage?.data?.repoMap && {
+    id: 'monorepo',
+    title: sourceCodePage.data.repoMap.title,
+    eyebrow: 'Structure',
+  },
+  sourceCodePage?.data?.typescript && {
+    id: 'contracts-types',
+    title: 'Contracts & Types',
+    eyebrow: 'Type System',
+  },
+  sourceCodePage?.data?.tailwindSection && {
+    id: 'styling',
+    title: 'Styling',
+    eyebrow: 'Design',
+  },
+  sourceCodePage?.data?.dataAssistedStyling && {
+    id: 'data-assisted',
+    title: sourceCodePage.data.dataAssistedStyling.title,
+    eyebrow: 'AI Analysis',
+  },
+  sourceCodePage?.data?.storybook && {
+    id: 'storybook',
+    title: sourceCodePage.data.storybook.title,
+    eyebrow: 'Documentation',
+  },
+  sourceCodePage?.data?.flateralus && {
+    id: 'flateralus',
+    title: sourceCodePage.data.flateralus.title,
+    eyebrow: 'Animation',
   },
   sourceCodePage?.data?.testingDx && {
     id: 'testing-dx',
     title: sourceCodePage.data.testingDx.title,
-    eyebrow: 'Development',
+    eyebrow: 'Testing',
   },
   sourceCodePage?.data?.securityOps && {
     id: 'security-ops',
     title: sourceCodePage.data.securityOps.title,
-    eyebrow: 'Operations',
+    eyebrow: 'Security',
   },
   sourceCodePage?.data?.futureChanges && {
     id: 'future-changes',
@@ -150,191 +145,12 @@ try {
           )
         }
 
-        {/* Repo Map Section */}
-        {
-          sourceCodePage?.data?.repoMap && (
-            <Section
-              id="monorepo"
-              eyebrow="Architecture"
-              title={sourceCodePage.data.repoMap.title}
-              intro={sourceCodePage.data.repoMap.description}
-            >
-              <div>
-                <div class="mb-6">
-                  <h3 class="font-heading text-foreground mb-2 text-xl font-bold">
-                    Repository Structure
-                  </h3>
-                  <p class="text-muted-foreground">
-                    A monorepo containing{' '}
-                    {repoMapData?.default?.apps?.length || 0} applications and{' '}
-                    {repoMapData?.default?.packages?.length || 0} shared
-                    packages.
-                  </p>
-                </div>
-
-                <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                  {/* Apps Panel */}
-                  {repoMapData && (
-                    <RepoPanel title="Apps" items={repoMapData.default.apps} />
-                  )}
-
-                  {/* Packages Panel */}
-                  {repoMapData && (
-                    <RepoPanel
-                      title="Packages"
-                      items={repoMapData.default.packages}
-                    />
-                  )}
-                </div>
-              </div>
-            </Section>
-          )
-        }
-
-        {/* TypeScript Section */}
-        {
-          sourceCodePage?.data?.typescript && (
-            <Section
-              id="typescript"
-              eyebrow="Type System"
-              title={sourceCodePage.data.typescript.title}
-              intro={sourceCodePage.data.typescript.content}
-            >
-              {sourceCodePage.data.typescript.patterns?.length > 0 && (
-                <div class="space-y-10 md:space-y-14">
-                  {sourceCodePage.data.typescript.patterns.map(
-                    (p: any, i: number) => (
-                      <div class="border-border/20 bg-card/20 w-full rounded-lg border px-4 py-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md md:py-8">
-                        <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-10">
-                          <div
-                            class={`flex flex-col gap-4 ${i % 2 === 1 ? 'lg:order-2 lg:text-right' : ''}`}
-                          >
-                            <h3 class="font-heading text-foreground text-xl tracking-tight uppercase md:text-2xl">
-                              {p.title}
-                            </h3>
-                            <div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 max-w-none">
-                              <Fragment
-                                set:html={marked.parse(
-                                  cleanMarkdown(p.description)
-                                )}
-                              />
-                            </div>
-                          </div>
-                          <div class={`${i % 2 === 1 ? 'lg:order-1' : ''}`}>
-                            <CodeBlock
-                              code={p.codeExample}
-                              language="ts"
-                              showLineNumbers
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-              )}
-            </Section>
-          )
-        }
-
-        {/* Why Tailwind Section */}
-        {
-          sourceCodePage?.data?.tailwindSection && (
-            <Section
-              id="tailwind"
-              eyebrow="Styling"
-              title={sourceCodePage.data.tailwindSection.title}
-              intro={sourceCodePage.data.tailwindSection.content}
-            >
-              {/* Rules */}
-              <div class="mb-8">
-                <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
-                  Rules I follow
-                </h3>
-                <ul class="list-outside list-disc space-y-2 pl-5">
-                  {sourceCodePage.data.tailwindSection.rules.map(
-                    (rule: string) => (
-                      <li class="text-foreground/90">{rule}</li>
-                    )
-                  )}
-                </ul>
-              </div>
-
-              {/* Token Excerpt */}
-              <div class="mb-8">
-                <h3 class="font-heading mb-4 text-xl font-bold tracking-tight text-white">
-                  {sourceCodePage.data.tailwindSection.tokenExcerptTitle}
-                </h3>
-                <div class="mb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="text-muted-foreground text-xs font-medium">
-                      theme.css
-                    </span>
-                    <span class="text-muted-foreground/80 text-xs">css</span>
-                  </div>
-                </div>
-                <CodeBlock
-                  code={sourceCodePage.data.tailwindSection.tokenExcerpt}
-                  language="css"
-                  showLineNumbers
-                  className="bg-brand-dark/90 text-white"
-                />
-              </div>
-
-              {/* Usage Example */}
-              <div>
-                <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
-                  {sourceCodePage.data.tailwindSection.usageExampleTitle}
-                </h3>
-                <div class="mb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="text-muted-foreground text-xs font-medium">
-                      component.html
-                    </span>
-                    <span class="text-muted-foreground/80 text-xs">html</span>
-                  </div>
-                </div>
-                <CodeBlock
-                  code={sourceCodePage.data.tailwindSection.usageExample}
-                  language="html"
-                />
-              </div>
-            </Section>
-          )
-        }
-
-        {/* Data-assisted styling Section */}
-        {
-          sourceCodePage?.data?.dataAssistedStyling && (
-            <Section
-              id="data-assisted"
-              eyebrow="Styling"
-              title={sourceCodePage.data.dataAssistedStyling.title}
-              intro={sourceCodePage.data.dataAssistedStyling.content}
-            >
-              <div class="mb-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-muted-foreground text-xs font-medium">
-                    tw-patterns.json
-                  </span>
-                  <span class="text-muted-foreground/80 text-xs">json</span>
-                </div>
-              </div>
-              <CodeBlock
-                code={sourceCodePage.data.dataAssistedStyling.codeExample}
-                language="json"
-                className="bg-brand-dark/90 text-white"
-              />
-            </Section>
-          )
-        }
-
         {/* Architecture Section */}
         {
           sourceCodePage?.data?.architecture && (
             <Section
               id="architecture"
-              eyebrow="System"
+              eyebrow="Architecture"
               title={sourceCodePage.data.architecture.title}
               intro={sourceCodePage.data.architecture.content}
             >
@@ -421,26 +237,244 @@ try {
           )
         }
 
-        {/* Content Model Section */}
+        {/* Performance & Accessibility Section */}
         {
-          sourceCodePage?.data?.contentModel && (
+          sourceCodePage?.data?.performanceAccessibility && (
             <Section
-              id="content-model"
-              eyebrow="Data"
-              title={sourceCodePage.data.contentModel.title}
-              intro={sourceCodePage.data.contentModel.content}
+              id="performance-accessibility"
+              eyebrow="Performance"
+              title={sourceCodePage.data.performanceAccessibility.title}
+            >
+              <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="card-neutral">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    Targets
+                  </h3>
+                  <div class="prose prose-lg max-w-none">
+                    <Fragment
+                      set:html={marked.parse(
+                        cleanMarkdown(
+                          sourceCodePage.data.performanceAccessibility.targets
+                        )
+                      )}
+                    />
+                  </div>
+                </div>
+                <div class="card-neutral">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    How I get there
+                  </h3>
+                  <div class="prose prose-lg max-w-none">
+                    <Fragment
+                      set:html={marked.parse(
+                        cleanMarkdown(
+                          sourceCodePage.data.performanceAccessibility
+                            .howToGetThere
+                        )
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Section>
+          )
+        }
+
+        {/* Repo Map Section */}
+        {
+          sourceCodePage?.data?.repoMap && (
+            <Section
+              id="monorepo"
+              eyebrow="Structure"
+              title={sourceCodePage.data.repoMap.title}
+              intro={sourceCodePage.data.repoMap.description}
+            >
+              <div>
+                <div class="mb-6">
+                  <h3 class="font-heading text-foreground mb-2 text-xl font-bold">
+                    Repository Structure
+                  </h3>
+                  <p class="text-muted-foreground">
+                    A monorepo containing{' '}
+                    {repoMapData?.default?.apps?.length || 0} applications and{' '}
+                    {repoMapData?.default?.packages?.length || 0} shared
+                    packages.
+                  </p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  {/* Apps Panel */}
+                  {repoMapData && (
+                    <RepoPanel title="Apps" items={repoMapData.default.apps} />
+                  )}
+
+                  {/* Packages Panel */}
+                  {repoMapData && (
+                    <RepoPanel
+                      title="Packages"
+                      items={repoMapData.default.packages}
+                    />
+                  )}
+                </div>
+              </div>
+            </Section>
+          )
+        }
+
+        {/* Contracts & Types Section */}
+        {
+          sourceCodePage?.data?.typescript && (
+            <Section
+              id="contracts-types"
+              eyebrow="Type System"
+              title="Contracts & Types"
+              intro={sourceCodePage.data.typescript.content}
+            >
+              {sourceCodePage.data.typescript.patterns?.length > 0 && (
+                <div class="space-y-10 md:space-y-14">
+                  {sourceCodePage.data.typescript.patterns.map(
+                    (p: any, i: number) => (
+                      <div class="border-border/20 bg-card/20 w-full rounded-lg border px-4 py-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md md:py-8">
+                        <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-10">
+                          <div
+                            class={`flex flex-col gap-4 ${i % 2 === 1 ? 'lg:order-2 lg:text-right' : ''}`}
+                          >
+                            <h3 class="font-heading text-foreground text-xl tracking-tight uppercase md:text-2xl">
+                              {p.title}
+                            </h3>
+                            <div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 max-w-none">
+                              <Fragment
+                                set:html={marked.parse(
+                                  cleanMarkdown(p.description)
+                                )}
+                              />
+                            </div>
+                          </div>
+                          <div class={`${i % 2 === 1 ? 'lg:order-1' : ''}`}>
+                            <CodeBlock
+                              code={p.codeExample}
+                              language="ts"
+                              showLineNumbers
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
+
+              {/* Content Model Integration */}
+              {sourceCodePage?.data?.contentModel && (
+                <div class="mt-12">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    Content Model (Keystatic + Zod)
+                  </h3>
+                  <div class="mb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="text-muted-foreground text-xs font-medium">
+                        content-schema.ts
+                      </span>
+                      <span class="text-muted-foreground/80 text-xs">ts</span>
+                    </div>
+                  </div>
+                  <CodeBlock
+                    code={sourceCodePage.data.contentModel.codeExample}
+                    language="ts"
+                    className="bg-brand-dark/90 text-white"
+                  />
+                </div>
+              )}
+            </Section>
+          )
+        }
+
+        {/* Styling Section */}
+        {
+          sourceCodePage?.data?.tailwindSection && (
+            <Section
+              id="styling"
+              eyebrow="Design"
+              title="Styling"
+              intro={sourceCodePage.data.tailwindSection.content}
+            >
+              {/* Rules */}
+              <div class="mb-8">
+                <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                  Rules I follow
+                </h3>
+                <ul class="list-outside list-disc space-y-2 pl-5">
+                  {sourceCodePage.data.tailwindSection.rules.map(
+                    (rule: string) => (
+                      <li class="text-foreground/90">{rule}</li>
+                    )
+                  )}
+                </ul>
+              </div>
+
+              {/* Token Excerpt */}
+              <div class="mb-8">
+                <h3 class="font-heading mb-4 text-xl font-bold tracking-tight text-white">
+                  {sourceCodePage.data.tailwindSection.tokenExcerptTitle}
+                </h3>
+                <div class="mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-muted-foreground text-xs font-medium">
+                      theme.css
+                    </span>
+                    <span class="text-muted-foreground/80 text-xs">css</span>
+                  </div>
+                </div>
+                <CodeBlock
+                  code={sourceCodePage.data.tailwindSection.tokenExcerpt}
+                  language="css"
+                  showLineNumbers
+                  className="bg-brand-dark/90 text-white"
+                />
+              </div>
+
+              {/* Usage Example */}
+              <div>
+                <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                  {sourceCodePage.data.tailwindSection.usageExampleTitle}
+                </h3>
+                <div class="mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-muted-foreground text-xs font-medium">
+                      component.html
+                    </span>
+                    <span class="text-muted-foreground/80 text-xs">html</span>
+                  </div>
+                </div>
+                <CodeBlock
+                  code={sourceCodePage.data.tailwindSection.usageExample}
+                  language="html"
+                />
+              </div>
+            </Section>
+          )
+        }
+
+        {/* Data-assisted styling Section */}
+        {
+          sourceCodePage?.data?.dataAssistedStyling && (
+            <Section
+              id="data-assisted"
+              eyebrow="Styling"
+              title={sourceCodePage.data.dataAssistedStyling.title}
+              intro={sourceCodePage.data.dataAssistedStyling.content}
             >
               <div class="mb-3">
                 <div class="flex items-center gap-2">
                   <span class="text-muted-foreground text-xs font-medium">
-                    content-schema.ts
+                    tw-patterns.json
                   </span>
-                  <span class="text-muted-foreground/80 text-xs">ts</span>
+                  <span class="text-muted-foreground/80 text-xs">json</span>
                 </div>
               </div>
               <CodeBlock
-                code={sourceCodePage.data.contentModel.codeExample}
-                language="ts"
+                code={sourceCodePage.data.dataAssistedStyling.codeExample}
+                language="json"
                 className="bg-brand-dark/90 text-white"
               />
             </Section>
@@ -452,7 +486,7 @@ try {
           sourceCodePage?.data?.storybook && (
             <Section
               id="storybook"
-              eyebrow="Development"
+              eyebrow="Documentation"
               title={sourceCodePage.data.storybook.title}
               intro={sourceCodePage.data.storybook.content}
             >
@@ -493,7 +527,7 @@ try {
           sourceCodePage?.data?.flateralus && (
             <Section
               id="flateralus"
-              eyebrow="Performance"
+              eyebrow="Animation"
               title={sourceCodePage.data.flateralus.title}
               intro={sourceCodePage.data.flateralus.content}
             >
@@ -514,55 +548,12 @@ try {
           )
         }
 
-        {/* Performance & Accessibility Section */}
-        {
-          sourceCodePage?.data?.performanceAccessibility && (
-            <Section
-              id="performance-accessibility"
-              eyebrow="Quality"
-              title={sourceCodePage.data.performanceAccessibility.title}
-            >
-              <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div class="card-neutral">
-                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
-                    Targets
-                  </h3>
-                  <div class="prose prose-lg max-w-none">
-                    <Fragment
-                      set:html={marked.parse(
-                        cleanMarkdown(
-                          sourceCodePage.data.performanceAccessibility.targets
-                        )
-                      )}
-                    />
-                  </div>
-                </div>
-                <div class="card-neutral">
-                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
-                    How I get there
-                  </h3>
-                  <div class="prose prose-lg max-w-none">
-                    <Fragment
-                      set:html={marked.parse(
-                        cleanMarkdown(
-                          sourceCodePage.data.performanceAccessibility
-                            .howToGetThere
-                        )
-                      )}
-                    />
-                  </div>
-                </div>
-              </div>
-            </Section>
-          )
-        }
-
         {/* Testing & DX Section */}
         {
           sourceCodePage?.data?.testingDx && (
             <Section
               id="testing-dx"
-              eyebrow="Development"
+              eyebrow="Testing"
               title={sourceCodePage.data.testingDx.title}
               intro={sourceCodePage.data.testingDx.content}
             >
@@ -620,7 +611,7 @@ try {
           sourceCodePage?.data?.securityOps && (
             <Section
               id="security-ops"
-              eyebrow="Operations"
+              eyebrow="Security"
               title={sourceCodePage.data.securityOps.title}
               intro={sourceCodePage.data.securityOps.content}
             />

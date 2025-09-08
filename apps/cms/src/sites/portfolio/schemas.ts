@@ -321,6 +321,11 @@ export const portfolioIndexPageSchema = makePageSchema({
       label: 'Content',
       description: 'Content describing Flateralus with markdown support',
     }),
+    buttonText: fields.text({
+      label: 'Button Text',
+      defaultValue: 'View Source Code',
+      description: 'Text for the button that links to the source-code page',
+    }),
   }),
 
   // Featured Projects section

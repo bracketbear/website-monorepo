@@ -15,6 +15,9 @@ const meta: Meta<typeof MeetFlateralusSection> = {
     content: {
       control: { type: 'text' },
     },
+    buttonText: {
+      control: { type: 'text' },
+    },
   },
 };
 
@@ -84,6 +87,7 @@ export const Default: Story = {
   args: {
     title: 'Meet Flateralus',
     content: defaultContent,
+    buttonText: 'View Source Code',
   },
 };
 
@@ -91,6 +95,7 @@ export const ShortContent: Story = {
   args: {
     title: 'Quick Overview',
     content: shortContent,
+    buttonText: 'Learn More',
   },
 };
 
@@ -98,6 +103,7 @@ export const LongContent: Story = {
   args: {
     title: 'Comprehensive Guide',
     content: longContent,
+    buttonText: 'Explore Documentation',
   },
 };
 
@@ -105,6 +111,7 @@ export const CustomTitle: Story = {
   args: {
     title: 'Interactive Framework',
     content: defaultContent,
+    buttonText: 'Get Started',
   },
 };
 
@@ -113,6 +120,7 @@ export const MinimalContent: Story = {
     title: 'Simple Introduction',
     content:
       '## Welcome to Flateralus\n\nA powerful framework for interactive experiences.',
+    buttonText: 'Try It Out',
   },
 };
 
@@ -139,5 +147,6 @@ const animation = createBlobAnimation({
 \`\`\`
 
 > This is a blockquote with important information.`,
+    buttonText: 'Read More',
   },
 };

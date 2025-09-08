@@ -121,6 +121,7 @@ export const portfolioIndexPageSchema = makePageSchema({
   meetFlateralus: z.object({
     title: z.string().default('Meet Flateralus'),
     content: z.string().optional(), // Markdoc content - optional to match CMS schema
+    buttonText: z.string().default('View Source Code'),
   }),
 
   // Featured Projects section
