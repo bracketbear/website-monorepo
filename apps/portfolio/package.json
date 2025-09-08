@@ -1,7 +1,7 @@
 {
   "name": "@bracketbear/portfolio",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "scripts": {
     "dev": "node ../../scripts/generate-repo-map.js && astro dev --port 4322",
     "prebuild": "node ../../scripts/generate-repo-map.js",

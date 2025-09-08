@@ -73,6 +73,52 @@ run_quality_checks() {
     print_success "All quality checks passed!"
 }
 
+# Function to create git tag for release
+create_release_tag() {
+    local version=$1
+    
+    print_status "Creating release tag v$version..."
+    
+    # Check if tag already exists
+    if git tag -l "v$version" | grep -q "v$version"; then
+        print_warning "Tag v$version already exists. Skipping tag creation."
+        return 0
+    fi
+    
+    # Create and push tag
+    git tag -a "v$version" -m "Release v$version"
+    git push origin "v$version"
+    
+    print_success "Release tag v$version created and pushed!"
+}
+
+# Function to rollback to previous tag
+rollback_to_previous() {
+    print_status "Rolling back to previous release..."
+    
+    # Get the latest two tags
+    local tags=($(git tag --sort=-version:refname | head -2))
+    
+    if [ ${#tags[@]} -lt 2 ]; then
+        print_error "No previous release found to rollback to."
+        exit 1
+    fi
+    
+    local current_tag=${tags[0]}
+    local previous_tag=${tags[1]}
+    
+    print_status "Rolling back from $current_tag to $previous_tag..."
+    
+    # Checkout the previous tag
+    git checkout "$previous_tag"
+    
+    # Deploy the previous version
+    print_status "Deploying previous version..."
+    main "$1"
+    
+    print_success "Successfully rolled back to $previous_tag"
+}
+
 # Function to deploy a specific site
 deploy_site() {
     local site_name=$1
@@ -110,13 +156,21 @@ main() {
         echo "  portfolio     Deploy the portfolio website"
         echo "  bracketbear   Deploy the bracketbear website"
         echo "  all           Deploy all websites (default)"
+        echo "  rollback      Rollback to previous release"
         echo "  --help, -h    Show this help message"
         echo ""
         echo "Examples:"
         echo "  $0 portfolio"
         echo "  $0 bracketbear"
         echo "  $0 all"
+        echo "  $0 rollback"
         exit 0
+    fi
+    
+    # Handle rollback command
+    if [ "$target" = "rollback" ]; then
+        rollback_to_previous "all"
+        return 0
     fi
     
     print_status "Starting deployment process..."
@@ -128,21 +182,27 @@ main() {
     # Run quality checks
     run_quality_checks
     
+    # Get version from package.json
+    local version=$(node -p "require('./package.json').version")
+    
     case $target in
         "portfolio")
             deploy_site "Portfolio" "apps/portfolio" "dist"
+            create_release_tag "$version"
             ;;
         "bracketbear")
             deploy_site "BracketBear Website" "apps/bracketbear-website" "dist"
+            create_release_tag "$version"
             ;;
         "all")
             print_status "Deploying all sites..."
             deploy_site "Portfolio" "apps/portfolio" "dist"
             deploy_site "BracketBear Website" "apps/bracketbear-website" "dist"
             print_success "All sites deployed successfully!"
+            create_release_tag "$version"
             ;;
         *)
-            print_error "Invalid target. Use: portfolio, bracketbear, or all"
+            print_error "Invalid target. Use: portfolio, bracketbear, all, or rollback"
             exit 1
             ;;
     esac

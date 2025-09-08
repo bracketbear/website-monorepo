@@ -1,7 +1,7 @@
 {
   "name": "@bracketbear/bear-ui-tailwind",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Tailwind CSS styles and utilities for BracketBear UI components",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
