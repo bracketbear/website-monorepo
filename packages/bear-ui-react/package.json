@@ -1,7 +1,7 @@
 {
   "name": "@bracketbear/bear-ui-react",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React components for BracketBear UI system",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

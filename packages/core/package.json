@@ -1,7 +1,7 @@
 {
   "name": "@bracketbear/core",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Core utilities and Astro components for BracketBear applications",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
