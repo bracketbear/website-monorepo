@@ -11,7 +11,7 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['primary', 'secondary', 'danger', 'ghost', 'ghostLight'],
+      options: ['primary', 'secondary', 'error', 'ghost', 'ghostLight'],
     },
     size: {
       control: { type: 'select' },
@@ -40,10 +40,10 @@ export const Secondary: Story = {
   },
 };
 
-export const Danger: Story = {
+export const Error: Story = {
   args: {
-    variant: 'danger',
-    children: 'Danger Button',
+    variant: 'error',
+    children: 'Error Button',
   },
 };
 
@@ -116,7 +116,7 @@ export const AllVariants: Story = {
     <div className="flex flex-wrap gap-4">
       <Button variant="primary">Primary</Button>
       <Button variant="secondary">Secondary</Button>
-      <Button variant="danger">Danger</Button>
+      <Button variant="error">Error</Button>
       <Button variant="ghost">Ghost</Button>
       <Button variant="ghostLight">Ghost Light</Button>
     </div>

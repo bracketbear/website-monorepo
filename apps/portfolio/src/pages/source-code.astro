@@ -1,5 +1,6 @@
 ---
 import { type Breadcrumb } from '@bracketbear/core';
+import { CodeBlock } from '@bracketbear/core/react';
 import { getCollection } from 'astro:content';
 import HeroLayout from '@/layouts/HeroLayout.astro';
 import { marked } from 'marked';
@@ -8,12 +9,13 @@ import { marked } from 'marked';
 function cleanMarkdown(content: string | undefined | null): string {
   if (!content) return '';
 
-  return content
-    .trim() // Remove leading/trailing whitespace
-    .replace(/\\~/g, '~') // Fix escaped tildes
-    .replace(/\\\*/g, '*') // Fix escaped asterisks
-    .replace(/\n\s*\n\s*\n/g, '\n\n') // Collapse multiple empty lines
-    .replace(/\s+$/gm, ''); // Remove trailing whitespace from each line
+  // return content
+  //   .trim() // Remove leading/trailing whitespace
+  //   .replace(/\\~/g, '~') // Fix escaped tildes
+  //   .replace(/\\\*/g, '*') // Fix escaped asterisks
+  //   .replace(/\n\s*\n\s*\n/g, '\n\n') // Collapse multiple empty lines
+  //   .replace(/\s+$/gm, ''); // Remove trailing whitespace from each line
+  return content;
 }
 
 const breadcrumbs: Breadcrumb[] = [
@@ -39,7 +41,7 @@ try {
   title={sourceCodePage.data.title}
   subtitle={sourceCodePage.data.subtitle}
   breadcrumbs={breadcrumbs}
-  animationPreset="curious-particle-network"
+  animationPreset="particle-sphere"
   currentPage="source-code"
 >
   {/* TL;DR Section */}
@@ -207,9 +209,11 @@ try {
                         </div>
                       </div>
                       <div class={`${i % 2 === 1 ? 'lg:order-1' : ''}`}>
-                        <pre class="bg-brand-dark/90 overflow-x-auto rounded-lg p-4 text-xs leading-relaxed text-white md:p-5 md:text-sm">
-                          <code>{p.codeExample}</code>
-                        </pre>
+                        <CodeBlock
+                          code={p.codeExample}
+                          language="ts"
+                          showLineNumbers
+                        />
                       </div>
                     </div>
                   </div>
@@ -258,21 +262,23 @@ try {
           {/* Token Excerpt */}
           <div class="bg-brand-dark/90 border-border/20 mb-8 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
             <h3 class="font-heading mb-4 text-2xl tracking-tight text-white uppercase">
-              Token excerpt
+              {sourceCodePage.data.tailwindSection.tokenExcerptTitle}
             </h3>
-            <pre class="overflow-x-auto text-sm text-white/90">
-              <code>{sourceCodePage.data.tailwindSection.tokenExcerpt}</code>
-            </pre>
+            <CodeBlock
+              code={sourceCodePage.data.tailwindSection.tokenExcerpt}
+              language="css"
+            />
           </div>
 
           {/* Usage Example */}
           <div class="bg-card/20 border-border/20 rounded-lg border p-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md">
             <h3 class="font-heading text-foreground mb-4 text-2xl tracking-tight uppercase">
-              Usage (no arbitrary values)
+              {sourceCodePage.data.tailwindSection.usageExampleTitle}
             </h3>
-            <pre class="text-foreground/90 overflow-x-auto text-sm">
-              <code>{sourceCodePage.data.tailwindSection.usageExample}</code>
-            </pre>
+            <CodeBlock
+              code={sourceCodePage.data.tailwindSection.usageExample}
+              language="html"
+            />
           </div>
         </div>
       </section>
@@ -299,11 +305,12 @@ try {
 
           <div class="bg-brand-dark/90 border-border/20 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
             <h3 class="font-heading mb-4 text-2xl tracking-tight text-white uppercase">
-              Example: pick readable text from an OKLCH background
+              {sourceCodePage.data.dataAssistedStyling.codeExampleTitle}
             </h3>
-            <pre class="overflow-x-auto text-sm text-white/90">
-              <code>{sourceCodePage.data.dataAssistedStyling.codeExample}</code>
-            </pre>
+            <CodeBlock
+              code={sourceCodePage.data.dataAssistedStyling.codeExample}
+              language="ts"
+            />
           </div>
         </div>
       </section>
@@ -330,11 +337,12 @@ try {
 
           <div class="bg-card/20 border-border/20 rounded-lg border p-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md">
             <h3 class="font-heading text-foreground mb-4 text-2xl tracking-tight uppercase">
-              A simple diagram of the flow
+              {sourceCodePage.data.architecture.mermaidDiagramTitle}
             </h3>
-            <pre class="text-foreground/90 overflow-x-auto text-sm">
-              <code>{sourceCodePage.data.architecture.mermaidDiagram}</code>
-            </pre>
+            <CodeBlock
+              code={sourceCodePage.data.architecture.mermaidDiagram}
+              language="markdown"
+            />
           </div>
         </div>
       </section>
@@ -360,9 +368,13 @@ try {
           </div>
 
           <div class="bg-brand-dark/90 border-border/20 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
-            <pre class="overflow-x-auto text-sm text-white/90">
-              <code>{sourceCodePage.data.contentModel.codeExample}</code>
-            </pre>
+            <h3 class="font-heading mb-4 text-2xl tracking-tight text-white uppercase">
+              {sourceCodePage.data.contentModel.codeExampleTitle}
+            </h3>
+            <CodeBlock
+              code={sourceCodePage.data.contentModel.codeExample}
+              language="ts"
+            />
           </div>
         </div>
       </section>
@@ -410,9 +422,13 @@ try {
           </div>
 
           <div class="bg-brand-dark/90 border-border/20 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
-            <pre class="overflow-x-auto text-sm text-white/90">
-              <code>{sourceCodePage.data.flateralus.codeExample}</code>
-            </pre>
+            <h3 class="font-heading mb-4 text-2xl tracking-tight text-white uppercase">
+              {sourceCodePage.data.flateralus.codeExampleTitle}
+            </h3>
+            <CodeBlock
+              code={sourceCodePage.data.flateralus.codeExample}
+              language="ts"
+            />
           </div>
         </div>
       </section>
@@ -483,9 +499,13 @@ try {
           </div>
 
           <div class="bg-brand-dark/90 border-border/20 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
-            <pre class="overflow-x-auto text-sm text-white/90">
-              <code>{sourceCodePage.data.testingDx.loggingFormat}</code>
-            </pre>
+            <h3 class="font-heading mb-4 text-2xl tracking-tight text-white uppercase">
+              {sourceCodePage.data.testingDx.loggingFormatTitle}
+            </h3>
+            <CodeBlock
+              code={sourceCodePage.data.testingDx.loggingFormat}
+              language="bash"
+            />
           </div>
         </div>
       </section>

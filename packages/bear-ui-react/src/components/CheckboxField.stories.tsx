@@ -27,7 +27,7 @@ type Story = StoryObj<typeof meta>;
 
 // Wrapper component to handle checkbox state
 const CheckboxFieldWrapper = (
-  args: Omit<React.ComponentProps<typeof CheckboxField>, 'checked' | 'onChange'>
+  args: Omit<React.ComponentProps<typeof CheckboxField>, 'onChange'>
 ) => {
   const [checked, setChecked] = useState(args.checked || false);
 

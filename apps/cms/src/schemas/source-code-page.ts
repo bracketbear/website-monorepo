@@ -62,9 +62,17 @@ export const sourceCodePageSchema = makePageSchema(
           label: 'Token Excerpt',
           multiline: true,
         }),
+        tokenExcerptTitle: fields.text({
+          label: 'Token Excerpt Title',
+          defaultValue: 'Token excerpt',
+        }),
         usageExample: fields.text({
           label: 'Usage Example',
           multiline: true,
+        }),
+        usageExampleTitle: fields.text({
+          label: 'Usage Example Title',
+          defaultValue: 'Usage (no arbitrary values)',
         }),
       },
       { label: 'Tailwind Section' }
@@ -84,6 +92,10 @@ export const sourceCodePageSchema = makePageSchema(
           label: 'Code Example',
           multiline: true,
         }),
+        codeExampleTitle: fields.text({
+          label: 'Code Example Title',
+          defaultValue: 'Example: pick readable text from an OKLCH background',
+        }),
       },
       { label: 'Data-Assisted Styling Section' }
     ),
@@ -101,6 +113,10 @@ export const sourceCodePageSchema = makePageSchema(
         mermaidDiagram: fields.text({
           label: 'Mermaid Diagram',
           multiline: true,
+        }),
+        mermaidDiagramTitle: fields.text({
+          label: 'Mermaid Diagram Title',
+          defaultValue: 'A simple diagram of the flow',
         }),
       },
       { label: 'Architecture Section' }
@@ -120,6 +136,10 @@ export const sourceCodePageSchema = makePageSchema(
         codeExample: fields.text({
           label: 'Code Example',
           multiline: true,
+        }),
+        codeExampleTitle: fields.text({
+          label: 'Code Example Title',
+          defaultValue: 'Zod schema example',
         }),
       },
       { label: 'Content Model Section' }
@@ -180,6 +200,10 @@ export const sourceCodePageSchema = makePageSchema(
           label: 'Code Example',
           multiline: true,
         }),
+        codeExampleTitle: fields.text({
+          label: 'Code Example Title',
+          defaultValue: 'Typed animation controls',
+        }),
       },
       { label: 'Flateralus Section' }
     ),
@@ -214,6 +238,10 @@ export const sourceCodePageSchema = makePageSchema(
         loggingFormat: fields.text({
           label: 'Logging Format',
           multiline: true,
+        }),
+        loggingFormatTitle: fields.text({
+          label: 'Logging Format Title',
+          defaultValue: 'Simple logging format',
         }),
       },
       { label: 'Testing & DX Section' }

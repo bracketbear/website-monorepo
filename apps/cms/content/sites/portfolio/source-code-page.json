@@ -5,7 +5,7 @@
   "noIndex": false,
   "contactCTA": {},
   "tldr": {
-    "title": "TL;DR",
+    "title": "The TL;DR",
     "points": [
       {
         "label": "Architecture",
@@ -54,8 +54,8 @@
     ]
   },
   "repoMap": {
-    "title": "Repo map (auto-generated)",
-    "description": "I'm a firm believer in mono-repos. Until the bird is ready to fly on its own, it should stay in the nest. This methodology keeps your features contained in one project's PRs and keeps everything in lock-step.\n\nApps and packages are separated and linked to each other in the respective `package.json` files. Here's an auto-generated list of apps and packages:\n"
+    "title": "Mono-Repo",
+    "description": "I'm a firm believer in mono-repos. Until the bird is ready to fly on its own, it should stay in the nest with the rest of the flock. This methodology keeps your features contained in one project's PRs and keeps everything in lock-step.\n\nApps and packages are separated and linked to each other in the respective `package.json` files. Here's an auto-generated list of the apps and packages when this website was built:\n"
   },
   "tailwindSection": {
     "title": "Tailwind (and how I use it)",
@@ -70,7 +70,7 @@
   },
   "dataAssistedStyling": {
     "title": "Data-assisted styling",
-    "content": "Because utilities are structured, I can analyze them. I track class usage and palette choices, then run small scripts to:\n\n- Flag near-duplicate spacing stacks.\n- Detect color drift (e.g., \"too much orange last month\").\n- Check contrast automatically.\n\nI also have an early-stage tool, `@bracketbear/tw-pattern-analyzer`, that clusters frequently co-occurring utilities to suggest potential reusable utilities and components. It’s light data science: useful signals, not gospel—still early days.\n",
+    "content": "Because utilities are structured, I can analyze them. I track class usage and palette choices, then run small scripts to:\n\n- Flag near-duplicate spacing stacks.\n\n- Detect color drift (e.g., \"too much orange last month\").\n\n- Check contrast automatically.\n\n  I also have an early-stage tool, `@bracketbear/tw-pattern-analyzer`, that clusters frequently co-occurring utilities to suggest potential reusable utilities and components. It’s light data science: useful signals, not gospel—still early days.\n",
     "codeExample": "{\n  \"totalClassLists\": 966,\n  \"uniquePatterns\": 549,\n  \"totalFiles\": 129,\n  \"totalPatterns\": 966,\n  \"clusters\": [\n    {\n      \"rep\": \"flex gap-2 items-center\",\n      \"members\": [\n        \"flex gap-2 items-center\",\n        \"flex flex-col gap-2 items-center\",\n        \"flex font-medium gap-2 items-center\"\n      ],\n      \"occurrences\": 17,\n      \"variants\": 3,\n      \"similarity\": 0.8333333333333334,\n      \"likelihood\": 37\n    },\n    {\n      \"rep\": \"container mx-auto text-center\",\n      \"members\": [\n        \"container mx-auto text-center\",\n        \"container mx-auto px-4 text-center\"\n      ],\n      \"occurrences\": 10,\n      \"variants\": 2,\n      \"similarity\": 0.875,\n      \"likelihood\": 19\n    },\n...\n}"
   },
   "architecture": {

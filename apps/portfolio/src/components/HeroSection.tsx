@@ -5,6 +5,7 @@ import {
   createParticleWaveAnimation,
   createBlobAnimation,
   createRetroGridAnimation,
+  createParticleSphereAnimation,
 } from '@bracketbear/flateralus-pixi-animations';
 import { getRandomControlValues } from '@bracketbear/flateralus';
 import { clsx, type LabelValue } from '@bracketbear/bear-ui';
@@ -112,6 +113,22 @@ const ANIMATION_CONTROLS = {
     lineColor: '#262626',
     backgroundColor: '#000000',
   },
+  particleSphere: {
+    particleCount: 200,
+    sphereRadius: 0.6,
+    particleSize: 3,
+    rotationSpeed: 0.01,
+    pulseSpeed: 1.3,
+    waveCount: 2,
+    waveAmplitude: 50,
+    pulseAmplitude: 2,
+    particleColor: '#010101',
+    opacity: 0.9,
+    showConnections: false,
+    connectionDistance: 30,
+    connectionColor: '#00ff88',
+    rotationAxis: 'xyz',
+  },
 };
 
 export type HeaderStat = LabelValue;
@@ -123,7 +140,8 @@ export interface HeroSectionProps {
     | 'particle-wave'
     | 'blob'
     | 'enhanced-wave'
-    | 'retro-grid';
+    | 'retro-grid'
+    | 'particle-sphere';
   /** Additional CSS classes */
   className?: string;
   /** Whether to show debug controls */
@@ -213,6 +231,11 @@ export function HeroSection({
         case 'retro-grid':
           animation = createRetroGridAnimation({
             ...ANIMATION_CONTROLS.retroGrid,
+          });
+          break;
+        case 'particle-sphere':
+          animation = createParticleSphereAnimation({
+            ...ANIMATION_CONTROLS.particleSphere,
           });
           break;
         case 'enhanced-wave':
@@ -327,6 +350,8 @@ export function HeroSection({
         return 'bg-gradient-to-br from-muted via-muted/95 to-primary/20 bg-header-pattern';
       case 'retro-grid':
         return 'bg-gradient-to-br from-muted via-muted/95 to-muted/20 bg-header-pattern';
+      case 'particle-sphere':
+        return 'bg-gradient-to-br from-muted via-muted/95 to-primary/20 bg-header-pattern';
       case 'enhanced-wave':
       default:
         return 'bg-gradient-to-br from-muted via-muted/90 to-muted/15 bg-header-pattern';

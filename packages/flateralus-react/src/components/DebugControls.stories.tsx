@@ -4,6 +4,7 @@ import { DebugControls } from './DebugControls';
 import type {
   AnimationManifest,
   ControlValues,
+  ControlValueTypes,
   Control,
 } from '@bracketbear/flateralus';
 
@@ -12,7 +13,6 @@ const createMockManifest = (): AnimationManifest => ({
   id: 'mock-animation',
   name: 'Mock Animation',
   description: 'A mock animation for Storybook stories',
-  version: '1.0.0',
   controls: [
     {
       name: 'speed',
@@ -177,7 +177,16 @@ export const WithStageControls: Story = {
     });
 
     const handleControlsChange = (values: Partial<ControlValues>) => {
-      setControlValues((prev) => ({ ...prev, ...values }));
+      setControlValues((prev) => {
+        const filteredValues: Partial<ControlValues> = {};
+        for (const [key, value] of Object.entries(values)) {
+          if (value !== undefined) {
+            filteredValues[key as keyof ControlValues] =
+              value as ControlValueTypes;
+          }
+        }
+        return { ...prev, ...filteredValues } as ControlValues;
+      });
     };
 
     const handleStageControlsChange = (values: Record<string, any>) => {
@@ -223,11 +232,11 @@ export const WithStageControls: Story = {
         <div className="mt-8 space-y-2">
           <h3 className="font-bold">Current Values:</h3>
           <div className="space-y-1 text-sm">
-            <div>Speed: {controlValues.speed}</div>
-            <div>Color: {controlValues.color}</div>
+            <div>Speed: {JSON.stringify(controlValues.speed)}</div>
+            <div>Color: {JSON.stringify(controlValues.color)}</div>
             <div>Effects: {controlValues.enableEffects ? 'On' : 'Off'}</div>
-            <div>Style: {controlValues.style}</div>
-            <div>Particles: {controlValues.particleCount}</div>
+            <div>Style: {JSON.stringify(controlValues.style)}</div>
+            <div>Particles: {JSON.stringify(controlValues.particleCount)}</div>
           </div>
 
           <h3 className="mt-4 font-bold">Stage Values:</h3>
@@ -287,7 +296,6 @@ export const ComplexControls: Story = {
       id: 'complex-animation',
       name: 'Complex Animation',
       description: 'An animation with many different control types',
-      version: '1.0.0',
       controls: [
         {
           name: 'rotationSpeed',
@@ -391,7 +399,16 @@ export const ComplexControls: Story = {
     });
 
     const handleControlsChange = (values: Partial<ControlValues>) => {
-      setControlValues((prev) => ({ ...prev, ...values }));
+      setControlValues((prev) => {
+        const filteredValues: Partial<ControlValues> = {};
+        for (const [key, value] of Object.entries(values)) {
+          if (value !== undefined) {
+            filteredValues[key as keyof ControlValues] =
+              value as ControlValueTypes;
+          }
+        }
+        return { ...prev, ...filteredValues } as ControlValues;
+      });
     };
 
     return (

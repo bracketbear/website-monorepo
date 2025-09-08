@@ -115,7 +115,6 @@ const createMockManifest = (): AnimationManifest => ({
   id: 'mock-animation',
   name: 'Mock Animation',
   description: 'A mock animation for Storybook stories',
-  version: '1.0.0',
   controls: [
     {
       name: 'speed',
@@ -279,8 +278,8 @@ const ControlsHookDemo = () => {
     <div className="space-y-4">
       <div className="rounded bg-gray-100 p-4 text-sm">
         <h3 className="mb-2 font-bold">useControls Hook State:</h3>
-        <div>Speed: {controlValues.speed}</div>
-        <div>Color: {controlValues.color}</div>
+        <div>Speed: {JSON.stringify(controlValues.speed)}</div>
+        <div>Color: {JSON.stringify(controlValues.color)}</div>
         <div>Effects: {controlValues.enableEffects ? 'On' : 'Off'}</div>
         <div>Reset Toast: {showResetToast ? 'Showing' : 'Hidden'}</div>
       </div>
@@ -330,25 +329,12 @@ const DebugControlsHookDemo = () => {
     application,
     onRandomize: () => console.log('Randomized!'),
     stageControls: {
-      manifest: {
-        id: 'stage-controls',
-        name: 'Stage Settings',
-        description: 'Controls for the animation stage',
-        controls: [
-          {
-            name: 'backgroundColor',
-            type: 'color',
-            label: 'Background Color',
-            description: 'The background color of the stage',
-            defaultValue: '#1a1a1a',
-            debug: true,
-            resetsAnimation: false,
-          },
-        ],
-      },
-      controlValues: {
-        backgroundColor: '#2a2a2a',
-      },
+      backgroundColor: '#2a2a2a',
+      backgroundAlpha: 0.8,
+      enableGrid: true,
+      gridColor: '#333333',
+      gridOpacity: 0.5,
+      gridSize: 20,
     },
     onStageControlsChange: (values) =>
       console.log('Stage controls changed:', values),
@@ -422,13 +408,8 @@ export const AllHooksCombined: Story = {
         showDownloadButton: true,
         application,
         stageControls: {
-          manifest: {
-            id: 'stage-controls',
-            name: 'Stage Settings',
-            description: 'Controls for the animation stage',
-            controls: [],
-          },
-          controlValues: {},
+          backgroundColor: '#1a1a1a',
+          enableGrid: true,
         },
       });
 
@@ -445,8 +426,8 @@ export const AllHooksCombined: Story = {
             </div>
             <div>
               <h4 className="font-semibold">useControls:</h4>
-              <div>Speed: {controlValues.speed}</div>
-              <div>Color: {controlValues.color}</div>
+              <div>Speed: {JSON.stringify(controlValues.speed)}</div>
+              <div>Color: {JSON.stringify(controlValues.color)}</div>
               <div>Effects: {controlValues.enableEffects ? 'On' : 'Off'}</div>
             </div>
           </div>

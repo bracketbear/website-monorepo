@@ -27,6 +27,43 @@ const mockGroupControl: GroupControlType = {
   label: 'Particle Settings',
   description: 'Settings for particle behavior',
   value: 'number', // This tells the group what type of controls to create
+  items: [
+    {
+      name: 'particleCount',
+      type: 'number',
+      label: 'Particle Count',
+      description: 'Number of particles',
+      defaultValue: 50,
+      min: 10,
+      max: 200,
+      debug: true,
+      resetsAnimation: false,
+    },
+    {
+      name: 'speed',
+      type: 'number',
+      label: 'Animation Speed',
+      description: 'Speed of the animation',
+      defaultValue: 2.0,
+      min: 0.1,
+      max: 5.0,
+      step: 0.1,
+      debug: true,
+      resetsAnimation: false,
+    },
+    {
+      name: 'size',
+      type: 'number',
+      label: 'Particle Size',
+      description: 'Size of particles',
+      defaultValue: 1.0,
+      min: 0.5,
+      max: 3.0,
+      step: 0.1,
+      debug: true,
+      resetsAnimation: false,
+    },
+  ],
   defaultValue: [
     { type: 'number', value: 50 },
     { type: 'number', value: 2.0 },
@@ -40,9 +77,9 @@ export const Default: Story = {
   args: {
     control: mockGroupControl,
     value: [
-      { type: 'number', value: 50 },
-      { type: 'number', value: 2.0 },
-      { type: 'number', value: 1.0 },
+      { type: 'number' as const, value: 50 },
+      { type: 'number' as const, value: 2.0 },
+      { type: 'number' as const, value: 1.0 },
     ],
     onControlChange: (key, value) => console.log(`${key}:`, value),
   },
@@ -58,9 +95,9 @@ export const Default: Story = {
 export const MixedTypes: Story = {
   render: () => {
     const [value, setValue] = useState([
-      { type: 'color', value: '#ff6b6b' },
-      { type: 'number', value: 75 },
-      { type: 'boolean', value: true },
+      { type: 'color' as const, value: '#ff6b6b' },
+      { type: 'number' as const, value: 75 },
+      { type: 'boolean' as const, value: true },
     ]);
 
     return (
