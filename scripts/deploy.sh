@@ -112,9 +112,9 @@ rollback_to_previous() {
     # Checkout the previous tag
     git checkout "$previous_tag"
     
-    # Deploy the previous version
+    # Deploy the previous version using the deploy script directly
     print_status "Deploying previous version..."
-    main "$1"
+    ./scripts/deploy.sh "$1"
     
     print_success "Successfully rolled back to $previous_tag"
 }

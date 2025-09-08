@@ -127,7 +127,7 @@
   },
   "securityOps": {
     "title": "Security & ops",
-    "content": "- Secrets stay server-side.\n- Security headers via Netlify (`X-Frame-Options`, `X-XSS-Protection`, `X-Content-Type-Options`, `Referrer-Policy`).\n- Tagged releases and a quick rollback to the previous tag if something looks wrong.\n- Dependency security audits run on every commit via pre-merge hooks.\n- Comprehensive quality gates: pre-commit, pre-push, and pre-merge hooks ensure code quality.\n- CI/CD security checks via GitHub Actions on every push and pull request.\n- Static site generation reduces attack surface by eliminating server-side vulnerabilities.\n"
+    "content": "- Secrets stay server-side.\n- Security headers via Netlify (`X-Frame-Options`, `X-XSS-Protection`, `X-Content-Type-Options`, `Referrer-Policy`).\n- Tagged releases and a quick rollback to the previous tag if something looks wrong.\n- Dependency security audits run on every commit via pre-merge hooks.\n- Comprehensive quality gates: pre-commit, pre-push, and pre-merge hooks ensure code quality.\n- CI/CD security checks via GitHub Actions on every push and pull request.\n- Static site generation reduces attack surface by eliminating server-side vulnerabilities.\n\n**Release Management:**\n- Synchronized versioning across all packages and apps using automated scripts\n- Git tags created automatically on each deployment (`v1.0.1`, `v2.0.0`, etc.)\n- One-command rollback to any previous release\n- Version bump commands (`npm run version:patch/minor/major`) sync across entire monorepo\n"
   },
   "futureChanges": {
     "title": "What I'd change next",
