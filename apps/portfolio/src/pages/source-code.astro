@@ -239,56 +239,46 @@ try {
         {/* TypeScript Section */}
         {
           sourceCodePage?.data?.typescript && (
-            <section class="px-content mt-40 mb-8">
-              <div class="text-center">
-                <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-                  {sourceCodePage.data.typescript.title}
-                </h2>
-              </div>
-              <div class="mt-8">
-                <div class="prose-2xl text-foreground/90 mx-auto mb-8 max-w-prose">
-                  <Fragment
-                    set:html={marked.parse(
-                      cleanMarkdown(sourceCodePage.data.typescript.content)
-                    )}
-                  />
-                </div>
-
-                {sourceCodePage.data.typescript.patterns?.length > 0 && (
-                  <div class="space-y-10 md:space-y-14">
-                    {sourceCodePage.data.typescript.patterns.map(
-                      (p: any, i: number) => (
-                        <div class="border-border/20 bg-card/20 w-full rounded-lg border px-4 py-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md md:py-8">
-                          <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-10">
-                            <div
-                              class={`flex flex-col gap-4 ${i % 2 === 1 ? 'lg:order-2 lg:text-right' : ''}`}
-                            >
-                              <h3 class="font-heading text-foreground text-xl tracking-tight uppercase md:text-2xl">
-                                {p.title}
-                              </h3>
-                              <div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 max-w-none">
-                                <Fragment
-                                  set:html={marked.parse(
-                                    cleanMarkdown(p.description)
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            <div class={`${i % 2 === 1 ? 'lg:order-1' : ''}`}>
-                              <CodeBlock
-                                code={p.codeExample}
-                                language="ts"
-                                showLineNumbers
+            <Section
+              id="typescript"
+              eyebrow="Type System"
+              title={sourceCodePage.data.typescript.title}
+              intro={sourceCodePage.data.typescript.content}
+            >
+              {sourceCodePage.data.typescript.patterns?.length > 0 && (
+                <div class="space-y-10 md:space-y-14">
+                  {sourceCodePage.data.typescript.patterns.map(
+                    (p: any, i: number) => (
+                      <div class="border-border/20 bg-card/20 w-full rounded-lg border px-4 py-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md md:py-8">
+                        <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-10">
+                          <div
+                            class={`flex flex-col gap-4 ${i % 2 === 1 ? 'lg:order-2 lg:text-right' : ''}`}
+                          >
+                            <h3 class="font-heading text-foreground text-xl tracking-tight uppercase md:text-2xl">
+                              {p.title}
+                            </h3>
+                            <div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 max-w-none">
+                              <Fragment
+                                set:html={marked.parse(
+                                  cleanMarkdown(p.description)
+                                )}
                               />
                             </div>
                           </div>
+                          <div class={`${i % 2 === 1 ? 'lg:order-1' : ''}`}>
+                            <CodeBlock
+                              code={p.codeExample}
+                              language="ts"
+                              showLineNumbers
+                            />
+                          </div>
                         </div>
-                      )
-                    )}
-                  </div>
-                )}
-              </div>
-            </section>
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
+            </Section>
           )
         }
 
