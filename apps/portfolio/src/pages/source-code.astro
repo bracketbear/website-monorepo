@@ -5,8 +5,8 @@ import { type Breadcrumb, CodeBlock } from '@bracketbear/core';
 import { getContentImageUrl } from '@bracketbear/astro-content';
 import HeroLayout from '@/layouts/HeroLayout.astro';
 import Section from '@/components/Section.astro';
-import Badge from '@/components/Badge.astro';
 import StickyTOC from '@/components/StickyTOC.astro';
+import RepoPanel from '@/components/RepoPanel.astro';
 
 // Helper function to clean markdown content
 function cleanMarkdown(content: string | undefined | null): string {
@@ -175,60 +175,15 @@ try {
                 <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                   {/* Apps Panel */}
                   {repoMapData && (
-                    <div class="card-neutral">
-                      <h3 class="font-heading text-foreground mb-4 text-lg font-bold">
-                        Apps ({repoMapData.default.apps.length})
-                      </h3>
-                      <ul class="list-outside list-disc space-y-3 pl-5">
-                        {repoMapData.default.apps.map((app) => (
-                          <li class="text-foreground/90">
-                            <div class="flex items-center gap-2 font-medium">
-                              {app.name}
-                              {app.type === 'private' && (
-                                <Badge variant="brand">private</Badge>
-                              )}
-                            </div>
-                            {app.description && (
-                              <div class="text-muted-foreground mt-1 text-sm">
-                                {app.description}
-                              </div>
-                            )}
-                            <div class="text-muted-foreground/60 mt-1 font-mono text-xs">
-                              {app.path}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    <RepoPanel title="Apps" items={repoMapData.default.apps} />
                   )}
 
                   {/* Packages Panel */}
                   {repoMapData && (
-                    <div class="card-neutral">
-                      <h3 class="font-heading text-foreground mb-4 text-lg font-bold">
-                        Packages ({repoMapData.default.packages.length})
-                      </h3>
-                      <ul class="list-outside list-disc space-y-3 pl-5">
-                        {repoMapData.default.packages.map((pkg) => (
-                          <li class="text-foreground/90">
-                            <div class="flex items-center gap-2 font-medium">
-                              {pkg.name}
-                              {pkg.type === 'private' && (
-                                <Badge variant="brand">private</Badge>
-                              )}
-                            </div>
-                            {pkg.description && (
-                              <div class="text-muted-foreground mt-1 text-sm">
-                                {pkg.description}
-                              </div>
-                            )}
-                            <div class="text-muted-foreground/60 mt-1 font-mono text-xs">
-                              {pkg.path}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    <RepoPanel
+                      title="Packages"
+                      items={repoMapData.default.packages}
+                    />
                   )}
                 </div>
               </div>

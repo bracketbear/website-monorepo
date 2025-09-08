@@ -110,9 +110,10 @@
     "mediaImage": "/content-images/sites/portfolio/source-code-page/storybook/storybook/mediaImage.png"
   },
   "flateralus": {
-    "title": "Flateralus (generative backgrounds without meltdown)",
+    "title": "Flateralus Animation System",
     "content": "Generative visuals are great until they eat the frame budget. I keep them in bounds with typed controls, visibility-based pausing, and guardrails (caps) that step complexity down before the UI suffers.\n",
-    "codeExample": "export const ParticleNetworkControls = {\n  particleCount: { type: \"int\", min: 100, max: 800, default: 400 },\n  linkDistance:  { type: \"float\", min: 20,  max: 180, default: 100 },\n  speed:         { type: \"float\", min: 0.1, max: 2.0, default: 0.6 },\n  theme:         { type: \"select\", options: [\"brand\",\"neutral\",\"warning\"], default: \"brand\" },\n} as const;"
+    "codeExample": "export const ParticleNetworkControls = {\n  particleCount: { type: \"int\", min: 100, max: 800, default: 400 },\n  linkDistance:  { type: \"float\", min: 20,  max: 180, default: 100 },\n  speed:         { type: \"float\", min: 0.1, max: 2.0, default: 0.6 },\n  theme:         { type: \"select\", options: [\"brand\",\"neutral\",\"warning\"], default: \"brand\" },\n} as const;",
+    "codeExampleTitle": "particle-network.ts"
   },
   "performanceAccessibility": {
     "title": "Performance & accessibility",
