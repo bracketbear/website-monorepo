@@ -26,7 +26,10 @@ export function CodeBlock({
   showLineNumbers = false,
   className,
 }: CodeBlockProps) {
-  const lines = useMemo(() => code.replace(/\n$/, '').split('\n'), [code]);
+  const lines = useMemo(() => {
+    if (!code) return [];
+    return code.replace(/\n$/, '').split('\n');
+  }, [code]);
   const codeRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -93,7 +96,7 @@ export function CodeBlock({
             </div>
           </div>
         ) : (
-          <span className="whitespace-pre">{code}</span>
+          <span className="whitespace-pre">{code || ''}</span>
         )}
       </code>
     </pre>

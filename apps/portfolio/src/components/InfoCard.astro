@@ -1,0 +1,32 @@
+---
+export interface Props {
+  eyebrow?: string;
+  title: string;
+  content: string;
+  className?: string;
+}
+
+const { eyebrow, title, content, className = '' } = Astro.props;
+---
+
+<div class={`card-neutral h-full ${className}`}>
+  {
+    eyebrow && (
+      <div class="mb-3">
+        <span class="text-muted-foreground text-xs font-medium tracking-wider uppercase">
+          {eyebrow}
+        </span>
+      </div>
+    )
+  }
+
+  <h3
+    class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight"
+  >
+    {title}
+  </h3>
+
+  <div class="text-muted-foreground leading-6">
+    <Fragment set:html={content} />
+  </div>
+</div>

@@ -120,8 +120,10 @@
   },
   "testingDx": {
     "title": "Testing & DX",
-    "content": "- Type-check, lint, and unit tests for utilities.\n- Storybook for component states; snapshot/regression where it earns its keep.\n",
-    "loggingFormat": "Simple logging format for scripts and small services:\n```\n%(asctime)s - %(name)s - %(levelname)s - %(message)s\n```"
+    "content": "Comprehensive testing strategy with automated quality gates and developer experience optimizations.\n\n**Testing Strategy:**\n- **Unit tests** for utilities and business logic using Vitest\n- **Integration tests** for complex workflows and API interactions\n- **Component tests** for React components with Testing Library\n- **Storybook** for component states and visual regression testing\n\n**Development Workflow:**\n- **Husky hooks** enforce code quality at every commit\n- **Pre-push** runs full test suite to prevent broken code\n- **Pre-merge** comprehensive checks before merging to dev\n- **Branch protection** prevents direct commits to main/dev\n\n**Quality Gates:**\n- Formatting (Prettier), linting (ESLint), type checking (TypeScript)\n- Test coverage, build verification, dependency audits\n- CSS pattern analysis to maintain design system consistency",
+    "huskyWorkflowDescription": "**Pre-commit & Pre-merge Hooks:** Every commit triggers branch protection (prevents direct commits to dev/main) and runs lint-staged for formatting. When merging into dev, a comprehensive pre-merge script runs: formatting checks, linting, TypeScript validation, full test suite, build verification, dependency audits, and git status checks. Only if all checks pass does the merge proceed.",
+    "vitestDescription": "**Monorepo Testing Setup:** Single Vitest configuration at the root handles all packages and apps. Tests are co-located with source files (e.g., `utils.ts` has `utils.test.ts`). Uses jsdom environment for React component testing with Testing Library. Aliases configured for monorepo packages. Tests run in Node.js with globals enabled for cleaner syntax.",
+    "testExampleDescription": "**Component Testing Pattern:** Tests focus on accessibility and user behavior rather than implementation details. Uses `getByRole` queries for semantic testing, checks actual DOM content rather than props, and tests both happy path and edge cases. Each test is isolated and descriptive about what behavior it's verifying."
   },
   "securityOps": {
     "title": "Security & ops",

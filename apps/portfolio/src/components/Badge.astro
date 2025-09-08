@@ -1,0 +1,22 @@
+---
+export interface Props {
+  variant?: 'default' | 'brand' | 'warn' | 'success';
+  children: string;
+  className?: string;
+}
+
+const { variant = 'default', children, className = '' } = Astro.props;
+
+const variantClasses = {
+  default: 'bg-muted text-muted-foreground',
+  brand: 'bg-brand-orange text-white',
+  warn: 'bg-brand-red text-white',
+  success: 'bg-brand-green text-white',
+};
+---
+
+<span
+  class={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${variantClasses[variant]} ${className}`}
+>
+  {children}
+</span>

@@ -1,0 +1,37 @@
+---
+export interface Props {
+  sections: Array<{
+    id: string;
+    title: string;
+    eyebrow?: string;
+  }>;
+  className?: string;
+}
+
+const { sections, className = '' } = Astro.props;
+---
+
+<nav class={`hidden lg:block sticky top-24 ${className}`}>
+  <div class="card-neutral">
+    <h3
+      class="font-heading text-foreground mb-4 text-sm font-bold tracking-wider uppercase"
+    >
+      On this page
+    </h3>
+
+    <ul class="space-y-2">
+      {
+        sections.map((section) => (
+          <li>
+            <a
+              href={`#${section.id}`}
+              class="text-muted-foreground hover:text-brand-orange link-underline block py-1 text-sm transition-colors"
+            >
+              {section.title}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</nav>

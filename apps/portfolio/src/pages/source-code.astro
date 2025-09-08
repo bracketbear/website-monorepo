@@ -1,21 +1,23 @@
 ---
-import { type Breadcrumb } from '@bracketbear/core';
-import { CodeBlock } from '@bracketbear/core/react';
+import { type Breadcrumb, CodeBlock } from '@bracketbear/core';
 import { getCollection } from 'astro:content';
 import HeroLayout from '@/layouts/HeroLayout.astro';
+import Section from '@/components/Section.astro';
+import Badge from '@/components/Badge.astro';
+import Callout from '@/components/Callout.astro';
+import StickyTOC from '@/components/StickyTOC.astro';
 import { marked } from 'marked';
 
 // Helper function to clean markdown content
 function cleanMarkdown(content: string | undefined | null): string {
   if (!content) return '';
 
-  // return content
-  //   .trim() // Remove leading/trailing whitespace
-  //   .replace(/\\~/g, '~') // Fix escaped tildes
-  //   .replace(/\\\*/g, '*') // Fix escaped asterisks
-  //   .replace(/\n\s*\n\s*\n/g, '\n\n') // Collapse multiple empty lines
-  //   .replace(/\s+$/gm, ''); // Remove trailing whitespace from each line
-  return content;
+  return content
+    .trim() // Remove leading/trailing whitespace
+    .replace(/\\~/g, '~') // Fix escaped tildes
+    .replace(/\\\*/g, '*') // Fix escaped asterisks
+    .replace(/\n\s*\n\s*\n/g, '\n\n') // Collapse multiple empty lines
+    .replace(/\s+$/gm, ''); // Remove trailing whitespace from each line
 }
 
 const breadcrumbs: Breadcrumb[] = [
@@ -26,6 +28,80 @@ const breadcrumbs: Breadcrumb[] = [
 // Get the source-code page singleton
 const sourceCodePageEntries = await getCollection('portfolioSourceCodePage');
 const sourceCodePage = sourceCodePageEntries[0]; // Singletons have only one entry
+
+// Define sections for TOC - pull from CMS data
+const sections = [
+  sourceCodePage?.data?.tldr && {
+    id: 'tldr',
+    title: sourceCodePage.data.tldr.title,
+    eyebrow: 'Overview',
+  },
+  sourceCodePage?.data?.repoMap && {
+    id: 'monorepo',
+    title: sourceCodePage.data.repoMap.title,
+    eyebrow: 'Architecture',
+  },
+  sourceCodePage?.data?.typescript && {
+    id: 'typescript',
+    title: sourceCodePage.data.typescript.title,
+    eyebrow: 'Type System',
+  },
+  sourceCodePage?.data?.tailwindSection && {
+    id: 'tailwind',
+    title: sourceCodePage.data.tailwindSection.title,
+    eyebrow: 'Styling',
+  },
+  sourceCodePage?.data?.dataAssistedStyling && {
+    id: 'data-assisted',
+    title: sourceCodePage.data.dataAssistedStyling.title,
+    eyebrow: 'Styling',
+  },
+  sourceCodePage?.data?.architecture && {
+    id: 'architecture',
+    title: sourceCodePage.data.architecture.title,
+    eyebrow: 'System',
+  },
+  sourceCodePage?.data?.contentModel && {
+    id: 'content-model',
+    title: sourceCodePage.data.contentModel.title,
+    eyebrow: 'Data',
+  },
+  sourceCodePage?.data?.storybook && {
+    id: 'storybook',
+    title: sourceCodePage.data.storybook.title,
+    eyebrow: 'Development',
+  },
+  sourceCodePage?.data?.flateralus && {
+    id: 'flateralus',
+    title: sourceCodePage.data.flateralus.title,
+    eyebrow: 'Performance',
+  },
+  sourceCodePage?.data?.performanceAccessibility && {
+    id: 'performance-accessibility',
+    title: sourceCodePage.data.performanceAccessibility.title,
+    eyebrow: 'Quality',
+  },
+  sourceCodePage?.data?.testingDx && {
+    id: 'testing-dx',
+    title: sourceCodePage.data.testingDx.title,
+    eyebrow: 'Development',
+  },
+  sourceCodePage?.data?.securityOps && {
+    id: 'security-ops',
+    title: sourceCodePage.data.securityOps.title,
+    eyebrow: 'Operations',
+  },
+  sourceCodePage?.data?.futureChanges && {
+    id: 'future-changes',
+    title: sourceCodePage.data.futureChanges.title,
+    eyebrow: 'Roadmap',
+  },
+  sourceCodePage?.data?.closing && {
+    id: 'closing',
+    title: sourceCodePage.data.closing.title,
+    eyebrow: 'Conclusion',
+  },
+].filter(Boolean);
 
 // Load the auto-generated repo map
 let repoMapData = null;
@@ -44,542 +120,660 @@ try {
   animationPreset="particle-sphere"
   currentPage="source-code"
 >
-  {/* TL;DR Section */}
-  {
-    sourceCodePage?.data?.tldr && (
-      <section class="px-content mb-8">
-        <div class="text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.tldr.title}
-          </h2>
-        </div>
-        <div class="mt-8">
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {sourceCodePage.data.tldr.points.map((point: any) => (
-              <div class="bg-brand-dark/90 border-border/20 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
-                <div class="mb-3 text-xl font-semibold text-white">
-                  {point.label}
+  <div class="container-content">
+    <div class="flex gap-6">
+      <StickyTOC sections={sections} />
+      <div class="min-w-0 flex-1">
+        {/* TL;DR Section */}
+        {
+          sourceCodePage?.data?.tldr && (
+            <Section
+              id="tldr"
+              eyebrow="Overview"
+              title={sourceCodePage.data.tldr.title}
+            >
+              <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {sourceCodePage.data.tldr.points.map((point: any) => (
+                  <div class="bg-brand-dark/90 border-border/20 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
+                    <h3 class="font-heading mb-4 text-xl font-bold tracking-tight text-white">
+                      {point.label}
+                    </h3>
+                    <ul class="list-outside list-disc space-y-2 pl-5 text-white/90">
+                      {point.bullets?.map((b: string) => (
+                        <li>{b}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          )
+        }
+
+        {/* Repo Map Section */}
+        {
+          sourceCodePage?.data?.repoMap && (
+            <Section
+              id="monorepo"
+              eyebrow="Architecture"
+              title={sourceCodePage.data.repoMap.title}
+              intro={sourceCodePage.data.repoMap.description}
+            >
+              <div>
+                <div class="mb-6">
+                  <h3 class="font-heading text-foreground mb-2 text-xl font-bold">
+                    Repository Structure
+                  </h3>
+                  <p class="text-muted-foreground">
+                    A monorepo containing{' '}
+                    {repoMapData?.default?.apps?.length || 0} applications and{' '}
+                    {repoMapData?.default?.packages?.length || 0} shared
+                    packages.
+                  </p>
                 </div>
-                <ul class="list-outside list-disc space-y-1 pl-5 text-base leading-relaxed text-white/90">
-                  {point.bullets?.map((b: string) => (
-                    <li>{b}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    )
-  }
 
-  {/* Repo Map Section */}
-  {
-    sourceCodePage?.data?.repoMap && (
-      <section class="mt-40 mb-8">
-        <div class="text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.repoMap.title}
-          </h2>
-        </div>
-        <div class="mt-8">
-          <div class="prose-2xl text-foreground/90 mx-auto mb-8 max-w-prose">
-            <Fragment
-              set:html={marked.parse(
-                cleanMarkdown(sourceCodePage.data.repoMap.description)
-              )}
-            />
-          </div>
-
-          {/* Auto-generated repo map */}
-          {repoMapData && (
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div class="bg-card/20 border-border/20 rounded-lg border p-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md">
-                <h3 class="font-heading text-foreground mb-4 text-2xl tracking-tight uppercase">
-                  Apps ({repoMapData.default.apps.length})
-                </h3>
-                <ul class="text-foreground/90 space-y-3">
-                  {repoMapData.default.apps.map((app) => (
-                    <li class="flex items-start gap-3">
-                      <span class="text-brand-orange mt-2 text-sm">•</span>
-                      <div class="flex-1">
-                        <div class="flex items-center gap-2 font-medium">
-                          {app.name}
-                          {app.type === 'private' && (
-                            <span class="bg-brand-orange/20 text-brand-orange rounded px-2 py-1 text-xs">
-                              private
-                            </span>
-                          )}
-                        </div>
-                        {app.description && (
-                          <div class="text-foreground/80 mt-1 text-sm">
-                            {app.description}
-                          </div>
-                        )}
-                        <div class="text-foreground/60 mt-1 font-mono text-xs">
-                          {app.path}
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div class="bg-card/20 border-border/20 rounded-lg border p-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md">
-                <h3 class="font-heading text-foreground mb-4 text-2xl tracking-tight uppercase">
-                  Packages ({repoMapData.default.packages.length})
-                </h3>
-                <ul class="text-foreground/90 space-y-3">
-                  {repoMapData.default.packages.map((pkg) => (
-                    <li class="flex items-start gap-3">
-                      <span class="text-brand-orange mt-2 text-sm">•</span>
-                      <div class="flex-1">
-                        <div class="flex items-center gap-2 font-medium">
-                          {pkg.name}
-                          {pkg.type === 'private' && (
-                            <span class="bg-brand-orange/20 text-brand-orange rounded px-2 py-1 text-xs">
-                              private
-                            </span>
-                          )}
-                        </div>
-                        {pkg.description && (
-                          <div class="text-foreground/80 mt-1 text-sm">
-                            {pkg.description}
-                          </div>
-                        )}
-                        <div class="text-foreground/60 mt-1 font-mono text-xs">
-                          {pkg.path}
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
-
-          {!repoMapData && (
-            <div class="bg-brand-dark/90 border-border/20 rounded-lg border p-6 text-center shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
-              <p class="text-white/90">
-                Repo map will be generated during build time.
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
-    )
-  }
-
-  {/* TypeScript Section */}
-  {
-    sourceCodePage?.data?.typescript && (
-      <section class="px-content mt-40 mb-8">
-        <div class="text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.typescript.title}
-          </h2>
-        </div>
-        <div class="mt-8">
-          <div class="prose-2xl text-foreground/90 mx-auto mb-8 max-w-prose">
-            <Fragment
-              set:html={marked.parse(
-                cleanMarkdown(sourceCodePage.data.typescript.content)
-              )}
-            />
-          </div>
-
-          {sourceCodePage.data.typescript.patterns?.length > 0 && (
-            <div class="space-y-10 md:space-y-14">
-              {sourceCodePage.data.typescript.patterns.map(
-                (p: any, i: number) => (
-                  <div class="border-border/20 bg-card/20 w-full rounded-lg border px-4 py-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md md:py-8">
-                    <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-10">
-                      <div
-                        class={`flex flex-col gap-4 ${i % 2 === 1 ? 'lg:order-2 lg:text-right' : ''}`}
-                      >
-                        <h3 class="font-heading text-foreground text-xl tracking-tight uppercase md:text-2xl">
-                          {p.title}
-                        </h3>
-                        <div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 max-w-none">
-                          <Fragment
-                            set:html={marked.parse(
-                              cleanMarkdown(p.description)
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  {/* Apps Panel */}
+                  {repoMapData && (
+                    <div class="card-neutral">
+                      <h3 class="font-heading text-foreground mb-4 text-lg font-bold">
+                        Apps ({repoMapData.default.apps.length})
+                      </h3>
+                      <ul class="list-outside list-disc space-y-3 pl-5">
+                        {repoMapData.default.apps.map((app) => (
+                          <li class="text-foreground/90">
+                            <div class="flex items-center gap-2 font-medium">
+                              {app.name}
+                              {app.type === 'private' && (
+                                <Badge variant="brand">private</Badge>
+                              )}
+                            </div>
+                            {app.description && (
+                              <div class="text-muted-foreground mt-1 text-sm">
+                                {app.description}
+                              </div>
                             )}
-                          />
+                            <div class="text-muted-foreground/60 mt-1 font-mono text-xs">
+                              {app.path}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Packages Panel */}
+                  {repoMapData && (
+                    <div class="card-neutral">
+                      <h3 class="font-heading text-foreground mb-4 text-lg font-bold">
+                        Packages ({repoMapData.default.packages.length})
+                      </h3>
+                      <ul class="list-outside list-disc space-y-3 pl-5">
+                        {repoMapData.default.packages.map((pkg) => (
+                          <li class="text-foreground/90">
+                            <div class="flex items-center gap-2 font-medium">
+                              {pkg.name}
+                              {pkg.type === 'private' && (
+                                <Badge variant="brand">private</Badge>
+                              )}
+                            </div>
+                            {pkg.description && (
+                              <div class="text-muted-foreground mt-1 text-sm">
+                                {pkg.description}
+                              </div>
+                            )}
+                            <div class="text-muted-foreground/60 mt-1 font-mono text-xs">
+                              {pkg.path}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Section>
+          )
+        }
+
+        {/* TypeScript Section */}
+        {
+          sourceCodePage?.data?.typescript && (
+            <section class="px-content mt-40 mb-8">
+              <div class="text-center">
+                <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
+                  {sourceCodePage.data.typescript.title}
+                </h2>
+              </div>
+              <div class="mt-8">
+                <div class="prose-2xl text-foreground/90 mx-auto mb-8 max-w-prose">
+                  <Fragment
+                    set:html={marked.parse(
+                      cleanMarkdown(sourceCodePage.data.typescript.content)
+                    )}
+                  />
+                </div>
+
+                {sourceCodePage.data.typescript.patterns?.length > 0 && (
+                  <div class="space-y-10 md:space-y-14">
+                    {sourceCodePage.data.typescript.patterns.map(
+                      (p: any, i: number) => (
+                        <div class="border-border/20 bg-card/20 w-full rounded-lg border px-4 py-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md md:py-8">
+                          <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-10">
+                            <div
+                              class={`flex flex-col gap-4 ${i % 2 === 1 ? 'lg:order-2 lg:text-right' : ''}`}
+                            >
+                              <h3 class="font-heading text-foreground text-xl tracking-tight uppercase md:text-2xl">
+                                {p.title}
+                              </h3>
+                              <div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 max-w-none">
+                                <Fragment
+                                  set:html={marked.parse(
+                                    cleanMarkdown(p.description)
+                                  )}
+                                />
+                              </div>
+                            </div>
+                            <div class={`${i % 2 === 1 ? 'lg:order-1' : ''}`}>
+                              <CodeBlock
+                                code={p.codeExample}
+                                language="ts"
+                                showLineNumbers
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div class={`${i % 2 === 1 ? 'lg:order-1' : ''}`}>
-                        <CodeBlock
-                          code={p.codeExample}
-                          language="ts"
-                          showLineNumbers
-                        />
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+            </section>
+          )
+        }
+
+        {/* Why Tailwind Section */}
+        {
+          sourceCodePage?.data?.tailwindSection && (
+            <Section
+              id="tailwind"
+              eyebrow="Styling"
+              title={sourceCodePage.data.tailwindSection.title}
+              intro={sourceCodePage.data.tailwindSection.content}
+            >
+              {/* Rules */}
+              <div class="mb-8">
+                <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                  Rules I follow
+                </h3>
+                <ul class="list-outside list-disc space-y-2 pl-5">
+                  {sourceCodePage.data.tailwindSection.rules.map(
+                    (rule: string) => (
+                      <li class="text-foreground/90">{rule}</li>
+                    )
+                  )}
+                </ul>
+              </div>
+
+              {/* Token Excerpt */}
+              <div class="mb-8">
+                <h3 class="font-heading mb-4 text-xl font-bold tracking-tight text-white">
+                  {sourceCodePage.data.tailwindSection.tokenExcerptTitle}
+                </h3>
+                <div class="mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-muted-foreground text-xs font-medium">
+                      theme.css
+                    </span>
+                    <span class="text-muted-foreground/60 text-xs">css</span>
+                  </div>
+                </div>
+                <CodeBlock
+                  code={sourceCodePage.data.tailwindSection.tokenExcerpt}
+                  language="css"
+                  showLineNumbers
+                  className="bg-brand-dark/90 text-white"
+                />
+              </div>
+
+              {/* Usage Example */}
+              <div>
+                <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                  {sourceCodePage.data.tailwindSection.usageExampleTitle}
+                </h3>
+                <div class="mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-muted-foreground text-xs font-medium">
+                      component.html
+                    </span>
+                    <span class="text-muted-foreground/60 text-xs">html</span>
+                  </div>
+                </div>
+                <CodeBlock
+                  code={sourceCodePage.data.tailwindSection.usageExample}
+                  language="html"
+                />
+              </div>
+            </Section>
+          )
+        }
+
+        {/* Data-assisted styling Section */}
+        {
+          sourceCodePage?.data?.dataAssistedStyling && (
+            <Section
+              id="data-assisted"
+              eyebrow="Styling"
+              title={sourceCodePage.data.dataAssistedStyling.title}
+              intro={sourceCodePage.data.dataAssistedStyling.content}
+            >
+              <div class="mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-muted-foreground text-xs font-medium">
+                    tw-patterns.json
+                  </span>
+                  <span class="text-muted-foreground/60 text-xs">json</span>
+                </div>
+              </div>
+              <CodeBlock
+                code={sourceCodePage.data.dataAssistedStyling.codeExample}
+                language="json"
+                className="bg-brand-dark/90 text-white"
+              />
+            </Section>
+          )
+        }
+
+        {/* Architecture Section */}
+        {
+          sourceCodePage?.data?.architecture && (
+            <Section
+              id="architecture"
+              eyebrow="System"
+              title={sourceCodePage.data.architecture.title}
+              intro={sourceCodePage.data.architecture.content}
+            >
+              <div class="mb-8">
+                <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                  System Flow
+                </h3>
+                <div class="card-neutral">
+                  <div class="prose prose-lg max-w-none">
+                    <div class="mb-6 text-center">
+                      <div class="bg-muted/20 inline-block rounded-lg p-6">
+                        <div class="text-muted-foreground mb-4 text-sm">
+                          Architecture Flow
+                        </div>
+                        <div class="space-y-3 text-sm">
+                          <div class="flex items-center justify-center gap-2">
+                            <span class="bg-primary text-primary-foreground rounded px-3 py-1 text-xs">
+                              User
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-secondary text-secondary-foreground rounded px-3 py-1 text-xs">
+                              CDN
+                            </span>
+                          </div>
+                          <div class="flex items-center justify-center gap-2">
+                            <span class="bg-secondary text-secondary-foreground rounded px-3 py-1 text-xs">
+                              CDN
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                              Astro Static Pages
+                            </span>
+                          </div>
+                          <div class="flex items-center justify-center gap-2">
+                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                              Astro
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-brand-blue rounded px-3 py-1 text-xs text-white">
+                              React Islands
+                            </span>
+                            <span class="text-muted-foreground text-xs">
+                              (hydrate as needed)
+                            </span>
+                          </div>
+                          <div class="flex items-center justify-center gap-2">
+                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                              Astro
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-brand-green rounded px-3 py-1 text-xs text-white">
+                              Keystatic Build
+                            </span>
+                            <span class="text-muted-foreground text-xs">
+                              (Zod typed)
+                            </span>
+                          </div>
+                          <div class="flex items-center justify-center gap-2">
+                            <span class="bg-brand-blue rounded px-3 py-1 text-xs text-white">
+                              Islands
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-brand-purple rounded px-3 py-1 text-xs text-white">
+                              Flateralus Runtime
+                            </span>
+                            <span class="text-muted-foreground text-xs">
+                              (PIXI 8)
+                            </span>
+                          </div>
+                          <div class="flex items-center justify-center gap-2">
+                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                              Astro
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-muted text-muted-foreground rounded px-3 py-1 text-xs">
+                              Image/Asset Pipeline
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                )
-              )}
-            </div>
-          )}
-        </div>
-      </section>
-    )
-  }
-
-  {/* Why Tailwind Section */}
-  {
-    sourceCodePage?.data?.tailwindSection && (
-      <section class="px-content mt-40 mb-8">
-        <div class="text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.tailwindSection.title}
-          </h2>
-        </div>
-        <div class="mt-8">
-          <div class="prose-2xl text-foreground/90 mx-auto mb-8 max-w-prose">
-            <Fragment
-              set:html={marked.parse(
-                cleanMarkdown(sourceCodePage.data.tailwindSection.content)
-              )}
-            />
-          </div>
-
-          {/* Rules */}
-          <div class="bg-card/20 border-border/20 mb-8 rounded-lg border p-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md">
-            <h3 class="font-heading text-foreground mb-4 text-2xl tracking-tight uppercase">
-              Rules I follow
-            </h3>
-            <ul class="text-foreground/90 space-y-2">
-              {sourceCodePage.data.tailwindSection.rules.map((rule: string) => (
-                <li class="flex items-start gap-3">
-                  <span class="text-brand-orange mt-2 text-sm">•</span>
-                  <span>{rule}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Token Excerpt */}
-          <div class="bg-brand-dark/90 border-border/20 mb-8 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
-            <h3 class="font-heading mb-4 text-2xl tracking-tight text-white uppercase">
-              {sourceCodePage.data.tailwindSection.tokenExcerptTitle}
-            </h3>
-            <CodeBlock
-              code={sourceCodePage.data.tailwindSection.tokenExcerpt}
-              language="css"
-            />
-          </div>
-
-          {/* Usage Example */}
-          <div class="bg-card/20 border-border/20 rounded-lg border p-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md">
-            <h3 class="font-heading text-foreground mb-4 text-2xl tracking-tight uppercase">
-              {sourceCodePage.data.tailwindSection.usageExampleTitle}
-            </h3>
-            <CodeBlock
-              code={sourceCodePage.data.tailwindSection.usageExample}
-              language="html"
-            />
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {/* Data-assisted styling Section */}
-  {
-    sourceCodePage?.data?.dataAssistedStyling && (
-      <section class="px-content mt-40 mb-8">
-        <div class="text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.dataAssistedStyling.title}
-          </h2>
-        </div>
-        <div class="mt-8">
-          <div class="prose-2xl text-foreground/90 mx-auto mb-8 max-w-prose">
-            <Fragment
-              set:html={marked.parse(
-                cleanMarkdown(sourceCodePage.data.dataAssistedStyling.content)
-              )}
-            />
-          </div>
-
-          <div class="bg-brand-dark/90 border-border/20 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
-            <h3 class="font-heading mb-4 text-2xl tracking-tight text-white uppercase">
-              {sourceCodePage.data.dataAssistedStyling.codeExampleTitle}
-            </h3>
-            <CodeBlock
-              code={sourceCodePage.data.dataAssistedStyling.codeExample}
-              language="ts"
-            />
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {/* Architecture Section */}
-  {
-    sourceCodePage?.data?.architecture && (
-      <section class="px-content mt-40 mb-8">
-        <div class="text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.architecture.title}
-          </h2>
-        </div>
-        <div class="mt-8">
-          <div class="prose-2xl text-foreground/90 mx-auto mb-8 max-w-prose">
-            <Fragment
-              set:html={marked.parse(
-                cleanMarkdown(sourceCodePage.data.architecture.content)
-              )}
-            />
-          </div>
-
-          <div class="bg-card/20 border-border/20 rounded-lg border p-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md">
-            <h3 class="font-heading text-foreground mb-4 text-2xl tracking-tight uppercase">
-              {sourceCodePage.data.architecture.mermaidDiagramTitle}
-            </h3>
-            <CodeBlock
-              code={sourceCodePage.data.architecture.mermaidDiagram}
-              language="markdown"
-            />
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {/* Content Model Section */}
-  {
-    sourceCodePage?.data?.contentModel && (
-      <section class="px-content mt-40 mb-8">
-        <div class="text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.contentModel.title}
-          </h2>
-        </div>
-        <div class="mt-8">
-          <div class="prose-2xl text-foreground/90 mx-auto mb-8 max-w-prose">
-            <Fragment
-              set:html={marked.parse(
-                cleanMarkdown(sourceCodePage.data.contentModel.content)
-              )}
-            />
-          </div>
-
-          <div class="bg-brand-dark/90 border-border/20 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
-            <h3 class="font-heading mb-4 text-2xl tracking-tight text-white uppercase">
-              {sourceCodePage.data.contentModel.codeExampleTitle}
-            </h3>
-            <CodeBlock
-              code={sourceCodePage.data.contentModel.codeExample}
-              language="ts"
-            />
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {/* Storybook Section */}
-  {
-    sourceCodePage?.data?.storybook && (
-      <section class="px-content mt-40 mb-8">
-        <div class="text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.storybook.title}
-          </h2>
-        </div>
-        <div class="container mx-auto mt-8">
-          <div class="prose-2xl text-foreground/90 mx-auto max-w-prose">
-            <Fragment
-              set:html={marked.parse(
-                cleanMarkdown(sourceCodePage.data.storybook.content)
-              )}
-            />
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {/* Flateralus Section */}
-  {
-    sourceCodePage?.data?.flateralus && (
-      <section class="px-content mt-40 mb-8">
-        <div class="container mx-auto text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.flateralus.title}
-          </h2>
-        </div>
-        <div class="mt-8">
-          <div class="prose-2xl text-foreground/90 mx-auto mb-8 max-w-prose">
-            <Fragment
-              set:html={marked.parse(
-                cleanMarkdown(sourceCodePage.data.flateralus.content)
-              )}
-            />
-          </div>
-
-          <div class="bg-brand-dark/90 border-border/20 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
-            <h3 class="font-heading mb-4 text-2xl tracking-tight text-white uppercase">
-              {sourceCodePage.data.flateralus.codeExampleTitle}
-            </h3>
-            <CodeBlock
-              code={sourceCodePage.data.flateralus.codeExample}
-              language="ts"
-            />
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {/* Performance & Accessibility Section */}
-  {
-    sourceCodePage?.data?.performanceAccessibility && (
-      <section class="px-content mt-40 mb-8">
-        <div class="text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.performanceAccessibility.title}
-          </h2>
-        </div>
-        <div class="mt-8">
-          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div class="bg-card/20 border-border/20 rounded-lg border p-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md">
-              <h3 class="font-heading text-foreground mb-4 text-2xl tracking-tight uppercase">
-                Targets
-              </h3>
-              <div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 max-w-none">
-                <Fragment
-                  set:html={marked.parse(
-                    cleanMarkdown(
-                      sourceCodePage.data.performanceAccessibility.targets
-                    )
-                  )}
-                />
+                </div>
               </div>
-            </div>
-            <div class="bg-card/20 border-border/20 rounded-lg border p-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md">
-              <h3 class="font-heading text-foreground mb-4 text-2xl tracking-tight uppercase">
-                How I get there
-              </h3>
-              <div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 max-w-none">
-                <Fragment
-                  set:html={marked.parse(
-                    cleanMarkdown(
-                      sourceCodePage.data.performanceAccessibility.howToGetThere
-                    )
-                  )}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    )
-  }
 
-  {/* Testing & DX Section */}
-  {
-    sourceCodePage?.data?.testingDx && (
-      <section class="px-content mt-40 mb-8">
-        <div class="text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.testingDx.title}
-          </h2>
-        </div>
-        <div class="mt-8">
-          <div class="prose-2xl text-foreground/90 mx-auto mb-8 max-w-prose">
-            <Fragment
-              set:html={marked.parse(
-                cleanMarkdown(sourceCodePage.data.testingDx.content)
-              )}
-            />
-          </div>
-
-          <div class="bg-brand-dark/90 border-border/20 rounded-lg border p-6 shadow-[0_4px_16px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
-            <h3 class="font-heading mb-4 text-2xl tracking-tight text-white uppercase">
-              {sourceCodePage.data.testingDx.loggingFormatTitle}
-            </h3>
-            <CodeBlock
-              code={sourceCodePage.data.testingDx.loggingFormat}
-              language="bash"
-            />
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {/* Security & Ops Section */}
-  {
-    sourceCodePage?.data?.securityOps && (
-      <section class="px-content mt-40 mb-8">
-        <div class="text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.securityOps.title}
-          </h2>
-        </div>
-        <div class="mt-8">
-          <div class="prose-2xl text-foreground/90 mx-auto max-w-prose">
-            <Fragment
-              set:html={marked.parse(
-                cleanMarkdown(sourceCodePage.data.securityOps.content)
-              )}
-            />
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {/* Future Changes Section */}
-  {
-    sourceCodePage?.data?.futureChanges && (
-      <section class="px-content mt-40 mb-8">
-        <div class="container mx-auto text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.futureChanges.title}
-          </h2>
-        </div>
-        <div class="container mx-auto mt-8">
-          <div class="bg-card/20 border-border/20 rounded-lg border p-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md">
-            <ul class="text-foreground/90 space-y-3">
-              {sourceCodePage.data.futureChanges.items.map((item: string) => (
-                <li class="flex items-start gap-3">
-                  <span class="text-brand-orange mt-2 text-sm">•</span>
-                  <div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 max-w-none">
-                    <Fragment set:html={marked.parse(cleanMarkdown(item))} />
+              <div>
+                <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                  Mermaid Source
+                </h3>
+                <div class="mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-muted-foreground text-xs font-medium">
+                      architecture.mermaid
+                    </span>
+                    <span class="text-muted-foreground/60 text-xs">
+                      markdown
+                    </span>
                   </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-    )
-  }
+                </div>
+                <CodeBlock
+                  code={sourceCodePage.data.architecture.mermaidDiagram}
+                  language="markdown"
+                />
+              </div>
+            </Section>
+          )
+        }
 
-  {/* Closing Section */}
-  {
-    sourceCodePage?.data?.closing && (
-      <section class="px-content mt-40 mb-8">
-        <div class="container mx-auto text-center">
-          <h2 class="font-heading text-foreground mb-6 text-5xl tracking-tight uppercase">
-            {sourceCodePage.data.closing.title}
-          </h2>
-        </div>
-        <div class="container mx-auto mt-8">
-          <div class="prose-2xl text-foreground/90 mx-auto max-w-prose">
-            <Fragment
-              set:html={marked.parse(
-                cleanMarkdown(sourceCodePage.data.closing.content)
-              )}
+        {/* Content Model Section */}
+        {
+          sourceCodePage?.data?.contentModel && (
+            <Section
+              id="content-model"
+              eyebrow="Data"
+              title={sourceCodePage.data.contentModel.title}
+              intro={sourceCodePage.data.contentModel.content}
+            >
+              <div class="mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-muted-foreground text-xs font-medium">
+                    content-schema.ts
+                  </span>
+                  <span class="text-muted-foreground/60 text-xs">ts</span>
+                </div>
+              </div>
+              <CodeBlock
+                code={sourceCodePage.data.contentModel.codeExample}
+                language="ts"
+                className="bg-brand-dark/90 text-white"
+              />
+            </Section>
+          )
+        }
+
+        {/* Storybook Section */}
+        {
+          sourceCodePage?.data?.storybook && (
+            <Section
+              id="storybook"
+              eyebrow="Development"
+              title={sourceCodePage.data.storybook.title}
+              intro={sourceCodePage.data.storybook.content}
+            >
+              <Callout variant="brand">
+                <strong>Multi-directory Storybook setup:</strong> Components are
+                organized across multiple packages with shared stories and
+                isolated development environments.
+              </Callout>
+
+              <div class="mt-6">
+                <div class="card-neutral">
+                  <div class="bg-muted/20 border-border rounded-lg border p-8 text-center">
+                    <div class="text-muted-foreground mb-4 text-sm">
+                      Storybook Interface Screenshot
+                    </div>
+                    <div class="mx-auto max-w-md rounded border bg-white p-4">
+                      <div class="text-muted-foreground mb-2 text-xs">
+                        bear-ui-react/ImageGallery/Docs
+                      </div>
+                      <div class="flex h-32 items-center justify-center rounded bg-gray-100">
+                        <div class="text-muted-foreground text-xs">
+                          Storybook Component Preview
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Section>
+          )
+        }
+
+        {/* Flateralus Section */}
+        {
+          sourceCodePage?.data?.flateralus && (
+            <Section
+              id="flateralus"
+              eyebrow="Performance"
+              title={sourceCodePage.data.flateralus.title}
+              intro={sourceCodePage.data.flateralus.content}
+            >
+              <div class="mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-muted-foreground text-xs font-medium">
+                    flateralus.ts
+                  </span>
+                  <span class="text-muted-foreground/60 text-xs">ts</span>
+                </div>
+              </div>
+              <CodeBlock
+                code={sourceCodePage.data.flateralus.codeExample}
+                language="ts"
+                className="bg-brand-dark/90 text-white"
+              />
+            </Section>
+          )
+        }
+
+        {/* Performance & Accessibility Section */}
+        {
+          sourceCodePage?.data?.performanceAccessibility && (
+            <Section
+              id="performance-accessibility"
+              eyebrow="Quality"
+              title={sourceCodePage.data.performanceAccessibility.title}
+            >
+              <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="card-neutral">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    Targets
+                  </h3>
+                  <div class="prose prose-lg max-w-none">
+                    <Fragment
+                      set:html={marked.parse(
+                        cleanMarkdown(
+                          sourceCodePage.data.performanceAccessibility.targets
+                        )
+                      )}
+                    />
+                  </div>
+                </div>
+                <div class="card-neutral">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    How I get there
+                  </h3>
+                  <div class="prose prose-lg max-w-none">
+                    <Fragment
+                      set:html={marked.parse(
+                        cleanMarkdown(
+                          sourceCodePage.data.performanceAccessibility
+                            .howToGetThere
+                        )
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Section>
+          )
+        }
+
+        {/* Testing & DX Section */}
+        {
+          sourceCodePage?.data?.testingDx && (
+            <Section
+              id="testing-dx"
+              eyebrow="Development"
+              title={sourceCodePage.data.testingDx.title}
+              intro={sourceCodePage.data.testingDx.content}
+            >
+              <div class="space-y-8">
+                {/* Husky Workflow */}
+                <div class="card-neutral">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    Pre-commit & Pre-merge Hooks
+                  </h3>
+                  <div class="prose prose-lg max-w-none">
+                    <Fragment
+                      set:html={marked.parse(
+                        cleanMarkdown(
+                          sourceCodePage.data.testingDx
+                            .huskyWorkflowDescription ||
+                            '**Pre-commit & Pre-merge Hooks:** Every commit triggers branch protection and runs lint-staged for formatting. When merging into dev, comprehensive checks run including formatting, linting, TypeScript validation, tests, build verification, and dependency audits.'
+                        )
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Vitest Setup */}
+                <div class="card-neutral">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    Monorepo Testing Setup
+                  </h3>
+                  <div class="prose prose-lg max-w-none">
+                    <Fragment
+                      set:html={marked.parse(
+                        cleanMarkdown(
+                          sourceCodePage.data.testingDx.vitestDescription ||
+                            '**Monorepo Testing Setup:** Single Vitest configuration at the root handles all packages and apps. Tests are co-located with source files and use jsdom environment for React component testing with Testing Library.'
+                        )
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Test Patterns */}
+                <div class="card-neutral">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    Component Testing Pattern
+                  </h3>
+                  <div class="prose prose-lg max-w-none">
+                    <Fragment
+                      set:html={marked.parse(
+                        cleanMarkdown(
+                          sourceCodePage.data.testingDx
+                            .testExampleDescription ||
+                            '**Component Testing Pattern:** Tests focus on accessibility and user behavior rather than implementation details. Uses semantic queries and checks actual DOM content rather than props.'
+                        )
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Section>
+          )
+        }
+
+        {/* Security & Ops Section */}
+        {
+          sourceCodePage?.data?.securityOps && (
+            <Section
+              id="security-ops"
+              eyebrow="Operations"
+              title={sourceCodePage.data.securityOps.title}
+              intro={sourceCodePage.data.securityOps.content}
             />
+          )
+        }
+
+        {/* Future Changes Section */}
+        {
+          sourceCodePage?.data?.futureChanges && (
+            <Section
+              id="future-changes"
+              eyebrow="Roadmap"
+              title={sourceCodePage.data.futureChanges.title}
+            >
+              <div class="card-neutral">
+                <ul class="list-outside list-disc space-y-3 pl-5">
+                  {sourceCodePage.data.futureChanges.items.map(
+                    (item: string) => (
+                      <li class="text-foreground/90">
+                        <div class="prose prose-lg max-w-none">
+                          <Fragment
+                            set:html={marked.parse(cleanMarkdown(item))}
+                          />
+                        </div>
+                      </li>
+                    )
+                  )}
+                </ul>
+              </div>
+            </Section>
+          )
+        }
+
+        {/* Closing Section */}
+        {
+          sourceCodePage?.data?.closing && (
+            <Section
+              id="closing"
+              eyebrow="Conclusion"
+              title={sourceCodePage.data.closing.title}
+              intro={sourceCodePage.data.closing.content}
+            />
+          )
+        }
+
+        {/* Footer Meta */}
+        <footer class="section-content border-border border-t py-8">
+          <div class="mx-auto max-w-4xl">
+            <div
+              class="text-muted-foreground flex flex-col gap-4 text-center text-sm"
+            >
+              <div>
+                <strong>Last updated:</strong>
+                {
+                  new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
+                }
+              </div>
+              <div>
+                Built with <strong>Astro</strong>, <strong>React islands</strong
+                >, <strong>Tailwind tokens</strong>, <strong>Keystatic</strong> +
+                <strong>Zod</strong>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
-    )
-  }
+        </footer>
+      </div>
+    </div>
+  </div>
 </HeroLayout>

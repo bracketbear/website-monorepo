@@ -235,13 +235,14 @@ export const sourceCodePageSchema = makePageSchema(
         content: fields.markdoc.inline({
           label: 'Content',
         }),
-        loggingFormat: fields.text({
-          label: 'Logging Format',
-          multiline: true,
+        huskyWorkflowDescription: fields.markdoc.inline({
+          label: 'Husky Workflow Description',
         }),
-        loggingFormatTitle: fields.text({
-          label: 'Logging Format Title',
-          defaultValue: 'Simple logging format',
+        vitestDescription: fields.markdoc.inline({
+          label: 'Vitest Description',
+        }),
+        testExampleDescription: fields.markdoc.inline({
+          label: 'Test Example Description',
         }),
       },
       { label: 'Testing & DX Section' }

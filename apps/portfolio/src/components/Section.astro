@@ -1,17 +1,59 @@
 ---
-interface Props {
+import { marked } from 'marked';
+
+export interface Props {
+  eyebrow?: string;
   title: string;
+  intro?: string;
+  id?: string;
   className?: string;
 }
 
-const { title, className = '' } = Astro.props;
+const { eyebrow, title, intro, id, className = '' } = Astro.props;
+
+// Helper function to clean markdown content
+function cleanMarkdown(content: string | undefined | null): string {
+  if (!content) return '';
+
+  return content
+    .trim() // Remove leading/trailing whitespace
+    .replace(/\\~/g, '~') // Fix escaped tildes
+    .replace(/\\\*/g, '*') // Fix escaped asterisks
+    .replace(/\n\s*\n\s*\n/g, '\n\n') // Collapse multiple empty lines
+    .replace(/\s+$/gm, ''); // Remove trailing whitespace from each line
+}
 ---
 
-<div class={`${className}`}>
-  <h2
-    class="font-heading text-text-primary mb-8 text-3xl font-black tracking-tight uppercase"
-  >
-    {title}
-  </h2>
-  <slot />
-</div>
+<section id={id} class={`section-content py-12 ${className}`}>
+  <div class="mx-auto max-w-5xl">
+    {
+      eyebrow && (
+        <div class="mb-4">
+          <span class="text-muted-foreground text-sm font-medium tracking-wider uppercase">
+            {eyebrow}
+          </span>
+        </div>
+      )
+    }
+
+    <h2
+      class="font-heading text-foreground mb-6 text-3xl font-bold tracking-tight"
+    >
+      {title}
+    </h2>
+
+    {
+      intro && (
+        <div class="mb-8">
+          <div class="text-muted-foreground prose prose-lg max-w-none max-w-prose text-lg leading-7">
+            <Fragment set:html={marked.parse(cleanMarkdown(intro))} />
+          </div>
+        </div>
+      )
+    }
+
+    <div class="prose prose-lg max-w-none">
+      <slot />
+    </div>
+  </div>
+</section>

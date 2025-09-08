@@ -87,6 +87,11 @@
     @apply absolute top-[0.6875em] left-[0.25em] h-[0.375em] w-[0.375em] rounded-full bg-current;
   }
 
+  /* Disable custom bullets when using list-disc */
+  & ul.list-disc > li::before {
+    content: none;
+  }
+
   & ol > li {
     @apply relative;
     padding-left: 1.375em;
@@ -117,12 +122,10 @@
     @apply text-sm font-semibold;
   }
 
-  & code::before {
-    content: '`';
-  }
-
-  & code::after {
-    content: '`';
+  /* Disable automatic backticks for processed markdown content */
+  &.prose-processed code::before,
+  &.prose-processed code::after {
+    content: none;
   }
 
   & table {

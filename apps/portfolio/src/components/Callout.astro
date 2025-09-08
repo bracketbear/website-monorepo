@@ -1,25 +1,22 @@
 ---
-interface Props {
-  title: string;
-  tone?: 'neutral' | 'info' | 'warning' | 'success';
+export interface Props {
+  variant?: 'default' | 'brand' | 'warn';
   className?: string;
 }
 
-const { title, tone = 'neutral', className = '' } = Astro.props;
+const { variant = 'default', className = '' } = Astro.props;
 
-const toneClasses = {
-  neutral: 'border-border/40 bg-muted/50',
-  info: 'border-border/40 bg-card/10',
-  warning: 'border-border/40 bg-primary/10',
-  success: 'border-border/40 bg-muted/10',
+const variantClasses = {
+  default: 'border-l-border bg-muted/50',
+  brand: 'border-l-brand-orange bg-brand-orange/10',
+  warn: 'border-l-brand-red bg-brand-red/10',
 };
 ---
 
-<div class={`border rounded-md p-6 ${toneClasses[tone]} ${className}`}>
-  <h3
-    class="font-heading text-foreground mb-4 text-xl font-black tracking-tight uppercase"
-  >
-    {title}
-  </h3>
-  <slot />
+<div
+  class={`border-l-4 ${variantClasses[variant]} rounded-r-lg p-4 ${className}`}
+>
+  <div class="text-muted-foreground text-sm">
+    <slot />
+  </div>
 </div>
