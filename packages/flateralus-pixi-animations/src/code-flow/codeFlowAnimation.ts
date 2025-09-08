@@ -330,7 +330,8 @@ export class CodeFlowAnimation extends BaseAnimation<
     context: PIXI.Application,
     controls: CodeFlowControlValues
   ): void {
-    const snippets = CODE_SNIPPETS[controls.language];
+    const snippets =
+      CODE_SNIPPETS[controls.language as keyof typeof CODE_SNIPPETS];
     const stageWidth = context.screen.width;
     const stageHeight = context.screen.height;
 
@@ -412,7 +413,7 @@ export class CodeFlowAnimation extends BaseAnimation<
         x,
         y,
         speed,
-        language: controls.language,
+        language: controls.language as keyof typeof CODE_SNIPPETS,
         snippet,
         opacity: controls.opacity,
         targetOpacity: controls.opacity,
