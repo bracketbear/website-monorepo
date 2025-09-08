@@ -1,6 +1,5 @@
 import { fields } from '@keystatic/core';
 import { makePageSchema } from '../../schemas/page';
-import { sourceCodePageSchema as baseSourceCodePageSchema } from '../../schemas/source-code-page';
 
 /**
  * Portfolio About Page Schema
@@ -617,4 +616,279 @@ export const portfolioProjectPageSchema = makePageSchema({
  * This schema defines the source-code page structure for the portfolio site.
  * It explains the technical architecture and implementation details.
  */
-export const portfolioSourceCodePageSchema = baseSourceCodePageSchema;
+export const portfolioSourceCodePageSchema = makePageSchema(
+  {
+    // TL;DR section with key points
+    tldr: fields.object(
+      {
+        title: fields.text({
+          label: 'TL;DR Title',
+          defaultValue: 'TL;DR',
+        }),
+        points: fields.array(
+          fields.object({
+            label: fields.text({ label: 'Point Label' }),
+            bullets: fields.array(fields.text({ label: 'Bullet' }), {
+              label: 'Bullets',
+            }),
+          }),
+          { label: 'Key Points' }
+        ),
+      },
+      { label: 'TL;DR Section' }
+    ),
+
+    // Repo map section (auto-generated content)
+    repoMap: fields.object(
+      {
+        title: fields.text({
+          label: 'Repo Map Title',
+          defaultValue: 'Repo map (auto-generated)',
+        }),
+        description: fields.markdoc.inline({
+          label: 'Description',
+        }),
+      },
+      { label: 'Repo Map Section' }
+    ),
+
+    // Why Tailwind section
+    tailwindSection: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Why Tailwind (and how I use it)',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        rules: fields.array(fields.text({ label: 'Rule' }), {
+          label: 'Rules',
+        }),
+        tokenExcerpt: fields.text({
+          label: 'Token Excerpt',
+          multiline: true,
+        }),
+        tokenExcerptTitle: fields.text({
+          label: 'Token Excerpt Title',
+          defaultValue: 'Custom utilities built from tokens',
+        }),
+        usageExample: fields.text({
+          label: 'Usage Example',
+          multiline: true,
+        }),
+        usageExampleTitle: fields.text({
+          label: 'Usage Example Title',
+          defaultValue: 'Usage in components',
+        }),
+      },
+      { label: 'Tailwind Section' }
+    ),
+
+    // Data-assisted styling section
+    dataAssistedStyling: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Data-assisted styling',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        codeExample: fields.text({
+          label: 'Code Example',
+          multiline: true,
+        }),
+      },
+      { label: 'Data-assisted Styling Section' }
+    ),
+
+    // Architecture section
+    architecture: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Architecture (at a glance)',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        mermaidDiagram: fields.text({
+          label: 'Mermaid Diagram',
+          multiline: true,
+        }),
+      },
+      { label: 'Architecture Section' }
+    ),
+
+    // Content model section
+    contentModel: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Content model (Keystatic + Zod)',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        codeExample: fields.text({
+          label: 'Code Example',
+          multiline: true,
+        }),
+      },
+      { label: 'Content Model Section' }
+    ),
+
+    // TypeScript section
+    typescript: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'TypeScript (Type-first across apps and packages)',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        patterns: fields.array(
+          fields.object({
+            title: fields.text({ label: 'Pattern Title' }),
+            description: fields.markdoc.inline({
+              label: 'Pattern Description',
+            }),
+            codeExample: fields.text({
+              label: 'Code Example',
+              multiline: true,
+            }),
+          }),
+          { label: 'TypeScript Patterns' }
+        ),
+      },
+      { label: 'TypeScript Section' }
+    ),
+
+    // Storybook section
+    storybook: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Storybook (single instance, multi-directory)',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        mediaImage: fields.image({
+          label: 'Storybook Screenshot',
+          directory: 'content/sites/portfolio/source-code-page/storybook',
+          publicPath:
+            '/content-images/sites/portfolio/source-code-page/storybook/',
+        }),
+      },
+      { label: 'Storybook Section' }
+    ),
+
+    // Flateralus section
+    flateralus: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Flateralus (generative backgrounds without meltdown)',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        codeExample: fields.text({
+          label: 'Code Example',
+          multiline: true,
+        }),
+        codeExampleTitle: fields.text({
+          label: 'Code Example Title',
+          defaultValue: 'Typed animation controls',
+        }),
+      },
+      { label: 'Flateralus Section' }
+    ),
+
+    // Performance & accessibility section
+    performanceAccessibility: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Performance & accessibility',
+        }),
+        targets: fields.markdoc.inline({
+          label: 'Performance Targets',
+        }),
+        howToGetThere: fields.markdoc.inline({
+          label: 'How I Get There',
+        }),
+      },
+      { label: 'Performance & Accessibility Section' }
+    ),
+
+    // Testing & DX section
+    testingDx: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Testing & DX',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        huskyWorkflowDescription: fields.markdoc.inline({
+          label: 'Husky Workflow Description',
+        }),
+        vitestDescription: fields.markdoc.inline({
+          label: 'Vitest Description',
+        }),
+        testExampleDescription: fields.markdoc.inline({
+          label: 'Test Example Description',
+        }),
+      },
+      { label: 'Testing & DX Section' }
+    ),
+
+    // Security & ops section
+    securityOps: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Security & ops',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+      },
+      { label: 'Security & Ops Section' }
+    ),
+
+    // What I'd change next section
+    futureChanges: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: "What I'd change next",
+        }),
+        items: fields.array(fields.markdoc.inline({ label: 'Change Item' }), {
+          label: 'Future Changes',
+        }),
+      },
+      { label: 'Future Changes Section' }
+    ),
+
+    // Closing section
+    closing: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Closing',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+      },
+      { label: 'Closing Section' }
+    ),
+  },
+  { showCta: false }
+);

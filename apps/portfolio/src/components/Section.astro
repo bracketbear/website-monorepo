@@ -15,12 +15,7 @@ const { eyebrow, title, intro, id, className = '' } = Astro.props;
 function cleanMarkdown(content: string | undefined | null): string {
   if (!content) return '';
 
-  return content
-    .trim() // Remove leading/trailing whitespace
-    .replace(/\\~/g, '~') // Fix escaped tildes
-    .replace(/\\\*/g, '*') // Fix escaped asterisks
-    .replace(/\n\s*\n\s*\n/g, '\n\n') // Collapse multiple empty lines
-    .replace(/\s+$/gm, ''); // Remove trailing whitespace from each line
+  return content;
 }
 ---
 
@@ -37,7 +32,7 @@ function cleanMarkdown(content: string | undefined | null): string {
     }
 
     <h2
-      class="font-heading text-foreground mb-6 text-3xl font-bold tracking-tight"
+      class="font-heading text-foreground mb-6 text-3xl font-bold tracking-tight uppercase"
     >
       {title}
     </h2>

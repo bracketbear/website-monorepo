@@ -77,6 +77,7 @@ export const sourceCodePageSchema = makePageSchema(
     storybook: z.object({
       title: z.string().default('Storybook (single instance, multi-directory)'),
       content: z.string(),
+      mediaImage: z.string().optional(),
     }),
 
     // Flateralus section
@@ -99,7 +100,9 @@ export const sourceCodePageSchema = makePageSchema(
     testingDx: z.object({
       title: z.string().default('Testing & DX'),
       content: z.string(),
-      loggingFormat: z.string(),
+      huskyWorkflowDescription: z.string(),
+      vitestDescription: z.string(),
+      testExampleDescription: z.string(),
     }),
 
     // Security & ops section

@@ -1,12 +1,12 @@
 ---
-import { type Breadcrumb, CodeBlock } from '@bracketbear/core';
 import { getCollection } from 'astro:content';
+import { marked } from 'marked';
+import { type Breadcrumb, CodeBlock } from '@bracketbear/core';
+import { getContentImageUrl } from '@bracketbear/astro-content';
 import HeroLayout from '@/layouts/HeroLayout.astro';
 import Section from '@/components/Section.astro';
 import Badge from '@/components/Badge.astro';
-import Callout from '@/components/Callout.astro';
 import StickyTOC from '@/components/StickyTOC.astro';
-import { marked } from 'marked';
 
 // Helper function to clean markdown content
 function cleanMarkdown(content: string | undefined | null): string {
@@ -533,31 +533,34 @@ try {
               title={sourceCodePage.data.storybook.title}
               intro={sourceCodePage.data.storybook.content}
             >
-              <Callout variant="brand">
-                <strong>Multi-directory Storybook setup:</strong> Components are
-                organized across multiple packages with shared stories and
-                isolated development environments.
-              </Callout>
-
-              <div class="mt-6">
-                <div class="card-neutral">
-                  <div class="bg-muted/20 border-border rounded-lg border p-8 text-center">
-                    <div class="text-muted-foreground mb-4 text-sm">
-                      Storybook Interface Screenshot
-                    </div>
-                    <div class="mx-auto max-w-md rounded border bg-white p-4">
-                      <div class="text-muted-foreground mb-2 text-xs">
-                        bear-ui-react/ImageGallery/Docs
-                      </div>
-                      <div class="flex h-32 items-center justify-center rounded bg-gray-100">
-                        <div class="text-muted-foreground text-xs">
-                          Storybook Component Preview
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {sourceCodePage.data.storybook.mediaImage && (
+                <img
+                  src={(() => {
+                    // Extract the relative path from the CMS image path
+                    // CMS stores: /content-images/sites/portfolio/source-code-page/storybook/storybook/mediaImage.png
+                    // We need: storybook/mediaImage.png for getContentImageUrl
+                    const imagePath = sourceCodePage.data.storybook.mediaImage;
+                    if (
+                      imagePath.startsWith(
+                        '/content-images/sites/portfolio/source-code-page/'
+                      )
+                    ) {
+                      const relativePath = imagePath.replace(
+                        '/content-images/sites/portfolio/source-code-page/',
+                        ''
+                      );
+                      return getContentImageUrl(
+                        'sites/portfolio',
+                        'source-code-page',
+                        relativePath
+                      );
+                    }
+                    return imagePath;
+                  })()}
+                  alt="Storybook interface showing component documentation and preview"
+                  class=""
+                />
+              )}
             </Section>
           )
         }
@@ -643,9 +646,6 @@ try {
               <div class="space-y-8">
                 {/* Husky Workflow */}
                 <div class="card-neutral">
-                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
-                    Pre-commit & Pre-merge Hooks
-                  </h3>
                   <div class="prose prose-lg max-w-none">
                     <Fragment
                       set:html={marked.parse(
@@ -661,9 +661,6 @@ try {
 
                 {/* Vitest Setup */}
                 <div class="card-neutral">
-                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
-                    Monorepo Testing Setup
-                  </h3>
                   <div class="prose prose-lg max-w-none">
                     <Fragment
                       set:html={marked.parse(
@@ -678,9 +675,6 @@ try {
 
                 {/* Test Patterns */}
                 <div class="card-neutral">
-                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
-                    Component Testing Pattern
-                  </h3>
                   <div class="prose prose-lg max-w-none">
                     <Fragment
                       set:html={marked.parse(

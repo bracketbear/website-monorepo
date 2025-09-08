@@ -70,7 +70,7 @@
   },
   "dataAssistedStyling": {
     "title": "Data-assisted styling",
-    "content": "Because utilities are structured, I can analyze them. I track class usage and palette choices, then run small scripts to:\n\n- Flag near-duplicate spacing stacks.\n\n- Detect color drift (e.g., \"too much orange last month\").\n\n- Check contrast automatically.\n\n  I also have an early-stage tool, `@bracketbear/tw-pattern-analyzer`, that clusters frequently co-occurring utilities to suggest potential reusable utilities and components. It’s light data science: useful signals, not gospel—still early days.\n",
+    "content": "Because utilities are structured, I can analyze them. I track class usage and palette choices, then run small scripts to:\n\n- Flag near-duplicate spacing stacks.\n- Detect color drift (e.g., \"too much orange last month\").\n- Check contrast automatically\n\nI also have an early-stage tool, `@bracketbear/tw-pattern-analyzer`, that clusters frequently co-occurring utilities to suggest potential reusable utilities and components. Don't get it twisted—I'm not a data scientist and I'm sure there are things that can be improved—but this extra bit of analysis is super helpful.\n",
     "codeExample": "{\n  \"totalClassLists\": 966,\n  \"uniquePatterns\": 549,\n  \"totalFiles\": 129,\n  \"totalPatterns\": 966,\n  \"clusters\": [\n    {\n      \"rep\": \"flex gap-2 items-center\",\n      \"members\": [\n        \"flex gap-2 items-center\",\n        \"flex flex-col gap-2 items-center\",\n        \"flex font-medium gap-2 items-center\"\n      ],\n      \"occurrences\": 17,\n      \"variants\": 3,\n      \"similarity\": 0.8333333333333334,\n      \"likelihood\": 37\n    },\n    {\n      \"rep\": \"container mx-auto text-center\",\n      \"members\": [\n        \"container mx-auto text-center\",\n        \"container mx-auto px-4 text-center\"\n      ],\n      \"occurrences\": 10,\n      \"variants\": 2,\n      \"similarity\": 0.875,\n      \"likelihood\": 19\n    },\n...\n}"
   },
   "architecture": {
@@ -80,11 +80,11 @@
   },
   "contentModel": {
     "title": "Content model (Keystatic + Zod)",
-    "content": "I keep content inside the type system. Editors work in Keystatic; Zod validates at build; components consume typed props.",
+    "content": "I keep content inside the type system. Editors work in Keystatic; Zod validates at build; components consume typed props.\n",
     "codeExample": "import { z } from \"zod\";\n\nexport const WorkProject = z.object({\n  id: z.string().uuid(),\n  title: z.string().min(1),\n  company: z.string(),\n  heroImage: z.string().url(),\n  skills: z.array(z.string()).min(1),\n  status: z.enum([\"draft\", \"live\"]),\n});\n\nexport type WorkProject = z.infer<typeof WorkProject>;"
   },
   "typescript": {
-    "title": "TypeScript (Type-first across apps and packages)",
+    "title": "TypeScript",
     "content": "We are TypeScript-first. Apps and packages expose explicit, well-documented types. We depend on interfaces, generics, and factory types to keep implementation details decoupled from contracts. We never use `any`; we strengthen types to fix errors.\n",
     "patterns": [
       {
@@ -106,7 +106,8 @@
   },
   "storybook": {
     "title": "Storybook (single instance, multi-directory)",
-    "content": "I run one Storybook that aggregates stories from apps and packages. Each story shows where it lives. This makes reviews faster and keeps ownership clear: if a component belongs in the shared UI, it moves there and inherits tokens.\n\n- One place to exercise states and edge cases.\n- Easy visual QA during refactors.\n- Encourages reuse without policing it manually.\n"
+    "content": "I run one Storybook that aggregates stories from apps and packages. Each story shows where it lives. This makes reviews faster and keeps ownership clear: if a component belongs in the shared UI, it moves there and inherits tokens.\n\n- One place to exercise states and edge cases.\n- Easy visual QA during refactors.\n- Encourages reuse without policing it manually.\n",
+    "mediaImage": "/content-images/sites/portfolio/source-code-page/storybook/storybook/mediaImage.png"
   },
   "flateralus": {
     "title": "Flateralus (generative backgrounds without meltdown)",
@@ -120,14 +121,14 @@
   },
   "testingDx": {
     "title": "Testing & DX",
-    "content": "Comprehensive testing strategy with automated quality gates and developer experience optimizations.\n\n**Testing Strategy:**\n- **Unit tests** for utilities and business logic using Vitest\n- **Integration tests** for complex workflows and API interactions\n- **Component tests** for React components with Testing Library\n- **Storybook** for component states and visual regression testing\n\n**Development Workflow:**\n- **Husky hooks** enforce code quality at every commit\n- **Pre-push** runs full test suite to prevent broken code\n- **Pre-merge** comprehensive checks before merging to dev\n- **Branch protection** prevents direct commits to main/dev\n\n**Quality Gates:**\n- Formatting (Prettier), linting (ESLint), type checking (TypeScript)\n- Test coverage, build verification, dependency audits\n- CSS pattern analysis to maintain design system consistency",
-    "huskyWorkflowDescription": "**Pre-commit & Pre-merge Hooks:** Every commit triggers branch protection (prevents direct commits to dev/main) and runs lint-staged for formatting. When merging into dev, a comprehensive pre-merge script runs: formatting checks, linting, TypeScript validation, full test suite, build verification, dependency audits, and git status checks. Only if all checks pass does the merge proceed.",
-    "vitestDescription": "**Monorepo Testing Setup:** Single Vitest configuration at the root handles all packages and apps. Tests are co-located with source files (e.g., `utils.ts` has `utils.test.ts`). Uses jsdom environment for React component testing with Testing Library. Aliases configured for monorepo packages. Tests run in Node.js with globals enabled for cleaner syntax.",
-    "testExampleDescription": "**Component Testing Pattern:** Tests focus on accessibility and user behavior rather than implementation details. Uses `getByRole` queries for semantic testing, checks actual DOM content rather than props, and tests both happy path and edge cases. Each test is isolated and descriptive about what behavior it's verifying."
+    "content": "Comprehensive testing strategy with automated quality gates and developer experience optimizations.\n\n**RTTesting Strategy:**\n\n- **Unit tests** for utilities and business logic using Vitest\n- **Integration tests** for complex workflows and API interactions\n- **Component tests** for React components with Testing Library\n- **Storybook** for component states and visual regression testing\n\n**Development Workflow:**\n\n- **Husky hooks** enforce code quality at every commit\n- **Pre-push** runs full test suite to prevent broken code\n- **Pre-merge** comprehensive checks before merging to dev\n- **Branch protection** prevents direct commits to main/dev\n\n**Quality Gates:**\n\n- Formatting (Prettier), linting (ESLint), type checking (TypeScript)\n- Test coverage, build verification, dependency audits\n- CSS pattern analysis to maintain design system consistency\n",
+    "huskyWorkflowDescription": "**Pre-commit & Pre-merge Hooks:** Every commit triggers branch protection (prevents direct commits to dev/main) and runs lint-staged for formatting. When merging into dev, a comprehensive pre-merge script runs: formatting checks, linting, TypeScript validation, full test suite, build verification, dependency audits, and git status checks. Only if all checks pass does the merge proceed.\n",
+    "vitestDescription": "**Monorepo Testing Setup:** Single Vitest configuration at the root handles all packages and apps. Tests are co-located with source files (e.g., `utils.ts` has `utils.test.ts`). Uses jsdom environment for React component testing with Testing Library. Aliases configured for monorepo packages. Tests run in Node.js with globals enabled for cleaner syntax.\n",
+    "testExampleDescription": "**Component Testing Pattern:** Tests focus on accessibility and user behavior rather than implementation details. Uses `getByRole` queries for semantic testing, checks actual DOM content rather than props, and tests both happy path and edge cases. Each test is isolated and descriptive about what behavior it's verifying.\n"
   },
   "securityOps": {
     "title": "Security & ops",
-    "content": "- Secrets stay server-side.\n- Security headers via Netlify (`X-Frame-Options`, `X-XSS-Protection`, `X-Content-Type-Options`, `Referrer-Policy`).\n- Tagged releases and a quick rollback to the previous tag if something looks wrong.\n- Dependency security audits run on every commit via pre-merge hooks.\n- Comprehensive quality gates: pre-commit, pre-push, and pre-merge hooks ensure code quality.\n- CI/CD security checks via GitHub Actions on every push and pull request.\n- Static site generation reduces attack surface by eliminating server-side vulnerabilities.\n\n**Release Management:**\n- Synchronized versioning across all packages and apps using automated scripts\n- Git tags created automatically on each deployment (`v1.0.1`, `v2.0.0`, etc.)\n- One-command rollback to any previous release\n- Version bump commands (`npm run version:patch/minor/major`) sync across entire monorepo\n"
+    "content": "- Secrets stay server-side.\n- Security headers via Netlify (`X-Frame-Options`, `X-XSS-Protection`, `X-Content-Type-Options`, `Referrer-Policy`).\n- Tagged releases and a quick rollback to the previous tag if something looks wrong.\n- Dependency security audits run on every commit via pre-merge hooks.\n- Comprehensive quality gates: pre-commit, pre-push, and pre-merge hooks ensure code quality.\n- CI/CD security checks via GitHub Actions on every push and pull request.\n- Static site generation reduces attack surface by eliminating server-side vulnerabilities.\n\n**Release Management:**\n\n- Synchronized versioning across all packages and apps using automated scripts\n- Git tags created automatically on each deployment (`v1.0.1`, `v2.0.0`, etc.)\n- One-command rollback to any previous release\n- Version bump commands (`npm run version:patch/minor/major`) sync across entire monorepo\n"
   },
   "futureChanges": {
     "title": "What I'd change next",
