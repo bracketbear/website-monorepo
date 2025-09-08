@@ -387,102 +387,80 @@ try {
                 <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
                   System Flow
                 </h3>
-                <div class="card-neutral">
-                  <div class="prose prose-lg max-w-none">
-                    <div class="mb-6 text-center">
-                      <div class="bg-muted/20 inline-block rounded-lg p-6">
-                        <div class="text-muted-foreground mb-4 text-sm">
-                          Architecture Flow
+                <div class="prose prose-lg max-w-none">
+                  <div class="mb-6">
+                    <div class="bg-muted/20 card-neutral rounded-lg p-6">
+                      <div class="text-muted-foreground mb-4 text-sm">
+                        Architecture Flow
+                      </div>
+                      <div class="space-y-3 text-sm">
+                        <div class="flex items-center gap-2">
+                          <span class="bg-primary text-primary-foreground rounded px-3 py-1 text-xs">
+                            User
+                          </span>
+                          <span class="text-muted-foreground">→</span>
+                          <span class="bg-secondary text-secondary-foreground rounded px-3 py-1 text-xs">
+                            CDN
+                          </span>
                         </div>
-                        <div class="space-y-3 text-sm">
-                          <div class="flex items-center justify-center gap-2">
-                            <span class="bg-primary text-primary-foreground rounded px-3 py-1 text-xs">
-                              User
-                            </span>
-                            <span class="text-muted-foreground">→</span>
-                            <span class="bg-secondary text-secondary-foreground rounded px-3 py-1 text-xs">
-                              CDN
-                            </span>
-                          </div>
-                          <div class="flex items-center justify-center gap-2">
-                            <span class="bg-secondary text-secondary-foreground rounded px-3 py-1 text-xs">
-                              CDN
-                            </span>
-                            <span class="text-muted-foreground">→</span>
-                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
-                              Astro Static Pages
-                            </span>
-                          </div>
-                          <div class="flex items-center justify-center gap-2">
-                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
-                              Astro
-                            </span>
-                            <span class="text-muted-foreground">→</span>
-                            <span class="bg-brand-blue rounded px-3 py-1 text-xs text-white">
-                              React Islands
-                            </span>
-                            <span class="text-muted-foreground text-xs">
-                              (hydrate as needed)
-                            </span>
-                          </div>
-                          <div class="flex items-center justify-center gap-2">
-                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
-                              Astro
-                            </span>
-                            <span class="text-muted-foreground">→</span>
-                            <span class="bg-brand-green rounded px-3 py-1 text-xs text-white">
-                              Keystatic Build
-                            </span>
-                            <span class="text-muted-foreground text-xs">
-                              (Zod typed)
-                            </span>
-                          </div>
-                          <div class="flex items-center justify-center gap-2">
-                            <span class="bg-brand-blue rounded px-3 py-1 text-xs text-white">
-                              Islands
-                            </span>
-                            <span class="text-muted-foreground">→</span>
-                            <span class="bg-brand-purple rounded px-3 py-1 text-xs text-white">
-                              Flateralus Runtime
-                            </span>
-                            <span class="text-muted-foreground text-xs">
-                              (PIXI 8)
-                            </span>
-                          </div>
-                          <div class="flex items-center justify-center gap-2">
-                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
-                              Astro
-                            </span>
-                            <span class="text-muted-foreground">→</span>
-                            <span class="bg-muted text-muted-foreground rounded px-3 py-1 text-xs">
-                              Image/Asset Pipeline
-                            </span>
-                          </div>
+                        <div class="flex items-center gap-2">
+                          <span class="bg-secondary text-secondary-foreground rounded px-3 py-1 text-xs">
+                            CDN
+                          </span>
+                          <span class="text-muted-foreground">→</span>
+                          <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                            Astro Static Pages
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                            Astro
+                          </span>
+                          <span class="text-muted-foreground">→</span>
+                          <span class="bg-brand-blue rounded px-3 py-1 text-xs text-white">
+                            React Islands
+                          </span>
+                          <span class="text-muted-foreground text-xs">
+                            (hydrate as needed)
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                            Astro
+                          </span>
+                          <span class="text-muted-foreground">→</span>
+                          <span class="bg-brand-green rounded px-3 py-1 text-xs text-white">
+                            Keystatic Build
+                          </span>
+                          <span class="text-muted-foreground text-xs">
+                            (Zod typed)
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="bg-brand-blue rounded px-3 py-1 text-xs text-white">
+                            Islands
+                          </span>
+                          <span class="text-muted-foreground">→</span>
+                          <span class="bg-brand-purple rounded px-3 py-1 text-xs text-white">
+                            Flateralus Runtime
+                          </span>
+                          <span class="text-muted-foreground text-xs">
+                            (PIXI 8)
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                            Astro
+                          </span>
+                          <span class="text-muted-foreground">→</span>
+                          <span class="bg-muted text-muted-foreground rounded px-3 py-1 text-xs">
+                            Image/Asset Pipeline
+                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div>
-                <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
-                  Mermaid Source
-                </h3>
-                <div class="mb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="text-muted-foreground text-xs font-medium">
-                      architecture.mermaid
-                    </span>
-                    <span class="text-muted-foreground/60 text-xs">
-                      markdown
-                    </span>
-                  </div>
-                </div>
-                <CodeBlock
-                  code={sourceCodePage.data.architecture.mermaidDiagram}
-                  language="markdown"
-                />
               </div>
             </Section>
           )
