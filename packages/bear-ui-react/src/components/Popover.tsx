@@ -115,7 +115,6 @@ export function Popover({
     <div className={baseClasses}>
       <HeadlessPopover className="relative">
         <HeadlessPopover.Button
-          as="div"
           className={clsx(
             'cursor-pointer',
             disabled && 'cursor-not-allowed opacity-50'
