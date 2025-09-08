@@ -340,7 +340,7 @@ export function HeroSection({
   };
 
   // Enhanced background classes based on preset
-  const getBackgroundClasses = () => {
+  const backgroundClasses = useMemo(() => {
     switch (preset) {
       case 'curious-particle-network':
         return 'bg-gradient-to-br from-muted via-muted/95 to-secondary/20 bg-header-pattern';
@@ -356,22 +356,22 @@ export function HeroSection({
       default:
         return 'bg-gradient-to-br from-muted via-muted/90 to-muted/15 bg-header-pattern';
     }
-  };
+  }, [preset]);
 
   // Get height classes based on whether this is an index page
-  const getHeightClasses = () => {
+  const heightClasses = useMemo(() => {
     return isIndexPage ? 'h-screen' : 'h-[60vh] min-h-[500px]';
-  };
+  }, [isIndexPage]);
 
-  // Calculate negative margin to go underneath navbar/breadcrumbs
-  const getNegativeMargin = () => {
+  // Calculate margin classes to go underneath navbar/breadcrumbs
+  const marginClasses = useMemo(() => {
     if (accountForNavigation && accountForBreadcrumbs) {
-      return '-6.5rem'; // -pt-30
+      return '-mt-28';
     } else if (accountForNavigation) {
-      return '-5rem'; // -pt-24
+      return '-mt-20';
     }
-    return '0'; // No negative margin needed
-  };
+    return ''; // No negative margin needed
+  }, [accountForNavigation, accountForBreadcrumbs]);
 
   // Create the hero content once
   const heroContent = children || (
@@ -391,11 +391,11 @@ export function HeroSection({
       <div
         className={clsx(
           'relative w-full',
-          getHeightClasses(),
-          getBackgroundClasses(),
+          heightClasses,
+          backgroundClasses,
+          marginClasses,
           className
         )}
-        style={{ marginTop: getNegativeMargin() }}
       >
         {/* Combined background container with multiple layers - same as client */}
         <div className="bg-noise bg-header-glow from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent opacity-100" />
@@ -422,11 +422,11 @@ export function HeroSection({
     <div
       className={clsx(
         'relative w-full',
-        getHeightClasses(),
-        getBackgroundClasses(),
+        heightClasses,
+        backgroundClasses,
+        marginClasses,
         className
       )}
-      style={{ marginTop: getNegativeMargin() }}
     >
       {/* Combined background container with multiple layers */}
       <div className="bg-noise bg-header-glow from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent opacity-100" />
