@@ -391,6 +391,13 @@ export function getContentImageUrl(
       // Skip: "", "work", "projects", projectId, and take the rest
       relativePath = pathParts.slice(4).join('/');
     }
+  } else if (imagePath.startsWith('/work/personal-projects/')) {
+    // Handle personal project paths like /work/personal-projects/portfolio-website/coverImage.png
+    const pathParts = imagePath.split('/');
+    if (pathParts.length >= 4) {
+      // Skip: "", "work", "personal-projects", projectId, and take the rest
+      relativePath = pathParts.slice(4).join('/');
+    }
   }
   // If it's a relative path like media/0/image.jpg, preserve the full structure
   const publicPath = join(
@@ -465,4 +472,24 @@ export function getProjectImageUrl(
  */
 export function getMediaImageUrl(projectId: string, imagePath: string): string {
   return getContentImageUrl('work/projects', projectId, imagePath);
+}
+
+/**
+ * Convenience function to get personal project image public URL
+ *
+ * @param projectId - The personal project identifier
+ * @param imagePath - The path to the image relative to the project
+ * @returns The public URL for the personal project image
+ *
+ * @example
+ * ```typescript
+ * const imageUrl = getPersonalProjectImageUrl('portfolio-website', 'coverImage.png');
+ * // Returns: '/content-images/work/personal-projects/portfolio-website/coverImage.png'
+ * ```
+ */
+export function getPersonalProjectImageUrl(
+  projectId: string,
+  imagePath: string
+): string {
+  return getContentImageUrl('work/personal-projects', projectId, imagePath);
 }

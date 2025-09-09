@@ -1,10 +1,13 @@
 import type { CollectionEntry } from 'astro:content';
 import { clsx, getProjectUrl } from '@bracketbear/bear-ui';
 import { SkillPill } from '@bracketbear/bear-ui-react';
-import { getProjectImageUrl } from '@bracketbear/astro-content';
+import {
+  getProjectImageUrl,
+  getPersonalProjectImageUrl,
+} from '@bracketbear/astro-content';
 
 export interface ProjectCardProps {
-  project: CollectionEntry<'workProject'>;
+  project: CollectionEntry<'workProject'> | CollectionEntry<'personalProject'>;
   skills: CollectionEntry<'workSkills'>[];
   variant?: 'light' | 'dark';
   compact?: boolean;
@@ -32,13 +35,24 @@ export default function ProjectCard({
     .slice(0, maxSkills);
 
   const coverImage = project.data.coverImage
-    ? getProjectImageUrl(project.id, project.data.coverImage)
+    ? project.collection === 'personalProject'
+      ? getPersonalProjectImageUrl(project.id, project.data.coverImage)
+      : getProjectImageUrl(project.id, project.data.coverImage)
     : undefined;
 
   // Use default card color (now off-white) for better visual appeal
   const cardClass = variant === 'dark' ? 'card-dark' : 'card';
 
-  const projectUrl = getProjectUrl(project.id);
+  // Determine project URL - special handling for website project
+  let projectUrl: string;
+  if (
+    project.collection === 'personalProject' &&
+    project.data.isWebsiteProject
+  ) {
+    projectUrl = '/source-code';
+  } else {
+    projectUrl = getProjectUrl(project.id);
+  }
 
   return (
     <a href={projectUrl} className="block h-full hover:no-underline">
@@ -73,13 +87,44 @@ export default function ProjectCard({
           {/* Project badges */}
           {showBadges && (
             <div className="mb-4 flex items-center gap-4">
-              {project.data.category && (
-                <span className="pill pill-category">
-                  {project.data.category}
-                </span>
+              {/* Work project badges */}
+              {project.collection === 'workProject' && (
+                <>
+                  {project.data.category && (
+                    <span className="pill pill-category">
+                      {project.data.category}
+                    </span>
+                  )}
+                  {project.data.isFeatured && (
+                    <span className="pill pill-featured">Featured</span>
+                  )}
+                </>
               )}
-              {project.data.isFeatured && (
-                <span className="pill pill-featured">Featured</span>
+
+              {/* Personal project badges */}
+              {project.collection === 'personalProject' && (
+                <>
+                  {project.data.category && (
+                    <span className="pill pill-category">
+                      {project.data.category}
+                    </span>
+                  )}
+                  {project.data.status &&
+                    project.data.status !== 'completed' && (
+                      <span className="pill pill-status">
+                        {project.data.status === 'in-progress'
+                          ? 'In Progress'
+                          : project.data.status === 'on-hold'
+                            ? 'On Hold'
+                            : project.data.status === 'archived'
+                              ? 'Archived'
+                              : project.data.status}
+                      </span>
+                    )}
+                  {project.data.isWebsiteProject && (
+                    <span className="pill pill-featured">This Website</span>
+                  )}
+                </>
               )}
             </div>
           )}

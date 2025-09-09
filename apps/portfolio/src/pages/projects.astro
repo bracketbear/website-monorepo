@@ -7,11 +7,13 @@ import { marked } from 'marked';
 
 // Type definitions
 type WorkProjectEntry = CollectionEntry<'workProject'>;
+type PersonalProjectEntry = CollectionEntry<'personalProject'>;
 
 interface ProjectCategory {
   title: string;
   description: string;
-  projects: string[];
+  workProjects: string[];
+  personalProjects: string[];
 }
 
 interface CategoryWithProjects {
@@ -21,7 +23,8 @@ interface CategoryWithProjects {
       description: string;
     };
   };
-  projects: WorkProjectEntry[];
+  workProjects: WorkProjectEntry[];
+  personalProjects: PersonalProjectEntry[];
 }
 
 // Get the projects page singleton from CMS
@@ -29,6 +32,7 @@ const projectsPageEntries = await getCollection('portfolioProjectsPage');
 const projectsPage = projectsPageEntries[0]; // Singletons have only one entry
 
 const workProject = await getCollection('workProject');
+const personalProject = await getCollection('personalProject');
 const breadcrumbs = getBreadcrumbs({
   label: 'Projects',
   href: '/projects',
@@ -37,8 +41,13 @@ const breadcrumbs = getBreadcrumbs({
 // Get projects by CMS-defined categories
 const projectsByCategory: CategoryWithProjects[] =
   projectsPage.data.projectCategories?.map((category: ProjectCategory) => {
-    const categoryProjects = workProject.filter((project: WorkProjectEntry) =>
-      category.projects.includes(project.id)
+    const categoryWorkProjects = workProject.filter(
+      (project: WorkProjectEntry) =>
+        category.workProjects?.includes(project.id) || false
+    );
+    const categoryPersonalProjects = personalProject.filter(
+      (project: PersonalProjectEntry) =>
+        category.personalProjects?.includes(project.id) || false
     );
 
     return {
@@ -48,7 +57,8 @@ const projectsByCategory: CategoryWithProjects[] =
           description: category.description,
         },
       },
-      projects: categoryProjects,
+      workProjects: categoryWorkProjects,
+      personalProjects: categoryPersonalProjects,
     };
   }) || [];
 
@@ -87,7 +97,11 @@ function parseMarkdown(content: string): string {
       <div class="space-y-16">
         {
           projectsByCategory.map(
-            ({ category, projects }: CategoryWithProjects) => (
+            ({
+              category,
+              workProjects,
+              personalProjects,
+            }: CategoryWithProjects) => (
               <section>
                 {/* Section Title */}
                 <div class="py-12">
@@ -102,21 +116,33 @@ function parseMarkdown(content: string): string {
                 </div>
 
                 <div class="grid gap-8 lg:grid-cols-2 xl:grid-cols-3">
-                  {projects.map((project: WorkProjectEntry) => {
-                    // Use default card color (off-white) for consistency
-                    return (
-                      <ProjectCard
-                        project={project}
-                        skills={workSkills}
-                        variant="light"
-                        showImage={true}
-                        showBadges={false}
-                        showSkills={true}
-                        maxSkills={5}
-                        compact={true}
-                      />
-                    );
-                  })}
+                  {/* Work Projects */}
+                  {workProjects.map((project: WorkProjectEntry) => (
+                    <ProjectCard
+                      project={project}
+                      skills={workSkills}
+                      variant="light"
+                      showImage={true}
+                      showBadges={false}
+                      showSkills={true}
+                      maxSkills={5}
+                      compact={true}
+                    />
+                  ))}
+
+                  {/* Personal Projects */}
+                  {personalProjects.map((project: PersonalProjectEntry) => (
+                    <ProjectCard
+                      project={project}
+                      skills={workSkills}
+                      variant="light"
+                      showImage={true}
+                      showBadges={false}
+                      showSkills={true}
+                      maxSkills={5}
+                      compact={true}
+                    />
+                  ))}
                 </div>
               </section>
             )

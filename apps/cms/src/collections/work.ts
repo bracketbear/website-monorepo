@@ -360,4 +360,96 @@ export const workCollections = {
       }),
     },
   }),
+
+  personalProject: collection({
+    label: 'Personal Projects',
+    slugField: 'title',
+    format: 'json',
+    path: workPath('personal-projects'),
+    columns: ['title', 'status'],
+    schema: {
+      title: fields.slug({
+        name: { label: 'Title', validation: { isRequired: true } },
+      }),
+      summary: fields.text({
+        label: 'Summary',
+        description:
+          'Brief project overview (displayed in project cards, max 160 chars)',
+        multiline: false,
+        validation: { length: { max: 160 } },
+      }),
+      description: fields.text({
+        label: 'Description',
+        multiline: true,
+      }),
+      coverImage: fields.image({
+        label: 'Cover Image',
+        description: 'Main image for the project card and hero',
+        directory: path.resolve(
+          process.cwd(),
+          'content/work/personal-projects'
+        ),
+        publicPath: '/work/personal-projects/',
+      }),
+      // Special handling for the website project
+      isWebsiteProject: fields.checkbox({
+        label: 'Is This Website Project?',
+        description:
+          'Check if this is the portfolio website itself (will link to /source-code)',
+        defaultValue: false,
+      }),
+      // External links
+      links: fields.array(
+        fields.object({
+          label: fields.text({
+            label: 'Link Label',
+            validation: { isRequired: true },
+          }),
+          url: fields.url({
+            label: 'URL',
+            validation: { isRequired: true },
+          }),
+          type: fields.select({
+            label: 'Link Type',
+            options: [
+              { label: 'Live Demo', value: 'demo' },
+              { label: 'GitHub', value: 'github' },
+              { label: 'Documentation', value: 'docs' },
+              { label: 'Other', value: 'other' },
+            ],
+            defaultValue: 'other',
+          }),
+        }),
+        {
+          label: 'External Links',
+          description:
+            'Add links to live demos, GitHub repos, documentation, etc.',
+          itemLabel: (props) => props.fields.label.value || 'New Link',
+        }
+      ),
+      // Skills used
+      skills: fields.multiRelationship({
+        label: 'Skills',
+        description: 'Select the skills used in this project',
+        collection: 'workSkills',
+      }),
+      // Project status
+      status: fields.select({
+        label: 'Project Status',
+        options: [
+          { label: 'Completed', value: 'completed' },
+          { label: 'In Progress', value: 'in-progress' },
+          { label: 'On Hold', value: 'on-hold' },
+          { label: 'Archived', value: 'archived' },
+        ],
+        defaultValue: 'completed',
+      }),
+      // Optional project category for organization
+      category: fields.text({
+        label: 'Category',
+        description:
+          'Optional category for grouping projects (e.g., "Web Apps", "Tools", "Experiments")',
+      }),
+    },
+  }),
 };
