@@ -314,8 +314,12 @@ export const DebugControls = memo(function DebugControls({
                 onClick={randomizeSettings}
                 size="icon"
                 aria-label="Randomize"
+                className="group p-1"
               >
-                <DiceIcon className="h-4 w-4" />
+                <DiceIcon
+                  className="h-4 w-4 transition-transform duration-500 group-hover:rotate-[360deg] group-hover:animate-bounce"
+                  style={{ transformOrigin: 'center' }}
+                />
               </Button>
 
               {showDownloadButton && (
@@ -324,9 +328,9 @@ export const DebugControls = memo(function DebugControls({
                   onClick={downloadSettings}
                   size="icon"
                   aria-label="Download"
-                  className="bg-brand-green hover:bg-brand-green/90 text-white"
+                  className="bg-brand-green hover:bg-brand-green/90 group text-white"
                 >
-                  <DownloadIcon className="h-4 w-4" />
+                  <DownloadIcon className="h-4 w-4 transition-transform duration-200 group-hover:animate-bounce" />
                 </Button>
               )}
 
@@ -335,9 +339,12 @@ export const DebugControls = memo(function DebugControls({
                 onClick={resetToDefaults}
                 size="icon"
                 aria-label="Reset"
-                className="bg-brand-yellow hover:bg-brand-yellow/90 text-black"
+                className="bg-brand-yellow hover:bg-brand-yellow/90 group text-black"
               >
-                <ResetIcon className="h-4 w-4" />
+                <ResetIcon
+                  className="h-4 w-4 transition-transform duration-300 group-hover:rotate-[-360deg]"
+                  style={{ animationDuration: '3s' }}
+                />
               </Button>
             </div>
           </div>
