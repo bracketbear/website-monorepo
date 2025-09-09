@@ -128,6 +128,75 @@ const {
 const subline = oneLiner ?? teaser?.headline ?? teaser?.subline ?? summary;
 const heroAlt = a11y?.coverAlt ?? title;
 
+// Section configuration for loopable rendering
+const sectionConfig = [
+  {
+    id: 'tech-stack',
+    title: 'Tech Stack',
+    condition: () => Array.isArray(skills) && skills.length > 0,
+    type: 'tech-stack',
+  },
+  {
+    id: 'problem',
+    title: 'Problem',
+    condition: () => !!(problem || description),
+    type: 'problem',
+    content: problem ?? description,
+  },
+  {
+    id: 'my-role',
+    title: 'My role',
+    condition: () => Array.isArray(scope) && scope.length > 0,
+    type: 'list',
+    content: scope,
+  },
+  {
+    id: 'my-contributions',
+    title: 'My Contributions',
+    condition: () =>
+      (Array.isArray(decisions) && decisions.length) ||
+      !!challengesAndSolutions,
+    type: 'contributions',
+    content: { decisions, challengesAndSolutions },
+  },
+  {
+    id: 'how-it-ended',
+    title: 'How it ended',
+    condition: () => !!(outcome || resultsAchieved),
+    type: 'problem',
+    content: outcome ?? resultsAchieved,
+  },
+  {
+    id: 'notes',
+    title: 'Notes',
+    condition: () => !!notes,
+    type: 'problem',
+    content: notes,
+  },
+  {
+    id: 'gallery',
+    title: projectPage?.data.sectionHeadings?.gallery || 'Gallery',
+    condition: () =>
+      Array.isArray(workProjectItem.data.media) &&
+      workProjectItem.data.media.length > 0,
+    type: 'gallery',
+  },
+  {
+    id: 'links',
+    title: 'Links',
+    condition: () => Array.isArray(links) && links.length > 0,
+    type: 'links',
+    content: links,
+  },
+  {
+    id: 'impact',
+    title: 'Impact',
+    condition: () => Array.isArray(impactTags) && impactTags.length > 0,
+    type: 'impact',
+    content: impactTags,
+  },
+];
+
 // Define stats data
 const stats = [
   ...(status
@@ -179,202 +248,150 @@ const stats = [
   currentPage="project"
 >
   <!-- Story-First Content Layout -->
-  <section class="px-content mb-8">
+  <div class="px-content mb-8">
     <div class="container mx-auto">
       <div class="mx-auto max-w-4xl">
-        <div class="space-y-16">
-          {/* Stack */}
+        <div>
+          {/* Loopable Sections */}
           {
-            Array.isArray(skills) && skills.length > 0 && (
-              <Section title="Tech Stack">
-                <div class="flex flex-wrap gap-2">
-                  {projectSkills.map((skill: SkillData) => (
-                    <Pill variant="glass-frosted" size="sm">
-                      {skill.data.title}
-                    </Pill>
-                  ))}
-                </div>
-              </Section>
-            )
-          }
+            sectionConfig.map((section) => {
+              if (!section.condition()) return null;
 
-          {/* Problem */}
-          {
-            (problem || description) && (
-              <Section title="Problem">
-                <div class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90">
-                  {problem ?? description}
-                </div>
-              </Section>
-            )
-          }
+              return (
+                <Section title={section.title} padding="small">
+                  <div class="prose prose-lg">
+                    {section.type === 'tech-stack' && (
+                      <div class="flex flex-wrap gap-2">
+                        {projectSkills.map((skill: SkillData) => (
+                          <Pill variant="glass-frosted" size="sm">
+                            {skill.data.title}
+                          </Pill>
+                        ))}
+                      </div>
+                    )}
 
-          {/* My role */}
-          {
-            Array.isArray(scope) && scope.length > 0 && (
-              <Section title="My role">
-                <ul class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90 list-disc pl-6">
-                  {scope.map((item: string) => (
-                    <li>{item}</li>
-                  ))}
-                </ul>
-              </Section>
-            )
-          }
+                    {section.type === 'problem' && section.content}
 
-          {/* My Contributions */}
-          {
-            (Array.isArray(decisions) && decisions.length) ||
-            !!challengesAndSolutions ? (
-              <Section title="My Contributions">
-                {Array.isArray(decisions) && decisions.length ? (
-                  <ul class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90 list-disc pl-6">
-                    {decisions.map((d: string) => (
-                      <li class="mb-2">{d}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90">
-                    {challengesAndSolutions}
-                  </div>
-                )}
-              </Section>
-            ) : null
-          }
+                    {section.type === 'list' && (
+                      <ul>
+                        {section.content.map((item: string) => (
+                          <li>{item}</li>
+                        ))}
+                      </ul>
+                    )}
 
-          {/* How it ended */}
-          {
-            (outcome || resultsAchieved) && (
-              <Section title="How it ended">
-                <div class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90">
-                  {outcome ?? resultsAchieved}
-                </div>
-              </Section>
-            )
-          }
+                    {section.type === 'contributions' && (
+                      <>
+                        {Array.isArray(section.content.decisions) &&
+                        section.content.decisions.length ? (
+                          <ul>
+                            {section.content.decisions.map((d: string) => (
+                              <li>{d}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          section.content.challengesAndSolutions
+                        )}
+                      </>
+                    )}
 
-          {/* Notes / behind the build */}
-          {
-            notes && (
-              <Section title="Notes">
-                <div class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90">
-                  {notes}
-                </div>
-              </Section>
-            )
-          }
+                    {section.type === 'gallery' &&
+                      (() => {
+                        // Process media items to create gallery images
+                        const galleryImages = workProjectItem.data.media
+                          .filter((item: any) => item?.image)
+                          .map((item: any) => {
+                            let imageUrl: string;
+                            try {
+                              imageUrl = getProjectImageUrl(
+                                workProjectItem.id,
+                                item.image
+                              );
+                            } catch (error) {
+                              console.warn(
+                                `Failed to load media image: ${item.image}`,
+                                error
+                              );
+                              return null;
+                            }
 
-          {/* Gallery */}
-          {
-            Array.isArray(workProjectItem.data.media) &&
-              workProjectItem.data.media.length > 0 && (
-                <Section
-                  title={
-                    projectPage?.data.sectionHeadings?.gallery || 'Gallery'
-                  }
-                >
-                  {(() => {
-                    // Process media items to create gallery images
-                    const galleryImages = workProjectItem.data.media
-                      .filter((item: any) => item?.image)
-                      .map((item: any) => {
-                        let imageUrl: string;
-                        try {
-                          imageUrl = getProjectImageUrl(
-                            workProjectItem.id,
-                            item.image
-                          );
-                        } catch (error) {
-                          console.warn(
-                            `Failed to load media image: ${item.image}`,
-                            error
-                          );
+                            return {
+                              src: imageUrl,
+                              alt:
+                                item.alt ??
+                                item.caption ??
+                                workProjectItem.data.title,
+                              caption: item.caption,
+                            };
+                          })
+                          .filter(Boolean);
+
+                        if (!galleryImages || galleryImages.length === 0) {
                           return null;
                         }
 
-                        return {
-                          src: imageUrl,
-                          alt:
-                            item.alt ??
-                            item.caption ??
-                            workProjectItem.data.title,
-                          caption: item.caption,
-                        };
-                      })
-                      .filter(Boolean);
-
-                    if (!galleryImages || galleryImages.length === 0) {
-                      return null;
-                    }
-
-                    return (
-                      <ImageGallery
-                        images={galleryImages}
-                        columns={3}
-                        showCaptions={true}
-                        client:load
-                      />
-                    );
-                  })()}
-                </Section>
-              )
-          }
-
-          {/* Links */}
-          {
-            Array.isArray(links) && links.length > 0 && (
-              <Section title="Links">
-                <ul class="prose prose-lg prose-headings:text-text-primary prose-p:text-text-primary/90 text-text-primary/90 list-disc pl-6">
-                  {links.map((l: { href: string; label: string }) => (
-                    <li>
-                      <a
-                        href={l.href}
-                        target="_blank"
-                        rel="noopener"
-                        class="text-brand-orange hover:text-brand-orange/80 underline transition-colors hover:no-underline"
-                      >
-                        {l.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </Section>
-            )
-          }
-
-          {/* Impact */}
-          {
-            Array.isArray(impactTags) && impactTags.length > 0 && (
-              <Section title="Impact">
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {impactTags.map((tag: string) => (
-                    <div class="glass-bg-frosted glass-border-frosted glass-shadow flex items-center gap-3 rounded-lg border p-4 transition-all">
-                      <div class="bg-brand-orange flex h-8 w-8 items-center justify-center rounded-full">
-                        <svg
-                          class="h-4 w-4 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                        return (
+                          <ImageGallery
+                            images={galleryImages}
+                            columns={3}
+                            showCaptions={true}
+                            client:load
                           />
-                        </svg>
+                        );
+                      })()}
+
+                    {section.type === 'links' && (
+                      <ul>
+                        {section.content.map(
+                          (l: { href: string; label: string }) => (
+                            <li>
+                              <a
+                                href={l.href}
+                                target="_blank"
+                                rel="noopener"
+                                class="text-brand-orange hover:text-brand-orange/80 underline transition-colors hover:no-underline"
+                              >
+                                {l.label}
+                              </a>
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    )}
+
+                    {section.type === 'impact' && (
+                      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {section.content.map((tag: string) => (
+                          <div class="glass-bg-frosted glass-border-frosted glass-shadow flex items-center gap-3 rounded-lg border p-4 transition-all">
+                            <div class="bg-brand-orange flex h-8 w-8 items-center justify-center rounded-full">
+                              <svg
+                                class="h-4 w-4 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                                />
+                              </svg>
+                            </div>
+                            <span class="text-text-primary font-heading text-sm font-semibold tracking-wide uppercase">
+                              {tag}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                      <span class="text-text-primary font-heading text-sm font-semibold tracking-wide uppercase">
-                        {tag}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </Section>
-            )
+                    )}
+                  </div>
+                </Section>
+              );
+            })
           }
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </ProjectHeaderLayout>

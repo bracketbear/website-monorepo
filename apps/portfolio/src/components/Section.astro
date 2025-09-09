@@ -8,9 +8,25 @@ export interface Props {
   intro?: string;
   id?: string;
   className?: string;
+  padding?: 'none' | 'small' | 'medium' | 'large';
 }
 
-const { eyebrow, title, intro, id, className = '' } = Astro.props;
+const {
+  eyebrow,
+  title,
+  intro,
+  id,
+  className = '',
+  padding = 'large',
+} = Astro.props;
+
+// Map padding prop to Tailwind classes
+const paddingClasses = {
+  none: '',
+  small: 'py-4',
+  medium: 'py-8',
+  large: 'py-12 first:pt-0 last:pb-0',
+};
 
 // Helper function to clean markdown content
 function cleanMarkdown(content: string | undefined | null): string {
@@ -22,7 +38,7 @@ function cleanMarkdown(content: string | undefined | null): string {
 
 <section
   id={id}
-  class={clsx(`section-content py-12 first:pt-0 last:pb-0`, className)}
+  class={clsx('section-content', paddingClasses[padding], className)}
 >
   <div>
     {
