@@ -2,6 +2,7 @@
   "name": "@bracketbear/tw-pattern-analyzer",
   "private": true,
   "version": "1.0.1",
+  "description": "Tailwind CSS pattern analyzer for identifying and optimizing CSS usage across the monorepo",
   "type": "module",
   "bin": {
     "tw-patterns": "./dist/cli.js"
@@ -11,7 +12,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts src/init.ts src/types.ts src/clustering.ts --format esm --dts --clean",
+    "build": "tsup src/index.ts src/cli.ts src/init.ts src/types.ts --format esm --dts --clean",
     "dev": "tsx src/cli.ts",
     "test": "vitest",
     "init": "tsx src/init.ts",

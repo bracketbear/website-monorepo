@@ -2,9 +2,10 @@
   "name": "@bracketbear/portfolio",
   "type": "module",
   "version": "1.0.1",
+  "description": "Personal portfolio website showcasing projects, work history, and skills",
   "scripts": {
     "dev": "node ../../scripts/generate-repo-map.js && astro dev --port 4322",
-    "prebuild": "node ../../scripts/generate-repo-map.js",
+    "prebuild": "node ../../scripts/generate-repo-map.js && node ../../scripts/update-main-readme.js",
     "build": "astro build",
     "preview": "astro preview --port 4322",
     "deploy": "netlify deploy --prod",

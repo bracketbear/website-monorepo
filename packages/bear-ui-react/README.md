@@ -1,71 +1,65 @@
 # @bracketbear/bear-ui-react
 
-React components for the BracketBear UI system. This package provides a comprehensive set of React components built on top of the core bear-ui system.
+## Overview
+
+React components for BracketBear UI system
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Development](#development)
+- [Build](#build)
+- [Back to Monorepo](../../README.md)
+
+## Features
+
+- **TypeScript**: Full type safety and IntelliSense support
+- **Modular Design**: Clean, reusable components and utilities
+- **Framework Agnostic**: Works with multiple frameworks
+- **Design System**: Consistent UI components and utilities
+- **Tailwind Integration**: Optimized Tailwind CSS utilities
+- **Accessibility**: WCAG compliant components
 
 ## Installation
+
+Install the package:
 
 ```bash
 npm install @bracketbear/bear-ui-react
 ```
 
-## Usage
-
-Import components:
-
-```tsx
-import { Button, Modal, Toast } from '@bracketbear/bear-ui-react';
-```
-
-Or import specific components:
-
-```tsx
-import { Button } from '@bracketbear/bear-ui-react/components';
-import { useToast } from '@bracketbear/bear-ui-react/hooks';
-```
-
-## What's Included
-
-### Components
-
-- **Basic**: Button, Pill, SkillPill, BracketBearLogo
-- **Forms**: ValidatedForm, TextInput, TextareaInput, CheckboxInput, Field, CheckboxField
-- **Layout**: Accordion, Modal, AlertModal, Popover, ImageGallery, ImageViewerModal
-- **Feedback**: Toast, ToastProvider, Testimonial, Stats
-- **Interactive**: Slider, Ticker, PointerFX, BulletList, ContactIcon
-
-### Hooks
-
-- `useToast` - Toast management
-- `useVisibilityObserver` - Visibility observation
-- `useIntersectionObserver` - Intersection observation
-- `useDebounce` - Debounce utility
-
-### Types
-
-Component prop interfaces for all exported components.
-
-## Dependencies
-
-This package depends on:
-
-- `@bracketbear/bear-ui` - Core types and utilities
-- `@bracketbear/bear-ui-tailwind` - Tailwind CSS styles
-- `@headlessui/react` - Headless UI components
-- `clsx` - Class name utility
-- `gsap` - Animation library
-- `pixi.js` - Graphics library
-
-## Peer Dependencies
-
-- `react` ^19.0.0
-- `react-dom` ^19.0.0
-
 ## Development
 
+To start development:
+
 ```bash
-npm run dev    # Watch mode for development
-npm run build  # Build for production
-npm run clean  # Clean build artifacts
-npm run test   # Run tests
-npm run type-check  # Type checking
+# From monorepo root
+npm run dev --workspace=packages/bear-ui-react
+
+# Or from bear-ui-react directory
+cd packages/bear-ui-react && npm run dev
 ```
+
+## Build
+
+To build for production:
+
+```bash
+# From monorepo root
+npm run build --workspace=packages/bear-ui-react
+
+# Or from bear-ui-react directory
+cd packages/bear-ui-react && npm run build
+```
+
+## Version
+
+Current version: **1.0.1**
+
+## Technologies Used
+
+- **TypeScript**: Type safety and modern JavaScript features
+- **React**: Component library
+- **Headless UI**: Accessible UI primitives

@@ -1,103 +1,64 @@
 # @bracketbear/bear-ui-tailwind
 
-Tailwind CSS styles and utilities for BracketBear UI components. This package provides a comprehensive set of Tailwind CSS utilities, components, and design tokens for the BracketBear design system.
+## Overview
+
+Tailwind CSS styles and utilities for BracketBear UI components
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Development](#development)
+- [Build](#build)
+- [Back to Monorepo](../../README.md)
+
+## Features
+
+- **TypeScript**: Full type safety and IntelliSense support
+- **Modular Design**: Clean, reusable components and utilities
+- **Framework Agnostic**: Works with multiple frameworks
+- **Design System**: Consistent UI components and utilities
+- **Tailwind Integration**: Optimized Tailwind CSS utilities
+- **Accessibility**: WCAG compliant components
 
 ## Installation
+
+Install the package:
 
 ```bash
 npm install @bracketbear/bear-ui-tailwind
 ```
 
-## Usage
-
-Import the main Tailwind CSS file in your application:
-
-```css
-@import '@bracketbear/bear-ui-tailwind/styles';
-```
-
-Or import specific style modules:
-
-```css
-@import '@bracketbear/bear-ui-tailwind/styles/theme.css';
-@import '@bracketbear/bear-ui-tailwind/styles/typography.css';
-@import '@bracketbear/bear-ui-tailwind/styles/buttons.css';
-```
-
-## What's Included
-
-### Core Styles
-
-- `bracketbear.tailwind.css` - Main Tailwind configuration and utilities
-
-### Design System
-
-- `theme.css` - Color scheme and design tokens
-- `typography.css` - Typography utilities and font configurations
-- `buttons.css` - Button component styles
-- `forms.css` - Form element styles
-- `cards.css` - Card component styles
-- `pills.css` - Pill and badge styles
-
-### Effects & Animations
-
-- `glass.css` - Glass morphism effects
-- `tangible.css` - Tangible design system styles
-- `animations.css` - Animation utilities
-
-### Layout & Utilities
-
-- `section.css` - Section layout styles
-- `border.css` - Border utilities
-- `box-shadow.css` - Shadow utilities
-
-## Font Dependencies
-
-This package includes the following fonts:
-
-- `@fontsource/barlow-condensed` - Condensed display font
-- `@fontsource/fira-sans` - Sans-serif body font
-
-## Peer Dependencies
-
-- `tailwindcss` ^4.1.0
-
 ## Development
 
+To start development:
+
 ```bash
-npm run dev    # Watch mode for development
-npm run build  # Build for production
-npm run clean  # Clean build artifacts
-npm run type-check  # Type checking
+# From monorepo root
+npm run dev --workspace=packages/bear-ui-tailwind
+
+# Or from bear-ui-tailwind directory
+cd packages/bear-ui-tailwind && npm run dev
 ```
 
-## Design System Features
+## Build
 
-### Color Palette
+To build for production:
 
-- Brand colors (red, blue, yellow, green)
-- Neutral grays
-- Semantic colors (success, warning, error)
-- Dark mode support
+```bash
+# From monorepo root
+npm run build --workspace=packages/bear-ui-tailwind
 
-### Typography Scale
+# Or from bear-ui-tailwind directory
+cd packages/bear-ui-tailwind && npm run build
+```
 
-- Responsive font sizes
-- Font weight variations
-- Line height utilities
-- Letter spacing controls
+## Version
 
-### Component Styles
+Current version: **1.0.1**
 
-- Button variants (primary, secondary, ghost, etc.)
-- Form field styling
-- Card layouts
-- Pill/badge components
-- Modal and overlay styles
+## Technologies Used
 
-### Animation System
-
-- Transition utilities
-- Keyframe animations
-- Hover effects
-- Loading states
+- **TypeScript**: Type safety and modern JavaScript features
+- **Tailwind CSS**: Utility-first CSS framework

@@ -2,8 +2,10 @@
   "name": "@bracketbear/bracketbear-website",
   "type": "module",
   "version": "1.0.1",
+  "description": "Main company website for Bracket Bear, built with Astro and integrated CMS",
   "scripts": {
-    "dev": "astro dev --host --port 4321",
+    "dev": "node ../../scripts/generate-repo-map.js && node ../../scripts/update-main-readme.js && astro dev --host --port 4321",
+    "prebuild": "node ../../scripts/generate-repo-map.js && node ../../scripts/update-main-readme.js",
     "build": "astro build",
     "preview": "astro preview --host --port 4321",
     "astro": "astro",
