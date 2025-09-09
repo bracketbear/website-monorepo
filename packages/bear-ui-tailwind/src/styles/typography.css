@@ -23,7 +23,7 @@
   --prose-line-height: 1.75;
   --prose-spacing: 1.25em;
   --prose-heading-spacing: 0.5em;
-  --prose-list-spacing: 1.625em;
+  --prose-list-spacing: 1.5em;
   --prose-blockquote-spacing: 1em;
   --prose-pre-spacing: 0.8571429em;
   --prose-table-spacing: 0.5714286em;
@@ -67,9 +67,9 @@
 
   & ul,
   & ol {
+    @apply list-outside;
     margin-top: var(--prose-spacing);
     margin-bottom: var(--prose-spacing);
-    padding-left: var(--prose-list-spacing);
   }
 
   & li {
@@ -79,7 +79,7 @@
 
   & ul > li {
     @apply relative;
-    padding-left: 1.375em;
+    padding-left: var(--prose-list-spacing);
   }
 
   & ul > li::before {
@@ -201,7 +201,6 @@
   --prose-line-height: 1.7142857;
   --prose-spacing: 1.1428571em;
   --prose-heading-spacing: 0.5714286em;
-  --prose-list-spacing: 1.5714286em;
   --prose-blockquote-spacing: 1.1111111em;
   --prose-pre-spacing: 0.75em;
   --prose-table-spacing: 0.5714286em;
@@ -221,7 +220,6 @@
   --prose-line-height: 1.7777778;
   --prose-spacing: 1.3333333em;
   --prose-heading-spacing: 0.6666667em;
-  --prose-list-spacing: 1.5555556em;
   --prose-blockquote-spacing: 1em;
   --prose-pre-spacing: 0.8888889em;
   --prose-table-spacing: 0.5714286em;
@@ -241,7 +239,6 @@
   --prose-line-height: 1.75;
   --prose-spacing: 1.375em;
   --prose-heading-spacing: 0.6875em;
-  --prose-list-spacing: 1.5em;
   --prose-blockquote-spacing: 1em;
   --prose-pre-spacing: 0.75em;
   --prose-table-spacing: 0.5714286em;
@@ -261,7 +258,6 @@
   --prose-line-height: 1.6666667;
   --prose-spacing: 1.4166667em;
   --prose-heading-spacing: 0.7083333em;
-  --prose-list-spacing: 1.4583333em;
   --prose-blockquote-spacing: 1em;
   --prose-pre-spacing: 0.6666667em;
   --prose-table-spacing: 0.5714286em;
