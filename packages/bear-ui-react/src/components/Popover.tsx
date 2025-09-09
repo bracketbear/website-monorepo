@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, isValidElement } from 'react';
 import { Popover as HeadlessPopover, Transition } from '@headlessui/react';
 import { clsx } from '@bracketbear/core';
 
@@ -111,18 +111,38 @@ export function Popover({
     }
   };
 
+  // Check if the trigger is already a button element to avoid nesting
+  const isTriggerButton =
+    isValidElement(trigger) &&
+    (trigger.type === 'button' ||
+      (typeof trigger.type === 'function' &&
+        'displayName' in trigger.type &&
+        trigger.type.displayName === 'Button') ||
+      (typeof trigger.type === 'object' &&
+        trigger.type !== null &&
+        'render' in trigger.type &&
+        typeof trigger.type.render === 'function' &&
+        'displayName' in trigger.type &&
+        trigger.type.displayName === 'Button'));
+
   return (
     <div className={baseClasses}>
       <HeadlessPopover className="relative">
-        <HeadlessPopover.Button
-          className={clsx(
-            'cursor-pointer',
-            disabled && 'cursor-not-allowed opacity-50'
-          )}
-          disabled={disabled}
-        >
-          {trigger}
-        </HeadlessPopover.Button>
+        {isTriggerButton ? (
+          <HeadlessPopover.Button as={Fragment} disabled={disabled}>
+            {trigger}
+          </HeadlessPopover.Button>
+        ) : (
+          <HeadlessPopover.Button
+            className={clsx(
+              'cursor-pointer',
+              disabled && 'cursor-not-allowed opacity-50'
+            )}
+            disabled={disabled}
+          >
+            {trigger}
+          </HeadlessPopover.Button>
+        )}
 
         <Transition
           as={Fragment}
