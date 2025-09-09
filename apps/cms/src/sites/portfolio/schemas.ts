@@ -321,6 +321,11 @@ export const portfolioIndexPageSchema = makePageSchema({
       label: 'Content',
       description: 'Content describing Flateralus with markdown support',
     }),
+    buttonText: fields.text({
+      label: 'Button Text',
+      defaultValue: 'View Source Code',
+      description: 'Text for the button that links to the source-code page',
+    }),
   }),
 
   // Featured Projects section
@@ -537,16 +542,30 @@ export const portfolioProjectsPageSchema = makePageSchema({
         description: 'Description of this project category',
         multiline: true,
       }),
-      projects: fields.array(
+      // Work projects
+      workProjects: fields.array(
         fields.relationship({
-          label: 'Project',
+          label: 'Work Project',
           collection: 'workProject',
-          description: 'Select projects to include in this category',
+          description: 'Select work projects to include in this category',
         }),
         {
-          label: 'Projects in Category',
-          description: 'Select projects to display in this category',
-          itemLabel: (props) => props.value || 'New Project',
+          label: 'Work Projects in Category',
+          description: 'Select work projects to display in this category',
+          itemLabel: (props) => props.value || 'New Work Project',
+        }
+      ),
+      // Personal projects
+      personalProjects: fields.array(
+        fields.relationship({
+          label: 'Personal Project',
+          collection: 'personalProject',
+          description: 'Select personal projects to include in this category',
+        }),
+        {
+          label: 'Personal Projects in Category',
+          description: 'Select personal projects to display in this category',
+          itemLabel: (props) => props.value || 'New Personal Project',
         }
       ),
     }),
@@ -609,3 +628,379 @@ export const portfolioProjectPageSchema = makePageSchema({
     }),
   }),
 });
+
+/**
+ * Portfolio Source Code Page Schema
+ *
+ * This schema defines the source-code page structure for the portfolio site.
+ * It explains the technical architecture and implementation details.
+ */
+export const portfolioSourceCodePageSchema = makePageSchema(
+  {
+    // Section order metadata
+    sectionOrder: fields.array(
+      fields.object({
+        id: fields.text({ label: 'Section ID' }),
+        title: fields.text({ label: 'Section Title' }),
+        file: fields.text({ label: 'File Name' }),
+        eyebrow: fields.text({ label: 'Eyebrow Text' }),
+      }),
+      { label: 'Section Order' }
+    ),
+
+    // TL;DR section with key points
+    tldr: fields.object(
+      {
+        title: fields.text({
+          label: 'TL;DR Title',
+          defaultValue: 'TL;DR',
+        }),
+        points: fields.array(
+          fields.object({
+            label: fields.text({ label: 'Point Label' }),
+            bullets: fields.array(fields.text({ label: 'Bullet' }), {
+              label: 'Bullets',
+            }),
+          }),
+          { label: 'Key Points' }
+        ),
+      },
+      { label: 'TL;DR Section' }
+    ),
+
+    // Repo map section (auto-generated content)
+    repoMap: fields.object(
+      {
+        title: fields.text({
+          label: 'Repo Map Title',
+          defaultValue: 'Repo map (auto-generated)',
+        }),
+        description: fields.markdoc.inline({
+          label: 'Description',
+        }),
+      },
+      { label: 'Repo Map Section' }
+    ),
+
+    // Why Tailwind section
+    tailwindSection: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Why Tailwind (and how I use it)',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        rules: fields.array(fields.text({ label: 'Rule' }), {
+          label: 'Rules',
+        }),
+        tokenExcerpt: fields.text({
+          label: 'Token Excerpt',
+          multiline: true,
+        }),
+        tokenExcerptTitle: fields.text({
+          label: 'Token Excerpt Title',
+          defaultValue: 'Custom utilities built from tokens',
+        }),
+        usageExample: fields.text({
+          label: 'Usage Example',
+          multiline: true,
+        }),
+        usageExampleTitle: fields.text({
+          label: 'Usage Example Title',
+          defaultValue: 'Usage in components',
+        }),
+        // Data and AI assisted styling subsection
+        dataAssistedStyling: fields.object(
+          {
+            title: fields.text({
+              label: 'Subsection Title',
+              defaultValue: 'Data and AI assisted styling',
+            }),
+            content: fields.markdoc.inline({
+              label: 'Content',
+            }),
+            codeExample: fields.text({
+              label: 'Code Example',
+              multiline: true,
+            }),
+          },
+          { label: 'Data and AI Assisted Styling Subsection' }
+        ),
+      },
+      { label: 'Tailwind Section' }
+    ),
+
+    // Architecture section
+    architecture: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Architecture (at a glance)',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        mermaidDiagram: fields.text({
+          label: 'Mermaid Diagram',
+          multiline: true,
+        }),
+        systemFlowTitle: fields.text({
+          label: 'System Flow Subsection Title',
+          defaultValue: 'System Flow',
+        }),
+      },
+      { label: 'Architecture Section' }
+    ),
+
+    // TypeScript section
+    typescript: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'TypeScript (Type-first across apps and packages)',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        patterns: fields.array(
+          fields.object({
+            title: fields.text({ label: 'Pattern Title' }),
+            description: fields.markdoc.inline({
+              label: 'Pattern Description',
+            }),
+            codeExample: fields.text({
+              label: 'Code Example',
+              multiline: true,
+            }),
+          }),
+          { label: 'TypeScript Patterns' }
+        ),
+      },
+      { label: 'TypeScript Section' }
+    ),
+
+    // Agentic workflows section
+    agenticWorkflows: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Agentic Workflows & Pair-Programming',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        protocolStepsTitle: fields.text({
+          label: 'Protocol Steps Subsection Title',
+          defaultValue: 'Pair-programming protocol (how I keep it predictable)',
+        }),
+        protocolSteps: fields.array(
+          fields.markdoc.inline({ label: 'Protocol Step' }),
+          { label: 'Pair-programming Protocol Steps' }
+        ),
+        rulesExcerpt: fields.text({
+          label: 'Project Rules Excerpt',
+          multiline: true,
+        }),
+        rulesExcerptTitle: fields.text({
+          label: 'Rules Excerpt Title',
+          defaultValue: 'Project Rules (excerpt)',
+        }),
+        rulesExcerptLanguage: fields.text({
+          label: 'Rules Excerpt Language',
+          defaultValue: 'mdc',
+        }),
+      },
+      { label: 'Agentic Workflows Section' }
+    ),
+
+    // Storybook section
+    storybook: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Storybook (single instance, multi-directory)',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        mediaImage: fields.image({
+          label: 'Storybook Screenshot',
+          directory: 'content/sites/portfolio/source-code-page/storybook',
+          publicPath:
+            '/content-images/sites/portfolio/source-code-page/storybook/',
+        }),
+      },
+      { label: 'Storybook Section' }
+    ),
+
+    // Flateralus section
+    flateralus: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Flateralus (generative backgrounds without meltdown)',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        codeExample: fields.text({
+          label: 'Code Example',
+          multiline: true,
+        }),
+        codeExampleTitle: fields.text({
+          label: 'Code Example Title',
+          defaultValue: 'Typed animation controls',
+        }),
+      },
+      { label: 'Flateralus Section' }
+    ),
+
+    // Performance & accessibility section
+    performanceAccessibility: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Performance & accessibility',
+        }),
+        targets: fields.markdoc.inline({
+          label: 'Performance Targets',
+        }),
+        howToGetThere: fields.markdoc.inline({
+          label: 'How I Get There',
+        }),
+        targetsTitle: fields.text({
+          label: 'Targets Subsection Title',
+          defaultValue: 'Targets',
+        }),
+        howToGetThereTitle: fields.text({
+          label: 'How I Get There Subsection Title',
+          defaultValue: 'How I get there',
+        }),
+      },
+      { label: 'Performance & Accessibility Section' }
+    ),
+
+    // Testing & DX section
+    testingDx: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Testing & DX',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        huskyWorkflowDescription: fields.markdoc.inline({
+          label: 'Husky Workflow Description',
+        }),
+        vitestDescription: fields.markdoc.inline({
+          label: 'Vitest Description',
+        }),
+        testExampleDescription: fields.markdoc.inline({
+          label: 'Test Example Description',
+        }),
+      },
+      { label: 'Testing & DX Section' }
+    ),
+
+    // Security & ops section
+    securityOps: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Security & ops',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+      },
+      { label: 'Security & Ops Section' }
+    ),
+
+    // What I'd change next section
+    futureChanges: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: "What I'd change next",
+        }),
+        items: fields.array(fields.markdoc.inline({ label: 'Change Item' }), {
+          label: 'Future Changes',
+        }),
+      },
+      { label: 'Future Changes Section' }
+    ),
+
+    // Closing section
+    closing: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Closing',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        // Modal content
+        modalTitle: fields.text({
+          label: 'Modal Title',
+          defaultValue: 'Before you dive in...',
+        }),
+        modalHeading: fields.text({
+          label: 'Modal Heading',
+          defaultValue: 'Coding is a journey, not a destination.',
+        }),
+        modalIntro: fields.markdoc.inline({
+          label: 'Modal Introduction',
+          description: 'Introduction text explaining the repository',
+        }),
+        modalAcknowledgment: fields.text({
+          label: 'Modal Acknowledgment Text',
+          defaultValue: 'By accessing this code, you acknowledge that:',
+        }),
+        modalPoints: fields.array(
+          fields.text({ label: 'Acknowledgment Point' }),
+          {
+            label: 'Acknowledgment Points',
+            description: 'List of points users must acknowledge',
+          }
+        ),
+        modalCheckboxLabel: fields.text({
+          label: 'Checkbox Label',
+          defaultValue:
+            'I understand that coding is a journey and agree to view this code as learning material',
+        }),
+        modalCancelButton: fields.text({
+          label: 'Cancel Button Text',
+          defaultValue: 'Cancel',
+        }),
+        modalAgreeButton: fields.text({
+          label: 'Agree Button Text',
+          defaultValue: 'I Agree - Take me to the code',
+        }),
+        repositoryUrl: fields.url({
+          label: 'Repository URL',
+          defaultValue: 'https://github.com/bracketbear/website-monorepo',
+        }),
+        // Button content
+        buttonTitle: fields.text({
+          label: 'Button Section Title',
+          defaultValue: 'Ready to explore the code?',
+        }),
+        buttonDescription: fields.text({
+          label: 'Button Description',
+          defaultValue:
+            'This repository contains the complete source code for this portfolio and all related projects.',
+        }),
+        buttonText: fields.text({
+          label: 'Button Text',
+          defaultValue: 'View Source Code',
+        }),
+      },
+      { label: 'Closing Section' }
+    ),
+  },
+  { showCta: false }
+);

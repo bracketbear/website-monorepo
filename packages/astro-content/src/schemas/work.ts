@@ -210,4 +210,48 @@ export const workProjectSchema = z.object({
   impactTags: z.array(z.string()).optional(),
 });
 
+/**
+ * Schema for personal project information
+ *
+ * Defines the structure for personal project data including details about
+ * side projects, experiments, and personal development work.
+ *
+ * @example
+ * ```typescript
+ * const personalProjectData = {
+ *   title: "Portfolio Website",
+ *   summary: "A modern portfolio website built with Astro...",
+ *   description: "Detailed project description...",
+ *   coverImage: "coverImage.jpg",
+ *   isWebsiteProject: true,
+ *   links: [
+ *     { label: "Live Demo", url: "https://example.com", type: "demo" },
+ *     { label: "GitHub", url: "https://github.com/user/repo", type: "github" }
+ *   ],
+ *   skills: ["astro", "typescript", "tailwind"],
+ *   status: "completed",
+ *   category: "Web Development"
+ * };
+ * ```
+ */
+const personalProjectLinkSchema = z.object({
+  label: z.string(),
+  url: z.string(),
+  type: z.enum(['demo', 'github', 'docs', 'other']).default('other'),
+});
+
+export const personalProjectSchema = z.object({
+  title: z.string(),
+  summary: z.string().optional(),
+  description: z.string().optional(),
+  coverImage: z.string().optional(),
+  isWebsiteProject: z.boolean().default(false),
+  links: z.array(personalProjectLinkSchema).optional(),
+  skills: z.array(z.string()).optional(), // references "workSkills"
+  status: z
+    .enum(['completed', 'in-progress', 'on-hold', 'archived'])
+    .default('completed'),
+  category: z.string().optional(),
+});
+
 // Type is exported from types.ts to avoid conflicts

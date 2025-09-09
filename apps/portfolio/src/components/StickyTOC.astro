@@ -1,0 +1,50 @@
+---
+import { clsx } from '@bracketbear/core';
+
+export interface Props {
+  sections: Array<{
+    id: string;
+    title: string;
+    eyebrow?: string;
+  }>;
+  label?: string;
+  activeSection?: string;
+  className?: string;
+}
+
+const {
+  sections,
+  label = 'On this page',
+  activeSection,
+  className = '',
+} = Astro.props;
+---
+
+<nav class={`hidden lg:block ${className}`}>
+  <div class="card-neutral">
+    <h3
+      class="font-heading text-foreground mb-4 text-sm font-bold tracking-wider uppercase"
+    >
+      {label}
+    </h3>
+
+    <ul class="space-y-2">
+      {
+        sections.map((section) => (
+          <li>
+            <a
+              href={`#${section.id}`}
+              data-section-id={section.id}
+              class={clsx(
+                'text-muted-foreground hover:text-brand-orange link-underline block py-1 text-sm transition-colors',
+                activeSection === section.id && 'text-brand-orange active'
+              )}
+            >
+              {section.title}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</nav>

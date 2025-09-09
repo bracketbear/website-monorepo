@@ -1,0 +1,53 @@
+{
+  "name": "@bracketbear/bear-ui-react",
+  "type": "module",
+  "version": "1.0.1",
+  "description": "React components for BracketBear UI system",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./components": {
+      "import": "./dist/components/index.js",
+      "types": "./dist/components/index.d.ts"
+    },
+    "./hooks": {
+      "import": "./dist/hooks/index.js",
+      "types": "./dist/hooks/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bracketbear/bear-ui": "file:../bear-ui",
+    "@bracketbear/bear-ui-tailwind": "file:../bear-ui-tailwind",
+    "@headlessui/react": "^2.2.7",
+    "clsx": "^2.1.1",
+    "gsap": "^3.13.0",
+    "pixi.js": "^8.10.2"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "concurrently": "^8.2.0",
+    "cpx": "^1.5.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

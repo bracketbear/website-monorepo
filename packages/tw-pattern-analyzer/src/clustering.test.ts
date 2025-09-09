@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { PatternStats, Cluster, AnalyzerConfig } from './types.js';
+import type { PatternStats, Cluster, AnalyzerConfig } from './types';
 
 // Mock the clustering logic that would be in the main index file
 // This tests the core clustering algorithms and scoring

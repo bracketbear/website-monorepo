@@ -5,9 +5,11 @@ import {
   createParticleWaveAnimation,
   createBlobAnimation,
   createRetroGridAnimation,
+  createParticleSphereAnimation,
 } from '@bracketbear/flateralus-pixi-animations';
 import { getRandomControlValues } from '@bracketbear/flateralus';
-import { clsx, Stats, type LabelValue } from '@bracketbear/core';
+import { clsx, type LabelValue } from '@bracketbear/bear-ui';
+import { Stats } from '@bracketbear/bear-ui-react';
 import { useMemo, useState, useEffect, type ReactNode } from 'react';
 import { HeroContent } from './HeroContent';
 
@@ -111,6 +113,22 @@ const ANIMATION_CONTROLS = {
     lineColor: '#262626',
     backgroundColor: '#000000',
   },
+  particleSphere: {
+    particleCount: 200,
+    sphereRadius: 0.6,
+    particleSize: 3,
+    rotationSpeed: 0.01,
+    pulseSpeed: 1.3,
+    waveCount: 2,
+    waveAmplitude: 50,
+    pulseAmplitude: 2,
+    particleColor: '#010101',
+    opacity: 0.9,
+    showConnections: false,
+    connectionDistance: 30,
+    connectionColor: '#00ff88',
+    rotationAxis: 'xyz',
+  },
 };
 
 export type HeaderStat = LabelValue;
@@ -122,7 +140,8 @@ export interface HeroSectionProps {
     | 'particle-wave'
     | 'blob'
     | 'enhanced-wave'
-    | 'retro-grid';
+    | 'retro-grid'
+    | 'particle-sphere';
   /** Additional CSS classes */
   className?: string;
   /** Whether to show debug controls */
@@ -212,6 +231,11 @@ export function HeroSection({
         case 'retro-grid':
           animation = createRetroGridAnimation({
             ...ANIMATION_CONTROLS.retroGrid,
+          });
+          break;
+        case 'particle-sphere':
+          animation = createParticleSphereAnimation({
+            ...ANIMATION_CONTROLS.particleSphere,
           });
           break;
         case 'enhanced-wave':
@@ -316,7 +340,7 @@ export function HeroSection({
   };
 
   // Enhanced background classes based on preset
-  const getBackgroundClasses = () => {
+  const backgroundClasses = useMemo(() => {
     switch (preset) {
       case 'curious-particle-network':
         return 'bg-gradient-to-br from-muted via-muted/95 to-secondary/20 bg-header-pattern';
@@ -326,26 +350,28 @@ export function HeroSection({
         return 'bg-gradient-to-br from-muted via-muted/95 to-primary/20 bg-header-pattern';
       case 'retro-grid':
         return 'bg-gradient-to-br from-muted via-muted/95 to-muted/20 bg-header-pattern';
+      case 'particle-sphere':
+        return 'bg-gradient-to-br from-muted via-muted/95 to-primary/20 bg-header-pattern';
       case 'enhanced-wave':
       default:
         return 'bg-gradient-to-br from-muted via-muted/90 to-muted/15 bg-header-pattern';
     }
-  };
+  }, [preset]);
 
   // Get height classes based on whether this is an index page
-  const getHeightClasses = () => {
+  const heightClasses = useMemo(() => {
     return isIndexPage ? 'h-screen' : 'h-[60vh] min-h-[500px]';
-  };
+  }, [isIndexPage]);
 
-  // Calculate negative margin to go underneath navbar/breadcrumbs
-  const getNegativeMargin = () => {
+  // Calculate margin classes to go underneath navbar/breadcrumbs
+  const marginClasses = useMemo(() => {
     if (accountForNavigation && accountForBreadcrumbs) {
-      return '-6.5rem'; // -pt-30
+      return '-mt-28';
     } else if (accountForNavigation) {
-      return '-5rem'; // -pt-24
+      return '-mt-20';
     }
-    return '0'; // No negative margin needed
-  };
+    return ''; // No negative margin needed
+  }, [accountForNavigation, accountForBreadcrumbs]);
 
   // Create the hero content once
   const heroContent = children || (
@@ -365,11 +391,11 @@ export function HeroSection({
       <div
         className={clsx(
           'relative w-full',
-          getHeightClasses(),
-          getBackgroundClasses(),
+          heightClasses,
+          backgroundClasses,
+          marginClasses,
           className
         )}
-        style={{ marginTop: getNegativeMargin() }}
       >
         {/* Combined background container with multiple layers - same as client */}
         <div className="bg-noise bg-header-glow from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent opacity-100" />
@@ -396,11 +422,11 @@ export function HeroSection({
     <div
       className={clsx(
         'relative w-full',
-        getHeightClasses(),
-        getBackgroundClasses(),
+        heightClasses,
+        backgroundClasses,
+        marginClasses,
         className
       )}
-      style={{ marginTop: getNegativeMargin() }}
     >
       {/* Combined background container with multiple layers */}
       <div className="bg-noise bg-header-glow from-muted/50 absolute inset-0 bg-gradient-to-t via-transparent to-transparent opacity-100" />

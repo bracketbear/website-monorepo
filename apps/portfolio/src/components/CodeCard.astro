@@ -1,0 +1,29 @@
+---
+import { CodeBlock } from '@bracketbear/core/react';
+
+export interface Props {
+  filename?: string;
+  language?: string;
+  code: string;
+  className?: string;
+}
+
+const { filename, language = 'text', code, className = '' } = Astro.props;
+---
+
+<div class={`${className}`}>
+  {
+    filename && (
+      <div class="mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-muted-foreground text-xs font-medium">
+            {filename}
+          </span>
+          <span class="text-muted-foreground/80 text-xs">{language}</span>
+        </div>
+      </div>
+    )
+  }
+
+  <CodeBlock code={code} language={language} />
+</div>

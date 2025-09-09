@@ -5,7 +5,7 @@ import { getAboutBreadcrumbs } from '@/config/breadcrumbs';
 import HeroLayout from '@/layouts/HeroLayout.astro';
 import { marked } from 'marked';
 import { getContentImageUrl } from '@bracketbear/astro-content';
-import { Testimonial, BulletList } from '@bracketbear/core/react';
+import { Testimonial, BulletList } from '@bracketbear/bear-ui-react';
 
 const breadcrumbs: Breadcrumb[] = getAboutBreadcrumbs();
 
@@ -159,7 +159,7 @@ const t = aboutPage.data.testimonials[0];
               <div
                 class={`border-border/20 bg-card/20 rounded-lg border p-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md md:p-8 ${aboutPage.data.stories.length === 1 ? 'mx-auto' : ''}`}
               >
-                <div class="text-foreground/60 font-semibold tracking-wider uppercase">
+                <div class="text-foreground/80 font-semibold tracking-wider uppercase">
                   Case note
                 </div>
                 <h3 class="font-heading text-foreground mt-2 mb-4 text-2xl tracking-tight uppercase">

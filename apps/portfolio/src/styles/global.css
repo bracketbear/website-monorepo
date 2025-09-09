@@ -1,4 +1,7 @@
-@import '@bracketbear/core/styles/bracketbear.tailwind.css';
+@import '@bracketbear/bear-ui-tailwind/styles/bracketbear.tailwind.css';
+@import '@bracketbear/core/react/styles/codeblock.css';
+@source '../../../../node_modules/@bracketbear/bear-ui-tailwind';
+@source '../../../../node_modules/@bracketbear/bear-ui-react';
 @source '../../../../node_modules/@bracketbear/core';
 @source '../../../../node_modules/@bracketbear/flateralus-react';
 
@@ -152,4 +155,9 @@
 /* Ensure mobile nav doesn't affect document flow */
 #mobile-menu {
   contain: layout style paint;
+}
+
+/* TOC active state styling */
+[data-section-id].active {
+  @apply text-brand-orange font-semibold;
 }

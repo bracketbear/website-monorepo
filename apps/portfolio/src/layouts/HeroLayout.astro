@@ -27,6 +27,7 @@ const presets = {
   blob: 'blob',
   'enhanced-wave': 'enhanced-wave',
   'retro-grid': 'retro-grid',
+  'particle-sphere': 'particle-sphere',
 } as const;
 type Preset = ObjectValues<typeof presets>;
 
@@ -85,7 +86,6 @@ const metaTitle = pageTitle ? generatePortfolioMetaTitle(pageTitle) : undefined;
         <HeroSection
           preset={presets[animationPreset]}
           showDebugControls={true}
-          enableLuminanceDetection={true}
           title={props.title}
           subtitle={props.subtitle}
           description={props.description}

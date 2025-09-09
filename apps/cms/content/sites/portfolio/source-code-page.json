@@ -1,0 +1,256 @@
+{
+  "title": "Source Code",
+  "metaDescription": "Technical architecture and implementation details of the portfolio site. Learn about the tech stack, design decisions, and development practices.",
+  "canonicalUrl": "https://harrisoncallahan.com/source-code",
+  "noIndex": false,
+  "contactCTA": {},
+  "sectionOrder": [
+    {
+      "id": "tldr",
+      "title": "The TL;DR",
+      "file": "source-code.astro",
+      "eyebrow": "Overview"
+    },
+    {
+      "id": "architecture",
+      "title": "Architecture",
+      "file": "source-code.astro",
+      "eyebrow": "Architecture"
+    },
+    {
+      "id": "performance-accessibility",
+      "title": "Performance & accessibility",
+      "file": "source-code.astro",
+      "eyebrow": "Performance"
+    },
+    {
+      "id": "monorepo",
+      "title": "Repo map (auto-generated)",
+      "file": "source-code.astro",
+      "eyebrow": "Structure"
+    },
+    {
+      "id": "contracts-types",
+      "title": "Contracts & Types",
+      "file": "source-code.astro",
+      "eyebrow": "Type System"
+    },
+    {
+      "id": "agentic-workflows",
+      "title": "Agentic Workflows & Pair-Programming",
+      "file": "source-code.astro",
+      "eyebrow": "AI Pairing"
+    },
+    {
+      "id": "styling",
+      "title": "Styling",
+      "file": "source-code.astro",
+      "eyebrow": "Design"
+    },
+    {
+      "id": "storybook",
+      "title": "Storybook (single instance, multi-directory)",
+      "file": "source-code.astro",
+      "eyebrow": "Documentation"
+    },
+    {
+      "id": "flateralus",
+      "title": "Flateralus Animation System",
+      "file": "source-code.astro",
+      "eyebrow": "Animation"
+    },
+    {
+      "id": "testing-dx",
+      "title": "Testing & DX",
+      "file": "source-code.astro",
+      "eyebrow": "Testing"
+    },
+    {
+      "id": "security-ops",
+      "title": "Security & ops",
+      "file": "source-code.astro",
+      "eyebrow": "Security"
+    },
+    {
+      "id": "future-changes",
+      "title": "What I'd change next",
+      "file": "source-code.astro",
+      "eyebrow": "Roadmap"
+    },
+    {
+      "id": "closing",
+      "title": "Closing",
+      "file": "source-code.astro",
+      "eyebrow": "Conclusion"
+    }
+  ],
+  "tldr": {
+    "title": "The TL;DR",
+    "points": [
+      {
+        "label": "Architecture",
+        "bullets": [
+          "Astro 5 with React islands where interactivity matters",
+          "Static first; hydrate only what needs it"
+        ]
+      },
+      {
+        "label": "Styling",
+        "bullets": [
+          "Tailwind v4 using `@theme` tokens",
+          "Avoid arbitrary values; use intentionally when needed (e.g., layered shadows/backdrop)",
+          "Utilities keep the design consistent and measurable"
+        ]
+      },
+      {
+        "label": "Content",
+        "bullets": [
+          "Keystatic + Zod for typed content end-to-end",
+          "Builds fail fast on bad data"
+        ]
+      },
+      {
+        "label": "Animations",
+        "bullets": [
+          "Flateralus (PIXI.js 8) with typed controls",
+          "Visibility-based pausing",
+          "Guardrails (caps) to keep frames smooth"
+        ]
+      },
+      {
+        "label": "Storybook",
+        "bullets": [
+          "Single Storybook instance across apps and packages",
+          "Titles show where each component lives"
+        ]
+      },
+      {
+        "label": "Philosophy",
+        "bullets": [
+          "Prefer constraints and clear boundaries",
+          "Keep the toolchain boring, the types strong, and the pages fast"
+        ]
+      }
+    ]
+  },
+  "repoMap": {
+    "title": "Mono-Repo",
+    "description": "I'm a firm believer in mono-repos. Until the bird is ready to fly on its own, it should stay in the nest with the rest of the flock. This methodology keeps your features contained in one project's PRs and keeps everything in lock-step.\n\nApps and packages are separated and linked to each other in the respective `package.json` files. Here's an auto-generated list of the apps and packages when this website was built:\n"
+  },
+  "tailwindSection": {
+    "title": "Tailwind (and how I use it)",
+    "content": "Tailwind gets a lot of heat. I like it because utility-first development enforces a design system. With tokens, spacing and color stay consistent; with utilities, usage is analyzable. I also compose **custom utilities** (e.g., `button`, `px-content`, glass variants) with `@apply` so the markup stays clean and consistent across the app.\n",
+    "rules": [
+      "No arbitrary values unless there's truly no other option.",
+      "All color/spacing/radius come from `@theme` tokens.",
+      "Compose utilities instead of overriding styles."
+    ],
+    "tokenExcerpt": "/* Utilities built from tokens using @apply */\n@utility button {\n  @apply inline-flex items-center justify-center gap-2 rounded-lg border-2 border-solid px-4 py-2 text-sm font-bold tracking-wide uppercase transition-all duration-150 ease-in-out;\n}\n\n@utility button-lg {\n  @apply rounded-xl px-8 py-4 text-xl;\n}\n\n@utility button-primary {\n  @apply border-border bg-primary text-primary-foreground border-2;\n}\n\n/* Layout utility shared across pages */\n@utility px-content {\n  @apply px-4 lg:px-6;\n}",
+    "usageExample": "<button class=\"button button-primary button-lg\">Primary Action</button>\n<a class=\"button button-outline button-sm\" href=\"#\">Secondary Link</a>",
+    "dataAssistedStyling": {
+      "title": "Data & AI-assisted styling",
+      "content": "Because utilities are structured unlike regular CSS, I can analyze them. I track class usage and palette choices, then run small scripts to:\n\n- Flag near-duplicate spacing stacks.\n- Detect color drift (e.g., \"too much orange last month\").\n- Check contrast automatically\n\nI also have an early-stage tool, `@bracketbear/tw-pattern-analyzer`, that clusters frequently co-occurring utilities to suggest potential reusable utilities and components. Don't get it twisted—I'm not a data scientist and I'm sure there are things that can be improved—but this extra bit of analysis is super helpful.\n",
+      "codeExample": "{\n  \"totalClassLists\": 966,\n  \"uniquePatterns\": 549,\n  \"totalFiles\": 129,\n  \"totalPatterns\": 966,\n  \"clusters\": [\n    {\n      \"rep\": \"flex gap-2 items-center\",\n      \"members\": [\n        \"flex gap-2 items-center\",\n        \"flex flex-col gap-2 items-center\",\n        \"flex font-medium gap-2 items-center\"\n      ],\n      \"occurrences\": 17,\n      \"variants\": 3,\n      \"similarity\": 0.8333333333333334,\n      \"likelihood\": 37\n    },\n    {\n      \"rep\": \"container mx-auto text-center\",\n      \"members\": [\n        \"container mx-auto text-center\",\n        \"container mx-auto px-4 text-center\"\n      ],\n      \"occurrences\": 10,\n      \"variants\": 2,\n      \"similarity\": 0.875,\n      \"likelihood\": 19\n    },\n...\n}"
+    }
+  },
+  "architecture": {
+    "title": "Architecture At A Glance",
+    "content": "- **Static first.** Pages render statically in Astro; islands mount React only where interaction or animation adds value.\n- **Typed content.** Content shapes live in Zod. The build fails on bad content rather than shipping surprises to production.\n- **Clear boundaries.** Apps depend \"down\" on packages; packages don't reach back into apps.\n- **Assets.** Images get width hints and sensible defaults; fonts are subset.\n",
+    "mermaidDiagram": "flowchart LR\n  U[User] --> CDN\n  CDN --> Astro[Astro Static Pages]\n  Astro -->|hydrate as needed| Islands[React Islands]\n  Astro --> Content[Keystatic Build (Zod typed)]\n  Islands --> Anim[Flateralus Runtime (PIXI 8)]\n  Astro --> Assets[Image/Asset Pipeline]",
+    "systemFlowTitle": "System Flow"
+  },
+  "typescript": {
+    "title": "TypeScript",
+    "content": "We are TypeScript-first. Apps and packages expose explicit, well-documented types. We depend on interfaces, generics, and factory types to keep implementation details decoupled from contracts. We never use `any`; we strengthen types to fix errors.\n",
+    "patterns": [
+      {
+        "title": "Interface-first contracts",
+        "description": "Define interfaces for public APIs; keep implementations behind them. This enables framework-agnostic cores and multiple adapters (e.g., PIXI, p5).\n",
+        "codeExample": "export interface Application<TContext = unknown> {\n  getContext(): TContext | null;\n  init(container: HTMLElement): Promise<void>;\n  start(): void;\n  stop(): void;\n  destroy(): void;\n}\n\nexport type ApplicationFactory<TApp extends Application> = (options?: unknown) => TApp;"
+      },
+      {
+        "title": "Generics for control surfaces",
+        "description": "Animations and hooks accept generic control types so UIs get end-to-end type safety without casting.\n",
+        "codeExample": "export function useAnimationStage<TControlValues>(options: { factory: (controls: TControlValues) => unknown }) {\n  // ...\n  return {} as { controls: TControlValues };\n}"
+      },
+      {
+        "title": "Content Model Integration",
+        "description": "I keep content inside the type system. Editors work in Keystatic; Zod validates at build; components consume typed props. Keystatic schemas mirror Zod schemas in `@bracketbear/astro-content` so content is validated at edit-time and build-time.\n",
+        "codeExample": "// CMS Schema (Keystatic)\n// apps/cms/src/schemas/page.ts\nexport function makeBasePageFields() {\n  return {\n    title: fields.text({\n      label: 'Page Title',\n      description: 'The main title for this page'\n    }),\n    metaDescription: fields.text({ \n      label: 'Meta Description' \n    }),\n    canonicalUrl: fields.text({ \n      label: 'Canonical URL' \n    }),\n    noIndex: fields.checkbox({\n      label: 'No Index',\n      description: 'Exclude from search engines'\n    })\n  };\n}\n\n// Zod Schema (Astro)\n// packages/astro-content/src/schemas/page.ts\nexport const basePageSchema = z.object({\n  title: z.string().optional(),\n  metaDescription: z.string().optional(),\n  canonicalUrl: z.string().url().optional(),\n  noIndex: z.boolean().default(false)\n});\n\nexport type BasePageData = z.infer<typeof basePageSchema>;"
+      }
+    ]
+  },
+  "agenticWorkflows": {
+    "title": "Agentic Workflows & Pair-Programming",
+    "content": "I pair-program with Cursor's Agent and keep it on rails with project Rules. The Agent plans first, shows a to-do list for longer changes, and proposes diffs I can accept or reject. Rules make those diffs align with how this repo is built.\n\n**How I use it**\n\n- **Plan → Act → Review.** Ask for a plan, let it break work into steps, then apply changes with diffs and checkpoints. If a step needs the terminal, I confirm the command first.\n- **Architecture sessions.** I'll have the Agent map modules, call out boundary violations, or sketch migration steps before touching code.\n- **Guardrails.** Project Rules live in `.cursor/rules` and are scoped to directories, so the Agent follows the same constraints I do.\n",
+    "protocolStepsTitle": "Pair-programming protocol (how I keep it predictable)",
+    "protocolSteps": [
+      "**State the outcome.** \"Refactor X into package Y, keep public API stable.\"\n",
+      "**Ask for a plan.** Agent produces a to-do list; I tweak it if needed.\n",
+      "**Apply with diffs.** I review and accept in chunks; checkpoints let me roll back.\n",
+      "**Run commands with confirm.** Anything destructive or long-running asks first.\n",
+      "**Exit criteria.** Tests pass, boundaries hold, tokens respected, and the plan's boxes are all checked.\n"
+    ],
+    "rulesExcerpt": "---\ndescription: Frontend styling rules\nglobs:\n  - \"apps/portfolio/**\"\n  - \"packages/ui-kit/**\"\nalwaysApply: false\n---\n- Tailwind v4 only with `@theme` tokens. No arbitrary values.\n- Prefer composition over overrides; if a utility needs `!important`, the API is wrong.\n- Keep panels/cards/code blocks on the same surface/radius/shadow set.\n@tokens.css",
+    "rulesExcerptTitle": "Project Rules (excerpt)",
+    "rulesExcerptLanguage": "mdc"
+  },
+  "storybook": {
+    "title": "Storybook (single instance, multi-directory)",
+    "content": "I run one Storybook that aggregates stories from apps and packages. Each story shows where it lives. This makes reviews faster and keeps ownership clear: if a component belongs in the shared UI, it moves there and inherits tokens.\n\n- One place to exercise states and edge cases.\n- Easy visual QA during refactors.\n- Encourages reuse without policing it manually.\n",
+    "mediaImage": "/content-images/sites/portfolio/source-code-page/storybook/storybook/mediaImage.png"
+  },
+  "flateralus": {
+    "title": "Flateralus Animation System",
+    "content": "Generative visuals are great until they eat the frame budget. I keep them in bounds with typed controls, visibility-based pausing, and guardrails (caps) that step complexity down before the UI suffers.\n",
+    "codeExample": "export const ParticleNetworkControls = {\n  particleCount: { type: \"int\", min: 100, max: 800, default: 400 },\n  linkDistance:  { type: \"float\", min: 20,  max: 180, default: 100 },\n  speed:         { type: \"float\", min: 0.1, max: 2.0, default: 0.6 },\n  theme:         { type: \"select\", options: [\"brand\",\"neutral\",\"warning\"], default: \"brand\" },\n} as const;",
+    "codeExampleTitle": "particle-network.ts"
+  },
+  "performanceAccessibility": {
+    "title": "Performance & accessibility",
+    "targets": "**Lighthouse Results:**\n\n- **Performance: 99/100** - Near-perfect Core Web Vitals\n- **Accessibility: 100/100** - Full WCAG compliance\n- **Best Practices: 100/100** - Security and modern web standards\n- **SEO: 100/100** - Optimized for search engines\n\n**Core Web Vitals:**\n\n- **LCP ≤ 1.2s** (Largest Contentful Paint)\n- **INP ≤ 50ms** (Interaction to Next Paint)\n- **CLS = 0** (Cumulative Layout Shift)\n",
+    "howToGetThere": "**Performance Strategy:**\n\n- **Static-first architecture** with Astro; selective React hydration only where needed\n- **Optimized images** with width hints, modern formats, and responsive sizing\n- **Font optimization** with subset loading and preload hints\n- **Animation controls** that pause when not visible to preserve frame budget\n- **Bundle optimization** with tree-shaking and code splitting\n\n**Accessibility Approach:**\n\n- **Semantic HTML** with proper heading hierarchy and landmarks\n- **ARIA labels** and roles for complex interactions\n- **Keyboard navigation** support throughout\n- **Color contrast** meeting WCAG AA standards\n- **Screen reader** compatibility with descriptive alt text\n",
+    "targetsTitle": "Targets",
+    "howToGetThereTitle": "How I get there"
+  },
+  "testingDx": {
+    "title": "Testing & DX",
+    "content": "Comprehensive testing strategy with automated quality gates and developer experience optimizations.\n\n**Testing Strategy:**\n\n- **Unit tests** for utilities and business logic using Vitest\n- **Integration tests** for complex workflows and API interactions\n- **Component tests** for React components with Testing Library\n- **Storybook** for component states and visual regression testing\n\n**Development Workflow:**\n\n- **Husky hooks** enforce code quality at every commit\n- **Pre-push** runs full test suite to prevent broken code\n- **Pre-merge** comprehensive checks before merging to dev\n- **Branch protection** prevents direct commits to main/dev\n\n**Quality Gates:**\n\n- Formatting (Prettier), linting (ESLint), type checking (TypeScript)\n- Test coverage, build verification, dependency audits\n- CSS pattern analysis to maintain design system consistency\n",
+    "huskyWorkflowDescription": "**Pre-commit & Pre-merge Hooks:** Every commit triggers branch protection (prevents direct commits to dev/main) and runs lint-staged for formatting. When merging into dev, a comprehensive pre-merge script runs: formatting checks, linting, TypeScript validation, full test suite, build verification, dependency audits, and git status checks. Only if all checks pass does the merge proceed.\n",
+    "vitestDescription": "**Monorepo Testing Setup:** Single Vitest configuration at the root handles all packages and apps. Tests are co-located with source files (e.g., `utils.ts` has `utils.test.ts`). Uses jsdom environment for React component testing with Testing Library. Aliases configured for monorepo packages. Tests run in Node.js with globals enabled for cleaner syntax.\n",
+    "testExampleDescription": "**Component Testing Pattern:** Tests focus on accessibility and user behavior rather than implementation details. Uses `getByRole` queries for semantic testing, checks actual DOM content rather than props, and tests both happy path and edge cases. Each test is isolated and descriptive about what behavior it's verifying.\n"
+  },
+  "securityOps": {
+    "title": "Security & ops",
+    "content": "- Secrets stay server-side.\n- Security headers via Netlify (`X-Frame-Options`, `X-XSS-Protection`, `X-Content-Type-Options`, `Referrer-Policy`).\n- Tagged releases and a quick rollback to the previous tag if something looks wrong.\n- Dependency security audits run on every commit via pre-merge hooks.\n- Comprehensive quality gates: pre-commit, pre-push, and pre-merge hooks ensure code quality.\n- CI/CD security checks via GitHub Actions on every push and pull request.\n- Static site generation reduces attack surface by eliminating server-side vulnerabilities.\n\n**Release Management:**\n\n- Synchronized versioning across all packages and apps using automated scripts\n- Git tags created automatically on each deployment (`v1.0.1`, `v2.0.0`, etc.)\n- One-command rollback to any previous release\n- Version bump commands (`npm run version:patch/minor/major`) sync across entire monorepo\n"
+  },
+  "futureChanges": {
+    "title": "What I'd change next",
+    "items": [
+      "Replace the quick OKLCH threshold with **APCA** scoring across the board.\n",
+      "Add a token audit that flags unused tokens and over-used utility combos.\n",
+      "Ship an image modal/gallery that supports deep-linking directly to a specific image.\n",
+      "Script performance traces for animation presets so regressions are obvious.\n"
+    ]
+  },
+  "closing": {
+    "title": "Closing and repository link",
+    "content": "If you want to see something specific—content shapes, token usage, or animation controls—reach out and I'll point you to a tight, focused example.\n",
+    "modalTitle": "Before you dive in...",
+    "modalHeading": "Coding is a journey, not a destination.",
+    "modalIntro": "This repository represents a snapshot in time of my learning and growth as a developer. The code you'll find here reflects my current understanding, preferences, and the tools I've chosen to work with.\n",
+    "modalAcknowledgment": "By accessing this code, you acknowledge that:",
+    "modalPoints": [
+      "This code is a work in progress and may contain imperfections",
+      "Best practices evolve, and what's shown here represents my current approach",
+      "The journey of learning to code never ends"
+    ],
+    "modalCheckboxLabel": "I understand that coding is a journey and agree to view this code as learning material",
+    "modalCancelButton": "Cancel",
+    "modalAgreeButton": "I Agree - Take me to the code",
+    "repositoryUrl": "https://github.com/bracketbear/website-monorepo",
+    "buttonTitle": "Ready to explore the code?",
+    "buttonDescription": "This repository contains the complete source code for this portfolio and all related projects.",
+    "buttonText": "View Source Code"
+  }
+}

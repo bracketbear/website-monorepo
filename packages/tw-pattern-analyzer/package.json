@@ -1,7 +1,7 @@
 {
   "name": "@bracketbear/tw-pattern-analyzer",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.1",
   "type": "module",
   "bin": {
     "tw-patterns": "./dist/cli.js"

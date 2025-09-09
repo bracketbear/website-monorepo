@@ -2,14 +2,13 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
-import markdoc from '@astrojs/markdoc';
 import svgr from 'vite-plugin-svgr';
 
 const bracketbearCss = '/packages/core/dist/styles/bracketbear.tailwind.css';
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [react(), markdoc()],
+  integrations: [react()],
   vite: {
     plugins: [
       // @ts-expect-error: Bug with TailwindCSS Vite plugin type definition
@@ -29,6 +28,28 @@ export default defineConfig({
         },
       },
     ],
+    build: {
+      cssCodeSplit: true, // Enable CSS code splitting
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Separate vendor chunks for better caching
+            'react-vendor': ['react', 'react-dom'],
+            'pixi-vendor': ['pixi.js'],
+            'flateralus-vendor': [
+              '@bracketbear/flateralus-react',
+              '@bracketbear/flateralus-pixi',
+              '@bracketbear/flateralus-pixi-animations',
+            ],
+          },
+        },
+      },
+    },
   },
   output: 'static',
+  compressHTML: true,
+  prefetch: {
+    prefetchAll: false, // Disable automatic prefetching to reduce initial load
+    defaultStrategy: 'viewport', // Only prefetch when elements enter viewport
+  },
 });

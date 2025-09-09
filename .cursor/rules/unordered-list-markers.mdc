@@ -1,0 +1,49 @@
+---
+globs: *.astro,*.tsx,*.mdx
+description: Unordered bulleted lists should almost never let wrapped content appear under the bullet; prefer outside markers with padding.
+---
+# Unordered List Marker Positioning
+
+- **Default behavior**: Use outside markers so wrapped lines align with the list content, not under the bullet.
+- **Tailwind utilities**: Prefer `list-disc list-outside pl-5` (adjust padding per context). Avoid `list-inside` unless there’s a strong visual reason.
+- **Consistency**: Apply the same pattern to nested lists; add incremental padding (e.g., `pl-4` per level) while keeping `list-outside`.
+- **Prose blocks**: If using typography utilities, ensure ULs still use outside markers. Override when necessary (e.g., `prose-ul:list-outside`).
+- **Exceptions (rare)**: Only use `list-inside` in tight UI where markers must sit in-column and wrapping under the marker is explicitly desired.
+
+## Examples
+
+### Before (not preferred)
+```astro
+<ul class="list-disc list-inside text-sm">
+  <li>
+    Long line that wraps onto multiple lines. Subsequent lines sit under the bullet, which hurts scanability.
+  </li>
+  <li>Another item</li>
+  <li>Third item</li>
+</ul>
+```
+
+### After (preferred)
+```astro
+<ul class="list-disc list-outside pl-5 text-sm">
+  <li>
+    Long line that wraps onto multiple lines. Subsequent lines align with the content, not under the bullet.
+  </li>
+  <li>Another item</li>
+  <li>Third item</li>
+  <!-- Nested list example -->
+  <li>
+    Parent item
+    <ul class="list-disc list-outside pl-4">
+      <li>Nested item</li>
+    </ul>
+  </li>
+  
+```
+
+## Rationale
+
+- **Scanability**: Aligning wrapped lines with the content column keeps bullets as markers, not layout anchors.
+- **Consistency**: Avoids unexpected text creep under markers across components and pages.
+- **Flexibility**: Padding (`pl-*`) can be tuned per layout without sacrificing alignment.
+

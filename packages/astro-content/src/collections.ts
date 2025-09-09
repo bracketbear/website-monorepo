@@ -8,6 +8,7 @@ import {
   workSkillCategorySchema,
   workProjectCategorySchema,
   workProjectSchema,
+  personalProjectSchema,
   blogSchema,
   pageSchema,
   serviceSchema,
@@ -18,6 +19,7 @@ import {
   portfolioWorkPageSchema,
   portfolioProjectsPageSchema,
   portfolioProjectPageSchema,
+  sourceCodePageSchema,
 } from './schemas';
 
 /**
@@ -47,6 +49,10 @@ export const workCollections = {
   workProject: {
     base: workPath('projects'),
     schema: workProjectSchema,
+  },
+  personalProject: {
+    base: workPath('personal-projects'),
+    schema: personalProjectSchema,
   },
 };
 
@@ -103,6 +109,11 @@ export const siteSpecificCollections = {
     base: join(contentPath, 'sites/portfolio'),
     schema: portfolioProjectPageSchema,
     pattern: 'project-page.json',
+  },
+  portfolioSourceCodePage: {
+    base: join(contentPath, 'sites/portfolio'),
+    schema: sourceCodePageSchema,
+    pattern: 'source-code-page.json',
   },
   // Portfolio site collections
   portfolioContactMethods: {

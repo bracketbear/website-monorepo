@@ -1,0 +1,797 @@
+---
+import { getCollection } from 'astro:content';
+import { marked } from 'marked';
+import { type Breadcrumb, clsx, CodeBlock } from '@bracketbear/core';
+import { getContentImageUrl } from '@bracketbear/astro-content';
+import HeroLayout from '@/layouts/HeroLayout.astro';
+import Section from '@/components/Section.astro';
+import StickyTOC from '@/components/StickyTOC.astro';
+import RepoPanel from '@/components/RepoPanel.astro';
+import { ClosingSection } from '@/components/ClosingSection';
+
+// Helper function to clean markdown content
+function cleanMarkdown(content: string | undefined | null): string {
+  if (!content) return '';
+
+  return content
+    .trim() // Remove leading/trailing whitespace
+    .replace(/\\~/g, '~') // Fix escaped tildes
+    .replace(/\\\*/g, '*') // Fix escaped asterisks
+    .replace(/\n\s*\n\s*\n/g, '\n\n') // Collapse multiple empty lines
+    .replace(/\s+$/gm, ''); // Remove trailing whitespace from each line
+}
+
+const activeSection = Astro.url.hash.slice(1);
+
+const breadcrumbs: Breadcrumb[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Source Code', href: '/source-code' },
+];
+
+// Get the source-code page singleton
+const sourceCodePageEntries = await getCollection('portfolioSourceCodePage');
+const sourceCodePage = sourceCodePageEntries[0]; // Singletons have only one entry
+
+// Debug: Log the closing data
+console.log('Closing data:', sourceCodePage?.data?.closing);
+
+// Define sections for TOC - pull from CMS data
+const sections = [
+  sourceCodePage?.data?.tldr && {
+    id: 'tldr',
+    title: sourceCodePage.data.tldr.title,
+    eyebrow: 'Overview',
+  },
+  sourceCodePage?.data?.architecture && {
+    id: 'architecture',
+    title: sourceCodePage.data.architecture.title,
+    eyebrow: 'Architecture',
+  },
+  sourceCodePage?.data?.performanceAccessibility && {
+    id: 'performance-accessibility',
+    title: sourceCodePage.data.performanceAccessibility.title,
+    eyebrow: 'Performance',
+  },
+  sourceCodePage?.data?.repoMap && {
+    id: 'monorepo',
+    title: sourceCodePage.data.repoMap.title,
+    eyebrow: 'Structure',
+  },
+  sourceCodePage?.data?.typescript && {
+    id: 'contracts-types',
+    title: 'Contracts & Types',
+    eyebrow: 'Type System',
+  },
+  sourceCodePage?.data?.agenticWorkflows && {
+    id: 'agentic-workflows',
+    title: sourceCodePage.data.agenticWorkflows.title,
+    eyebrow: 'AI Pairing',
+  },
+  sourceCodePage?.data?.tailwindSection && {
+    id: 'styling',
+    title: 'Styling',
+    eyebrow: 'Design',
+  },
+  sourceCodePage?.data?.storybook && {
+    id: 'storybook',
+    title: sourceCodePage.data.storybook.title,
+    eyebrow: 'Documentation',
+  },
+  sourceCodePage?.data?.flateralus && {
+    id: 'flateralus',
+    title: sourceCodePage.data.flateralus.title,
+    eyebrow: 'Animation',
+  },
+  sourceCodePage?.data?.testingDx && {
+    id: 'testing-dx',
+    title: sourceCodePage.data.testingDx.title,
+    eyebrow: 'Testing',
+  },
+  sourceCodePage?.data?.securityOps && {
+    id: 'security-ops',
+    title: sourceCodePage.data.securityOps.title,
+    eyebrow: 'Security',
+  },
+  sourceCodePage?.data?.futureChanges && {
+    id: 'future-changes',
+    title: sourceCodePage.data.futureChanges.title,
+    eyebrow: 'Roadmap',
+  },
+  sourceCodePage?.data?.closing && {
+    id: 'closing',
+    title: sourceCodePage.data.closing.title,
+    eyebrow: 'Conclusion',
+  },
+].filter(Boolean);
+
+// Load the auto-generated repo map
+let repoMapData = null;
+try {
+  repoMapData = await import('@/generated/repo-map.json');
+} catch (error) {
+  console.warn('Failed to load repo map data:', error);
+}
+---
+
+<HeroLayout
+  pageTitle="Source Code"
+  title={sourceCodePage.data.title}
+  subtitle={sourceCodePage.data.subtitle}
+  breadcrumbs={breadcrumbs}
+  animationPreset="particle-sphere"
+  currentPage="source-code"
+>
+  <div class="container-content">
+    <div class="relative">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
+        <div class="lg:sticky lg:top-36 lg:self-start">
+          <StickyTOC sections={sections} activeSection={activeSection} />
+        </div>
+        <div class="min-w-0">
+          {/* TL;DR Section */}
+          {
+            sourceCodePage?.data?.tldr && (
+              <Section
+                id="tldr"
+                eyebrow="Overview"
+                title={sourceCodePage.data.tldr.title}
+              >
+                <div class="grid grid-cols-1 gap-6 xl:grid-cols-2 2xl:grid-cols-2">
+                  {sourceCodePage.data.tldr.points.map((point: any) => (
+                    <div class="card-dark prose px-4 pt-0 pb-2">
+                      <h3 class="font-heading mb-4 text-xl font-bold tracking-tight text-white uppercase">
+                        {point.label}
+                      </h3>
+                      <ul class="list-outside list-disc space-y-2 text-white/90">
+                        {point.bullets?.map((b: string) => (
+                          <li>{b}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </Section>
+            )
+          }
+
+          {/* Architecture Section */}
+          {
+            sourceCodePage?.data?.architecture && (
+              <Section
+                id="architecture"
+                eyebrow="Architecture"
+                title={sourceCodePage.data.architecture.title}
+                intro={sourceCodePage.data.architecture.content}
+              >
+                <div class="mb-8">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    {sourceCodePage.data.architecture.systemFlowTitle}
+                  </h3>
+                  <div class="prose prose-lg max-w-none">
+                    <div class="mb-6">
+                      <div class="card">
+                        <div class="space-y-3 text-sm">
+                          <div class="flex items-center gap-2">
+                            <span class="bg-primary text-primary-foreground rounded px-3 py-1 text-xs">
+                              User
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-secondary text-secondary-foreground rounded px-3 py-1 text-xs">
+                              CDN
+                            </span>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <span class="bg-secondary text-secondary-foreground rounded px-3 py-1 text-xs">
+                              CDN
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                              Astro Static Pages
+                            </span>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                              Astro
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-brand-blue rounded px-3 py-1 text-xs text-white">
+                              React Islands
+                            </span>
+                            <span class="text-muted-foreground text-xs">
+                              (hydrate as needed)
+                            </span>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                              Astro
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-brand-green rounded px-3 py-1 text-xs text-white">
+                              Keystatic Build
+                            </span>
+                            <span class="text-muted-foreground text-xs">
+                              (Zod typed)
+                            </span>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <span class="bg-brand-blue rounded px-3 py-1 text-xs text-white">
+                              Islands
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-brand-purple rounded px-3 py-1 text-xs text-white">
+                              Flateralus Runtime
+                            </span>
+                            <span class="text-muted-foreground text-xs">
+                              (PIXI 8)
+                            </span>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <span class="bg-brand-orange rounded px-3 py-1 text-xs text-white">
+                              Astro
+                            </span>
+                            <span class="text-muted-foreground">→</span>
+                            <span class="bg-muted text-muted-foreground rounded px-3 py-1 text-xs">
+                              Image/Asset Pipeline
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Section>
+            )
+          }
+
+          {/* Performance & Accessibility Section */}
+          {
+            sourceCodePage?.data?.performanceAccessibility && (
+              <Section
+                id="performance-accessibility"
+                eyebrow="Performance"
+                title={sourceCodePage.data.performanceAccessibility.title}
+              >
+                <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                  <div class="card-neutral">
+                    <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                      {
+                        sourceCodePage.data.performanceAccessibility
+                          .targetsTitle
+                      }
+                    </h3>
+                    <div class="prose prose-lg max-w-none">
+                      <Fragment
+                        set:html={marked.parse(
+                          cleanMarkdown(
+                            sourceCodePage.data.performanceAccessibility.targets
+                          )
+                        )}
+                      />
+                    </div>
+                  </div>
+                  <div class="card-neutral">
+                    <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                      {
+                        sourceCodePage.data.performanceAccessibility
+                          .howToGetThereTitle
+                      }
+                    </h3>
+                    <div class="prose prose-lg max-w-none">
+                      <Fragment
+                        set:html={marked.parse(
+                          cleanMarkdown(
+                            sourceCodePage.data.performanceAccessibility
+                              .howToGetThere
+                          )
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Section>
+            )
+          }
+
+          {/* Repo Map Section */}
+          {
+            sourceCodePage?.data?.repoMap && (
+              <Section
+                id="monorepo"
+                eyebrow="Structure"
+                title={sourceCodePage.data.repoMap.title}
+                intro={sourceCodePage.data.repoMap.description}
+              >
+                <div>
+                  <div class="mb-6">
+                    <h3 class="font-heading text-foreground mb-2 text-xl font-bold">
+                      Repository Structure
+                    </h3>
+                    <p class="text-muted-foreground">
+                      A monorepo containing{' '}
+                      {repoMapData?.default?.apps?.length || 0} applications and{' '}
+                      {repoMapData?.default?.packages?.length || 0} shared
+                      packages.
+                    </p>
+                  </div>
+
+                  <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                    {/* Apps Panel */}
+                    {repoMapData && (
+                      <RepoPanel
+                        title="Apps"
+                        items={repoMapData.default.apps}
+                      />
+                    )}
+
+                    {/* Packages Panel */}
+                    {repoMapData && (
+                      <RepoPanel
+                        title="Packages"
+                        items={repoMapData.default.packages}
+                      />
+                    )}
+                  </div>
+                </div>
+              </Section>
+            )
+          }
+
+          {/* Contracts & Types Section */}
+          {
+            sourceCodePage?.data?.typescript && (
+              <Section
+                id="contracts-types"
+                eyebrow="Type System"
+                title="Contracts & Types"
+                intro={sourceCodePage.data.typescript.content}
+              >
+                {sourceCodePage.data.typescript.patterns?.length > 0 && (
+                  <div class="space-y-10 xl:space-y-14">
+                    {sourceCodePage.data.typescript.patterns.map(
+                      (p: any, i: number) => (
+                        <div class="card pt-0">
+                          <div class="grid grid-cols-1 items-start xl:grid-cols-2">
+                            <div
+                              class={clsx(
+                                `prose prose-lg flex flex-col xl:gap-4`,
+                                i % 2 === 1 ? 'xl:order-2 xl:text-right' : ''
+                              )}
+                            >
+                              <h3 class="">{p.title}</h3>
+                              <div>
+                                <Fragment
+                                  set:html={marked.parse(
+                                    cleanMarkdown(p.description)
+                                  )}
+                                />
+                              </div>
+                            </div>
+                            <div
+                              class={clsx([
+                                'self-center xl:pt-4',
+                                i % 2 === 1 ? 'xl:order-1' : '',
+                              ])}
+                            >
+                              <CodeBlock
+                                code={p.codeExample}
+                                language="ts"
+                                showLineNumbers
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+                )}
+              </Section>
+            )
+          }
+
+          {/* Agentic Workflows Section */}
+          {
+            sourceCodePage?.data?.agenticWorkflows && (
+              <Section
+                id="agentic-workflows"
+                eyebrow="AI Pairing"
+                title={sourceCodePage.data.agenticWorkflows.title}
+                intro={sourceCodePage.data.agenticWorkflows.content}
+              >
+                {/* Protocol Steps */}
+                <div class="mb-8">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    {sourceCodePage.data.agenticWorkflows.protocolStepsTitle}
+                  </h3>
+                  <ol>
+                    {sourceCodePage.data.agenticWorkflows.protocolSteps?.map(
+                      (step: string) => (
+                        <li>
+                          <Fragment
+                            set:html={marked.parse(cleanMarkdown(step))}
+                          />
+                        </li>
+                      )
+                    )}
+                  </ol>
+                </div>
+
+                {/* Rules Excerpt */}
+                <div class="mb-8">
+                  <h3 class="font-heading mb-4 text-xl font-bold tracking-tight">
+                    {sourceCodePage.data.agenticWorkflows.rulesExcerptTitle}
+                  </h3>
+                  <div class="mb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="text-muted-foreground text-xs font-medium">
+                        .cursor/rules
+                      </span>
+                      <span class="text-muted-foreground/80 text-xs">
+                        {
+                          sourceCodePage.data.agenticWorkflows
+                            .rulesExcerptLanguage
+                        }
+                      </span>
+                    </div>
+                  </div>
+                  <CodeBlock
+                    code={sourceCodePage.data.agenticWorkflows.rulesExcerpt}
+                    language={
+                      sourceCodePage.data.agenticWorkflows.rulesExcerptLanguage
+                    }
+                    showLineNumbers
+                    className="bg-brand-dark/90 text-white"
+                  />
+                </div>
+              </Section>
+            )
+          }
+
+          {/* Styling Section */}
+          {
+            sourceCodePage?.data?.tailwindSection && (
+              <Section
+                id="styling"
+                eyebrow="Design"
+                title="Styling"
+                intro={sourceCodePage.data.tailwindSection.content}
+              >
+                {/* Rules */}
+                <div class="mb-8">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    Rules I follow
+                  </h3>
+                  <ul class="list-outside list-disc space-y-2">
+                    {sourceCodePage.data.tailwindSection.rules.map(
+                      (rule: string) => (
+                        <li class="text-foreground/90">{rule}</li>
+                      )
+                    )}
+                  </ul>
+                </div>
+
+                {/* Token Excerpt */}
+                <div class="mb-8">
+                  <h3 class="font-heading mb-4 text-xl font-bold tracking-tight text-white">
+                    {sourceCodePage.data.tailwindSection.tokenExcerptTitle}
+                  </h3>
+                  <div class="mb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="text-muted-foreground text-xs font-medium">
+                        theme.css
+                      </span>
+                      <span class="text-muted-foreground/80 text-xs">css</span>
+                    </div>
+                  </div>
+                  <CodeBlock
+                    code={sourceCodePage.data.tailwindSection.tokenExcerpt}
+                    language="css"
+                    showLineNumbers
+                    className="bg-brand-dark/90 text-white"
+                  />
+                </div>
+
+                {/* Usage Example */}
+                <div class="mb-8">
+                  <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                    {sourceCodePage.data.tailwindSection.usageExampleTitle}
+                  </h3>
+                  <div class="mb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="text-muted-foreground text-xs font-medium">
+                        component.html
+                      </span>
+                      <span class="text-muted-foreground/80 text-xs">html</span>
+                    </div>
+                  </div>
+                  <CodeBlock
+                    code={sourceCodePage.data.tailwindSection.usageExample}
+                    language="html"
+                    showLineNumbers
+                  />
+                </div>
+
+                {/* Data and AI Assisted Styling Subsection */}
+                {sourceCodePage.data.tailwindSection.dataAssistedStyling && (
+                  <div>
+                    <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                      {
+                        sourceCodePage.data.tailwindSection.dataAssistedStyling
+                          .title
+                      }
+                    </h3>
+                    <div class="mb-4">
+                      <div class="prose prose-invert max-w-none">
+                        <div
+                          set:html={marked.parse(
+                            cleanMarkdown(
+                              sourceCodePage.data.tailwindSection
+                                .dataAssistedStyling.content
+                            )
+                          )}
+                        />
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <div class="flex items-center gap-2">
+                        <span class="text-muted-foreground text-xs font-medium">
+                          tw-patterns.json
+                        </span>
+                        <span class="text-muted-foreground/80 text-xs">
+                          json
+                        </span>
+                      </div>
+                    </div>
+                    <CodeBlock
+                      code={
+                        sourceCodePage.data.tailwindSection.dataAssistedStyling
+                          .codeExample
+                      }
+                      language="json"
+                      showLineNumbers
+                      className="bg-brand-dark/90 text-white"
+                    />
+                  </div>
+                )}
+              </Section>
+            )
+          }
+
+          {/* Storybook Section */}
+          {
+            sourceCodePage?.data?.storybook && (
+              <Section
+                id="storybook"
+                eyebrow="Documentation"
+                title={sourceCodePage.data.storybook.title}
+                intro={sourceCodePage.data.storybook.content}
+              >
+                {sourceCodePage.data.storybook.mediaImage && (
+                  <img
+                    src={(() => {
+                      // Extract the relative path from the CMS image path
+                      // CMS stores: /content-images/sites/portfolio/source-code-page/storybook/storybook/mediaImage.png
+                      // We need: storybook/mediaImage.png for getContentImageUrl
+                      const imagePath =
+                        sourceCodePage.data.storybook.mediaImage;
+                      if (
+                        imagePath.startsWith(
+                          '/content-images/sites/portfolio/source-code-page/'
+                        )
+                      ) {
+                        const relativePath = imagePath.replace(
+                          '/content-images/sites/portfolio/source-code-page/',
+                          ''
+                        );
+                        return getContentImageUrl(
+                          'sites/portfolio',
+                          'source-code-page',
+                          relativePath
+                        );
+                      }
+                      return imagePath;
+                    })()}
+                    alt="Storybook interface showing component documentation and preview"
+                    class=""
+                  />
+                )}
+              </Section>
+            )
+          }
+
+          {/* Flateralus Section */}
+          {
+            sourceCodePage?.data?.flateralus && (
+              <Section
+                id="flateralus"
+                eyebrow="Animation"
+                title={sourceCodePage.data.flateralus.title}
+                intro={sourceCodePage.data.flateralus.content}
+              >
+                <div class="mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-muted-foreground text-xs font-medium">
+                      flateralus.ts
+                    </span>
+                    <span class="text-muted-foreground/80 text-xs">ts</span>
+                  </div>
+                </div>
+                <CodeBlock
+                  code={sourceCodePage.data.flateralus.codeExample}
+                  language="ts"
+                  showLineNumbers
+                  className="bg-brand-dark/90 text-white"
+                />
+              </Section>
+            )
+          }
+
+          {/* Testing & DX Section */}
+          {
+            sourceCodePage?.data?.testingDx && (
+              <Section
+                id="testing-dx"
+                eyebrow="Testing"
+                title={sourceCodePage.data.testingDx.title}
+                intro={sourceCodePage.data.testingDx.content}
+              >
+                <div class="space-y-8">
+                  {/* Husky Workflow */}
+                  <div class="card-neutral">
+                    <div class="prose prose-lg max-w-none">
+                      <Fragment
+                        set:html={marked.parse(
+                          cleanMarkdown(
+                            sourceCodePage.data.testingDx
+                              .huskyWorkflowDescription ||
+                              '**Pre-commit & Pre-merge Hooks:** Every commit triggers branch protection and runs lint-staged for formatting. When merging into dev, comprehensive checks run including formatting, linting, TypeScript validation, tests, build verification, and dependency audits.'
+                          )
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Vitest Setup */}
+                  <div class="card-neutral">
+                    <div class="prose prose-lg max-w-none">
+                      <Fragment
+                        set:html={marked.parse(
+                          cleanMarkdown(
+                            sourceCodePage.data.testingDx.vitestDescription ||
+                              '**Monorepo Testing Setup:** Single Vitest configuration at the root handles all packages and apps. Tests are co-located with source files and use jsdom environment for React component testing with Testing Library.'
+                          )
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Test Patterns */}
+                  <div class="card-neutral">
+                    <div class="prose prose-lg max-w-none">
+                      <Fragment
+                        set:html={marked.parse(
+                          cleanMarkdown(
+                            sourceCodePage.data.testingDx
+                              .testExampleDescription ||
+                              '**Component Testing Pattern:** Tests focus on accessibility and user behavior rather than implementation details. Uses semantic queries and checks actual DOM content rather than props.'
+                          )
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Section>
+            )
+          }
+
+          {/* Security & Ops Section */}
+          {
+            sourceCodePage?.data?.securityOps && (
+              <Section
+                id="security-ops"
+                eyebrow="Security"
+                title={sourceCodePage.data.securityOps.title}
+                intro={sourceCodePage.data.securityOps.content}
+              />
+            )
+          }
+
+          {/* Future Changes Section */}
+          {
+            sourceCodePage?.data?.futureChanges && (
+              <Section
+                id="future-changes"
+                eyebrow="Roadmap"
+                title={sourceCodePage.data.futureChanges.title}
+              >
+                <div class="card-neutral">
+                  <ul class="prose max-w-prose">
+                    {sourceCodePage.data.futureChanges.items.map(
+                      (item: string) => (
+                        <li
+                          class="text-foreground/90"
+                          set:html={marked.parse(cleanMarkdown(item))}
+                        />
+                      )
+                    )}
+                  </ul>
+                </div>
+              </Section>
+            )
+          }
+
+          {/* Closing Section */}
+          {
+            sourceCodePage?.data?.closing && (
+              <Section
+                id="closing"
+                eyebrow="Conclusion"
+                title={sourceCodePage.data.closing.title}
+              >
+                <ClosingSection
+                  client:load
+                  intro={sourceCodePage.data.closing.content}
+                  modalTitle={
+                    sourceCodePage.data.closing.modalTitle ||
+                    'Before you dive in...'
+                  }
+                  modalHeading={
+                    sourceCodePage.data.closing.modalHeading ||
+                    'Coding is a journey, not a destination.'
+                  }
+                  modalIntro={
+                    sourceCodePage.data.closing.modalIntro ||
+                    'This repository represents a snapshot in time of my learning and growth as a developer.'
+                  }
+                  modalAcknowledgment={
+                    sourceCodePage.data.closing.modalAcknowledgment ||
+                    'By accessing this code, you acknowledge that:'
+                  }
+                  modalPoints={
+                    sourceCodePage.data.closing.modalPoints || [
+                      'This code is a work in progress and may contain imperfections',
+                      "Best practices evolve, and what's shown here represents my current approach",
+                      'The journey of learning to code never ends',
+                    ]
+                  }
+                  modalCheckboxLabel={
+                    sourceCodePage.data.closing.modalCheckboxLabel ||
+                    'I understand that coding is a journey and agree to view this code as learning material'
+                  }
+                  modalCancelButton={
+                    sourceCodePage.data.closing.modalCancelButton || 'Cancel'
+                  }
+                  modalAgreeButton={
+                    sourceCodePage.data.closing.modalAgreeButton ||
+                    'I Agree - Take me to the code'
+                  }
+                  repositoryUrl={
+                    sourceCodePage.data.closing.repositoryUrl ||
+                    'https://github.com/bracketbear/website-monorepo'
+                  }
+                  buttonTitle={
+                    sourceCodePage.data.closing.buttonTitle ||
+                    'Ready to explore the code?'
+                  }
+                  buttonDescription={
+                    sourceCodePage.data.closing.buttonDescription ||
+                    'This repository contains the complete source code for this portfolio and all related projects.'
+                  }
+                  buttonText={
+                    sourceCodePage.data.closing.buttonText || 'View Source Code'
+                  }
+                />
+              </Section>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</HeroLayout>
+
+<script define:vars={{ sections }}>
+  // Make sections available to the TypeScript module
+  window.sections = sections;
+</script>
+
+<script src="@/utils/sectionObserver.ts"></script>

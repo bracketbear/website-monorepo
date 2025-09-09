@@ -6,7 +6,7 @@ import {
   ToastProvider,
   useToast,
   Button,
-} from '@bracketbear/core/react';
+} from '@bracketbear/bear-ui-react';
 
 export interface FilteredWorkHistoryProps {
   skills: CollectionEntry<'workSkills'>[];

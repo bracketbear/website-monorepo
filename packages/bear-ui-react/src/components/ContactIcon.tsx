@@ -1,0 +1,169 @@
+import type { ComponentProps } from 'react';
+
+type ContactIconName =
+  | 'mail'
+  | 'github'
+  | 'linkedin'
+  | 'phone'
+  | 'twitter'
+  | 'website';
+
+export interface ContactIconProps
+  extends Omit<ComponentProps<'svg'>, 'children'> {
+  name: ContactIconName;
+}
+
+export function ContactIcon({
+  name,
+  className = '',
+  ...props
+}: ContactIconProps) {
+  const iconProps = {
+    className,
+    width: 24,
+    height: 24,
+    fill: 'none',
+    xmlns: 'http://www.w3.org/2000/svg',
+    ...props,
+  };
+
+  switch (name) {
+    case 'mail':
+      return (
+        <svg {...iconProps} viewBox="0 0 24 24">
+          <path
+            d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M22 6L12 13L2 6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+
+    case 'github':
+      return (
+        <svg {...iconProps} viewBox="0 0 24 24">
+          <path
+            d="M9 19C4 20.5 4 16.5 2 16M16 22V18.13C16.0375 17.6532 15.9731 17.1738 15.811 16.7238C15.6489 16.2738 15.3929 15.8634 15.06 15.52C18.2 15.17 21.5 13.98 21.5 8.52C21.4997 7.12383 21.0627 5.7812 20.3615 4.67424C19.6603 3.56728 18.7366 2.75447 17.67 2.35C17.2541 2.26348 16.8264 2.21688 16.396 2.212C15.9656 2.20712 15.5362 2.24512 15.116 2.325C14.4987 2.31548 13.8847 2.42478 13.3073 2.64688C12.7299 2.86898 12.2007 3.20022 11.747 3.625C10.5961 3.11125 9.33106 3.11125 8.18 3.625C7.72633 3.20022 7.19713 2.86898 6.61975 2.64688C6.04237 2.42478 5.42839 2.31548 4.811 2.325C4.39077 2.24512 3.96139 2.20712 3.531 2.212C3.10061 2.21688 2.67293 2.26348 2.257 2.35C1.19044 2.75447 0.266715 3.56728 -0.434465 4.67424C-1.13564 5.7812 -1.57264 7.12383 -1.573 8.52C-1.573 13.97 1.743 15.16 4.773 15.55C4.44 15.8934 4.18399 16.3038 4.02189 16.7538C3.85979 17.2038 3.79539 17.6832 3.833 18.16V22"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+
+    case 'linkedin':
+      return (
+        <svg {...iconProps} viewBox="0 0 24 24">
+          <path
+            d="M16 8C17.5913 8 19.1174 8.63214 20.2426 9.75736C21.3679 10.8826 22 12.4087 22 14V21H18V14C18 13.4696 17.7893 12.9609 17.4142 12.5858C17.0391 12.2107 16.5304 12 16 12C15.4696 12 14.9609 12.2107 14.5858 12.5858C14.2107 12.9609 14 13.4696 14 14V21H10V14C10 12.4087 10.6321 10.8826 11.7574 9.75736C12.8826 8.63214 14.4087 8 16 8V8Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M6 9H2V21H6V9Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M4 6C5.10457 6 6 5.10457 6 4C6 2.89543 5.10457 2 4 2C2.89543 2 2 2.89543 2 4C2 5.10457 2.89543 6 4 6Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+
+    case 'phone':
+      return (
+        <svg {...iconProps} viewBox="0 0 24 24">
+          <path
+            d="M22 16.92V19.92C22.0011 20.1985 21.9441 20.4742 21.8325 20.7292C21.7209 20.9842 21.5573 21.2131 21.3521 21.4014C21.1469 21.5897 20.9046 21.7335 20.6407 21.8227C20.3768 21.9119 20.0971 21.9448 19.82 21.92C16.7428 21.5856 13.787 20.5341 11.19 18.85C8.77382 17.3146 6.72533 15.2661 5.18999 12.85C3.49997 10.2412 2.44824 7.27099 2.11999 4.18C2.09519 3.90347 2.12787 3.62432 2.21649 3.36089C2.30512 3.09747 2.44756 2.85549 2.63452 2.65049C2.82147 2.44549 3.04888 2.28179 3.30258 2.16971C3.55628 2.05764 3.83058 1.99991 4.10999 2H7.10999C7.59522 1.99522 8.06577 2.16708 8.43373 2.48353C8.80168 2.79999 9.04201 3.23945 9.10999 3.72C9.23662 4.68007 9.47144 5.62273 9.80999 6.53C9.94454 6.88792 9.97345 7.27675 9.89385 7.64971C9.81425 8.02267 9.62985 8.36256 9.35999 8.63L8.08999 9.9C9.51443 12.4136 11.5864 14.4856 14.1 15.91L15.37 14.64C15.6374 14.3701 15.9773 14.1857 16.3503 14.1061C16.7232 14.0265 17.1121 14.0554 17.47 14.19C18.3773 14.5286 19.3199 14.7634 20.28 14.89C20.7658 14.9585 21.2094 15.2032 21.5265 15.5775C21.8437 15.9518 22.0122 16.4296 22 16.92Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+
+    case 'twitter':
+      return (
+        <svg {...iconProps} viewBox="0 0 24 24">
+          <path
+            d="M23 3C22.0424 3.67548 20.9821 4.19211 19.86 4.53C19.2577 3.83751 18.4573 3.34669 17.567 3.12393C16.6767 2.90116 15.7395 2.9572 14.8821 3.28445C14.0247 3.61169 13.2884 4.19445 12.773 4.95376C12.2575 5.71308 11.9877 6.62234 12 7.56V8.56C10.2426 8.58557 8.50127 8.19587 6.93101 7.42145C5.36074 6.64704 4.01032 5.51009 2.988 4.11C2.988 4.11 1 4.11 1 6.11C1 7.11 1.5 8.11 2.5 8.61C1.5 8.61 1 9.61 1 10.61C1 11.61 1.5 12.61 2.5 13.11C1.5 13.11 1 14.11 1 15.11C1 16.11 1.5 17.11 2.5 17.61C1.5 17.61 1 18.61 1 19.61C1 20.61 1.5 21.61 2.5 22.11C4.01032 20.7099 5.36074 19.5729 6.93101 18.7985C8.50127 18.0241 10.2426 17.6344 12 17.66C11.9877 18.5977 12.2575 19.5069 12.773 20.2663C13.2884 21.0256 14.0247 21.6083 14.8821 21.9356C15.7395 22.2628 16.6767 22.3189 17.567 22.0961C18.4573 21.8733 19.2577 21.3825 19.86 20.69C20.9821 21.0279 22.0424 21.5445 23 22.22V3Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+
+    case 'website':
+      return (
+        <svg {...iconProps} viewBox="0 0 24 24">
+          <path
+            d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M12 18C13.1 18 14 18.9 14 20C14 21.1 13.1 22 12 22C10.9 22 10 21.1 10 20C10 18.9 10.9 18 12 18Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M4.93 4.93C5.92 3.94 7.34 3.34 8.83 3.34C10.32 3.34 11.74 3.94 12.73 4.93"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M11.27 19.07C10.28 20.06 8.86 20.66 7.37 20.66C5.88 20.66 4.46 20.06 3.47 19.07"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M19.07 11.27C20.06 10.28 20.66 8.86 20.66 7.37C20.66 5.88 20.06 4.46 19.07 3.47"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M4.93 19.07C3.94 18.08 3.34 16.66 3.34 15.17C3.34 13.68 3.94 12.26 4.93 11.27"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+
+    default:
+      console.warn(`Unknown contact icon: ${name}`);
+      return null;
+  }
+}

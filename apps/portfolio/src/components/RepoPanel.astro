@@ -1,0 +1,36 @@
+---
+export interface Props {
+  title: string;
+  items: Array<{
+    name: string;
+    description?: string;
+    path: string;
+    type?: string;
+  }>;
+}
+
+const { title, items } = Astro.props;
+---
+
+<div class="card-neutral">
+  <h3 class="font-heading text-foreground mb-4 text-lg font-bold">
+    {title} ({items.length})
+  </h3>
+  <ul class="list-outside list-disc space-y-3 pl-5">
+    {
+      items.map((item) => (
+        <li class="text-foreground/90">
+          <div class="flex items-center gap-2 font-medium">{item.name}</div>
+          {item.description && (
+            <div class="text-muted-foreground mt-1 text-sm">
+              {item.description}
+            </div>
+          )}
+          <div class="text-muted-foreground/80 mt-1 font-mono text-xs">
+            {item.path}
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</div>

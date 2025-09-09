@@ -6,7 +6,7 @@ import {
   TextareaInput,
   CheckboxField,
   Button,
-} from '@bracketbear/core/react';
+} from '@bracketbear/bear-ui-react';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name is required'),

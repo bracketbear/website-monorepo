@@ -1,1 +1,15 @@
+# Branch protection: Prevent commits to dev and main
+current_branch=$(git branch --show-current)
+protected_branches="dev main"
+
+for branch in $protected_branches; do
+  if [ "$current_branch" = "$branch" ]; then
+    echo "❌ Direct commits to '$branch' branch are not allowed!"
+    echo "💡 Please create a feature branch and use pull requests instead."
+    echo "   Example: git checkout -b feature/your-feature-name"
+    exit 1
+  fi
+done
+
+echo "✅ Branch protection check passed. Running lint-staged..."
 npx lint-staged

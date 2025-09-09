@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import '@bracketbear/core/styles';
+@import '@bracketbear/bear-ui-tailwind/styles/bracketbear.tailwind.css';
 
 :root {
   --foreground-rgb: 0, 0, 0;

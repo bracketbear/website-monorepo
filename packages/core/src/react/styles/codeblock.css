@@ -1,0 +1,58 @@
+/* Dark theme highlight.js styles for BracketBear code blocks */
+.hljs {
+  color: #f3f4f6; /* gray-100 - light text for dark background */
+  background: transparent;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #9ca3af; /* gray-400 */
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+  color: #c084fc; /* violet-400 */
+}
+
+.hljs-literal,
+.hljs-number,
+.hljs-variable {
+  color: #60a5fa; /* blue-400 */
+}
+
+.hljs-string,
+.hljs-doctag,
+.hljs-template-variable {
+  color: #4ade80; /* green-400 */
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-title,
+.hljs-name,
+.hljs-section {
+  color: #fb923c; /* orange-400 */
+}
+
+.hljs-type,
+.hljs-class .hljs-title {
+  color: #38bdf8; /* sky-400 */
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link {
+  color: #f87171; /* red-400 */
+}
+
+.hljs-meta {
+  color: #6b7280; /* gray-500 */
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: 600;
+}

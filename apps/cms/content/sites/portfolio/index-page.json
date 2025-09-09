@@ -1,5 +1,5 @@
 {
-  "title": "Hi, I'm Harrison",
+  "title": "Home",
   "subtitle": "I'm a product-minded full-stack engineer with a passion for experiential technology",
   "metaDescription": "Harrison Callahan builds full-stack tools for experiential teams. Self-taught developer turning loose ideas into working systems.",
   "canonicalUrl": "https://harrisoncallahan.com/",
@@ -22,7 +22,8 @@
   },
   "meetFlateralus": {
     "title": "Flateralus",
-    "content": "## Recently, I've been exploring a schema-first methodology for building experiential apps\n\nInstead of hammering an experience management system integration into an existing app, you define a contract that everything adheres to—your app, your rendering layer, your state manager, your CMS—literally everything. This automatically unlocks:\n\n- Automatic mode and control registration in your renderer or in your management system\n- Seeded randomness for controls without configuration\n- Mode configurations that can be saved locally, in a code base, or in a remote CMS\n\n### It gives you more time to create and be inspired\n\n**(more info coming soon)**\n"
+    "content": "## Recently, I've been exploring a schema-first methodology for building experiential apps\n\nInstead of hammering an experience management system integration into an existing app, you define a contract that everything adheres to—your app, your rendering layer, your state manager, your CMS—literally everything. This automatically unlocks:\n\n- Automatic mode and control registration in your renderer or in your management system\n- Seeded randomness for controls without configuration\n- Mode configurations that can be saved locally, in a code base, or in a remote CMS\n\n### It gives you more time to create and be inspired\n",
+    "buttonText": "Learn how I structure projects"
   },
   "featuredProjects": {
     "title": "Project Highlights",

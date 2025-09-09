@@ -13,17 +13,26 @@
     {
       "title": "SaaS Experiential Content Management Systems",
       "description": "My bread and butter. I'm focused on building the most designer-, developer-, and content-manager-friendly systems I can. There's a lot of untapped potential here, and I've shipped multiple experiential CMSs end-to-end.",
-      "projects": ["dl-gumband", "ds-bridge"]
+      "workProjects": ["dl-gumband", "ds-bridge"],
+      "personalProjects": []
     },
     {
       "title": "Experiential Projects",
       "description": "In my brief time as an experiential developer, I got to work on some pretty cool projects. These really opened up my eyes to how a CMS can make their lives much easier if done right.",
-      "projects": ["ds-elekta", "ds-pwc", "ds-stoller-winery"]
+      "workProjects": ["ds-elekta", "ds-pwc", "ds-stoller-winery"],
+      "personalProjects": []
     },
     {
       "title": "Full-Stack Development",
       "description": "End-to-end web applications that demonstrate full-stack development capabilities and modern architecture.",
-      "projects": ["ss-supply-stream"]
+      "workProjects": ["ss-supply-stream"],
+      "personalProjects": []
+    },
+    {
+      "title": "Personal Projects",
+      "description": "Side projects and personal experiments that showcase my passion for building things. These projects often explore new technologies and creative solutions to interesting problems.",
+      "workProjects": [],
+      "personalProjects": ["portfolio-website"]
     }
   ]
 }

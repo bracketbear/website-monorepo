@@ -1,0 +1,31 @@
+{
+  "title": "Portfolio Website",
+  "summary": "A modern portfolio website built with Astro, TypeScript, Tailwind CSS and powered by a CMS.",
+  "description": "This portfolio website represents a complete full-stack project showcasing modern web development practices. Built with Astro for optimal performance, it features a custom content management system using Keystatic, a comprehensive component library, and interactive animations using PixiJS.\n\nThe site demonstrates expertise in:\n- Modern static site generation with Astro\n- TypeScript for type safety\n- Tailwind CSS for styling\n- Custom CMS development\n- Component library architecture\n- Performance optimization\n- SEO best practices\n\nAll source code is available for review, demonstrating clean architecture, comprehensive documentation, and modern development workflows.",
+  "coverImage": "/work/personal-projects/portfolio-website/coverImage.png",
+  "isWebsiteProject": true,
+  "links": [
+    {
+      "label": "View Source Code",
+      "url": "/source-code",
+      "type": "docs"
+    },
+    {
+      "label": "GitHub Repository",
+      "url": "https://github.com/harrisoncallahan/bracketbear",
+      "type": "github"
+    }
+  ],
+  "skills": [
+    "astro",
+    "typescript",
+    "tailwind-css",
+    "keystatic",
+    "pixijs",
+    "component-library",
+    "cms-development",
+    "performance-optimization"
+  ],
+  "status": "completed",
+  "category": "Web Development"
+}

@@ -1,0 +1,35 @@
+---
+import Callout from './Callout.astro';
+
+export interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  note?: string;
+  className?: string;
+}
+
+const { src, alt, caption, note, className = '' } = Astro.props;
+---
+
+<figure class={`mx-auto max-w-4xl ${className}`}>
+  <div class="card-neutral overflow-hidden p-0">
+    <img src={src} alt={alt} class="h-auto w-full" loading="lazy" />
+  </div>
+
+  {
+    caption && (
+      <figcaption class="mt-4 text-center">
+        <p class="text-muted-foreground text-sm">{caption}</p>
+      </figcaption>
+    )
+  }
+
+  {
+    note && (
+      <div class="mt-4">
+        <Callout variant="brand">{note}</Callout>
+      </div>
+    )
+  }
+</figure>

@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { AstroButton } from '@bracketbear/core/astro';
-import { SkillPill } from '@bracketbear/core/react';
+import { SkillPill } from '@bracketbear/bear-ui-react';
 import HomeLayout from '@/layouts/HomeLayout.astro';
 import { ContactSection } from '@/components/ContactSection';
 import ProjectCard from '@/components/ProjectCard';
@@ -130,7 +130,7 @@ function parseMarkdown(content: string): string {
     className="w-full"
     client:load
     preset="curious-particle-network"
-    title={indexPage.data.title}
+    title={indexPage.data.hero?.title}
     subtitle={indexPage.data.subtitle}
     description={indexPage.data.hero?.description}
     showActions={true}
@@ -220,6 +220,7 @@ function parseMarkdown(content: string): string {
           <MeetFlateralusSection
             title={indexPage.data.meetFlateralus?.title}
             content={indexPage.data.meetFlateralus?.content}
+            buttonText={indexPage.data.meetFlateralus?.buttonText}
             client:only="react"
           />
         </div>
@@ -258,7 +259,7 @@ function parseMarkdown(content: string): string {
                     </p>
                   </div>
                   <div class="mt-2 text-right md:mt-0">
-                    <p class="text-foreground/60 font-bold">
+                    <p class="text-foreground/80 font-bold">
                       {formatDate(job.data.startDate)} -
                       {job.data.endDate
                         ? formatDate(job.data.endDate)

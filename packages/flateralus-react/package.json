@@ -1,6 +1,6 @@
 {
   "name": "@bracketbear/flateralus-react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,11 +10,12 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
-    "test": "echo \"No tests yet\" && exit 0",
+    "test": "vitest --run",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@bracketbear/core": "file:../core",
+    "@bracketbear/bear-ui": "file:../bear-ui",
+    "@bracketbear/bear-ui-react": "file:../bear-ui-react",
     "@bracketbear/flateralus": "file:../flateralus"
   },
   "peerDependencies": {

@@ -1,4 +1,4 @@
-import { Slider, TextInput } from '@bracketbear/core/react';
+import { Slider, TextInput } from '@bracketbear/bear-ui-react';
 import type { NumberControl as NumberControlType } from '@bracketbear/flateralus';
 import { BaseControlWrapper } from './BaseControlWrapper';
 
@@ -45,7 +45,7 @@ export function NumberControl({
         step={control.step}
         value={currentValue}
         onChange={(e) => onControlChange(control.name, Number(e.target.value))}
-        className="w-20 overflow-x-auto text-right"
+        className="w-16 overflow-x-auto text-right sm:w-20"
         size="sm"
       />
     </BaseControlWrapper>

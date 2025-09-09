@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import type {
   ControlValues,
   AnimationManifest,
@@ -37,6 +37,10 @@ export function useControls<
     useState<ControlValues>(initialControlValues);
   const [showResetToast, setShowResetToast] = useState(false);
 
+  // Use a ref to track the current animation to avoid stale closures
+  const animationRef = useRef(animation);
+  animationRef.current = animation;
+
   // Sync local state with animation's current control values
   useEffect(() => {
     if (animation) {
@@ -47,12 +51,43 @@ export function useControls<
     }
   }, [animation]);
 
+  // Set up a callback to sync with animation control updates
+  useEffect(() => {
+    if (!animation) return;
+
+    // Set up the callback to sync local state with animation state
+    const handleControlsUpdated = (updatedControls: ControlValues) => {
+      setControlValues(updatedControls);
+    };
+
+    // Set the callback on the animation using the new method
+    if (typeof animation.setOnControlsUpdated === 'function') {
+      animation.setOnControlsUpdated(handleControlsUpdated);
+    }
+
+    // Fallback: manually sync control values periodically
+    const interval = setInterval(() => {
+      const currentValues = animation.getControlValues();
+      if (currentValues && Object.keys(currentValues).length > 0) {
+        setControlValues(currentValues);
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(interval);
+      // Clean up callback if possible
+      if (typeof animation.setOnControlsUpdated === 'function') {
+        animation.setOnControlsUpdated(undefined);
+      }
+    };
+  }, [animation]);
+
   /**
    * Handle control changes from debug panel
    */
   const handleControlsChange = useCallback(
     async (newValues: Partial<ControlValues>) => {
-      if (!animation || !manifest) return;
+      if (!animationRef.current || !manifest) return;
 
       let shouldReset = false;
 
@@ -77,27 +112,26 @@ export function useControls<
           }
         }
 
-        animation.reset(merged as any);
+        animationRef.current.reset(merged as any);
         setControlValues(merged);
         onReset?.();
       } else {
         // Update controls without reset
-        setControlValues((prev) => {
-          const merged: ControlValues = { ...prev };
-          for (const key in newValues) {
-            if (newValues[key] !== undefined) {
-              merged[key] = newValues[key] as any;
-            }
+        const updatedValues = { ...controlValues };
+        for (const key in newValues) {
+          if (newValues[key] !== undefined) {
+            updatedValues[key] = newValues[key] as any;
           }
-          return merged;
-        });
+        }
 
-        animation.updateControls(newValues as any);
+        setControlValues(updatedValues);
+        animationRef.current.updateControls(newValues as any);
       }
     },
-    [animation, manifest, controlValues, onReset]
+    [controlValues, manifest, onReset]
   );
 
+  // Always return a valid object
   return {
     controlValues,
     handleControlsChange,

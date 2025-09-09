@@ -8,7 +8,7 @@ import type {
   PatternStats,
   Report,
   FileParseResult,
-} from './types.js';
+} from './types';
 
 function defaultConfig(): AnalyzerConfig {
   return {
@@ -306,7 +306,10 @@ export async function analyze(options: AnalyzerOptions): Promise<Report> {
   };
 
   // JSON output (if enabled)
-  if (finalOut && config.output.json.enabled && out !== null) {
+  // Write when an output path is resolved from either CLI flag or config.
+  // The previous condition incorrectly checked `out !== null`, which prevented
+  // writing when using only the config file. We should key off `finalOut`.
+  if (finalOut && config.output.json.enabled) {
     const p = resolve(process.cwd(), finalOut);
     // Ensure containing directory exists
     try {

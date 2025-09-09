@@ -2,17 +2,19 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { AnimationStage } from '@bracketbear/flateralus-react';
 import { PixiApplication } from '@bracketbear/flateralus-pixi';
 import { createBlobAnimation } from '@bracketbear/flateralus-pixi-animations';
-import { Pill } from '@bracketbear/core/react';
+import { Pill, Button } from '@bracketbear/bear-ui-react';
 import { marked } from 'marked';
 
 interface MeetFlateralusSectionProps {
   title?: string;
   content?: string;
+  buttonText?: string;
 }
 
 export function MeetFlateralusSection({
   title = 'Meet Flateralus',
   content = '## A powerful schema for connecting experiential apps to everything.',
+  buttonText = 'View Source Code',
 }: MeetFlateralusSectionProps) {
   const [isClient, setIsClient] = useState(false);
   const [isAnimationReady, setIsAnimationReady] = useState(false);
@@ -75,6 +77,12 @@ export function MeetFlateralusSection({
                 __html: content ? marked.parse(content) : '',
               }}
             />
+            {/* Button linking to source-code page */}
+            <div className="mt-6">
+              <Button href="/source-code" className="font-semibold" size="lg">
+                {buttonText}
+              </Button>
+            </div>
           </div>
           {/* Animation Stage - right side */}
           <div className="order-1 lg:order-2">

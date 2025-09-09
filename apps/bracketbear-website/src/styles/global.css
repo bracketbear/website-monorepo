@@ -1,5 +1,8 @@
-@import '@bracketbear/core/styles/bracketbear.tailwind.css';
-@source '../../../../node_modules/@bracketbear/core/dist';
+@import '@bracketbear/bear-ui-tailwind/styles/bracketbear.tailwind.css';
+@source '../../../../node_modules/@bracketbear/bear-ui-tailwind';
+@source '../../../../node_modules/@bracketbear/bear-ui-react';
+@source '../../../../node_modules/@bracketbear/core';
+@source '../../../../node_modules/@bracketbear/flateralus-react';
 
 /* Utility Classes */
 @layer components {

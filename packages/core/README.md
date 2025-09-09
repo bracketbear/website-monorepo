@@ -2,7 +2,7 @@
 
 ## Overview
 
-Shared components, layouts, and utilities for Bracket Bear applications. Provides a consistent design system, layout components, and type definitions across all projects.
+Core utilities and Astro components for Bracket Bear applications. This package provides Astro-specific layout components, utilities, and type definitions. For React components, see `@bracketbear/bear-ui-react`. For Tailwind styles, see `@bracketbear/bear-ui-tailwind`.
 
 ## Table of Contents
 
@@ -28,31 +28,32 @@ Shared components, layouts, and utilities for Bracket Bear applications. Provide
 
 ## Features
 
-- **Design System**: Atoms, tokens, and styling
-- **Layout Components**: Configurable navigation, footer, and layout
-- **Theme System**: Dark/light mode with system preference support
+- **Astro Components**: Layout, navigation, and footer components
+- **Utilities**: Meta title generation, navigation utilities
 - **Type Safety**: Full TypeScript support with shared types
-- **Framework Agnostic**: Support for both Astro and React
+- **Framework Specific**: Optimized for Astro applications
 
-## Quick Start
+## Package Structure
 
-### Basic Usage
+The BracketBear UI system is now split into multiple packages:
 
-```astro
----
-import { Layout, portfolioNavigation } from '@bracketbear/core/astro';
-import ContactForm from '@/components/ContactForm.astro';
----
+- **@bracketbear/bear-ui** - Core types and utilities
+- **@bracketbear/bear-ui-tailwind** - Tailwind CSS styles and utilities
+- **@bracketbear/bear-ui-react** - React components
+- **@bracketbear/core** - Astro components and utilities (this package)
 
-<Layout
-  title="My Page"
-  navigation={portfolioNavigation}
-  contactForm={ContactForm}
->
-  <main>
-    <h1>Hello World!</h1>
-  </main>
-</Layout>
+## Installation
+
+For React applications:
+
+```bash
+npm install @bracketbear/bear-ui-react @bracketbear/bear-ui-tailwind
+```
+
+For Astro applications:
+
+```bash
+npm install @bracketbear/core @bracketbear/bear-ui-tailwind
 ```
 
 ## Layout Components
@@ -214,14 +215,10 @@ interface LayoutProps {
 
 ## Styling
 
-The package includes a shared Tailwind configuration with:
-
-- Custom color tokens
-- Brutalist design utilities
-- Responsive utilities
+This package no longer includes styles. For Tailwind CSS styles, use:
 
 ```css
-@import '@bracketbear/core/styles';
+@import '@bracketbear/bear-ui-tailwind/styles';
 ```
 
 ## Development

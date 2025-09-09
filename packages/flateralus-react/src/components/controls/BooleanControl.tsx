@@ -1,4 +1,4 @@
-import { CheckboxInput } from '@bracketbear/core/react';
+import { CheckboxInput } from '@bracketbear/bear-ui-react';
 import type { BooleanControl as BooleanControlType } from '@bracketbear/flateralus';
 import { BaseControlWrapper } from './BaseControlWrapper';
 

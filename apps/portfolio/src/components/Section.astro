@@ -1,17 +1,74 @@
 ---
-interface Props {
+import { clsx } from '@bracketbear/core';
+import { marked } from 'marked';
+
+export interface Props {
+  eyebrow?: string;
   title: string;
+  intro?: string;
+  id?: string;
   className?: string;
+  padding?: 'none' | 'small' | 'medium' | 'large';
 }
 
-const { title, className = '' } = Astro.props;
+const {
+  eyebrow,
+  title,
+  intro,
+  id,
+  className = '',
+  padding = 'large',
+} = Astro.props;
+
+// Map padding prop to Tailwind classes
+const paddingClasses = {
+  none: '',
+  small: 'py-4',
+  medium: 'py-8',
+  large: 'py-12 first:pt-0 last:pb-0',
+};
+
+// Helper function to clean markdown content
+function cleanMarkdown(content: string | undefined | null): string {
+  if (!content) return '';
+
+  return content;
+}
 ---
 
-<div class={`${className}`}>
-  <h2
-    class="font-heading text-text-primary mb-8 text-3xl font-black tracking-tight uppercase"
-  >
-    {title}
-  </h2>
-  <slot />
-</div>
+<section
+  id={id}
+  class={clsx('section-content', paddingClasses[padding], className)}
+>
+  <div>
+    {
+      eyebrow && (
+        <div class="mb-4">
+          <span class="text-muted-foreground text-sm font-medium tracking-wider uppercase">
+            {eyebrow}
+          </span>
+        </div>
+      )
+    }
+
+    <h2
+      class="font-heading text-foreground mb-6 text-3xl font-bold tracking-tight uppercase"
+    >
+      {title}
+    </h2>
+
+    {
+      intro && (
+        <div class="mb-8">
+          <div class="text-muted-foreground prose prose-lg max-w-none max-w-prose text-lg leading-7">
+            <Fragment set:html={marked.parse(cleanMarkdown(intro))} />
+          </div>
+        </div>
+      )
+    }
+
+    <div class="prose prose-lg max-w-none">
+      <slot />
+    </div>
+  </div>
+</section>
