@@ -17,8 +17,8 @@ const __dirname = dirname(__filename);
 /**
  * Load the generated repo map
  */
-function loadRepoMap() {
-  const repoMapPath = join(
+function loadRepoMap(repoMapPath = null) {
+  const defaultRepoMapPath = join(
     __dirname,
     '..',
     'apps',
@@ -27,8 +27,9 @@ function loadRepoMap() {
     'generated',
     'repo-map.json'
   );
+  const repoMapPathToUse = repoMapPath || defaultRepoMapPath;
 
-  if (!existsSync(repoMapPath)) {
+  if (!existsSync(repoMapPathToUse)) {
     console.error(
       '❌ repo-map.json not found. Run npm run generate:repo-map first.'
     );
@@ -36,7 +37,7 @@ function loadRepoMap() {
   }
 
   try {
-    const content = readFileSync(repoMapPath, 'utf8');
+    const content = readFileSync(repoMapPathToUse, 'utf8');
     return JSON.parse(content);
   } catch (error) {
     console.error('❌ Failed to parse repo-map.json:', error);
@@ -47,8 +48,8 @@ function loadRepoMap() {
 /**
  * Update the main README with repo map integration
  */
-function updateMainReadme(repoMap) {
-  const mainReadmePath = join(__dirname, '..', 'README.md');
+function updateMainReadme(repoMap, readmePath = null) {
+  const mainReadmePath = readmePath || join(__dirname, '..', 'README.md');
 
   // Generate the new TOC sections using actual descriptions from repo-map.json
   const appsSection = repoMap.apps
@@ -115,6 +116,9 @@ function main() {
     process.exit(1);
   }
 }
+
+// Export functions for testing
+export { loadRepoMap, updateMainReadme };
 
 // Run the script
 main();
