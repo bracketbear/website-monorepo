@@ -78,11 +78,6 @@
     "content": "- **Static first.** Pages render statically in Astro; islands mount React only where interaction or animation adds value.\n- **Typed content.** Content shapes live in Zod. The build fails on bad content rather than shipping surprises to production.\n- **Clear boundaries.** Apps depend \"down\" on packages; packages don't reach back into apps.\n- **Assets.** Images get width hints and sensible defaults; fonts are subset.\n",
     "mermaidDiagram": "flowchart LR\n  U[User] --> CDN\n  CDN --> Astro[Astro Static Pages]\n  Astro -->|hydrate as needed| Islands[React Islands]\n  Astro --> Content[Keystatic Build (Zod typed)]\n  Islands --> Anim[Flateralus Runtime (PIXI 8)]\n  Astro --> Assets[Image/Asset Pipeline]"
   },
-  "contentModel": {
-    "title": "Content model (Keystatic + Zod)",
-    "content": "I keep content inside the type system. Editors work in Keystatic; Zod validates at build; components consume typed props.\n",
-    "codeExample": "import { z } from \"zod\";\n\nexport const WorkProject = z.object({\n  id: z.string().uuid(),\n  title: z.string().min(1),\n  company: z.string(),\n  heroImage: z.string().url(),\n  skills: z.array(z.string()).min(1),\n  status: z.enum([\"draft\", \"live\"]),\n});\n\nexport type WorkProject = z.infer<typeof WorkProject>;"
-  },
   "typescript": {
     "title": "TypeScript",
     "content": "We are TypeScript-first. Apps and packages expose explicit, well-documented types. We depend on interfaces, generics, and factory types to keep implementation details decoupled from contracts. We never use `any`; we strengthen types to fix errors.\n",
@@ -98,9 +93,9 @@
         "codeExample": "export function useAnimationStage<TControlValues>(options: { factory: (controls: TControlValues) => unknown }) {\n  // ...\n  return {} as { controls: TControlValues };\n}"
       },
       {
-        "title": "Schema-driven content",
-        "description": "Keystatic schemas mirror Zod schemas in `@bracketbear/astro-content` so content is validated at edit-time and build-time.\n",
-        "codeExample": "// CMS (Keystatic)\nfields.text({ label: 'Title' })\n\n// Astro (Zod)\nz.object({ title: z.string() })"
+        "title": "Content Model Integration",
+        "description": "I keep content inside the type system. Editors work in Keystatic; Zod validates at build; components consume typed props. Keystatic schemas mirror Zod schemas in `@bracketbear/astro-content` so content is validated at edit-time and build-time.\n",
+        "codeExample": "// CMS Schema (Keystatic)\n// apps/cms/src/schemas/page.ts\nexport function makeBasePageFields() {\n  return {\n    title: fields.text({\n      label: 'Page Title',\n      description: 'The main title for this page'\n    }),\n    metaDescription: fields.text({ \n      label: 'Meta Description' \n    }),\n    canonicalUrl: fields.text({ \n      label: 'Canonical URL' \n    }),\n    noIndex: fields.checkbox({\n      label: 'No Index',\n      description: 'Exclude from search engines'\n    })\n  };\n}\n\n// Zod Schema (Astro)\n// packages/astro-content/src/schemas/page.ts\nexport const basePageSchema = z.object({\n  title: z.string().optional(),\n  metaDescription: z.string().optional(),\n  canonicalUrl: z.string().url().optional(),\n  noIndex: z.boolean().default(false)\n});\n\nexport type BasePageData = z.infer<typeof basePageSchema>;"
       }
     ]
   },

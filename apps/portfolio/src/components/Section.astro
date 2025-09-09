@@ -1,4 +1,5 @@
 ---
+import { clsx } from '@bracketbear/core';
 import { marked } from 'marked';
 
 export interface Props {
@@ -19,7 +20,7 @@ function cleanMarkdown(content: string | undefined | null): string {
 }
 ---
 
-<section id={id} class={`section-content py-12 ${className}`}>
+<section id={id} class={clsx(`section-content py-12 first:pt-0`, className)}>
   <div class="mx-auto max-w-5xl">
     {
       eyebrow && (

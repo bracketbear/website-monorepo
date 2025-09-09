@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { marked } from 'marked';
-import { type Breadcrumb, CodeBlock } from '@bracketbear/core';
+import { type Breadcrumb, clsx, CodeBlock } from '@bracketbear/core';
 import { getContentImageUrl } from '@bracketbear/astro-content';
 import HeroLayout from '@/layouts/HeroLayout.astro';
 import Section from '@/components/Section.astro';
@@ -132,7 +132,7 @@ try {
                 eyebrow="Overview"
                 title={sourceCodePage.data.tldr.title}
               >
-                <div class="x:grid-cols-3 grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-6 xl:grid-cols-2 2xl:grid-cols-2">
                   {sourceCodePage.data.tldr.points.map((point: any) => (
                     <div class="card-dark prose px-4 pt-0 pb-2">
                       <h3 class="font-heading mb-4 text-xl font-bold tracking-tight text-white uppercase">
@@ -247,7 +247,7 @@ try {
                 eyebrow="Performance"
                 title={sourceCodePage.data.performanceAccessibility.title}
               >
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
                   <div class="card-neutral">
                     <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
                       Targets
@@ -304,7 +304,7 @@ try {
                     </p>
                   </div>
 
-                  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
                     {/* Apps Panel */}
                     {repoMapData && (
                       <RepoPanel
@@ -336,18 +336,19 @@ try {
                 intro={sourceCodePage.data.typescript.content}
               >
                 {sourceCodePage.data.typescript.patterns?.length > 0 && (
-                  <div class="space-y-10 md:space-y-14">
+                  <div class="space-y-10 xl:space-y-14">
                     {sourceCodePage.data.typescript.patterns.map(
                       (p: any, i: number) => (
-                        <div class="border-border/20 bg-card/20 w-full rounded-lg border px-4 py-6 shadow-[0_2px_8px_0_rgba(31,38,135,0.1)] backdrop-blur-md md:py-8">
-                          <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-10">
+                        <div class="card pt-0">
+                          <div class="grid grid-cols-1 items-start xl:grid-cols-2">
                             <div
-                              class={`flex flex-col gap-4 ${i % 2 === 1 ? 'lg:order-2 lg:text-right' : ''}`}
+                              class={clsx(
+                                `prose prose-lg flex flex-col xl:gap-4`,
+                                i % 2 === 1 ? 'xl:order-2 xl:text-right' : ''
+                              )}
                             >
-                              <h3 class="font-heading text-foreground text-xl tracking-tight uppercase md:text-2xl">
-                                {p.title}
-                              </h3>
-                              <div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 max-w-none">
+                              <h3 class="">{p.title}</h3>
+                              <div>
                                 <Fragment
                                   set:html={marked.parse(
                                     cleanMarkdown(p.description)
@@ -355,7 +356,12 @@ try {
                                 />
                               </div>
                             </div>
-                            <div class={`${i % 2 === 1 ? 'lg:order-1' : ''}`}>
+                            <div
+                              class={clsx([
+                                'self-center',
+                                i % 2 === 1 ? 'xl:order-1' : '',
+                              ])}
+                            >
                               <CodeBlock
                                 code={p.codeExample}
                                 language="ts"
@@ -366,29 +372,6 @@ try {
                         </div>
                       )
                     )}
-                  </div>
-                )}
-
-                {/* Content Model Integration */}
-                {sourceCodePage?.data?.contentModel && (
-                  <div class="mt-12">
-                    <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
-                      Content Model (Keystatic + Zod)
-                    </h3>
-                    <div class="mb-3">
-                      <div class="flex items-center gap-2">
-                        <span class="text-muted-foreground text-xs font-medium">
-                          content-schema.ts
-                        </span>
-                        <span class="text-muted-foreground/80 text-xs">ts</span>
-                      </div>
-                    </div>
-                    <CodeBlock
-                      code={sourceCodePage.data.contentModel.codeExample}
-                      language="ts"
-                      showLineNumbers
-                      className="bg-brand-dark/90 text-white"
-                    />
                   </div>
                 )}
               </Section>

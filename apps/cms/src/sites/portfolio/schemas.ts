@@ -726,24 +726,6 @@ export const portfolioSourceCodePageSchema = makePageSchema(
       { label: 'Architecture Section' }
     ),
 
-    // Content model section
-    contentModel: fields.object(
-      {
-        title: fields.text({
-          label: 'Section Title',
-          defaultValue: 'Content model (Keystatic + Zod)',
-        }),
-        content: fields.markdoc.inline({
-          label: 'Content',
-        }),
-        codeExample: fields.text({
-          label: 'Code Example',
-          multiline: true,
-        }),
-      },
-      { label: 'Content Model Section' }
-    ),
-
     // TypeScript section
     typescript: fields.object(
       {

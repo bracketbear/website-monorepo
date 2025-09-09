@@ -51,13 +51,6 @@ export const sourceCodePageSchema = makePageSchema(
       mermaidDiagram: z.string(),
     }),
 
-    // Content model section
-    contentModel: z.object({
-      title: z.string().default('Content model (Keystatic + Zod)'),
-      content: z.string(),
-      codeExample: z.string(),
-    }),
-
     // TypeScript section
     typescript: z.object({
       title: z

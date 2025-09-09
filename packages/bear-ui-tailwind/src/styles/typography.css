@@ -21,7 +21,7 @@
   /* Base prose variables - these will be overridden by size variants */
   --prose-font-size: 1rem;
   --prose-line-height: 1.75;
-  --prose-spacing: 1.25em;
+  --prose-spacing: 0.75em;
   --prose-heading-spacing: 0.5em;
   --prose-list-spacing: 1.5em;
   --prose-blockquote-spacing: 1em;
@@ -48,7 +48,7 @@
   }
 
   & h3 {
-    @apply mt-6 mb-2 font-semibold;
+    @apply mt-6 mb-2 font-semibold uppercase;
     font-size: var(--prose-h3-size);
     line-height: 1.6;
   }
