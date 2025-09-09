@@ -354,6 +354,30 @@ export function createContentImageLoader(
 }
 
 /**
+ * Extract relative path from a full CMS image path
+ *
+ * @param imagePath - The full image path from CMS
+ * @param contentType - The content type (e.g., 'work/projects')
+ * @returns The relative path after removing the content type prefix and content ID
+ */
+function extractRelativePath(imagePath: string, contentType: string): string {
+  const contentTypePrefix = `/${contentType}/`;
+
+  if (imagePath.startsWith(contentTypePrefix)) {
+    const pathParts = imagePath.split('/');
+    if (pathParts.length >= 4) {
+      // Skip: "", contentType parts, contentId, and take the rest
+      // For 'work/projects', skip: "", "work", "projects", contentId
+      // For 'work/personal-projects', skip: "", "work", "personal-projects", contentId
+      const contentTypeDepth = contentType.split('/').length + 1; // +1 for the leading slash
+      return pathParts.slice(contentTypeDepth + 1).join('/');
+    }
+  }
+
+  return imagePath; // Return as-is if it doesn't match the expected pattern
+}
+
+/**
  * Utility function to get public URL for a content image
  *
  * This function returns the public URL for an image that has been copied
@@ -382,23 +406,7 @@ export function getContentImageUrl(
   // Handle both full paths and relative paths from CMS
   // If it's a full path like /work/projects/ds-elekta/media/0/image.jpg,
   // extract the relative part: media/0/image.jpg
-  let relativePath = imagePath;
-  if (imagePath.startsWith('/work/projects/')) {
-    // Remove the /work/projects/ prefix and also remove the project ID
-    // since it's already provided as contentId parameter
-    const pathParts = imagePath.split('/');
-    if (pathParts.length >= 4) {
-      // Skip: "", "work", "projects", projectId, and take the rest
-      relativePath = pathParts.slice(4).join('/');
-    }
-  } else if (imagePath.startsWith('/work/personal-projects/')) {
-    // Handle personal project paths like /work/personal-projects/portfolio-website/coverImage.png
-    const pathParts = imagePath.split('/');
-    if (pathParts.length >= 4) {
-      // Skip: "", "work", "personal-projects", projectId, and take the rest
-      relativePath = pathParts.slice(4).join('/');
-    }
-  }
+  const relativePath = extractRelativePath(imagePath, contentType);
   // If it's a relative path like media/0/image.jpg, preserve the full structure
   const publicPath = join(
     findPublicDir(),
