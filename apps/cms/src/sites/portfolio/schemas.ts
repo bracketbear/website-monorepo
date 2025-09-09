@@ -623,6 +623,17 @@ export const portfolioProjectPageSchema = makePageSchema({
  */
 export const portfolioSourceCodePageSchema = makePageSchema(
   {
+    // Section order metadata
+    sectionOrder: fields.array(
+      fields.object({
+        id: fields.text({ label: 'Section ID' }),
+        title: fields.text({ label: 'Section Title' }),
+        file: fields.text({ label: 'File Name' }),
+        eyebrow: fields.text({ label: 'Eyebrow Text' }),
+      }),
+      { label: 'Section Order' }
+    ),
+
     // TL;DR section with key points
     tldr: fields.object(
       {
@@ -721,6 +732,10 @@ export const portfolioSourceCodePageSchema = makePageSchema(
           label: 'Mermaid Diagram',
           multiline: true,
         }),
+        systemFlowTitle: fields.text({
+          label: 'System Flow Subsection Title',
+          defaultValue: 'System Flow',
+        }),
       },
       { label: 'Architecture Section' }
     ),
@@ -750,6 +765,40 @@ export const portfolioSourceCodePageSchema = makePageSchema(
         ),
       },
       { label: 'TypeScript Section' }
+    ),
+
+    // Agentic workflows section
+    agenticWorkflows: fields.object(
+      {
+        title: fields.text({
+          label: 'Section Title',
+          defaultValue: 'Agentic Workflows & Pair-Programming',
+        }),
+        content: fields.markdoc.inline({
+          label: 'Content',
+        }),
+        protocolStepsTitle: fields.text({
+          label: 'Protocol Steps Subsection Title',
+          defaultValue: 'Pair-programming protocol (how I keep it predictable)',
+        }),
+        protocolSteps: fields.array(
+          fields.markdoc.inline({ label: 'Protocol Step' }),
+          { label: 'Pair-programming Protocol Steps' }
+        ),
+        rulesExcerpt: fields.text({
+          label: 'Project Rules Excerpt',
+          multiline: true,
+        }),
+        rulesExcerptTitle: fields.text({
+          label: 'Rules Excerpt Title',
+          defaultValue: 'Project Rules (excerpt)',
+        }),
+        rulesExcerptLanguage: fields.text({
+          label: 'Rules Excerpt Language',
+          defaultValue: 'mdc',
+        }),
+      },
+      { label: 'Agentic Workflows Section' }
     ),
 
     // Storybook section
@@ -806,6 +855,14 @@ export const portfolioSourceCodePageSchema = makePageSchema(
         }),
         howToGetThere: fields.markdoc.inline({
           label: 'How I Get There',
+        }),
+        targetsTitle: fields.text({
+          label: 'Targets Subsection Title',
+          defaultValue: 'Targets',
+        }),
+        howToGetThereTitle: fields.text({
+          label: 'How I Get There Subsection Title',
+          defaultValue: 'How I get there',
         }),
       },
       { label: 'Performance & Accessibility Section' }

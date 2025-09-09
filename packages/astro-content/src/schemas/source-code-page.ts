@@ -11,6 +11,18 @@ import { makePageSchema } from './page';
  */
 export const sourceCodePageSchema = makePageSchema(
   {
+    // Section order metadata
+    sectionOrder: z
+      .array(
+        z.object({
+          id: z.string(),
+          title: z.string(),
+          file: z.string(),
+          eyebrow: z.string(),
+        })
+      )
+      .optional(),
+
     // TL;DR section with key points
     tldr: z.object({
       title: z.string().default('TL;DR'),
@@ -48,6 +60,7 @@ export const sourceCodePageSchema = makePageSchema(
       title: z.string().default('Architecture (at a glance)'),
       content: z.string(),
       mermaidDiagram: z.string(),
+      systemFlowTitle: z.string().default('System Flow'),
     }),
 
     // TypeScript section
@@ -63,6 +76,19 @@ export const sourceCodePageSchema = makePageSchema(
           codeExample: z.string(),
         })
       ),
+    }),
+
+    // Agentic workflows section
+    agenticWorkflows: z.object({
+      title: z.string().default('Agentic Workflows & Pair-Programming'),
+      content: z.string(),
+      protocolStepsTitle: z
+        .string()
+        .default('Pair-programming protocol (how I keep it predictable)'),
+      protocolSteps: z.array(z.string()),
+      rulesExcerpt: z.string(),
+      rulesExcerptTitle: z.string().default('Project Rules (excerpt)'),
+      rulesExcerptLanguage: z.string().default('mdc'),
     }),
 
     // Storybook section
@@ -86,6 +112,8 @@ export const sourceCodePageSchema = makePageSchema(
       title: z.string().default('Performance & accessibility'),
       targets: z.string(),
       howToGetThere: z.string(),
+      targetsTitle: z.string().default('Targets'),
+      howToGetThereTitle: z.string().default('How I get there'),
     }),
 
     // Testing & DX section

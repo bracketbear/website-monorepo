@@ -4,6 +4,86 @@
   "canonicalUrl": "https://harrisoncallahan.com/source-code",
   "noIndex": false,
   "contactCTA": {},
+  "sectionOrder": [
+    {
+      "id": "tldr",
+      "title": "The TL;DR",
+      "file": "source-code.astro",
+      "eyebrow": "Overview"
+    },
+    {
+      "id": "architecture",
+      "title": "Architecture",
+      "file": "source-code.astro",
+      "eyebrow": "Architecture"
+    },
+    {
+      "id": "performance-accessibility",
+      "title": "Performance & accessibility",
+      "file": "source-code.astro",
+      "eyebrow": "Performance"
+    },
+    {
+      "id": "monorepo",
+      "title": "Repo map (auto-generated)",
+      "file": "source-code.astro",
+      "eyebrow": "Structure"
+    },
+    {
+      "id": "contracts-types",
+      "title": "Contracts & Types",
+      "file": "source-code.astro",
+      "eyebrow": "Type System"
+    },
+    {
+      "id": "agentic-workflows",
+      "title": "Agentic Workflows & Pair-Programming",
+      "file": "source-code.astro",
+      "eyebrow": "AI Pairing"
+    },
+    {
+      "id": "styling",
+      "title": "Styling",
+      "file": "source-code.astro",
+      "eyebrow": "Design"
+    },
+    {
+      "id": "storybook",
+      "title": "Storybook (single instance, multi-directory)",
+      "file": "source-code.astro",
+      "eyebrow": "Documentation"
+    },
+    {
+      "id": "flateralus",
+      "title": "Flateralus Animation System",
+      "file": "source-code.astro",
+      "eyebrow": "Animation"
+    },
+    {
+      "id": "testing-dx",
+      "title": "Testing & DX",
+      "file": "source-code.astro",
+      "eyebrow": "Testing"
+    },
+    {
+      "id": "security-ops",
+      "title": "Security & ops",
+      "file": "source-code.astro",
+      "eyebrow": "Security"
+    },
+    {
+      "id": "future-changes",
+      "title": "What I'd change next",
+      "file": "source-code.astro",
+      "eyebrow": "Roadmap"
+    },
+    {
+      "id": "closing",
+      "title": "Closing",
+      "file": "source-code.astro",
+      "eyebrow": "Conclusion"
+    }
+  ],
   "tldr": {
     "title": "The TL;DR",
     "points": [
@@ -76,7 +156,8 @@
   "architecture": {
     "title": "Architecture At A Glance",
     "content": "- **Static first.** Pages render statically in Astro; islands mount React only where interaction or animation adds value.\n- **Typed content.** Content shapes live in Zod. The build fails on bad content rather than shipping surprises to production.\n- **Clear boundaries.** Apps depend \"down\" on packages; packages don't reach back into apps.\n- **Assets.** Images get width hints and sensible defaults; fonts are subset.\n",
-    "mermaidDiagram": "flowchart LR\n  U[User] --> CDN\n  CDN --> Astro[Astro Static Pages]\n  Astro -->|hydrate as needed| Islands[React Islands]\n  Astro --> Content[Keystatic Build (Zod typed)]\n  Islands --> Anim[Flateralus Runtime (PIXI 8)]\n  Astro --> Assets[Image/Asset Pipeline]"
+    "mermaidDiagram": "flowchart LR\n  U[User] --> CDN\n  CDN --> Astro[Astro Static Pages]\n  Astro -->|hydrate as needed| Islands[React Islands]\n  Astro --> Content[Keystatic Build (Zod typed)]\n  Islands --> Anim[Flateralus Runtime (PIXI 8)]\n  Astro --> Assets[Image/Asset Pipeline]",
+    "systemFlowTitle": "System Flow"
   },
   "typescript": {
     "title": "TypeScript",
@@ -99,6 +180,21 @@
       }
     ]
   },
+  "agenticWorkflows": {
+    "title": "Agentic Workflows & Pair-Programming",
+    "content": "I pair-program with Cursor's Agent and keep it on rails with project Rules. The Agent plans first, shows a to-do list for longer changes, and proposes diffs I can accept or reject. Rules make those diffs align with how this repo is built.\n\n**How I use it**\n\n- **Plan → Act → Review.** Ask for a plan, let it break work into steps, then apply changes with diffs and checkpoints. If a step needs the terminal, I confirm the command first.\n- **Architecture sessions.** I'll have the Agent map modules, call out boundary violations, or sketch migration steps before touching code.\n- **Guardrails.** Project Rules live in `.cursor/rules` and are scoped to directories, so the Agent follows the same constraints I do.\n",
+    "protocolStepsTitle": "Pair-programming protocol (how I keep it predictable)",
+    "protocolSteps": [
+      "**State the outcome.** \"Refactor X into package Y, keep public API stable.\"",
+      "**Ask for a plan.** Agent produces a to-do list; I tweak it if needed.",
+      "**Apply with diffs.** I review and accept in chunks; checkpoints let me roll back.",
+      "**Run commands with confirm.** Anything destructive or long-running asks first.",
+      "**Exit criteria.** Tests pass, boundaries hold, tokens respected, and the plan's boxes are all checked."
+    ],
+    "rulesExcerpt": "---\ndescription: Frontend styling rules\nglobs:\n  - \"apps/portfolio/**\"\n  - \"packages/ui-kit/**\"\nalwaysApply: false\n---\n- Tailwind v4 only with `@theme` tokens. No arbitrary values.\n- Prefer composition over overrides; if a utility needs `!important`, the API is wrong.\n- Keep panels/cards/code blocks on the same surface/radius/shadow set.\n@tokens.css",
+    "rulesExcerptTitle": "Project Rules (excerpt)",
+    "rulesExcerptLanguage": "mdc"
+  },
   "storybook": {
     "title": "Storybook (single instance, multi-directory)",
     "content": "I run one Storybook that aggregates stories from apps and packages. Each story shows where it lives. This makes reviews faster and keeps ownership clear: if a component belongs in the shared UI, it moves there and inherits tokens.\n\n- One place to exercise states and edge cases.\n- Easy visual QA during refactors.\n- Encourages reuse without policing it manually.\n",
@@ -113,7 +209,9 @@
   "performanceAccessibility": {
     "title": "Performance & accessibility",
     "targets": "**Lighthouse Results:**\n\n- **Performance: 99/100** - Near-perfect Core Web Vitals\n- **Accessibility: 100/100** - Full WCAG compliance\n- **Best Practices: 100/100** - Security and modern web standards\n- **SEO: 100/100** - Optimized for search engines\n\n**Core Web Vitals:**\n\n- **LCP ≤ 1.2s** (Largest Contentful Paint)\n- **INP ≤ 50ms** (Interaction to Next Paint) \n- **CLS = 0** (Cumulative Layout Shift)\n",
-    "howToGetThere": "**Performance Strategy:**\n\n- **Static-first architecture** with Astro; selective React hydration only where needed\n- **Optimized images** with width hints, modern formats, and responsive sizing\n- **Font optimization** with subset loading and preload hints\n- **Animation controls** that pause when not visible to preserve frame budget\n- **Bundle optimization** with tree-shaking and code splitting\n\n**Accessibility Approach:**\n\n- **Semantic HTML** with proper heading hierarchy and landmarks\n- **ARIA labels** and roles for complex interactions\n- **Keyboard navigation** support throughout\n- **Color contrast** meeting WCAG AA standards\n- **Screen reader** compatibility with descriptive alt text\n"
+    "howToGetThere": "**Performance Strategy:**\n\n- **Static-first architecture** with Astro; selective React hydration only where needed\n- **Optimized images** with width hints, modern formats, and responsive sizing\n- **Font optimization** with subset loading and preload hints\n- **Animation controls** that pause when not visible to preserve frame budget\n- **Bundle optimization** with tree-shaking and code splitting\n\n**Accessibility Approach:**\n\n- **Semantic HTML** with proper heading hierarchy and landmarks\n- **ARIA labels** and roles for complex interactions\n- **Keyboard navigation** support throughout\n- **Color contrast** meeting WCAG AA standards\n- **Screen reader** compatibility with descriptive alt text\n",
+    "targetsTitle": "Targets",
+    "howToGetThereTitle": "How I get there"
   },
   "testingDx": {
     "title": "Testing & DX",

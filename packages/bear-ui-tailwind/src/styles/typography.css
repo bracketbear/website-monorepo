@@ -92,14 +92,13 @@
     content: none;
   }
 
-  & ol > li {
-    @apply relative;
-    padding-left: 1.375em;
+  & ol {
+    @apply list-decimal;
   }
 
-  & ol > li::before {
-    content: counter(list-item, decimal) '.';
-    @apply absolute top-0 left-0 w-[1.625em] font-normal text-current;
+  & ol > li {
+    @apply relative;
+    padding-left: var(--prose-list-spacing);
   }
 
   & blockquote {
