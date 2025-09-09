@@ -29,7 +29,6 @@
     "test": "vitest --run",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
-    "test:scripts": "vitest scripts/",
     "type-check": "npm run type-check --workspace=@bracketbear/bear-ui --workspace=@bracketbear/bear-ui-tailwind --workspace=@bracketbear/bear-ui-react --workspace=@bracketbear/core --workspace=@bracketbear/flateralus --workspace=@bracketbear/flateralus-pixi-animations --workspace=@bracketbear/flateralus-p5-animations --workspace=@bracketbear/flateralus-react --workspace=@bracketbear/flateralus-pixi --workspace=@bracketbear/flateralus-p5 --workspace=@bracketbear/tw-pattern-analyzer --workspace=@bracketbear/portfolio",
     "prepare": "husky",
     "deploy:portfolio": "./scripts/deploy.sh portfolio",
