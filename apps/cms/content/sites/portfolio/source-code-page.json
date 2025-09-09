@@ -185,11 +185,11 @@
     "content": "I pair-program with Cursor's Agent and keep it on rails with project Rules. The Agent plans first, shows a to-do list for longer changes, and proposes diffs I can accept or reject. Rules make those diffs align with how this repo is built.\n\n**How I use it**\n\n- **Plan → Act → Review.** Ask for a plan, let it break work into steps, then apply changes with diffs and checkpoints. If a step needs the terminal, I confirm the command first.\n- **Architecture sessions.** I'll have the Agent map modules, call out boundary violations, or sketch migration steps before touching code.\n- **Guardrails.** Project Rules live in `.cursor/rules` and are scoped to directories, so the Agent follows the same constraints I do.\n",
     "protocolStepsTitle": "Pair-programming protocol (how I keep it predictable)",
     "protocolSteps": [
-      "**State the outcome.** \"Refactor X into package Y, keep public API stable.\"",
-      "**Ask for a plan.** Agent produces a to-do list; I tweak it if needed.",
-      "**Apply with diffs.** I review and accept in chunks; checkpoints let me roll back.",
-      "**Run commands with confirm.** Anything destructive or long-running asks first.",
-      "**Exit criteria.** Tests pass, boundaries hold, tokens respected, and the plan's boxes are all checked."
+      "**State the outcome.** \"Refactor X into package Y, keep public API stable.\"\n",
+      "**Ask for a plan.** Agent produces a to-do list; I tweak it if needed.\n",
+      "**Apply with diffs.** I review and accept in chunks; checkpoints let me roll back.\n",
+      "**Run commands with confirm.** Anything destructive or long-running asks first.\n",
+      "**Exit criteria.** Tests pass, boundaries hold, tokens respected, and the plan's boxes are all checked.\n"
     ],
     "rulesExcerpt": "---\ndescription: Frontend styling rules\nglobs:\n  - \"apps/portfolio/**\"\n  - \"packages/ui-kit/**\"\nalwaysApply: false\n---\n- Tailwind v4 only with `@theme` tokens. No arbitrary values.\n- Prefer composition over overrides; if a utility needs `!important`, the API is wrong.\n- Keep panels/cards/code blocks on the same surface/radius/shadow set.\n@tokens.css",
     "rulesExcerptTitle": "Project Rules (excerpt)",
@@ -208,7 +208,7 @@
   },
   "performanceAccessibility": {
     "title": "Performance & accessibility",
-    "targets": "**Lighthouse Results:**\n\n- **Performance: 99/100** - Near-perfect Core Web Vitals\n- **Accessibility: 100/100** - Full WCAG compliance\n- **Best Practices: 100/100** - Security and modern web standards\n- **SEO: 100/100** - Optimized for search engines\n\n**Core Web Vitals:**\n\n- **LCP ≤ 1.2s** (Largest Contentful Paint)\n- **INP ≤ 50ms** (Interaction to Next Paint) \n- **CLS = 0** (Cumulative Layout Shift)\n",
+    "targets": "**Lighthouse Results:**\n\n- **Performance: 99/100** - Near-perfect Core Web Vitals\n- **Accessibility: 100/100** - Full WCAG compliance\n- **Best Practices: 100/100** - Security and modern web standards\n- **SEO: 100/100** - Optimized for search engines\n\n**Core Web Vitals:**\n\n- **LCP ≤ 1.2s** (Largest Contentful Paint)\n- **INP ≤ 50ms** (Interaction to Next Paint)\n- **CLS = 0** (Cumulative Layout Shift)\n",
     "howToGetThere": "**Performance Strategy:**\n\n- **Static-first architecture** with Astro; selective React hydration only where needed\n- **Optimized images** with width hints, modern formats, and responsive sizing\n- **Font optimization** with subset loading and preload hints\n- **Animation controls** that pause when not visible to preserve frame budget\n- **Bundle optimization** with tree-shaking and code splitting\n\n**Accessibility Approach:**\n\n- **Semantic HTML** with proper heading hierarchy and landmarks\n- **ARIA labels** and roles for complex interactions\n- **Keyboard navigation** support throughout\n- **Color contrast** meeting WCAG AA standards\n- **Screen reader** compatibility with descriptive alt text\n",
     "targetsTitle": "Targets",
     "howToGetThereTitle": "How I get there"
@@ -238,12 +238,11 @@
     "content": "If you want to see something specific—content shapes, token usage, or animation controls—reach out and I'll point you to a tight, focused example.\n",
     "modalTitle": "Before you dive in...",
     "modalHeading": "Coding is a journey, not a destination.",
-    "modalIntro": "This repository represents a snapshot in time of my learning and growth as a developer. The code you'll find here reflects my current understanding, preferences, and the tools I've chosen to work with.",
+    "modalIntro": "This repository represents a snapshot in time of my learning and growth as a developer. The code you'll find here reflects my current understanding, preferences, and the tools I've chosen to work with.\n",
     "modalAcknowledgment": "By accessing this code, you acknowledge that:",
     "modalPoints": [
       "This code is a work in progress and may contain imperfections",
       "Best practices evolve, and what's shown here represents my current approach",
-      "You're viewing this as inspiration and learning material, not production-ready code",
       "The journey of learning to code never ends"
     ],
     "modalCheckboxLabel": "I understand that coding is a journey and agree to view this code as learning material",
