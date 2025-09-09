@@ -156,3 +156,8 @@
 #mobile-menu {
   contain: layout style paint;
 }
+
+/* TOC active state styling */
+[data-section-id].active {
+  @apply text-brand-orange font-semibold;
+}

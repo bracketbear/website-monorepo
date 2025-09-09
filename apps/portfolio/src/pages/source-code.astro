@@ -20,6 +20,8 @@ function cleanMarkdown(content: string | undefined | null): string {
     .replace(/\s+$/gm, ''); // Remove trailing whitespace from each line
 }
 
+const activeSection = Astro.url.hash.slice(1);
+
 const breadcrumbs: Breadcrumb[] = [
   { label: 'Home', href: '/' },
   { label: 'Source Code', href: '/source-code' },
@@ -118,8 +120,8 @@ try {
   <div class="container-content">
     <div class="relative">
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
-        <div class="xl:sticky xl:top-24 xl:self-start">
-          <StickyTOC sections={sections} />
+        <div class="lg:sticky lg:top-36 lg:self-start">
+          <StickyTOC sections={sections} activeSection={activeSection} />
         </div>
         <div class="min-w-0">
           {/* TL;DR Section */}
@@ -641,7 +643,7 @@ try {
                         <li
                           class="text-foreground/90"
                           set:html={marked.parse(cleanMarkdown(item))}
-                        ></li>
+                        />
                       )
                     )}
                   </ul>
@@ -666,3 +668,10 @@ try {
     </div>
   </div>
 </HeroLayout>
+
+<script define:vars={{ sections }}>
+  // Make sections available to the TypeScript module
+  window.sections = sections;
+</script>
+
+<script src="@/utils/sectionObserver.ts"></script>
