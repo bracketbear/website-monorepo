@@ -1,22 +1,68 @@
-# Flateralus React Package Structure
+# @bracketbear/flateralus-react
 
-This package is organized for clarity, scalability, and maintainability. The structure is based on the following taxonomy:
+## Overview
 
-## Directory Structure
+React bindings for Flateralus animation engine.
 
-- `components/` — All React components (e.g., `AnimationStage`, `DebugControls`).
-- `hooks/` — Custom React hooks (present or future).
+## Table of Contents
 
-## Rationale
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Development](#development)
+- [Build](#build)
+- [Back to Monorepo](../../README.md)
 
-- **Separation of Concerns:** UI components and hooks are kept distinct.
-- **Scalability:** New components and hooks can be added in their respective folders.
-- **Maintainability:** Each part of the system is easy to locate and update.
+## Features
 
-## Export Pattern
+- **TypeScript**: Full type safety and IntelliSense support
+- **Modular Design**: Clean, reusable components and utilities
+- **Framework Agnostic**: Works with multiple frameworks
+- **Animation Engine**: High-performance graphics and animations
+- **Multiple Renderers**: Support for PIXI.js and p5.js
+- **React Integration**: React bindings for easy integration
 
-Each directory contains an `index.ts` (or `index.tsx`) file to provide clean exports. The package root `index.tsx` re-exports from these submodules for a simple public API.
+## Installation
 
----
+Install the package:
 
-This pattern should be followed for all future additions to the package.
+```bash
+npm install @bracketbear/flateralus-react
+```
+
+## Development
+
+To start development:
+
+```bash
+# From monorepo root
+npm run dev --workspace=packages/flateralus-react
+
+# Or from flateralus-react directory
+cd packages/flateralus-react && npm run dev
+```
+
+## Build
+
+To build for production:
+
+```bash
+# From monorepo root
+npm run build --workspace=packages/flateralus-react
+
+# Or from flateralus-react directory
+cd packages/flateralus-react && npm run build
+```
+
+## Version
+
+Current version: **1.0.1**
+
+## Technologies Used
+
+- **TypeScript**: Type safety and modern JavaScript features
+- **React**: Component library
+- **Headless UI**: Accessible UI primitives
+- **PIXI.js**: 2D graphics library
+- **p5.js**: Creative coding library
+- **GSAP**: Animation library

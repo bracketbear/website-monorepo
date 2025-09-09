@@ -1,6 +1,7 @@
 {
   "name": "@bracketbear/flateralus-pixi-animations",
   "version": "1.0.1",
+  "description": "PIXI.js animations for Flateralus framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -20,6 +21,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "description": "PIXI.js animations for Flateralus framework"
+  "license": "ISC"
 }

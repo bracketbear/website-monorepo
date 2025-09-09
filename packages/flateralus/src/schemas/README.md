@@ -257,4 +257,3 @@ const newGroup = createGroupControl('color', {
 ## Examples
 
 See `controls.example.ts` for comprehensive examples of how to use the type-safe group control system.
-

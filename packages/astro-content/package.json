@@ -2,6 +2,7 @@
   "name": "@bracketbear/astro-content",
   "type": "module",
   "version": "1.0.1",
+  "description": "Content management utilities for Astro with CMS integration, image handling, and Vite plugin support",
   "main": "index.ts",
   "types": "index.ts",
   "scripts": {

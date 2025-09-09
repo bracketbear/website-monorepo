@@ -1,53 +1,63 @@
 # @bracketbear/bear-ui
 
-Core UI system for BracketBear applications. This package contains shared types, utilities, and interfaces that are used across the BracketBear UI ecosystem.
+## Overview
+
+Core UI system for BracketBear applications
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Development](#development)
+- [Build](#build)
+- [Back to Monorepo](../../README.md)
+
+## Features
+
+- **TypeScript**: Full type safety and IntelliSense support
+- **Modular Design**: Clean, reusable components and utilities
+- **Framework Agnostic**: Works with multiple frameworks
+- **Design System**: Consistent UI components and utilities
+- **Tailwind Integration**: Optimized Tailwind CSS utilities
+- **Accessibility**: WCAG compliant components
 
 ## Installation
+
+Install the package:
 
 ```bash
 npm install @bracketbear/bear-ui
 ```
 
-## Usage
-
-Import shared types and utilities:
-
-```typescript
-import {
-  BreadcrumbItem,
-  LabelValue,
-  LayoutConfig,
-} from '@bracketbear/bear-ui/types';
-import { clsx, debounce, generateMetaTitle } from '@bracketbear/bear-ui/utils';
-```
-
-## What's Included
-
-### Types
-
-Navigation, layout, and form-related TypeScript interfaces and types.
-
-### Utils
-
-- Class name utilities (`clsx`) - Single source of truth for class name handling
-- Form validation and meta title generation
-- Button styling utilities
-- Header spacing calculations
-- Navigation helpers
-- Shared constants
-
 ## Development
 
+To start development:
+
 ```bash
-npm run dev    # Watch mode for development
-npm run build  # Build for production
-npm run clean  # Clean build artifacts
-npm run type-check  # Type checking
+# From monorepo root
+npm run dev --workspace=packages/bear-ui
+
+# Or from bear-ui directory
+cd packages/bear-ui && npm run dev
 ```
 
-## Dependencies
+## Build
 
-This package is consumed by:
+To build for production:
 
-- `@bracketbear/bear-ui-tailwind` - Tailwind CSS styles
-- `@bracketbear/bear-ui-react` - React components
+```bash
+# From monorepo root
+npm run build --workspace=packages/bear-ui
+
+# Or from bear-ui directory
+cd packages/bear-ui && npm run build
+```
+
+## Version
+
+Current version: **1.0.1**
+
+## Technologies Used
+
+- **TypeScript**: Type safety and modern JavaScript features
