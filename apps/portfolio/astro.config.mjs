@@ -36,7 +36,11 @@ export default defineConfig({
             // Separate vendor chunks for better caching
             'react-vendor': ['react', 'react-dom'],
             'pixi-vendor': ['pixi.js'],
-            'flateralus-vendor': ['@bracketbear/flateralus-react', '@bracketbear/flateralus-pixi', '@bracketbear/flateralus-pixi-animations'],
+            'flateralus-vendor': [
+              '@bracketbear/flateralus-react',
+              '@bracketbear/flateralus-pixi',
+              '@bracketbear/flateralus-pixi-animations',
+            ],
           },
         },
       },
