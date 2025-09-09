@@ -23,7 +23,7 @@
   --prose-line-height: 1.75;
   --prose-spacing: 0.75em;
   --prose-heading-spacing: 0.5em;
-  --prose-list-spacing: 1.5em;
+  --prose-list-spacing: 0.75em;
   --prose-blockquote-spacing: 1em;
   --prose-pre-spacing: 0.8571429em;
   --prose-table-spacing: 0.5714286em;
@@ -67,7 +67,7 @@
 
   & ul,
   & ol {
-    @apply list-outside;
+    @apply list-outside pl-5;
     margin-top: var(--prose-spacing);
     margin-bottom: var(--prose-spacing);
   }
@@ -77,18 +77,18 @@
     margin-bottom: calc(var(--prose-spacing) * 0.25);
   }
 
+  /* Use standard disc bullets for all unordered lists */
+  & ul {
+    @apply list-disc;
+  }
+
   & ul > li {
     @apply relative;
     padding-left: var(--prose-list-spacing);
   }
 
+  /* Remove custom bullets - use standard Tailwind disc bullets */
   & ul > li::before {
-    content: '';
-    @apply absolute top-[0.6875em] left-[0.25em] h-[0.375em] w-[0.375em] rounded-full bg-current;
-  }
-
-  /* Disable custom bullets when using list-disc */
-  & ul.list-disc > li::before {
     content: none;
   }
 

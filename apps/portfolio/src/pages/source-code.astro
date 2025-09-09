@@ -138,7 +138,7 @@ try {
                       <h3 class="font-heading mb-4 text-xl font-bold tracking-tight text-white uppercase">
                         {point.label}
                       </h3>
-                      <ul class="list-outside list-disc space-y-2 pl-5 text-white/90">
+                      <ul class="list-outside list-disc space-y-2 text-white/90">
                         {point.bullets?.map((b: string) => (
                           <li>{b}</li>
                         ))}
@@ -392,7 +392,7 @@ try {
                   <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
                     Rules I follow
                   </h3>
-                  <ul class="list-outside list-disc space-y-2 pl-5">
+                  <ul class="list-outside list-disc space-y-2">
                     {sourceCodePage.data.tailwindSection.rules.map(
                       (rule: string) => (
                         <li class="text-foreground/90">{rule}</li>
