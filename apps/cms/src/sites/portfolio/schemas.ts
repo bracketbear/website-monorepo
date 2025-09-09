@@ -929,6 +929,61 @@ export const portfolioSourceCodePageSchema = makePageSchema(
         content: fields.markdoc.inline({
           label: 'Content',
         }),
+        // Modal content
+        modalTitle: fields.text({
+          label: 'Modal Title',
+          defaultValue: 'Before you dive in...',
+        }),
+        modalHeading: fields.text({
+          label: 'Modal Heading',
+          defaultValue: 'Coding is a journey, not a destination.',
+        }),
+        modalIntro: fields.markdoc.inline({
+          label: 'Modal Introduction',
+          description: 'Introduction text explaining the repository',
+        }),
+        modalAcknowledgment: fields.text({
+          label: 'Modal Acknowledgment Text',
+          defaultValue: 'By accessing this code, you acknowledge that:',
+        }),
+        modalPoints: fields.array(
+          fields.text({ label: 'Acknowledgment Point' }),
+          {
+            label: 'Acknowledgment Points',
+            description: 'List of points users must acknowledge',
+          }
+        ),
+        modalCheckboxLabel: fields.text({
+          label: 'Checkbox Label',
+          defaultValue:
+            'I understand that coding is a journey and agree to view this code as learning material',
+        }),
+        modalCancelButton: fields.text({
+          label: 'Cancel Button Text',
+          defaultValue: 'Cancel',
+        }),
+        modalAgreeButton: fields.text({
+          label: 'Agree Button Text',
+          defaultValue: 'I Agree - Take me to the code',
+        }),
+        repositoryUrl: fields.url({
+          label: 'Repository URL',
+          defaultValue: 'https://github.com/bracketbear/website-monorepo',
+        }),
+        // Button content
+        buttonTitle: fields.text({
+          label: 'Button Section Title',
+          defaultValue: 'Ready to explore the code?',
+        }),
+        buttonDescription: fields.text({
+          label: 'Button Description',
+          defaultValue:
+            'This repository contains the complete source code for this portfolio and all related projects.',
+        }),
+        buttonText: fields.text({
+          label: 'Button Text',
+          defaultValue: 'View Source Code',
+        }),
       },
       { label: 'Closing Section' }
     ),

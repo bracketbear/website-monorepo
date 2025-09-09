@@ -20,7 +20,10 @@ function cleanMarkdown(content: string | undefined | null): string {
 }
 ---
 
-<section id={id} class={clsx(`section-content py-12 first:pt-0`, className)}>
+<section
+  id={id}
+  class={clsx(`section-content py-12 first:pt-0 last:pb-0`, className)}
+>
   <div>
     {
       eyebrow && (

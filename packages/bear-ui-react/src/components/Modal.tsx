@@ -33,9 +33,9 @@ export interface ModalProps {
 
 const sizeClasses = {
   sm: 'sm:max-w-sm',
-  md: 'sm:max-w-md',
-  lg: 'sm:max-w-lg',
-  xl: 'sm:max-w-2xl',
+  md: 'sm:max-w-2xl',
+  lg: 'sm:max-w-4xl',
+  xl: 'sm:max-w-6xl',
   full: 'sm:max-w-full sm:mx-4',
 };
 
@@ -89,9 +89,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 'max-h-[90vh] sm:max-h-[85vh]',
                 sizeClasses[size],
                 // Glass or card styling
-                glass
-                  ? 'glass-bg-light glass-shadow-lg glass-border rounded-lg border-2'
-                  : 'card tangible',
+                glass ? 'card-neutral tangible' : 'card-neutral tangible',
                 className
               )}
             >
@@ -100,25 +98,20 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 <div
                   className={clsx(
                     'sticky top-0 z-10 flex items-center justify-between border-b-2 p-4',
-                    glass
-                      ? 'glass-border glass-text'
-                      : 'border-brand-dark bg-brand-orange'
+                    'border-brand-dark bg-card-neutral'
                   )}
                 >
                   {title && (
                     <DialogTitle
                       as="h2"
-                      className={clsx(
-                        'font-heading text-xl font-bold',
-                        glass ? 'glass-text' : 'text-brand-dark'
-                      )}
+                      className="font-heading text-foreground text-xl font-bold"
                     >
                       {title}
                     </DialogTitle>
                   )}
                   {showCloseButton && (
                     <Button
-                      variant={glass ? 'ghostLight' : 'secondary'}
+                      variant="ghost"
                       size="icon"
                       onClick={onClose}
                       aria-label="Close modal"

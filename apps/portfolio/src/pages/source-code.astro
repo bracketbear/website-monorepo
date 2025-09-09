@@ -7,6 +7,7 @@ import HeroLayout from '@/layouts/HeroLayout.astro';
 import Section from '@/components/Section.astro';
 import StickyTOC from '@/components/StickyTOC.astro';
 import RepoPanel from '@/components/RepoPanel.astro';
+import { ClosingSection } from '@/components/ClosingSection';
 
 // Helper function to clean markdown content
 function cleanMarkdown(content: string | undefined | null): string {
@@ -30,6 +31,9 @@ const breadcrumbs: Breadcrumb[] = [
 // Get the source-code page singleton
 const sourceCodePageEntries = await getCollection('portfolioSourceCodePage');
 const sourceCodePage = sourceCodePageEntries[0]; // Singletons have only one entry
+
+// Debug: Log the closing data
+console.log('Closing data:', sourceCodePage?.data?.closing);
 
 // Define sections for TOC - pull from CMS data
 const sections = [
@@ -722,8 +726,62 @@ try {
                 id="closing"
                 eyebrow="Conclusion"
                 title={sourceCodePage.data.closing.title}
-                intro={sourceCodePage.data.closing.content}
-              />
+              >
+                <ClosingSection
+                  client:load
+                  intro={sourceCodePage.data.closing.content}
+                  modalTitle={
+                    sourceCodePage.data.closing.modalTitle ||
+                    'Before you dive in...'
+                  }
+                  modalHeading={
+                    sourceCodePage.data.closing.modalHeading ||
+                    'Coding is a journey, not a destination.'
+                  }
+                  modalIntro={
+                    sourceCodePage.data.closing.modalIntro ||
+                    'This repository represents a snapshot in time of my learning and growth as a developer.'
+                  }
+                  modalAcknowledgment={
+                    sourceCodePage.data.closing.modalAcknowledgment ||
+                    'By accessing this code, you acknowledge that:'
+                  }
+                  modalPoints={
+                    sourceCodePage.data.closing.modalPoints || [
+                      'This code is a work in progress and may contain imperfections',
+                      "Best practices evolve, and what's shown here represents my current approach",
+                      "You're viewing this as inspiration and learning material, not production-ready code",
+                      'The journey of learning to code never ends',
+                    ]
+                  }
+                  modalCheckboxLabel={
+                    sourceCodePage.data.closing.modalCheckboxLabel ||
+                    'I understand that coding is a journey and agree to view this code as learning material'
+                  }
+                  modalCancelButton={
+                    sourceCodePage.data.closing.modalCancelButton || 'Cancel'
+                  }
+                  modalAgreeButton={
+                    sourceCodePage.data.closing.modalAgreeButton ||
+                    'I Agree - Take me to the code'
+                  }
+                  repositoryUrl={
+                    sourceCodePage.data.closing.repositoryUrl ||
+                    'https://github.com/bracketbear/website-monorepo'
+                  }
+                  buttonTitle={
+                    sourceCodePage.data.closing.buttonTitle ||
+                    'Ready to explore the code?'
+                  }
+                  buttonDescription={
+                    sourceCodePage.data.closing.buttonDescription ||
+                    'This repository contains the complete source code for this portfolio and all related projects.'
+                  }
+                  buttonText={
+                    sourceCodePage.data.closing.buttonText || 'View Source Code'
+                  }
+                />
+              </Section>
             )
           }
         </div>

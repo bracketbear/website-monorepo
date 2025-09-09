@@ -17,7 +17,7 @@ export const CheckboxField: React.FC<CheckboxFieldProps> = ({
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       <CheckboxInput id={id} error={error} {...props} />
-      <label htmlFor={id} className="text-brand-dark font-bold">
+      <label htmlFor={id} className="text-foreground font-bold">
         {label}
       </label>
       {error && (

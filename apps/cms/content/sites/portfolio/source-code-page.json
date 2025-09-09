@@ -234,7 +234,24 @@
     ]
   },
   "closing": {
-    "title": "Closing",
-    "content": "If you want to see something specific—content shapes, token usage, or animation controls—reach out and I'll point you to a tight, focused example.\n"
+    "title": "Closing and repository link",
+    "content": "If you want to see something specific—content shapes, token usage, or animation controls—reach out and I'll point you to a tight, focused example.\n",
+    "modalTitle": "Before you dive in...",
+    "modalHeading": "Coding is a journey, not a destination.",
+    "modalIntro": "This repository represents a snapshot in time of my learning and growth as a developer. The code you'll find here reflects my current understanding, preferences, and the tools I've chosen to work with.",
+    "modalAcknowledgment": "By accessing this code, you acknowledge that:",
+    "modalPoints": [
+      "This code is a work in progress and may contain imperfections",
+      "Best practices evolve, and what's shown here represents my current approach",
+      "You're viewing this as inspiration and learning material, not production-ready code",
+      "The journey of learning to code never ends"
+    ],
+    "modalCheckboxLabel": "I understand that coding is a journey and agree to view this code as learning material",
+    "modalCancelButton": "Cancel",
+    "modalAgreeButton": "I Agree - Take me to the code",
+    "repositoryUrl": "https://github.com/bracketbear/website-monorepo",
+    "buttonTitle": "Ready to explore the code?",
+    "buttonDescription": "This repository contains the complete source code for this portfolio and all related projects.",
+    "buttonText": "View Source Code"
   }
 }
