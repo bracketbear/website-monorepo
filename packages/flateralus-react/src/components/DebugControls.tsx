@@ -301,7 +301,7 @@ export const DebugControls = memo(function DebugControls({
         offset={2}
         showArrow={true}
       >
-        <div className="max-h-[80vh] w-96 overflow-y-auto p-4">
+        <div className="max-h-[80vh] w-[90vw] max-w-sm overflow-y-auto p-4 sm:w-96">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-white/90">
