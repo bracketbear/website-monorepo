@@ -26,7 +26,7 @@ export function BaseControlWrapper({
   return (
     <div className={`flex flex-col gap-0.5 py-2 ${className}`}>
       <div className="flex items-center gap-2">
-        <label className="w-32 shrink-0 text-xs text-white/70">
+        <label className="w-24 shrink-0 text-xs text-white/70 sm:w-32">
           {displayLabel}
         </label>
         {children}

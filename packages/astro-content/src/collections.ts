@@ -8,6 +8,7 @@ import {
   workSkillCategorySchema,
   workProjectCategorySchema,
   workProjectSchema,
+  personalProjectSchema,
   blogSchema,
   pageSchema,
   serviceSchema,
@@ -48,6 +49,10 @@ export const workCollections = {
   workProject: {
     base: workPath('projects'),
     schema: workProjectSchema,
+  },
+  personalProject: {
+    base: workPath('personal-projects'),
+    schema: personalProjectSchema,
   },
 };
 

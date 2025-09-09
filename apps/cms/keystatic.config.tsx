@@ -32,6 +32,7 @@ export default config({
         'workCompany',
         'workJobs',
         'workProject',
+        'personalProject',
         'workSkills',
         'workSkillCategory',
         'workProjectCategory',

@@ -1,4 +1,4 @@
-import { Fragment, isValidElement } from 'react';
+import { Fragment, isValidElement, useRef, useEffect, useState } from 'react';
 import { Popover as HeadlessPopover, Transition } from '@headlessui/react';
 import { clsx } from '@bracketbear/core';
 
@@ -23,6 +23,64 @@ export interface PopoverProps {
   disabled?: boolean;
   /** Whether to show an arrow pointing to the trigger */
   showArrow?: boolean;
+  /** Whether to automatically adjust placement based on viewport boundaries */
+  autoPlacement?: boolean;
+  /** Maximum width of the popover panel */
+  maxWidth?: string | number;
+  /** Maximum height of the popover panel */
+  maxHeight?: string | number;
+}
+
+/**
+ * Calculate optimal placement based on viewport boundaries
+ */
+function calculateOptimalPlacement(
+  triggerRect: DOMRect,
+  panelRect: DOMRect,
+  preferredPlacement: PopoverProps['placement'],
+  offset: number
+): NonNullable<PopoverProps['placement']> {
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  // Calculate available space in each direction
+  const spaceAbove = triggerRect.top;
+  const spaceBelow = viewportHeight - triggerRect.bottom;
+  const spaceLeft = triggerRect.left;
+  const spaceRight = viewportWidth - triggerRect.right;
+
+  // Calculate required space for panel
+  const panelWidth = panelRect.width || 256; // fallback width
+  const panelHeight = panelRect.height || 200; // fallback height
+
+  // Check if preferred placement fits
+  const fitsAbove = spaceAbove >= panelHeight + offset;
+  const fitsBelow = spaceBelow >= panelHeight + offset;
+  const fitsLeft = spaceLeft >= panelWidth + offset;
+  const fitsRight = spaceRight >= panelWidth + offset;
+
+  // Determine best placement based on available space
+  if (preferredPlacement?.startsWith('bottom') && fitsBelow) {
+    return preferredPlacement;
+  }
+  if (preferredPlacement?.startsWith('top') && fitsAbove) {
+    return preferredPlacement;
+  }
+  if (preferredPlacement?.startsWith('right') && fitsRight) {
+    return preferredPlacement;
+  }
+  if (preferredPlacement?.startsWith('left') && fitsLeft) {
+    return preferredPlacement;
+  }
+
+  // Fallback to best available space
+  if (fitsBelow) return 'bottom-start';
+  if (fitsAbove) return 'top-start';
+  if (fitsRight) return 'right-start';
+  if (fitsLeft) return 'left-start';
+
+  // If nothing fits well, use the preferred placement anyway
+  return preferredPlacement || 'bottom-start';
 }
 
 /**
@@ -39,18 +97,49 @@ export function Popover({
   offset = 8,
   disabled = false,
   showArrow = false,
+  autoPlacement = true,
+  maxWidth = '90vw',
+  maxHeight = '80vh',
 }: PopoverProps) {
   const baseClasses = clsx('relative inline-block', className);
+  const [actualPlacement, setActualPlacement] = useState(placement);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const panelClasses = clsx(
     'z-50 rounded-lg border border-neutral-600 bg-neutral-900/95 shadow-2xl shadow-black/60 backdrop-blur-md',
-    'min-w-64 max-w-md'
+    'min-w-64',
+    // Apply max width and height constraints
+    typeof maxWidth === 'number'
+      ? `max-w-[${maxWidth}px]`
+      : `max-w-[${maxWidth}]`,
+    typeof maxHeight === 'number'
+      ? `max-h-[${maxHeight}px]`
+      : `max-h-[${maxHeight}]`,
+    'overflow-auto' // Allow scrolling if content exceeds max dimensions
   );
+
+  // Calculate optimal placement when popover opens
+  useEffect(() => {
+    if (autoPlacement && triggerRef.current && panelRef.current) {
+      const triggerRect = triggerRef.current.getBoundingClientRect();
+      const panelRect = panelRef.current.getBoundingClientRect();
+      const optimalPlacement = calculateOptimalPlacement(
+        triggerRect,
+        panelRect,
+        placement,
+        offset
+      );
+      setActualPlacement(optimalPlacement);
+    } else {
+      setActualPlacement(placement);
+    }
+  }, [autoPlacement, placement, offset]);
 
   const getPlacementClasses = () => {
     const baseOffset = `mt-${offset}`;
 
-    switch (placement) {
+    switch (actualPlacement) {
       case 'top':
         return `${baseOffset} bottom-full left-1/2 -translate-x-1/2`;
       case 'top-start':
@@ -81,7 +170,7 @@ export function Popover({
   };
 
   const getArrowClasses = () => {
-    switch (placement) {
+    switch (actualPlacement) {
       case 'top':
         return 'top-full left-1/2 -translate-x-1/2 border-t-neutral-600 border-l-transparent border-r-transparent border-b-transparent';
       case 'top-start':
@@ -117,20 +206,18 @@ export function Popover({
     (trigger.type === 'button' ||
       (typeof trigger.type === 'function' &&
         'displayName' in trigger.type &&
-        trigger.type.displayName === 'Button') ||
+        (trigger.type as any).displayName === 'Button') ||
       (typeof trigger.type === 'object' &&
         trigger.type !== null &&
-        'render' in trigger.type &&
-        typeof trigger.type.render === 'function' &&
         'displayName' in trigger.type &&
-        trigger.type.displayName === 'Button'));
+        (trigger.type as any).displayName === 'Button'));
 
   return (
     <div className={baseClasses}>
       <HeadlessPopover className="relative">
         {isTriggerButton ? (
           <HeadlessPopover.Button as={Fragment} disabled={disabled}>
-            {trigger}
+            <div ref={triggerRef}>{trigger}</div>
           </HeadlessPopover.Button>
         ) : (
           <HeadlessPopover.Button
@@ -140,7 +227,7 @@ export function Popover({
             )}
             disabled={disabled}
           >
-            {trigger}
+            <div ref={triggerRef}>{trigger}</div>
           </HeadlessPopover.Button>
         )}
 
@@ -156,7 +243,7 @@ export function Popover({
           <HeadlessPopover.Panel
             className={clsx('absolute', getPlacementClasses())}
           >
-            <div className={panelClasses}>
+            <div ref={panelRef} className={panelClasses}>
               {showArrow && (
                 <div
                   className={clsx(

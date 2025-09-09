@@ -542,16 +542,30 @@ export const portfolioProjectsPageSchema = makePageSchema({
         description: 'Description of this project category',
         multiline: true,
       }),
-      projects: fields.array(
+      // Work projects
+      workProjects: fields.array(
         fields.relationship({
-          label: 'Project',
+          label: 'Work Project',
           collection: 'workProject',
-          description: 'Select projects to include in this category',
+          description: 'Select work projects to include in this category',
         }),
         {
-          label: 'Projects in Category',
-          description: 'Select projects to display in this category',
-          itemLabel: (props) => props.value || 'New Project',
+          label: 'Work Projects in Category',
+          description: 'Select work projects to display in this category',
+          itemLabel: (props) => props.value || 'New Work Project',
+        }
+      ),
+      // Personal projects
+      personalProjects: fields.array(
+        fields.relationship({
+          label: 'Personal Project',
+          collection: 'personalProject',
+          description: 'Select personal projects to include in this category',
+        }),
+        {
+          label: 'Personal Projects in Category',
+          description: 'Select personal projects to display in this category',
+          itemLabel: (props) => props.value || 'New Personal Project',
         }
       ),
     }),

@@ -28,7 +28,8 @@ export const portfolioProjectsPageSchema = makePageSchema({
       z.object({
         title: z.string(),
         description: z.string(),
-        projects: z.array(z.string()), // Array of project IDs
+        workProjects: z.array(z.string()).optional(), // Array of work project IDs
+        personalProjects: z.array(z.string()).optional(), // Array of personal project IDs
       })
     )
     .optional(),
