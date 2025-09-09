@@ -8,15 +8,31 @@ This is a monorepo containing all Bracket Bear applications and shared packages.
 
 ### Applications
 
-- [Portfolio](/apps/portfolio/README.md) - Personal portfolio website built with Astro
-- [Bracket Bear Website](/apps/bracketbear-website/README.md) - Main company website
-- [CMS](/apps/cms/README.md) - Content management system for managing site content
+- [bracketbear-website](/apps/bracketbear-website/) - Main company website for Bracket Bear, built with Astro and integrated CMS
+- [cms](/apps/cms/) - Keystatic CMS for Bracket Bear
+- [portfolio](/apps/portfolio/) - Personal portfolio website showcasing projects, work history, and skills
 
 ### Packages
 
-- [Core](/packages/core/README.md) - Shared components, layouts, and utilities
-- [Astro Content](/packages/astro-content/README.md) - Content management utilities for Astro
-- [Flateralus](/packages/flateralus/README.md) - Interactive graphics and animation library
+- [astro-content](/packages/astro-content/) - Content management utilities for Astro with CMS integration, image handling, and Vite plugin support
+- [bear-ui](/packages/bear-ui/) - Core UI system for BracketBear applications
+- [bear-ui-react](/packages/bear-ui-react/) - React components for BracketBear UI system
+- [bear-ui-tailwind](/packages/bear-ui-tailwind/) - Tailwind CSS styles and utilities for BracketBear UI components
+- [core](/packages/core/) - Core utilities and Astro components for BracketBear applications
+- [flateralus](/packages/flateralus/) - Flateralus animation engine. TypeScript-first, but works in JS.
+- [flateralus-p5](/packages/flateralus-p5/) - p5.js adapter for Flateralus animation framework.
+- [flateralus-p5-animations](/packages/flateralus-p5-animations/) - p5.js animations for Flateralus framework
+- [flateralus-pixi](/packages/flateralus-pixi/) - PIXI.js adapter for Flateralus animation framework.
+- [flateralus-pixi-animations](/packages/flateralus-pixi-animations/) - PIXI.js animations for Flateralus framework
+- [flateralus-react](/packages/flateralus-react/) - React bindings for Flateralus animation engine.
+- [tw-pattern-analyzer](/packages/tw-pattern-analyzer/) - Tailwind CSS pattern analyzer for identifying and optimizing CSS usage across the monorepo
+
+### Repository Map
+
+The repository structure is automatically generated and maintained. See the [source code page](/apps/portfolio/source-code) for an interactive view of all apps and packages.
+
+**Total Items**: 15 (3 apps, 12 packages)
+**Last Updated**: 9/9/2025
 
 ## Requirements
 

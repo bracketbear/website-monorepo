@@ -1,98 +1,69 @@
-# Bracket Bear Website
+# bracketbear-website
 
 ## Overview
 
-Main company website for Bracket Bear, built with Astro. Showcases services, company information, and client work with a modern, brutalist design aesthetic.
+A app in the Bracket Bear monorepo.
 
 ## Table of Contents
 
-- [Bracket Bear Website](#bracket-bear-website)
-  - [Overview](#overview)
-  - [Table of Contents](#table-of-contents)
-  - [Features](#features)
-  - [Installation](#installation)
-  - [Development](#development)
-  - [Build](#build)
-  - [Project Structure](#project-structure)
-  - [Technologies Used](#technologies-used)
-  - [Design System](#design-system)
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Development](#development)
+- [Build](#build)
+- [Back to Monorepo](../../README.md)
 
 ## Features
 
-- **Company Showcase**: Services, about, and contact information
-- **Brutalist Design**: Bold, high-contrast design with comic-book style colors
-- **Interactive Elements**: Dynamic components and animations
-- **Responsive Design**: Mobile-first approach with responsive layouts
-- **Performance Optimized**: Static site generation with Astro
+- **Modern Web Stack**: Built with latest web technologies
 - **TypeScript**: Full type safety across the application
+- **Performance Optimized**: Fast loading and efficient rendering
+- **Company Website**: Professional business presence
+- **Content Management**: Integrated CMS for easy updates
+- **SEO Optimized**: Search engine friendly
 
 ## Installation
 
-The Bracket Bear website is part of the Bracket Bear monorepo. To install dependencies:
+This bracketbear-website app is part of the Bracket Bear monorepo. To install dependencies:
 
 ```bash
 # From monorepo root
 npm install
 
-# Or from website directory
+# Or from bracketbear-website directory
 cd apps/bracketbear-website && npm install
 ```
 
 ## Development
 
-To start the development server:
+To start development:
 
 ```bash
 # From monorepo root
 npm run dev --workspace=apps/bracketbear-website
 
-# Or from website directory
+# Or from bracketbear-website directory
 cd apps/bracketbear-website && npm run dev
 ```
 
-The development server will start on `http://localhost:4321` (or the next available port).
-
 ## Build
 
-To build the website for production:
+To build for production:
 
 ```bash
 # From monorepo root
 npm run build --workspace=apps/bracketbear-website
 
-# Or from website directory
+# Or from bracketbear-website directory
 cd apps/bracketbear-website && npm run build
 ```
 
-The built site will be output to `dist/`.
+## Version
 
-## Project Structure
-
-```
-apps/bracketbear-website/
-├── src/
-│   ├── components/        # Astro and React components
-│   ├── layouts/           # Page layouts
-│   ├── pages/             # Astro pages
-│   ├── styles/            # Global styles
-│   └── utils/             # Utility functions
-├── public/                # Static assets
-└── content/               # Content collections
-```
+Current version: **1.0.1**
 
 ## Technologies Used
 
+- **TypeScript**: Type safety and modern JavaScript features
 - **Astro**: Static site generator
-- **React**: Interactive components
-- **TypeScript**: Type safety
-- **Tailwind CSS**: Styling
-- **@bracketbear/core**: Shared components and utilities
-
-## Design System
-
-The website uses the shared design system from `@bracketbear/core`, including:
-
-- Brutalist card components
-- Custom Tailwind utilities
-- Tangible design effects
-- Halftone patterns and shadows
+- **Tailwind CSS**: Utility-first CSS framework
