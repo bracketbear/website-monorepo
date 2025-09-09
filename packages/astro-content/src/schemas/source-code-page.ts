@@ -35,13 +35,12 @@ export const sourceCodePageSchema = makePageSchema(
       rules: z.array(z.string()),
       tokenExcerpt: z.string(),
       usageExample: z.string(),
-    }),
-
-    // Data-assisted styling section
-    dataAssistedStyling: z.object({
-      title: z.string().default('Data-assisted styling'),
-      content: z.string(),
-      codeExample: z.string(),
+      // Data and AI assisted styling subsection
+      dataAssistedStyling: z.object({
+        title: z.string().default('Data and AI assisted styling'),
+        content: z.string(),
+        codeExample: z.string(),
+      }),
     }),
 
     // Architecture section

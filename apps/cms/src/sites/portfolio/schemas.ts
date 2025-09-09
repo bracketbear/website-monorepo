@@ -686,26 +686,25 @@ export const portfolioSourceCodePageSchema = makePageSchema(
           label: 'Usage Example Title',
           defaultValue: 'Usage in components',
         }),
+        // Data and AI assisted styling subsection
+        dataAssistedStyling: fields.object(
+          {
+            title: fields.text({
+              label: 'Subsection Title',
+              defaultValue: 'Data and AI assisted styling',
+            }),
+            content: fields.markdoc.inline({
+              label: 'Content',
+            }),
+            codeExample: fields.text({
+              label: 'Code Example',
+              multiline: true,
+            }),
+          },
+          { label: 'Data and AI Assisted Styling Subsection' }
+        ),
       },
       { label: 'Tailwind Section' }
-    ),
-
-    // Data-assisted styling section
-    dataAssistedStyling: fields.object(
-      {
-        title: fields.text({
-          label: 'Section Title',
-          defaultValue: 'Data-assisted styling',
-        }),
-        content: fields.markdoc.inline({
-          label: 'Content',
-        }),
-        codeExample: fields.text({
-          label: 'Code Example',
-          multiline: true,
-        }),
-      },
-      { label: 'Data-assisted Styling Section' }
     ),
 
     // Architecture section

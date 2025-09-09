@@ -63,11 +63,6 @@ const sections = [
     title: 'Styling',
     eyebrow: 'Design',
   },
-  sourceCodePage?.data?.dataAssistedStyling && {
-    id: 'data-assisted',
-    title: sourceCodePage.data.dataAssistedStyling.title,
-    eyebrow: 'AI Analysis',
-  },
   sourceCodePage?.data?.storybook && {
     id: 'storybook',
     title: sourceCodePage.data.storybook.title,
@@ -423,7 +418,7 @@ try {
                 </div>
 
                 {/* Usage Example */}
-                <div>
+                <div class="mb-8">
                   <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
                     {sourceCodePage.data.tailwindSection.usageExampleTitle}
                   </h3>
@@ -441,33 +436,49 @@ try {
                     showLineNumbers
                   />
                 </div>
-              </Section>
-            )
-          }
 
-          {/* Data-assisted styling Section */}
-          {
-            sourceCodePage?.data?.dataAssistedStyling && (
-              <Section
-                id="data-assisted"
-                eyebrow="Styling"
-                title={sourceCodePage.data.dataAssistedStyling.title}
-                intro={sourceCodePage.data.dataAssistedStyling.content}
-              >
-                <div class="mb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="text-muted-foreground text-xs font-medium">
-                      tw-patterns.json
-                    </span>
-                    <span class="text-muted-foreground/80 text-xs">json</span>
+                {/* Data and AI Assisted Styling Subsection */}
+                {sourceCodePage.data.tailwindSection.dataAssistedStyling && (
+                  <div>
+                    <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+                      {
+                        sourceCodePage.data.tailwindSection.dataAssistedStyling
+                          .title
+                      }
+                    </h3>
+                    <div class="mb-4">
+                      <div class="prose prose-invert max-w-none">
+                        <div
+                          set:html={marked.parse(
+                            cleanMarkdown(
+                              sourceCodePage.data.tailwindSection
+                                .dataAssistedStyling.content
+                            )
+                          )}
+                        />
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <div class="flex items-center gap-2">
+                        <span class="text-muted-foreground text-xs font-medium">
+                          tw-patterns.json
+                        </span>
+                        <span class="text-muted-foreground/80 text-xs">
+                          json
+                        </span>
+                      </div>
+                    </div>
+                    <CodeBlock
+                      code={
+                        sourceCodePage.data.tailwindSection.dataAssistedStyling
+                          .codeExample
+                      }
+                      language="json"
+                      showLineNumbers
+                      className="bg-brand-dark/90 text-white"
+                    />
                   </div>
-                </div>
-                <CodeBlock
-                  code={sourceCodePage.data.dataAssistedStyling.codeExample}
-                  language="json"
-                  showLineNumbers
-                  className="bg-brand-dark/90 text-white"
-                />
+                )}
               </Section>
             )
           }
