@@ -54,14 +54,14 @@ function updateMainReadme(repoMap) {
   const appsSection = repoMap.apps
     .map(
       (app) =>
-        `- [${app.name}](/apps/${app.name}/README.md) - ${app.description || 'Application in the Bracket Bear monorepo'}`
+        `- [${app.name}](/apps/${app.name}/) - ${app.description || 'Application in the Bracket Bear monorepo'}`
     )
     .join('\n');
 
   const packagesSection = repoMap.packages
     .map(
       (pkg) =>
-        `- [${pkg.name}](/packages/${pkg.name}/README.md) - ${pkg.description || 'Package in the Bracket Bear monorepo'}`
+        `- [${pkg.name}](/packages/${pkg.name}/) - ${pkg.description || 'Package in the Bracket Bear monorepo'}`
     )
     .join('\n');
 

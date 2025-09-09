@@ -8,24 +8,24 @@ This is a monorepo containing all Bracket Bear applications and shared packages.
 
 ### Applications
 
-- [bracketbear-website](/apps/bracketbear-website/README.md) - Main company website for Bracket Bear, built with Astro and integrated CMS
-- [cms](/apps/cms/README.md) - Keystatic CMS for Bracket Bear
-- [portfolio](/apps/portfolio/README.md) - Personal portfolio website showcasing projects, work history, and skills
+- [bracketbear-website](/apps/bracketbear-website/) - Main company website for Bracket Bear, built with Astro and integrated CMS
+- [cms](/apps/cms/) - Keystatic CMS for Bracket Bear
+- [portfolio](/apps/portfolio/) - Personal portfolio website showcasing projects, work history, and skills
 
 ### Packages
 
-- [astro-content](/packages/astro-content/README.md) - Content management utilities for Astro with CMS integration, image handling, and Vite plugin support
-- [bear-ui](/packages/bear-ui/README.md) - Core UI system for BracketBear applications
-- [bear-ui-react](/packages/bear-ui-react/README.md) - React components for BracketBear UI system
-- [bear-ui-tailwind](/packages/bear-ui-tailwind/README.md) - Tailwind CSS styles and utilities for BracketBear UI components
-- [core](/packages/core/README.md) - Core utilities and Astro components for BracketBear applications
-- [flateralus](/packages/flateralus/README.md) - Flateralus animation engine. TypeScript-first, but works in JS.
-- [flateralus-p5](/packages/flateralus-p5/README.md) - p5.js adapter for Flateralus animation framework.
-- [flateralus-p5-animations](/packages/flateralus-p5-animations/README.md) - p5.js animations for Flateralus framework
-- [flateralus-pixi](/packages/flateralus-pixi/README.md) - PIXI.js adapter for Flateralus animation framework.
-- [flateralus-pixi-animations](/packages/flateralus-pixi-animations/README.md) - PIXI.js animations for Flateralus framework
-- [flateralus-react](/packages/flateralus-react/README.md) - React bindings for Flateralus animation engine.
-- [tw-pattern-analyzer](/packages/tw-pattern-analyzer/README.md) - Tailwind CSS pattern analyzer for identifying and optimizing CSS usage across the monorepo
+- [astro-content](/packages/astro-content/) - Content management utilities for Astro with CMS integration, image handling, and Vite plugin support
+- [bear-ui](/packages/bear-ui/) - Core UI system for BracketBear applications
+- [bear-ui-react](/packages/bear-ui-react/) - React components for BracketBear UI system
+- [bear-ui-tailwind](/packages/bear-ui-tailwind/) - Tailwind CSS styles and utilities for BracketBear UI components
+- [core](/packages/core/) - Core utilities and Astro components for BracketBear applications
+- [flateralus](/packages/flateralus/) - Flateralus animation engine. TypeScript-first, but works in JS.
+- [flateralus-p5](/packages/flateralus-p5/) - p5.js adapter for Flateralus animation framework.
+- [flateralus-p5-animations](/packages/flateralus-p5-animations/) - p5.js animations for Flateralus framework
+- [flateralus-pixi](/packages/flateralus-pixi/) - PIXI.js adapter for Flateralus animation framework.
+- [flateralus-pixi-animations](/packages/flateralus-pixi-animations/) - PIXI.js animations for Flateralus framework
+- [flateralus-react](/packages/flateralus-react/) - React bindings for Flateralus animation engine.
+- [tw-pattern-analyzer](/packages/tw-pattern-analyzer/) - Tailwind CSS pattern analyzer for identifying and optimizing CSS usage across the monorepo
 
 ### Repository Map
 
