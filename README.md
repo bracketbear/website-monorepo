@@ -32,7 +32,7 @@ This is a monorepo containing all Bracket Bear applications and shared packages.
 The repository structure is automatically generated and maintained. See the [source code page](/apps/portfolio/source-code) for an interactive view of all apps and packages.
 
 **Total Items**: 15 (3 apps, 12 packages)
-**Last Updated**: 9/9/2025
+**Last Updated**: 9/10/2025
 
 ## Requirements
 
