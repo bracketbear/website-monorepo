@@ -14,6 +14,7 @@ export const buttonVariantClasses = {
 } as const;
 
 export const buttonSizeClasses = {
+  xs: 'button-xs',
   sm: 'button-sm',
   md: 'button-md',
   lg: 'button-lg',

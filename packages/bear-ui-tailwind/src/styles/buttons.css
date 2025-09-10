@@ -8,6 +8,10 @@
 }
 
 /* Button sizes - only modify padding and text size */
+@utility button-xs {
+  @apply rounded-sm px-2 py-1 text-xs;
+}
+
 @utility button-sm {
   @apply rounded-md px-4 py-2 text-sm;
 }

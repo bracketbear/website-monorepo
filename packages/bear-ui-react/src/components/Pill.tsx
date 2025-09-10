@@ -40,7 +40,7 @@ export function Pill({
   const isInteractive = interactive || !!onClick;
 
   // Map pill sizes to button sizes
-  const buttonSize = size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md';
+  const buttonSize = size === 'sm' ? 'xs' : size === 'lg' ? 'lg' : 'md';
 
   return (
     <Button
