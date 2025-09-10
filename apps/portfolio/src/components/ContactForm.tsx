@@ -326,7 +326,7 @@ export function ContactForm() {
                   options={SUBJECT_OPTIONS}
                   placeholder="What can I help you with?"
                   disabled={isSubmitting}
-                  error={errors.subject}
+                  error={!!errors.subject}
                   required
                   aria-label="Contact subject"
                   aria-describedby={
@@ -378,7 +378,7 @@ export function ContactForm() {
                         options={BUDGET_OPTIONS}
                         placeholder="Select budget range"
                         disabled={isSubmitting}
-                        error={errors.budget}
+                        error={!!errors.budget}
                         required
                         aria-label="Budget range"
                         aria-describedby={
@@ -405,7 +405,7 @@ export function ContactForm() {
                         options={TIMELINE_OPTIONS}
                         placeholder="Select timeline"
                         disabled={isSubmitting}
-                        error={errors.timeline}
+                        error={!!errors.timeline}
                         required
                         aria-label="Project timeline"
                         aria-describedby={

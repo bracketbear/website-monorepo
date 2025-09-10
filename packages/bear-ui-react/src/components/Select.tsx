@@ -20,8 +20,8 @@ export interface SelectProps {
   placeholder?: string;
   /** Whether the select is disabled */
   disabled?: boolean;
-  /** Whether the select has an error */
-  error?: string;
+  /** Whether the select has an error (for styling only) */
+  error?: boolean;
   /** Additional CSS classes */
   className?: string;
   /** ID for the select */
@@ -135,15 +135,6 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             </Transition>
           </div>
         </Listbox>
-        {error && (
-          <p
-            id={ariaDescribedBy}
-            className="text-brand-red mt-1 text-left text-sm"
-            role="alert"
-          >
-            {error}
-          </p>
-        )}
       </div>
     );
   }
