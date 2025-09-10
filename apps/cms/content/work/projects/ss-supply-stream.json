@@ -44,17 +44,8 @@
   },
   "oneLiner": "Headless e‑commerce front‑end that moved a sales‑led model toward organic online orders.",
   "problem": "Our parent company wanted to create an e-commerce app that was built with modern tooling and custom theming",
-  "scope": [
-    "Integrated Vue into BigCommerce’s Stencil theme",
-    "Migrated to a headless front‑end (Vue 3 / Nuxt 3)",
-    "Styled with TailwindCSS and wired to platform APIs",
-    "Converted designs into tangible web pages and components"
-  ],
-  "decisions": [
-    "Introduced team to TypeScript concepts and taught them how to integrate them into JSDoc comments, increasing developer experience",
-    "Pitched ideas for reducing tech debt and increasing developer velocity",
-    "Leaned on previous experience porting apps from Vue 2 to Vue 3 to help increase team velocity"
-  ],
+  "scope": ["Served as front-end developer for the SupplyStream project"],
+  "challengesAndSolutions": "- Integrated Vue into BigCommerce's Stencil theme\n- Migrated to a headless front‑end (Vue 3 / Nuxt 3)\n- Styled with TailwindCSS and wired to platform APIs\n- Converted designs into tangible web pages and components\n- Introduced team to TypeScript concepts and taught them how to integrate them into JSDoc comments, increasing developer experience\n- Pitched ideas for reducing tech debt and increasing developer velocity\n- Leaned on previous experience porting apps from Vue 2 to Vue 3 to help increase team velocity",
   "outcome": "We were able to deliver an e-commerce platform that increased sales and reach for our parent company. This app was powered by a wildly complex management system, and it was able to handle the complexity with grace and simplicity.",
   "notes": "My biggest takeaway from this project was just how much I appreciated TypeScript. The experience of going from a TS project to plain ol' Javascript really enforced how valuable developer experience is that it unlocks—JSDocs can only go so far.",
   "status": "shipped",

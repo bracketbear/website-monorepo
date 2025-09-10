@@ -28,15 +28,9 @@
   "oneLiner": "A multi‑screen installation for PwC built as a single application",
   "problem": "Previous projects split features across multiple small apps, which made operations harder. PwC needed one application that could drive very different displays and inputs, from LED film with lidar sensors to an interactive learning space.",
   "scope": [
-    "Learned C++/Windows/Visual Studio quickly and contributed production code",
-    "Built interactive modules for the Learning Zone, including an admin presentation mode",
-    "Used my previous CMS developer experience to integrate the entire team's modes into our CMS"
+    "Served as experience developer for the PwC Interactive Installation project"
   ],
-  "decisions": [
-    "Contributed an animated PNG sprite to our core C++ app building library, which was awesome considering my newness to the language",
-    "Developed the Learning Zone app with such accuracy that the client thought that we were showing them the motion graphics video that they had already approved",
-    "Traveled to Washington, D.C. while representing our company to install the front-end and CMS applications"
-  ],
+  "challengesAndSolutions": "- Learned C++/Windows/Visual Studio quickly and contributed production code\n- Built interactive modules for the Learning Zone, including an admin presentation mode\n- Used my previous CMS developer experience to integrate the entire team's modes into our CMS\n- Contributed an animated PNG sprite to our core C++ app building library, which was awesome considering my newness to the language\n- Developed the Learning Zone app with such accuracy that the client thought that we were showing them the motion graphics video that they had already approved\n- Traveled to Washington, D.C. while representing our company to install the front-end and CMS applications",
   "outcome": "A dependable installation that people gravitated to. Personal highlight: seeing the app live while looking out at the Capitol during install week.",
   "notes": "This was such a unique project because of the Learning Zone functionality. It was essentially a giant point-and-click animated pegboard of things to teach you about taxes and auditing—yay taxes and auditing! This was a great project to learn C++ in, and that learning eventually did wonders for getting rid of my imposter syndrome. Let's go!",
   "status": "shipped",

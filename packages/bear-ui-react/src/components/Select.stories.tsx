@@ -147,7 +147,7 @@ export const WithError: Story = {
   render: ControlledSelect,
   args: {
     options: basicOptions,
-    error: 'This field is required',
+    error: true,
     placeholder: 'Select an option',
   },
 };
