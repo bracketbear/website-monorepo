@@ -111,8 +111,8 @@ function FilteredWorkHistoryContent({
   return (
     <div className="flex flex-col gap-8 lg:flex-row" ref={containerRef}>
       {/* Sidebar: Filters */}
-      <aside className="h-full w-full flex-shrink-0 py-4 lg:sticky lg:top-0 lg:w-1/3 lg:self-start">
-        <div className="card overflow-y-auto lg:flex lg:max-h-[calc(100vh-2rem)] lg:flex-col">
+      <aside className="h-full w-full flex-shrink-0 py-4 lg:sticky lg:top-34 lg:w-1/3 lg:self-start">
+        <div className="card overflow-y-auto lg:flex lg:max-h-[calc(100vh-10.5rem)] lg:flex-col">
           {/* Clear Filters Button */}
           <div className="mb-4">
             <Button

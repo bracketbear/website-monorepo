@@ -42,21 +42,33 @@
   }
 
   & h2 {
-    @apply font-heading mt-8 mb-4 font-bold uppercase;
+    @apply font-heading mb-4 font-bold uppercase;
     font-size: var(--prose-h2-size);
     line-height: 1.3333333;
   }
 
+  & h2:not(:first-child) {
+    @apply mt-8;
+  }
+
   & h3 {
-    @apply mt-6 mb-2 font-semibold uppercase;
+    @apply mb-2 font-semibold uppercase;
     font-size: var(--prose-h3-size);
     line-height: 1.6;
   }
 
+  & h3:not(:first-child) {
+    @apply mt-6;
+  }
+
   & h4 {
-    @apply mt-6 mb-2 font-semibold;
+    @apply mb-2 font-semibold;
     font-size: var(--prose-h4-size);
     line-height: 1.5;
+  }
+
+  & h4:not(:first-child) {
+    @apply mt-6;
   }
 
   & p {

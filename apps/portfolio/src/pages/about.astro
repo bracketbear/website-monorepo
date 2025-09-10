@@ -197,7 +197,7 @@ const t = aboutPage.data.testimonials[0];
               <h3 class="font-heading text-foreground mb-4 text-2xl tracking-tight uppercase">
                 Best fit
               </h3>
-              <div class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/80 prose-strong:text-foreground prose-em:text-foreground/90 prose-ul:text-foreground/80 prose-li:text-foreground/80 mx-auto max-w-prose text-left">
+              <div class="prose prose-lg text-foreground/80 mx-auto max-w-prose text-left">
                 <Fragment set:html={marked.parse(aboutPage.data.fit.bestFit)} />
               </div>
             </div>
@@ -206,19 +206,16 @@ const t = aboutPage.data.testimonials[0];
                 <h3 class="font-heading text-foreground mb-4 text-2xl tracking-tight uppercase">
                   {aboutPage.data.howToStart.title}
                 </h3>
-                <ul class="text-foreground/90 space-y-3 text-left">
-                  {aboutPage.data.howToStart.items.map((item: any) => (
-                    <li class="flex items-start gap-3">
-                      <span class="text-foreground mt-2 text-sm">•</span>
-                      <div>
-                        <div class="font-medium">{item.title}</div>
-                        <div class="text-foreground/80 mt-1 text-sm">
-                          <Fragment set:html={marked.parse(item.content)} />
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <div class="prose prose-lg text-foreground/80 mx-auto max-w-prose text-left">
+                  <ul>
+                    {aboutPage.data.howToStart.items.map((item: any) => (
+                      <li>
+                        <strong>{item.title}</strong>
+                        <Fragment set:html={marked.parse(item.content)} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             )}
           </div>

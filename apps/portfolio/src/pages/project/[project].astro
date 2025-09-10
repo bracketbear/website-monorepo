@@ -7,6 +7,7 @@ import { getBreadcrumbs } from '@/config/breadcrumbs';
 import { generatePortfolioMetaTitle } from '@/config/meta-title';
 import ProjectHeaderLayout from '@/layouts/ProjectHeaderLayout.astro';
 import Section from '@/components/Section.astro';
+import { marked } from 'marked';
 
 import { ImageGallery, Pill } from '@bracketbear/bear-ui-react';
 
@@ -290,7 +291,13 @@ const stats = [
                             ))}
                           </ul>
                         ) : (
-                          section.content.challengesAndSolutions
+                          section.content.challengesAndSolutions && (
+                            <Fragment
+                              set:html={marked.parse(
+                                section.content.challengesAndSolutions
+                              )}
+                            />
+                          )
                         )}
                       </>
                     )}

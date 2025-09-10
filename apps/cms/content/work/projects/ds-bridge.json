@@ -4,6 +4,7 @@
   "duration": "18 Months",
   "coverImage": "/work/projects/ds-bridge/coverImage.png",
   "summary": "A SaaS content management system for experiences",
+  "challengesAndSolutions": "* Led front‑end development for Bridge UI\nMigrated components from Vue 2 → Vue 3\n- Converted the app to TypeScript\n- Moved the build from Webpack to Vite for faster, simpler builds\n- Read Rust code to map/validate data shapes in the UI\n- Adopted Vite for faster, simpler builds\n- Introduced strict typing to stabilize integration with the Rust API\n- Established patterns for component structure and data flow so future work stayed consistent",
   "media": [
     {
       "image": "/work/projects/ds-bridge/media/0/image.png",
@@ -42,15 +43,13 @@
   },
   "oneLiner": "A CMS UI for installs—front‑end on Vue 3 + TypeScript over a Rust back end.",
   "problem": "We wanted to build an experiential content management system that wasn't a \"kit of parts\" solution. Instead, we wanted to have a software service that we could add new installations to via a JSON manifest. This would save thousands of dollars of man hours off of each project.",
-  "scope": [
+  "scope": ["Served as lead front-end engineer for the project"],
+  "decisions": [
     "Led front‑end development for Bridge UI",
     "Migrated components from Vue 2 → Vue 3",
     "Converted the app to TypeScript",
-    "Moved the build from Webpack to Vite",
-    "Read Rust code to map/validate data shapes in the UI"
-  ],
-  "decisions": [
-    "Adopted Vite for faster, simpler builds",
+    "Moved the build from Webpack to Vite for faster, simpler builds",
+    "Read Rust code to map/validate data shapes in the UI",
     "Introduced strict typing to stabilize integration with the Rust API",
     "Established patterns for component structure and data flow so future work stayed consistent"
   ],

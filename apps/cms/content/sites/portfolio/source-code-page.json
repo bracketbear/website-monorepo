@@ -90,45 +90,49 @@
       {
         "label": "Architecture",
         "bullets": [
-          "Astro 5 with React islands where interactivity matters",
-          "Static first; hydrate only what needs it"
+          "Astro 5 + React islands where interactivity matters",
+          "Static-first; hydrate only what's needed",
+          "Assets: width hints for images; subset/preload fonts"
+        ]
+      },
+      {
+        "label": "Agentic development",
+        "bullets": [
+          "Pair-program in Cursor under versioned `.cursor/rules`",
+          "Plan → Act → Review; apply diffs with checkpoints; confirm commands",
+          "Architecture sessions map modules and flag boundary violations"
         ]
       },
       {
         "label": "Styling",
         "bullets": [
-          "Tailwind v4 using `@theme` tokens",
-          "Avoid arbitrary values; use intentionally when needed (e.g., layered shadows/backdrop)",
-          "Utilities keep the design consistent and measurable"
+          "Tailwind v4 with `@theme` tokens and composed utilities",
+          "No arbitrary values unless truly unavoidable (e.g., layered shadows/backdrop)",
+          "Single Storybook across apps/packages; titles show ownership"
         ]
       },
       {
         "label": "Content",
         "bullets": [
           "Keystatic + Zod for typed content end-to-end",
-          "Builds fail fast on bad data"
+          "Builds fail fast on bad data",
+          "Keystatic schemas mirror Zod for edit-time + build-time validation"
         ]
       },
       {
         "label": "Animations",
         "bullets": [
-          "Flateralus (PIXI.js 8) with typed controls",
+          "Flateralus (PIXI 8) with typed controls",
           "Visibility-based pausing",
-          "Guardrails (caps) to keep frames smooth"
-        ]
-      },
-      {
-        "label": "Storybook",
-        "bullets": [
-          "Single Storybook instance across apps and packages",
-          "Titles show where each component lives"
+          "Guardrails (caps) to protect frame budget"
         ]
       },
       {
         "label": "Philosophy",
         "bullets": [
           "Prefer constraints and clear boundaries",
-          "Keep the toolchain boring, the types strong, and the pages fast"
+          "Keep the toolchain boring, the types strong, and the pages fast",
+          "Target near-perfect Lighthouse scores across Performance/Accessibility/Best-Practices/SEO"
         ]
       }
     ]
@@ -202,9 +206,92 @@
   },
   "flateralus": {
     "title": "Flateralus Animation System",
-    "content": "Generative visuals are great until they eat the frame budget. I keep them in bounds with typed controls, visibility-based pausing, and guardrails (caps) that step complexity down before the UI suffers.\n",
-    "codeExample": "export const ParticleNetworkControls = {\n  particleCount: { type: \"int\", min: 100, max: 800, default: 400 },\n  linkDistance:  { type: \"float\", min: 20,  max: 180, default: 100 },\n  speed:         { type: \"float\", min: 0.1, max: 2.0, default: 0.6 },\n  theme:         { type: \"select\", options: [\"brand\",\"neutral\",\"warning\"], default: \"brand\" },\n} as const;",
-    "codeExampleTitle": "particle-network.ts"
+    "content": "Generative visuals are great until they eat the frame budget. Flateralus keeps them in bounds with a schema-driven control system that provides typed controls, visibility-based pausing, and intelligent performance guardrails.\n\n**The Control System Pattern**\n\nThe heart of Flateralus is its control system—a schema-driven approach that defines animation parameters as TypeScript manifests. This pattern provides several powerful benefits:\n\n- **Type Safety**: Control types are automatically inferred from schemas, providing compile-time validation\n- **Runtime Validation**: All control values are validated using Zod schemas with automatic error handling\n- **Performance Optimization**: Controls can be marked as \"reset\" (expensive recalculation) or \"dynamic\" (smooth interpolation)\n- **Debug UI Generation**: Automatic UI generation for animation parameters during development\n- **Framework Agnostic**: Works across PIXI.js, p5.js, and custom rendering backends\n\n**Why This Pattern Matters**\n\nThis schema-driven approach transforms animation development from ad-hoc parameter tweaking into a structured, maintainable system. Instead of hardcoding values or manually managing UI controls, you define your animation's interface once and get type safety, validation, and automatic UI generation for free.\n\nThe pattern scales beautifully—from simple bouncing balls to complex particle systems with hundreds of parameters. It enforces good practices by making expensive operations explicit (via `resetsAnimation`) and provides clear boundaries between what can be smoothly interpolated versus what requires recalculation.\n\n**Real-World Benefits**\n\n- **Developer Experience**: No more guessing parameter ranges or forgetting to validate inputs\n- **Performance**: Automatic visibility-based pausing and intelligent update batching\n- **Maintainability**: Clear separation between animation logic and parameter management\n- **Debugging**: Built-in debug controls and performance monitoring\n- **Collaboration**: Schemas serve as living documentation for animation parameters",
+    "codeExample": "// Schema-driven control definition\nconst particleManifest = createManifest({\n  id: 'particle-system',\n  name: 'Particle System',\n  controls: [\n    {\n      name: 'particleCount',\n      type: 'number',\n      label: 'Particle Count',\n      defaultValue: 100,\n      min: 10,\n      max: 1000,\n      step: 10,\n      resetsAnimation: true, // Expensive recalculation\n    },\n    {\n      name: 'speed',\n      type: 'number',\n      label: 'Speed',\n      defaultValue: 2,\n      min: 0.1,\n      max: 10,\n      step: 0.1,\n      // Dynamic - smooth interpolation\n    },\n    {\n      name: 'particleColor',\n      type: 'color',\n      label: 'Particle Color',\n      defaultValue: '#ff6b35',\n    },\n    {\n      name: 'enableTrails',\n      type: 'boolean',\n      label: 'Enable Trails',\n      defaultValue: false,\n    },\n  ] as const,\n} as const);\n\n// TypeScript automatically infers:\n// type Controls = {\n//   particleCount: number;\n//   speed: number;\n//   particleColor: string;\n//   enableTrails: boolean;\n// }",
+    "codeExampleTitle": "particle-system.ts",
+    "controlTypes": {
+      "title": "Control Types & Behaviors",
+      "content": "Flateralus supports five control types, each with specific behaviors and validation rules:",
+      "types": [
+        {
+          "name": "Number Controls",
+          "description": "Numeric values with min/max/step constraints. Perfect for speeds, counts, and continuous parameters.",
+          "example": "speed: { type: 'number', defaultValue: 1, min: 0.1, max: 10, step: 0.1 }"
+        },
+        {
+          "name": "Boolean Controls",
+          "description": "True/false toggles for features like trails, debug modes, or animation states.",
+          "example": "enableTrails: { type: 'boolean', defaultValue: false }"
+        },
+        {
+          "name": "Color Controls",
+          "description": "Color values (hex strings or numeric) with automatic validation and UI generation.",
+          "example": "particleColor: { type: 'color', defaultValue: '#ff6b35' }"
+        },
+        {
+          "name": "Select Controls",
+          "description": "Dropdown selections for discrete options like themes, modes, or algorithms.",
+          "example": "theme: { type: 'select', options: [{ value: 'brand', label: 'Brand' }], defaultValue: 'brand' }"
+        },
+        {
+          "name": "Group Controls",
+          "description": "Arrays of related controls for complex configurations like particle presets or multi-object systems.",
+          "example": "particles: { type: 'group', value: 'mixed', items: [...], defaultValue: [...] }"
+        }
+      ]
+    },
+    "performancePatterns": {
+      "title": "Performance Patterns",
+      "content": "The control system enforces performance-conscious patterns through intelligent update behavior:",
+      "patterns": [
+        {
+          "name": "Reset Controls",
+          "description": "Controls marked with `resetsAnimation: true` trigger complete animation recalculation. Use for parameters that require expensive operations like particle count changes or complex geometry updates.",
+          "useCase": "Particle count, grid resolution, algorithm selection"
+        },
+        {
+          "name": "Dynamic Controls",
+          "description": "Controls without `resetsAnimation` update smoothly in real-time. Perfect for parameters that can be interpolated like colors, speeds, or positions.",
+          "useCase": "Colors, speeds, opacity, scale, rotation"
+        },
+        {
+          "name": "Visibility-Based Pausing",
+          "description": "Animations automatically pause when not visible, preserving frame budget for active content.",
+          "useCase": "Background animations, decorative elements, off-screen content"
+        },
+        {
+          "name": "Guardrails & Caps",
+          "description": "Built-in performance monitoring that steps complexity down before the UI suffers.",
+          "useCase": "Mobile optimization, low-end device support, frame rate protection"
+        }
+      ]
+    },
+    "frameworkIntegration": {
+      "title": "Framework Integration",
+      "content": "Flateralus provides seamless integration across multiple rendering backends and frameworks:",
+      "integrations": [
+        {
+          "name": "PIXI.js Integration",
+          "description": "High-performance 2D graphics with WebGL acceleration. Perfect for complex visual effects and particle systems.",
+          "package": "@bracketbear/flateralus-pixi"
+        },
+        {
+          "name": "p5.js Integration",
+          "description": "Creative coding friendly with simple API. Great for generative art and experimental animations.",
+          "package": "@bracketbear/flateralus-p5"
+        },
+        {
+          "name": "React Integration",
+          "description": "Components and hooks for seamless React integration with automatic debug controls and lifecycle management.",
+          "package": "@bracketbear/flateralus-react"
+        },
+        {
+          "name": "Custom Backends",
+          "description": "Extensible architecture allows custom rendering backends by extending BaseApplication.",
+          "package": "Core framework"
+        }
+      ]
+    }
   },
   "performanceAccessibility": {
     "title": "Performance & accessibility",

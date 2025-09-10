@@ -79,24 +79,27 @@ export default function WorkHistory({
   return (
     <div className="space-y-8">
       {groupedJobs.map((group) => (
-        <div key={group.company.id} className="card tangible tangible-card">
+        <div
+          key={group.company.id}
+          className="card tangible tangible-card prose max-w-none p-6"
+        >
           {/* Company header with halftone text shadow */}
-          <h3 className="heading mb-6 text-3xl">{group.company.data.title}</h3>
+          <h3 className="heading mb-4 text-3xl">{group.company.data.title}</h3>
           {/* Company Jobs */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             {group.jobs.map((job) => {
               return (
                 <div
                   key={job.id}
                   className={clsx(
-                    'border-brand-orange border-l-4 pl-6 transition-all duration-300',
+                    'border-brand-dark/50 border-l-2 pl-6 transition-all duration-300',
                     job.isHidden
                       ? 'opacity-50 grayscale'
                       : 'hover:border-brand-red'
                   )}
                 >
                   <div className="mb-2 flex items-center gap-2">
-                    <h4 className="font-heading text-xl uppercase">
+                    <h4 className="font-heading pt-0 text-xl uppercase">
                       {job.data.title}
                     </h4>
                   </div>
@@ -106,18 +109,11 @@ export default function WorkHistory({
                       ? formatDate(job.data.endDate)
                       : 'Present'}
                   </div>
-                  <p className="text-foreground mb-3 leading-relaxed font-medium">
-                    {job.data.description}
-                  </p>
+                  <p className="mb-3">{job.data.description}</p>
                   {job.data.highlights && job.data.highlights.length > 0 && (
-                    <ul className="mb-4 list-outside list-disc space-y-1 pl-4">
+                    <ul className="mb-4">
                       {job.data.highlights?.map((highlight: string) => (
-                        <li
-                          key={highlight}
-                          className="text-foreground font-medium"
-                        >
-                          {highlight}
-                        </li>
+                        <li key={highlight}>{highlight}</li>
                       ))}
                     </ul>
                   )}
@@ -158,9 +154,22 @@ export default function WorkHistory({
                             <a
                               key={project.id}
                               href={getProjectUrl(project.id)}
-                              className="pill pill-brand-orange pill-hover"
+                              className="pill pill-brand-orange pill-hover flex items-center gap-1"
                             >
                               {project.data.title}
+                              <svg
+                                className="h-3 w-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                />
+                              </svg>
                             </a>
                           ))}
                         </div>

@@ -32,16 +32,8 @@
   },
   "oneLiner": "Built a CMS that fed data to two OpenGL apps: a Tasting Table and a Barback display.",
   "problem": "Stoller Winery needed a single source of truth for wine data, events, and media that the on‑site apps could consume to display on their interactive, LED tasting tables and on their LED \"barback\" application.",
-  "scope": [
-    "Developed the CMS and data model",
-    "Integrated with two front‑end apps (Tasting Table & Barback)",
-    "Supported features like 3D map info, newsletter signup, and live content"
-  ],
-  "decisions": [
-    "Kept the admin simple so staff could update without training",
-    "Unified data so both apps pulled from the same source",
-    "Gave insights from previous career as a brewery manager to help in making product decisions"
-  ],
+  "scope": ["Served as full-stack developer for the Stoller Winery project"],
+  "challengesAndSolutions": "- Developed the CMS and data model\n- Integrated with two front‑end apps (Tasting Table & Barback)\n- Supported features like 3D map info, newsletter signup, and live content\n- Kept the admin simple so staff could update without training\n- Unified data so both apps pulled from the same source\n- Gave insights from previous career as a brewery manager to help in making product decisions",
   "outcome": "Reliable tools for the tasting room that showed up in press coverage and guest photos.",
   "notes": "Having worked in craft beer for eight years, this was a great project for me to be able to work on. This was also my first project ever working in experiential, and it was so much fun to be able to work on. Absolutely adore this project. Fun fact: this winery owns the Spruce Goose from The Aviator movie!",
   "status": "shipped",

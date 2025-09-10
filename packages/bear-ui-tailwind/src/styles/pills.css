@@ -48,14 +48,15 @@
 
 /* Size variants */
 @utility pill-sm {
-  @apply min-h-6 min-w-6 px-3 py-1 text-xs;
+  @apply min-h-6 min-w-6 px-3 py-1.5 text-xs font-bold;
+}
+
+@utility pill-md {
+  @apply min-h-8 min-w-8 px-4 py-2 text-sm font-bold;
 }
 
 @utility pill-lg {
-  padding: 0.75rem 1.5rem;
-  font-size: 1.125rem;
-  min-height: 2.5rem;
-  border-radius: 9999px;
+  @apply min-h-10 min-w-10 px-5 py-2.5 text-base font-bold;
 }
 
 /* Interactive states */
@@ -68,7 +69,7 @@
 }
 
 @utility pill-selected {
-  @apply pill-brand-green;
+  @apply pill-brand-red;
 }
 
 @utility pill-pressed {
@@ -85,7 +86,7 @@
 }
 
 @utility pill-skill {
-  @apply border-muted bg-muted text-muted-foreground;
+  @apply border-brand-dark bg-brand-dark text-brand-light font-bold;
 }
 
 @utility pill-company {

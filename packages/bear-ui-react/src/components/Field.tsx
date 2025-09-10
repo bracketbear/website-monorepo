@@ -46,7 +46,7 @@ export const Field: React.FC<FieldProps> = ({
         {error && (
           <div
             id={`${id}-error`}
-            className="text-error mt-1 text-xs font-bold"
+            className="text-error mt-1 text-left text-xs font-bold"
             role="alert"
             aria-live="polite"
           >

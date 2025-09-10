@@ -138,7 +138,7 @@ try {
               >
                 <div class="grid grid-cols-1 gap-6 xl:grid-cols-2 2xl:grid-cols-2">
                   {sourceCodePage.data.tldr.points.map((point: any) => (
-                    <div class="card-dark prose px-4 pt-0 pb-2">
+                    <div class="card-dark prose px-4 py-4">
                       <h3 class="font-heading mb-4 text-xl font-bold tracking-tight text-white uppercase">
                         {point.label}
                       </h3>
@@ -349,7 +349,7 @@ try {
                   <div class="space-y-10 xl:space-y-14">
                     {sourceCodePage.data.typescript.patterns.map(
                       (p: any, i: number) => (
-                        <div class="card pt-0">
+                        <div class="card p-6">
                           <div class="grid grid-cols-1 items-start xl:grid-cols-2">
                             <div
                               class={clsx(

@@ -9,11 +9,11 @@
   },
   "narrative": {
     "title": "Hey! I'm Harrison.",
-    "content": "I've been working on the web in some form or another since high school. My first opportunity was at Polich Art Works—an art foundry that took a chance on a kid who's only selling point was that he could use a computer. There I was introduced to two concepts that would stay with me throughout my career: web technologies and art.\n\nLater, while working at a brewery, I was tasked with figuring out how to collect emails for and send a newsletter. Any sane or experienced person would have gone straight to MailChimp, but instead I taught myself PHP, built a form to collect emails on our website and send them to a database, and then another form to send the emails. That led to writing a WordPress theme and a couple of plugins to manage menus, and from there my software development journey started.\n\nFlash forward a few years later and 3,500 miles away. Feeling stuck a few years into my career, I took a three-month Laravel contract with an experiential shop in Portland, OR. Seeing a museum app driving content on a wall for the first time flipped a switch in my head: I could get paid to write code that made the world a cooler place. I pushed for the full-time role, got it, and have never looked back. Since then, I've spent years in experiential—Downstream, Deeplocal—building management software, going on virtual and in-person installs, and learning as much as I can learning about the industry I love."
+    "content": "I've been working on the web in some form or another since high school. My first opportunity was at Polich Art Works—an art foundry that took a chance on a kid who's only selling point was that he could use a computer. There I was introduced to two concepts that would stay with me throughout my career: web technologies and art.\n\nLater, while working at a brewery, I was tasked with figuring out how to collect emails for and send a newsletter. Any sane or experienced person would have gone straight to MailChimp, but instead I taught myself PHP, built a form to collect emails on our website and send them to a database, and then another form to send the emails. That led to writing a WordPress theme and a couple of plugins to manage menus, and from there my software development journey started.\n\nFlash forward a few years later and 3,500 miles away. I was feeling stuck a few years into my career, so I took a three-month Laravel contract with an experiential shop in Portland, OR. Completely oblivious to the world of experiences, I saw a museum app driving content on a wall for the first time and flipped a switch in my head: I could get paid to write code that made the world a cooler place. Driven and determined, I pushed for the full-time role, got it, and have never looked back. Since then, I've spent years in experiential—working at Downstream and Deeplocal—building experience content management software, going on virtual and in-person installs, training clients on how to use our products, and learning as much as I can learning about the industry I love."
   },
   "whatIDoNow": {
     "title": "What I'm up to now",
-    "content": "I lean on my experiences and pair it with generative A.I. to produce quality work that delivers real value to my partners and clients. I spend time to tackle some of the pain points I've seen in the experiential industry to come up with solutions that help, not hinder, our users. I document, test, and CI/CD myself to sleep to make sure that I'm not shipping a dud.\n\n#### In short, I try to be a one-person team that feels like a ten-person team."
+    "content": "I lean on my experiences and pair it with generative A.I. to produce quality work that delivers value to my partners and clients. I spend time to tackle some of the pain points I've seen in the experiential industry to come up with solutions that help, not hinder, our users. I document, test, and CI/CD myself to sleep to make sure that I'm not shipping a dud.\n\n#### In short, I try to be a one-person team that feels like a ten-person team."
   },
   "howIPartner": {
     "title": "How I Work",
@@ -55,15 +55,15 @@
     "items": [
       {
         "title": "Clear communication",
-        "content": "I believe in transparent, honest communication that builds trust and ensures everyone is aligned on goals and expectations.\n"
+        "content": "I believe in transparent, honest communication that builds trust and ensures everyone is aligned on goals and expectations. I also make sure to communicate where it makes sense and where we can reference it later without thinking about it.\n"
       },
       {
         "title": "Pragmatic decision making",
-        "content": "I focus on practical solutions that deliver real value, balancing idealism with the constraints of time, budget, and technical reality.\n"
+        "content": "I focus on practical solutions that deliver real value, balancing idealism with the constraints of time, budget, and technical reality. I'm always asking myself, \"Can we and should we do this better?\"\n"
       },
       {
         "title": "Modularity, scalability, and developer experience",
-        "content": "I build systems that are easy to understand, maintain, and extend. Good architecture today prevents technical debt tomorrow.\n"
+        "content": "I build systems that are easy to understand, maintain, and extend. Good architecture today prevents technical debt tomorrow—I've seen this take entire teams of people down and I refuse to be the reason why this happens again.\n"
       }
     ]
   },
@@ -94,7 +94,7 @@
     }
   ],
   "fit": {
-    "bestFit": "Ideal partners and teammates bring a defined outcome and straight talk; I bring structure, momentum, and a cadence you can rely on.\n"
+    "bestFit": "- **Contracting teams** that need extra hands for specific projects or sprints\n- **Experiential agencies** looking to build custom tools, integrations, or content management systems\n- **Partners** interested in developing AI-powered experience management solutions\n- **Senior/Lead/Principal roles** at companies where I can drive technical strategy and mentor teams\n- **Small, lean teams** that value pragmatism, clear communication, and shipping quality work\n- **Organizations** that appreciate the \"swiss army knife\" approach—someone who can prototype, architect, and execute across the full stack"
   },
   "howToStart": {
     "title": "How to start",
