@@ -90,45 +90,49 @@
       {
         "label": "Architecture",
         "bullets": [
-          "Astro 5 with React islands where interactivity matters",
-          "Static first; hydrate only what needs it"
+          "Astro 5 + React islands where interactivity matters",
+          "Static-first; hydrate only what's needed",
+          "Assets: width hints for images; subset/preload fonts"
+        ]
+      },
+      {
+        "label": "Agentic development",
+        "bullets": [
+          "Pair-program in Cursor under versioned `.cursor/rules`",
+          "Plan → Act → Review; apply diffs with checkpoints; confirm commands",
+          "Architecture sessions map modules and flag boundary violations"
         ]
       },
       {
         "label": "Styling",
         "bullets": [
-          "Tailwind v4 using `@theme` tokens",
-          "Avoid arbitrary values; use intentionally when needed (e.g., layered shadows/backdrop)",
-          "Utilities keep the design consistent and measurable"
+          "Tailwind v4 with `@theme` tokens and composed utilities",
+          "No arbitrary values unless truly unavoidable (e.g., layered shadows/backdrop)",
+          "Single Storybook across apps/packages; titles show ownership"
         ]
       },
       {
         "label": "Content",
         "bullets": [
           "Keystatic + Zod for typed content end-to-end",
-          "Builds fail fast on bad data"
+          "Builds fail fast on bad data",
+          "Keystatic schemas mirror Zod for edit-time + build-time validation"
         ]
       },
       {
         "label": "Animations",
         "bullets": [
-          "Flateralus (PIXI.js 8) with typed controls",
+          "Flateralus (PIXI 8) with typed controls",
           "Visibility-based pausing",
-          "Guardrails (caps) to keep frames smooth"
-        ]
-      },
-      {
-        "label": "Storybook",
-        "bullets": [
-          "Single Storybook instance across apps and packages",
-          "Titles show where each component lives"
+          "Guardrails (caps) to protect frame budget"
         ]
       },
       {
         "label": "Philosophy",
         "bullets": [
           "Prefer constraints and clear boundaries",
-          "Keep the toolchain boring, the types strong, and the pages fast"
+          "Keep the toolchain boring, the types strong, and the pages fast",
+          "Target near-perfect Lighthouse scores across Performance/Accessibility/Best-Practices/SEO"
         ]
       }
     ]
