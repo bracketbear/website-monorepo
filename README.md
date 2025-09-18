@@ -20,7 +20,7 @@ This is a monorepo containing all Bracket Bear applications and shared packages.
 - [bear-ui-tailwind](/packages/bear-ui-tailwind/) - Tailwind CSS styles and utilities for BracketBear UI components
 - [cms-mcp-server](/packages/cms-mcp-server/) - MCP server for Bracket Bear CMS content
 - [core](/packages/core/) - Core utilities and Astro components for BracketBear applications
-- [flateralus](/packages/flateralus/) - Flateralus animation engine. TypeScript-first, but works in JS.
+- [flateralus](/packages/flateralus/) - Flateralus animation engine.
 - [flateralus-p5](/packages/flateralus-p5/) - p5.js adapter for Flateralus animation framework.
 - [flateralus-p5-animations](/packages/flateralus-p5-animations/) - p5.js animations for Flateralus framework
 - [flateralus-pixi](/packages/flateralus-pixi/) - PIXI.js adapter for Flateralus animation framework.

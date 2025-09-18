@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { makePageSchema } from './page';
+import { makePageSchema } from './page.js';
 
 // --- New sub-section schemas ---
 const richSection = z.object({

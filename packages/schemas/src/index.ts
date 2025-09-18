@@ -24,14 +24,14 @@
  */
 
 // Export all work schemas
-export * from './work';
+export * from './work.js';
 
 // Export all content schemas
-export * from './content';
-export * from './page';
-export * from './about-page';
-export * from './contact-page';
-export * from './work-page';
-export * from './projects-page';
-export * from './project-page';
-export * from './source-code-page';
+export * from './content.js';
+export * from './page.js';
+export * from './about-page.js';
+export * from './contact-page.js';
+export * from './work-page.js';
+export * from './projects-page.js';
+export * from './project-page.js';
+export * from './source-code-page.js';

@@ -1,7 +1,7 @@
 {
   "name": "@bracketbear/flateralus",
   "version": "1.0.1",
-  "description": "Flateralus animation engine. TypeScript-first, but works in JS.",
+  "description": "Flateralus animation engine.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",

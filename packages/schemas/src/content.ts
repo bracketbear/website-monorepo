@@ -42,4 +42,4 @@ export const serviceSchema = z.object({
 });
 
 // Re-export the shared contact method schema
-export { contactMethodSchema } from './contact-method';
+export { contactMethodSchema } from './contact-method.js';
