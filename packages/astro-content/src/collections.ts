@@ -20,7 +20,7 @@ import {
   portfolioProjectsPageSchema,
   portfolioProjectPageSchema,
   sourceCodePageSchema,
-} from './schemas';
+} from '@bracketbear/schemas';
 
 /**
  * Collection configuration for work-related content

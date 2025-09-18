@@ -1,17 +1,19 @@
 /**
- * Content Schemas for @bracketbear/astro-content
+ * Content Schemas for @bracketbear/schemas
  *
  * This module exports all content schemas used for validating and typing
- * content data in the CMS. The schemas are organized into two main categories:
+ * content data across the Bracket Bear ecosystem. The schemas are organized into
+ * three main categories:
  *
  * 1. Work Schemas - For professional experience, projects, and skills
  * 2. Content Schemas - For general content like blog posts, pages, and services
+ * 3. Page Schemas - For site-specific page configurations
  *
  * All schemas use Zod for runtime validation and TypeScript type generation.
  *
  * @example
  * ```typescript
- * import { workProjectSchema, blogSchema } from '@bracketbear/astro-content';
+ * import { workProjectSchema, blogSchema } from '@bracketbear/schemas';
  *
  * // Validate project data
  * const projectData = workProjectSchema.parse(rawProjectData);

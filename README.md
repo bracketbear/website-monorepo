@@ -25,14 +25,15 @@ This is a monorepo containing all Bracket Bear applications and shared packages.
 - [flateralus-pixi](/packages/flateralus-pixi/) - PIXI.js adapter for Flateralus animation framework.
 - [flateralus-pixi-animations](/packages/flateralus-pixi-animations/) - PIXI.js animations for Flateralus framework
 - [flateralus-react](/packages/flateralus-react/) - React bindings for Flateralus animation engine.
+- [schemas](/packages/schemas/) - Zod schemas for content validation and TypeScript type generation
 - [tw-pattern-analyzer](/packages/tw-pattern-analyzer/) - Tailwind CSS pattern analyzer for identifying and optimizing CSS usage across the monorepo
 
 ### Repository Map
 
 The repository structure is automatically generated and maintained. See the [source code page](/apps/portfolio/source-code) for an interactive view of all apps and packages.
 
-**Total Items**: 15 (3 apps, 12 packages)
-**Last Updated**: 9/10/2025
+**Total Items**: 16 (3 apps, 13 packages)
+**Last Updated**: 9/18/2025
 
 ## Requirements
 

@@ -1,4 +1,3 @@
-import type { CollectionEntry } from 'astro:content';
 import type {
   workCompanySchema,
   workJobSchema,
@@ -9,7 +8,7 @@ import type {
   blogSchema,
   pageSchema,
   serviceSchema,
-} from './schemas';
+} from '@bracketbear/schemas';
 
 // Export the raw schema types (inferred from Zod schemas)
 export type WorkCompany = typeof workCompanySchema._type;
@@ -22,29 +21,6 @@ export type Blog = typeof blogSchema._type;
 export type Page = typeof pageSchema._type;
 export type Service = typeof serviceSchema._type;
 
-// Export collection entry types
-export type WorkCompanyEntry = CollectionEntry<'workCompany'>;
-export type WorkJobEntry = CollectionEntry<'workJobs'>;
-export type WorkSkillEntry = CollectionEntry<'workSkills'>;
-export type WorkSkillCategoryEntry = CollectionEntry<'workSkillCategory'>;
-export type WorkProjectCategoryEntry = CollectionEntry<'workProjectCategory'>;
-export type WorkProjectEntry = CollectionEntry<'workProject'>;
-export type BlogEntry = CollectionEntry<'blog'>;
-export type PageEntry = CollectionEntry<'pages'>;
-export type ServiceEntry = CollectionEntry<'services'>;
-
-// Helper types for common patterns
-export type WorkJobWithCompany = WorkJobEntry & {
-  companyData?: WorkCompanyEntry;
-};
-
-export type WorkProjectWithJob = WorkProjectEntry & {
-  jobData?: WorkJobEntry;
-};
-
-export type WorkSkillWithCategory = WorkSkillEntry & {
-  categoryData?: WorkSkillCategoryEntry;
-};
-
-// Re-export CollectionEntry for convenience
-export type { CollectionEntry } from 'astro:content';
+// Note: CollectionEntry types are Astro-specific and should be defined
+// in Astro applications that use this package, not in the package itself.
+// This keeps the package framework-agnostic.
