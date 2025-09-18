@@ -18,6 +18,7 @@ This is a monorepo containing all Bracket Bear applications and shared packages.
 - [bear-ui](/packages/bear-ui/) - Core UI system for BracketBear applications
 - [bear-ui-react](/packages/bear-ui-react/) - React components for BracketBear UI system
 - [bear-ui-tailwind](/packages/bear-ui-tailwind/) - Tailwind CSS styles and utilities for BracketBear UI components
+- [cms-mcp-server](/packages/cms-mcp-server/) - MCP server for Bracket Bear CMS content
 - [core](/packages/core/) - Core utilities and Astro components for BracketBear applications
 - [flateralus](/packages/flateralus/) - Flateralus animation engine. TypeScript-first, but works in JS.
 - [flateralus-p5](/packages/flateralus-p5/) - p5.js adapter for Flateralus animation framework.
@@ -32,7 +33,7 @@ This is a monorepo containing all Bracket Bear applications and shared packages.
 
 The repository structure is automatically generated and maintained. See the [source code page](/apps/portfolio/source-code) for an interactive view of all apps and packages.
 
-**Total Items**: 16 (3 apps, 13 packages)
+**Total Items**: 17 (3 apps, 14 packages)
 **Last Updated**: 9/18/2025
 
 ## Requirements

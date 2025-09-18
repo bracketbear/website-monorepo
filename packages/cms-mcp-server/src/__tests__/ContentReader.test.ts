@@ -1,23 +1,34 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
+const { mockReadFileSync, mockReaddirSync, mockStatSync } = vi.hoisted(() => ({
+  mockReadFileSync: vi.fn(),
+  mockReaddirSync: vi.fn(),
+  mockStatSync: vi.fn(),
+}));
+
 vi.mock('fs', () => ({
-  readFileSync: vi.fn(),
-  readdirSync: vi.fn(),
-  statSync: vi.fn(),
+  default: {
+    readFileSync: mockReadFileSync,
+    readdirSync: mockReaddirSync,
+    statSync: mockStatSync,
+  },
+  readFileSync: mockReadFileSync,
+  readdirSync: mockReaddirSync,
+  statSync: mockStatSync,
 }));
 
 vi.mock('path', () => ({
+  default: {
+    join: (...args: string[]) => args.join('/'),
+    resolve: (...args: string[]) => args.join('/'),
+    dirname: (path: string) => path.split('/').slice(0, -1).join('/'),
+  },
   join: (...args: string[]) => args.join('/'),
   resolve: (...args: string[]) => args.join('/'),
+  dirname: (path: string) => path.split('/').slice(0, -1).join('/'),
 }));
 
-import { ContentReader } from '../types.js';
-import { readFileSync, readdirSync, statSync } from 'fs';
-
-// Get the mocked functions
-const mockReadFileSync = vi.mocked(readFileSync);
-const mockReaddirSync = vi.mocked(readdirSync);
-const mockStatSync = vi.mocked(statSync);
+import { ContentReader } from '../types';
 
 describe('ContentReader', () => {
   let contentReader: ContentReader;
@@ -33,11 +44,27 @@ describe('ContentReader', () => {
       const mockCompany1 = { title: 'Company 1', location: 'NYC' };
       const mockCompany2 = { title: 'Company 2', location: 'SF' };
 
-      mockReaddirSync.mockReturnValue(mockFiles as any);
-      mockStatSync.mockReturnValue({ isFile: () => true } as any);
-      mockReadFileSync
-        .mockReturnValueOnce(JSON.stringify(mockCompany1))
-        .mockReturnValueOnce(JSON.stringify(mockCompany2));
+      // Mock readdirSync to return files when called with the expected path
+      mockReaddirSync.mockImplementation((path: string) => {
+        if (path.includes('work/companies')) {
+          return mockFiles as any;
+        }
+        return [] as any;
+      });
+
+      mockStatSync.mockImplementation((_path: string) => {
+        return { isFile: () => true } as any;
+      });
+
+      mockReadFileSync.mockImplementation((path: string) => {
+        if (path.includes('company1.json')) {
+          return JSON.stringify(mockCompany1);
+        }
+        if (path.includes('company2.json')) {
+          return JSON.stringify(mockCompany2);
+        }
+        return '{}';
+      });
 
       const companies = contentReader.getCompanies();
 
@@ -51,7 +78,13 @@ describe('ContentReader', () => {
       const mockCompany1 = { title: 'Company 1' };
       const mockCompany3 = { title: 'Company 3' };
 
-      mockReaddirSync.mockReturnValue(mockFiles as any);
+      mockReaddirSync.mockImplementation((path: string) => {
+        if (path.includes('work/companies')) {
+          return mockFiles as any;
+        }
+        return [] as any;
+      });
+
       mockStatSync.mockReturnValue({ isFile: () => true } as any);
       mockReadFileSync
         .mockReturnValueOnce(JSON.stringify(mockCompany1))
@@ -68,7 +101,13 @@ describe('ContentReader', () => {
       const mockFiles = ['company1.json', 'invalid.json'];
       const mockCompany1 = { title: 'Company 1' };
 
-      mockReaddirSync.mockReturnValue(mockFiles as any);
+      mockReaddirSync.mockImplementation((path: string) => {
+        if (path.includes('work/companies')) {
+          return mockFiles as any;
+        }
+        return [] as any;
+      });
+
       mockStatSync.mockReturnValue({ isFile: () => true } as any);
       mockReadFileSync
         .mockReturnValueOnce(JSON.stringify(mockCompany1))
@@ -95,7 +134,13 @@ describe('ContentReader', () => {
         isCurrentJob: false,
       };
 
-      mockReaddirSync.mockReturnValue(mockFiles as any);
+      mockReaddirSync.mockImplementation((path: string) => {
+        if (path.includes('work/jobs')) {
+          return mockFiles as any;
+        }
+        return [] as any;
+      });
+
       mockStatSync.mockReturnValue({ isFile: () => true } as any);
       mockReadFileSync.mockReturnValue(JSON.stringify(mockJob));
 
@@ -123,7 +168,13 @@ describe('ContentReader', () => {
         impactTags: ['performance'],
       };
 
-      mockReaddirSync.mockReturnValue(mockFiles as any);
+      mockReaddirSync.mockImplementation((path: string) => {
+        if (path.includes('work/projects')) {
+          return mockFiles as any;
+        }
+        return [] as any;
+      });
+
       mockStatSync.mockReturnValue({ isFile: () => true } as any);
       mockReadFileSync.mockReturnValue(JSON.stringify(mockProject));
 
@@ -144,7 +195,13 @@ describe('ContentReader', () => {
         isFeatured: true,
       };
 
-      mockReaddirSync.mockReturnValue(mockFiles as any);
+      mockReaddirSync.mockImplementation((path: string) => {
+        if (path.includes('work/skills')) {
+          return mockFiles as any;
+        }
+        return [] as any;
+      });
+
       mockStatSync.mockReturnValue({ isFile: () => true } as any);
       mockReadFileSync.mockReturnValue(JSON.stringify(mockSkill));
 
