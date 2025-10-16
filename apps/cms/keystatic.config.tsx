@@ -2,6 +2,7 @@ import { config } from '@keystatic/core';
 import { workCollections } from './src/collections/work';
 import { contentCollections } from './src/collections/content';
 import { portfolioCollections } from './src/sites/portfolio/collections';
+import { bracketbearCollections } from './src/sites/bracketbear/collections';
 import { singletons } from './src/singletons';
 
 export default config({
@@ -18,6 +19,11 @@ export default config({
       },
     },
     navigation: {
+      'Bracket Bear Site': [
+        'bracketbearIndexPage',
+        'bracketbearAboutPage',
+        'bracketbearServicesPage',
+      ],
       'Portfolio Site': [
         'portfolioIndexPage',
         'portfolioContactPage',
@@ -46,6 +52,7 @@ export default config({
     ...workCollections,
     ...contentCollections,
     ...portfolioCollections,
+    ...bracketbearCollections,
   },
   singletons,
 });

@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import { z } from 'zod';
 
 import { contentPath, workPath } from './utils';
 import {
@@ -20,6 +21,7 @@ import {
   portfolioProjectsPageSchema,
   portfolioProjectPageSchema,
   sourceCodePageSchema,
+  makePageSchema,
 } from '@bracketbear/schemas';
 
 /**
@@ -120,41 +122,93 @@ export const siteSpecificCollections = {
     base: join(contentPath, 'sites/portfolio/contact-methods'),
     schema: contactMethodSchema,
   },
-  // TODO: Add Bracket Bear collections when Bracket Bear site is implemented
-  // bracketBearAboutPage: {
-  //   base: join(contentPath, 'sites/bracketbear'),
-  //   schema: bracketBearAboutPageSchema,
-  // },
-  // bracketbearIndexPage: {
-  //   base: join(contentPath, 'sites/bracketbear'),
-  //   schema: indexPageSchema,
-  // },
-  // bracketbearContactPage: {
-  //   base: join(contentPath, 'sites/bracketbear'),
-  //   schema: makePageSchema({
-  //     phone: z.string().optional(),
-  //     address: z.string().optional(),
-  //     contactFormId: z.string().optional(),
-  //     officeHours: z.string().optional(),
-  //   }),
-  // },
-  // bracketbearAboutPage: {
-  //   base: join(contentPath, 'sites/bracketbear'),
-  //   schema: makePageSchema({
-  //     teamMembers: z
-  //       .array(
-  //         z.object({
-  //           name: z.string(),
-  //           role: z.string(),
-  //           bio: z.string().optional(),
-  //           image: z.string().optional(),
-  //         })
-  //       )
-  //       .optional(),
-  //     companyValues: z.array(z.string()).optional(),
-  //     foundedYear: z.number().optional(),
-  //   }),
-  // },
+  // Bracket Bear site singletons
+  bracketbearIndexPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: makePageSchema({
+      hero: z.object({
+        tagline: z.string(),
+        subtitle: z.string(),
+      }),
+      intro: z.object({
+        title: z.string(),
+        content: z.string(),
+        magicWandQuestion: z.string(),
+      }),
+      whatWeOffer: z.object({
+        title: z.string(),
+        services: z.array(
+          z.object({
+            title: z.string(),
+            description: z.string(),
+          })
+        ),
+      }),
+      whyBracketBear: z.object({
+        title: z.string(),
+        values: z.array(
+          z.object({
+            title: z.string(),
+            description: z.string(),
+          })
+        ),
+      }),
+    }),
+    pattern: 'index-page.json',
+  },
+  bracketbearAboutPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: makePageSchema({
+      hero: z.object({
+        title: z.string(),
+        subtitle: z.string(),
+      }),
+      ourStory: z.object({
+        title: z.string(),
+        content: z.string(),
+      }),
+      philosophy: z.object({
+        title: z.string(),
+        subtitle: z.string(),
+        content: z.string(),
+      }),
+      coreValues: z.object({
+        title: z.string(),
+        subtitle: z.string(),
+        values: z.array(
+          z.object({
+            title: z.string(),
+            description: z.string(),
+          })
+        ),
+      }),
+      whoWeAre: z.object({
+        title: z.string(),
+        content: z.string(),
+      }),
+    }),
+    pattern: 'about-page.json',
+  },
+  bracketbearServicesPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: makePageSchema({
+      hero: z.object({
+        title: z.string(),
+        subtitle: z.string(),
+      }),
+      intro: z.object({
+        title: z.string(),
+        content: z.string(),
+      }),
+      serviceModes: z.array(
+        z.object({
+          title: z.string(),
+          description: z.string(),
+        })
+      ),
+    }),
+    pattern: 'services-page.json',
+  },
 };
 
 /**

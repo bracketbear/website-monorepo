@@ -1,56 +1,60 @@
 {
-  "title": "Bracket Bear - Creative Technology Studio",
-  "subtitle": "Creative Technology Studio",
-  "content": "# Welcome to Bracket Bear\n\nWe're a creative technology studio specializing in experiential marketing and interactive installations.",
-
-  "metaDescription": "Creative technology studio specializing in experiential marketing, interactive installations, and digital experiences.",
+  "title": "Bracket Bear - The Agency for Experience Agencies",
+  "subtitle": "Creative Technology Partner",
+  "metaDescription": "Bracket Bear is a values-driven creative technology partner built on the art of hospitality. We help experience agencies remove what limits them so their magic can thrive.",
   "canonicalUrl": "https://bracketbear.com/",
   "ogImage": "bracketbear-hero.jpg",
   "noIndex": false,
-  "about": {
-    "title": "What We Do",
-    "introduction": "We're a creative technology studio that specializes in experiential marketing and interactive installations.",
-    "description": "Our team combines cutting-edge technology with creative storytelling to create unforgettable brand experiences.\n\nWe work with brands, agencies, and venues to bring their visions to life through interactive installations, digital experiences, and immersive environments.",
-    "experience": "With years of experience in the experiential marketing industry, we understand what it takes to create moments that matter.",
-    "additional": "We specialize in **interactive installations**, **digital experiences**, and **immersive environments**.",
-    "showSkillsTicker": true,
-    "featuredSkills": ["react", "typescript", "pixi"]
+  "hero": {
+    "tagline": "THE AGENCY FOR EXPERIENCE AGENCIES",
+    "subtitle": "We give exceptional service to the people who create experiences — helping agencies remove what limits them, so their magic can thrive."
   },
-  "featuredProjects": {
-    "title": "Featured Work",
-    "subtitle": "Our portfolio showcases the diverse range of experiences we've created for clients across various industries.\n\nEach project represents our commitment to innovation and creative excellence.",
-    "maxDisplay": 2,
-    "showViewAllButton": true,
-    "viewAllButtonText": "View All Work →",
-    "viewAllButtonLink": "/work",
-    "selectedProjects": ["ds-elekta", "ds-pwc"]
+  "intro": {
+    "title": "Intro Section",
+    "content": "Bracket Bear is a values-driven creative technology partner built on the art of hospitality.\nWe believe experience agencies deserve the same care, curiosity, and service they offer their own clients.\nOur work starts with a simple question — one that guides everything we do:",
+    "magicWandQuestion": "\"If you could wave a magic wand and fix one thing keeping your agency from reaching its potential, what would it be?\"\nWhatever that is, that's where we begin."
   },
-  "recentExperience": {
-    "title": "Our Services",
-    "subtitle": "We offer a comprehensive range of creative technology services to help brands create meaningful connections with their audiences.\n\nFrom concept to execution, we handle every aspect of your project.",
-    "maxDisplay": 2,
-    "showViewAllButton": true,
-    "viewAllButtonText": "Learn More →",
-    "viewAllButtonLink": "/services",
-    "selectedJobs": []
+  "whatWeOffer": {
+    "title": "What We Offer",
+    "services": [
+      {
+        "title": "Augment Your Team",
+        "description": "We embed with your team like an extension of it, bringing specialized creative or technical expertise that feels seamless, not supplemental."
+      },
+      {
+        "title": "Deliver the Project",
+        "description": "We take the reins from prototype to installation so you can focus on creative leadership while we bring it to life."
+      },
+      {
+        "title": "Consult & Collaborate",
+        "description": "We share years of experience building tools, systems, and installations to help you make confident, informed decisions."
+      }
+    ]
   },
-  "contact": {
-    "title": "Let's Create Something Amazing",
-    "subtitle": "Ready to bring your vision to life? We'd love to discuss your project and explore how we can help you create an unforgettable experience.",
-    "showContactForm": true
+  "whyBracketBear": {
+    "title": "Why Bracket Bear",
+    "values": [
+      {
+        "title": "We're hospitality minded",
+        "description": "We extend the same thoughtfulness and attention to our partners that they give their audiences."
+      },
+      {
+        "title": "We're values first",
+        "description": "If it doesn't align with our principles, we don't do it — every project should serve people, not just pixels."
+      },
+      {
+        "title": "We're scalable by design",
+        "description": "We grow alongside our partners through modular, flexible collaboration."
+      },
+      {
+        "title": "We bring founder-level experience",
+        "description": "From award-winning agencies like Downstream and Deeplocal."
+      }
+    ]
   },
-  "layout": {
-    "hideContactForm": true,
-    "showHeroSection": true,
-    "showAboutSection": true,
-    "showFeaturedProjects": true,
-    "showRecentExperience": true,
-    "showContactSection": true
-  },
-  "seo": {
-    "structuredData": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"Organization\",\n  \"name\": \"Bracket Bear\",\n  \"description\": \"Creative technology studio specializing in experiential marketing and interactive installations.\",\n  \"url\": \"https://bracketbear.com\",\n  \"sameAs\": [\n    \"https://linkedin.com/company/bracketbear\"\n  ]\n}",
-    "additionalMetaTags": "<meta name=\"author\" content=\"Bracket Bear\" />\n<meta name=\"keywords\" content=\"creative technology, experiential marketing, interactive installations, digital experiences\" />",
-    "enableAnalytics": true,
-    "preloadCriticalAssets": true
+  "contactCTA": {
+    "text": "We build technology with a human touch.\nTell us what your magic wand would fix — and let's start there.",
+    "buttonText": "Get In Touch",
+    "buttonLink": "/contact"
   }
 }

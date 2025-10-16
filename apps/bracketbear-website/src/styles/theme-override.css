@@ -1,0 +1,54 @@
+/* Bracket Bear Theme Override */
+/* Dark theme with orange/red primary color for Bracket Bear website */
+
+@theme {
+  /* Dark theme base colors */
+  --color-background: hsl(200, 0%, 15%); /* Dark background */
+  --color-foreground: hsl(200, 0%, 85%); /* Light text */
+
+  /* Override primary colors with dark orange/red theme */
+  --color-primary: #d94a2c; /* Dark orange/red primary */
+  --color-primary-hover: #c43d1f; /* Darker hover state */
+  --color-primary-foreground: #fff; /* White text on primary */
+
+  /* Dark theme surfaces */
+  --color-card: color-mix(in srgb, var(--color-background) 95%, white 5%);
+  --color-card-foreground: var(--color-foreground);
+  --color-muted: color-mix(in srgb, var(--color-background) 80%, white 20%);
+  --color-muted-foreground: color-mix(
+    in srgb,
+    var(--color-foreground) 80%,
+    transparent
+  );
+
+  /* Dark theme borders */
+  --color-border: color-mix(in srgb, var(--color-foreground) 18%, transparent);
+
+  /* Adjust secondary colors to complement the orange theme */
+  --color-secondary: color-mix(
+    in srgb,
+    var(--color-primary) 10%,
+    var(--color-background) 90%
+  );
+  --color-secondary-hover: color-mix(
+    in srgb,
+    var(--color-primary) 15%,
+    var(--color-background) 85%
+  );
+  --color-secondary-foreground: var(--color-foreground);
+
+  /* Update ring color to match primary */
+  --color-ring: color-mix(in srgb, var(--color-primary) 50%, transparent);
+
+  /* Brand color adjustments for consistency */
+  --color-brand-orange: var(--color-primary); /* Use primary as brand orange */
+  --color-brand-orange-light: color-mix(
+    in srgb,
+    var(--color-primary) 20%,
+    var(--color-background) 80%
+  );
+
+  /* Text colors for dark theme */
+  --color-text-primary: var(--color-foreground);
+  --color-text-secondary: var(--color-muted-foreground);
+}

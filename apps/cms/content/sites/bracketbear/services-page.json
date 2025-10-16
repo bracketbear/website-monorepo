@@ -1,0 +1,35 @@
+{
+  "title": "Services - Bracket Bear",
+  "subtitle": "Creative Technology Partner",
+  "metaDescription": "Bracket Bear offers three flexible ways to partner with experience agencies: Augment Your Team, Deliver the Project, and Consult & Collaborate.",
+  "canonicalUrl": "https://bracketbear.com/services",
+  "ogImage": "bracketbear-services.jpg",
+  "noIndex": false,
+  "hero": {
+    "title": "Services",
+    "subtitle": "We help experiential agencies bring bold ideas to life — through care, craft, and technical clarity."
+  },
+  "intro": {
+    "title": "Intro",
+    "content": "Every partnership with Bracket Bear is built on empathy and execution.\nWe adapt to how you work and provide the right level of support to keep your projects running smoothly.\nOur three modes of service are designed to meet you where you are — and scale with you as you grow."
+  },
+  "serviceModes": [
+    {
+      "title": "Augment Your Team",
+      "description": "When your pipeline gets heavy or your project needs specialized expertise, we embed directly with your team.\nThink of us as an extension of your in-house crew — following your direction, aligning with your workflow, and helping you hit deadlines without compromise.\nOur presence is seamless, our communication clear, and our focus steady.\nYou stay in creative flow; we make sure the work moves forward."
+    },
+    {
+      "title": "Deliver the Project",
+      "description": "Sometimes you just need someone to own it.\nWe manage delivery from prototype to on-site installation, taking full responsibility for technical build, coordination, and launch.\nYou lead the creative vision; we bring it to life — with precision, reliability, and hospitality in every detail.\nFrom interactive installations to CMS-driven experiences, we deliver the work so you can focus on leading your clients."
+    },
+    {
+      "title": "Consult & Collaborate",
+      "description": "When you're exploring new territory or refining process, we help you find clarity.\nThrough audits, workshops, and ongoing collaboration, we share the perspective shaped by years of building systems, tools, and experiences.\nWe help you make confident, informed decisions — the kind that move teams forward and keep ideas alive."
+    }
+  ],
+  "contactCTA": {
+    "text": "Whatever your magic wand would fix — that's where we start.\nLet's build something unforgettable together.",
+    "buttonText": "Get In Touch",
+    "buttonLink": "/contact"
+  }
+}

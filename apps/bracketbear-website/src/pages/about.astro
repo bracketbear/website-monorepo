@@ -5,12 +5,12 @@ import { getCollection } from 'astro:content';
 import { Button } from '@bracketbear/bear-ui-react';
 import { marked } from 'marked';
 
-// Get the homepage content from CMS
-const indexPageData = await getCollection('bracketbearIndexPage');
-const pageData = indexPageData[0]?.data;
+// Get the about page content from CMS
+const aboutPageData = await getCollection('bracketbearAboutPage');
+const pageData = aboutPageData[0]?.data;
 
 if (!pageData) {
-  throw new Error('Homepage content not found');
+  throw new Error('About page content not found');
 }
 ---
 
@@ -21,7 +21,7 @@ if (!pageData) {
       <h1
         class="font-heading text-foreground mb-8 text-4xl font-bold tracking-tight uppercase lg:text-6xl"
       >
-        {pageData.hero.tagline}
+        {pageData.hero.title}
       </h1>
       <p
         class="text-muted-foreground mx-auto max-w-4xl text-lg leading-7 lg:text-xl"
@@ -31,41 +31,41 @@ if (!pageData) {
     </div>
   </section>
 
-  <!-- Intro Section -->
-  <Section title={pageData.intro.title} intro={pageData.intro.content}>
-    <blockquote class="border-primary bg-card border-l-4 p-6 italic">
-      <div
-        class="text-foreground text-lg leading-7"
-        set:html={marked.parse(pageData.intro.magicWandQuestion)}
-      />
-    </blockquote>
+  <!-- Our Story Section -->
+  <Section title={pageData.ourStory.title}>
+    <div
+      class="text-muted-foreground text-lg leading-7"
+      set:html={marked.parse(pageData.ourStory.content)}
+    />
   </Section>
 
-  <!-- What We Offer Section -->
-  <Section title={pageData.whatWeOffer.title}>
+  <!-- Philosophy Section -->
+  <Section title={pageData.philosophy.title}>
+    <h3
+      class="font-heading text-foreground mb-6 text-xl font-bold tracking-tight"
+    >
+      {pageData.philosophy.subtitle}
+    </h3>
+    <div
+      class="text-muted-foreground text-lg leading-7"
+      set:html={marked.parse(pageData.philosophy.content)}
+    />
+  </Section>
+
+  <!-- Core Values Section -->
+  <Section title={pageData.coreValues.title}>
+    <h3
+      class="font-heading text-foreground mb-12 text-center text-xl font-bold tracking-tight"
+    >
+      {pageData.coreValues.subtitle}
+    </h3>
     <div class="grid gap-8 lg:grid-cols-3">
       {
-        pageData.whatWeOffer.services.map((service: any) => (
+        pageData.coreValues.values.map((value: any) => (
           <div class="comic-panel">
-            <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
-              {service.title}
-            </h3>
-            <p class="text-muted-foreground leading-7">{service.description}</p>
-          </div>
-        ))
-      }
-    </div>
-  </Section>
-
-  <!-- Why Bracket Bear Section -->
-  <Section title={pageData.whyBracketBear.title}>
-    <div class="grid gap-8 lg:grid-cols-2">
-      {
-        pageData.whyBracketBear.values.map((value: any) => (
-          <div class="comic-panel">
-            <h3 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
+            <h4 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
               {value.title}
-            </h3>
+            </h4>
             <div
               class="text-muted-foreground prose prose-lg max-w-none"
               set:html={marked.parse(value.description)}
@@ -74,6 +74,14 @@ if (!pageData) {
         ))
       }
     </div>
+  </Section>
+
+  <!-- Who We Are Section -->
+  <Section title={pageData.whoWeAre.title}>
+    <div
+      class="text-muted-foreground text-lg leading-7"
+      set:html={marked.parse(pageData.whoWeAre.content)}
+    />
   </Section>
 
   <!-- CTA Section -->
