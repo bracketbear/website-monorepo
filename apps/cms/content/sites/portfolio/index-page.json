@@ -1,6 +1,6 @@
 {
   "title": "Home",
-  "subtitle": "I'm a product-minded full-stack engineer with a passion for experiential technology",
+  "subtitle": "I'm an experienced full-stack engineer with a passion for building scalable systems",
   "metaDescription": "Harrison Callahan builds full-stack tools for experiential teams. Self-taught developer turning loose ideas into working systems.",
   "canonicalUrl": "https://harrisoncallahan.com/",
   "ogImage": "portfolio-hero.jpg",
@@ -27,12 +27,12 @@
   },
   "featuredProjects": {
     "title": "Project Highlights",
-    "subtitle": "Here are the two biggest systems that I've worked on recently—Deeplocal's Gumband and Downstream's Bridge. These SaaS applications taught me so much about software and systems architecture, product management and ownership, and more. Check out my full project collection to see everything I've worked on recently.",
+    "subtitle": "Here are some of the systems that I've worked on recently. These SaaS applications taught me so much about software and systems architecture, product management and ownership, and more. Check out my full project collection to see everything I've worked on recently.",
     "maxDisplay": 3,
     "showViewAllButton": true,
     "viewAllButtonText": "See all projects →",
     "viewAllButtonLink": "/projects",
-    "selectedProjects": ["dl-gumband", "ds-bridge"]
+    "selectedProjects": ["dl-gumband", "ds-bridge", "ss-supply-stream"]
   },
   "recentExperience": {
     "title": "Recent experience",

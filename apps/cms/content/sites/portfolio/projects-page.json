@@ -7,25 +7,19 @@
     "buttonText": "Get In Touch",
     "buttonLink": "/contact"
   },
-  "introduction": "Here are the projects I've worked on, organized by category. Each project represents a unique challenge and solution that showcases different aspects of my skills and experience. From **full-stack development** to **experiential engineering**, these projects demonstrate my ability to tackle complex problems and deliver solutions.\n",
+  "introduction": "Here are the projects I've worked on, organized by category. Each project represents a unique challenge and solution that showcases different aspects of my skills and experience. From **SaaS platforms** to **experiential engineering**, these projects demonstrate my ability to tackle complex problems and deliver solutions.\n",
   "stats": [],
   "projectCategories": [
     {
-      "title": "SaaS Experiential Content Management Systems",
-      "description": "My bread and butter. I'm focused on building the most designer-, developer-, and content-manager-friendly systems I can. There's a lot of untapped potential here, and I've shipped multiple experiential CMSs end-to-end.",
-      "workProjects": ["dl-gumband", "ds-bridge"],
+      "title": "SaaS Platforms",
+      "description": "Scalable software solutions that power creative teams and streamline complex workflows",
+      "workProjects": ["dl-gumband", "ds-bridge", "ss-supply-stream"],
       "personalProjects": []
     },
     {
       "title": "Experiential Projects",
       "description": "In my brief time as an experiential developer, I got to work on some pretty cool projects. These really opened up my eyes to how a CMS can make their lives much easier if done right.",
       "workProjects": ["ds-elekta", "ds-pwc", "ds-stoller-winery"],
-      "personalProjects": []
-    },
-    {
-      "title": "Full-Stack Development",
-      "description": "End-to-end web applications that demonstrate full-stack development capabilities and modern architecture.",
-      "workProjects": ["ss-supply-stream"],
       "personalProjects": []
     },
     {

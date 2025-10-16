@@ -341,7 +341,7 @@ export class ContentReader {
   }
 
   /**
-   * Search across all content
+   * Enhanced search across all content with fuzzy matching and semantic understanding
    */
   searchContent(query: string): {
     companies: Company[];
@@ -352,67 +352,18 @@ export class ContentReader {
     services: Service[];
     portfolioPages: PortfolioPage[];
   } {
-    const lowerQuery = query.toLowerCase();
+    const searchTerms = this.extractSearchTerms(query);
+    const originalQuery = query.toLowerCase();
 
-    const companies = this.getCompanies().filter(
-      (company) =>
-        company.title.toLowerCase().includes(lowerQuery) ||
-        company.location?.toLowerCase().includes(lowerQuery)
-    );
-
-    const jobs = this.getJobs().filter(
-      (job) =>
-        job.title.toLowerCase().includes(lowerQuery) ||
-        job.company.toLowerCase().includes(lowerQuery) ||
-        job.description?.toLowerCase().includes(lowerQuery) ||
-        job.highlights?.some((highlight) =>
-          highlight.toLowerCase().includes(lowerQuery)
-        )
-    );
-
-    const projects = this.getProjects().filter(
-      (project) =>
-        project.title.toLowerCase().includes(lowerQuery) ||
-        project.summary.toLowerCase().includes(lowerQuery) ||
-        project.description?.toLowerCase().includes(lowerQuery) ||
-        project.problem?.toLowerCase().includes(lowerQuery) ||
-        project.outcome?.toLowerCase().includes(lowerQuery) ||
-        project.scope?.some((item) =>
-          item.toLowerCase().includes(lowerQuery)
-        ) ||
-        project.decisions?.some((decision) =>
-          decision.toLowerCase().includes(lowerQuery)
-        ) ||
-        project.impactTags?.some((tag) =>
-          tag.toLowerCase().includes(lowerQuery)
-        )
-    );
-
-    const skills = this.getSkills().filter(
-      (skill) =>
-        skill.title.toLowerCase().includes(lowerQuery) ||
-        skill.description?.toLowerCase().includes(lowerQuery)
-    );
-
-    const blogPosts = this.getBlogPosts().filter(
-      (post) =>
-        post.title.toLowerCase().includes(lowerQuery) ||
-        post.excerpt?.toLowerCase().includes(lowerQuery) ||
-        post.content?.toLowerCase().includes(lowerQuery) ||
-        post.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery))
-    );
-
-    const services = this.getServices().filter(
-      (service) =>
-        service.title.toLowerCase().includes(lowerQuery) ||
-        service.description?.toLowerCase().includes(lowerQuery)
-    );
-
-    const portfolioPages = this.getPortfolioPages().filter(
-      (page) =>
-        page.title.toLowerCase().includes(lowerQuery) ||
-        page.content?.toLowerCase().includes(lowerQuery) ||
-        page.metaDescription?.toLowerCase().includes(lowerQuery)
+    const companies = this.searchAndRankCompanies(searchTerms, originalQuery);
+    const jobs = this.searchAndRankJobs(searchTerms, originalQuery);
+    const projects = this.searchAndRankProjects(searchTerms, originalQuery);
+    const skills = this.searchAndRankSkills(searchTerms, originalQuery);
+    const blogPosts = this.searchAndRankBlogPosts(searchTerms, originalQuery);
+    const services = this.searchAndRankServices(searchTerms, originalQuery);
+    const portfolioPages = this.searchAndRankPortfolioPages(
+      searchTerms,
+      originalQuery
     );
 
     return {
@@ -424,5 +375,591 @@ export class ContentReader {
       services,
       portfolioPages,
     };
+  }
+
+  /**
+   * Extract and normalize search terms from query with semantic expansion
+   */
+  private extractSearchTerms(query: string): string[] {
+    const baseTerms = query
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((term) => term.length > 0)
+      .map((term) => term.replace(/[^\w-]/g, '')); // Remove punctuation
+
+    // Add semantic synonyms and related terms
+    const expandedTerms = [...baseTerms];
+
+    // Add synonyms for common terms
+    const synonyms: Record<string, string[]> = {
+      portfolio: ['projects', 'work', 'experience', 'case-studies'],
+      project: ['portfolio', 'work', 'case-study', 'experience'],
+      category: ['categories', 'type', 'section', 'group'],
+      subheading: ['subheadings', 'heading', 'headings', 'title', 'titles'],
+      saas: ['software', 'platform', 'application', 'service'],
+      experiential: ['interactive', 'immersive', 'digital-experience'],
+      cms: ['content-management', 'content-management-system'],
+      'full-stack': ['fullstack', 'full-stack-development', 'web-development'],
+      frontend: ['front-end', 'frontend-development', 'ui-development'],
+      backend: ['back-end', 'backend-development', 'server-development'],
+    };
+
+    // Add related terms
+    baseTerms.forEach((term) => {
+      if (synonyms[term]) {
+        expandedTerms.push(...synonyms[term]);
+      }
+    });
+
+    // Remove duplicates and return
+    return [...new Set(expandedTerms)];
+  }
+
+  /**
+   * Check if text matches any search term with fuzzy matching
+   */
+  private matchesSearchTerms(text: string, searchTerms: string[]): boolean {
+    if (!text) return false;
+
+    const lowerText = text.toLowerCase();
+
+    // Exact match gets highest priority
+    const fullQuery = searchTerms.join(' ');
+    if (lowerText.includes(fullQuery)) return true;
+
+    // Check if all search terms are present (in any order)
+    const allTermsMatch = searchTerms.every(
+      (term) => lowerText.includes(term) || this.fuzzyMatch(lowerText, term)
+    );
+
+    if (allTermsMatch) return true;
+
+    // Check individual terms for partial matches
+    return searchTerms.some(
+      (term) => lowerText.includes(term) || this.fuzzyMatch(lowerText, term)
+    );
+  }
+
+  /**
+   * Simple fuzzy matching based on Levenshtein distance
+   */
+  private fuzzyMatch(text: string, term: string): boolean {
+    if (term.length < 3) return text.includes(term);
+
+    // Check if term is contained in text with some tolerance
+    for (let i = 0; i <= text.length - term.length; i++) {
+      const substring = text.substring(i, i + term.length);
+      if (this.levenshteinDistance(substring, term) <= 1) {
+        return true;
+      }
+    }
+
+    // Check if term contains text (for abbreviations)
+    if (term.length > text.length && term.includes(text)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Calculate Levenshtein distance between two strings
+   */
+  private levenshteinDistance(str1: string, str2: string): number {
+    const matrix = Array(str2.length + 1)
+      .fill(null)
+      .map(() => Array(str1.length + 1).fill(null));
+
+    for (let i = 0; i <= str1.length; i++) matrix[0][i] = i;
+    for (let j = 0; j <= str2.length; j++) matrix[j][0] = j;
+
+    for (let j = 1; j <= str2.length; j++) {
+      for (let i = 1; i <= str1.length; i++) {
+        const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
+        matrix[j][i] = Math.min(
+          matrix[j][i - 1] + 1, // deletion
+          matrix[j - 1][i] + 1, // insertion
+          matrix[j - 1][i - 1] + indicator // substitution
+        );
+      }
+    }
+
+    return matrix[str2.length][str1.length];
+  }
+
+  /**
+   * Calculate relevance score for a match
+   */
+  private calculateRelevanceScore(
+    text: string,
+    searchTerms: string[],
+    originalQuery: string
+  ): number {
+    if (!text) return 0;
+
+    const lowerText = text.toLowerCase();
+    const lowerOriginal = originalQuery.toLowerCase();
+
+    let score = 0;
+
+    // Exact match gets highest score
+    if (lowerText.includes(lowerOriginal)) {
+      score += 100;
+    }
+
+    // All terms present gets high score
+    const allTermsMatch = searchTerms.every((term) => lowerText.includes(term));
+    if (allTermsMatch) {
+      score += 50;
+    }
+
+    // Individual term matches
+    searchTerms.forEach((term) => {
+      if (lowerText.includes(term)) {
+        score += 10;
+      }
+    });
+
+    // Bonus for matches at the beginning of text
+    searchTerms.forEach((term) => {
+      if (lowerText.startsWith(term)) {
+        score += 20;
+      }
+    });
+
+    return score;
+  }
+
+  /**
+   * Search and rank companies with enhanced matching
+   */
+  private searchAndRankCompanies(
+    searchTerms: string[],
+    originalQuery: string
+  ): Company[] {
+    const companies = this.getCompanies();
+    const scoredCompanies = companies
+      .map((company) => ({
+        company,
+        score: Math.max(
+          this.calculateRelevanceScore(
+            company.title,
+            searchTerms,
+            originalQuery
+          ),
+          this.calculateRelevanceScore(
+            company.location || '',
+            searchTerms,
+            originalQuery
+          ),
+          this.calculateRelevanceScore(
+            company.website || '',
+            searchTerms,
+            originalQuery
+          )
+        ),
+      }))
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((item) => item.company);
+
+    return scoredCompanies;
+  }
+
+  /**
+   * Search and rank jobs with enhanced matching
+   */
+  private searchAndRankJobs(
+    searchTerms: string[],
+    originalQuery: string
+  ): Job[] {
+    const jobs = this.getJobs();
+    const scoredJobs = jobs
+      .map((job) => {
+        const titleScore = this.calculateRelevanceScore(
+          job.title,
+          searchTerms,
+          originalQuery
+        );
+        const companyScore = this.calculateRelevanceScore(
+          job.company,
+          searchTerms,
+          originalQuery
+        );
+        const descScore = this.calculateRelevanceScore(
+          job.description || '',
+          searchTerms,
+          originalQuery
+        );
+        const highlightsScore =
+          job.highlights?.reduce(
+            (max, highlight) =>
+              Math.max(
+                max,
+                this.calculateRelevanceScore(
+                  highlight,
+                  searchTerms,
+                  originalQuery
+                )
+              ),
+            0
+          ) || 0;
+        const skillsScore =
+          job.workSkills?.reduce(
+            (max, skill) =>
+              Math.max(
+                max,
+                this.calculateRelevanceScore(skill, searchTerms, originalQuery)
+              ),
+            0
+          ) || 0;
+
+        return {
+          job,
+          score: Math.max(
+            titleScore,
+            companyScore,
+            descScore,
+            highlightsScore,
+            skillsScore
+          ),
+        };
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((item) => item.job);
+
+    return scoredJobs;
+  }
+
+  /**
+   * Search and rank projects with enhanced matching
+   */
+  private searchAndRankProjects(
+    searchTerms: string[],
+    originalQuery: string
+  ): Project[] {
+    const projects = this.getProjects();
+    const scoredProjects = projects
+      .map((project) => {
+        const titleScore = this.calculateRelevanceScore(
+          project.title,
+          searchTerms,
+          originalQuery
+        );
+        const summaryScore = this.calculateRelevanceScore(
+          project.summary,
+          searchTerms,
+          originalQuery
+        );
+        const descScore = this.calculateRelevanceScore(
+          project.description || '',
+          searchTerms,
+          originalQuery
+        );
+        const problemScore = this.calculateRelevanceScore(
+          project.problem || '',
+          searchTerms,
+          originalQuery
+        );
+        const outcomeScore = this.calculateRelevanceScore(
+          project.outcome || '',
+          searchTerms,
+          originalQuery
+        );
+        const oneLinerScore = this.calculateRelevanceScore(
+          project.oneLiner || '',
+          searchTerms,
+          originalQuery
+        );
+        const categoryScore = this.calculateRelevanceScore(
+          project.category || '',
+          searchTerms,
+          originalQuery
+        );
+        const scopeScore =
+          project.scope?.reduce(
+            (max, item) =>
+              Math.max(
+                max,
+                this.calculateRelevanceScore(item, searchTerms, originalQuery)
+              ),
+            0
+          ) || 0;
+        const decisionsScore =
+          project.decisions?.reduce(
+            (max, decision) =>
+              Math.max(
+                max,
+                this.calculateRelevanceScore(
+                  decision,
+                  searchTerms,
+                  originalQuery
+                )
+              ),
+            0
+          ) || 0;
+        const impactScore =
+          project.impactTags?.reduce(
+            (max, tag) =>
+              Math.max(
+                max,
+                this.calculateRelevanceScore(tag, searchTerms, originalQuery)
+              ),
+            0
+          ) || 0;
+        const skillsScore =
+          project.skills?.reduce(
+            (max, skill) =>
+              Math.max(
+                max,
+                this.calculateRelevanceScore(skill, searchTerms, originalQuery)
+              ),
+            0
+          ) || 0;
+
+        return {
+          project,
+          score: Math.max(
+            titleScore,
+            summaryScore,
+            descScore,
+            problemScore,
+            outcomeScore,
+            oneLinerScore,
+            categoryScore,
+            scopeScore,
+            decisionsScore,
+            impactScore,
+            skillsScore
+          ),
+        };
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((item) => item.project);
+
+    return scoredProjects;
+  }
+
+  /**
+   * Search and rank skills with enhanced matching
+   */
+  private searchAndRankSkills(
+    searchTerms: string[],
+    originalQuery: string
+  ): Skill[] {
+    const skills = this.getSkills();
+    const scoredSkills = skills
+      .map((skill) => ({
+        skill,
+        score: Math.max(
+          this.calculateRelevanceScore(skill.title, searchTerms, originalQuery),
+          this.calculateRelevanceScore(
+            skill.description || '',
+            searchTerms,
+            originalQuery
+          ),
+          this.calculateRelevanceScore(
+            skill.category,
+            searchTerms,
+            originalQuery
+          )
+        ),
+      }))
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((item) => item.skill);
+
+    return scoredSkills;
+  }
+
+  /**
+   * Search and rank blog posts with enhanced matching
+   */
+  private searchAndRankBlogPosts(
+    searchTerms: string[],
+    originalQuery: string
+  ): BlogPost[] {
+    const blogPosts = this.getBlogPosts();
+    const scoredPosts = blogPosts
+      .map((post) => {
+        const titleScore = this.calculateRelevanceScore(
+          post.title,
+          searchTerms,
+          originalQuery
+        );
+        const excerptScore = this.calculateRelevanceScore(
+          post.excerpt || '',
+          searchTerms,
+          originalQuery
+        );
+        const contentScore = this.calculateRelevanceScore(
+          post.content || '',
+          searchTerms,
+          originalQuery
+        );
+        const tagsScore =
+          post.tags?.reduce(
+            (max, tag) =>
+              Math.max(
+                max,
+                this.calculateRelevanceScore(tag, searchTerms, originalQuery)
+              ),
+            0
+          ) || 0;
+
+        return {
+          post,
+          score: Math.max(titleScore, excerptScore, contentScore, tagsScore),
+        };
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((item) => item.post);
+
+    return scoredPosts;
+  }
+
+  /**
+   * Search and rank services with enhanced matching
+   */
+  private searchAndRankServices(
+    searchTerms: string[],
+    originalQuery: string
+  ): Service[] {
+    const services = this.getServices();
+    const scoredServices = services
+      .map((service) => ({
+        service,
+        score: Math.max(
+          this.calculateRelevanceScore(
+            service.title,
+            searchTerms,
+            originalQuery
+          ),
+          this.calculateRelevanceScore(
+            service.description || '',
+            searchTerms,
+            originalQuery
+          )
+        ),
+      }))
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((item) => item.service);
+
+    return scoredServices;
+  }
+
+  /**
+   * Search and rank portfolio pages with enhanced matching including nested content
+   */
+  private searchAndRankPortfolioPages(
+    searchTerms: string[],
+    originalQuery: string
+  ): PortfolioPage[] {
+    const portfolioPages = this.getPortfolioPages();
+    const scoredPages = portfolioPages
+      .map((page) => {
+        const titleScore = this.calculateRelevanceScore(
+          page.title,
+          searchTerms,
+          originalQuery
+        );
+        const contentScore = this.calculateRelevanceScore(
+          page.content || '',
+          searchTerms,
+          originalQuery
+        );
+        const metaScore = this.calculateRelevanceScore(
+          page.metaDescription || '',
+          searchTerms,
+          originalQuery
+        );
+
+        let nestedScore = 0;
+        try {
+          const pageData = this.readJsonFile<any>(
+            `sites/portfolio/${page.title.toLowerCase().replace(/\s+/g, '-')}.json`
+          );
+          if (pageData) {
+            nestedScore = this.calculateNestedContentScore(
+              pageData,
+              searchTerms,
+              originalQuery
+            );
+          }
+        } catch (error: unknown) {
+          console.error('Error reading portfolio page data:', error);
+          // Ignore errors and continue with basic matching
+        }
+
+        return {
+          page,
+          score: Math.max(titleScore, contentScore, metaScore, nestedScore),
+        };
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((item) => item.page);
+
+    return scoredPages;
+  }
+
+  /**
+   * Calculate score for nested content structures
+   */
+  private calculateNestedContentScore(
+    obj: any,
+    searchTerms: string[],
+    originalQuery: string
+  ): number {
+    let maxScore = 0;
+
+    if (typeof obj === 'string') {
+      return this.calculateRelevanceScore(obj, searchTerms, originalQuery);
+    }
+
+    if (Array.isArray(obj)) {
+      obj.forEach((item) => {
+        maxScore = Math.max(
+          maxScore,
+          this.calculateNestedContentScore(item, searchTerms, originalQuery)
+        );
+      });
+    }
+
+    if (obj && typeof obj === 'object') {
+      Object.values(obj).forEach((value) => {
+        maxScore = Math.max(
+          maxScore,
+          this.calculateNestedContentScore(value, searchTerms, originalQuery)
+        );
+      });
+    }
+
+    return maxScore;
+  }
+
+  /**
+   * Recursively search nested content structures
+   */
+  private searchNestedContent(obj: any, searchTerms: string[]): boolean {
+    if (typeof obj === 'string') {
+      return this.matchesSearchTerms(obj, searchTerms);
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.some((item) => this.searchNestedContent(item, searchTerms));
+    }
+
+    if (obj && typeof obj === 'object') {
+      return Object.values(obj).some((value) =>
+        this.searchNestedContent(value, searchTerms)
+      );
+    }
+
+    return false;
   }
 }
