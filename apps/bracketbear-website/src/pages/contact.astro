@@ -1,0 +1,110 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+import { ContactForm } from '@/components/ContactForm';
+import { ContactIcon } from '@bracketbear/bear-ui-react';
+import { marked } from 'marked';
+
+// Get the contact page singleton from CMS
+const contactPageEntries = await getCollection('bracketbearContactPage');
+const contactPage = contactPageEntries[0];
+const contactMethods = await getCollection('bracketbearContactMethods');
+
+// Helper function to parse markdown content
+function parseMarkdown(content: string): string {
+  return marked.parse(content) as string;
+}
+
+// Get contact methods in the order specified by CMS
+const selectedContactMethods =
+  contactPage.data.contactMethods
+    ?.map((methodId: string) =>
+      contactMethods.find((method) => method.id === methodId)
+    )
+    .filter(Boolean) || [];
+---
+
+<Layout title={contactPage.data.title}>
+  <!-- Hero Section -->
+  <section class="px-content py-16 lg:py-24">
+    <div class="container mx-auto text-center">
+      <h1
+        class="font-heading text-foreground mb-8 text-4xl font-bold tracking-tight uppercase lg:text-6xl"
+      >
+        {contactPage.data.hero.title}
+      </h1>
+      <p
+        class="text-muted-foreground mx-auto max-w-4xl text-lg leading-7 lg:text-xl"
+      >
+        {contactPage.data.hero.subtitle}
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Contact Content Section -->
+  <section class="px-content">
+    <div class="container mx-auto">
+      <div class="grid w-full items-start gap-8 lg:grid-cols-2 lg:gap-12">
+        <!-- Left Content Section -->
+        <div class="space-y-6">
+          <!-- Introduction Content -->
+          {
+            contactPage.data.introduction && (
+              <div
+                class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground/90 max-w-none"
+                set:html={parseMarkdown(contactPage.data.introduction)}
+              />
+            )
+          }
+
+          <!-- Contact Methods -->
+          {
+            selectedContactMethods.length > 0 && (
+              <div class="space-y-4">
+                <h2 class="font-heading text-foreground text-xl tracking-tight uppercase">
+                  GET IN TOUCH
+                </h2>
+                <div class="space-y-3 text-base font-medium">
+                  {selectedContactMethods.map((method: any) => (
+                    <a
+                      href={method.data.value}
+                      class="text-foreground/90 hover:text-primary flex items-center gap-3 transition-colors"
+                    >
+                      <span class="text-xl">
+                        <ContactIcon name={method.data.icon} />
+                      </span>
+                      <span>{method.data.label}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+        </div>
+
+        <!-- Right Contact Form Section -->
+        <div class="">
+          <div
+            class="rounded-lg border border-white/20 bg-white/80 p-6 shadow-[0_4px_16px_0_rgba(31,38,135,0.1)] backdrop-blur-md md:p-8"
+          >
+            {
+              contactPage.data.contactForm.title && (
+                <h3 class="font-heading mb-4 text-xl tracking-tight uppercase">
+                  {contactPage.data.contactForm.title}
+                </h3>
+              )
+            }
+            {
+              contactPage.data.contactForm.description && (
+                <div class="text-foreground mb-6 text-base leading-relaxed font-medium">
+                  <p>{contactPage.data.contactForm.description}</p>
+                </div>
+              )
+            }
+            <ContactForm client:load />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

@@ -10,6 +10,10 @@ export const navItems: NavItem[] = [
     name: 'Services',
     href: '/services',
   },
+  {
+    name: 'Contact',
+    href: '/contact',
+  },
 ] as const;
 
 export const navigationConfig: NavigationConfig = {

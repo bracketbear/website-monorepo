@@ -1,8 +1,9 @@
 ---
-import Layout from '@/layouts/Layout.astro';
+import HomeLayout from '@/layouts/HomeLayout.astro';
 import Section from '@/components/Section.astro';
 import { getCollection } from 'astro:content';
 import { Button } from '@bracketbear/bear-ui-react';
+import { HeroSection } from '@/components/HeroSection';
 import { marked } from 'marked';
 
 // Get the homepage content from CMS
@@ -14,22 +15,24 @@ if (!pageData) {
 }
 ---
 
-<Layout title={pageData.title}>
-  <!-- Hero Section -->
-  <section class="px-content py-16 lg:py-24">
-    <div class="container mx-auto text-center">
-      <h1
-        class="font-heading text-foreground mb-8 text-4xl font-bold tracking-tight uppercase lg:text-6xl"
-      >
-        {pageData.hero.tagline}
-      </h1>
-      <p
-        class="text-muted-foreground mx-auto max-w-4xl text-lg leading-7 lg:text-xl"
-      >
-        {pageData.hero.subtitle}
-      </p>
-    </div>
-  </section>
+<HomeLayout
+  title={pageData.title}
+  hideContactForm={false}
+  metaDescription={pageData.metaDescription || pageData.hero.subtitle}
+  currentPage="home"
+>
+  <!-- Hero Section with Particle Animation -->
+  <HeroSection
+    className="w-full"
+    client:load
+    preset="curious-particle-network"
+    title={pageData.hero.tagline}
+    subtitle={pageData.hero.subtitle}
+    showActions={false}
+    accountForNavigation={true}
+    accountForBreadcrumbs={false}
+    isIndexPage={true}
+  />
 
   <!-- Intro Section -->
   <Section title={pageData.intro.title} intro={pageData.intro.content}>
@@ -94,4 +97,4 @@ if (!pageData) {
       </div>
     </div>
   </section>
-</Layout>
+</HomeLayout>

@@ -1,0 +1,51 @@
+---
+import { LayeredLayout, NavBar } from '@bracketbear/core';
+import { navigationConfig } from '@/config/navigation';
+import '@/styles/global.css';
+
+interface Props {
+  title?: string;
+  hideContactForm?: boolean;
+  hideFooter?: boolean;
+  breadcrumbs?: any;
+  metaDescription?: string;
+  currentPage?: string;
+}
+
+const {
+  title,
+  hideContactForm,
+  hideFooter,
+  breadcrumbs,
+  metaDescription,
+  currentPage,
+} = Astro.props;
+---
+
+<LayeredLayout
+  title={title}
+  hideContactForm={hideContactForm}
+  hideFooter={hideFooter}
+  hideNavigation={true}
+  navigation={{
+    ...navigationConfig,
+    currentPage,
+  }}
+  breadcrumbs={breadcrumbs}
+  metaDescription={metaDescription}
+  class="bg-background text-foreground"
+>
+  <!-- Transparent Navigation -->
+  <NavBar
+    config={{
+      ...navigationConfig,
+      currentPage,
+    }}
+    variant="glass"
+  />
+
+  <!-- Main content with consistent background -->
+  <div class="min-h-screen">
+    <slot />
+  </div>
+</LayeredLayout>

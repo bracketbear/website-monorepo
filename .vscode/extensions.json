@@ -1,0 +1,4 @@
+{
+  "recommendations": ["astro-build.astro-vscode", "stivo.tailwind-fold"],
+  "unwantedRecommendations": []
+}

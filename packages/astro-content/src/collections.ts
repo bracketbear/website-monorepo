@@ -209,6 +209,30 @@ export const siteSpecificCollections = {
     }),
     pattern: 'services-page.json',
   },
+  bracketbearContactPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: makePageSchema(
+      {
+        hero: z.object({
+          title: z.string(),
+          subtitle: z.string(),
+        }),
+        introduction: z.string(),
+        contactMethods: z.array(z.string()),
+        contactForm: z.object({
+          title: z.string(),
+          description: z.string(),
+        }),
+      },
+      { showCta: false }
+    ),
+    pattern: 'contact-page.json',
+  },
+  // Bracket Bear site collections
+  bracketbearContactMethods: {
+    base: join(contentPath, 'sites/bracketbear/contact-methods'),
+    schema: contactMethodSchema,
+  },
 };
 
 /**

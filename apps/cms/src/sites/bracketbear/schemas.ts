@@ -236,3 +236,59 @@ export const bracketbearServicesPageSchema = makePageSchema({
     }
   ),
 });
+
+/**
+ * Bracket Bear Contact Page Schema
+ *
+ * This schema defines the structure for the Contact page,
+ * including hero, introduction, contact methods, and form sections.
+ */
+export const bracketbearContactPageSchema = makePageSchema(
+  {
+    // Hero section
+    hero: fields.object({
+      title: fields.text({
+        label: 'Hero Title',
+        description: 'Main title for the contact page',
+      }),
+      subtitle: fields.text({
+        label: 'Hero Subtitle',
+        description: 'Subtitle for the contact page',
+        multiline: true,
+      }),
+    }),
+
+    // Introduction section
+    introduction: fields.text({
+      label: 'Introduction Content',
+      description: 'Introduction content for the contact page (markdown)',
+      multiline: true,
+    }),
+
+    // Contact methods section
+    contactMethods: fields.array(
+      fields.text({
+        label: 'Contact Method ID',
+        description: 'ID of the contact method to display',
+      }),
+      {
+        label: 'Contact Methods',
+        itemLabel: (props) => props.value || 'New Contact Method',
+      }
+    ),
+
+    // Contact form section
+    contactForm: fields.object({
+      title: fields.text({
+        label: 'Form Title',
+        description: 'Title for the contact form section',
+      }),
+      description: fields.text({
+        label: 'Form Description',
+        description: 'Description for the contact form section',
+        multiline: true,
+      }),
+    }),
+  },
+  { showCta: false }
+);

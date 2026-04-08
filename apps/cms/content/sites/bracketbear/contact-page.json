@@ -1,0 +1,18 @@
+{
+  "title": "Contact Bracket Bear",
+  "subtitle": "Let's bring some hospitality to your next experience",
+  "metaDescription": "Get in touch with Bracket Bear. We're here to help your agency do its best work through technical consulting, project delivery, and team augmentation.",
+  "canonicalUrl": "https://bracketbear.com/contact",
+  "ogImage": "bracketbear-contact.jpg",
+  "noIndex": false,
+  "hero": {
+    "title": "Contact Bracket Bear",
+    "subtitle": "Let's bring some hospitality to your next experience"
+  },
+  "introduction": "Ready to explore how we can help your agency reach its potential? Whether you need to augment your team, deliver a project, or consult on your next big idea, we're here to listen and help.\n\nEvery collaboration begins with understanding your unique challenges and goals. We believe in leading with care, listening deeply, and helping experiential agencies do their best work in the world.",
+  "contactMethods": ["email", "linkedin"],
+  "contactForm": {
+    "title": "Start a Conversation",
+    "description": "Tell us about your project, goals, or how we can help your agency. We'll get back to you within 24 hours to schedule a conversation."
+  }
+}

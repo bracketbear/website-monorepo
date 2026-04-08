@@ -2,53 +2,37 @@
 /* Dark theme with orange/red primary color for Bracket Bear website */
 
 @theme {
-  /* Dark theme base colors */
-  --color-background: hsl(200, 0%, 15%); /* Dark background */
-  --color-foreground: hsl(200, 0%, 85%); /* Light text */
+  /* Monotone red/orange theme - warm light background with dark text */
+  --color-background: hsl(20, 100%, 95%); /* Warm light orange background */
+  --color-foreground: hsl(20, 100%, 15%); /* Dark orange text */
 
-  /* Override primary colors with dark orange/red theme */
-  --color-primary: #d94a2c; /* Dark orange/red primary */
-  --color-primary-hover: #c43d1f; /* Darker hover state */
+  /* Primary colors - deeper orange/red */
+  --color-primary: hsl(20, 85%, 35%); /* Deep orange primary */
+  --color-primary-hover: hsl(20, 85%, 25%); /* Darker hover state */
   --color-primary-foreground: #fff; /* White text on primary */
 
-  /* Dark theme surfaces */
-  --color-card: color-mix(in srgb, var(--color-background) 95%, white 5%);
+  /* Monotone surfaces using the same warm palette */
+  --color-card: hsl(20, 100%, 98%); /* Very light warm card background */
   --color-card-foreground: var(--color-foreground);
-  --color-muted: color-mix(in srgb, var(--color-background) 80%, white 20%);
-  --color-muted-foreground: color-mix(
-    in srgb,
-    var(--color-foreground) 80%,
-    transparent
-  );
+  --color-muted: hsl(20, 100%, 90%); /* Light warm muted background */
+  --color-muted-foreground: hsl(20, 100%, 25%); /* Medium dark warm text */
 
-  /* Dark theme borders */
-  --color-border: color-mix(in srgb, var(--color-foreground) 18%, transparent);
+  /* Borders in the same warm tone */
+  --color-border: hsl(20, 100%, 80%); /* Light warm border */
 
-  /* Adjust secondary colors to complement the orange theme */
-  --color-secondary: color-mix(
-    in srgb,
-    var(--color-primary) 10%,
-    var(--color-background) 90%
-  );
-  --color-secondary-hover: color-mix(
-    in srgb,
-    var(--color-primary) 15%,
-    var(--color-background) 85%
-  );
+  /* Secondary colors in the same monotone palette */
+  --color-secondary: hsl(20, 100%, 85%); /* Light warm secondary */
+  --color-secondary-hover: hsl(20, 100%, 80%); /* Slightly darker on hover */
   --color-secondary-foreground: var(--color-foreground);
 
-  /* Update ring color to match primary */
-  --color-ring: color-mix(in srgb, var(--color-primary) 50%, transparent);
+  /* Ring color matches the monotone theme */
+  --color-ring: hsl(20, 100%, 70%); /* Medium warm ring */
 
-  /* Brand color adjustments for consistency */
+  /* Brand colors for consistency */
   --color-brand-orange: var(--color-primary); /* Use primary as brand orange */
-  --color-brand-orange-light: color-mix(
-    in srgb,
-    var(--color-primary) 20%,
-    var(--color-background) 80%
-  );
+  --color-brand-orange-light: hsl(20, 100%, 85%); /* Light warm brand orange */
 
-  /* Text colors for dark theme */
+  /* Text colors for monotone theme */
   --color-text-primary: var(--color-foreground);
   --color-text-secondary: var(--color-muted-foreground);
 }

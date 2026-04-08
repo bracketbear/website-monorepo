@@ -1,0 +1,220 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // ── Install ──────────────────────────────────────────────
+    {
+      "label": "Install Dependencies",
+      "type": "shell",
+      "command": "npm install",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev-setup"
+      },
+      "problemMatcher": []
+    },
+
+    // ── UI Packages ──────────────────────────────────────────
+    {
+      "label": "Dev: bear-ui",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/bear-ui",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "packages"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: bear-ui-tailwind",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/bear-ui-tailwind",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "packages"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: bear-ui-react",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/bear-ui-react",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "packages"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: core",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/core",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "packages"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: schemas",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/schemas",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "packages"
+      },
+      "problemMatcher": []
+    },
+
+    // ── Flateralus (Animation Engine) ────────────────────────
+    {
+      "label": "Dev: flateralus",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/flateralus",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "animations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: flateralus-pixi",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/flateralus-pixi",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "animations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: flateralus-p5",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/flateralus-p5",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "animations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: flateralus-pixi-animations",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/flateralus-pixi-animations",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "animations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: flateralus-p5-animations",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/flateralus-p5-animations",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "animations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: flateralus-react",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/flateralus-react",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "animations"
+      },
+      "problemMatcher": []
+    },
+
+    // ── Apps ─────────────────────────────────────────────────
+    {
+      "label": "Dev: CMS",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/cms",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "apps"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Bracket Bear Website",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/bracketbear-website",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "apps"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Portfolio",
+      "type": "shell",
+      "command": "npm run dev --workspace=@bracketbear/portfolio",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "apps"
+      },
+      "problemMatcher": []
+    },
+
+    // ── Compound Tasks ───────────────────────────────────────
+    {
+      "label": "Start All Dev Servers",
+      "dependsOn": [
+        "Dev: bear-ui",
+        "Dev: bear-ui-tailwind",
+        "Dev: bear-ui-react",
+        "Dev: core",
+        "Dev: schemas",
+        "Dev: flateralus",
+        "Dev: flateralus-pixi",
+        "Dev: flateralus-p5",
+        "Dev: flateralus-pixi-animations",
+        "Dev: flateralus-p5-animations",
+        "Dev: flateralus-react",
+        "Dev: CMS",
+        "Dev: Bracket Bear Website",
+        "Dev: Portfolio"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    },
+    {
+      "label": "Full Dev Setup (Install + Start)",
+      "dependsOn": ["Install Dependencies", "Start All Dev Servers"],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    }
+  ]
+}
