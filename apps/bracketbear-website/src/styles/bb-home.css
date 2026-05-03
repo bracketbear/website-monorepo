@@ -1,0 +1,1384 @@
+@import '@fontsource/anton/400.css';
+@import '@fontsource/archivo-black/400.css';
+@import '@fontsource/plus-jakarta-sans/300.css';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/500.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+
+/* ============================================================
+   bb-home.css — scoped homepage stylesheet
+   All selectors are namespaced under .bb-home so that
+   body/html/universal resets do NOT leak to other pages.
+   ============================================================ */
+
+.bb-home {
+  /* Sunset / silhouette palette — DKC silhouette levels feel.
+     Orange dominates. Ink is the high-contrast text color.       */
+  --orange: #ff5f1f; /* canvas / dominant */
+  --orange-bright: #ff7a33; /* highlights */
+  --orange-deep: #d8420c; /* shadowed band */
+  --orange-rust: #a82a07; /* dusk */
+  --sun: #ffc24a; /* the "sun" rim */
+  --cream: #fff3e3; /* paper highlights */
+
+  --ink: #110a08; /* near-black, warm — silhouette color */
+  --ink-2: #1c130e; /* slightly lifted ink */
+  --ink-soft: #2a1d14; /* ink-on-orange muted */
+  --ink-dim: #4a3326; /* tertiary text on orange */
+
+  --cyan: #7df9ff; /* tape damage — VERY sparingly */
+  --acid: #d8ff3d;
+
+  --rail: clamp(1rem, 4vw, 3rem);
+  --max: 84rem;
+
+  --display: 'Anton', 'Helvetica Neue', sans-serif;
+  --wordmark: 'Archivo Black', 'Helvetica Neue', sans-serif;
+  --body:
+    'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont,
+    sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  --ease-out: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --duration-absorb: 0.42s;
+
+  /* html-level rules merged in */
+  background: var(--orange);
+  color: var(--ink);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+
+  /* body-level rules merged in */
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  cursor: none;
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 50% 22%,
+      var(--sun) 0%,
+      var(--orange-bright) 30%,
+      var(--orange) 55%,
+      transparent 100%
+    ),
+    var(--orange);
+}
+
+.bb-home,
+.bb-home * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Subtle grain — far less aggressive against orange */
+.bb-home::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 200;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/></svg>");
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+/* Soft vignette toward bottom */
+.bb-home::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 199;
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    transparent 50%,
+    rgba(17, 10, 8, 0.35) 100%
+  );
+}
+
+/* ============== CURSOR — blob + pixel hand on hover ============== */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  background: var(--ink);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate3d(-50%, -50%, 0) scale(1);
+  transform-origin: 50% 50%;
+  transition:
+    opacity 0.2s var(--ease-out),
+    background 0.2s var(--ease-out);
+  will-change: transform;
+  filter: blur(0.4px);
+}
+/* Flip blob to orange over any dark-fill region — either a section
+   tagged with [data-cursor-light] or any inline .highlight stamp. */
+.bb-home:has([data-cursor-light]:hover, .highlight:hover) .cursor {
+  background: var(--orange-bright);
+}
+
+.cursor-hand {
+  /* Outer: positioned by JS at the mouse point, zero-sized anchor */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+}
+.cursor-hand__inner {
+  /* Inner: hot-point offset + bouncy scale-in. Fingertip at SVG (4.5, 0.5)
+     → at 3x display scale, hot-point is (13.5px, 1.5px) from top-left. */
+  width: 39px;
+  height: 42px;
+  transform: translate(-13.5px, -1.5px) scale(0.6) rotate(-8deg);
+  transform-origin: 13.5px 1.5px;
+  opacity: 0;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.18s var(--ease-out);
+  filter: drop-shadow(0 3px 0 rgba(17, 10, 8, 0.22));
+}
+.cursor-hand.is-on .cursor-hand__inner {
+  opacity: 1;
+  transform: translate(-13.5px, -1.5px) scale(1) rotate(0deg);
+}
+.cursor-hand svg {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+}
+.cursor-hand.is-press .cursor-hand__inner {
+  transform: translate(-13.5px, -1.5px) scale(0.88) rotate(-3deg);
+}
+
+@media (hover: none) {
+  .bb-home {
+    cursor: auto;
+  }
+  .cursor,
+  .cursor-hand {
+    display: none;
+  }
+}
+
+/* Selection */
+.bb-home ::selection {
+  background: var(--ink);
+  color: var(--orange);
+}
+
+.bb-home a {
+  color: inherit;
+  text-decoration: none;
+}
+.bb-home img,
+.bb-home svg,
+.bb-home canvas {
+  display: block;
+  max-width: 100%;
+}
+.bb-home button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: none;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--rail);
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.label--ink {
+  color: var(--ink);
+}
+
+/* Highlight — the brand's signature inline emphasis: bright orange
+   text on an ink stamp. Doubles as a chunky marker stroke. Pair with
+   box-decoration-break: clone so a wrapped run paints one padded box
+   per line (real-marker behavior) instead of a single bridging box.
+   The cursor flips to orange over any .highlight automatically (see
+   the body:has() rule near .cursor) so the blob stays visible. */
+.highlight {
+  background: var(--ink);
+  color: var(--orange-bright);
+  padding: 0.1em 0.28em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* ============== NAV ============== */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  background: color-mix(in srgb, var(--orange) 80%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+}
+.nav,
+.nav a {
+  cursor: none;
+}
+.nav__inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 2rem;
+  padding-block: 0.9rem;
+}
+
+/* WORDMARK — Archivo Black + actual [BB] logo mark.
+   Mark sized to match cap-height of the text for optical balance.
+   Wordmark sits on baseline; mark anchored to cap-line via flex align. */
+.wordmark {
+  font-family: var(--wordmark);
+  font-size: 1.15rem;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink);
+  line-height: 1;
+}
+.wordmark__mark {
+  display: block;
+  /* Logo viewBox is 400.89 × 249.73 (~1.605:1). Sized so the mark
+     reads at roughly cap-height of the wordmark text. */
+  width: 33px;
+  height: 20.5px;
+  color: var(--ink);
+  flex-shrink: 0;
+  /* Lift slightly so the mark's optical center sits on the cap line */
+  margin-top: -1px;
+}
+.wordmark__mark svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.nav__links {
+  display: flex;
+  gap: 2.2rem;
+  justify-self: end;
+  margin-right: 2rem;
+}
+.nav__links a {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  position: relative;
+  padding-block: 0.35rem;
+  transition: color 0.3s var(--ease-out);
+}
+.nav__links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease-out);
+}
+.nav__links a:hover {
+  color: var(--ink);
+}
+.nav__links a:hover::after {
+  transform: scaleX(1);
+}
+
+/* ============== ABSORB BUTTONS ============== */
+/* The ink fill is delivered by ::before — a blob that grows from the
+   cursor entry point with bouncy overshoot, then recedes toward the
+   exit point on leave. The element bg stays in its default color. */
+.btn,
+.pill,
+.ticket,
+.offer {
+  --fx: 50%;
+  --fy: 50%;
+  --fr: 0;
+}
+.btn::before,
+.pill::before,
+.ticket::before,
+.offer::before {
+  content: '';
+  position: absolute;
+  left: var(--fx);
+  top: var(--fy);
+  width: 6px;
+  height: 6px;
+  background: var(--ink);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(var(--fr));
+  transform-origin: 50% 50%;
+  pointer-events: none;
+  z-index: 0;
+  transition:
+    transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+    left 0.45s var(--ease-out),
+    top 0.45s var(--ease-out);
+  will-change: transform;
+}
+/* Leave state: shrink cleanly from the pointer's exit point — no
+   overshoot. The bouncy curve only fires on entry (absorb); on leave,
+   use a plain ease-out and snap the anchor instantly so the recede
+   originates exactly where the cursor left. */
+.btn:not(.is-absorbed)::before,
+.pill:not(.is-absorbed)::before,
+.ticket:not(.is-absorbed)::before,
+.offer:not(.is-absorbed)::before {
+  transition:
+    transform 0.35s var(--ease-out),
+    left 0s,
+    top 0s;
+}
+
+.btn,
+.pill,
+.ticket {
+  --bg: var(--cream);
+  --fg: var(--ink);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--mono);
+  font-weight: 700;
+  cursor: none;
+  background: var(--bg);
+  color: var(--fg);
+  transition:
+    color var(--duration-absorb) var(--ease-out),
+    box-shadow var(--duration-absorb) var(--ease-out),
+    transform 0.25s var(--ease-out);
+  will-change: color, transform;
+  border: 0;
+}
+/* Keep button content above the fill */
+.btn > *,
+.pill > *,
+.ticket > * {
+  position: relative;
+  z-index: 1;
+}
+.btn.is-absorbed,
+.pill.is-absorbed,
+.ticket.is-absorbed {
+  --fg: var(--orange-bright);
+  box-shadow: 0 14px 36px -12px rgba(17, 10, 8, 0.55);
+  /* --fr is set by JS based on element size + entry point */
+}
+
+.btn--primary {
+  padding: 1.05rem 1.5rem;
+  font-size: 0.84rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% 100%,
+    14px 100%,
+    0 calc(100% - 14px)
+  );
+}
+.btn--primary::after {
+  content: '→';
+  font-size: 1rem;
+  transition: transform 0.3s var(--ease-out);
+}
+.btn--primary:hover::after {
+  transform: translateX(4px);
+}
+
+.btn--ghost {
+  --bg: transparent;
+  background: var(--bg);
+  color: var(--ink);
+  border: 2.5px solid var(--ink);
+  padding: 1.05rem 1.4rem;
+  font-size: 0.84rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.btn--ghost.is-absorbed {
+  color: var(--orange-bright);
+}
+
+.pill {
+  padding: 0.55rem 0.95rem;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 999px;
+}
+.pill__dot {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+/* ============== STATUS BAR ============== */
+.status {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  background: color-mix(in srgb, var(--orange-bright) 70%, transparent);
+  backdrop-filter: blur(8px);
+}
+.status__row {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  align-items: center;
+  gap: 1.5rem;
+  padding-block: 0.9rem 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  line-height: 1;
+  font-weight: 500;
+}
+.status__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--ink);
+  font-weight: 800;
+}
+.status__live::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--acid);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--acid) 35%, transparent);
+  animation: pulse 1.6s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.status__version {
+  text-align: right;
+  color: var(--ink-soft);
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+.ticker {
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+.ticker__track {
+  display: inline-flex;
+  gap: 3rem;
+  animation: scroll 38s linear infinite;
+  align-items: center;
+}
+.ticker span {
+  display: inline-flex;
+  align-items: center;
+}
+.ticker span::before {
+  content: '◆';
+  color: var(--ink);
+  margin-right: 0.6rem;
+  font-size: 0.8em;
+}
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ============== HERO ============== */
+.hero {
+  padding-top: calc(56px + 32px);
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+}
+.hero__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 3.5rem;
+  padding-block: 4rem 6rem;
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .hero__inner {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.hero__kicker {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+}
+
+/* ANTON HEADLINES — the workhorse display face */
+.head {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  line-height: 0.86;
+  color: var(--ink);
+}
+
+/* Two-tier headline: a subordinate eyebrow line ("THE AGENCY for")
+   capped at ~37% the size of the punchline ("EXPERIENCE / AGENCIES.")
+   underneath. Editorial-deck hierarchy — kicker over feature head.
+   The orange-on-ink "for" lozenge stays the only ornament, but it's
+   now an inline stamp inside the eyebrow rather than its own line. */
+.hero__title {
+  position: relative;
+  line-height: 1;
+}
+.hero__eyebrow {
+  display: inline-block;
+  font-size: clamp(1.5rem, 3.7vw, 2.85rem);
+  line-height: 1;
+  margin-bottom: 0.22em;
+}
+.hero__punch {
+  display: block;
+  font-size: clamp(3.2rem, 9.4vw, 7.8rem);
+  /* 0.92, not 0.86 — at this scale Anton's caps were crashing into
+     the previous line's baseline. Still tight, no longer touching. */
+  line-height: 0.92;
+}
+/* Keep the brackets glued to their word so a wrap can never strand
+   a closing bracket on its own line. */
+.hero__title .bracketed {
+  white-space: nowrap;
+}
+/* The brand IS brackets — [BB] is literally what the wordmark is.
+   Extending the bracket motif into the headline ties the type
+   system to the logo and makes the wordplay (AGENCY ↔ AGENCIES)
+   legible: the words BB lays claim to are the bracketed ones.
+   Brackets in Archivo Black (the wordmark face) — the only place
+   we touch the wordmark font outside the wordmark itself. */
+.hero__title .bracket {
+  font-family: var(--wordmark);
+  font-weight: 900;
+  font-size: 1.05em;
+  line-height: 1;
+  color: var(--ink);
+  display: inline-block;
+  vertical-align: -0.05em;
+}
+.hero__title .bracket--open {
+  margin-right: 0.04em;
+}
+.hero__title .bracket--close {
+  margin-left: 0.04em;
+}
+
+.hero__lede {
+  margin-top: 1.8rem;
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 38ch;
+  font-weight: 400;
+}
+.hero__lede strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.hero__cta {
+  margin-top: 2.4rem;
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Hero stage — frameless. The vasculature bleeds past the grid cell;
+   only the crosshair labels and the canvas live here. */
+.stage {
+  position: relative;
+  aspect-ratio: 1 / 1.1;
+  background: transparent;
+  overflow: visible;
+  isolation: isolate;
+}
+/* Field extends 50% past the stage box on all sides — fireflies and
+   the alt-dim plane have plenty of space to drift, but the animation
+   stays anchored around its container, not bleeding into the text. */
+.stage__field {
+  position: absolute;
+  inset: -50%;
+  z-index: 0;
+  pointer-events: none;
+}
+.stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.stage__crosshair {
+  z-index: 4;
+}
+.stage__crosshair {
+  position: absolute;
+  z-index: 4;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  pointer-events: none;
+  font-weight: 500;
+}
+.stage__crosshair--tl {
+  top: 0.9rem;
+  left: 0.9rem;
+}
+.stage__crosshair--tr {
+  top: 0.9rem;
+  right: 0.9rem;
+  text-align: right;
+}
+.stage__crosshair--bl {
+  bottom: 0.9rem;
+  left: 0.9rem;
+}
+.stage__crosshair--br {
+  bottom: 0.9rem;
+  right: 0.9rem;
+  text-align: right;
+}
+.stage__crosshair span {
+  display: block;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ============== INTRO / MAGIC WAND ============== */
+.intro {
+  padding-block: 8rem 7rem;
+  border-top: 2px solid var(--ink);
+  position: relative;
+  background: var(--orange-bright);
+}
+.intro__grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 4rem;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .intro__grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+.intro__quote {
+  font-family: var(--display);
+  font-size: clamp(2.4rem, 5.6vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  color: var(--ink);
+  position: relative;
+}
+.intro__quote::before {
+  content: '\201C';
+  position: absolute;
+  left: -0.34em;
+  top: -0.18em;
+  font-size: 1.4em;
+  color: var(--ink);
+  font-family: serif;
+  font-weight: 900;
+  line-height: 1;
+}
+/* Inline highlight stamps: a vertical-clip linear-gradient stands in
+   for a flat background. Anton's natural ascent+descent (~148% of
+   font-size) makes a solid inline `background` paint a box much
+   taller than the parent's tight line-height, bleeding into the
+   lines above and below. The gradient clips the paint to roughly
+   cap-top → just past baseline (~12%–84% of content area), so the
+   stamp fits inside the line-box without losing wrap-friendly
+   inline behavior. */
+.intro__quote .accent {
+  background: linear-gradient(
+    to bottom,
+    transparent 12%,
+    var(--ink) 12%,
+    var(--ink) 84%,
+    transparent 84%
+  );
+  color: var(--orange-bright);
+  padding: 0 0.15em;
+}
+.intro__sig {
+  margin-top: 2rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.intro__sig::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  background: var(--ink);
+}
+
+.marg {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  font-weight: 500;
+}
+.marg .key {
+  color: var(--ink);
+  font-weight: 700;
+}
+.marg p + p {
+  margin-top: 1rem;
+}
+
+/* ============== SECTION ============== */
+.sec {
+  padding-block: 7rem;
+  border-top: 2px solid var(--ink);
+  position: relative;
+}
+.sec--orange {
+  background: var(--orange);
+}
+.sec--bright {
+  background: var(--orange-bright);
+}
+.sec__head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+.sec__num {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--ink);
+  letter-spacing: 0.22em;
+  margin-bottom: 1.2rem;
+  font-weight: 700;
+}
+.sec__title {
+  font-family: var(--display);
+  font-size: clamp(2.6rem, 7vw, 6rem);
+  line-height: 0.88;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.sec__title .accent {
+  background: linear-gradient(
+    to bottom,
+    transparent 12%,
+    var(--ink) 12%,
+    var(--ink) 84%,
+    transparent 84%
+  );
+  color: var(--orange-bright);
+  padding: 0 0.12em;
+}
+.sec__meta {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-align: right;
+  line-height: 1.7;
+  font-weight: 500;
+}
+.sec__meta .v {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ============== OFFERINGS ============== */
+.offers {
+  border-top: 2px solid var(--ink);
+}
+.offer {
+  display: grid;
+  grid-template-columns: 5rem 18rem 1fr 12rem;
+  gap: 2.5rem;
+  padding-block: 3rem;
+  border-bottom: 2px solid var(--ink);
+  align-items: start;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  cursor: none;
+}
+/* Keep offer content above the fill blob */
+.offer > * {
+  position: relative;
+  z-index: 1;
+}
+.offer.is-absorbed {
+  /* --fr is set by JS based on element size + entry point */
+}
+.offer.is-absorbed .offer__num,
+.offer.is-absorbed .offer__title,
+.offer.is-absorbed .offer__body,
+.offer.is-absorbed .offer__tag,
+.offer.is-absorbed .offer__arrow {
+  color: var(--orange-bright);
+}
+.offer.is-absorbed .offer__body strong {
+  color: var(--cream);
+}
+.offer.is-absorbed .offer__arrow {
+  transform: translateX(8px);
+}
+@media (max-width: 900px) {
+  .offer {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding-block: 2.4rem;
+  }
+}
+.offer__num {
+  font-family: var(--mono);
+  font-size: 0.84rem;
+  color: var(--ink);
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  transition: color 0.3s var(--ease-out);
+}
+.offer__title {
+  font-family: var(--display);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  color: var(--ink);
+  transition: color 0.3s var(--ease-out);
+}
+.offer__body {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 50ch;
+  transition: color 0.3s var(--ease-out);
+}
+.offer__body strong {
+  color: var(--ink);
+  font-weight: 600;
+  transition: color 0.3s var(--ease-out);
+}
+.offer__tag {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-align: right;
+  line-height: 1.7;
+  font-weight: 500;
+  transition: color 0.3s var(--ease-out);
+}
+.offer__arrow {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--mono);
+  font-size: 1.6rem;
+  color: var(--ink);
+  transition:
+    transform 0.4s var(--ease-out),
+    color 0.3s var(--ease-out);
+}
+
+/* ============== VALUES ============== */
+.values {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border-top: 2px solid var(--ink);
+}
+@media (max-width: 760px) {
+  .values {
+    grid-template-columns: 1fr;
+  }
+}
+.value {
+  padding: 2.6rem 2rem 2.6rem 0;
+  border-bottom: 2px solid var(--ink);
+  position: relative;
+}
+.value:nth-child(odd) {
+  border-right: 2px solid var(--ink);
+  padding-right: 3rem;
+}
+.value:nth-child(even) {
+  padding-left: 3rem;
+}
+@media (max-width: 760px) {
+  .value:nth-child(odd) {
+    border-right: 0;
+    padding-right: 0;
+  }
+  .value:nth-child(even) {
+    padding-left: 0;
+  }
+}
+.value__tag {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+}
+.value__tag::before {
+  content: '◆';
+  font-size: 0.6rem;
+}
+.value__title {
+  font-family: var(--display);
+  font-size: clamp(2rem, 3.4vw, 2.8rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 1rem;
+}
+.value__body {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 42ch;
+}
+.value__body strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ============== MANIFESTO — INVERTED BAND ============== */
+.manifesto {
+  padding-block: 9rem;
+  border-top: 2px solid var(--ink);
+  position: relative;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--cream);
+}
+.manifesto__decor {
+  position: absolute;
+  right: -8vw;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80vw;
+  max-width: 1400px;
+  color: transparent;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.9;
+}
+.manifesto__decor svg {
+  width: 100%;
+  height: auto;
+  fill: none;
+  stroke: var(--orange-deep);
+  stroke-width: 2;
+}
+.manifesto__decor svg path {
+  fill: none;
+  stroke: var(--orange-deep);
+  stroke-width: 2;
+}
+@media (max-width: 760px) {
+  .manifesto__decor {
+    right: -20vw;
+    width: 140vw;
+    opacity: 0.55;
+  }
+}
+.manifesto__inner {
+  position: relative;
+  z-index: 2;
+  max-width: 60rem;
+}
+.manifesto__lines {
+  font-family: var(--display);
+  font-size: clamp(2.2rem, 5.2vw, 4.6rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+.manifesto__lines p {
+  padding-block: 0.9rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--cream) 15%, transparent);
+}
+.manifesto__lines p:last-child {
+  border-bottom: 0;
+}
+.manifesto__lines .accent {
+  background: linear-gradient(
+    to bottom,
+    transparent 12%,
+    var(--orange-bright) 12%,
+    var(--orange-bright) 84%,
+    transparent 84%
+  );
+  color: var(--ink);
+  padding: 0 0.12em;
+}
+.manifesto__lines .strike {
+  position: relative;
+  color: color-mix(in srgb, var(--cream) 35%, transparent);
+}
+.manifesto__lines .strike::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 4px;
+  background: var(--orange-bright);
+}
+
+/* ============== CTA ============== */
+.cta {
+  padding-block: 8rem;
+  border-top: 2px solid var(--ink);
+  position: relative;
+  background: var(--orange-bright);
+}
+.cta__grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 5rem;
+  align-items: end;
+}
+@media (max-width: 900px) {
+  .cta__grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+.cta__title {
+  font-family: var(--display);
+  font-size: clamp(2.8rem, 8vw, 7rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.cta__title .accent {
+  background: linear-gradient(
+    to bottom,
+    transparent 12%,
+    var(--ink) 12%,
+    var(--ink) 84%,
+    transparent 84%
+  );
+  color: var(--orange-bright);
+  padding: 0 0.12em;
+}
+.cta__contact {
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+.cta__contact a {
+  color: var(--ink);
+  border-bottom: 2px solid var(--ink);
+  font-weight: 700;
+}
+
+/* ============== FOOTER — NIGHT ============== */
+.foot {
+  padding-block: 3.5rem 5rem;
+  border-top: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--cream);
+}
+.foot,
+.foot a {
+  cursor: none;
+}
+.foot__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  line-height: 1.8;
+  color: color-mix(in srgb, var(--cream) 70%, transparent);
+  font-weight: 500;
+}
+@media (max-width: 760px) {
+  .foot__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+.foot .wordmark {
+  color: var(--cream);
+}
+.foot .wordmark__mark {
+  color: var(--orange-bright);
+}
+.foot h4 {
+  font-size: 0.74rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--orange-bright);
+  margin-bottom: 0.8rem;
+  font-weight: 700;
+}
+.foot a:hover {
+  color: var(--cream);
+}
+.foot__bottom {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--cream) 18%, transparent);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 50%, transparent);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* ============== FONT PICKER (tabbed: body + mono) ============== */
+.picker {
+  position: fixed;
+  bottom: 1.4rem;
+  right: 1.4rem;
+  z-index: 300;
+  background: var(--ink);
+  color: var(--cream);
+  border: 2px solid var(--ink);
+  padding: 0;
+  box-shadow: 0 18px 40px -12px rgba(17, 10, 8, 0.5);
+  overflow: hidden;
+  width: 280px;
+  border-radius: 6px;
+}
+.picker__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.8rem;
+  background: var(--orange-bright);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-bottom: 2px solid var(--ink);
+  cursor: none;
+}
+.picker__head .picker__toggle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: none;
+  line-height: 1;
+  padding: 0 0.2em;
+}
+.picker__tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--ink-2);
+  font-family: var(--mono);
+}
+.picker__tab {
+  background: transparent;
+  border: 0;
+  color: color-mix(in srgb, var(--cream) 55%, transparent);
+  padding: 0.55rem 0.6rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: none;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 0.2s var(--ease-out),
+    background 0.2s var(--ease-out),
+    border-color 0.2s var(--ease-out);
+}
+.picker__tab:hover {
+  color: var(--cream);
+}
+.picker__tab[aria-selected='true'] {
+  color: var(--orange-bright);
+  border-bottom-color: var(--orange-bright);
+  background: var(--ink);
+}
+.picker__panel {
+  max-height: 17rem;
+  overflow-y: auto;
+  transition: max-height 0.3s var(--ease-out);
+}
+.picker__panel[hidden] {
+  display: none;
+}
+.picker.is-collapsed .picker__panel,
+.picker.is-collapsed .picker__tabs {
+  display: none;
+}
+.picker__opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  background: transparent;
+  color: var(--cream);
+  width: 100%;
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  cursor: none;
+  text-align: left;
+  border-bottom: 1px solid color-mix(in srgb, var(--cream) 10%, transparent);
+  transition: background 0.2s var(--ease-out);
+}
+.picker__opt:last-child {
+  border-bottom: 0;
+}
+.picker__opt:hover {
+  background: color-mix(in srgb, var(--cream) 10%, transparent);
+}
+.picker__opt[aria-pressed='true'] {
+  background: var(--orange-bright);
+  color: var(--ink);
+  font-weight: 700;
+}
+.picker__opt .key {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, currentColor 55%, transparent);
+  flex-shrink: 0;
+}
+
+/* Reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.9s var(--ease-out),
+    transform 0.9s var(--ease-out);
+}
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal--up-1 {
+  transition-delay: 0.06s;
+}
+.reveal--up-2 {
+  transition-delay: 0.16s;
+}
+.reveal--up-3 {
+  transition-delay: 0.26s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-home *,
+  .bb-home *::before,
+  .bb-home *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
