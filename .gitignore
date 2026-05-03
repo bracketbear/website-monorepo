@@ -4,3 +4,5 @@ dist
 reports/
 # Local Netlify folder
 .netlify
+# Claude Code per-machine settings
+.claude/

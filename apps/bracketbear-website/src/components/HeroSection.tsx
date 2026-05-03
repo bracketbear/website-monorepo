@@ -6,9 +6,11 @@ import {
   createBlobAnimation,
   createRetroGridAnimation,
   createParticleSphereAnimation,
+  createLogoParticleSphereAnimation,
 } from '@bracketbear/flateralus-pixi-animations';
 import { getRandomControlValues } from '@bracketbear/flateralus';
 import { clsx } from '@bracketbear/bear-ui';
+import { Button } from '@bracketbear/bear-ui-react';
 import { useMemo, useState, useEffect, type ReactNode } from 'react';
 
 // Animation control value constants
@@ -127,6 +129,23 @@ const ANIMATION_CONTROLS = {
     connectionColor: '#ea580c',
     rotationAxis: 'xyz',
   },
+  logoParticleSphere: {
+    particleCount: 800,
+    logoScale: 0.85,
+    particleSize: 2.5,
+    depthSpread: 30,
+    rotationSpeedX: 0.002,
+    rotationSpeedY: 0.004,
+    pulseSpeed: 1.4,
+    pulseAmplitude: 0.2,
+    particleColor: '#00fff7',
+    particleColorSecondary: '#39ff14',
+    opacity: 1.0,
+    showConnections: true,
+    connectionDistance: 16,
+    connectionColor: '#b400ff',
+    glowSize: 6,
+  },
 };
 
 export interface HeroSectionProps {
@@ -137,7 +156,8 @@ export interface HeroSectionProps {
     | 'blob'
     | 'enhanced-wave'
     | 'retro-grid'
-    | 'particle-sphere';
+    | 'particle-sphere'
+    | 'logo-particle-sphere';
   /** Additional CSS classes */
   className?: string;
   /** Whether to show debug controls */
@@ -227,6 +247,11 @@ export function HeroSection({
             ...ANIMATION_CONTROLS.particleSphere,
           });
           break;
+        case 'logo-particle-sphere':
+          animation = createLogoParticleSphereAnimation({
+            ...ANIMATION_CONTROLS.logoParticleSphere,
+          });
+          break;
         case 'enhanced-wave':
         default:
           // Enhanced particle wave with better visual appeal
@@ -274,6 +299,8 @@ export function HeroSection({
         return 'bg-gradient-to-br from-orange-50 via-orange-100 to-orange-200/50';
       case 'particle-sphere':
         return 'bg-gradient-to-br from-orange-50 via-orange-100 to-orange-200/50';
+      case 'logo-particle-sphere':
+        return 'bg-black';
       case 'enhanced-wave':
       default:
         return 'bg-gradient-to-br from-orange-50 via-orange-100 to-orange-200/30';
@@ -295,32 +322,52 @@ export function HeroSection({
     return ''; // No negative margin needed
   }, [accountForNavigation, accountForBreadcrumbs]);
 
+  // Whether the preset uses a dark background
+  const isDarkPreset = preset === 'logo-particle-sphere';
+
   // Create the hero content
   const heroContent = children || (
     <div className="text-center">
       {title && (
-        <h1 className="font-heading text-foreground mb-8 text-4xl font-bold tracking-tight uppercase lg:text-6xl">
+        <h1
+          className={clsx(
+            'font-heading mb-8 text-4xl font-bold tracking-tight uppercase lg:text-6xl',
+            isDarkPreset ? 'text-white' : 'text-foreground'
+          )}
+        >
           {title}
         </h1>
       )}
       {subtitle && (
-        <p className="text-foreground/90 mx-auto mb-8 max-w-4xl text-lg leading-7 lg:text-xl">
+        <p
+          className={clsx(
+            'mx-auto mb-8 max-w-4xl text-lg leading-7 lg:text-xl',
+            isDarkPreset ? 'text-white/90' : 'text-foreground/90'
+          )}
+        >
           {subtitle}
         </p>
       )}
       {description && (
-        <p className="text-foreground/80 mx-auto max-w-2xl text-base leading-6 lg:text-lg">
+        <p
+          className={clsx(
+            'mx-auto max-w-2xl text-base leading-6 lg:text-lg',
+            isDarkPreset ? 'text-white/80' : 'text-foreground/80'
+          )}
+        >
           {description}
         </p>
       )}
       {showActions && (
-        <div className="mt-8">
-          <button
+        <div className="pointer-events-auto mt-8">
+          <Button
+            variant="trippy"
+            size="lg"
             onClick={handleRandomize}
-            className="bg-primary text-primary-foreground hover:bg-primary-hover rounded-lg px-6 py-3 font-semibold shadow-lg transition-colors"
+            className="shadow-lg [--pulse-duration:6s] hover:shadow-xl"
           >
             Get Weird
-          </button>
+          </Button>
         </div>
       )}
     </div>
@@ -339,7 +386,14 @@ export function HeroSection({
         )}
       >
         {/* Combined background container with multiple layers - same as client */}
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-200/30 via-transparent to-transparent opacity-100" />
+        <div
+          className={clsx(
+            'absolute inset-0 opacity-100',
+            isDarkPreset
+              ? 'bg-gradient-to-t from-gray-950/60 via-transparent to-transparent'
+              : 'bg-gradient-to-t from-orange-200/30 via-transparent to-transparent'
+          )}
+        />
 
         {/* Render text content with same positioning */}
         <div
@@ -395,7 +449,7 @@ export function HeroSection({
       {/* Content layer - always on top */}
       <div
         className={clsx(
-          'relative z-10 flex h-full w-full items-center justify-center',
+          'pointer-events-none relative z-10 flex h-full w-full items-center justify-center',
           accountForNavigation && accountForBreadcrumbs
             ? 'pt-30'
             : accountForNavigation
