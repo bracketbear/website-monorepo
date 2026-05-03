@@ -189,11 +189,11 @@ New section. Sits between Offerings (§7) and Three Cs (§9). Suggested structur
 
 ### 8.2 Pull quote (lead)
 
-Display treatment using the existing `.highlight` stamp on the conditional clause:
+Base display class: the global `.head` (Anton headline utility) — same family already used by `.sec__title`, `.cta__title`, etc. **Do not use `.hero__punch` or any other `.hero__*` class outside the hero.** The stamp on the conditional clause uses the global `.highlight` class.
 
-> [stamp →] If you can't [/stamp] generate a CMS with a custom content model and a TouchDesigner app with a single command to an AI agent — we should talk.
+> [`.highlight` stamp →] If you can't [/stamp] generate a CMS with a custom content model and a TouchDesigner app with a single command to an AI agent — we should talk.
 
-This is the LinkedIn line verbatim.
+This is the LinkedIn line verbatim. Visual treatment beyond the base classes (sizing, line breaks, surrounding chrome) is a new-component decision for Harrison per the design-source-of-truth boundary in §1.
 
 ### 8.3 Demo block (under the pull quote)
 
@@ -205,8 +205,8 @@ This is the LinkedIn line verbatim.
 
 Smaller scale than the demo block — frames as backing context, not the headline.
 
-- Eyebrow: `WHERE THIS COMES FROM`
-- Body:
+- Eyebrow (uses global `.label` class, mono uppercase): `WHERE THIS COMES FROM`
+- Body (body-type, not display):
   > Our folks have built systems across **Downstream**, **Deeplocal**, and other award-winning experiential agencies — the kind of installations and tools where "almost working" doesn't count. That scar tissue comes with us.
 
 **Phrasing rule:** these are operator credits (where the team has worked), not client credits. Do NOT use "we partnered with" or "our clients include" for these names.
@@ -215,8 +215,8 @@ Smaller scale than the demo block — frames as backing context, not the headlin
 
 Visually distinct from the operator credit — frames as present-tense partnership. Bracket Bear LLC's actual B2B relationship.
 
-- Eyebrow: `WHO WE'RE BUILDING WITH`
-- Body:
+- Eyebrow (uses global `.label` class, mono uppercase): `WHO WE'RE BUILDING WITH`
+- Body (body-type, not display):
   > We're currently building alongside **Hyperquake** — `[OPEN ITEM #1: Harrison to provide one specific line about what the platform/technology partnership produces. Placeholder candidates: "extending their experiential runtime into the agency-side tooling layer," "co-developing the CMS + integrations stack their teams ship on." Lock before publication.]`
 
 **Public mention:** confirmed greenlit by Harrison on 2026-05-03.
@@ -269,7 +269,7 @@ Replaces the existing four `.value` cards (`RULE 01–04`). Maps to existing `.s
 
 Maps to existing `.manifesto#about` section. Drops the strike-through "we don't / we do" pattern in favor of a thesis-and-list treatment.
 
-**Banner label** (existing `.label` treatment, orange-bright on ink, top of section):
+**Banner label** (uses global `.label` class with the existing inline overrides for orange-bright color and bold weight, matching the draft's manifesto treatment at `<p class="label" style="color: var(--orange-bright); ...">`):
 
 > BRACKET BEAR IS ITSELF AN EXPERIENCE.
 
@@ -307,7 +307,7 @@ Maps to existing `.cta#contact` section + `.cta__grid`. Two-column structure pre
 
 ### 11.3 Welcome bookend (full-width, beneath both columns)
 
-This is the page's last beat before the footer. New element, not present in the existing draft — Harrison to specify visual treatment, but suggested: large display type, full-width, breathing room above and below.
+This is the page's last beat before the footer. New element, not present in the existing draft. Base display class: the global `.head` (Anton headline utility). **Do not reuse `.hero__punch` or any other `.hero__*` class — this is not a second hero.** Visual treatment (size, full-width framing, breathing room, surrounding chrome) is a new-component decision for Harrison per the design-source-of-truth boundary in §1.
 
 > Welcome to Bracket Bear.<br>
 > We're happy you're here.
