@@ -125,35 +125,99 @@ export const siteSpecificCollections = {
   // Bracket Bear site singletons
   bracketbearIndexPage: {
     base: join(contentPath, 'sites/bracketbear'),
-    schema: makePageSchema({
-      hero: z.object({
-        tagline: z.string(),
-        subtitle: z.string(),
-      }),
-      intro: z.object({
-        title: z.string(),
-        content: z.string(),
-        magicWandQuestion: z.string(),
-      }),
-      whatWeOffer: z.object({
-        title: z.string(),
-        services: z.array(
-          z.object({
-            title: z.string(),
-            description: z.string(),
-          })
-        ),
-      }),
-      whyBracketBear: z.object({
-        title: z.string(),
-        values: z.array(
-          z.object({
-            title: z.string(),
-            description: z.string(),
-          })
-        ),
-      }),
-    }),
+    schema: makePageSchema(
+      {
+        statusTicker: z.object({
+          beats: z.array(z.string()),
+        }),
+        hero: z.object({
+          kicker: z.string(),
+          eyebrow: z.string(),
+          punchLine1: z.string(),
+          lede: z.string(),
+          ctaPrimary: z.object({
+            label: z.string(),
+            href: z.string(),
+          }),
+          ctaGhost: z.object({
+            label: z.string(),
+            href: z.string(),
+          }),
+        }),
+        intro: z.object({
+          aside: z.string(),
+          leadBlock: z.string(),
+          closingLine: z.string(),
+        }),
+        offerings: z.object({
+          eyebrow: z.string(),
+          title: z.string(),
+          meta: z.string(),
+          items: z.array(
+            z.object({
+              number: z.string(),
+              title: z.string(),
+              body: z.string(),
+              tag: z.string(),
+            })
+          ),
+          platformLayers: z.object({
+            eyebrow: z.string(),
+            items: z.array(
+              z.object({
+                title: z.string(),
+                body: z.string(),
+              })
+            ),
+          }),
+        }),
+        receipts: z.object({
+          eyebrow: z.string(),
+          title: z.string(),
+          meta: z.string(),
+          pullQuoteStamp: z.string(),
+          pullQuoteBody: z.string(),
+          demoBody: z.string(),
+          demoCtaLabel: z.string(),
+          demoCtaHref: z.string(),
+          operatorCredit: z.object({
+            eyebrow: z.string(),
+            body: z.string(),
+          }),
+          hyperquake: z.object({
+            eyebrow: z.string(),
+            body: z.string(),
+          }),
+        }),
+        commitments: z.object({
+          eyebrow: z.string(),
+          title: z.string(),
+          meta: z.string(),
+          items: z.array(
+            z.object({
+              tag: z.string(),
+              title: z.string(),
+              body: z.string(),
+            })
+          ),
+        }),
+        manifesto: z.object({
+          banner: z.string(),
+          lines: z.array(z.string()),
+        }),
+        closingCta: z.object({
+          eyebrow: z.string(),
+          title: z.string(),
+          body: z.string(),
+          contactLines: z.array(z.string()),
+          ctaLabel: z.string(),
+          ctaHref: z.string(),
+          bookendLine1: z.string(),
+          bookendLine2: z.string(),
+        }),
+      },
+      { showCta: false }
+    ),
     pattern: 'index-page.json',
   },
   bracketbearAboutPage: {

@@ -46,4 +46,6 @@ export default defineConfig({
     ],
   },
   output: 'static',
+  // Astro 7 defaults to 'jsx' whitespace collapsing; keep the v5 behavior
+  compressHTML: true,
 });

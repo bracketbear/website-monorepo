@@ -1382,3 +1382,132 @@
     transform: none;
   }
 }
+
+/* ============================================================================
+   Phase 4 additions — new section component styles layered on the draft.
+   ============================================================================ */
+
+/* ThreeCs commitments — 3-up override on the .values grid */
+.bb-home .values--three {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 900px) {
+  .bb-home .values--three {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Offerings sub-strip — "What's inside the platform" */
+.bb-home .layers {
+  margin-top: 4rem;
+  padding-block: 2.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+}
+.bb-home .layers__eyebrow {
+  margin-bottom: 1.6rem;
+}
+.bb-home .layers__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+@media (max-width: 900px) {
+  .bb-home .layers__grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+.bb-home .layer__title {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  font-size: 1.4rem;
+  line-height: 1;
+  margin-bottom: 0.6rem;
+  color: var(--ink);
+}
+.bb-home .layer__body {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  max-width: 32ch;
+}
+
+/* Receipts section — pull quote + demo + credits */
+.bb-home .sec--receipts {
+  padding-block: 5rem 6rem;
+  background: var(--orange);
+  position: relative;
+}
+.bb-home .receipts__quote {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+.bb-home .receipts__pull {
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.005em;
+  max-width: 28ch;
+}
+.bb-home .receipts__demo {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2rem;
+  align-items: center;
+  padding-block: 2rem;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  margin-bottom: 3rem;
+}
+.bb-home .receipts__demo-body {
+  font-size: 1.1rem;
+  line-height: 1.45;
+  max-width: 56ch;
+}
+@media (max-width: 700px) {
+  .bb-home .receipts__demo {
+    grid-template-columns: 1fr;
+  }
+}
+.bb-home .receipts__credit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+@media (max-width: 700px) {
+  .bb-home .receipts__credit-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+.bb-home .receipts__credit p.label {
+  margin-bottom: 1rem;
+}
+.bb-home .receipts__credit-body {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+.bb-home .receipts__credit-body strong {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+/* Closing CTA welcome bookend (page's last beat) */
+.bb-home .cta__bookend {
+  margin-top: 6rem;
+  padding-block: 5rem;
+  text-align: center;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+}
+.bb-home .cta__bookend-line {
+  font-size: clamp(2rem, 5vw, 4.2rem);
+  line-height: 1;
+  letter-spacing: -0.005em;
+}
+.bb-home .cta__bookend-line--sub {
+  font-size: clamp(1.2rem, 2.4vw, 1.8rem);
+  margin-top: 0.6em;
+  color: var(--ink-soft);
+}

@@ -6,7 +6,6 @@ import FilteredWorkHistory from './FilteredWorkHistory';
 const mockSkills: CollectionEntry<'workSkills'>[] = [
   {
     id: 'react',
-    slug: 'react',
     body: '',
     collection: 'workSkills',
     data: {
@@ -21,7 +20,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'typescript',
-    slug: 'typescript',
     body: '',
     collection: 'workSkills',
     data: {
@@ -36,7 +34,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'node',
-    slug: 'node',
     body: '',
     collection: 'workSkills',
     data: {
@@ -51,7 +48,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'python',
-    slug: 'python',
     body: '',
     collection: 'workSkills',
     data: {
@@ -66,7 +62,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'nextjs',
-    slug: 'nextjs',
     body: '',
     collection: 'workSkills',
     data: {
@@ -81,7 +76,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'tailwind',
-    slug: 'tailwind',
     body: '',
     collection: 'workSkills',
     data: {
@@ -99,7 +93,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
 const mockSkillCategories: CollectionEntry<'workSkillCategory'>[] = [
   {
     id: 'front-end',
-    slug: 'front-end',
     body: '',
     collection: 'workSkillCategory',
     data: {
@@ -109,7 +102,6 @@ const mockSkillCategories: CollectionEntry<'workSkillCategory'>[] = [
   },
   {
     id: 'back-end',
-    slug: 'back-end',
     body: '',
     collection: 'workSkillCategory',
     data: {
@@ -122,7 +114,6 @@ const mockSkillCategories: CollectionEntry<'workSkillCategory'>[] = [
 const mockCompanies: CollectionEntry<'workCompany'>[] = [
   {
     id: 'bracketbear',
-    slug: 'bracketbear',
     body: '',
     collection: 'workCompany',
     data: {
@@ -134,7 +125,6 @@ const mockCompanies: CollectionEntry<'workCompany'>[] = [
   },
   {
     id: 'freelance',
-    slug: 'freelance',
     body: '',
     collection: 'workCompany',
     data: {
@@ -147,7 +137,6 @@ const mockCompanies: CollectionEntry<'workCompany'>[] = [
 const mockJobs: CollectionEntry<'workJobs'>[] = [
   {
     id: 'bb-full-stack-engineer',
-    slug: 'bb-full-stack-engineer',
     body: '',
     collection: 'workJobs',
     data: {
@@ -168,7 +157,6 @@ const mockJobs: CollectionEntry<'workJobs'>[] = [
   },
   {
     id: 'freelance-developer',
-    slug: 'freelance-developer',
     body: '',
     collection: 'workJobs',
     data: {
@@ -189,7 +177,6 @@ const mockJobs: CollectionEntry<'workJobs'>[] = [
   },
   {
     id: 'current-position',
-    slug: 'current-position',
     body: '',
     collection: 'workJobs',
     data: {
@@ -212,7 +199,6 @@ const mockJobs: CollectionEntry<'workJobs'>[] = [
 const mockProjects: CollectionEntry<'workProject'>[] = [
   {
     id: 'interactive-museum',
-    slug: 'interactive-museum',
     body: '',
     collection: 'workProject',
     data: {
@@ -227,7 +213,6 @@ const mockProjects: CollectionEntry<'workProject'>[] = [
   },
   {
     id: 'client-portal',
-    slug: 'client-portal',
     body: '',
     collection: 'workProject',
     data: {
@@ -241,7 +226,6 @@ const mockProjects: CollectionEntry<'workProject'>[] = [
   },
   {
     id: 'modern-web-app',
-    slug: 'modern-web-app',
     body: '',
     collection: 'workProject',
     data: {
@@ -307,7 +291,6 @@ export const ManySkills: Story = {
       ...mockSkills,
       {
         id: 'docker',
-        slug: 'docker',
         body: '',
         collection: 'workSkills',
         data: {
@@ -322,7 +305,6 @@ export const ManySkills: Story = {
       },
       {
         id: 'aws',
-        slug: 'aws',
         body: '',
         collection: 'workSkills',
         data: {

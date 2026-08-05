@@ -7,7 +7,7 @@
 
 import { readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import { glob } from 'glob';
 
 const __filename = fileURLToPath(import.meta.url);

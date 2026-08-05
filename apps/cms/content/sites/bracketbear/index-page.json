@@ -1,60 +1,141 @@
 {
-  "title": "Bracket Bear - The Agency for Experience Agencies",
-  "subtitle": "Creative Technology Partner",
-  "metaDescription": "Bracket Bear is a values-driven creative technology partner built on the art of hospitality. We help experience agencies remove what limits them so their magic can thrive.",
+  "title": "Bracket Bear — The Experiential Software Platform Experts",
+  "subtitle": "We build the platforms behind experiential work.",
+  "metaDescription": "Bracket Bear is the experiential software platform experts. We rebuild the content modeling, integrations, and workflows behind experiential agencies into one platform that actually behaves.",
   "canonicalUrl": "https://bracketbear.com/",
   "ogImage": "bracketbear-hero.jpg",
   "noIndex": false,
+  "statusTicker": {
+    "beats": [
+      "Now booking — summer '26",
+      "Platform consultancy + software studio",
+      "Welcome to Bracket Bear",
+      "Pittsburgh × Portland"
+    ]
+  },
   "hero": {
-    "tagline": "THE AGENCY FOR EXPERIENCE AGENCIES",
-    "subtitle": "We give exceptional service to the people who create experiences — helping agencies remove what limits them, so their magic can thrive."
+    "kicker": "BRACKET BEAR, EST. 2024",
+    "eyebrow": "We are the",
+    "punchLine1": "experiential software platform experts.",
+    "lede": "Most experiential agencies spend more on integrations and CMS surgery than on the work clients hired them for. We rebuild that layer — **content modeling, integrations, workflows** — as one platform.",
+    "ctaPrimary": {
+      "label": "Start with the audit",
+      "href": "#contact"
+    },
+    "ctaGhost": {
+      "label": "Read the thesis →",
+      "href": "#approach"
+    }
   },
   "intro": {
-    "title": "Intro Section",
-    "content": "Bracket Bear is a values-driven creative technology partner built on the art of hospitality.\nWe believe experience agencies deserve the same care, curiosity, and service they offer their own clients.\nOur work starts with a simple question — one that guides everything we do:",
-    "magicWandQuestion": "\"If you could wave a magic wand and fix one thing keeping your agency from reaching its potential, what would it be?\"\nWhatever that is, that's where we begin."
+    "aside": "The honest read.",
+    "leadBlock": "Too many tools that don't talk to each other. Too much custom integration. Too much budget gone before the real work even starts. That's the **platform tax** most experiential agencies are paying. We come in, look at how work actually moves through your stack, find what's quietly working against you, and rebuild it as one platform — content, integrations, workflows, connected.",
+    "closingLine": "We're operators by background — hospitality, physical-space experience — so every system has to earn its place. We polish every rock we touch, from the platform architecture to the invoices we put our name on. **Welcome to Bracket Bear. We build systems for the people building experiences.**"
   },
-  "whatWeOffer": {
-    "title": "What We Offer",
-    "services": [
+  "offerings": {
+    "eyebrow": "WHAT WE DO",
+    "title": "We come in, fix it, stay close.",
+    "meta": "Observe. Identify. Streamline.\nDon't disappear.",
+    "items": [
       {
-        "title": "Augment Your Team",
-        "description": "We embed with your team like an extension of it, bringing specialized creative or technical expertise that feels seamless, not supplemental."
+        "number": "001",
+        "title": "We show you what's fighting you.",
+        "body": "We come in, walk your stack, and write up where it's costing you the most. Specific systems, specific dollars, specific moves to make. You get a real read on your platform — the kind that's hard to do from the inside.",
+        "tag": "Audit\n/ 1–2 weeks"
       },
       {
-        "title": "Deliver the Project",
-        "description": "We take the reins from prototype to installation so you can focus on creative leadership while we bring it to life."
+        "number": "002",
+        "title": "We rebuild it as one platform.",
+        "body": "Content modeling, integrations, workflows — currently scattered across separate tools and brittle middleware — collapsed into one platform. Leaner, faster, dramatically cheaper to maintain. Same work, less drag.",
+        "tag": "Rebuild\n/ project"
       },
       {
-        "title": "Consult & Collaborate",
-        "description": "We share years of experience building tools, systems, and installations to help you make confident, informed decisions."
+        "number": "003",
+        "title": "We stay on the team.",
+        "body": "Once the platform is healthy, the job is keeping it that way — extending it, integrating new tools as they come up, shipping new experiential builds on top of it. We join your standup, learn your repo, and stay close. Specialists in real-time graphics, TouchDesigner, and the integrations layer that connects them.",
+        "tag": "Embed\n/ retainer"
+      }
+    ],
+    "platformLayers": {
+      "eyebrow": "WHAT'S INSIDE THE PLATFORM",
+      "items": [
+        {
+          "title": "Content model + CMS",
+          "body": "How agencies actually create and version their work. Sanity, Payload, custom — whatever fits."
+        },
+        {
+          "title": "Integrations + workflows",
+          "body": "The middle layer that decides whether things ship or sit. APIs, queues, automations, the boring stuff that makes the rest possible."
+        },
+        {
+          "title": "Real-time + experiential apps",
+          "body": "TouchDesigner, kiosk software, native installs. The runtime layer where audiences actually interact."
+        }
+      ]
+    }
+  },
+  "receipts": {
+    "eyebrow": "RECEIPTS",
+    "title": "Built before. Shipping now.",
+    "meta": "Past tense / present tense.\nBoth ours.",
+    "pullQuoteStamp": "If you can't",
+    "pullQuoteBody": "generate a CMS with a custom content model and a TouchDesigner app with a single command to an AI agent — we should talk.",
+    "demoBody": "Our tooling can. Custom-model CMS and a paired TouchDesigner app, from one prompt to a running project. It's the platform thesis taken to its end — new builds start at the speed of asking.",
+    "demoCtaLabel": "See it live →",
+    "demoCtaHref": "mailto:hello@bracketbear.com?subject=Demo%20request",
+    "operatorCredit": {
+      "eyebrow": "WHERE THIS COMES FROM",
+      "body": "Our folks have built systems across award-winning agencies **Downstream** and **Deeplocal**."
+    },
+    "hyperquake": {
+      "eyebrow": "WHO WE'RE BUILDING WITH",
+      "body": "We're currently building alongside **Hyperquake** — extending their experiential runtime into the agency-side tooling layer."
+    }
+  },
+  "commitments": {
+    "eyebrow": "COMMITMENTS",
+    "title": "Three things we keep showing up for.",
+    "meta": "",
+    "items": [
+      {
+        "tag": "C / 01",
+        "title": "Community.",
+        "body": "Somebody made room for us when we needed it. We make room for who's next — apprentices, junior engineers, agency folks learning the platform layer for the first time. That's how we got here. That's how the work keeps getting better."
+      },
+      {
+        "tag": "C / 02",
+        "title": "Collaboration.",
+        "body": "When an agency hands us work, we don't show up like a vendor running a checklist. We ride with the partner — share credit, share the messy parts, stay close enough that the work feels co-owned. Because it is."
+      },
+      {
+        "tag": "C / 03",
+        "title": "Continuous improvement.",
+        "body": "We're harder on our own systems than anyone else is. The platform we use to run Bracket Bear gets the same scrutiny we put on a client's. The day that stops, the work stops getting better."
       }
     ]
   },
-  "whyBracketBear": {
-    "title": "Why Bracket Bear",
-    "values": [
-      {
-        "title": "We're hospitality minded",
-        "description": "We extend the same thoughtfulness and attention to our partners that they give their audiences."
-      },
-      {
-        "title": "We're values first",
-        "description": "If it doesn't align with our principles, we don't do it — every project should serve people, not just pixels."
-      },
-      {
-        "title": "We're scalable by design",
-        "description": "We grow alongside our partners through modular, flexible collaboration."
-      },
-      {
-        "title": "We bring founder-level experience",
-        "description": "From award-winning agencies like Downstream and Deeplocal."
-      }
+  "manifesto": {
+    "banner": "BRACKET BEAR IS ITSELF AN EXPERIENCE.",
+    "lines": [
+      "The platform we ship.",
+      "The invoice we put our name on.",
+      "The repo we hand off.",
+      "The way we run a meeting.",
+      "All of it, treated like the work."
     ]
   },
-  "contactCTA": {
-    "text": "We build technology with a human touch.\nTell us what your magic wand would fix — and let's start there.",
-    "buttonText": "Get In Touch",
-    "buttonLink": "/contact"
+  "closingCta": {
+    "eyebrow": "START",
+    "title": "Show us where the work is getting stuck.",
+    "body": "Email us, write us a note, share a recording — whatever's easiest. We'll come look.",
+    "contactLines": [
+      "◆ <a href=\"mailto:hello@bracketbear.com\">hello@bracketbear.com</a>",
+      "◆ Pittsburgh × Portland",
+      "◆ Booking summer '26"
+    ],
+    "ctaLabel": "Open the door",
+    "ctaHref": "mailto:hello@bracketbear.com",
+    "bookendLine1": "Welcome to Bracket Bear.",
+    "bookendLine2": "We're happy you're here."
   }
 }

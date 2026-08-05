@@ -11,9 +11,7 @@ export default defineConfig({
   integrations: [react()],
   vite: {
     plugins: [
-      // @ts-expect-error: Bug with TailwindCSS Vite plugin type definition
       tailwindcss(),
-      // @ts-expect-error: Bug with TailwindCSS Vite plugin type definition
       svgr(),
       // TODO: There's a bug where you have to save global.css in order for the HMR to work.
       // TODO: pull this out into UX kit and make it a plugin.
@@ -32,15 +30,18 @@ export default defineConfig({
       cssCodeSplit: true, // Enable CSS code splitting
       rollupOptions: {
         output: {
-          manualChunks: {
+          // Rolldown (Vite 8) only supports the function form of manualChunks
+          manualChunks: (id) => {
             // Separate vendor chunks for better caching
-            'react-vendor': ['react', 'react-dom'],
-            'pixi-vendor': ['pixi.js'],
-            'flateralus-vendor': [
-              '@bracketbear/flateralus-react',
-              '@bracketbear/flateralus-pixi',
-              '@bracketbear/flateralus-pixi-animations',
-            ],
+            if (/node_modules\/(react|react-dom)\//.test(id)) {
+              return 'react-vendor';
+            }
+            if (/node_modules\/(pixi\.js|@pixi)\//.test(id)) {
+              return 'pixi-vendor';
+            }
+            if (id.includes('flateralus')) {
+              return 'flateralus-vendor';
+            }
           },
         },
       },

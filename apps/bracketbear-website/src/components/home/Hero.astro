@@ -1,0 +1,72 @@
+---
+import { marked } from 'marked';
+
+interface Props {
+  kicker: string;
+  eyebrow: string;
+  punchLine1: string;
+  lede: string;
+  ctaPrimary: { label: string; href: string };
+  ctaGhost: { label: string; href: string };
+}
+
+const { kicker, eyebrow, punchLine1, lede, ctaPrimary, ctaGhost } = Astro.props;
+
+const punchLine1Lines = punchLine1.split('\n');
+const ledeHtml = marked.parseInline(lede);
+---
+
+<section class="hero">
+  <div class="hero__inner container">
+    <div>
+      <div class="hero__kicker reveal">
+        <span class="label">{kicker}</span>
+      </div>
+
+      <h1 class="head hero__title reveal reveal--up-1">
+        <span class="hero__eyebrow highlight">{eyebrow}</span>
+        <span class="hero__punch">
+          {
+            punchLine1Lines.map((line, i) => (
+              <>
+                {line}
+                {i < punchLine1Lines.length - 1 && <br />}
+              </>
+            ))
+          }
+        </span>
+      </h1>
+
+      <p class="hero__lede reveal reveal--up-2" set:html={ledeHtml} />
+
+      <div class="hero__cta reveal reveal--up-3">
+        <a href={ctaPrimary.href} class="btn btn--primary" data-hot>
+          <span>{ctaPrimary.label}</span>
+        </a>
+        <a href={ctaGhost.href} class="btn btn--ghost" data-hot>
+          <span>{ctaGhost.label}</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="stage reveal reveal--up-2" aria-hidden="true">
+      <div class="stage__field"><canvas id="stage"></canvas></div>
+      <div class="stage__crosshair stage__crosshair--tl">
+        <span>SIG / 01</span>
+        BB·STAGE
+      </div>
+      <div class="stage__crosshair stage__crosshair--tr">
+        <span>0xFF5F1F</span>
+        ORANGE / SIGNAL
+      </div>
+      <div class="stage__crosshair stage__crosshair--bl">
+        FEED · LIVE<br />
+        <span id="stageHr">SIGNAL · NOMINAL</span>
+      </div>
+      <div class="stage__crosshair stage__crosshair--br">
+        <span>PORTAL · MASKED</span>
+        FLATERALUS / PIXI
+      </div>
+    </div>
+  </div>
+</section>

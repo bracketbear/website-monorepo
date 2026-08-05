@@ -7,18 +7,22 @@ interface Props {
   title?: string;
   hideContactForm?: boolean;
   hideFooter?: boolean;
+  hideNavigation?: boolean;
   breadcrumbs?: any;
   metaDescription?: string;
   currentPage?: string;
+  homeBodyClass?: string;
 }
 
 const {
   title,
   hideContactForm,
   hideFooter,
+  hideNavigation,
   breadcrumbs,
   metaDescription,
   currentPage,
+  homeBodyClass,
 } = Astro.props;
 ---
 
@@ -35,17 +39,20 @@ const {
   metaDescription={metaDescription}
   class="bg-background text-foreground"
 >
-  <!-- Transparent Navigation -->
-  <NavBar
-    config={{
-      ...navigationConfig,
-      currentPage,
-    }}
-    variant="glass"
-  />
+  {
+    !hideNavigation && (
+      <NavBar
+        config={{
+          ...navigationConfig,
+          currentPage,
+        }}
+        variant="glass"
+      />
+    )
+  }
 
   <!-- Main content with consistent background -->
-  <div class="min-h-screen">
+  <div class={`min-h-screen ${homeBodyClass ?? ''}`}>
     <slot />
   </div>
 </LayeredLayout>

@@ -23,7 +23,7 @@ export const basePageSchema = z.object({
   title: z.string().optional(),
   subtitle: z.string().optional(),
   metaDescription: z.string().optional(),
-  canonicalUrl: z.string().url().optional(),
+  canonicalUrl: z.url().optional(),
   ogImage: z.string().optional(),
   noIndex: z.boolean().default(false),
 });
@@ -82,7 +82,7 @@ export function makePageSchema<Extras extends z.ZodRawShape = z.ZodRawShape>(
   // Merge fields only if there are any to merge
   if (extras || (showCta && Object.keys(ctaFields).length > 0)) {
     const fieldsToMerge = { ...ctaFields, ...extras };
-    return basePageSchema.merge(z.object(fieldsToMerge));
+    return basePageSchema.extend(fieldsToMerge);
   }
 
   return basePageSchema;

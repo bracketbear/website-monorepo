@@ -1,0 +1,18 @@
+---
+interface Props {
+  beats: string[];
+}
+const { beats } = Astro.props;
+const ticker = [...beats, ...beats];
+---
+
+<div class="status" aria-hidden="true">
+  <div class="status__row container">
+    <span class="status__live">News Feed</span>
+    <div class="ticker">
+      <div class="ticker__track">
+        {ticker.map((beat) => <span>{beat}</span>)}
+      </div>
+    </div>
+  </div>
+</div>

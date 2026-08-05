@@ -908,11 +908,6 @@ import * as filters from 'pixi-filters';
     heartContainer.x = bbCenterX + mx * 0.6;
     heartContainer.y = bbCenterY + my * 0.6;
 
-    // Very gentle z-axis breath — ~12.5 second cycle, ±1.8% scale.
-    // Subtle enough to feel like a slow inhale/exhale, not animation.
-    const breath = 1 + Math.sin(now * 0.0005) * 0.018;
-    heartContainer.scale.set(breath);
-
     // Slow gradient rotation — gives the violet bloom subtle life
     bgGrad.rotation += 0.0014;
 
@@ -946,7 +941,12 @@ import * as filters from 'pixi-filters';
     const FLEE_ARRIVAL_DIST = 6;
     fireflyG.clear();
     fireflyShadowG.clear();
-    fireflyShadowG.beginFill(0x110a08, 0.42);
+    // Fade fireflies to 0 as they enter the BB silhouette area. The BB
+    // is already showing the same alt-dim, so the firefly's circular
+    // edge crossing the silhouette would otherwise reveal a seam where
+    // its displacement pass doesn't match the BB portal's pass.
+    const ffFadeOut = bbRadius * 0.95; // fully visible at/outside this dist
+    const ffFadeIn = bbRadius * 0.55; // fully invisible inside this dist
     if (fluidRT) {
       const ffMat = new PIXI.Matrix();
       for (let i = 0; i < fireflies.length; i++) {
@@ -1047,13 +1047,27 @@ import * as filters from 'pixi-filters';
         else if (cx > frameMaxX - pad) cx = frameMaxX - pad;
         if (cy < frameMinY + pad) cy = frameMinY + pad;
         else if (cy > frameMaxY - pad) cy = frameMaxY - pad;
+        const distToBB = Math.hypot(cx - bbCenterX, cy - bbCenterY);
+        let ffAlpha;
+        if (distToBB >= ffFadeOut) ffAlpha = 1;
+        else if (distToBB <= ffFadeIn) ffAlpha = 0;
+        else {
+          const t = (distToBB - ffFadeIn) / (ffFadeOut - ffFadeIn);
+          ffAlpha = t * t * (3 - 2 * t); // smoothstep
+        }
+        if (ffAlpha <= 0) continue;
+        fireflyShadowG.beginFill(0x110a08, 0.42 * ffAlpha);
         fireflyShadowG.drawCircle(cx + 5, cy + 4, ff.radius * 1.05);
-        fireflyG.beginTextureFill({ texture: fluidRT, matrix: ffMat });
+        fireflyShadowG.endFill();
+        fireflyG.beginTextureFill({
+          texture: fluidRT,
+          matrix: ffMat,
+          alpha: ffAlpha,
+        });
         fireflyG.drawCircle(cx, cy, ff.radius);
         fireflyG.endFill();
       }
     }
-    fireflyShadowG.endFill();
 
     // Sync BB drop shadow to heartContainer (offset down-right)
     bbShadowSprite.x = heartContainer.x + 10;

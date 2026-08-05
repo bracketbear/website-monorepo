@@ -1,4 +1,10 @@
 {
+  // Run tasks in a non-login shell: macOS login shells (zsh -l) rebuild PATH via
+  // path_helper + ~/.zprofile, which buries the Node 22 path injected by tasks.json.
+  "terminal.integrated.automationProfile.osx": {
+    "path": "/bin/zsh",
+    "args": []
+  },
   "search.exclude": {
     "**/.cache": true,
     "**/.output": true,

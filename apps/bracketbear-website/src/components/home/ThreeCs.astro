@@ -1,0 +1,50 @@
+---
+interface CommitmentItem {
+  tag: string;
+  title: string;
+  body: string;
+}
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  meta: string;
+  items: CommitmentItem[];
+}
+
+const { eyebrow, title, meta, items } = Astro.props;
+const metaLines = meta.split('\n');
+---
+
+<section class="sec sec--bright" id="values">
+  <div class="container">
+    <header class="sec__head reveal">
+      <div>
+        <p class="sec__num">{eyebrow}</p>
+        <h2 class="sec__title">{title}</h2>
+      </div>
+      <div class="sec__meta">
+        {
+          metaLines.map((line, i) => (
+            <>
+              {line}
+              {i < metaLines.length - 1 && <br />}
+            </>
+          ))
+        }
+      </div>
+    </header>
+
+    <div class="values values--three">
+      {
+        items.map((item, i) => (
+          <article class={`value reveal ${i % 2 === 1 ? 'reveal--up-1' : ''}`}>
+            <p class="value__tag">{item.tag}</p>
+            <h3 class="value__title">{item.title}</h3>
+            <p class="value__body">{item.body}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

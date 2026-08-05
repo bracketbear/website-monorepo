@@ -15,7 +15,10 @@ export interface ToastMessage {
 }
 
 interface ToastContextType {
-  showToast: (message: string, options?: Omit<ToastMessage, 'id'>) => void;
+  showToast: (
+    message: string,
+    options?: Partial<Omit<ToastMessage, 'id'>>
+  ) => void;
   hideToast: (id: string) => void;
   toasts: ToastMessage[];
 }

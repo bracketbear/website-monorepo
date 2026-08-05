@@ -6,7 +6,6 @@ import ProjectCard from './ProjectCard';
 const mockSkills: CollectionEntry<'workSkills'>[] = [
   {
     id: 'react',
-    slug: 'react',
     body: '',
     collection: 'workSkills',
     data: {
@@ -21,7 +20,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'typescript',
-    slug: 'typescript',
     body: '',
     collection: 'workSkills',
     data: {
@@ -36,7 +34,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'node',
-    slug: 'node',
     body: '',
     collection: 'workSkills',
     data: {
@@ -53,7 +50,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
 
 const mockProject: CollectionEntry<'workProject'> = {
   id: 'sample-project',
-  slug: 'sample-project',
   body: '',
   collection: 'workProject',
   data: {
@@ -89,7 +85,6 @@ const mockProject: CollectionEntry<'workProject'> = {
 
 const mockProjectMinimal: CollectionEntry<'workProject'> = {
   id: 'minimal-project',
-  slug: 'minimal-project',
   body: '',
   collection: 'workProject',
   data: {

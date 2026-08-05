@@ -3,6 +3,9 @@
   "name": "bracketbear-website",
   "version": "1.0.1",
   "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "workspaces": [
     "packages/*",
     "apps/*"

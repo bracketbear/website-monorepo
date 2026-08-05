@@ -6,7 +6,6 @@ import WorkHistory from './WorkHistory';
 const mockSkills: CollectionEntry<'workSkills'>[] = [
   {
     id: 'react',
-    slug: 'react',
     body: '',
     collection: 'workSkills',
     data: {
@@ -21,7 +20,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'typescript',
-    slug: 'typescript',
     body: '',
     collection: 'workSkills',
     data: {
@@ -36,7 +34,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'node',
-    slug: 'node',
     body: '',
     collection: 'workSkills',
     data: {
@@ -51,7 +48,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'python',
-    slug: 'python',
     body: '',
     collection: 'workSkills',
     data: {
@@ -69,7 +65,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
 const mockCompanies: CollectionEntry<'workCompany'>[] = [
   {
     id: 'bracketbear',
-    slug: 'bracketbear',
     body: '',
     collection: 'workCompany',
     data: {
@@ -81,7 +76,6 @@ const mockCompanies: CollectionEntry<'workCompany'>[] = [
   },
   {
     id: 'freelance',
-    slug: 'freelance',
     body: '',
     collection: 'workCompany',
     data: {
@@ -94,7 +88,6 @@ const mockCompanies: CollectionEntry<'workCompany'>[] = [
 const mockJobs: CollectionEntry<'workJobs'>[] = [
   {
     id: 'bb-full-stack-engineer',
-    slug: 'bb-full-stack-engineer',
     body: '',
     collection: 'workJobs',
     data: {
@@ -115,7 +108,6 @@ const mockJobs: CollectionEntry<'workJobs'>[] = [
   },
   {
     id: 'freelance-developer',
-    slug: 'freelance-developer',
     body: '',
     collection: 'workJobs',
     data: {
@@ -139,7 +131,6 @@ const mockJobs: CollectionEntry<'workJobs'>[] = [
 const mockProjects: CollectionEntry<'workProject'>[] = [
   {
     id: 'interactive-museum',
-    slug: 'interactive-museum',
     body: '',
     collection: 'workProject',
     data: {
@@ -154,7 +145,6 @@ const mockProjects: CollectionEntry<'workProject'>[] = [
   },
   {
     id: 'client-portal',
-    slug: 'client-portal',
     body: '',
     collection: 'workProject',
     data: {

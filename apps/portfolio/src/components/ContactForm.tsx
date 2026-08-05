@@ -13,7 +13,7 @@ import {
 const contactSchema = z
   .object({
     name: z.string().min(2, 'Name is required'),
-    email: z.string().email('Valid email required'),
+    email: z.email('Valid email required'),
     subject: z.enum(
       [
         'general',
@@ -24,7 +24,7 @@ const contactSchema = z
         'other',
       ],
       {
-        errorMap: () => ({ message: 'Please select a subject' }),
+        error: 'Please select a subject',
       }
     ),
     message: z.string().min(10, 'Message must be at least 10 characters'),

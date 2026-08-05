@@ -1,5 +1,11 @@
 {
   "version": "2.0.0",
+  // Astro 7 requires Node >= 22.12; task shells don't load nvm, so pin it here (see .nvmrc)
+  "options": {
+    "env": {
+      "PATH": "${env:HOME}/.nvm/versions/node/v22.22.2/bin:${env:PATH}"
+    }
+  },
   "tasks": [
     // ── Install ──────────────────────────────────────────────
     {

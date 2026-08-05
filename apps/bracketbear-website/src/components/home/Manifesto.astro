@@ -1,0 +1,27 @@
+---
+interface Props {
+  banner: string;
+  lines: string[];
+}
+
+const { banner, lines } = Astro.props;
+---
+
+<section class="manifesto" id="about" data-cursor-light>
+  <div class="manifesto__decor" aria-hidden="true">
+    <svg viewBox="0 0 400.89 249.73" preserveAspectRatio="xMaxYMid meet">
+      <use href="#bb-logo"></use>
+    </svg>
+  </div>
+  <div class="manifesto__inner reveal container">
+    <p
+      class="label"
+      style="color: var(--orange-bright); margin-bottom: 2.5rem; font-weight: 700;"
+    >
+      {banner}
+    </p>
+    <div class="manifesto__lines">
+      {lines.map((line) => <p>{line}</p>)}
+    </div>
+  </div>
+</section>

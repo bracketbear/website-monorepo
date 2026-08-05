@@ -1,0 +1,55 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  body: string;
+  contactLines: string[];
+  ctaLabel: string;
+  ctaHref: string;
+  bookendLine1: string;
+  bookendLine2: string;
+}
+
+const {
+  eyebrow,
+  title,
+  body,
+  contactLines,
+  ctaLabel,
+  ctaHref,
+  bookendLine1,
+  bookendLine2,
+} = Astro.props;
+---
+
+<section class="cta" id="contact">
+  <div class="cta__grid container">
+    <div class="reveal">
+      <p class="sec__num" style="margin-bottom: 2rem;">{eyebrow}</p>
+      <h2 class="cta__title">{title}</h2>
+    </div>
+    <div class="cta__contact reveal reveal--up-1">
+      <p>{body}</p>
+      <p style="margin-top: 1.5rem;">
+        {
+          contactLines.map((line, i) => (
+            <Fragment>
+              <Fragment set:html={line} />
+              {i < contactLines.length - 1 && <br />}
+            </Fragment>
+          ))
+        }
+      </p>
+      <p style="margin-top: 2rem;">
+        <a href={ctaHref} class="btn btn--primary" data-hot>
+          <span>{ctaLabel}</span>
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <div class="cta__bookend reveal reveal--up-2 container">
+    <p class="head cta__bookend-line">{bookendLine1}</p>
+    <p class="head cta__bookend-line cta__bookend-line--sub">{bookendLine2}</p>
+  </div>
+</section>

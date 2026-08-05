@@ -1,0 +1,80 @@
+---
+import { marked } from 'marked';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  meta: string;
+  pullQuoteStamp: string;
+  pullQuoteBody: string;
+  demoBody: string;
+  demoCtaLabel: string;
+  demoCtaHref: string;
+  operatorCredit: { eyebrow: string; body: string };
+  hyperquake: { eyebrow: string; body: string };
+}
+
+const {
+  eyebrow,
+  title,
+  meta,
+  pullQuoteStamp,
+  pullQuoteBody,
+  demoBody,
+  demoCtaLabel,
+  demoCtaHref,
+  operatorCredit,
+  hyperquake,
+} = Astro.props;
+
+const metaLines = meta.split('\n');
+const operatorBodyHtml = marked.parseInline(operatorCredit.body);
+const hyperquakeBodyHtml = marked.parseInline(hyperquake.body);
+---
+
+<section class="sec sec--receipts" id="receipts">
+  <div class="container">
+    <header class="sec__head reveal">
+      <div>
+        <p class="sec__num">{eyebrow}</p>
+        <h2 class="sec__title">{title}</h2>
+      </div>
+      <div class="sec__meta">
+        {
+          metaLines.map((line, i) => (
+            <>
+              {line}
+              {i < metaLines.length - 1 && <br />}
+            </>
+          ))
+        }
+      </div>
+    </header>
+
+    <div class="receipts__quote reveal reveal--up-1">
+      <p class="head receipts__pull">
+        <span class="highlight">{pullQuoteStamp}</span>
+        {' '}{pullQuoteBody}
+      </p>
+    </div>
+
+    <div class="receipts__demo reveal reveal--up-2">
+      <p class="receipts__demo-body">{demoBody}</p>
+      <a href={demoCtaHref} class="btn btn--primary" data-hot>
+        <span>{demoCtaLabel}</span>
+      </a>
+    </div>
+
+    <div class="receipts__credit-grid">
+      <div class="receipts__credit reveal">
+        <p class="label">{operatorCredit.eyebrow}</p>
+        <p class="receipts__credit-body" set:html={operatorBodyHtml} />
+      </div>
+
+      <div class="receipts__credit reveal reveal--up-1">
+        <p class="label">{hyperquake.eyebrow}</p>
+        <p class="receipts__credit-body" set:html={hyperquakeBodyHtml} />
+      </div>
+    </div>
+  </div>
+</section>

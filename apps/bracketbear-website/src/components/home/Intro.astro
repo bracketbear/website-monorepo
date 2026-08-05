@@ -1,0 +1,26 @@
+---
+import { marked } from 'marked';
+
+interface Props {
+  aside: string;
+  leadBlock: string;
+  closingLine: string;
+}
+
+const { aside, leadBlock, closingLine } = Astro.props;
+const leadBlockHtml = marked.parseInline(leadBlock);
+const closingLineHtml = marked.parseInline(closingLine);
+---
+
+<section class="intro" id="approach">
+  <div class="intro__grid container">
+    <aside class="marg reveal">
+      <p>{aside}</p>
+    </aside>
+
+    <div>
+      <p class="intro__quote reveal reveal--up-1" set:html={leadBlockHtml} />
+      <p class="intro__sig reveal reveal--up-2" set:html={closingLineHtml} />
+    </div>
+  </div>
+</section>

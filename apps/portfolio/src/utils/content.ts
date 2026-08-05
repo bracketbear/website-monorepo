@@ -1,18 +1,11 @@
 import {
   getCollection,
-  type AnyEntryMap,
+  type CollectionKey,
   type CollectionEntry,
 } from 'astro:content';
-import type { PortfolioAboutPageData } from '@bracketbear/astro-content';
+import type { PortfolioAboutPageData } from '@bracketbear/schemas';
 
-type GetCollectionParams<
-  C extends keyof AnyEntryMap,
-  E extends CollectionEntry<C>,
-> = [C, (entry: CollectionEntry<C>) => entry is E];
-type CollectionName = GetCollectionParams<
-  keyof AnyEntryMap,
-  CollectionEntry<keyof AnyEntryMap>
->[0];
+type CollectionName = CollectionKey;
 
 /**
  * Get a collection and return it as a keyed object for efficient lookups.

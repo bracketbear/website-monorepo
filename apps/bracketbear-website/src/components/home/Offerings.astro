@@ -1,0 +1,93 @@
+---
+import { marked } from 'marked';
+
+interface OfferingItem {
+  number: string;
+  title: string;
+  body: string;
+  tag: string;
+}
+
+interface PlatformLayer {
+  title: string;
+  body: string;
+}
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  meta: string;
+  items: OfferingItem[];
+  platformLayers: {
+    eyebrow: string;
+    items: PlatformLayer[];
+  };
+}
+
+const { eyebrow, title, meta, items, platformLayers } = Astro.props;
+const metaLines = meta.split('\n');
+---
+
+<section class="sec sec--orange" id="work">
+  <div class="container">
+    <header class="sec__head reveal">
+      <div>
+        <p class="sec__num">{eyebrow}</p>
+        <h2 class="sec__title">{title}</h2>
+      </div>
+      <div class="sec__meta">
+        {
+          metaLines.map((line, i) => (
+            <>
+              {line}
+              {i < metaLines.length - 1 && <br />}
+            </>
+          ))
+        }
+      </div>
+    </header>
+  </div>
+
+  <div class="container">
+    <div class="offers" role="list">
+      {
+        items.map((item) => {
+          const tagLines = item.tag.split('\n');
+          const bodyHtml = marked.parseInline(item.body);
+          return (
+            <article class="offer reveal" role="listitem" data-hot>
+              <span class="offer__num">{item.number}</span>
+              <h3 class="offer__title">{item.title}</h3>
+              <p class="offer__body" set:html={bodyHtml} />
+              <span class="offer__tag">
+                {tagLines.map((line, i) => (
+                  <>
+                    {line}
+                    {i < tagLines.length - 1 && <br />}
+                  </>
+                ))}
+              </span>
+              <span class="offer__arrow">↗</span>
+            </article>
+          );
+        })
+      }
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="layers" role="list">
+      <p class="label layers__eyebrow">{platformLayers.eyebrow}</p>
+      <div class="layers__grid">
+        {
+          platformLayers.items.map((layer) => (
+            <div class="layer" role="listitem">
+              <h4 class="layer__title">{layer.title}</h4>
+              <p class="layer__body">{layer.body}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
