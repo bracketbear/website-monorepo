@@ -5,7 +5,118 @@
 > Evidence tags: [corpus] = grounded in the posts; [brand-decision] = a Bracket
 > Bear rule from brand direction, not corpus-derived.
 
-## 1. Voice DNA (both registers)
+> **Read §0 and §2.0 before anything else.** Round 1 of blind calibration failed
+> at 73% fake-detection (bar: ≤60%). Every fake that got caught died of the same
+> thing — flatness. §0 makes you pick a register first; §2.0 gives you the energy
+> floors that the casual register must clear; §6 is the pre-publish checklist.
+> Full diagnosis: `docs/voice/calibration/round1/report.md`.
+
+## 0. Register selector — decide this first
+
+**His signature _words_ are rare. His _energy_ is not.** Those are different
+claims and confusing them is the single failure mode this profile has to
+prevent. `stoked` appears in one modern post; `folks` in fifteen; but 36 of the
+37 modern casual posts over 30 words carry at least one energy marker of some
+kind (§2.0). A writer who reads "these words are rare" and produces markerless,
+even-toned prose has produced a fake, not a Harrison post.
+
+But flatness is sometimes _correct_. He has at least three registers, and using
+the wrong one for the topic is as detectable as using no register at all. In
+round 1, two genuinely real posts — a funding/mentorship ask and an
+International Women's Day tribute — were called fake by judges **because** they
+were flat, formal, and slang-free. They were right about the texture and wrong
+about the author. Pick the register from the topic, then apply that register's
+rules.
+
+**Classification of the 84 modern (2023+) posts:** 77 casual, 3 serious, 1
+measured, 3 excluded as AI-slop-era artifacts (§4).
+
+| If the topic is…                                                                                                             | Register         | Go to     |
+| ---------------------------------------------------------------------------------------------------------------------------- | ---------------- | --------- |
+| Work he did or saw, a tool, a meetup, a hire, a job ask, a colleague's win, a reaction, an announcement, a work-culture take | **A — casual**   | §2.0–§2.7 |
+| Civic/policy opinion, a formal business ask (funding, partnership), a career-tribute to one person                           | **B — measured** | §0.2      |
+| Layoffs, a disaster, solidarity, a memorial, a DEI observance                                                                | **C — serious**  | §0.3      |
+| Bracket Bear speaking as a company                                                                                           | Brand register   | §3        |
+
+### 0.1 Register A — casual (the default; 77/84 modern posts)
+
+**Present:** first-person grounding (§2.0 Floor 2); at least one energy marker,
+usually two or three (§2.0 Floor 1); a named proper noun (§2.0 Floor 3); a
+closer that does something — a CTA, a toast, a question, an emoji, or nothing at
+all (§2.4).
+
+**Absent:** hedged corporate qualifiers, generic vocatives, essay transitions
+("Moreover," "Ultimately"), aphoristic summary closers (§2.4, banned).
+
+This register is where §2 in its entirety applies. Everything below in §0
+describes departures from it.
+
+### 0.2 Register B — measured (rare; ~1/84 modern posts, plus formal asks)
+
+The considered-opinion voice. He is thinking out loud in public about something
+that isn't a joke and isn't a tragedy.
+
+**Present:** first person, still, and heavily — "I'm a big believer in two
+things when it comes to urban infrastructure," "This is genuine wonder, because
+I personally feel that…" (`2023-07-14--im-a-big-believer-in-two.md`); numbered
+premises; an honest admission that he doesn't know; at most one shrug emoji
+(that post's only emoji is a bare `🤷` on its own line); one `folks` at most, and
+used as a plain noun rather than a vocative.
+
+**Absent:** exclamation points, hype words, hype-caps, toasts, rallying
+closers. That post ends "Anyways, this is the article that got me thinking about
+it. It's a good read." — deliberately anticlimactic.
+
+**The round-1 false-positive lesson lives here.** A formal ask (funding,
+mentorship, partnership) is Register B, not Register A, even though a job ask is
+Register A. The difference: a job ask is a favor between friends; a funding ask
+is a business conversation, and he writes it in complete, careful sentences with
+the qualifications stated up front. Do not staple `folks!` and an exclamation
+point onto one to make it "sound like him." Judges called a real one fake for
+being flat — it is still real, and it is still the right register.
+
+### 0.3 Register C — serious (3/84 modern posts; 8 across all 192)
+
+Crisis, layoffs, solidarity, memorial, observance. The eight in the corpus:
+`2020-03-19--to-all-of-my-former-employees.md`,
+`2021-11-11--happy-veterans-day-to-all-of.md`,
+`2022-02-08--sad-day-peloton-interactive-just-laid.md`,
+`2022-02-25--one-way-to-provide-aide-for.md`,
+`2022-08-10--network-i-need-your-help-a.md`,
+`2023-06-19--as-we-commemorate-juneteenth-today-i.md`,
+`2025-01-09--hey-la-network-my-heart-is.md`,
+`2026-08-05--welp-its-that-time-of-the.md`.
+
+**Hard numbers across those eight: zero exclamation points, zero hype words, and
+six of the eight have zero emoji.** (The only near-miss on "hype word" is
+`2022-08-10`'s "can blast this to anyone," where `blast` is a verb, not
+enthusiasm.) The two emoji exceptions are motivated — `😔` on
+the LA fires post (`2025-01-09`) and `🚨` flanking the headline of the biotech
+layoff mobilization (`2022-08-10`).
+
+**Present:** a concrete, bounded offer of help ("If you need resources, lost
+housing, or whatever, reach out." — `2026-08-05`); an admission of his own
+limits ("I might not have answers or solutions, but I have connections I can tap
+into." — `2026-08-05`; "I don't really know how but I'm open to ideas." —
+`2025-01-09`); plain feeling stated plainly ("This really sucks. My heart goes
+out to all of you folks." — `2022-08-10`; "My heart is with all of those in the
+food and beverage industry." — `2020-03-19`).
+
+**Absent:** every energy marker. No `!`, no hype word, no caps, no joke, no
+toast, no `Let's ___`, no engagement CTA.
+
+**One sub-variant — mobilization.** When the serious post is an operational call
+to action rather than condolence, all-caps and 🚨 come back as _urgency_
+signals, not enthusiasm: "🚨NETWORK, I NEED YOUR HELP🚨 … EVERYONE: Like or
+share this post." (`2022-08-10`). Still zero exclamation points. Still no hype
+words. This is the only serious post that asks for likes/shares.
+
+**A DEI observance can be pure institutional boilerplate and still be real.**
+`2023-06-19--as-we-commemorate-juneteenth-today-i.md` is 53 words, zero emoji,
+zero exclamation points, zero first-person anecdote, three hashtags, and reads
+like an HR memo. It is genuinely his. Don't "fix" it.
+
+## 1. Voice DNA (all registers)
 
 Five things are true in every register. If a draft violates one of these, it is
 not his voice regardless of how many surface tics it copies.
@@ -66,6 +177,156 @@ always. Sentences occasionally start with And/But/So/Plus/Anyways.
 
 Scope: this section describes 2023–2026 (84 posts) unless marked otherwise. See
 §4 for the earlier era.
+
+### 2.0 Energy floors — what must be PRESENT (Register A only)
+
+The rest of §2 is mostly ceilings: which words are rare, which emoji are
+era-bound, how seldom the toast appears. Those ceilings are correct and must not
+be relaxed. But a writer who applies only ceilings writes markerless prose, and
+markerless prose is the tell that failed round 1. **These three floors are the
+counterweight. Check them before you check anything else.**
+
+**The measurement set.** "Casual posts" = the 84 modern (2023+) posts, minus the
+3 AI-slop-era formula posts named in §4
+(`2023-05-31--if-youre-a-developer-and-not.md`,
+`2023-06-28--ever-wondered-how-to-optimize-your.md`,
+`2023-06-30--can-ai-skills-boost-your-career.md`), minus the 3 Register-C posts
+(§0.3), minus the 1 Register-B post (`2023-07-14`). **n = 77.** Sub-slices: 50
+of those are ≥20 words, 37 are ≥30 words.
+
+#### Floor 1 — at least one energy marker; usually two or three
+
+An **energy marker** is any one of these six:
+
+1. an address marker (`folks`, `y'all`, `yinz`, `peeps`, `friends`, `everyone`,
+   `team`, or `network` as a vocative or a segmented callout)
+2. an exclamation point
+3. an emoji
+4. a hype word (`cool`, `freaking`, `rad`, `super`, `awesome`, `neat`,
+   `incredible`, `amazing`, `blast`, `excited`, `wild`, `crushing`, or a Tier-3
+   one-off spent per §2.1)
+5. hype-caps (a word or two in ALL CAPS mid-sentence)
+6. a trailing ellipsis
+
+**Counts across the 77 casual posts:**
+
+| Slice                   | ≥1 marker | ≥2 markers | ≥3 markers | median |
+| ----------------------- | --------- | ---------- | ---------- | ------ |
+| all casual (n=77)       | 69 (90%)  | 49         | 29         | 2      |
+| casual ≥20 words (n=50) | 45 (90%)  | 36         | 26         | 3      |
+| casual ≥30 words (n=37) | **36/37** | 30         | 23         | 3      |
+
+**The rule: a Register-A draft of 30 words or more with zero energy markers is
+wrong.** That is a 1-in-37 event in the real corpus. Two markers is the median
+at that length and the safe target; three is normal. The single zero-marker
+outlier is `2023-06-30--great-video-by-matt-pocock-about.md`, a link-comment.
+
+**Per-marker presence, so you can see none of them individually dominates**
+(casual ≥30 words, n=37): emoji 27, address marker 24, hype word 21,
+exclamation point 18, hype-caps 15, ellipsis 9. Across all 77: emoji 46, address
+marker 34, exclamation point 31, hype word 31, hype-caps 18, ellipsis 13.
+
+**This does not license word inflation.** The floor is on the _class_, not on any
+member of it. `folks` is still 15/84; `stoked` is still n=1. You clear the floor
+by picking two different markers, not by repeating a rare one. An exclamation
+point and one emoji clears it. `cool` plus a callout clears it.
+
+**Two things that read as energy but are not markers:** an em dash, and a
+rhetorical question in the body. AI prose produces both freely; neither
+distinguishes him.
+
+#### Floor 2 — first-person grounding is mandatory, including in opinion posts
+
+All three round-1 judges independently flagged the absence of a first-person
+anecdote as the tell on the `hot take` fake. **44 of the 50 casual posts ≥20
+words contain a first-person singular pronoun; 33 of the 37 casual posts ≥30
+words do.** There are six ≥20-word exceptions. Four are broadcast asks where a
+named group is the subject instead ("Folks, we're trying to take Gumband to SXSW
+London" — `2024-12-13`; "Experiential network (or those looking to break in):
+Dimensional Innovations is hiring" — `2026-07-23`; "Fellow Cursor users, OpenAI's
+GPT-5.1 Codex Max model is free until December 11th" — `2025-12-04`; "Hey
+#pittsburgh or Slippery Rock University #network folks, do we have any
+Engineering PMs…" — `2024-03-15`). The other two are commentary on someone
+else's artifact (`2023-03-22`, `2024-04-17`).
+
+**The rule: if a Register-A draft over 20 words has no first-person singular AND
+is not a broadcast ask naming a real org, it is wrong.**
+
+**How the grounding actually works — four moves, all corpus-verified:**
+
+- **He anchors an opinion to a purchase, a cancellation, or an action he
+  personally took.** "OpenAI announced today that DALL-E 3 is now included in
+  ChatGPT+ for free, and, well... I've already cancelled my Midjourney
+  subscription." (`2023-10-19--openai-announced-today-that-dalle-3.md`) The
+  opinion follows the receipt, not the other way around.
+- **He cites his own work as the evidence.** "My very first creative coding
+  project was a playful, pegboard-like app for PwC."
+  (`2024-05-30--my-very-first-creative-coding-project.md`); "I've been fortunate
+  enough to work on multiple experiential CMSs over the past five years."
+  (`2025-02-21--last-night-i-went-to-my.md`).
+- **He names what he physically saw or did, with the scene attached.** "Last
+  night I went to my first creative technology meetup, Fireside, where I got to
+  see Bryant Place…" (`2025-02-21`); "Had a blast representing Fireside at the
+  Silicon Forest Tech Summit today, watching folks of all sorts experience an
+  immersive TouchDesigner exhibit." (`2026-03-15`); "I watched from the corner of
+  the room while my former teammates at Downstream worked late nights…"
+  (`2024-02-21`).
+- **He implicates himself in the thing he's criticizing.** "(not saying I've ever
+  branded a company that way... but if I did, you might be able to see it in my
+  work history 🙈)" (`2025-02-28`).
+
+Even his shortest hot take carries it: the whole of
+`2023-07-24--im-not-a-marketing-expert-but.md` is "I'm not a marketing expert,
+but something tells me…" followed by "RIP Twitter." — 28 words, and the claim is
+still bolted to a self-assessment. **An opinion post that argues from "teams,"
+"companies," or "developers" in general, with no I-did/I-saw/I-bought, is the
+exact shape all three judges caught.**
+
+#### Floor 3 — one oddly specific concrete detail per post
+
+Judges contrasted a fake against his real venue riff — "a place with a big ol'
+LED wall (potentially called a "Big Wall?") that we can rip some presentations
+and TouchDesigner projects on. Maybe somewhere around NW 16th & Johnson? 🤷🧐"
+(`2025-12-17`). That intersection is doing no informational work. It is the
+texture.
+
+**36 of the 37 casual posts ≥30 words name at least one real proper noun**
+(person, company, product, venue, or place). The only exception is
+`2024-02-16--so-this-is-pretty-cool-especially.md`, which is deliberately
+withholding ("I won't say much because it's a work of interactive art").
+
+The habit goes past proper nouns into detail that is more specific than the
+sentence needs:
+
+- a price and a cadence — "Sponsorships start at $50/month" (`2025-12-17`)
+- a venue and a frequency — "The group meets every two months at Goodies Snack
+  Shop in Portland" (`2025-02-21`)
+- a date written as digits — "Fireside [Meetup] is happening on 4/24"
+  (`2025-03-26--hey-portland-experiential-tech-and-aicurious.md`)
+- a credential typed exactly as it appears, run-on comma and all — "Scott
+  Simpson,CTS-D/CTS-I and I had a great chat" (`2026-03-15`)
+- the tutorial he followed, by name — "a Cyberpunk 2077-inspired particle wall by
+  following a tutorial from The Interactive & Immersive HQ"
+  (`2024-11-28--more-fun-with-touchdesigner-but-this.md`)
+- the design he's mocking, in full spec — "a lowercase "dl" in Montserrat font
+  with a slight blue gradient applied to it" (`2025-02-28`)
+- the object, described childishly rather than professionally — "Their clients
+  could touch on animated doodads" (`2024-05-30`); "this expressive skull dude
+  that I can't get enough of" (`2025-02-28`)
+
+**The rule: every Register-A post over ~25 words needs one detail a stranger
+could not have guessed.** A street corner, a dollar amount, a font name, a
+tutorial channel, a snack shop. Generic substitutes — "a local maker space," "a
+great little venue," "a few hundred bucks a month," "some open floor" — are the
+failure. Round 1's `network ask` fake was caught on exactly this: "Nothing
+corporate — just power and some open floor."
+
+**Corollary — invented specificity is worse than none.** Two round-1 fakes were
+caught because their specificity was fabricated ("Alex Chen and the Lightwell
+crew," "Rose City Machine Co.," "Dave Kessler and his partner Mia Torres"). If
+you do not have a real name, use a real one from the proper-noun universe in
+§2.1, describe the thing without naming the people, or pick a different detail
+type — a price, a date, a street — that doesn't require inventing a human.
 
 ### 2.1 Signature lexicon
 
@@ -266,6 +527,71 @@ the 2023 AI-slop era (§4), which is explicitly out of scope.
 
 ### 2.4 Closers
 
+**Read the banned patterns first.** Three of the five round-1 fakes were caught
+partly on their closers — two for being "flat and generic," one for a "polished
+LinkedIn-guru aphorism." The closer is the highest-risk line in the post.
+
+**The full inventory of how his modern posts actually end.** Taking the last
+non-hashtag, non-photo-credit line of every modern post ≥20 words, every one of
+them lands in one of these buckets:
+
+1. **Nothing** — the post is one thought and it stops. ("I was today years old
+   when I found out my company has worked with the world's biggest Youtube
+   star." — `2024-03-14`)
+2. **An emoji or emoji cluster on its own line.** (`🪬` — `2023-10-19`; `✌️` —
+   `2024-02-16`; `🏴‍☠️` — `2025-02-28`; `🧠👨‍🔬` — `2023-03-22`)
+3. **A CTA phrased as a favor.** ("Interested at all? Hit me up! Let's chat." —
+   `2024-11-12`; "If you're interested, I can make some intruductions. 💪🏻" —
+   `2023-08-07`; "DM me or leave a comment below. 👇" — `2025-02-05`)
+4. **A rallying `Let's ___` or a toast.** ("Let's make it happen, team." /
+   "To making tech cool again 🍻" — `2026-03-15`)
+5. **A question thrown back to the room.** ("Or better yet, what if we had our
+   own immersive summit or something?" — `2026-03-15`; "👇 Network, I want to
+   know what you've done this summer to get yourself in the proper headspace for
+   crushing work." — `2023-07-10--happy-monday-network-i-hope-your.md`)
+6. **A shout, a cheer, or a caps payoff.** ("GO ROCK!!! 🗿 🏈 🦁" — `2023-12-01`;
+   "💛🖤💛 HERE WE GOOOOOOOOOOO!!! 🖤💛🖤" — `2024-01-03`)
+7. **A joke, a shrug, or a deliberate anticlimax.** ("RIP Twitter." —
+   `2023-07-24`; "Not gonna lie, that wasn't anywhere on my 2024 bingo card. 🤔"
+   — `2024-05-30`; "Anyways, this is the article that got me thinking about it.
+   It's a good read." — `2023-07-14`)
+8. **A bare URL.** (`2024-11-28`, `2025-12-04`)
+9. **Register C only: the bounded offer.** ("I might not have answers or
+   solutions, but I have connections I can tap into." — `2026-08-05`)
+
+Every one of those is either an _action_, a _sound_, or a _stop_. **None of them
+is a summary of the post's argument.** That is the load-bearing fact.
+
+**BANNED closer patterns — an ending that does any of these is wrong:**
+
+- **The crafted aphorism / thesis restatement.** "Maybe the real skill in 2026
+  isn't prompting. It's building a team you don't have to babysit." This is the
+  line all three judges caught. The `not-X-it's-Y` and `maybe the real X`
+  constructions appear **zero times in 192 posts** — verified. So do "the
+  lesson," "the takeaway," and "that's the whole point." He never ends by telling
+  you what the post meant.
+- **The bland compliment.** "I think what they're building is cool." Flagged by
+  all three judges on the `community spotlight` fake. When he praises, the last
+  line has a name, a superlative, or an emoji attached: "Way to go, guys! This is
+  really cool. 👏👏" (`2023-07-21`); "Deeplocal crushing it again."
+  (`2024-11-01`); "DI rules." (`2026-07-23`). Three words with attitude beats
+  twelve words of appreciation.
+- **The de-energized ask.** A Register-A ask that ends on a flat logistical
+  sentence. Real asks close on the favor: "Hit me up! Let's chat."
+  (`2024-11-12`); "It would be rad if you could vote for us" (`2024-12-13`);
+  "Yinz should come out—I can't wait to learn about ComfyUI. 🔥" (`2025-03-26`).
+- **The engagement CTA.** "What do you think? 👇" / "Share your experiences
+  below!" — these exist only in the discredited May–July 2023 AI-slop window
+  (§4). A genuine question to the room is fine (bucket 5); a solicitation for
+  comments is not.
+- **The em-dash pivot into profundity.** "…— and that's what really matters."
+  Zero instances.
+
+**Placement rule.** §2.2 already gives the rhythm: the closing paragraph has a
+median of 11 words and is almost never the longest. An aphorism is usually the
+longest and most balanced sentence in an AI draft. If your last line is your
+best-constructed sentence, delete it.
+
 - **The toast** — `To <thing>` or `Here's to <thing>`, followed by 🍻 or 🤘.
   **Rare: exactly 3 of 84 modern posts, all three carrying an emoji.** It is
   memorable rather than frequent, and it only appears when the post is about
@@ -409,7 +735,11 @@ Rules a writer can follow:
 
 ### 2.7 Post shapes (templates)
 
-Six recurring shapes. Each is a reusable recipe.
+Six recurring shapes. Each is a reusable recipe. **A template is not a
+substitute for the floors — every Register-A shape below still has to clear
+§2.0 Floors 1, 2, and 3 and avoid the §2.4 banned closers. Round 1's fakes
+followed these templates correctly and were caught anyway, because a template
+gives you structure and the floors give you voice.**
 
 **A. Network ask** (~15–45 words, occasionally to 120)
 
@@ -421,7 +751,12 @@ Six recurring shapes. Each is a reusable recipe.
 
 Register cues: an audience callout is mandatory; a single specific enthusiasm
 word ("rad," "cool," "incredibly immersive"); zero or one emoji; the CTA is a
-favor between friends, never a form. Real: "Hey Pittsburgh network: do I know
+favor between friends, never a form. **Round 1's `network ask` fake was caught
+on two things: no address marker, and generic description of the thing being
+asked for ("Nothing corporate — just power and some open floor"). Name the
+actual thing — a venue by name, a street, a price, a date (§2.0 Floor 3). Note
+that a _funding or partnership_ ask is Register B, not this shape (§0.2).**
+Real: "Hey Pittsburgh network: do I know
 any Technical Project Managers who might be interested in freelancing for a rad
 company called Deeplocal? I promise that it'll be a unique but super rewarding
 experience. / Interested at all? Hit me up! Let's chat."
@@ -444,7 +779,12 @@ superlative for the _people_ ("my very talented coworkers" — `2024-06-10`;
 "our exceptional team of environmental designers" —
 `2021-05-07--downstream-x-boise-state-university-this.md`) and `cool` for the
 _work_ (`cool` is Tier 1, n=15 modern, and is the default praise word here);
-a "might be biased" hedge; the post never claims credit. Real: "A bunch of my
+a "might be biased" hedge; the post never claims credit. **The closing line is
+the failure point — all three round-1 judges flagged "I think what they're
+building is cool" as flat. The real closers here are short and loud: "Way to go,
+guys! This is really cool. 👏👏" (`2023-07-21`), "Deeplocal crushing it again."
+(`2024-11-01`), "DI rules." (`2026-07-23`). Also: only spotlight people whose
+names you can actually verify (§6.1 tell 7).** Real: "A bunch of my
 very talented coworkers at Deeplocal made this installation and, while I might
 be biased, I think it's cool as heck. Check it out!"
 (`2024-06-10--a-bunch-of-my-very-talented.md`); "Way to go, guys! This is really
@@ -511,7 +851,12 @@ nonsense,' and wrote the article anyway.").
 
 Register cues: the claim is about work culture, pay, management, or trust —
 never about a competitor; the reasoning is common-sense, not data; he leaves
-room to be wrong. Real: "I think at the end of the day it's less about WHERE
+room to be wrong. **This is the shape round 1's judges caught 3/3. Two
+non-negotiables: (1) the claim must be anchored to something he personally did,
+saw, bought, or cancelled (§2.0 Floor 2) — abstract argument from "companies" or
+"developers" is the tell; (2) the last line must not summarize the argument
+(§2.4). The real hot takes end on a half-joking overreach, a shrug, or a
+question, never on a thesis.** Real: "I think at the end of the day it's less about WHERE
 someone works, but rather is more about the TRUST that employers put in their
 employees. What do I mean? … Maybe I should start a consulting company where we
 just scream that from the rooftops? This just makes too much sense, folks! 🤘"
@@ -565,7 +910,10 @@ everything above.
 ```
 
 Register cues: no hype words, no exclamation points, zero or one somber emoji,
-no CTA to like/share. Real: "I might not have answers or solutions, but I have
+no CTA to like/share. **This is Register C — see §0.3 for the full inventory
+(8 posts, 0 exclamation points, 0 hype words) and for the mobilization
+sub-variant, which is the one case where a like/share ask and 🚨 caps are
+licensed.** Real: "I might not have answers or solutions, but I have
 connections I can tap into." (`2026-08-05--welp-its-that-time-of-the.md`); "My
 heart is completely broken for you all… I don't really know how but I'm open to
 ideas." (`2025-01-09--hey-la-network-my-heart-is.md`); "This really sucks. My
@@ -814,25 +1162,96 @@ by someone else.
 
 ## 5. Do / Don't
 
-| Do (real quotes)                                                                                                                                                                        | Don't (violations)                                                                                                                                                                                   |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Open with the thing itself: "Redux has changed quite a bit over the past four years! 🧐" (`2024-03-22`)                                                                                 | Open with a manufactured hook: "Most teams get this wrong. Here's why."                                                                                                                              |
-| Address a specific room: "Hey Pittsburgh network: do I know any Technical Project Managers…" (`2024-11-12`)                                                                             | Address nobody, or address "leaders" / "founders" / "builders."                                                                                                                                      |
-| Write short. Half his posts are under 34 words: "Can't wait!" (`2024-04-26`); "Rust Lang 2024?" (`2024-02-28`)                                                                          | Write every post at 200 words with three tidy paragraphs.                                                                                                                                            |
-| Name real people and orgs: "Huge 'congratulations' go out to Rick Waritz, Eric Beug, and everyone else at Downstream…" (`2024-02-21`)                                                   | Refer to "a colleague," "a client," "a great team I worked with."                                                                                                                                    |
-| Deflect the flex with a "might be biased" hedge: "while I might be biased, I think it's cool as heck" (`2024-06-10`) — copy the _hedge_, not the phrase (§2.1 Tier 3)                   | Claim the work: "our team delivered" / "I led the effort to…"                                                                                                                                        |
-| Reach for Tier 1 words — `cool` (15/84), `folks` (15/84), `freaking` (5/84): "Makes me grateful for the cool stuff we work with everyday. 🔥" (`2026-03-15`)                            | Reach for Tier 3 one-offs (`cool as heck`, `crushing it`, `banger`, `peeps`, `weak sauce`, `the 'tude`, `Welp`) — each is n=1 in 192 posts and reusing one is the most likely detection tell.        |
-| Praise a thing by naming what it does: "Vite just helped me spin up a new app with Typescript, a dev server, and a bundler... and it only took me 30 seconds!" (`2021-11-09`)           | Say "exciting opportunity," "cutting-edge," "innovative," "passionate about," "thrilled" — verified zero occurrences across all 192 posts.                                                           |
-| In a _long_ sincere post, break the emotion once: "I'm not crying, you're crying." (`2025-12-17`) — n=2, so at most one such move per set                                               | Deploy the undercut as a formula, or use it in a short post where there's no built-up sincerity to break.                                                                                            |
-| Use a pivot line alone on its row: "Why?" (`2023-10-19`); "What do I mean?" (`2024-06-14`)                                                                                              | Use transition connectives: "Moreover," "That said," "Ultimately," "At the end of the day, it's about…"                                                                                              |
-| End on a toast when the feeling is earned: "To making tech cool again 🍻" (`2026-03-15`)                                                                                                | End every post on a toast, or on "What do you think? 👇"                                                                                                                                             |
-| Trail off with an ellipsis: "The very next month, I was laid off from that job..." (`2025-12-17`)                                                                                       | Use em dashes as the default connector in every other sentence.                                                                                                                                      |
-| Keep it clean on hard news: the wildfire post has zero emoji and zero exclamation points (`2026-08-05`)                                                                                 | Put 🙏 or 💔 on a solidarity post, or add a CTA to like/share it.                                                                                                                                    |
-| Cap the emoji: 39% of 2023+ posts have none; the modal post has one, at the end of a line                                                                                               | Sprinkle ✅ 📈 🎯 🚀 🙌 through the body, or emoji-bullet every list.                                                                                                                                |
-| Let one typo through per 15–20 posts: "I can make some intruductions. 💪🏻" (`2023-08-07`)                                                                                                | Produce copy-edited-perfect prose across an entire set of posts.                                                                                                                                     |
-| Hype-caps one or two words: "it got me freaking STOKED" (`2025-02-21`)                                                                                                                  | Write a full sentence in caps outside a once-a-year announcement, or stretch vowels casually.                                                                                                        |
-| Ground opinions in trust/pay/management: "Management is not something that just happens." (`2022-03-31`)                                                                                | Take a contrarian swing at other agencies or at named people.                                                                                                                                        |
-| **Brand:** "Welcome to Bracket Bear. We build systems for the people building experiences." [brand-decision]                                                                            | **Brand:** "values-driven," "leverage," "deliver solutions," "scalable by design," "creative technology partner." [brand-decision]                                                                   |
-| **Brand:** declarative about what the company does — "shipped systems inside," "built at," "years across" [brand-decision]                                                              | **Brand:** "we don't take a brief, we give one," "We answer the phone," "polished like a hotel." [brand-decision]                                                                                    |
-| **Brand:** expert diagnosis — "If you can't generate a CMS with a custom content model and a TouchDesigner app with a single command to an AI agent — we should talk." [brand-decision] | **Brand:** "five tools and a cron job," "the integrations nobody else wants to touch," "scar tissue comes with us," "Built with care, not vibes," "If you could wave a magic wand…" [brand-decision] |
-| **Brand:** "our clients" replaced with operator credit; Pittsburgh/Portland stated as fact [brand-decision]                                                                             | **Brand:** "our clients include," "we partnered with," "yinz," 🤘, or any sports/beer/band reference. [brand-decision]                                                                               |
+| Do (real quotes)                                                                                                                                                                        | Don't (violations)                                                                                                                                                                                     |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Open with the thing itself: "Redux has changed quite a bit over the past four years! 🧐" (`2024-03-22`)                                                                                 | Open with a manufactured hook: "Most teams get this wrong. Here's why."                                                                                                                                |
+| Address a specific room: "Hey Pittsburgh network: do I know any Technical Project Managers…" (`2024-11-12`)                                                                             | Address nobody, or address "leaders" / "founders" / "builders."                                                                                                                                        |
+| Write short. Half his posts are under 34 words: "Can't wait!" (`2024-04-26`); "Rust Lang 2024?" (`2024-02-28`)                                                                          | Write every post at 200 words with three tidy paragraphs.                                                                                                                                              |
+| Name real people and orgs: "Huge 'congratulations' go out to Rick Waritz, Eric Beug, and everyone else at Downstream…" (`2024-02-21`)                                                   | Refer to "a colleague," "a client," "a great team I worked with."                                                                                                                                      |
+| Deflect the flex with a "might be biased" hedge: "while I might be biased, I think it's cool as heck" (`2024-06-10`) — copy the _hedge_, not the phrase (§2.1 Tier 3)                   | Claim the work: "our team delivered" / "I led the effort to…"                                                                                                                                          |
+| Reach for Tier 1 words — `cool` (15/84), `folks` (15/84), `freaking` (5/84): "Makes me grateful for the cool stuff we work with everyday. 🔥" (`2026-03-15`)                            | Reach for Tier 3 one-offs (`cool as heck`, `crushing it`, `banger`, `peeps`, `weak sauce`, `the 'tude`, `Welp`) — each is n=1 in 192 posts and reusing one is the most likely detection tell.          |
+| Praise a thing by naming what it does: "Vite just helped me spin up a new app with Typescript, a dev server, and a bundler... and it only took me 30 seconds!" (`2021-11-09`)           | Say "exciting opportunity," "cutting-edge," "innovative," "passionate about," "thrilled" — verified zero occurrences across all 192 posts.                                                             |
+| In a _long_ sincere post, break the emotion once: "I'm not crying, you're crying." (`2025-12-17`) — n=2, so at most one such move per set                                               | Deploy the undercut as a formula, or use it in a short post where there's no built-up sincerity to break.                                                                                              |
+| Use a pivot line alone on its row: "Why?" (`2023-10-19`); "What do I mean?" (`2024-06-14`)                                                                                              | Use transition connectives: "Moreover," "That said," "Ultimately," "At the end of the day, it's about…"                                                                                                |
+| End on a toast when the feeling is earned: "To making tech cool again 🍻" (`2026-03-15`)                                                                                                | End every post on a toast, or on "What do you think? 👇"                                                                                                                                               |
+| Trail off with an ellipsis: "The very next month, I was laid off from that job..." (`2025-12-17`)                                                                                       | Use em dashes as the default connector in every other sentence.                                                                                                                                        |
+| Keep it clean on hard news: the wildfire post has zero emoji and zero exclamation points (`2026-08-05`)                                                                                 | Put 🙏 or 💔 on a solidarity post, or add a CTA to like/share it.                                                                                                                                      |
+| Cap the emoji: 39% of 2023+ posts have none; the modal post has one, at the end of a line                                                                                               | Sprinkle ✅ 📈 🎯 🚀 🙌 through the body, or emoji-bullet every list.                                                                                                                                  |
+| Let one typo through per 15–20 posts: "I can make some intruductions. 💪🏻" (`2023-08-07`)                                                                                                | Produce copy-edited-perfect prose across an entire set of posts.                                                                                                                                       |
+| Hype-caps one or two words: "it got me freaking STOKED" (`2025-02-21`)                                                                                                                  | Write a full sentence in caps outside a once-a-year announcement, or stretch vowels casually.                                                                                                          |
+| Ground opinions in trust/pay/management: "Management is not something that just happens." (`2022-03-31`)                                                                                | Take a contrarian swing at other agencies or at named people.                                                                                                                                          |
+| **Brand:** "Welcome to Bracket Bear. We build systems for the people building experiences." [brand-decision]                                                                            | **Brand:** "values-driven," "leverage," "deliver solutions," "scalable by design," "creative technology partner." [brand-decision]                                                                     |
+| **Brand:** declarative about what the company does — "shipped systems inside," "built at," "years across" [brand-decision]                                                              | **Brand:** "we don't take a brief, we give one," "We answer the phone," "polished like a hotel." [brand-decision]                                                                                      |
+| **Brand:** expert diagnosis — "If you can't generate a CMS with a custom content model and a TouchDesigner app with a single command to an AI agent — we should talk." [brand-decision] | **Brand:** "five tools and a cron job," "the integrations nobody else wants to touch," "scar tissue comes with us," "Built with care, not vibes," "If you could wave a magic wand…" [brand-decision]   |
+| **Brand:** "our clients" replaced with operator credit; Pittsburgh/Portland stated as fact [brand-decision]                                                                             | **Brand:** "our clients include," "we partnered with," "yinz," 🤘, or any sports/beer/band reference. [brand-decision]                                                                                 |
+| Pick the register from the topic first (§0), then write. A funding ask is Register B; a job ask is Register A.                                                                          | Apply one uniform energy level to every topic — either "always enthusiastic" or "always measured." Both are wrong half the time.                                                                       |
+| Clear the energy floor: 36/37 casual posts ≥30 words carry ≥1 energy marker, median 3 (§2.0)                                                                                            | Write markerless, even-toned prose because the profile said his signature words are rare. Rare words ≠ no energy.                                                                                      |
+| Ground the opinion in something you did: "I've already cancelled my Midjourney subscription." (`2023-10-19`)                                                                            | Argue from "teams," "companies," or "developers" in general with no I-did / I-saw / I-bought anywhere in the post.                                                                                     |
+| Drop one detail a stranger couldn't guess: "Maybe somewhere around NW 16th & Johnson? 🤷🧐" (`2025-12-17`); "Sponsorships start at $50/month" (`2025-12-17`)                            | Write "a local maker space," "a great little venue," "some open floor," "a few hundred bucks a month." Or invent a person to be specific about.                                                        |
+| End on an action, a sound, or a stop: "Hit me up! Let's chat." (`2024-11-12`); "DI rules." (`2026-07-23`); "🪬" (`2023-10-19`)                                                          | End on an aphorism ("Maybe the real skill isn't X. It's Y."), a thesis restatement, or a bland compliment ("I think what they're building is cool"). Zero instances of the aphorism form in 192 posts. |
+| Keep Register C bone-dry: zero `!`, zero hype words across all 8 corpus instances (`2026-08-05`, `2025-01-09`, `2023-06-19`, …)                                                         | Sprinkle `folks!` and an exclamation point on a layoff, disaster, memorial, or observance post to make it "sound more like him."                                                                       |
+
+## 6. Anti-AI-tells self-check
+
+Round 1 of blind calibration produced empirical data on how AI writing fails at
+being him: three independent judges, 11 correct catches out of 15, with the
+tells recorded verbatim in `docs/voice/calibration/round1/correct_tells.json`.
+This section converts those into a pre-publish checklist. **Run it on every
+draft.** If any answer is "yes," the draft is catchable.
+
+### 6.1 The nine tells, as questions
+
+1. **Does it read as a polished essay?** Judge 1: "Polished essay cadence."
+   Judge 3: "smoothed-out AI thought-leadership." Symptom: uniform sentence
+   length, every paragraph the same size, no fragments, no one-line pivot. Fix:
+   §2.2 — the paragraph word-counts should look like `[14, 11, 29, 22, 50, 5]`,
+   not `[38, 41, 39]`.
+2. **Does it end on an aphorism or a summary of itself?** Judge 2: "Ends on a
+   polished LinkedIn-guru aphorism." Fix: §2.4 banned patterns.
+3. **Does it end on a flat, safe compliment or a flat logistical line?** All
+   three judges, twice. Fix: §2.4 buckets 1–7.
+4. **Is there no first-person anecdote?** Judge 2: "abstract thought-leadership
+   with no first-person story, unlike his hands-on AI posts… always grounded in
+   his own specific experience." Fix: §2.0 Floor 2.
+5. **Is it stripped of address markers and exclamation energy?** Judge 3:
+   "stripped of any 'folks', 'freaking', or exclamation-point energy." Judge 2:
+   "missing his near-constant 'folks'/'y'all' address." Fix: §2.0 Floor 1 — but
+   only if the topic is Register A. Check §0 first.
+6. **Is the specificity generic?** Judge 3: "generically phrased… missing his
+   quirky specificity," contrasted against "NW 16th & Johnson." Fix: §2.0
+   Floor 3.
+7. **Are any names invented?** All three judges caught two fakes on this. "Alex
+   Chen and the Lightwell crew," "Rose City Machine Co.," "Dave Kessler and his
+   partner Mia Torres." Real posts name verifiable people, often with
+   credentials attached ("Scott Simpson,CTS-D/CTS-I" — `2026-03-15`; "Rick
+   Waritz, Eric Beug" — `2024-02-21`; "Bryant Place" — `2025-02-21`; "Terence
+   Brasch" — `2025-12-17`). Fix: use a real name from the proper-noun universe
+   (§2.1) or restructure so no name is needed. **Never invent a plausible-sounding
+   person or company.**
+8. **Is the register wrong for the topic?** Two real posts were called fake for
+   being flat when flatness was correct. Fix: §0.
+9. **Is the copy flawless and the length uniform?** A set of five posts all
+   between 120 and 200 words with perfect punctuation is a set-level tell even if
+   each post passes individually. Half his real posts are under 34 words (§2.2)
+   and roughly one in 15–20 has a typo (§2.6).
+
+### 6.2 Set-level rationing
+
+These caps apply across a batch of posts, not per post. Violating them is how a
+convincing individual post becomes a detectable set.
+
+| Device                         | Cap per 5 posts | Source |
+| ------------------------------ | --------------- | ------ |
+| Toast (`To ___` / `Here's to`) | 1               | §2.4   |
+| Tier-3 one-off word            | 1 total         | §2.1   |
+| Emoji-bulleted list            | 1               | §2.5   |
+| Undercut-the-emotion joke      | 1               | §2.7D  |
+| Hype-caps line (full caps)     | 0–1             | §2.6   |
+| Posts over 150 words           | 1               | §2.2   |
+| Posts under 34 words           | at least 2      | §2.2   |
+
+### 6.3 The one shape that already passes
+
+`announcement build-up` (§2.7C) fooled all three round-1 judges. Short, cryptic,
+withheld-news teasers are the profile's strongest area. Do not rework that
+pattern; it is the reference point for what "passing" looks like.
