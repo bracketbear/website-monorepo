@@ -12,12 +12,91 @@ ratio, none read `VOICE.md` or any file under `docs/voice/calibration/` or
 `docs/voice/linkedin/` (each judge's tool-use count was 0, verified from
 subagent usage stats).
 
-## Result: PASS
+## Result: PASS — the real evidence is discriminability collapse, not the raw accuracy delta
 
-**Mean fake accuracy: 40%** (pass threshold: ≤60%)
+**Primary evidence: d′ (discriminability) fell from 1.59 in round 1 to 0.09 in
+round 2.** A d′ near zero means round 2's judges could not distinguish fakes
+from real posts materially better than chance. This is the headline result.
+The raw 73% → 40% mean-accuracy figure is _not_ the headline result — see
+"Why the raw accuracy comparison is inflated," below, for why that number
+overstates what actually changed.
 
-Down from round 1's 73%. All three judges independently landed at exactly
-40% (2/5 fakes caught each), well under the bar.
+**Mean fake accuracy: 40%** (pass threshold: ≤60%). All three judges
+independently landed at exactly 40% (2/5 fakes caught each).
+
+**The PASS has no margin.** All three judges produced an _identical_
+hit/miss pattern at the shape level: each independently caught exactly the
+same two fakes (`hot take`, `short reaction`) and missed exactly the same
+three (`announcement build-up`, `network ask`, `community spotlight`).
+Because the three judges are perfectly correlated shape-by-shape, the
+effective sample size here is **5 independent shape-level trials**, not 15
+fake-item-judgments. On that basis: 2/5 shapes fooled every judge = 40%. If
+one more shape had fooled all three judges (3/5 instead of 2/5), the result
+would be exactly 60% — precisely at the pass/fail boundary. The PASS holds,
+but this round could not have absorbed a single additional shape flipping
+the other way.
+
+## Signal-detection breakdown
+
+| Round | Hit rate (pooled, 3 judges × 5 fakes) | False-alarm rate (pooled, 3 judges × 10 reals) | d′       |
+| ----- | ------------------------------------- | ---------------------------------------------- | -------- |
+| 1     | 11/15 = 73.3%                         | 5/30 = 16.7%                                   | **1.59** |
+| 2     | 6/15 = 40.0%                          | 11/30 = 36.7%                                  | **0.09** |
+
+Total "fake" calls (hits + false alarms, out of 45 possible per round: 15
+items × 3 judges) were **16/45 in round 1 vs. 17/45 in round 2** — judges'
+overall willingness to say "fake" barely moved between rounds. What changed
+is _where_ those calls landed: in round 1 they landed mostly on genuine
+fakes (high hit rate, low false-alarm rate); in round 2 they landed almost as
+often on real posts as on fakes (hit rate ≈ false-alarm rate). That
+hit≈false-alarm pattern is the textbook signature of discrimination
+collapsing toward chance, not of judges becoming more "trigger-happy" in
+aggregate — response bias (the propensity to say "fake" at all) stayed
+essentially flat; only the judges' ability to tell fakes from reals changed.
+
+## Why the raw accuracy comparison is inflated
+
+The report originally framed "73% FAIL → 40% PASS" as evidence the VOICE.md
+revision worked. A per-shape decomposition of the 5-catch drop (11/15 → 6/15)
+shows this framing overstates the case:
+
+| Shape                   | Round 1 catches (of 3) | Round 2 catches (of 3) | Δ   | Confound status                                                                                                                                                                                                                                                                   |
+| ----------------------- | ---------------------- | ---------------------- | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hot take`              | 3                      | 3                      | 0   | Net zero. Mechanism shifted (floor-absence → template-recognizability), not evidence of improvement.                                                                                                                                                                              |
+| `short reaction`        | 3                      | 3                      | 0   | Net zero. Round 1's catches were pure CONTENT tells (invented names); round 2's are pure VOICE tells (flatness). Same catch count, different cause.                                                                                                                               |
+| `community spotlight`   | 3                      | 0                      | -3  | **Confounded.** Round 1's catches were driven by invented names (a CONTENT tell) mixed with a flat-closer VOICE tell. The test-design change removed the invented-name trigger for this shape entirely, so this 3-catch swing cannot be cleanly credited to VOICE.md's revisions. |
+| `network ask`           | 2                      | 0                      | -2  | **Unconfounded.** Round 1's catches were pure VOICE tells (missing address marker, generic specificity) with no content component. This is the one shape where the drop is legitimate evidence of profile improvement.                                                            |
+| `announcement build-up` | 0                      | 0                      | 0   | Net zero, and not independent evidence across rounds — see below.                                                                                                                                                                                                                 |
+
+Of the raw 5-catch (33-percentage-point) drop, 3 of the 5 catches
+(`community spotlight`) come from a shape whose round-1 tells were CONTENT
+tells the test-design change specifically eliminated. Only `network ask`'s
+2-catch drop is unconfounded evidence that the profile itself got harder to
+catch on a pure-voice basis.
+
+**The decisive counterfactual: scoring round 1 on VOICE tells only.**
+Round 1's `docs/voice/calibration/round1/correct_tells.json` lets each of the
+11 round-1 catches be classified: `hot take` (3, pure VOICE), `network ask`
+(2, pure VOICE), `short reaction` (3, pure CONTENT — every one of the six
+judge quotes is about "Alex Chen" / "the Lightwell crew" reading as
+placeholder names, with no voice-based reasoning at all), `community
+spotlight` (3, mixed — every judge cited _both_ the invented names _and_ the
+flat closer for the same catch). Scoring only the unambiguous VOICE catches
+gives a **low bound of 5/15 = 33%** (excluding `community spotlight`
+entirely, since its catches can't be untangled from the content confound)
+and a **high bound of 8/15 = 53%** (crediting `community spotlight` in full
+to its voice component). **Both bounds are under the 60% pass bar. Round 1
+would have PASSED under round 2's content-neutral rules.**
+
+This means the FAIL in round 1 was itself partly a test-design artifact —
+two of its five caught shapes were being caught on fact-plausibility, not
+voice — and round 2's PASS is not a clean "profile fix turned a fail into a
+pass" story. It is better read as: round 1's measured fail rate was
+inflated by a confound; round 2 removed that confound and _also_ measured a
+genuine, non-confounded improvement on one shape (`network ask`); and the
+d′ collapse to near-chance is the strongest evidence the profile revision
+made the surviving voice signal harder to key on, independent of any of this
+attribution complexity.
 
 ## Per-judge scores
 
@@ -31,8 +110,8 @@ Down from round 1's 73%. All three judges independently landed at exactly
 ## Correct tells, grouped by fake shape
 
 Of 5 fake shapes × 3 judges = 15 possible catches, judges made **6 correct
-catches** — down from round 1's 11/15. Three of the five shapes now fool
-every judge completely.
+catches** — down from round 1's 11/15 (see the attribution caveats above
+before reading this drop as a clean improvement).
 
 ### `hot take` (id 7, "Most experiential agencies are sitting on a platform problem…") — caught 3/3 — VOICE tell
 
@@ -57,11 +136,9 @@ reference pack, so a fake that follows that template closely enough starts to
 read as a structural echo of that specific reference post rather than an
 independent voice sample. This is partly a methodology artifact of a small
 reference pack, and partly a genuine signal that the hot-take template is
-still too tightly prescriptive — "claim, 'Why?', reasoning, half-joking
-close" is reproducible as a recognizable skeleton even when every individual
-floor is technically cleared.
+still too tightly prescriptive.
 
-### `short reaction` (id 4, "Congrats on the promotion — you earned it. 🎉") — caught 3/3 — VOICE tell (was CONTENT tell in round 1)
+### `short reaction` (id 4, "Congrats on the promotion — you earned it. 🎉") — caught 3/3 — VOICE tell (was a CONTENT tell in round 1)
 
 All three judges caught this one, but for a different reason than round 1's
 equivalent fake. The round-2 ghostwriter, following the no-invented-names
@@ -77,21 +154,21 @@ converged on flatness:
 - judge3: "generic and flat — 'you earned it. 🎉' has none of his signature
   markers."
 
-**This is a genuine VOICE tell**, and it is the most important finding of
-round 2: with the content confound removed, the underlying voice gap on this
-shape is now visible. A short reaction without a named referent still needs
-_some_ texture — VOICE.md's §2.7F sub-shapes (announcement tease,
-finished-a-thing note, standalone observation) are the documented way to keep
-a nameless short post self-contained; this fake used none of them and reads
-as a content-free platitude instead.
+This catch count is unchanged from round 1 (3/3 both rounds) — but the
+_cause_ changed completely, from a content-plausibility tell to a genuine
+voice-floor tell. That reclassification is the clearest illustration of what
+the test-design change was for: removing the content escape hatch revealed a
+real, still-unfixed voice gap on this shape rather than making it
+uncatchable.
 
-### `network ask` (id 8) — caught 0/3 — tell disappeared
+### `network ask` (id 8) — caught 0/3 — tell disappeared (unconfounded improvement)
 
 Round 1 caught this shape 2/3 on missing address markers and generic
-specificity ("Nothing corporate — just power and some open floor"). The
-round-2 fake ("Hey PDX network: anyone know a TouchDesigner dev…") opens with
-the address-marker callout and closes on a favor-CTA ("Hit me up or drop a
-comment. Let's chat!"), and fully passed:
+specificity ("Nothing corporate — just power and some open floor"), both
+pure VOICE tells with no content component. The round-2 fake ("Hey PDX
+network: anyone know a TouchDesigner dev…") opens with the address-marker
+callout and closes on a favor-CTA ("Hit me up or drop a comment. Let's
+chat!"), and fully passed:
 
 - judge1: "a plain, low-key direct ask consistent with his casual networking
   posts."
@@ -99,122 +176,147 @@ comment. Let's chat!"), and fully passed:
   established local-network-favor pattern."
 - judge3: "matches his casual, direct networking-ask voice."
 
-### `community spotlight` (id 13) — caught 0/3 — tell disappeared
+This is the one shape in the whole comparison where the before/after is not
+confounded by the test-design change — the round-1 tell was pure voice, and
+it is genuinely gone in round 2.
+
+### `community spotlight` (id 13) — caught 0/3 — tell disappeared, but comparison is confounded
 
 Round 1 caught this shape 3/3 on invented names ("Rose City Machine Co.",
-"Dave Kessler and his partner Mia Torres") plus a flat closer. The round-2
-fake avoided naming any person or business (per the test-design constraint),
-used a real Pittsburgh neighborhood ("Lawrenceville") instead of a fabricated
-shop name, and closed with "Cool space, cooler people. 🤘" instead of a bland
-compliment. All three judges called it real, citing the sensory specificity
-and the punchy closer as authentic.
+"Dave Kessler and his partner Mia Torres") mixed with a flat closer. The
+round-2 fake avoided naming any person or business (per the test-design
+constraint), used a real Pittsburgh neighborhood ("Lawrenceville") instead of
+a fabricated shop name, and closed with "Cool space, cooler people. 🤘"
+instead of a bland compliment. All three judges called it real.
 
-### `announcement build-up` (id 3) — caught 0/3 — still passes, as expected
+That said, one of the three judges' stated reasoning contains an error worth
+flagging. Judge3's tell reads: "the wistful Pittsburgh nostalgia capped with
+'🤘' mirrors the exact sign-off emoji used in his 'Cool space, cooler people'
+style reference posts about Pittsburgh/Deeplocal." But **"Cool space, cooler
+people" does not appear anywhere in the reference pack — it is the fake's own
+closing line**, not a phrase from an authentic post. Judge3 hallucinated a
+corroborating match rather than actually verifying it against the reference
+posts. The verdict (real) was still correct, and judge1/judge2's
+reasoning about the specific-detail and closer fix is sound, but judge3's
+specific justification should not be read as validated evidence that this
+phrasing is corpus-attested — it's a judge error that happened to land on
+the right side.
 
-Consistent with round 1 and with VOICE.md §6.3's explicit note that this
-shape is the profile's strongest area. All three judges called the teaser
-real, citing the terse cryptic-teaser format and `#bracketbear2026` hashtag.
+Because round 1's catches on this shape were entangled with the
+invented-name confound (see the attribution table above), this 3→0 flip is
+**not** clean evidence the closer-fix (§2.4's banned bland-compliment rule)
+alone fixed the shape — it's evidence the shape passes under round 2's
+content-neutral test, which is a real result on its own terms, just not a
+controlled before/after comparison.
+
+### `announcement build-up` (id 3) — caught 0/3 — still passes, but not independent evidence across rounds
+
+Consistent with round 1, all three judges called the teaser real, citing the
+terse cryptic-teaser format and `#bracketbear2026` hashtag. Worth flagging:
+the round-1 and round-2 fakes for this shape are structurally near-identical
+constructs — a one-to-two-line vague-good-news tease, an ellipsis, and the
+`#bracketbear2026` hashtag ("Got some Bracket Bear news coming next week,
+folks. Sitting on this is rough..." in round 1 vs. "I've been quietly working
+on something for Bracket Bear the past few weeks... more very soon." in round
+2). The 0/3-in-both-rounds result should be read as the same underlying
+pattern confirmed twice with different wording, not as two independent
+confirmations of the profile's strength here.
 
 ## False positives on real posts
 
-Three real posts drew false positives from **all three judges**, and all
-three are the exact same posts round 1 flagged as false positives:
+Four distinct real posts drew at least one false-positive "fake" call in
+round 2 — up from two in round 1:
 
 - **id 2** (`2026-07-24--hey-network-do-you-or-someone.md`, the funding/
-  mentorship ask) — flagged by judge1 and judge2 (round 1: same post, same
-  two judges).
+  mentorship ask) — flagged fake by **all three** judges in round 2. This is
+  the same underlying post round 1 flagged, but round 1 only caught it 2/3
+  (judge1, judge2); in round 2 judge3 also flagged it, so this post's
+  false-positive rate got _worse_ between rounds, not merely repeated.
 - **id 10** (`2025-03-08--for-international-womens-day-id-like.md`, the
-  International Women's Day post) — flagged by all three judges (round 1:
-  same post, all three judges).
+  International Women's Day post) — flagged fake by **all three** judges in
+  both rounds. Unchanged.
+- **id 15** (`2023-11-30--openais-chatgpt-turns-1-today-this.md`) — flagged
+  fake by **all three** judges. This post was **not** a false positive in
+  round 1 at all; it is new to round 2. It uses a ✅-bulleted-checklist
+  structure that VOICE.md's §2.5 explicitly documents as an AI-slop-era
+  pattern he genuinely used once for real.
+- **id 6** (`2024-12-15--hey-design-network-have-you-thought.md`) — flagged
+  fake by judge1 and judge2 (not judge3) for "flat, generic complaint
+  language." Also new to round 2.
 
-Two additional real posts were newly caught as false positives in round 2
-that were not flagged in round 1:
+So three posts (id2, id10, id15) are unanimous false positives across all
+three judges. Two of those three (id2, id10) are the same underlying posts
+round 1 flagged; one (id15) is entirely new. A fourth post (id6) drew a 2/3
+false-positive vote and is also new to round 2. Note that judge3 has the
+_lowest_ total false-positive count of the three judges (3/10) despite
+independently agreeing on the id15 unanimous false positive — the increase in
+false positives is concentrated on specific posts that multiple judges
+misread the same way, not a general shift toward suspicion by any one judge.
 
-- **id 15** (`2023-11-30--openais-chatgpt-turns-1-today-this.md`) — flagged by
-  all three judges as "clean checklist" / "non-judgmental partner" reading as
-  too tidy — ironically, this real post uses a ✅-bulleted list structure that
-  VOICE.md's §2.5 explicitly calls out as an AI-slop-era pattern he actually
-  used once for real.
-- **id 6** (`2024-12-15--hey-design-network-have-you-thought.md`) — flagged by
-  judge1 and judge2 for "flat, generic complaint language."
-
-Per Task 5's instructions, these are judge noise on real posts, not actionable
-VOICE.md gaps — they're the same "flat/formal register read as fake" failure
-mode round 1 already documented and that VOICE.md's §0.2/§0.3 register rules
-explicitly warn against over-correcting.
+Per Task 5's instructions, these are judge noise on real posts, not
+actionable VOICE.md gaps — they're the same "flat/formal register read as
+fake" failure mode round 1 already documented and that VOICE.md's §0.2/§0.3
+register rules explicitly warn against over-correcting.
 
 ## Round 1 vs round 2 comparison
 
-**Tells that disappeared** (fixed by the revision):
+**Tells that disappeared, unconfounded (real evidence of improvement):**
 
 - `network ask` generic-specificity + missing-address-marker tell (round 1:
-  2/3 catches) — gone in round 2 (0/3).
-- `community spotlight` invented-name + flat-closer tell (round 1: 3/3
-  catches) — gone in round 2 (0/3), though this is partly a test-design
-  effect (see below) and partly a real closer fix (§2.4's banned-bland-
-  compliment rule).
+  2/3 catches, pure VOICE) — gone in round 2 (0/3).
 
-**Tells that persist:**
+**Tells that disappeared, but confounded by the test-design change (not
+clean evidence of improvement):**
+
+- `community spotlight` invented-name + flat-closer tell (round 1: 3/3
+  catches, mixed CONTENT+VOICE) — gone in round 2 (0/3). Cannot be
+  disentangled from the content-confound removal.
+
+**Tells that persist (net zero, mechanism sometimes changed):**
 
 - `hot take` is still caught 3/3, but the _mechanism_ changed from
   floor-absence (round 1: no markers, no first person, no proper noun) to
   template-recognizability (round 2: markers present, but the post follows
   the documented hot-take skeleton closely enough to read as derivative of
   the one real hot-take post in the reference pack).
-- The same two real posts (funding ask, IWD tribute) are still false-positive
-  magnets for the same reason: formal/flat register on a topic that is
-  genuinely supposed to be flat.
+- `short reaction` is still caught 3/3, but the mechanism flipped from a
+  CONTENT tell (invented names) to a VOICE tell (markerless flatness) — this
+  is the test-design change working as intended, exposing a real gap that was
+  previously hidden behind an easier-to-catch content tell.
+- The same two real posts (funding ask, IWD tribute) are still
+  false-positive magnets for the same reason: formal/flat register on a
+  topic that is genuinely supposed to be flat. The funding-ask post actually
+  got worse (2/3 → 3/3 judges).
+- `announcement build-up` still passes 0/3, but the round-1 and round-2
+  fakes are structurally near-identical, so this is one confirmed data point,
+  not two.
 
-**New tells:**
+**New:**
 
-- `short reaction` markerless-flatness tell (round 2: 3/3) — this didn't
-  exist as a _distinct_ finding in round 1 because that fake was caught on
-  invented names first; stripping the content confound revealed the voice
-  gap underneath.
-- Two new real-post false positives (id 15, id 6) not seen in round 1,
-  suggesting judges 2 and 3 in this round were somewhat more trigger-happy on
-  "too tidy" prose generally — consistent with mean false-positive rate
-  ticking up slightly (round 1: ~1.7/10 mean; round 2: ~3.7/10 mean) even as
-  fake-catch accuracy fell.
-
-## Note on the test-design change and its effect on comparability
-
-Per the round-2 brief, the ghostwriter was explicitly instructed not to
-invent named individuals or businesses — it could only use entities that
-genuinely appear in VOICE.md's own text (Deeplocal, Downstream, Gumband,
-Fireside, Bracket Bear, TouchDesigner, Portland/PDX, Pittsburgh, etc.) or
-refer to people/places without naming them. This removes the round-1 CONTENT
-confound (judges catching fakes on _fact-plausibility_ — "Alex Chen" sounding
-made up — rather than on _voice fidelity_).
-
-**Effect on comparability:** round 1 and round 2 scores are not a strictly
-apples-to-apples measure of the same thing. Round 1's 73% included two
-shapes (`short reaction`, `community spotlight`) caught partly or wholly on
-invented-name detection, which is not a voice-profile property at all. Round
-2's 40% is a cleaner measure of voice fidelity specifically, because the
-content escape hatch was closed. That the score still dropped by 33 points
-under a _harder_, more voice-focused test is a stronger signal that the
-VOICE.md revisions (§0 register selector, §2.0 energy floors, §2.4 banned
-closers, §6 self-check) genuinely improved voice fidelity, not merely that
-the test got easier. The one shape where the content-confound removal
-directly produced a _different_ tell rather than no tell (`short reaction`,
-still 3/3) shows the confound removal is doing its job as designed: it
-converts a content-plausibility test back into a voice test and the voice
-gap that was hiding underneath is now visible and actionable.
+- Two new real-post false positives (id15, id6) that round 1 did not have.
 
 ## Interpretation
 
-The profile passes calibration at 40% mean fake accuracy against a 60% pass
-bar. Two of five fakes were caught, both on genuine voice properties: the hot
-take fake for reading as too structurally/rhetorically polished relative to
-the single real hot-take exemplar it was templated from, and the short
-reaction fake for being markerless and referent-free once it could no longer
-lean on a plausible-sounding invented name. Three shapes that failed round 1
-(`network ask`, `community spotlight`, `announcement build-up`) now pass
-cleanly. The persisting false positives on the funding-ask and IWD posts
-confirm — again — that judges' single most reliable (and least reliable)
-heuristic is "sounds flat = fake," which is sometimes right and sometimes
-exactly backwards; VOICE.md's register-selector fix (§0) has not eliminated
-this because it is a property of how AI judges reason under uncertainty, not
-a property of the corpus. No further revision loop is required; round 2
-passes.
+The profile passes calibration, and the strongest evidence for that is not
+the raw 73%→40% accuracy swing but the collapse in discriminability: d′ fell
+from 1.59 (round 1, well above chance) to 0.09 (round 2, indistinguishable
+from chance), while judges' overall propensity to call something "fake" held
+essentially flat (16/45 vs. 17/45 total fake calls). That is a bias-
+independent signal that the surviving voice gaps are no longer reliably
+exploitable, even though the raw accuracy comparison is inflated by a
+test-design confound removed between rounds (community spotlight's 3-catch
+swing is inseparable from that removal; a content-neutral rescoring of round
+1 lands at 33–53%, which would itself have passed).
+
+Only one shape (`network ask`) shows unconfounded before/after improvement.
+Two shapes (`hot take`, `short reaction`) still get caught 3/3 in both
+rounds — `short reaction`'s underlying cause changed from content to voice,
+meaning there is a real, still-open voice gap on markerless short reactions
+that the content confound was previously masking; `hot take`'s persistence
+suggests the §2.7E template is recognizable as a template regardless of floor
+compliance. The PASS holds, but it holds with no statistical margin — all
+three judges are perfectly correlated at the shape level, so the effective
+sample is 5 shapes, and a single shape flipping the other way would put the
+result exactly at the 60% bar. No further revision loop is required by the
+letter of the pass bar, but the `short reaction` and `hot take` gaps are
+worth a future look given how little room this round had to spare.
