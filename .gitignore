@@ -6,3 +6,6 @@ reports/
 .netlify
 # Claude Code per-machine settings
 .claude/
+# ...except project skills, which are shared with the repo
+!.claude/skills/
+!.claude/skills/**
