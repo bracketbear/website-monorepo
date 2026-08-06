@@ -1,0 +1,278 @@
+{
+  "judge1": [
+    {
+      "id": 1,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "Corporate jargon like 'war chest' and 'developing new lines of business' with zero casual markers ('y'all', 'folks', 'freaking') \u2014 even his serious asks (ref 9, ref 15) keep some personality; this reads like a business-plan paragraph."
+    },
+    {
+      "id": 2,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "Polished essay cadence ending in an aphorism ('It's building a team you don't have to babysit') with no slang, no emoji, no first-person anecdote \u2014 the isolated 'Why?' mimics his structure but the voice underneath is generic LinkedIn-thinkfluencer, not his."
+    },
+    {
+      "id": 3,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'yinz' plus the black/gold heart emoji sequence mirrors ref 5's Steelers/Deeplocal palette, and the coy 'Big news soon.' teaser matches his habit of dangling announcements."
+    },
+    {
+      "id": 4,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'y'all', the hyper-specific 'PDX carpet' detail, and the drawn-out 'Let's gooooooooooo!!!\ud83d\udd25' are the same excitement-cadence as ref 5's 'HERE WE GOOOOOOOOOOO!!!'"
+    },
+    {
+      "id": 5,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "Every real post names actual, specific local people/businesses (Bryant Place, Terence Brasch, Deeplocal) \u2014 'Alex Chen and the Lightwell crew' reads like placeholder-generic AI stand-in names rather than a real Portland connection."
+    },
+    {
+      "id": 6,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'folks' plus 'Sitting on this is rough...' is the same withholding-a-secret teaser voice as ref 5 ('Here's what I've been holding in for three weeks')."
+    },
+    {
+      "id": 7,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "Completely flat and generic with no personal anecdote, slang, or emoji \u2014 even his award post about a sensitive year (ref 12) stays personal and casual; this is boilerplate corporate-holiday copy."
+    },
+    {
+      "id": 8,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "Absurdly specific self-deprecating detail ('five year old, 10-inch iPad') plus 'The future's here, folks. We did it! \ud83d\ude4c' matches his tech-marvel enthusiasm voice from ref 2/ref 14."
+    },
+    {
+      "id": 9,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "Tags a long list of named people with credentials exactly like ref 12 ('Scott Simpson,CTS-D/CTS-I'), plus 'Y-E-S walls' pun and 'resisssstingggg' elongation match his humor style precisely."
+    },
+    {
+      "id": 10,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "The grammatically loose 'Using an AI agent like ChatGPT develop time saving scripts' and the specific complaint about docs/community match his casual, slightly imperfect tutorial-sharing posts (ref 8)."
+    },
+    {
+      "id": 11,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'\ud83d\udca9' emoji and 'Do y'all know how hard it is to keep my mouth shut' mirrors ref 6's proud-but-restrained brag about coworkers' cool work."
+    },
+    {
+      "id": 12,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "Invented-sounding business name 'Rose City Machine Co.' with tidy full names 'Dave Kessler and his partner Mia Torres,' plus a flat generic closer ('I think what they're building is cool') that lacks his usual punchy sign-off."
+    },
+    {
+      "id": 13,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "Checkmark-bullet structure and 'Here's to the future. \ud83e\udd42' toast closing matches the format and tone of ref 1's own ChatGPT enthusiasm post."
+    },
+    {
+      "id": 14,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'\ud83d\udd25\ud83d\udd25\ud83d\udd25' repetition and ending on a direct question to the audience mirrors his TouchDesigner tutorial posts (ref 8) and his habit of engaging readers directly."
+    },
+    {
+      "id": 15,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'Hit me up' plus the plain, no-frills community-building ask matches his venue/help requests in ref 12 ('somewhere around NW 16th & Johnson?') and ref 9."
+    }
+  ],
+  "judge2": [
+    {
+      "id": 1,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "Corporate hedge-speak like 'building its war chest' and 'will only be talking with connections or direct referrals for the initial chats' \u2014 no exclamation points, no 'folks/y'all', reads like careful business-speak rather than his raw, vulnerable asks (compare ref 4's 'I chose to voluntarily leave my job')."
+    },
+    {
+      "id": 2,
+      "verdict": "fake",
+      "confidence": 5,
+      "tell": "Ends on a polished LinkedIn-guru aphorism \u2014 'Maybe the real skill in 2026 isn't prompting. It's building a team you don't have to babysit.' \u2014 abstract thought-leadership with no first-person story, unlike his hands-on AI posts (refs 1, 13, 14) which are always grounded in his own specific experience."
+    },
+    {
+      "id": 3,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'\ud83d\udda4\ud83d\udc9b\ud83d\udda4' Pittsburgh-colors emoji plus 'yinz' and the bare teaser 'Big news soon.' exactly mirror refs 5 and 6's cadence."
+    },
+    {
+      "id": 4,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'Gotta take a pic of the PDX carpet' is a hyper-specific Portland-insider detail, and 'Let's gooooooooooo!!!\ud83d\udd25' matches the stretched-letter hype of ref 5's 'HERE WE GOOOOOOOOOOO!!!'"
+    },
+    {
+      "id": 5,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "'Alex Chen and the Lightwell crew' reads like generic placeholder names \u2014 his real posts name specific, verifiable, often credentialed people (e.g. 'Scott Simpson,CTS-D/CTS-I')."
+    },
+    {
+      "id": 6,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'Sitting on this is rough...' plus 'folks' and '#bracketbear2026' matches his established short-teaser pattern (compare ref 6's one-liner tease)."
+    },
+    {
+      "id": 7,
+      "verdict": "fake",
+      "confidence": 5,
+      "tell": "'recognize and highlight the impact that women have made on the world and to push for women's equality' is flat corporate boilerplate \u2014 zero slang, emoji, or exclamation, totally unlike his voice even in serious moments."
+    },
+    {
+      "id": 8,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'five year old, 10-inch iPad' is an oddly specific, self-deprecating detail, and 'The future's here, folks. We did it! \ud83d\ude4c' matches his tech-giddiness pattern."
+    },
+    {
+      "id": 9,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "Names multiple specific credentialed people including 'Scott Simpson,CTS-D/CTS-I' (also appearing verbatim in ref 13), plus the stylized elongated spelling 'resisssstingggg' matches his typing tics."
+    },
+    {
+      "id": 10,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "'the docs aren't great, the community is small' is a grounded first-person gripe, and the '\ud83d\udc47 Check this video out' callout matches ref 8's tutorial-link habit."
+    },
+    {
+      "id": 11,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'\ud83d\udca9' as a casual profanity substitute plus naming Deeplocal directly matches refs 5/11, and the 'can't brag about it' frustration echoes ref 6."
+    },
+    {
+      "id": 12,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "'Dave Kessler and his partner Mia Torres' feel like generic invented names, and the closer 'I think what they're building is cool' is flat compared to his signature superlative enthusiasm (contrast the CETI post's 'MY GOODNESS Y'ALL!!!')."
+    },
+    {
+      "id": 13,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'write stories about ridiculous nonsense' is an oddly specific personal detail, and 'Here's to the future. \ud83e\udd42' matches his toast-style sign-offs ('\ud83c\udf7b' in refs 10 and 13)."
+    },
+    {
+      "id": 14,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "Names the real specific feature '@workspace command' and uses 'TODAY! \ud83d\udd25\ud83d\udd25\ud83d\udd25' matching his announcement-excitement pattern."
+    },
+    {
+      "id": 15,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "A direct ask to his network missing his near-constant 'folks'/'y'all' address, and 'Nothing corporate \u2014 just power and some open floor' reads flatter and more generic than his asks (contrast ref 9's 'Folks... It would be rad if...')."
+    }
+  ],
+  "judge3": [
+    {
+      "id": 1,
+      "verdict": "real",
+      "confidence": 2,
+      "tell": "No emoji or 'y'all/folks' flourishes, but the precise boundary-setting ('mentorship, not actual investors right now... will only be talking with connections or direct referrals') reads like a genuine, careful personal ask rather than generic AI thought-leadership."
+    },
+    {
+      "id": 2,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "Mimics his 'I think it's less about X and more about Y. Why?' rhetorical structure from ref post 7, but it's stripped of any 'folks', 'freaking', or exclamation-point energy \u2014 reads as smoothed-out AI thought-leadership ('the bottleneck stops being output') rather than his voice."
+    },
+    {
+      "id": 3,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'yinz' and the \ud83d\udda4\ud83d\udc9b\ud83d\udda4 Pittsburgh-colors emoji sequence exactly match ref post 5's sign-off, plus the layoff callback matches his real 2023\u21922024 story arc."
+    },
+    {
+      "id": 4,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'y'all', the PDX airport carpet in-joke, and 'Let's gooooooooooo!!!' stretched-word enthusiasm match his exact excitement register (see 'HERE WE GOOOOOOOOOOO' in ref 5)."
+    },
+    {
+      "id": 5,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "'Alex Chen' and 'the Lightwell crew' are generic placeholder-feeling names \u2014 his real posts name specific, verifiable people with full titles (Scott Simpson,CTS-D/CTS-I, Bryant Place), not vague 'buddy X and the Y crew' phrasing."
+    },
+    {
+      "id": 6,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "Short teaser style matches ref post 6's 'I was today years old...' brevity and his habit of dropping cryptic Bracket Bear hints with the #bracketbear2026 tag."
+    },
+    {
+      "id": 7,
+      "verdict": "fake",
+      "confidence": 5,
+      "tell": "'It's an important day for all of us to recognize and highlight the impact...' is generic corporate-holiday boilerplate with zero personal voice \u2014 contrast with ref post 15's wildfire post which immediately turns personal ('I might not have answers or solutions, but I have connections')."
+    },
+    {
+      "id": 8,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "Hyper-specific, slightly absurd tech detail ('five year old, 10-inch iPad', 'Arc Browser tab') plus 'The future's here, folks. We did it! \ud83d\ude4c' matches his gadget-enthusiast voice from ref post 2 (DALL-E)."
+    },
+    {
+      "id": 9,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "Name-drops 'Scott Simpson,CTS-D/CTS-I' with the exact same odd credential formatting as ref post 13, plus the ALL-CAPS 'IT'S FREE!!!', 'resisssstingggg', and tagging a list of named people matches ref post 12's structure precisely."
+    },
+    {
+      "id": 10,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "The '\ud83d\udc47 Check this video out for inspiration' tutorial-link pattern matches ref post 8's tutorial-sharing habit, and the complaint about bad docs/small community feels like a lived specific gripe rather than generic AI praise."
+    },
+    {
+      "id": 11,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'Do y'all know how hard it is to keep my mouth shut' directly echoes the withheld-secret excitement of ref post 6 (YouTube star) and ref post 5 ('holding in for three weeks'), same Deeplocal pride and emoji stacking."
+    },
+    {
+      "id": 12,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "'Dave Kessler and his partner Mia Torres' feels like invented filler names, and the closing line 'I think what they're building is cool' is flat and generic \u2014 his real posts end with a punchier personal hook, not a bland compliment."
+    },
+    {
+      "id": 13,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "The \u2705 bulleted self-reflection list matches the \ud83d\udcb0\ud83c\udfa8\ud83e\udee3 structured format of ref post 4, and 'a lot of times it's kinda crappy' has his characteristic self-deprecating hedge."
+    },
+    {
+      "id": 14,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "'TODAY! \ud83d\udd25\ud83d\udd25\ud83d\udd25' matches his emoji-stacking enthusiasm, and closing with a direct engagement question ('What new feature are you looking forward to using?') matches his habit of inviting comments."
+    },
+    {
+      "id": 15,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "Compared to his real, detail-rich venue-hunting riff in ref post 12 ('a big ol' LED wall... maybe called a Big Wall... NW 16th & Johnson'), this version is generically phrased ('Nothing corporate \u2014 just power and some open floor') and missing his quirky specificity."
+    }
+  ]
+}
