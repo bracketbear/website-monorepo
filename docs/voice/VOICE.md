@@ -269,7 +269,13 @@ fable — §2.7 says outright "Do not write one").
 **Per-marker presence, so you can see none of them individually dominates**
 (casual ≥30 words, n=37): emoji 27, address marker 22, hype word 18,
 exclamation point 18, ellipsis 9, hype-caps 8. Across all 77: emoji 46, address
-marker 33, exclamation point 31, hype word 28, ellipsis 13, hype-caps 9.
+marker 32, exclamation point 31, hype word 28, ellipsis 13, hype-caps 9.
+
+The address-marker figure is the one count here that moves by ±1 depending on
+whether a borderline mid-sentence `network` reads as a vocative callout. Three
+independent recounts landed on 22 and 23 for the n=37 slice. Nothing a writer
+does changes on that margin — the floor is "at least one marker," and both
+readings clear it — so treat this column as approximate and Floor 1 as exact.
 
 **This does not license word inflation.** The floor is on the _class_, not on any
 member of it. `folks` is still 15/84; `stoked` is still n=1. You clear the floor
