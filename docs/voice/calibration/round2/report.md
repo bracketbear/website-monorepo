@@ -238,8 +238,11 @@ round 2 — up from two in round 1:
 - **id 15** (`2023-11-30--openais-chatgpt-turns-1-today-this.md`) — flagged
   fake by **all three** judges. This post was **not** a false positive in
   round 1 at all; it is new to round 2. It uses a ✅-bulleted-checklist
-  structure that VOICE.md's §2.5 explicitly documents as an AI-slop-era
-  pattern he genuinely used once for real.
+  structure that VOICE.md's §2.5 lists under "**Never** ✅❌📈🎯🚀🙌 in a
+  modern post as decoration" — §2.5's "appears once" note is about 🚀, not
+  about ✅. The sharper point is that this is a **real** post violating that
+  "never," which is part of why judges called it fake: the absolute is stated
+  without its counterexample. §2.5 has since been softened to record it.
 - **id 6** (`2024-12-15--hey-design-network-have-you-thought.md`) — flagged
   fake by judge1 and judge2 (not judge3) for "flat, generic complaint
   language." Also new to round 2.

@@ -1,6 +1,9 @@
 # Harrison Callahan — Voice Profile
 
-> Derived from 192 LinkedIn posts (2017–2026) at `docs/voice/linkedin/posts/`.
+> Derived from 192 LinkedIn posts (2017–2026) at `docs/voice/linkedin/posts/` —
+> that directory holds 202, but 10 are reserved as a blind-calibration holdout
+> (`docs/voice/calibration/holdout.json`) and are deliberately neither analyzed
+> nor quoted here, so judges see unseen material.
 > Calibration-tested per `docs/superpowers/specs/2026-08-05-voice-analysis-design.md`.
 > Evidence tags: [corpus] = grounded in the posts; [brand-decision] = a Bracket
 > Bear rule from brand direction, not corpus-derived.
@@ -10,6 +13,11 @@
 > thing — flatness. §0 makes you pick a register first; §2.0 gives you the energy
 > floors that the casual register must clear; §6 is the pre-publish checklist.
 > Full diagnosis: `docs/voice/calibration/round1/report.md`.
+>
+> **Round 2, run against this revised profile, PASSED** — 40% mean fake accuracy,
+> and judge discriminability (d′) collapsed from 1.59 to 0.09, i.e. to chance.
+> The pass has no margin and two shapes are still caught 3/3 (§6.1, gaps 10 and
+> 11). Full report: `docs/voice/calibration/round2/report.md`.
 
 ## 0. Register selector — decide this first
 
@@ -259,9 +267,9 @@ already tells you not to imitate:
 fable — §2.7 says outright "Do not write one").
 
 **Per-marker presence, so you can see none of them individually dominates**
-(casual ≥30 words, n=37): emoji 27, address marker 24, hype word 18,
+(casual ≥30 words, n=37): emoji 27, address marker 22, hype word 18,
 exclamation point 18, ellipsis 9, hype-caps 8. Across all 77: emoji 46, address
-marker 34, exclamation point 31, hype word 28, ellipsis 13, hype-caps 9.
+marker 33, exclamation point 31, hype word 28, ellipsis 13, hype-caps 9.
 
 **This does not license word inflation.** The floor is on the _class_, not on any
 member of it. `folks` is still 15/84; `stoked` is still n=1. You clear the floor
@@ -733,6 +741,12 @@ Rules a writer can follow:
   posts, and never with generic 🚀💡🎯.
 - **Never** ✅❌📈🎯🚀🙌 in a modern post as decoration. 🚀 appears once, in the
   discredited 2023 AI-slop era (`2023-05-31--if-youre-a-developer-and-not.md`).
+  **This "never" is a rule for you, not a claim that he never did it.** One real
+  late-2023 post in the calibration lineup is built on a ✅-bulleted checklist,
+  and in round 2 all three judges called that genuine post fake — largely for
+  that reason (`docs/voice/calibration/round2/report.md`, id 15). So the pattern
+  is corpus-attested in the AI-slop window and is _still_ the wrong thing to
+  imitate: it reads as machine-written even when he wrote it.
 
 ### 2.6 Punctuation habits
 
@@ -926,6 +940,17 @@ I should start a consulting company…"), an address marker, an exclamation poin
 and 🤘. **That is the trade — drop the proper noun and the energy markers have to
 carry the post.** A hot take with neither is round 1's caught fake.
 
+**Known open gap — this shape was caught 3/3 again in round 2, for a new
+reason.** The round-2 fake cleared the floors (first-person frame, em dash,
+closing emoji) and was still caught, because it walked the template above
+beat-for-beat: claim → "Why?" → because → reframe → half-joking business idea →
+one emoji. Judge 2 named it as "template reuse rather than organic variation."
+The skeleton is descriptive, not a form to fill in. **Vary it deliberately:
+change the pivot line or drop it, reorder the reasoning, let a paragraph run
+long, end somewhere the template did not predict.** A hot take that matches all
+six beats in order is the most catchable draft this profile can produce
+(`docs/voice/calibration/round2/report.md`).
+
 Real: "I think at the end of the day it's less about WHERE
 someone works, but rather is more about the TRUST that employers put in their
 employees. What do I mean? … Maybe I should start a consulting company where we
@@ -969,6 +994,19 @@ and a standalone observation ("Redux has changed quite a bit over the past four
 years! 🧐" — `2024-03-22--redux-has-changed-quite-a-bit.md`). If you are writing
 a short post with no attachment, use one of those four sub-shapes — a
 deictic-only reaction with nothing to point at reads as a non-sequitur.
+
+**Known open gap — this shape was caught 3/3 in round 2, and being short is not
+a licence for flatness.** Round 1 caught the short-reaction fake on an invented
+name — a content tell. Round 2 removed invented names from the test, and all
+three judges still caught it, this time purely on voice: "Congrats on the
+promotion — you earned it. 🎉" drew "no named person, company, or concrete
+detail" and "none of his signature markers." With the content confound gone,
+this is a **genuine, still-unfixed voice gap**, not a test artifact. §6.1's
+questions 4–6 are length-gated off here, so nothing else in the checklist
+catches it. **Anchor every short reaction in one verifiable specific — the named
+thing, the named person, or the attachment it points at. "Congrats, Athletic
+Brewing Co.!" (`2024-04-17`) works because of the name; "Congrats on the
+promotion" does not** (`docs/voice/calibration/round2/report.md`).
 
 **G. Crisis solidarity** (~50–70 words) — worth naming because its rules invert
 everything above.
@@ -1055,6 +1093,11 @@ position outside this set will read wrong even with perfect surface mimicry.
 Bracket Bear is positioned as "the experiential software platform experts" — a
 services company that diagnoses and rebuilds the platform layer behind
 experiential work. [brand-decision]
+
+**Calibration never tested this register.** Both blind rounds used only personal
+LinkedIn posts, so §3 is not calibration-validated the way §2 is — it rests on
+brand decisions plus the six corpus-grounded carryovers in §3.1. Treat its rules
+as deliberate positioning, not as measured evidence about how Harrison writes.
 
 ### 3.1 What carries over from the personal register
 
@@ -1263,17 +1306,32 @@ by someone else.
 
 ## 6. Anti-AI-tells self-check
 
-Round 1 of blind calibration produced empirical data on how AI writing fails at
-being him: three independent judges, 11 correct catches out of 15, with the
-tells recorded verbatim in `docs/voice/calibration/round1/correct_tells.json`.
-This section converts those into a pre-publish checklist. **Run it on every
-draft.** If any answer is "yes," the draft is catchable.
+Two rounds of blind calibration produced empirical data on how AI writing fails
+at being him. **Round 1 FAILED** — three independent judges, 11 correct catches
+out of 15 (73%), with the tells recorded verbatim in
+`docs/voice/calibration/round1/correct_tells.json`. Questions 1–9 below were
+derived from those catches. **Round 2, run against the revised profile, PASSED**
+— 6 catches out of 15 (40%), with judge discriminability (d′) falling from 1.59
+to 0.09, i.e. to chance (`docs/voice/calibration/round2/report.md`).
 
-### 6.1 The nine tells, as questions
+Read the pass carefully rather than as a clean win. Only one shape (`network
+ask`) improved on unconfounded evidence; one shape's round-1 catches were a
+test-design artifact that round 2 removed; and **two shapes were caught 3/3 in
+both rounds** and remain open gaps — items 10 and 11 below. All three round-2
+judges were perfectly correlated shape-by-shape, so the effective sample was 5
+shape-level trials, and one more shape flipping would have landed the result
+exactly on the 60% bar.
+
+This section converts all of that into a pre-publish checklist. **Run it on
+every draft.** If any answer is "yes," the draft is catchable.
+
+### 6.1 The tells, as questions
 
 **Questions 4, 5, and 6 are length-gated** — they apply to Register-A posts over
 roughly 20–30 words (§0.1). Skip them on a short reaction (§2.7F); forcing
-markers onto a one-line post is its own tell.
+markers onto a one-line post is its own tell. **Question 11 is not gated and
+still applies to short posts** — with 4–6 skipped, it is the only thing checking
+them.
 
 1. **Does it read as a polished essay?** Judge 1: "Polished essay cadence."
    Judge 3: "smoothed-out AI thought-leadership." Symptom: uniform sentence
@@ -1309,6 +1367,23 @@ markers onto a one-line post is its own tell.
    each post passes individually. Half his real posts are under 34 words (§2.2)
    and roughly one in 15–20 has a typo (§2.6).
 
+**Questions 10 and 11 are the two open gaps round 2 did not close.** Both shapes
+were caught 3/3 in _both_ rounds. Neither is length-gated — check them whenever
+the shape applies.
+
+10. **Does a hot take follow §2.7E's template beat-for-beat?** New in round 2.
+    The fake cleared every floor and was caught anyway, on structure: judge 2
+    called it "template reuse rather than organic variation," and judges read it
+    as a structural echo of the one real hot-take post. Fix: §2.7E's open-gap
+    note — break at least one beat of the skeleton on purpose.
+11. **Is a short reaction anchored in a verifiable specific?** In round 1 this
+    shape was caught on invented names, a content tell. Round 2 removed invented
+    names and it was still caught 3/3, now on flatness alone — "no named person,
+    company, or concrete detail." That reclassifies it as a **real voice gap**.
+    Because questions 4–6 are length-gated off on short posts, this is the only
+    check standing between a one-liner and a detectable fake. Fix: §2.7F's
+    open-gap note — name the thing, name the person, or point at the attachment.
+
 ### 6.2 Set-level rationing
 
 These caps apply across a batch of posts, not per post. Violating them is how a
@@ -1326,6 +1401,16 @@ convincing individual post becomes a detectable set.
 
 ### 6.3 The one shape that already passes
 
-`announcement build-up` (§2.7C) fooled all three round-1 judges. Short, cryptic,
-withheld-news teasers are the profile's strongest area. Do not rework that
-pattern; it is the reference point for what "passing" looks like.
+`announcement build-up` (§2.7C) fooled all three judges in round 1 and again in
+round 2. Short, cryptic, withheld-news teasers are the pattern with the most
+evidence behind it, and the closest thing this profile has to a reference point
+for what "passing" looks like. Do not rework it.
+
+**But do not read 0/3 twice as two independent confirmations.** Round 2's report
+flags that the round-1 and round-2 fakes for this shape were structurally
+near-identical constructs — a one-to-two-line vague-good-news tease, an
+ellipsis, and the same `#bracketbear2026` hashtag. That is **one underlying
+pattern confirmed twice with different wording, not two independent data
+points** (`docs/voice/calibration/round2/report.md`). The shape is the
+best-supported one in the profile; calling it "the profile's strongest area"
+overstates what two correlated trials can show.

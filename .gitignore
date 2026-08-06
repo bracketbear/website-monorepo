@@ -9,3 +9,6 @@ reports/
 # ...except project skills, which are shared with the repo
 !.claude/skills/
 !.claude/skills/**
+
+# Superpowers scratch/working directory — never commit
+.superpowers/

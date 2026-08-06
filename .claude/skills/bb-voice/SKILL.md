@@ -5,11 +5,15 @@ description: Use when drafting LinkedIn posts, articles, marketing copy, or any 
 
 # Writing in Harrison's Voice
 
-`docs/voice/VOICE.md` (~1,250 lines) is the single source of truth for
+`docs/voice/VOICE.md` is the single source of truth for
 Harrison's voice and Bracket Bear's brand voice. It was derived from 192
-LinkedIn posts and passed blind calibration against AI-generated fakes —
-round 2's mean fake-detection accuracy was 40%, comfortably under the ≤60%
-pass bar. But the pass had no real margin: all three judges independently
+LinkedIn posts (of the 202 in `docs/voice/linkedin/posts/`; the other 10 are a
+held-out calibration set) and passed blind calibration against AI-generated
+fakes — round 2's mean fake-detection accuracy was 40%, comfortably under the
+≤60% pass bar. **Calibration exercised only the personal register**, so §3's
+brand rules are not calibration-validated; they rest on brand decisions plus
+§3.1's six corpus-grounded carryovers. And the pass had no real margin: all
+three judges independently
 caught the exact same two fake post-shapes and missed the exact same three,
 so the effective sample was only 5 shape-level trials, not 15 item
 judgments. One more shape fooling all three judges (3/5 instead of 2/5)
@@ -34,7 +38,8 @@ This project serves two contexts:
   person. Apply §1 (Voice DNA, all registers) plus §2 (Personal LinkedIn
   register).
 - **Brand** — Bracket Bear website, product, or marketing copy. Apply §1
-  plus §3 (Bracket Bear brand register). §3.2 lists patterns that are
+  plus §3 (Bracket Bear brand register) — the register calibration never
+  tested, so follow it as stated rather than inferring from §2. §3.2 lists patterns that are
   corpus-real for Harrison personally but **banned** in brand copy (emoji
   density, hype-caps, stretched words, Pittsburgh dialect markers, sports/
   beer/band references, "folks" as the brand's word, self-deprecation, and
@@ -76,14 +81,17 @@ Before returning any draft to the user, check it against:
 - **§5** (Do/Don't table) — covers openers, closers, naming real people vs.
   invented ones, word tiers, brand-copy banned phrases, and register
   matching.
-- **§6** (Anti-AI-tells self-check) — nine questions derived from what
+- **§6** (Anti-AI-tells self-check) — eleven questions derived from what
   actually caught AI-written fakes in blind judging (polished-essay cadence,
   aphorism endings, flat safe compliments, missing first-person anecdote,
   stripped-out energy markers, generic specificity, invented names, wrong
-  register for the topic, flawless/uniform-length copy). Questions 4–6 are
-  length-gated (§0.1) — skip them on short reactions rather than forcing
-  markers onto a one-liner. If drafting a batch, also check §6.2's
-  set-level rationing caps (e.g., at most one toast per 5 posts).
+  register for the topic, flawless/uniform-length copy, plus the two gaps
+  round 2 left open: a hot take that walks §2.7E's template beat-for-beat, and
+  an unanchored short reaction). Questions 4–6 are length-gated (§0.1) — skip
+  them on short reactions rather than forcing markers onto a one-liner, but
+  **question 11 still applies to short posts and is the only check covering
+  them.** If drafting a batch, also check §6.2's set-level rationing caps
+  (e.g., at most one toast per 5 posts).
 
 Fix any violation found in this step before the draft is shown. This check
 happens before the user sees the draft, not as a revision after they react

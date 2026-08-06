@@ -9,7 +9,7 @@
 
 **Mean fake accuracy: 73%** (pass threshold: <=60%)
 
-Judges caught AI-written posts far more often than the calibration bar allows. The voice profile is currently _too imitable_ -- the tells judges used to catch fakes are legible enough that three independent readers converged on most of them.
+Judges caught AI-written posts far more often than the calibration bar allows. The voice profile is currently _too catchable_ -- the tells judges used to catch fakes are legible enough that three independent readers converged on most of them.
 
 ## Per-judge scores
 

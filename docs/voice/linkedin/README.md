@@ -1,8 +1,13 @@
 # LinkedIn post corpus
 
 Harrison Callahan's LinkedIn posts, scraped 2026-08-05 from the profile activity
-feed (Posts filter) for later voice/writing-style analysis. **No analysis has been
-done yet** — this is raw source material.
+feed (Posts filter). This is the raw source material for the voice/writing-style
+analysis, which **has been done**: see [`../VOICE.md`](../VOICE.md) for the
+resulting voice profile and [`../calibration/`](../calibration/) for the two
+blind calibration rounds that tested it. Ten of the posts here are held out of
+VOICE.md's analysis and citations as a calibration set
+([`../calibration/holdout.json`](../calibration/holdout.json)), so VOICE.md is
+derived from 192 of the 202 files in `posts/`.
 
 ## Contents
 
