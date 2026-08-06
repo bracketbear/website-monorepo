@@ -94,3 +94,39 @@ and was not part of this commit.
   to be delivered to Harrison separately.
 - No runtime test of the skill is possible in this session (skill list
   refreshes next session), consistent with the brief's own Step 2 note.
+
+## Round 1 fixes (reviewer feedback)
+
+A reviewer verified all 13 section references, the ordered procedure, both
+registers, and the paraphrase warning, and flagged two issues, both fixed:
+
+1. **Miscited calibration data (major).** The original caveat said round-2
+   judges "landed at exactly the 60% pass threshold." Checked against
+   `docs/voice/calibration/round2/report.md`: that's wrong — mean fake
+   accuracy was 40% against a ≤60% bar, a comfortable-looking raw number. The
+   actual fragility is structural, not a boundary score: all three judges
+   independently caught the identical two fake shapes and missed the
+   identical three, so the effective sample is 5 shape-level trials, not 15
+   item judgments (2/5 caught = 40%). The report states explicitly that one
+   more shape fooling all three judges (3/5) would have put the score
+   "exactly at the pass/fail boundary" — that's where the 60% figure
+   actually belongs, as a counterfactual, not as what round 2 measured.
+   Rewrote the caveat in `.claude/skills/bb-voice/SKILL.md` to say this
+   accurately: 40% mean accuracy, identical hit/miss pattern across judges,
+   effective n=5, one-shape-flip-away from the boundary.
+2. **Floor paraphrase drift risk (minor).** Step 2 previously restated the
+   three floors' rule lines and enumerated Floor 1's six energy-marker types
+   in the skill's own words — content that was revised twice during
+   calibration per VOICE.md's own text. Rewrote Step 2 to cite §2.0 and state
+   only what the floors are _for_ (mandatory minimums applied while
+   drafting, not fixed after the fact) without reproducing the floor
+   definitions, thresholds, or marker list.
+
+Verified the corrected numbers by re-reading
+`docs/voice/calibration/round2/report.md` lines 15-35 before writing them
+into the skill.
+
+### Commit (round 1 fix)
+
+`fix: correct calibration citation and de-duplicate floors in bb-voice
+skill` — not pushed, per instruction. README.md left unstaged.
