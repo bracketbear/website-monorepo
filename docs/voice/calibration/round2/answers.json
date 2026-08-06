@@ -1,0 +1,77 @@
+[
+  {
+    "id": 1,
+    "label": "real",
+    "src": "2026-08-01--portland-experiential-technology-pros-how-the.md"
+  },
+  {
+    "id": 2,
+    "label": "real",
+    "src": "2026-07-24--hey-network-do-you-or-someone.md"
+  },
+  {
+    "id": 3,
+    "label": "fake",
+    "src": "announcement build-up"
+  },
+  {
+    "id": 4,
+    "label": "fake",
+    "src": "short reaction"
+  },
+  {
+    "id": 5,
+    "label": "real",
+    "src": "2026-01-10--first-bracket-bear-install-yall-gotta.md"
+  },
+  {
+    "id": 6,
+    "label": "real",
+    "src": "2024-12-15--hey-design-network-have-you-thought.md"
+  },
+  {
+    "id": 7,
+    "label": "fake",
+    "src": "hot take"
+  },
+  {
+    "id": 8,
+    "label": "fake",
+    "src": "network ask"
+  },
+  {
+    "id": 9,
+    "label": "real",
+    "src": "2023-12-04--github-copilot-has-always-felt-a.md"
+  },
+  {
+    "id": 10,
+    "label": "real",
+    "src": "2025-03-08--for-international-womens-day-id-like.md"
+  },
+  {
+    "id": 11,
+    "label": "real",
+    "src": "2026-03-13--one-year-ago-today-my-team.md"
+  },
+  {
+    "id": 12,
+    "label": "real",
+    "src": "2024-10-02--thirtythousand-feet-in-the-sky-on.md"
+  },
+  {
+    "id": 13,
+    "label": "fake",
+    "src": "community spotlight"
+  },
+  {
+    "id": 14,
+    "label": "real",
+    "src": "2025-02-07--do-yall-know-how-hard-it.md"
+  },
+  {
+    "id": 15,
+    "label": "real",
+    "src": "2023-11-30--openais-chatgpt-turns-1-today-this.md"
+  }
+]
