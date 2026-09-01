@@ -48,7 +48,6 @@ export default defineConfig({
     },
   },
   output: 'static',
-  compressHTML: true,
   prefetch: {
     prefetchAll: false, // Disable automatic prefetching to reduce initial load
     defaultStrategy: 'viewport', // Only prefetch when elements enter viewport
