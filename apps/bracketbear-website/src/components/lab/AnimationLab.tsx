@@ -1,10 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { PixiApplication, PointerService } from '@bracketbear/flateralus-pixi';
-import { applyTheme, type ThemeId } from '@bracketbear/flateralus';
+import {
+  PixiApplication,
+  PointerService,
+  type PixiAnimation,
+} from '@bracketbear/flateralus-pixi';
+import {
+  applyTheme,
+  getManifestDefaultControlValues,
+  getRandomControlValues,
+  type AnimationManifest,
+  type ThemeId,
+} from '@bracketbear/flateralus';
 import { REGISTRY } from './registry';
 import LabHeader from './LabHeader';
 import LabNav from './LabNav';
 import LabStage from './LabStage';
+import LabInspector from './LabInspector';
 
 /** Animations bake layout at init, so a resize rebuilds rather than reflows. */
 const RESIZE_DEBOUNCE_MS = 250;
@@ -17,33 +28,42 @@ export default function AnimationLab() {
   const [inContext, setInContext] = useState(true);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [values, setValues] = useState<Record<string, unknown>>({});
+  const [manifest, setManifest] = useState<AnimationManifest | null>(null);
 
   const hostRef = useRef<HTMLDivElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const appRef = useRef<PixiApplication | null>(null);
   const pointerRef = useRef<PointerService>(new PointerService());
+  const animRef = useRef<PixiAnimation<AnimationManifest> | null>(null);
   const activeIdRef = useRef(activeId);
   activeIdRef.current = activeId;
+  const valuesRef = useRef(values);
+  valuesRef.current = values;
 
   /**
    * Build the active entry fresh. setAnimation destroys whatever was
    * mounted, so this doubles as teardown.
    */
-  const mount = useCallback(() => {
+  const mount = useCallback((initialControls?: Record<string, unknown>) => {
     const app = appRef.current;
     if (!app) return;
     const entry = REGISTRY.find((e) => e.id === activeIdRef.current);
     if (!entry) return;
     pointerRef.current.clearClicks();
     try {
-      const animation = entry.create();
+      const animation = entry.create(initialControls);
       animation.setPointerService(pointerRef.current);
       app.setAnimation(animation);
+      animRef.current = animation;
+      setManifest(animation.getManifest());
+      setValues(animation.getControlValues() as Record<string, unknown>);
       setError(null);
     } catch (e) {
-      // Per-frame error isolation: surface it on the stage, do not let one
-      // broken animation take the page down silently.
+      // Error isolation: surface it on the stage, do not let one broken
+      // animation take the page down silently.
       console.error(entry.id, e);
+      animRef.current = null;
       setError(`${entry.id}: ${(e as Error).message}`);
     }
   }, []);
@@ -92,11 +112,22 @@ export default function AnimationLab() {
     return () => pointer.detach();
   }, [ready]);
 
-  // Remount on selection and on theme change — many pieces read the
-  // palette at build time, so recoloring requires a rebuild.
+  // Selecting a different animation starts from its own defaults.
   useEffect(() => {
     if (ready) mount();
-  }, [activeId, theme, ready, mount]);
+  }, [activeId, ready, mount]);
+
+  // A theme change rebuilds with the values already dialled in — many
+  // pieces read the palette at build time, so recoloring needs a rebuild.
+  const didMountTheme = useRef(false);
+  useEffect(() => {
+    if (!ready) return;
+    if (!didMountTheme.current) {
+      didMountTheme.current = true;
+      return;
+    }
+    mount(valuesRef.current);
+  }, [theme, ready, mount]);
 
   // Debounced remount on resize.
   useEffect(() => {
@@ -105,7 +136,7 @@ export default function AnimationLab() {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const ro = new ResizeObserver(() => {
       clearTimeout(timer);
-      timer = setTimeout(mount, RESIZE_DEBOUNCE_MS);
+      timer = setTimeout(() => mount(valuesRef.current), RESIZE_DEBOUNCE_MS);
     });
     ro.observe(wrap);
     return () => {
@@ -140,6 +171,39 @@ export default function AnimationLab() {
     setTheme(id);
   }, []);
 
+  /**
+   * A control marked resetsAnimation rebuilds the scene; everything else
+   * updates the running animation in place.
+   */
+  const handleControl = useCallback(
+    (name: string, value: string | number | boolean) => {
+      const next = { ...valuesRef.current, [name]: value };
+      setValues(next);
+      const control = manifest?.controls.find((c) => c.name === name);
+      if (control?.resetsAnimation) {
+        mount(next);
+        return;
+      }
+      try {
+        animRef.current?.updateControls({ [name]: value });
+      } catch (e) {
+        console.error(name, e);
+        setError(`${name}: ${(e as Error).message}`);
+      }
+    },
+    [manifest, mount]
+  );
+
+  const handleRandomize = useCallback(() => {
+    if (!manifest) return;
+    mount(getRandomControlValues(manifest) as Record<string, unknown>);
+  }, [manifest, mount]);
+
+  const handleReset = useCallback(() => {
+    if (!manifest) return;
+    mount(getManifestDefaultControlValues(manifest) as Record<string, unknown>);
+  }, [manifest, mount]);
+
   const active = REGISTRY.find((e) => e.id === activeId) ?? null;
 
   return (
@@ -152,8 +216,8 @@ export default function AnimationLab() {
         onTheme={handleTheme}
         inContext={inContext}
         onView={setInContext}
-        onRandomize={() => {}}
-        onReset={() => {}}
+        onRandomize={handleRandomize}
+        onReset={handleReset}
       />
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         <LabNav activeId={activeId} onSelect={setActiveId} />
@@ -166,6 +230,14 @@ export default function AnimationLab() {
           showChrome={true}
           error={error}
         />
+        {active && manifest && (
+          <LabInspector
+            entry={active}
+            manifest={manifest}
+            values={values}
+            onChange={handleControl}
+          />
+        )}
       </div>
     </div>
   );

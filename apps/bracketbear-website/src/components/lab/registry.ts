@@ -13,7 +13,10 @@ export interface LabEntry {
   name: string;
   blurb: string;
   tag: string;
-  create: () => PixiAnimation<AnimationManifest>;
+  /** Factory. Omitting initialControls builds the manifest defaults. */
+  create: (
+    initialControls?: Record<string, unknown>
+  ) => PixiAnimation<AnimationManifest>;
 }
 
 /**
