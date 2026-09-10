@@ -456,6 +456,8 @@ class ParticleWaveAnimation extends PixiAnimation<
   }
 
   onDestroy(): void {
+    // Tear down the inherited root container as well.
+    super.onDestroy();
     if (this.system) {
       for (const p of this.system.particles) {
         if (p.graphics && p.graphics.parent) {

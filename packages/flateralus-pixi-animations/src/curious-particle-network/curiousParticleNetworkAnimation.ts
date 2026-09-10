@@ -561,6 +561,8 @@ class CuriousParticleNetworkAnimation extends PixiAnimation<
   }
 
   onDestroy(): void {
+    // Tear down the inherited root container as well.
+    super.onDestroy();
     if (this.system) {
       // Remove and destroy all particle graphics
       for (const p of this.system.particles) {
