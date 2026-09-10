@@ -452,7 +452,7 @@ export class RetroGridAnimation extends BaseAnimation<
         // Draw different shapes based on selection
         this.drawParticleShape(
           particle,
-          controls.particleShape,
+          String(controls.particleShape),
           squareSize,
           controls.squareColor
         );
@@ -472,7 +472,7 @@ export class RetroGridAnimation extends BaseAnimation<
           targetAlpha: controls.opacity,
           currentAlpha: controls.opacity,
           animationOffset: Math.random() * Math.PI * 2,
-          shape: controls.particleShape, // Store the shape used for this particle
+          shape: String(controls.particleShape), // Store the shape used for this particle
         });
       }
     }

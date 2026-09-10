@@ -46,11 +46,13 @@ export const SelectControlSchema = BaseControlSchema.extend({
   type: z.literal('select'),
   options: z.array(
     z.object({
-      value: z.string(),
+      // Numeric values carry palette entries and stage indices; the UI
+      // renders a color swatch when the value is a number.
+      value: z.union([z.string(), z.number()]),
       label: z.string(),
     })
   ),
-  defaultValue: z.string(),
+  defaultValue: z.union([z.string(), z.number()]),
 });
 
 /**

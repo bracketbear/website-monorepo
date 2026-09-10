@@ -394,7 +394,7 @@ class ParticleWaveAnimation extends PixiAnimation<
         // Calculate wave value based on shape and direction
         const waveValue = calculateWaveValue(
           phase + this.system!.time * controls.waveFrequency + phaseOffset,
-          controls.waveShape
+          String(controls.waveShape)
         );
 
         if (controls.waveDirection === 'horizontal') {

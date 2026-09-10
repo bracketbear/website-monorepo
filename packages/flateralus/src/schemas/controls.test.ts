@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { SelectControlSchema } from './controls';
+import { createManifest } from '../utils/create-manifest';
+import { createControlValuesSchema } from '../utils/create-control-values-schema';
 import {
   createGroupControl,
   ColorGroupControlSchema,
@@ -404,5 +407,68 @@ describe('Group Control Schemas', () => {
       const result = GroupControlSchema.safeParse(mixedGroup);
       expect(result.success).toBe(true);
     });
+  });
+});
+
+describe('SelectControlSchema numeric values', () => {
+  it('accepts numeric option values and a numeric default', () => {
+    const parsed = SelectControlSchema.safeParse({
+      name: 'stage',
+      type: 'select',
+      label: 'Stage',
+      options: [
+        { value: 1, label: 'Ink stage' },
+        { value: 0, label: 'Orange stage' },
+      ],
+      defaultValue: 1,
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it('still accepts string option values', () => {
+    const parsed = SelectControlSchema.safeParse({
+      name: 'waveDirection',
+      type: 'select',
+      label: 'Wave Direction',
+      options: [{ value: 'horizontal', label: 'Horizontal' }],
+      defaultValue: 'horizontal',
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it('rejects a default that is neither a string nor a number', () => {
+    const parsed = SelectControlSchema.safeParse({
+      name: 'stage',
+      type: 'select',
+      options: [{ value: 1, label: 'Ink stage' }],
+      defaultValue: true,
+    });
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe('numeric selects survive animation construction', () => {
+  it('validates a numeric default through createControlValuesSchema', () => {
+    const manifest = createManifest({
+      id: 'numeric-select',
+      name: 'Numeric Select',
+      description: 'Numeric select control values',
+      controls: [
+        {
+          name: 'stage',
+          type: 'select',
+          label: 'Stage',
+          options: [
+            { value: 1, label: 'Ink stage' },
+            { value: 0, label: 'Orange stage' },
+          ],
+          defaultValue: 1,
+        },
+      ],
+    });
+    const schema = createControlValuesSchema(manifest);
+    expect(schema.safeParse({ stage: 1 }).success).toBe(true);
+    expect(schema.safeParse({ stage: 0 }).success).toBe(true);
+    expect(schema.safeParse({ stage: 7 }).success).toBe(false);
   });
 });

@@ -34,7 +34,7 @@ function controlToZodSchema(control: Mutable<Control>): ZodTypeAny {
       // Now options is mutable
       const options = control.options;
       return z
-        .string()
+        .union([z.string(), z.number()])
         .refine((val) => options.some((opt) => opt.value === val), {
           message: `Value must be one of: ${options.map((o) => o.value).join(', ')}`,
         });

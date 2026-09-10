@@ -95,11 +95,11 @@ export interface BooleanControlValue extends ControlValue<boolean> {
   };
 }
 
-export interface SelectControlValue extends ControlValue<string> {
+export interface SelectControlValue extends ControlValue<string | number> {
   type: 'select';
-  value: string;
+  value: string | number;
   metadata?: {
-    options?: string[];
+    options?: (string | number)[];
   };
 }
 
@@ -128,7 +128,7 @@ type ControlTypeToValueTypeMap = {
   number: number;
   boolean: boolean;
   color: string;
-  select: string;
+  select: string | number;
   group: AnyControlValue[];
 };
 
