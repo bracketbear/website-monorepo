@@ -1,0 +1,143 @@
+@import '@fontsource/anton/400.css';
+@import '@fontsource/archivo-black/400.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+
+/* ============================================================
+   lab.css — Animation Lab shell.
+   Scoped under .bb-lab so nothing leaks to the marketing pages.
+   ============================================================ */
+
+.bb-lab {
+  --orange: #ff5f1f;
+  --bright: #ff7a33;
+  --deep: #d8420c;
+  --rust: #a82a07;
+  --sun: #ffc24a;
+  --cream: #fff3e3;
+  --ink: #110a08;
+  --ink-2: #1c130e;
+  --cyan: #7df9ff;
+  --acid: #d8ff3d;
+
+  --hairline: rgba(255, 243, 227, 0.14);
+  --muted-18: rgba(255, 243, 227, 0.18);
+  --muted-25: rgba(255, 243, 227, 0.25);
+  --muted-30: rgba(255, 243, 227, 0.3);
+  --muted-42: rgba(255, 243, 227, 0.42);
+  --muted-55: rgba(255, 243, 227, 0.55);
+  --muted-60: rgba(255, 243, 227, 0.6);
+  --muted-70: rgba(255, 243, 227, 0.7);
+  --muted-75: rgba(255, 243, 227, 0.75);
+
+  --display: 'Anton', 'Helvetica Neue', sans-serif;
+  --wordmark: 'Archivo Black', 'Helvetica Neue', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Notches — the one non-zero corner treatment in the system. */
+.bb-lab .notch-8 {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% 100%,
+    8px 100%,
+    0 calc(100% - 8px)
+  );
+}
+.bb-lab .notch-14 {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% 100%,
+    14px 100%,
+    0 calc(100% - 14px)
+  );
+}
+
+.bb-lab .lab-mono {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* Nav and inspector scrollbars, kept out of the way. */
+.bb-lab .lab-scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-25) transparent;
+}
+.bb-lab .lab-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.bb-lab .lab-scroll::-webkit-scrollbar-thumb {
+  background: var(--muted-25);
+}
+
+.bb-lab .lab-nav-item:hover {
+  color: var(--cream);
+  background: rgba(255, 243, 227, 0.07);
+}
+.bb-lab .lab-opt:hover {
+  border-color: var(--cream);
+}
+.bb-lab .lab-theme-dot {
+  transition: transform 0.15s ease;
+}
+.bb-lab .lab-theme-dot:hover {
+  transform: scale(1.18);
+}
+.bb-lab .lab-seg:hover {
+  color: var(--cream);
+}
+.bb-lab .lab-randomize:hover {
+  background: var(--sun);
+}
+.bb-lab .lab-reset:hover {
+  border-color: var(--cream);
+}
+
+.bb-lab input[type='range'] {
+  accent-color: var(--orange);
+  width: 100%;
+}
+
+@keyframes bbLabPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.bb-lab .status-dot {
+  animation: bbLabPulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-lab .status-dot {
+    animation: none;
+  }
+  .bb-lab .lab-theme-dot,
+  .bb-lab .lab-opt,
+  .bb-lab .lab-seg {
+    transition: none;
+  }
+}

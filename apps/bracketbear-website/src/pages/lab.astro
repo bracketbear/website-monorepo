@@ -1,0 +1,29 @@
+---
+// The Animation Lab is a full-viewport internal tool, so it deliberately
+// skips Layout.astro: no site nav, no footer, no contact form, no pointer
+// effects competing with the stage cursor.
+import AnimationLab from '@/components/lab/AnimationLab';
+import '@/styles/lab.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Animation Lab — Bracket Bear</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #110a08;
+      }
+    </style>
+  </head>
+  <body>
+    <AnimationLab client:only="react" />
+  </body>
+</html>
