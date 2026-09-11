@@ -27,6 +27,13 @@ Harrison already writes. Those are marked `[corpus]`. Everything else is marked
 `[decision]` and traces to brand work Harrison did on 2026-05-02 through
 2026-05-04.
 
+**Amended 2026-08-24.** The first version of this document was defined almost
+entirely by subtraction: a long ban list and one approved sentence shape. The
+homepage it produced ran twelve consecutive first-person-plural declaratives and
+repeated one three-noun abstraction four times. Two new sections under
+[Voice](#voice) — **Required: the additive rules** and **Permitted: clarified** —
+fix that. Every ban below still stands except where those sections say otherwise.
+
 ---
 
 ## Positioning
@@ -156,7 +163,8 @@ virtue too small to flex on. The strike-through "We don't 'leverage synergies'"
 device in an early manifesto draft falls under this rule and was dropped.
 
 **Replace with:** declarative statements about what the company actually does.
-No contrast move, no comparison-to-other-agencies framing.
+No contrast move, no comparison-to-other-agencies framing. (Declarative is the
+default shape, not the only permitted one — see **Permitted: clarified**.)
 
 ### Banned — operator-flex, twee detail, jokey-insider voice
 
@@ -183,6 +191,43 @@ rock we touch") rather than punchy operator-detail one-liners.
 **The test: if a line could be a HackerNews comment posted as a flex, it is
 wrong for this brand.**
 
+### Required: the additive rules
+
+`[decision]` **Added 2026-08-24.** Bans alone produced flat, generic copy. These
+are obligations rather than permissions — a draft that violates one is wrong even
+if it breaks no ban.
+
+1. **Every section carries at least one real named noun.** A tool, a runtime, a
+   place, a company, a client's actual thing. "Content modeling, integrations,
+   workflows" is not a named noun, it is a category list, and the v1 homepage
+   shipped it four times. The standard is the corpus line already quoted above:
+   "a CMS that powers the tasting tables."
+2. **No two consecutive headlines open with "We."** The v1 homepage ran twelve
+   first-person-plural declaratives from hero to bookend. That is what "use
+   declarative statements" sounds like when it is the only approved shape.
+3. **Specific enthusiasm is permitted, and it attaches to a named thing.**
+   `[corpus]` — `VOICE.md` §1.1: enthusiasm is Harrison's baseline register and it
+   never attaches to an abstraction. The brand may be visibly into TouchDesigner,
+   a good content model, or someone else's work. It may not be excited about
+   "solutions."
+
+### Permitted: clarified
+
+`[decision]` **Added 2026-08-24.** Three things this document banned by
+implication rather than on purpose.
+
+| Permitted                                                                                             | The line that still holds                                                                                                                                                                                                                                           |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Second person.** Address the reader — "your producers," "what your stack is costing you."           | The **generic vocative** stays banned. "Leaders," "founders," "builders" appear zero times in 192 posts (`VOICE.md` §1.2). Name the reader by their situation, never by their job title.                                                                            |
+| **Rhetorical questions.** A question that makes the reader recognize a situation they are already in. | **Consultative-asking stays banned**, and these are different moves. "If you could wave a magic wand…" asks the reader to supply the diagnosis. "Count the places a single content change has to be made before it's live" hands them one. The first is still dead. |
+| **Specific enthusiasm** — see the additive rules above.                                               | Enthusiasm about an abstraction is still hype. Still zero emoji, zero hype-caps, one exclamation point at most and usually none.                                                                                                                                    |
+
+**What did not change: the operator-flex ban holds.** "Five tools and a cron
+job," "the integrations nobody else wants to touch," "scar tissue comes with us"
+stay dead. Those were never what made the copy generic — the gap they left got
+filled with nothing instead of with facts. A named noun beats a flex on
+specificity, and it does not read as a HackerNews comment.
+
 ### The aggressive register ceiling
 
 The sharpest line currently approved: `[decision]`
@@ -202,6 +247,7 @@ far the brand goes. (The functionality exists; there was no recorded demo as of
 | Declarative about what the company does — "shipped systems inside," "built at," "years across"                                                              | "we don't take a brief, we give one," "We answer the phone," "polished like a hotel."                                                                                    |
 | Expert diagnosis — "If you can't generate a CMS with a custom content model and a TouchDesigner app with a single command to an AI agent — we should talk." | "five tools and a cron job," "the integrations nobody else wants to touch," "scar tissue comes with us," "Built with care, not vibes," "If you could wave a magic wand…" |
 | Operator credit; Pittsburgh/Portland stated as fact                                                                                                         | "our clients include," "we partnered with," "yinz," 🤘, or any sports/beer/band reference.                                                                               |
+| Named nouns — "Built at Downstream: the CMS powering Stoller's tasting tables and the barback LED wall."                                                    | "content modeling, integrations, workflows" repeated as a mantra; any section with no real noun in it.                                                                   |
 
 ### The hashtag series
 
