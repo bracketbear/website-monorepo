@@ -739,8 +739,8 @@
 }
 .intro__quote {
   font-family: var(--display);
-  font-size: clamp(2.4rem, 5.6vw, 5rem);
-  line-height: 0.95;
+  font-size: clamp(1.6rem, 2.9vw, 2.6rem);
+  line-height: 1.08;
   letter-spacing: -0.005em;
   text-transform: uppercase;
   color: var(--ink);
@@ -784,15 +784,21 @@
   text-transform: uppercase;
   color: var(--ink-soft);
   font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
+  line-height: 1.8;
+  max-width: 68ch;
 }
 .intro__sig::before {
   content: '';
+  display: inline-block;
   width: 24px;
   height: 2px;
   background: var(--ink);
+  margin-right: 0.7rem;
+  vertical-align: middle;
+}
+.intro__sig strong {
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .marg {
@@ -1048,33 +1054,26 @@
 }
 .manifesto__decor {
   position: absolute;
-  right: -8vw;
+  right: -3vw;
   top: 50%;
   transform: translateY(-50%);
-  width: 80vw;
-  max-width: 1400px;
-  color: transparent;
+  width: min(46vw, 720px);
+  /* symbol paths use fill="currentColor" inside the <use> shadow tree,
+     so the silhouette color must arrive via inherited `color` */
+  color: var(--orange-deep);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.9;
+  opacity: 0.4;
 }
 .manifesto__decor svg {
   width: 100%;
   height: auto;
-  fill: none;
-  stroke: var(--orange-deep);
-  stroke-width: 2;
-}
-.manifesto__decor svg path {
-  fill: none;
-  stroke: var(--orange-deep);
-  stroke-width: 2;
 }
 @media (max-width: 760px) {
   .manifesto__decor {
-    right: -20vw;
-    width: 140vw;
-    opacity: 0.55;
+    right: -18vw;
+    width: 85vw;
+    opacity: 0.2;
   }
 }
 .manifesto__inner {
@@ -1391,9 +1390,32 @@
 .bb-home .values--three {
   grid-template-columns: repeat(3, 1fr);
 }
+.bb-home .values--three .value {
+  padding: 2.6rem 2.5rem;
+  border-right: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+.bb-home .values--three .value:first-child {
+  padding-left: 0;
+}
+.bb-home .values--three .value:last-child {
+  border-right: 0;
+  padding-right: 0;
+}
+.bb-home .values--three .value__title {
+  /* reserve two title lines so bodies start on one baseline */
+  min-height: 1.84em;
+}
 @media (max-width: 900px) {
   .bb-home .values--three {
     grid-template-columns: 1fr;
+  }
+  .bb-home .values--three .value {
+    border-right: 0;
+    padding: 2.4rem 0;
+  }
+  .bb-home .values--three .value__title {
+    min-height: 0;
   }
 }
 
@@ -1445,10 +1467,22 @@
   margin-bottom: 3rem;
 }
 .bb-home .receipts__pull {
-  font-size: clamp(2rem, 4.5vw, 3.5rem);
-  line-height: 1.05;
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  line-height: 1.14;
   letter-spacing: -0.005em;
-  max-width: 28ch;
+  max-width: 36ch;
+}
+.bb-home .receipts__pull .highlight {
+  /* Anton's ascent+descent make a flat background bleed into the next
+     line; clip the stamp to the glyph band like .sec__title .accent. */
+  background: linear-gradient(
+    to bottom,
+    transparent 12%,
+    var(--ink) 12%,
+    var(--ink) 84%,
+    transparent 84%
+  );
+  padding: 0 0.12em;
 }
 .bb-home .receipts__demo {
   display: grid;
