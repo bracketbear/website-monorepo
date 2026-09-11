@@ -49,17 +49,31 @@ with free edges. A membrane version would be honest physics of the wrong phenome
 
 Splitting it is not only for the stencil; it is where the boundary condition goes.
 
-### D2 — Free edges via zero bending moment, and it is an approximation
+### D2 — Simply supported edges, and the spec says so plainly
 
-A true free edge requires both zero moment and zero shear (a Neumann-type pair that is fiddly to
-discretize on a masked irregular boundary — and the mark boundary is very irregular).
+An earlier draft of this spec claimed "free edges via zero bending moment." That was wrong, and
+the correction matters enough to record rather than quietly swap.
 
-What ships: `L` is zeroed outside the plate mask, which imposes `∇²w = 0` at the boundary — the
-zero-moment half. The shear condition is not imposed.
+What is actually implementable on an irregular masked boundary — and the mark's boundary is very
+irregular — is **simply supported**: `w = 0` and `∇²w = 0` on the edge. Both fall straight out of
+the mask. Cells outside the plate hold `w = 0`, and `L` is zeroed outside, so the two conditions
+are imposed by construction with no ghost-cell extrapolation anywhere.
 
-This is stated as an approximation, not as the exact free-edge BC, and it is the first thing to
-revisit if the figures read as too drumhead-like. It gives plate-like curvature and the boundary
-still determines the modes, which is what the toy is about.
+Free-free is the textbook Chladni case and this is not it. The honest statement is that this is a
+driven simply-supported plate.
+
+**Why the figures are still non-trivial, which is the part that nearly killed the design.** On a
+square, every standard separable boundary condition has separable eigenfunctions —
+`sin(mπx)·sin(nπy)` — which are grids and diagonals, the exact boring outcome D1 exists to avoid.
+The rescue is **degeneracy**: `(m,n)` and `(n,m)` share a frequency, and a point driver at the
+plate center excites both equally by symmetry. What you see is the superposition `φ_mn + φ_nm`,
+and those superpositions are the curved, ringed, cornered figures people recognize. The grids are
+the eigenfunctions; the figures are what a driven plate does with them.
+
+The circular and mark boundaries are non-separable to begin with, so they need no such argument.
+
+This also means the center driver is load-bearing, not a simplification (see D8). Move the driver
+off-center and the degenerate pair stops combining symmetrically.
 
 ### D3 — β is clamped below the stability limit in code
 
@@ -70,25 +84,60 @@ The leapfrog `w' = 2w − w_prev − β·∇⁴w` is conditionally stable at `β
 β ≤ 4/64 = 1/16 = 0.0625
 ```
 
-Target `β ≈ 0.03`. The control is clamped at **0.05** in code, not merely bounded in the
+Target `β ≈ 0.04`. The control is clamped at **0.05** in code, not merely bounded in the
 manifest, so no randomize-all and no restored control value can detonate the integrator.
 
 `β` is dimensionless and per-step: it already absorbs `dt²/dx⁴`, and the grid spacing is one
 cell. Every tuning constant in this animation is stated in the simulation's own units — grid
 cells, cells per step, radians per step — before any claim is made about what it does.
 
-Simulation grid is ~300 cells on the long edge, matching `caustics-pool`. Fixed timestep at
-`STEP = 1/240`, faster than the pool's `1/90` because the fourth-order stencil needs it, with a
-capped accumulator of the same shape:
+### D3a — Grid size and step rate are fixed by the dispersion relation, not by taste
+
+This is the calculation that sets the whole animation's shape, and getting it wrong produces a
+plate that technically works and is useless. An earlier draft of this spec said "~300 cells,
+`STEP = 1/240`," copied from `caustics-pool`. Those numbers give a plate whose legible modes
+oscillate at about **0.1 Hz** — a six-second wobble, not a vibration. The sand would have nothing
+to respond to.
+
+The discrete dispersion relation for the scheme is:
+
+```
+ω = sqrt(β · 16 · sin⁴(k/2))        ω in radians per step, k in radians per cell
+```
+
+For `m` half-waves across `N` cells, `k = mπ/N`. A legible Chladni figure wants roughly 4–16
+half-waves across the plate. At `N = 128` and `β = 0.04`:
+
+| m (half-waves) | k rad/cell | ω rad/step | at 1200 steps/s |
+| -------------- | ---------- | ---------- | --------------- |
+| 8              | 0.196      | 0.0077     | 1.5 Hz          |
+| 12             | 0.295      | 0.0174     | 3.3 Hz          |
+| 16             | 0.393      | 0.0305     | 5.8 Hz          |
+| 22             | 0.540      | 0.0570     | 10.9 Hz         |
+
+So: **the sim grid is a fixed 128×128 and `STEP = 1/1200`.** Roughly 20 substeps per frame at
+60fps, each pass covering 16,384 pixels — about 655k fragment invocations per frame for the whole
+plate, which is nothing. Resolution buys mode headroom and costs frequency; this pair lands the
+usable band at 1.5–11 Hz, which looks like a plate buzzing rather than a sheet undulating.
 
 ```ts
-const STEP = 1 / 240;
-this.acc = Math.min(this.acc + dt, 3 / 240); // cap: 3 steps, never a spiral
+const STEP = 1 / 1200;
+this.acc = Math.min(this.acc + dt, 30 * STEP); // cap: 30 steps, never a spiral
 while (this.acc >= STEP) {
   this.acc -= STEP;
   step();
 }
 ```
+
+**The grid is square and fixed, independent of canvas size.** The plate is an object in the
+scene, not a full-bleed field, so there is no aspect-matching to do and no `ensureSim` dance —
+this is a real simplification over `caustics-pool`, which has to keep its cells square against a
+resizing canvas. It also means a resize never clears the field, so there is nothing to re-prime
+(see D11).
+
+A coarse plate grid does not mean coarse nodal lines. Grains live in continuous plate uv and are
+drawn at screen resolution; the envelope is sampled with `LINEAR` filtering. The lines are as
+sharp as the sand, not as the grid.
 
 ### D4 — Three fields in one texture; the envelope is the one that matters
 
@@ -101,8 +150,11 @@ One RGBA target, ping-ponged:
 | `.z`    | `A`, the amplitude envelope     |
 | `.w`    | spare                           |
 
-`A` is an exponential average of `|w|` with a time constant of roughly 50 steps — several drive
-periods.
+`A` is an exponential average of `|w|` whose time constant is tied to the drive rather than
+fixed: `α = ω / (2π · 3)`, i.e. three drive periods. A fixed step count cannot work when the
+sweep spans 1.5–11 Hz — 50 steps is most of a period at the bottom of the range and dozens of
+periods at the top. Tying it to `ω` keeps "how hard is this spot shaking" meaning the same thing
+across the whole sweep.
 
 The envelope exists because grains cannot respond to instantaneous height. A plate ringing at a
 few hundred hertz is a blur; what a grain responds to is _how hard this spot is shaking_, which
@@ -138,6 +190,14 @@ applies two effects:
 - `β_eff = β / (1 + μD)` — added mass lowers local stiffness, so a loaded region detunes.
 - damping increases with `D` — sand dissipates energy.
 
+Damping itself is a control in **seconds of ring-down**, not a raw per-step multiplier. At 1200
+steps/s the useful range of that multiplier is 0.9999–0.99999, which is unreadable and untunable;
+`decay = exp(−STEP/ringTime)` with `ringTime` from 0.5 to 30 s is the same number in units a
+person can reason about. It also exposes the thing that actually matters for the hunt: `Q ≈
+ω·ringTime·(steps/s)/2`, so at the default 4 s and mid-sweep, Q ≈ 20 — sharp enough that landing
+on a mode feels like landing, broad enough that build-up takes a second or two rather than
+fifteen.
+
 The figure the plate builds therefore changes the plate that built it. Pile enough sand on a line
 and the mode shifts underneath it.
 
@@ -158,12 +218,19 @@ conserved and the scene cannot slowly empty itself over an ambient page's lifeti
 
 ### D8 — Cursor is a tone control; click pours sand
 
-- **X** → drive frequency, mapped over a range chosen so 10–20 modes fall inside it.
+- **X** → drive frequency, mapped **linearly** onto `ω ∈ [0.006, 0.055]` radians per step.
 - **Y** → drive amplitude.
 - **Click** → pours a fresh handful of sand at the cursor.
 
-The driver is a fixed point source at the plate center. This is not a simplification — it is why
-the classic figures are the ones they are, since only modes with a center antinode get fed.
+The map is linear on purpose. For a Kirchhoff plate `ω ∝ k²` while the 2D mode count below `k`
+goes as `k²`, so the number of modes below `ω` grows **linearly in `ω`** — modes are uniformly
+dense in frequency. A linear sweep therefore encounters them at a steady rate, and a
+log/geometric map (the reflex choice, correct for audio) would crowd them all into one end of the
+cursor's travel.
+
+The driver is a fixed point source at the plate center. Per D2 this is load-bearing: it is what
+excites degenerate mode pairs symmetrically, and it is why only modes with a center antinode get
+fed at all.
 
 The pour is implemented as a ring pointer respawning a slab of the grain texture at the click
 point. Watching a poured pile crawl outward onto the lines is the clearest demonstration of
@@ -191,13 +258,17 @@ GPU→CPU sync in the animation, and the scene degrades to a constant-rate sweep
 
 ### D11 — Prime the plate, not the sand
 
-Pre-roll ~500 steps outside the accumulator so the envelope is established and the plate is
-already ringing on the first visible frame. Scatter sand uniformly and **let the figure form on
+Pre-roll 2,400 steps (two simulation seconds) outside the accumulator so the envelope is
+established and the plate is already ringing on the first visible frame. The envelope's own time
+constant is three drive periods, so anything much shorter hands the grains a half-built field. Scatter sand uniformly and **let the figure form on
 screen** over the first seconds.
 
 This is a deliberate reading of "your default state must show the best thing." The best thing
 this toy does is the migration. Pre-rolling the grains into position would hide it and would also
-mean seeding a figure rather than growing one. Re-prime on resize, since the state is cleared.
+mean seeding a figure rather than growing one.
+
+There is no re-prime on resize: per D3a the sim grid is fixed and canvas-independent, so a resize
+touches only the display pass and never clears the field.
 
 ### D12 — Three source files, not one
 
