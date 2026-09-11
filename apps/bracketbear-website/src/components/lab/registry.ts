@@ -1,7 +1,9 @@
 import type { PixiAnimation } from '@bracketbear/flateralus-pixi';
 import type { AnimationManifest } from '@bracketbear/flateralus';
 import {
+  createDmtTunnelAnimation,
   createGooLampAnimation,
+  createInterferenceFieldAnimation,
   createHalftoneTideAnimation,
   createKaleidoAnimation,
   createHeatHazeAnimation,
@@ -180,6 +182,30 @@ export const REGISTRY: LabEntry[] = [
       'A metaball field — every pixel sums the inverse-square influence of a dozen orbiting blobs, so they merge, pinch, and split as they pass. Interactive: the cursor is a blob of its own; click to squeeze the whole field for a beat. Ambient: a ghost blob wanders the tank instead.',
     create: (initialControls) =>
       createGooLampAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'dmt-tunnel',
+    section: 'toys',
+    name: 'Breakthrough Tunnel',
+    tag: 'glsl toy',
+    blurb:
+      'A polar kaleidoscope fold and domain-warped filigree projected as a tunnel. A trip envelope carries the scene from starfield ascent through a kaleidoscopic peak and back to dark, then loops. The pointer steers the vanishing point and hue drift; click fires a breakthrough surge that floods the core.',
+    create: (initialControls) =>
+      createDmtTunnelAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'interference-field',
+    section: 'toys',
+    name: 'Sub-Bass Interference',
+    tag: 'glsl toy',
+    blurb:
+      'Two or three radial wave fields at near-identical wavelengths, summed and drawn as contour lines. The tiny detune makes the pattern beat. The pointer carries the third source; click knocks the detune off its resting value and the field spends about twenty seconds re-settling into phase.',
+    create: (initialControls) =>
+      createInterferenceFieldAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

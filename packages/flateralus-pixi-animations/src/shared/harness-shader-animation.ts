@@ -49,6 +49,17 @@ export abstract class HarnessShaderAnimation<
   /** False for effects with no mask texture at all, such as the toys. */
   protected readonly needsMask: boolean = true;
 
+  /**
+   * Framebuffer pixels per CSS pixel. 1 means the offscreen canvas matches
+   * the stage exactly, which is what the mask-based effects want because
+   * their uRect is in CSS pixels. Effects that want device-resolution
+   * rendering override this; the sprite is still laid out in CSS pixels, so
+   * the only visible difference is sharpness and cost.
+   */
+  protected get renderScale(): number {
+    return this.dpr ?? 1;
+  }
+
   /** Push the effect's own uniforms. Called every frame, after the common ones. */
   protected abstract setUniforms(
     gl: WebGL2RenderingContext,
@@ -107,8 +118,9 @@ export abstract class HarnessShaderAnimation<
 
     const sw = app.screen.width;
     const sh = app.screen.height;
-    const W = Math.max(2, Math.round(sw));
-    const H = Math.max(2, Math.round(sh));
+    const scale = this.renderScale;
+    const W = Math.max(2, Math.round(sw * scale));
+    const H = Math.max(2, Math.round(sh * scale));
     if (ctx.canvas.width !== W || ctx.canvas.height !== H) {
       ctx.canvas.width = W;
       ctx.canvas.height = H;
@@ -121,7 +133,9 @@ export abstract class HarnessShaderAnimation<
     gl.viewport(0, 0, W, H);
     gl.useProgram(ctx.program);
     gl.uniform1f(locs.uTime!, this.time);
-    gl.uniform2f(locs.uRes!, sw, sh);
+    // Resolution is in framebuffer pixels, which equals CSS pixels at the
+    // default render scale.
+    gl.uniform2f(locs.uRes!, W, H);
 
     // `grain` and `stage` are shared by every effect on this harness, but
     // they live in each manifest, so read them structurally.
