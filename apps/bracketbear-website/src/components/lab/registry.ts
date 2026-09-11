@@ -3,6 +3,8 @@ import type { AnimationManifest } from '@bracketbear/flateralus';
 import {
   createHalftoneTideAnimation,
   createHeatHazeAnimation,
+  createLedMatrixAnimation,
+  createSchematicLensAnimation,
   createPixelSunriseAnimation,
   createRdVatAnimation,
   createSignalAlignmentAnimation,
@@ -53,6 +55,30 @@ export const REGISTRY: LabEntry[] = [
       'Swifts crossing the sunset, DKC-silhouette style: scythe-winged boids that burst-flap then glide, never slowing down. Fully ambient; the cursor reads as a hawk and scatters them; click to release more.',
     create: (initialControls) =>
       createSilhouetteFlockAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'schematic-lens',
+    section: 'hero',
+    name: 'Schematic Lens',
+    tag: 'glsl shader',
+    blurb:
+      'The cursor carries a molten glass lens. Outside it, the finished lockup; through it, the same scene refracted and magnified into a schematic pass — grid, hatching, edge-traced outline. Click fires an expanding pulse that sweeps the schematic across the full frame.',
+    create: (initialControls) =>
+      createSchematicLensAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'led-matrix',
+    section: 'hero',
+    name: 'LED Matrix',
+    tag: 'glsl shader',
+    blurb:
+      'The mark shown on a simulated LED wall — a fixed dot grid where each diode samples the logo mask at its cell center, with live content playing through the lit region. The cursor reveals the unlit hardware grid; clicks send a signal pulse rippling through every diode.',
+    create: (initialControls) =>
+      createLedMatrixAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

@@ -1,4 +1,6 @@
-export { logoMask } from './logo';
+import { logoMask } from './logo';
+
+export { logoMask };
 
 /**
  * Shared WebGL2 harness for the shader animations.
@@ -272,4 +274,37 @@ export function headlineMask(): HTMLCanvasElement | null {
     }
   }
   return headCanvas;
+}
+
+// ---------------------------------------------------------------------------
+// Composite mask: the mark above the wordmark, used by the lockup effects.
+// ---------------------------------------------------------------------------
+
+let compCanvas: HTMLCanvasElement | null = null;
+
+/**
+ * The full lockup as a mask: the mark over "BRACKET BEAR" set in Anton.
+ * Returns null until the font has loaded.
+ */
+export function compositeMask(): HTMLCanvasElement | null {
+  if (compCanvas) return compCanvas;
+  // headlineMask kicks the font load; reuse that readiness signal.
+  if (!headlineMask()) return null;
+  const logo = logoMask();
+  const cv = document.createElement('canvas');
+  cv.width = 1440;
+  cv.height = 980;
+  const g = cv.getContext('2d')!;
+  const lw = 860;
+  const lh = lw * (logo.height / logo.width);
+  g.drawImage(logo, (1440 - lw) / 2, 90, lw, lh);
+  g.fillStyle = '#fff';
+  g.textAlign = 'center';
+  g.font = '100px Anton';
+  const t = 'BRACKET BEAR';
+  const size = Math.min(190, (100 * 860) / (g.measureText(t).width || 1));
+  g.font = `${Math.round(size)}px Anton`;
+  g.fillText(t, 720, 90 + lh + 58 + size * 0.72);
+  compCanvas = cv;
+  return cv;
 }
