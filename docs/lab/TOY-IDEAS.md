@@ -7,6 +7,9 @@ This file is the home for ideas that are not yet work. An idea graduates when it
 gets a spec in `docs/superpowers/specs/`; it comes back here with a post-mortem
 if it dies.
 
+Registered from `AGENTS.md` at the repo root, alongside the other agent-facing
+docs.
+
 ## The rubric
 
 Five questions, in this order. They are ordered by how expensive the mistake is
