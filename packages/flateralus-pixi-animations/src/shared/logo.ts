@@ -12,7 +12,16 @@ const LOGO_PATHS = [
   'm225.92,117.28c-8.64-6.9-19.67-28.03-12.06-57.26C227.79,6.53,271.35.64,283.47.05c1.72-.08,3.16,1.28,3.16,3v83.21c0,1.66,1.34,3,3,3h19.68c1.66,0,3,1.34,3,3v64.05c0,1.66-1.34,3-3,3h-19.68c-1.66,0-3,1.34-3,3v84.29c0,1.73-1.46,3.11-3.19,2.99-14.86-.98-76.62-9.08-77.35-75.78-.27-27.6,7.69-40.17,19.83-56.54z',
 ];
 
-const LOGO_VIEWBOX = { w: 400.89, h: 249.73 };
+export const LOGO_VIEWBOX = { w: 400.89, h: 249.73 };
+
+/**
+ * The mark as Path2D objects, for animations that need their own fill
+ * passes — a baked bloom, say, where the mark has to be filled several
+ * times with different shadows rather than blitted as a finished bitmap.
+ */
+export function logoPath2Ds(): Path2D[] {
+  return LOGO_PATHS.map((d) => new Path2D(d));
+}
 
 /**
  * Draw the mark filled white into a 2D context already scaled to fit.

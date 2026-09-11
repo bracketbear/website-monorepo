@@ -1,24 +1,39 @@
 import type { PixiAnimation } from '@bracketbear/flateralus-pixi';
 import type { AnimationManifest } from '@bracketbear/flateralus';
 import {
+  createAtomicAgeAnimation,
+  createBlockPartyAnimation,
+  createCausticsPoolAnimation,
+  createContourHoodAnimation,
+  createContourPghAnimation,
   createCrtPhosphorAnimation,
   createDmtTunnelAnimation,
+  createEnergyBodyAnimation,
+  createFoilStatementAnimation,
   createGooLampAnimation,
+  createHalftoneTideAnimation,
+  createHeatHazeAnimation,
+  createHoloMarkAnimation,
+  createInkDissolveAnimation,
   createInterferenceFieldAnimation,
   createJellyTankAnimation,
-  createHalftoneTideAnimation,
   createKaleidoAnimation,
-  createHeatHazeAnimation,
   createLedMatrixAnimation,
   createLogoResolveAnimation,
+  createPixelSunriseAnimation,
   createPortalMarkAnimation,
+  createRdVatAnimation,
+  createRustMachineAnimation,
+  createScanTerrainAnimation,
   createSchematicLensAnimation,
   createSdfForgeAnimation,
-  createVisionaryEyeAnimation,
-  createPixelSunriseAnimation,
-  createRdVatAnimation,
+  createShatterGlassAnimation,
   createSignalAlignmentAnimation,
   createSilhouetteFlockAnimation,
+  createSlimeMoldAnimation,
+  createStreetPulseAnimation,
+  createSunArcAnimation,
+  createVisionaryEyeAnimation,
 } from '@bracketbear/flateralus-pixi-animations';
 import type { SectionKey } from './sections';
 
@@ -257,6 +272,186 @@ export const REGISTRY: LabEntry[] = [
       'Domain-warped noise folded through an n-way mirror. Interactive: the cursor steers the rotation and its distance from center sets the warp depth; click kicks the zoom and shifts the pattern to a new region of the field. Ambient: it turns and breathes on its own.',
     create: (initialControls) =>
       createKaleidoAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'ink-dissolve',
+    section: 'hero',
+    name: 'Ink Dissolve',
+    tag: 'glsl shader',
+    blurb:
+      'Ink dropped into the mark and left to dissolve: a Navier-Stokes solver with advection, vorticity confinement and a Jacobi pressure solve carries the dye through the letterforms.',
+    create: (initialControls) =>
+      createInkDissolveAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'holo-mark',
+    section: 'hero',
+    name: 'Hologram Mark',
+    tag: 'glsl 3d',
+    blurb:
+      'The mark as true 3D geometry with no mesh and no 3D library: a signed distance field computed from the logo at load, extruded to a solid, and sphere-traced per pixel with analytic normals, then run through a CRT chain. Pointer speed accumulates instability until the signal tears and re-locks.',
+    create: (initialControls) =>
+      createHoloMarkAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'shatter-glass',
+    section: 'hero',
+    name: 'Shatter Glass',
+    tag: 'glsl shader',
+    blurb:
+      'The mark sits behind a pane of tempered glass. Each click drives a Voronoi crack network out from the hit, and networks merge as hits accumulate. Reach the pane’s strength and it lets go: shards fall away under gravity and a fresh pane is fitted.',
+    create: (initialControls) =>
+      createShatterGlassAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'foil-statement',
+    section: 'statement',
+    name: 'Press Foil',
+    tag: 'holo foil',
+    blurb:
+      'The statement set as press foil: type and frame are one alpha mask over a live material gradient, and the light source is your cursor. Tilt to rake the sheen across the block; swap the foil stock while it runs. Click for a full flash pass.',
+    create: (initialControls) =>
+      createFoilStatementAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'street-pulse',
+    section: 'work',
+    name: 'Night Traffic',
+    tag: 'osm data',
+    blurb:
+      'Baked OpenStreetMap road geometry lit by connectivity propagation, so traffic spreads through the network the way it actually would rather than along scripted paths.',
+    create: (initialControls) =>
+      createStreetPulseAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'atomic-age',
+    section: 'receipts',
+    name: 'Atomic Age',
+    tag: 'retro-future',
+    blurb:
+      'A phosphor CRT with a radar sweep and a rads meter, drawn in the persistence-of-vision style of a tube that never quite clears.',
+    create: (initialControls) =>
+      createAtomicAgeAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'energy-body',
+    section: 'receipts',
+    name: 'All Eyes',
+    tag: 'visionary',
+    blurb:
+      'A phyllotaxis field of eyes that tracks the cursor, with blink waves rolling across the field.',
+    create: (initialControls) =>
+      createEnergyBodyAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'block-party',
+    section: 'about',
+    name: 'Block Party',
+    tag: 'osm data',
+    blurb:
+      'Baked building footprints popping in block by block, so the city assembles itself rather than fading up.',
+    create: (initialControls) =>
+      createBlockPartyAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'contour-hood',
+    section: 'about',
+    name: 'Contour Hood',
+    tag: 'topo',
+    blurb:
+      'Mt Hood’s actual topography, contoured from real elevation data baked into the build. Lines plot on from the valley floor, an elevation sweep climbs to the summit, and the cursor tilts the whole stack like a 2.5D hologram.',
+    create: (initialControls) =>
+      createContourHoodAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'contour-pgh',
+    section: 'about',
+    name: 'Contour Pittsburgh',
+    tag: 'topo',
+    blurb:
+      'The same contour factory driven by Pittsburgh elevation data: the three-rivers confluence carved into the Allegheny Plateau. The rivers read as the empty low ground and the sweep climbs from the water up the hills.',
+    create: (initialControls) =>
+      createContourPghAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'sun-arc',
+    section: 'cta',
+    name: 'Solar Day',
+    tag: 'solar math',
+    blurb:
+      'Real solar position maths for a given date and city, so the arc of the day is the actual one rather than a decorative sweep.',
+    create: (initialControls) =>
+      createSunArcAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'rust-machine',
+    section: 'cta',
+    name: 'Rust Machine',
+    tag: 'industrial',
+    blurb:
+      'Industrial decay with beat-locked slams and tears, the machine coming apart slightly faster than it holds together.',
+    create: (initialControls) =>
+      createRustMachineAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'slime-mold',
+    section: 'toys',
+    name: 'Slime Mold',
+    tag: 'glsl sim',
+    blurb:
+      'Physarum agents in a float texture, each sensing and steering toward the trail the others leave behind, so transport networks emerge without anything planning them.',
+    create: (initialControls) =>
+      createSlimeMoldAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'scan-terrain',
+    section: 'toys',
+    name: 'Scan Terrain',
+    tag: 'glsl particles',
+    blurb:
+      'A point-cloud landscape built entirely in a vertex shader: ~50,000 particles generated from gl_VertexID, displaced by ridged fbm, flown through along a winding canyon. A scan pulse sweeps out over the terrain, and the mark is stamped into the landscape as a flat-topped mesa.',
+    create: (initialControls) =>
+      createScanTerrainAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'caustics-pool',
+    section: 'toys',
+    name: 'Caustics Pool',
+    tag: 'glsl optics',
+    blurb:
+      'A water surface integrated with the 2D wave equation, with caustics computed rather than painted: the display pass measures the Jacobian of the refraction map, so the floor brightens where rays converge. Pool toys ride the result.',
+    create: (initialControls) =>
+      createCausticsPoolAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

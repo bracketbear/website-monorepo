@@ -96,40 +96,13 @@ Every task below follows this recipe. It is written once here rather than repeat
 
 ## Progress
 
-Done and verified in the Lab: `signal-alignment`, `led-matrix`, `schematic-lens`, `portal-mark`,
-`visionary-eye`, `sdf-forge`, `logo-resolve`, `goo-lamp`, `kaleido`, `dmt-tunnel`,
-`interference-field`, `jelly-tank`, `crt-phosphor`. Thirteen of the selected 28, plus
-`signal-alignment` from the earlier plan — fourteen in total.
+**Complete.** All 28 selected animations are ported and registered, plus the five
+pipeline-proof animations kept from the foundation plan, for 33 in the Lab.
 
-Blocked pending a decision: `contour-hood`, `contour-pgh` — see below.
-
-Remaining, with the size of each job:
-
-| Animation                                                                             | Source                | Size and shape                                                                                                                     |
-| ------------------------------------------------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `street-pulse`, `atomic-age`, `energy-body`, `block-party`, `sun-arc`, `rust-machine` | `lab-animations-4.js` | six animations in 1385 lines, sharing the baked OSM, star and solar data. Move `bb-city-data.js` into the repo first.              |
-| `caustics-pool`                                                                       | `lab-shaders-16.js`   | 739 lines. Wave-equation ping-pong plus a CPU pool-toy simulation with its own physics. The largest single job left.               |
-| `ink-dissolve`                                                                        | `lab-shaders-11.js`   | 500 lines. Navier-Stokes with advection, vorticity and a Jacobi pressure solve, so more passes than the two-program ping-pong.     |
-| `shatter-glass`                                                                       | `lab-shaders-7.js`    | 454 lines. Click-driven Voronoi crack networks; watch its teardown.                                                                |
-| `foil-statement`                                                                      | `lab-animations-7.js` | 422 lines of scene graph. Note this file's `sel` helper takes its arguments in a different order than the others.                  |
-| `slime-mold`                                                                          | `lab-shaders-8.js`    | 401 lines across five GL programs, including a vertex-shader deposit pass.                                                         |
-| `holo-mark`                                                                           | `lab-shaders-12.js`   | 378 lines. Builds a logo SDF at load and uses analytic normals.                                                                    |
-| `scan-terrain`                                                                        | `lab-shaders-13.js`   | 260 lines. The only vertex-shader particle system; the harness hardcodes its vertex shader, so it needs a hook or its own program. |
-
-Four harness families are now proven: the plain mask harness, the signed-distance-field harness,
-the mask-less toys harness, and the ping-pong feedback buffers in `shared/ping-pong.ts`.
-
-**Extraction gotcha.** Several prototype shaders are built by concatenation rather than as one
-literal, in the shape `` `...${''}` + HELP + `...` ``. Pulling the text between the first and last
-backtick captures that splice as GLSL and the shader fails to compile. Extract the helper block
-separately and substitute it. `jelly-tank` hit this; check for it before assuming a port is
-verbatim.
-
-Three harness families now exist and are proven, so each remaining shader is mostly its manifest,
-its fragment source and its own uniforms: the plain mask harness (`heat-haze`, `led-matrix`,
-`schematic-lens`), the signed-distance-field harness (`portal-mark`, `visionary-eye`), and the
-mask-less toys harness (`goo-lamp`, `kaleido`). The self-contained simulations still follow
-`rd-vat` and each own their framebuffers.
+The two contour animations are no longer blocked: their elevation grids are baked into
+`src/shared/terrain.ts` as base64 int16 metres and the runtime fetch is deleted. The
+prototype's d3 dependency is gone too — the marching-squares contour maths is ported into
+`src/shared/contour-lines.ts` and was checked byte-for-byte against d3-contour on both grids.
 
 ## Order of work
 
