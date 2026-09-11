@@ -134,12 +134,12 @@ describe('chladni physics', () => {
   it('reproduces the dispersion table in the spec', () => {
     // Spec D3a: m half-waves across GRID cells at beta = 0.04.
     const w = (m: number) => modeOmega(0.04, (m * Math.PI) / GRID);
-    expect(w(8)).toBeCloseTo(0.0077, 4);
-    expect(w(16)).toBeCloseTo(0.0305, 4);
+    expect(w(8)).toBeCloseTo(0.00769, 5);
+    expect(w(16)).toBeCloseTo(0.03045, 5);
     // The drive band must actually contain the legible modes, or the
     // cursor sweeps across nothing.
     expect(w(8)).toBeGreaterThan(OMEGA_MIN);
-    expect(w(22)).toBeLessThan(OMEGA_MAX * 1.01);
+    expect(w(22)).toBeLessThan(OMEGA_MAX);
   });
 });
 ```
@@ -195,11 +195,13 @@ export function clampStiffness(beta: number): number {
 }
 
 /**
- * Drive band in radians per step. At 1200 steps/s this is roughly 1.5 Hz to
- * 11 Hz, which is where the legible modes of a 128-cell plate live.
+ * Drive band in radians per step. At 1200 steps/s this is roughly 1.2 Hz to
+ * 11.1 Hz, which brackets the legible modes of a 128-cell plate: m = 8
+ * half-waves sits at 0.00769 and m = 22 at 0.05691, and the band has to
+ * contain both ends or the cursor sweeps past nothing at the top.
  */
 export const OMEGA_MIN = 0.006;
-export const OMEGA_MAX = 0.055;
+export const OMEGA_MAX = 0.058;
 
 /**
  * Cursor x to drive frequency, linearly.

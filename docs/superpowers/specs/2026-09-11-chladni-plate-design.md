@@ -110,10 +110,10 @@ half-waves across the plate. At `N = 128` and `β = 0.04`:
 
 | m (half-waves) | k rad/cell | ω rad/step | at 1200 steps/s |
 | -------------- | ---------- | ---------- | --------------- |
-| 8              | 0.196      | 0.0077     | 1.5 Hz          |
-| 12             | 0.295      | 0.0174     | 3.3 Hz          |
-| 16             | 0.393      | 0.0305     | 5.8 Hz          |
-| 22             | 0.540      | 0.0570     | 10.9 Hz         |
+| 8              | 0.196      | 0.00769    | 1.5 Hz          |
+| 12             | 0.295      | 0.01722    | 3.3 Hz          |
+| 16             | 0.393      | 0.03045    | 5.8 Hz          |
+| 22             | 0.540      | 0.05691    | 10.9 Hz         |
 
 So: **the sim grid is a fixed 128×128 and `STEP = 1/1200`.** Roughly 20 substeps per frame at
 60fps, each pass covering 16,384 pixels — about 655k fragment invocations per frame for the whole
@@ -218,7 +218,7 @@ conserved and the scene cannot slowly empty itself over an ambient page's lifeti
 
 ### D8 — Cursor is a tone control; click pours sand
 
-- **X** → drive frequency, mapped **linearly** onto `ω ∈ [0.006, 0.055]` radians per step.
+- **X** → drive frequency, mapped **linearly** onto `ω ∈ [0.006, 0.058]` radians per step.
 - **Y** → drive amplitude.
 - **Click** → pours a fresh handful of sand at the cursor.
 
