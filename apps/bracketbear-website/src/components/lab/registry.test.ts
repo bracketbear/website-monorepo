@@ -38,6 +38,7 @@ const SELECTED = [
   'dmt-tunnel',
   'interference-field',
   'caustics-pool',
+  'chladni-plate',
 ];
 
 /**

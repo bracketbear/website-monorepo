@@ -4,6 +4,7 @@ import {
   createAtomicAgeAnimation,
   createBlockPartyAnimation,
   createCausticsPoolAnimation,
+  createChladniPlateAnimation,
   createContourHoodAnimation,
   createContourPghAnimation,
   createCrtPhosphorAnimation,
@@ -452,6 +453,18 @@ export const REGISTRY: LabEntry[] = [
       'A water surface integrated with the 2D wave equation, with caustics computed rather than painted: the display pass measures the Jacobian of the refraction map, so the floor brightens where rays converge. Pool toys ride the result.',
     create: (initialControls) =>
       createCausticsPoolAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'chladni-plate',
+    section: 'toys',
+    name: 'Chladni Plate',
+    tag: 'glsl sim',
+    blurb:
+      'A driven plate with sand on it. Placeholder blurb — rewritten in Task 9 using the bb-voice skill.',
+    create: (initialControls) =>
+      createChladniPlateAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

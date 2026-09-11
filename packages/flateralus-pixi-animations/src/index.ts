@@ -2,6 +2,7 @@ export * from './atomic-age';
 export * from './blob';
 export * from './block-party';
 export * from './caustics-pool';
+export * from './chladni-plate';
 export * from './code-flow';
 export * from './contour-hood';
 export * from './contour-pgh';
