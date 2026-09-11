@@ -4,7 +4,9 @@ import {
   createHalftoneTideAnimation,
   createHeatHazeAnimation,
   createLedMatrixAnimation,
+  createPortalMarkAnimation,
   createSchematicLensAnimation,
+  createVisionaryEyeAnimation,
   createPixelSunriseAnimation,
   createRdVatAnimation,
   createSignalAlignmentAnimation,
@@ -55,6 +57,30 @@ export const REGISTRY: LabEntry[] = [
       'Swifts crossing the sunset, DKC-silhouette style: scythe-winged boids that burst-flap then glide, never slowing down. Fully ambient; the cursor reads as a hawk and scatters them; click to release more.',
     create: (initialControls) =>
       createSilhouetteFlockAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'portal-mark',
+    section: 'hero',
+    name: 'Portal Mark',
+    tag: 'glsl shader',
+    blurb:
+      'The mark cut out of the stage as a window into fourteen worlds. The letterform cut stays anchored, but worlds with physical mass react at its edge. Clicking sweeps the next world through the portal as an expanding circle from the click point, and each world spills its own light onto the stage around the letterforms.',
+    create: (initialControls) =>
+      createPortalMarkAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'visionary-eye',
+    section: 'hero',
+    name: 'Visionary Eye',
+    tag: 'glsl shader',
+    blurb:
+      'The third-eye mandala wrapped onto a raytraced spherical eye. Smooth pursuit of the cursor while you are over the stage; self-directed saccades and fixation micro-tremor when left alone. The pupil dilates with attention and the energy filaments carve real relief into the surface.',
+    create: (initialControls) =>
+      createVisionaryEyeAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

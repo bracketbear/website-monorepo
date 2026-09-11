@@ -128,7 +128,8 @@ function compile(
 export function createShaderContext(
   frag: string,
   extraUniforms: readonly string[],
-  maskCanvas: HTMLCanvasElement
+  maskCanvas: HTMLCanvasElement,
+  commonUniforms: readonly string[] = COMMON_UNIFORMS
 ): ShaderContext | null {
   const canvas = document.createElement('canvas');
   canvas.width = 32;
@@ -156,7 +157,7 @@ export function createShaderContext(
   gl.useProgram(program);
 
   const locs: Record<string, WebGLUniformLocation | null> = {};
-  for (const name of [...COMMON_UNIFORMS, ...extraUniforms]) {
+  for (const name of [...commonUniforms, ...extraUniforms]) {
     locs[name] = gl.getUniformLocation(program, name);
   }
 

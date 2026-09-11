@@ -6,6 +6,7 @@ import type {
 } from '@bracketbear/flateralus';
 import { PixiAnimation } from '@bracketbear/flateralus-pixi';
 import {
+  COMMON_UNIFORMS,
   createShaderContext,
   destroyShaderContext,
   setColor,
@@ -31,6 +32,12 @@ export abstract class HarnessShaderAnimation<
   protected abstract readonly frag: string;
   /** Uniform names beyond the common set. */
   protected abstract readonly extraUniforms: readonly string[];
+
+  /**
+   * The common uniform list this effect's prelude declares. The SDF family
+   * uses a different prelude and adds uTexAR, so it overrides this.
+   */
+  protected readonly commonUniforms: readonly string[] = COMMON_UNIFORMS;
 
   /**
    * The mask texture source. Returning null means "not ready yet" — the
@@ -72,7 +79,12 @@ export abstract class HarnessShaderAnimation<
     if (!this.ctx) {
       const mask = this.mask();
       if (!mask) return;
-      const ctx = createShaderContext(this.frag, this.extraUniforms, mask);
+      const ctx = createShaderContext(
+        this.frag,
+        this.extraUniforms,
+        mask,
+        this.commonUniforms
+      );
       if (!ctx) {
         this.failed = true;
         return;
@@ -123,6 +135,8 @@ export abstract class HarnessShaderAnimation<
     setColor(gl, locs.uOrange!, PAL.bright);
     setColor(gl, locs.uSun!, PAL.sun);
     setColor(gl, locs.uCream!, PAL.cream);
+    // Declared only by the SDF prelude; harmless where absent.
+    if (locs.uTexAR) gl.uniform1f(locs.uTexAR, ctx.texWidth / ctx.texHeight);
 
     this.setUniforms(gl, locs, ctx, controls, dt, app);
 
