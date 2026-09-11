@@ -5,7 +5,7 @@ reports/
 # Local Netlify folder
 .netlify
 # Claude Code per-machine settings
-.claude/
+.claude/*
 # ...except project skills, which are shared with the repo
 !.claude/skills/
 !.claude/skills/**
