@@ -72,6 +72,10 @@ These need nothing but the palette and draw utilities. Start here: they are the 
 
 ### Task 1: `lab-animations-1.js` — the rest of it
 
+**Partially done.** `signal-alignment` and `silhouette-flock` are ported, registered and
+verified. Only `pixel-sunrise` and the shared pixel helpers remain, which is Step 1 and Step 4
+below.
+
 **Files:** Create `src/pixel-sunrise/`, `src/silhouette-flock/`, `src/signal-alignment/`. Modify `src/index.ts`, `registry.ts`.
 
 Ports `pixel-sunrise` (hero, 8-bit ordered dither over a low-FPS pixel grid), `silhouette-flock` (hero, boids with burst-flap glide and the cursor as a hawk), and `signal-alignment` (intro, a flow field split by a noise-versus-order threshold).
@@ -263,9 +267,10 @@ Ports the remaining effect from the file `rd-vat` came from: a spring-damped bea
 ### Task 20: full-catalog leak and performance pass
 
 - [ ] **Step 1:** Cycle every animation in a **foreground** tab. A hidden tab stops animation frames and clamps timers, which makes the instrumentation time out and produces no measurement.
-- [ ] **Step 2:** Confirm no WebGL context-limit warning, a canvas count that stays at one, and a heap that returns near baseline after collection.
-- [ ] **Step 3:** Record the per-animation mount cost and give a `dpr` override to anything that cannot hold frame rate.
-- [ ] **Step 4:** Commit the overrides.
+- [ ] **Step 2:** Confirm no WebGL context-limit warning and a canvas count that stays at one. Both held across 72 cycles of the first three animations.
+- [ ] **Step 3:** Measure the settled heap, and measure it quietly — an instrument that allocates while sampling swamps the signal. With three animations the floor was 8MB at load, 33MB after 36 cycles and 52MB after 72, roughly 0.5MB retained per cycle and decelerating. Compare the full catalog against that curve; a steeper or linear line means a real leak.
+- [ ] **Step 4:** Record the per-animation mount cost and give a `dpr` override to anything that cannot hold frame rate.
+- [ ] **Step 5:** Commit the overrides.
 
 ## A note on this plan's granularity
 

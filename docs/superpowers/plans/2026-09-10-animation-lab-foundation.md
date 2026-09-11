@@ -1717,10 +1717,30 @@ set `box-sizing: border-box`.
 - Numeric select controls render their color swatches and drive the animations,
   end to end, which was the point of the schema change.
 
-**One check could not be completed.** The plan asked for mount and teardown to be
-cycled ten times while watching the WebGL context count and the JS heap. Roughly
-25 cycles ran with no context-limit warning, no shader error, no exception, and
-the canvas count steady at one, so nothing suggests a leak. Precise timing and
-heap numbers were not obtained: the tab was backgrounded, where animation frames
-stop firing and timers are clamped, so the instrumentation timed out rather than
-returning measurements. That is a gap in the evidence, not evidence of a problem.
+**The leak check, completed.** The first attempt failed because the tab was
+backgrounded, where animation frames stop and timers are clamped, so awaited
+loops timed out before returning anything. Rewriting the cycle as a self-driving
+timer that records progress on `window`, and reading the result from a separate
+call, works regardless of throttling.
+
+Seventy-two mount and unmount cycles across the three animations produced no
+WebGL context-limit warning, no shader error, no exception, and a canvas count
+that never left one. That rules out the failure mode that actually breaks the
+Lab, which is exhausting the browser's WebGL context budget.
+
+The heap needed more care. Sampled naively it looked alarming, climbing to 92MB
+over 36 cycles, but most of that is collectable garbage: `rd-vat` allocates a
+4.7MB seed buffer per mount and drops it. A first instrument made this worse by
+allocating 48MB per sample itself. Measured quietly, the heap sat at 90MB, then a
+collection dropped it to 52MB where it held flat.
+
+| After                      | Settled heap |
+| -------------------------- | ------------ |
+| page load, nothing mounted | 8 MB         |
+| 36 cycles                  | 33 MB        |
+| 72 cycles                  | 52 MB        |
+
+So roughly 0.5MB is retained per cycle, decelerating rather than running away,
+which is consistent with PIXI's own caches and V8 compiled code rather than a
+per-mount leak. It is small enough not to gate the bulk port, and worth
+re-measuring across the full catalog in that plan's closing task.
