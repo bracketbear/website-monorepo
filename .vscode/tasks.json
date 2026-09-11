@@ -1,9 +1,10 @@
 {
   "version": "2.0.0",
-  // Astro 7 requires Node >= 22.12; task shells don't load nvm, so pin it here (see .nvmrc)
+  // Astro 7 requires Node >= 22.12; task shells don't load nvm, so pin it here (see .nvmrc).
+  // ~/.local/bin is where the native `claude` binary lives; non-login shells don't add it.
   "options": {
     "env": {
-      "PATH": "${env:HOME}/.nvm/versions/node/v22.22.2/bin:${env:PATH}"
+      "PATH": "${env:HOME}/.local/bin:${env:HOME}/.nvm/versions/node/v22.22.2/bin:${env:PATH}"
     }
   },
   "tasks": [
@@ -194,6 +195,48 @@
       "problemMatcher": []
     },
 
+    // ── Claude Code ──────────────────────────────────────────
+    // Three interactive `claude --chrome` sessions sharing one terminal tab group.
+    {
+      "label": "Claude: Chrome 1",
+      "type": "shell",
+      "command": "claude --chrome",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "claude",
+        "close": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude: Chrome 2",
+      "type": "shell",
+      "command": "claude --chrome",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "claude",
+        "close": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude: Chrome 3",
+      "type": "shell",
+      "command": "claude --chrome",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "claude",
+        "close": true
+      },
+      "problemMatcher": []
+    },
+
     // ── Compound Tasks ───────────────────────────────────────
     {
       "label": "Start All Dev Servers",
@@ -220,6 +263,15 @@
       "label": "Full Dev Setup (Install + Start)",
       "dependsOn": ["Install Dependencies", "Start All Dev Servers"],
       "dependsOrder": "sequence",
+      "problemMatcher": []
+    },
+    {
+      // Auto-runs when the folder opens (once you've allowed automatic tasks:
+      // Cmd+Shift+P -> "Tasks: Manage Automatic Tasks" -> Allow).
+      "label": "Claude: Open 3 Chrome Sessions",
+      "dependsOn": ["Claude: Chrome 1", "Claude: Chrome 2", "Claude: Chrome 3"],
+      "dependsOrder": "parallel",
+      "runOptions": { "runOn": "folderOpen" },
       "problemMatcher": []
     }
   ]
