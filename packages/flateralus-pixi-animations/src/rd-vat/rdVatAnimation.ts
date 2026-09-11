@@ -2,7 +2,8 @@ import * as PIXI from 'pixi.js';
 import { createManifest, PAL } from '@bracketbear/flateralus';
 import type { ManifestToControlValues } from '@bracketbear/flateralus';
 import { PixiAnimation } from '@bracketbear/flateralus-pixi';
-import { VERT, logoMask, setColor } from '../shared/shader-harness';
+import { logoMask, setColor } from '../shared/shader-harness';
+import { PingPong } from '../shared/ping-pong';
 
 const MANIFEST = createManifest({
   id: 'rd-vat',
@@ -237,50 +238,12 @@ function rdSeed(sw: number, sh: number, type: number): Float32Array {
   return data;
 }
 
-function compile(gl: WebGL2RenderingContext, type: number, src: string) {
-  const sh = gl.createShader(type)!;
-  gl.shaderSource(sh, src);
-  gl.compileShader(sh);
-  if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
-    console.error('rd-vat shader:', gl.getShaderInfoLog(sh));
-    return null;
-  }
-  return sh;
-}
-
-function program(gl: WebGL2RenderingContext, frag: string) {
-  const vs = compile(gl, gl.VERTEX_SHADER, VERT);
-  const fs = compile(gl, gl.FRAGMENT_SHADER, frag);
-  if (!vs || !fs) return null;
-  const p = gl.createProgram()!;
-  gl.attachShader(p, vs);
-  gl.attachShader(p, fs);
-  gl.linkProgram(p);
-  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
-    console.error('rd-vat link:', gl.getProgramInfoLog(p));
-    return null;
-  }
-  return p;
-}
-
-type Locs = Record<string, WebGLUniformLocation | null>;
-
 /**
  * Gray-Scott reaction-diffusion over a ping-pong pair of float textures.
  * Needs its own FBO setup, so it does not use the shared blit harness.
  */
 export class RdVatAnimation extends PixiAnimation<typeof MANIFEST> {
-  private canvas: HTMLCanvasElement | null = null;
-  private gl: WebGL2RenderingContext | null = null;
-  private simProg: WebGLProgram | null = null;
-  private dispProg: WebGLProgram | null = null;
-  private simL: Locs = {};
-  private dispL: Locs = {};
-  private state: (WebGLTexture | null)[] = [null, null];
-  private fbo: (WebGLFramebuffer | null)[] = [null, null];
-  private cur = 0;
-  private simW = 0;
-  private simH = 0;
+  private pp: PingPong | null = null;
   private failed = false;
 
   private sprite: PIXI.Sprite | null = null;
@@ -299,135 +262,48 @@ export class RdVatAnimation extends PixiAnimation<typeof MANIFEST> {
     this.lastSeed = null;
   }
 
-  private build(): boolean {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
-    const gl = canvas.getContext('webgl2', {
-      antialias: false,
-      alpha: false,
-      premultipliedAlpha: true,
-    });
-    // Float render targets are mandatory for the feedback buffer.
-    if (!gl || !gl.getExtension('EXT_color_buffer_float')) return false;
-
-    const simProg = program(gl, SIM_FRAG);
-    const dispProg = program(gl, DISP_FRAG);
-    if (!simProg || !dispProg) return false;
-
-    gl.useProgram(simProg);
-    for (const n of [
-      'uState',
-      'uTexel',
-      'uFeed',
-      'uKill',
-      'uBrush',
-      'uBlob',
-      'uAsp',
-    ]) {
-      this.simL[n] = gl.getUniformLocation(simProg, n);
-    }
-    gl.useProgram(dispProg);
-    for (const n of [
-      'uState',
-      'uTime',
-      'uGrain',
-      'uInk',
-      'uDeep',
-      'uOrange',
-      'uSun',
-      'uCream',
-      'uTexel',
-    ]) {
-      this.dispL[n] = gl.getUniformLocation(dispProg, n);
-    }
-
-    this.canvas = canvas;
-    this.gl = gl;
-    this.simProg = simProg;
-    this.dispProg = dispProg;
-    return true;
-  }
-
-  private initState(sw: number, sh: number, data: Float32Array): void {
-    const gl = this.gl!;
-    this.simW = sw;
-    this.simH = sh;
-    for (let i = 0; i < 2; i++) {
-      const tx = gl.createTexture()!;
-      gl.bindTexture(gl.TEXTURE_2D, tx);
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA16F,
-        sw,
-        sh,
-        0,
-        gl.RGBA,
-        gl.FLOAT,
-        i === 0 ? data : null
-      );
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      const fb = gl.createFramebuffer()!;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-      gl.framebufferTexture2D(
-        gl.FRAMEBUFFER,
-        gl.COLOR_ATTACHMENT0,
-        gl.TEXTURE_2D,
-        tx,
-        0
-      );
-      this.state[i] = tx;
-      this.fbo[i] = fb;
-    }
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  }
-
-  private reseed(data: Float32Array): void {
-    const gl = this.gl!;
-    for (let i = 0; i < 2; i++) {
-      gl.bindTexture(gl.TEXTURE_2D, this.state[i]);
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA16F,
-        this.simW,
-        this.simH,
-        0,
-        gl.RGBA,
-        gl.FLOAT,
-        data
-      );
-    }
-  }
-
   onUpdate(
     app: PIXI.Application,
     controls: RdVatControlValues,
     deltaTime: number
   ): void {
     if (this.failed) return;
-    if (!this.gl && !this.build()) {
-      this.failed = true;
-      return;
+    if (!this.pp) {
+      const pp = PingPong.create({
+        simFrag: SIM_FRAG,
+        dispFrag: DISP_FRAG,
+        simUniforms: ['uTexel', 'uFeed', 'uKill', 'uBrush', 'uBlob', 'uAsp'],
+        dispUniforms: [
+          'uTime',
+          'uGrain',
+          'uInk',
+          'uDeep',
+          'uOrange',
+          'uSun',
+          'uCream',
+          'uTexel',
+        ],
+      });
+      if (!pp) {
+        this.failed = true;
+        return;
+      }
+      this.pp = pp;
     }
-    const gl = this.gl!;
+    const pp = this.pp;
 
     const sw = app.screen.width;
     const sh = app.screen.height;
 
-    if (!this.simW) {
+    if (!pp.sw) {
       const gw = SIM_WIDTH;
       const gh = Math.max(64, Math.round((gw * sh) / Math.max(1, sw)));
-      this.initState(gw, gh, rdSeed(gw, gh, Number(controls.seedTex)));
+      pp.initState(gw, gh, rdSeed(gw, gh, Number(controls.seedTex)));
       this.lastSeed = Number(controls.seedTex);
     }
 
     if (!this.sprite) {
-      this.texture = PIXI.Texture.from(this.canvas!);
+      this.texture = PIXI.Texture.from(pp.canvas);
       this.sprite = new PIXI.Sprite(this.texture);
       this.getRoot().addChild(this.sprite);
     }
@@ -438,9 +314,9 @@ export class RdVatAnimation extends PixiAnimation<typeof MANIFEST> {
     const dpr = this.dpr ?? Math.min(2, window.devicePixelRatio || 1);
     const W = Math.max(2, Math.round(sw * dpr));
     const H = Math.max(2, Math.round(sh * dpr));
-    if (this.canvas!.width !== W || this.canvas!.height !== H) {
-      this.canvas!.width = W;
-      this.canvas!.height = H;
+    if (pp.canvas.width !== W || pp.canvas.height !== H) {
+      pp.canvas.width = W;
+      pp.canvas.height = H;
       this.texture?.source.resize(W, H);
     }
     this.sprite.width = sw;
@@ -449,7 +325,7 @@ export class RdVatAnimation extends PixiAnimation<typeof MANIFEST> {
     const seedTex = Number(controls.seedTex);
     if (this.lastSeed !== seedTex) {
       this.lastSeed = seedTex;
-      this.reseed(rdSeed(this.simW, this.simH, seedTex));
+      pp.reseed(rdSeed(pp.sw, pp.sh, seedTex));
     }
 
     const interactive = Number(controls.mode) > 0.5;
@@ -483,76 +359,47 @@ export class RdVatAnimation extends PixiAnimation<typeof MANIFEST> {
 
     const chem =
       CHEM[Math.max(0, Math.min(3, Math.round(Number(controls.chem))))];
-    const asp = this.simW / this.simH;
+    const asp = pp.sw / pp.sh;
     const steps = Math.round(controls.speed);
 
     for (let i = 0; i < steps; i++) {
-      const dst = 1 - this.cur;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo[dst]);
-      gl.viewport(0, 0, this.simW, this.simH);
-      gl.useProgram(this.simProg);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, this.state[this.cur]);
-      gl.uniform1i(this.simL.uState!, 0);
-      gl.uniform2f(this.simL.uTexel!, 1 / this.simW, 1 / this.simH);
-      gl.uniform1f(this.simL.uFeed!, chem.f);
-      gl.uniform1f(this.simL.uKill!, chem.k);
-      gl.uniform1f(this.simL.uAsp!, asp);
-      gl.uniform4f(this.simL.uBrush!, bx, by, controls.brush, bs * 0.09);
-      if (this.blob) {
-        gl.uniform4f(
-          this.simL.uBlob!,
-          this.blob.x,
-          this.blob.y,
-          controls.brush * 2.6,
-          0.6
-        );
-      } else {
-        gl.uniform4f(this.simL.uBlob!, -9, -9, 0.01, 0);
-      }
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      this.cur = dst;
+      pp.step((gl, L) => {
+        gl.uniform2f(L.uTexel!, 1 / pp.sw, 1 / pp.sh);
+        gl.uniform1f(L.uFeed!, chem.f);
+        gl.uniform1f(L.uKill!, chem.k);
+        gl.uniform1f(L.uAsp!, asp);
+        gl.uniform4f(L.uBrush!, bx, by, controls.brush, bs * 0.09);
+        if (this.blob) {
+          gl.uniform4f(
+            L.uBlob!,
+            this.blob.x,
+            this.blob.y,
+            controls.brush * 2.6,
+            0.6
+          );
+        } else {
+          gl.uniform4f(L.uBlob!, -9, -9, 0.01, 0);
+        }
+      });
     }
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, W, H);
-    gl.useProgram(this.dispProg);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.state[this.cur]);
-    gl.uniform1i(this.dispL.uState!, 0);
-    gl.uniform1f(this.dispL.uTime!, this.time);
-    gl.uniform1f(this.dispL.uGrain!, controls.grain ? 1 : 0);
-    gl.uniform2f(this.dispL.uTexel!, 1 / this.simW, 1 / this.simH);
-    setColor(gl, this.dispL.uInk!, PAL.ink);
-    setColor(gl, this.dispL.uDeep!, PAL.deep);
-    setColor(gl, this.dispL.uOrange!, PAL.bright);
-    setColor(gl, this.dispL.uSun!, PAL.sun);
-    setColor(gl, this.dispL.uCream!, PAL.cream);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    pp.display(W, H, (gl, L) => {
+      gl.uniform1f(L.uTime!, this.time);
+      gl.uniform1f(L.uGrain!, controls.grain ? 1 : 0);
+      gl.uniform2f(L.uTexel!, 1 / pp.sw, 1 / pp.sh);
+      setColor(gl, L.uInk!, PAL.ink);
+      setColor(gl, L.uDeep!, PAL.deep);
+      setColor(gl, L.uOrange!, PAL.bright);
+      setColor(gl, L.uSun!, PAL.sun);
+      setColor(gl, L.uCream!, PAL.cream);
+    });
 
     this.texture?.source.update();
   }
 
   onDestroy(): void {
-    const gl = this.gl;
-    if (gl) {
-      for (let i = 0; i < 2; i++) {
-        if (this.state[i]) gl.deleteTexture(this.state[i]);
-        if (this.fbo[i]) gl.deleteFramebuffer(this.fbo[i]);
-      }
-      if (this.simProg) gl.deleteProgram(this.simProg);
-      if (this.dispProg) gl.deleteProgram(this.dispProg);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
-    }
-    this.state = [null, null];
-    this.fbo = [null, null];
-    this.simW = 0;
-    this.simH = 0;
-    this.cur = 0;
-    this.gl = null;
-    this.canvas = null;
-    this.simProg = null;
-    this.dispProg = null;
+    this.pp?.destroy();
+    this.pp = null;
     this.failed = false;
     this.sprite = null;
     this.texture?.destroy(true);

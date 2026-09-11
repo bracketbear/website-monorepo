@@ -1,6 +1,7 @@
 import type { PixiAnimation } from '@bracketbear/flateralus-pixi';
 import type { AnimationManifest } from '@bracketbear/flateralus';
 import {
+  createCrtPhosphorAnimation,
   createDmtTunnelAnimation,
   createGooLampAnimation,
   createInterferenceFieldAnimation,
@@ -184,6 +185,18 @@ export const REGISTRY: LabEntry[] = [
       'The [BB] mark as a neon sign: pixels flicker on like a boot sequence, then hold with an additive glow while individual pixels glitch cyan and the sign buzzes. The cursor heats pixels through cyan to white-hot; click for a shockwave.',
     create: (initialControls) =>
       createLogoResolveAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'crt-phosphor',
+    section: 'toys',
+    name: 'CRT Phosphor',
+    tag: 'glsl sim',
+    blurb:
+      'A persistence-of-vision tube with a physical beam — the electron gun is a spring-damped mass chasing your cursor, so it overshoots, whips, and rings. A slow beam pools blinding light, a fast whip leaves only a faint streak. Park the beam and it burns in; click to degauss and wipe the burn-in.',
+    create: (initialControls) =>
+      createCrtPhosphorAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

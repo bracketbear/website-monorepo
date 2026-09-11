@@ -1,5 +1,6 @@
 export * from './blob';
 export * from './code-flow';
+export * from './crt-phosphor';
 export * from './curious-particle-network';
 export * from './dmt-tunnel';
 export * from './goo-lamp';
