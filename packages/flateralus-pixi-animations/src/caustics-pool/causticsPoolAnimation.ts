@@ -8,7 +8,7 @@ const MANIFEST = createManifest({
   id: 'caustics-pool',
   name: 'Caustics Pool (GLSL)',
   description:
-    'A water surface integrated with the 2D wave equation in a GPU ping-pong buffer — real propagation, reflection off the pool walls, interference where wakes cross. The display pass refracts sunlight through the surface normals and measures the Jacobian of that refraction map, so caustics are computed, not painted: where rays converge, the floor brightens. Pool toys ride the result: each frame their positions sample the height field, wave slope pushes them around, the gradient tilts them, and their drift cuts wakes of its own. Drag to cut a wake; click to drop a stone — or shove a toy.',
+    'A water surface integrated with the 2D wave equation in a GPU ping-pong buffer — real propagation, reflection off the pool walls, interference where wakes cross. A breeze writes pressure into the field so the surface is never still, in either mode: the chop, the ring and the decay are all answers the integrator gives, not an animation played over the top. The display pass refracts sunlight through the surface normals and measures the Jacobian of that refraction map, so caustics are computed, not painted: where rays converge, the floor brightens. Pool toys ride the result: each frame their positions sample the height field, wave slope pushes them around, the gradient tilts them, and their drift cuts wakes of its own. Drag to cut a wake; click to drop a stone — or shove a toy.',
   controls: [
     {
       name: 'mode',
@@ -39,6 +39,16 @@ const MANIFEST = createManifest({
       max: 0.999,
       step: 0.001,
       defaultValue: 0.994,
+      debug: true,
+    },
+    {
+      name: 'wind',
+      type: 'number',
+      label: 'Wind Chop',
+      min: 0,
+      max: 3,
+      step: 0.1,
+      defaultValue: 1.1,
       debug: true,
     },
     {
@@ -114,13 +124,21 @@ export type CausticsPoolControlValues = ManifestToControlValues<
 
 type Locs = Record<string, WebGLUniformLocation | null>;
 
-// Carried across verbatim from the prototype. Do not reformat.
+// Carried across from the prototype, plus the wind pressure term below.
+// Do not reformat the GLSL.
 const STEP_FS = `#version 300 es
     precision highp float;
     in vec2 vUV; out vec4 fragColor;
     uniform sampler2D uH;   // x = h, y = h_prev
-    uniform float uC2, uDamp;
+    uniform float uC2, uDamp, uWind, uTime;
     uniform vec2 uSim;
+    float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
+    float vnoise(vec2 p) {
+      vec2 i = floor(p), fr = fract(p);
+      vec2 u = fr * fr * (3.0 - 2.0 * fr);
+      return mix(mix(hash21(i), hash21(i + vec2(1.0, 0.0)), u.x),
+                 mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), u.x), u.y);
+    }
     void main() {
       vec2 px = 1.0 / uSim;
       vec2 c = texture(uH, vUV).xy;
@@ -129,7 +147,31 @@ const STEP_FS = `#version 300 es
       float B = texture(uH, vUV - vec2(0.0, px.y)).x;
       float T = texture(uH, vUV + vec2(0.0, px.y)).x;
       float lap = L + Rv + B + T - 4.0 * c.x;
-      float nh = (2.0 * c.x - c.y + uC2 * lap) * uDamp;
+      // A breeze crossing the pool: a noise pressure field advected downwind,
+      // in a soft band so the chop is never uniform. Wind is a force on the
+      // field, not a picture of waves — the ring, the interference and the
+      // decay are the integrator's answer, not ours. It runs in both modes,
+      // so the surface is alive before anyone touches it.
+      // Frequency is the lever, not amplitude: caustics come from curvature,
+      // and curvature goes as k², so halving the wavelength buys ~4x the
+      // bending for the same force. 27 cycles across a ~302-cell grid is a
+      // ~11-cell wavelength — short enough to bend light, clear of the
+      // stencil's dispersive band near Nyquist.
+      //
+      // The drift constant is in NOISE-CELL units (it is subtracted from w,
+      // which is already scaled by the frequency above), so 0.15 here is
+      // ~1.7 grid cells/s against a wave speed of sqrt(uC2)*90 ~ 49 cells/s.
+      // The gusts are therefore quasi-static: the surface holds a forced
+      // pattern that follows them, rather than radiating resonant chop.
+      // That is the regime this is tuned in — verified by eye, not derived.
+      vec2 w = vUV * vec2(27.0, 21.0) - vec2(uTime * 0.15, uTime * 0.05);
+      float gust = vnoise(w) - 0.5 + 0.5 * (vnoise(w * 2.17 + 31.0) - 0.5);
+      // Fetch: a standing gradient across the pool, deliberately with no clock
+      // of its own. Patchiness comes from gusts drifting through it, not from
+      // a second oscillator laid over the top.
+      float band = 0.55 + 0.45 * sin(vUV.y * 2.3 + vUV.x * 1.1);
+      float force = gust * band * uWind * 0.013;
+      float nh = (2.0 * c.x - c.y + uC2 * lap + force) * uDamp;
       fragColor = vec4(nh, c.x, 0.0, 1.0);
     }`;
 
@@ -192,7 +234,10 @@ const DISPLAY_FS = `#version 300 es
       vec3 r = refract(vec3(0.0, 0.0, -1.0), n, 0.7519);
       return uv + r.xy * (uDepth / max(0.35, -r.z));
     }
-    vec3 floorCol(vec2 f) {
+    // Tiles only. Split out of the lockup below so the dispersion taps can
+    // sample the floor three times without evaluating the mark's wear three
+    // times — a flat painted graphic shows no visible chromatic fringe.
+    vec3 floorTile(vec2 f) {
       // tiled pool floor, slightly rounded corners
       vec2 t = f * vec2(uAsp, 1.0) * uTileN;
       vec2 ft = abs(fract(t) - 0.5);
@@ -207,8 +252,24 @@ const DISPLAY_FS = `#version 300 es
       // grime creeping in from the grout edge
       float rim = smoothstep(-0.13, -0.01, db);
       shade *= 1.0 - 0.09 * rim * (0.4 + 0.6 * mot);
-      vec3 col = mix(uFloorA * shade, uFloorB, grout * 0.7);
-      // the mark, painted decades ago: bleached, flaking, worn through at the grout
+      // ceramic glaze: very low-frequency mottle across the whole floor, so
+      // the eye reads one continuous surface rather than a repeating unit
+      shade *= 0.93 + 0.14 * fbm(gz * 6.0 + 3.0);
+      // a handful of tiles have gone blotchy. A floor with a history reads as
+      // a place; a uniform one reads as a render.
+      float stain = smoothstep(0.62, 0.98, hash21(floor(t) + 7.3));
+      vec3 tile = uFloorA * shade;
+      tile = mix(tile, tile * vec3(0.86, 0.93, 0.9), stain * (0.35 + 0.4 * mot));
+      return mix(tile, uFloorB, grout * 0.7);
+    }
+
+    // The mark, painted decades ago: bleached, flaking, worn through at the
+    // grout. Applied once, over whatever the dispersed tile sample produced.
+    vec3 lockup(vec3 col, vec2 f) {
+      vec2 t = f * vec2(uAsp, 1.0) * uTileN;
+      vec2 ft = abs(fract(t) - 0.5);
+      float db = length(max(ft - vec2(0.415), 0.0)) - 0.045;
+      float grout = smoothstep(0.0, 0.024, db);
       vec2 q = (f - 0.5) * vec2(uAsp, 1.0);
       vec2 luv = q / uLockBox + 0.5;
       if (luv.x > 0.0 && luv.x < 1.0 && luv.y > 0.0 && luv.y < 1.0) {
@@ -328,7 +389,14 @@ const DISPLAY_FS = `#version 300 es
       float J = abs(dx.x * dy.y - dx.y * dy.x);
       float focus = clamp(1.0 / max(J, 0.06) - 0.72, 0.0, 4.0);
       float caust = min(pow(focus, 1.35) * uCaust, 2.1);
-      vec3 col = floorCol(f0);
+      // Dispersion: each wavelength bends a little differently, so sample the
+      // floor at three slightly different depths along the same refracted ray.
+      // The faint warm/cool fringe on the bright edges is most of what reads
+      // as "real water" rather than "a distorted picture".
+      vec2 disp = f0 - uv;
+      vec3 col = lockup(vec3(floorTile(uv + disp * 0.985).r,
+                             floorTile(uv + disp).g,
+                             floorTile(uv + disp * 1.018).b), f0);
       // toy shadows on the floor, offset along the sun
       for (int i = 0; i < 4; i++) {
         vec4 Ts = uToys[i];
@@ -531,7 +599,7 @@ function ortho3(M: number[]): void {
   M[8] = M[0] * M[4] - M[1] * M[3];
 }
 
-const STEP_UNIFORMS = ['uH', 'uC2', 'uDamp', 'uSim'] as const;
+const STEP_UNIFORMS = ['uH', 'uC2', 'uDamp', 'uWind', 'uTime', 'uSim'] as const;
 const SPLAT_UNIFORMS = ['uC', 'uAmp', 'uRad', 'uSim'] as const;
 const DISP_UNIFORMS = [
   'uH',
@@ -679,6 +747,11 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
   private cvy = 0;
   private nextRain = 0.4;
   private nextBig = 6;
+  /** Seed the field once, then run it forward before the first visible frame. */
+  private primed = false;
+  private preroll = 0;
+  /** Forcing clock, advanced per simulation step and wrapped. Never wall time. */
+  private windT = 0;
   private pendingSplats: Splat[] = [];
   private toys: Toy[] = [];
 
@@ -697,6 +770,9 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
     this.my = -1;
     this.nextRain = 0.4;
     this.nextBig = 6;
+    this.primed = false;
+    this.preroll = 0;
+    this.windT = 0;
     this.cvx = 0;
     this.cvy = 0;
     this.pendingSplats = [];
@@ -835,6 +911,9 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
     this.hi = 0;
     // Readback format is a property of the attachment, so re-probe it.
     this.readMode = null;
+    // The textures were just cleared, so the pool is flat again — re-prime it
+    // or a resize drops the viewer back onto a mirror with no caustics.
+    this.primed = false;
   }
 
   /**
@@ -948,6 +1027,19 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
     const asp = sw / Math.max(1, sh);
     // Splats queued by last frame's collisions land at the head of this one.
     const splats = this.pendingSplats.splice(0);
+
+    // Open on water that is already alive. Without this the pool spends its
+    // first seconds as a mirror while the wind builds the chop up from flat,
+    // and the caustics — the whole point — are invisible for all of it.
+    //
+    // Let the wind do it rather than seeding drops: seeded drops ring as big
+    // coherent circles, and coherent circles focus into blown-out white
+    // donuts instead of filigree. Wind builds the same energy as broken chop.
+    if (!this.primed) {
+      this.primed = true;
+      this.preroll = 240;
+    }
+
     const pointer = this.pointer;
     const mouse = pointer?.mouse;
 
@@ -1065,12 +1157,16 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
       gl.bindTexture(gl.TEXTURE_2D, tx);
     };
 
-    // Fixed-step wave integration: the stencil is only stable at a fixed dt,
-    // and the accumulator is capped at 3 steps so a stall cannot spiral.
-    this.acc = Math.min(this.acc + dt, 3 / 90);
     const STEP = 1 / 90;
-    while (this.acc >= STEP) {
-      this.acc -= STEP;
+    const doStep = () => {
+      // One step of wind per step of water. Per-step, not per-frame: handing
+      // every substep in a frame the same wall-clock t applies one frozen
+      // gust field 1-3 times in a row, which makes chop strength a function
+      // of the display refresh rate. Wrapped because hash21's sin() degrades
+      // at large coordinates and this runs for hours on an ambient page —
+      // safe only because wind is a force, so a seam in the forcing is just a
+      // change of gust and the field itself stays continuous through it.
+      this.windT = (this.windT + STEP) % 4096;
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.hFb[1 - this.hi]);
       gl.viewport(0, 0, this.sw, this.simH);
       gl.useProgram(this.stepProg);
@@ -1078,9 +1174,28 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
       gl.uniform1i(this.stepL.uH!, 0);
       gl.uniform1f(this.stepL.uC2!, controls.speed);
       gl.uniform1f(this.stepL.uDamp!, controls.damp);
+      gl.uniform1f(this.stepL.uWind!, controls.wind);
+      gl.uniform1f(this.stepL.uTime!, this.windT);
       gl.uniform2f(this.stepL.uSim!, this.sw, this.simH);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       this.hi = 1 - this.hi;
+    };
+
+    // The pre-roll runs outside the accumulator on purpose: the cap below
+    // would eat all but three of its steps. The forcing clock advances inside
+    // doStep, so the wind moves across the roll-forward instead of pushing
+    // one frozen pattern 240 times and standing a wave up out of it.
+    while (this.preroll > 0) {
+      this.preroll--;
+      doStep();
+    }
+
+    // Fixed-step wave integration: the stencil is only stable at a fixed dt,
+    // and the accumulator is capped at 3 steps so a stall cannot spiral.
+    this.acc = Math.min(this.acc + dt, 3 / 90);
+    while (this.acc >= STEP) {
+      this.acc -= STEP;
+      doStep();
     }
 
     // ---- toy physics: sample the surface, ride the slope
@@ -1252,7 +1367,7 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
     gl.uniform4fv(this.dispL['uToys[0]']!, this.toyA);
     gl.uniformMatrix3fv(this.dispL.uBallM!, false, this.toys[0].M);
     gl.uniform2f(this.dispL.uLockBox!, 0.6, 0.52);
-    gl.uniform1f(this.dispL.uTileN!, 7.0);
+    gl.uniform1f(this.dispL.uTileN!, 11.0);
     gl.uniform4fv(this.dispL['uToyD[0]']!, this.toyD);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
