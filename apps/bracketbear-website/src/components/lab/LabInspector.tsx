@@ -70,6 +70,8 @@ export default function LabInspector({
       aria-label="Manifest"
       style={{
         width: 296,
+        // 296px is the spec'd total, padding included.
+        boxSizing: 'border-box',
         flexShrink: 0,
         borderLeft: '1px solid rgba(255,243,227,0.14)',
         background: '#1c130e',

@@ -15,6 +15,8 @@ export default function LabNav({ activeId, onSelect }: Props) {
       aria-label="Animations"
       style={{
         width: 236,
+        // 236px is the spec'd total, padding included.
+        boxSizing: 'border-box',
         flexShrink: 0,
         borderRight: '1px solid rgba(255,243,227,0.14)',
         padding: '1rem 0.8rem 2rem 0.8rem',

@@ -25,7 +25,9 @@ const CONTEXT_DIM = 0.45;
 export default function AnimationLab() {
   const [activeId, setActiveId] = useState(REGISTRY[0]?.id ?? '');
   const [theme, setTheme] = useState<ThemeId>('sunset');
-  const [inContext, setInContext] = useState(true);
+  // Defaults to Bare: the context overlays are not built yet, so "In
+  // context" would only dim the stage with nothing rendered over it.
+  const [inContext, setInContext] = useState(false);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [values, setValues] = useState<Record<string, unknown>>({});
