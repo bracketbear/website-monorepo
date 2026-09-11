@@ -18,6 +18,7 @@ export * from './portal-mark';
 export * from './rd-vat';
 export * from './retro-grid';
 export * from './schematic-lens';
+export * from './sdf-forge';
 export * from './signal-alignment';
 export * from './silhouette-flock';
 export * from './utils';

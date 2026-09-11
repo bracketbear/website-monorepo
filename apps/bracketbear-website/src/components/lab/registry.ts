@@ -12,6 +12,7 @@ import {
   createLogoResolveAnimation,
   createPortalMarkAnimation,
   createSchematicLensAnimation,
+  createSdfForgeAnimation,
   createVisionaryEyeAnimation,
   createPixelSunriseAnimation,
   createRdVatAnimation,
@@ -87,6 +88,18 @@ export const REGISTRY: LabEntry[] = [
       'The third-eye mandala wrapped onto a raytraced spherical eye. Smooth pursuit of the cursor while you are over the stage; self-directed saccades and fixation micro-tremor when left alone. The pupil dilates with attention and the energy filaments carve real relief into the surface.',
     create: (initialControls) =>
       createVisionaryEyeAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'sdf-forge',
+    section: 'hero',
+    name: 'SDF Forge',
+    tag: 'glsl shader',
+    blurb:
+      'The mark as forged metal — its signed distance field becomes a beveled height field, relit per pixel from the SDF gradient. The cursor carries the forge lamp. Click to hammer: a spark burst, a heat bloom that cools from white through orange to black, and a dent that slowly anneals flat.',
+    create: (initialControls) =>
+      createSdfForgeAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

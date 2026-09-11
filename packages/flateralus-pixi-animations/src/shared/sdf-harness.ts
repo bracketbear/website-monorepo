@@ -15,7 +15,17 @@ const SDF_W = 1280;
 const SDF_PAD = 200;
 const SDF_SPREAD = 190;
 
-let sdfCanvas: HTMLCanvasElement | null = null;
+export interface SdfInfo {
+  canvas: HTMLCanvasElement;
+  /** 1 where the mark is solid. */
+  bin: Uint8Array;
+  W: number;
+  H: number;
+  /** Normalized points well inside the mark, for placing hits. */
+  pts: [number, number][];
+}
+
+let sdfInfo: SdfInfo | null = null;
 
 /**
  * Two-pass chamfer distance transform. Returns distance in pixels from each
@@ -66,8 +76,13 @@ function distanceTransform(
  * The mark as a signed distance field: red carries the signed distance
  * remapped to 0..1, green carries the original alpha.
  */
-export function sdfMask(): HTMLCanvasElement {
-  if (sdfCanvas) return sdfCanvas;
+/**
+ * The SDF plus the binary mask and a set of interior sample points, for
+ * effects that need to ask "is this point on the mark?" or place a hit
+ * somewhere plausible.
+ */
+export function sdfMaskInfo(): SdfInfo {
+  if (sdfInfo) return sdfInfo;
   const logo = logoMask();
   const W = SDF_W;
   const lw = W - SDF_PAD * 2;
@@ -100,8 +115,33 @@ export function sdfMask(): HTMLCanvasElement {
     px[i * 4 + 3] = 255;
   }
   g.putImageData(img, 0, 0);
-  sdfCanvas = cv;
-  return cv;
+
+  // Sample points at least 22px inside the mark, so a hit never lands on
+  // the edge. Deterministic count, random positions, as the prototype had.
+  const pts: [number, number][] = [];
+  let guard = 0;
+  while (pts.length < 220 && guard++ < 8000) {
+    const x = Math.floor(Math.random() * W);
+    const y = Math.floor(Math.random() * H);
+    if (bin[y * W + x] && dOut[y * W + x] > 22) pts.push([x / W, y / H]);
+  }
+
+  sdfInfo = { canvas: cv, bin, W, H, pts };
+  return sdfInfo;
+}
+
+/** The SDF canvas alone, for effects that only sample the texture. */
+export function sdfMask(): HTMLCanvasElement {
+  return sdfMaskInfo().canvas;
+}
+
+/** Is this normalized point inside the mark? */
+export function onMark(u: number, v: number): boolean {
+  if (u < 0 || u > 1 || v < 0 || v > 1) return false;
+  const info = sdfMaskInfo();
+  return !!info.bin[
+    Math.floor(v * (info.H - 1)) * info.W + Math.floor(u * (info.W - 1))
+  ];
 }
 
 /** Fragment prelude for the SDF family. Carried across verbatim. */
