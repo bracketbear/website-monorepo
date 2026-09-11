@@ -77,3 +77,24 @@ export function logoBitmask(cells: number): LogoBitmask {
   for (let i = 0; i < w * h; i++) m[i] = data[i * 4 + 3] > 110 ? 1 : 0;
   return { w, h, m };
 }
+
+const imageDataCache = new Map<string, ImageData>();
+
+/**
+ * The mark as raw pixels, for animations that sample alpha per cell rather
+ * than using the canvas as a texture.
+ */
+export function logoImageData(width = 240, height = 150): ImageData {
+  const key = `${width}x${height}`;
+  const hit = imageDataCache.get(key);
+  if (hit) return hit;
+  const cv = document.createElement('canvas');
+  cv.width = width;
+  cv.height = height;
+  const g = cv.getContext('2d', { willReadFrequently: true })!;
+  g.scale(width / LOGO_VIEWBOX.w, height / LOGO_VIEWBOX.h);
+  fillPaths(g);
+  const data = g.getImageData(0, 0, width, height);
+  imageDataCache.set(key, data);
+  return data;
+}

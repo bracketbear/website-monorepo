@@ -94,6 +94,24 @@ Every task below follows this recipe. It is written once here rather than repeat
 
 ---
 
+## Progress
+
+Done and verified in the Lab: `signal-alignment`, `led-matrix`, `schematic-lens`, `portal-mark`,
+`visionary-eye`, `goo-lamp`, `kaleido`, `logo-resolve`. Eight of the selected 28.
+
+Blocked pending a decision: `contour-hood`, `contour-pgh` — see below.
+
+Remaining: `sdf-forge`, `shatter-glass`, `ink-dissolve`, `holo-mark`, `crt-phosphor`,
+`slime-mold`, `jelly-tank`, `scan-terrain`, `dmt-tunnel`, `interference-field`, `caustics-pool`,
+`foil-statement`, `street-pulse`, `atomic-age`, `energy-body`, `block-party`, `sun-arc`,
+`rust-machine`.
+
+Three harness families now exist and are proven, so each remaining shader is mostly its manifest,
+its fragment source and its own uniforms: the plain mask harness (`heat-haze`, `led-matrix`,
+`schematic-lens`), the signed-distance-field harness (`portal-mark`, `visionary-eye`), and the
+mask-less toys harness (`goo-lamp`, `kaleido`). The self-contained simulations still follow
+`rd-vat` and each own their framebuffers.
+
 ## Order of work
 
 Cheapest and highest-confidence first, so a failure shows up against a proven pipeline rather than a new one.
@@ -110,6 +128,22 @@ Cheapest and highest-confidence first, so a failure shows up against a proven pi
 - `lab-shaders-13.js` `scan-terrain` is the only vertex-shader particle system. Give it its own program rather than bending the shared fullscreen-triangle harness.
 - `lab-animations-4.js` `sun-arc` computes real solar position from a date. Pin the date in a control rather than reading the clock, so it is reproducible.
 - `lab-animations-3.js` the two contour pieces must call one shared factory, not two copies.
+
+## Blocked: the contour pair
+
+`contour-hood` and `contour-pgh` fetch nine elevation tiles each from
+`https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/...` at runtime and decode the
+terrarium encoding into a 180x180 grid in the browser.
+
+Shipping that on the marketing site means a third-party runtime dependency on every view of
+those animations, with the cross-origin fetch, the latency, and the failure mode that comes with
+it. The prototype already established the alternative: the OpenStreetMap, star-catalog and solar
+data are all baked into the repo rather than fetched.
+
+Baking the two elevation grids is the right fix, and it needs a decision that is not the port's
+to make: downloading the tiles once and committing roughly 32,400 samples per city. Until that
+call is made, these two are not ported. Everything else on the list is free of external
+dependencies.
 
 ## Closing tasks
 

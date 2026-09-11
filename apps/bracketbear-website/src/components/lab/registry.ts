@@ -6,6 +6,7 @@ import {
   createKaleidoAnimation,
   createHeatHazeAnimation,
   createLedMatrixAnimation,
+  createLogoResolveAnimation,
   createPortalMarkAnimation,
   createSchematicLensAnimation,
   createVisionaryEyeAnimation,
@@ -155,6 +156,18 @@ export const REGISTRY: LabEntry[] = [
       'The site’s halftone pattern, alive: dot radii breathe in slow traveling waves. The cursor inflates the field; clicks drop ripples.',
     create: (initialControls) =>
       createHalftoneTideAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'logo-resolve',
+    section: 'about',
+    name: 'Logo Resolve',
+    tag: '8-bit',
+    blurb:
+      'The [BB] mark as a neon sign: pixels flicker on like a boot sequence, then hold with an additive glow while individual pixels glitch cyan and the sign buzzes. The cursor heats pixels through cyan to white-hot; click for a shockwave.',
+    create: (initialControls) =>
+      createLogoResolveAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },
