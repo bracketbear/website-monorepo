@@ -282,59 +282,276 @@ const DISPLAY_FS = `#version 300 es
       }
       return col;
     }
+    // --- pool toys -------------------------------------------------------
+    // Every toy is a real model. Each one is intersected per pixel against a
+    // shared camera — a signed distance field for the duck and the doughnut,
+    // closed form for the ball — so silhouettes, self-occlusion and the
+    // shadow a body throws across itself come out of geometry rather than
+    // being drawn on.
+    float sdEllipsoid(vec3 p, vec3 r) {
+      float k0 = length(p / r);
+      float k1 = length(p / (r * r));
+      return k0 * (k0 - 1.0) / max(k1, 1e-6);
+    }
+    float sdCapsule(vec3 p, vec3 a, vec3 b, float ra, float rb) {
+      vec3 pa = p - a, ba = b - a;
+      float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+      return length(pa - ba * h) - mix(ra, rb, h);
+    }
+    float smin(float a, float b, float k) {
+      float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+      return mix(b, a, h) - k * h * (1.0 - h);
+    }
+    // The camera every toy is seen through. The local wave gradient tips the
+    // body, the spin turns it about its own axis, and the view leans 17
+    // degrees off vertical so a scene shot from overhead still shows volume.
+    // M takes toy space to screen space. A toy that cannot heel — a sphere
+    // looks identical however it is turned — passes a zero gradient and gets
+    // world space back, which also makes its z a true height above the water.
+    void toyFrame(vec2 p, vec2 grad, float sp, out vec3 ro, out vec3 rd, out mat3 M) {
+      // Heel, saturating. A float has buoyant stiffness: the further it goes
+      // over, the harder it resists going further, and there is an angle it
+      // simply will not pass. tanh is that curve — linear across the small
+      // slopes it spends most of its time on, flattening to a ceiling near 22
+      // degrees, so a big swell rocks it and never rolls it onto its side.
+      vec2 g = -grad * 3.2;
+      float gm = length(g);
+      if (gm > 1e-5) g *= 0.40 * tanh(gm / 0.40) / gm;
+      vec3 upS = normalize(vec3(g, 1.0));
+      vec3 sideS = normalize(cross(upS, vec3(cos(sp), sin(sp), 0.0)));
+      M = mat3(cross(sideS, upS), sideS, upS);
+      float ct = 0.955, st = 0.296;
+      vec3 camZ = vec3(0.0, -st, ct);
+      ro = transpose(M) * (vec3(p.x, 0.0, 0.0) + vec3(0.0, ct, st) * p.y + camZ * 2.6);
+      rd = transpose(M) * (-camZ);
+    }
+    // True height above the water. A toy's frame is tilted by its heel, so its
+    // own z is height along its own axis — right for placing features on the
+    // body, wrong for the waterline, because the pool stays flat while the toy
+    // rocks. Measured in the toy's z it is the water that appears to tilt, and
+    // one side of a big float reads as sinking. Only the third row of M is
+    // needed to get back to world up.
+    float waterHeight(mat3 M, vec3 hp) {
+      return dot(vec3(M[0].z, M[1].z, M[2].z), hp);
+    }
+    // --- doughnut float ----------------------------------------------------
+    // A torus lying in the xy plane, its mid-plane a little above the
+    // waterline so about a third of the tube is under — where an inflated one
+    // rides. The outer edge lands exactly on 1.0, the toy's own radius.
+    const float DR = 0.63;      // ring radius
+    const float DT = 0.37;      // tube radius
+    // The mid-plane sits on the waterline: half the tube under, where an
+    // inflated ring actually rides. This one number has to satisfy both rims
+    // at once, and the camera decides the window. Looking down 17 degrees, the
+    // far side of the ring is only visible above about 17 degrees around its
+    // tube, so if the waterline lands at or above that the far rim terminates
+    // wet, with no dry dough between it and the pool — and a ring whose far
+    // edge ends in the water reads as one that is sinking at the back. Sitting
+    // the mid-plane here puts the far rim a clear 0.11 above the surface while
+    // still leaving the near rim's wet band and a sliver of submerged tube in
+    // view, which is the pair of cues that says the ring is in the water.
+    const float DZ = 0.0;       // height of the ring's mid-plane
+    float doughMap(vec3 p) {
+      vec2 q = vec2(length(p.xy) - DR, p.z - DZ);
+      return length(q) - DT;
+    }
+    // Soft shadow toward the sun, traced through the ring's own body. The sun
+    // side throwing a shadow across the hole and onto the far inner wall is
+    // most of what separates a torus from a ring painted on a disc.
+    float doughShadow(vec3 p, vec3 l) {
+      float s = 1.0, t = 0.05;
+      for (int i = 0; i < 12; i++) {
+        float d = doughMap(p + l * t);
+        s = min(s, 10.0 * d / t);
+        if (s < 0.03 || t > 2.2) break;
+        t += clamp(d, 0.03, 0.22);
+      }
+      return clamp(s, 0.0, 1.0);
+    }
+    // --- rubber duck -------------------------------------------------------
+    // Duck space: +x forward, +y its left, +z up, origin on the waterline.
+    // The toy is blow-molded, so it is modelled the way it is made — lobes
+    // fused together, tight enough at the wings that the seam stays visible.
+    // Returns (distance, material: 0 vinyl, 1 bill).
+    vec2 duckMap(vec3 p) {
+      vec3 pm = vec3(p.x, abs(p.y), p.z);
+      float d = sdEllipsoid(p - vec3(-0.04, 0.0, -0.04), vec3(0.54, 0.43, 0.40));
+      d = smin(d, sdEllipsoid(p - vec3(0.28, 0.0, -0.04), vec3(0.36, 0.35, 0.34)), 0.26);
+      // tail: a broad flat fan kicked up off the back, not a point
+      vec3 tp = p - vec3(-0.50, 0.0, 0.15);
+      tp.xz = mat2(0.87, 0.50, -0.50, 0.87) * tp.xz;
+      d = smin(d, sdEllipsoid(tp, vec3(0.24, 0.125, 0.095)), 0.17);
+      d = smin(d, sdCapsule(p, vec3(0.30, 0.0, 0.14), vec3(0.43, 0.0, 0.55), 0.175, 0.17), 0.15);
+      d = smin(d, sdEllipsoid(p - vec3(0.47, 0.0, 0.72), vec3(0.33, 0.32, 0.32)), 0.12);
+      // wings: a swell down each flank, blended just tight enough to leave a
+      // crease rather than a second lobe
+      d = smin(d, sdEllipsoid(pm - vec3(-0.06, 0.345, 0.05), vec3(0.33, 0.110, 0.23)), 0.07);
+      vec3 bp = p - vec3(0.76, 0.0, 0.655);
+      bp.xz = mat2(0.971, 0.239, -0.239, 0.971) * bp.xz;   // the bill droops
+      float bill = sdEllipsoid(bp, vec3(0.29, 0.165, 0.065));
+      float id = bill < d ? 1.0 : 0.0;
+      return vec2(smin(d, bill, 0.035), id);
+    }
+    vec3 duckNormal(vec3 p) {
+      vec2 e = vec2(1.0, -1.0);
+      float h = 0.0022;
+      return normalize(e.xyy * duckMap(p + e.xyy * h).x + e.yyx * duckMap(p + e.yyx * h).x
+                     + e.yxy * duckMap(p + e.yxy * h).x + e.xxx * duckMap(p + e.xxx * h).x);
+    }
+    // The head's shadow falling across the back is most of what separates a
+    // model from a decal, and it costs one short march.
+    float duckShadow(vec3 p, vec3 l) {
+      float s = 1.0, t = 0.05;
+      for (int i = 0; i < 11; i++) {
+        float d = duckMap(p + l * t).x;
+        s = min(s, 11.0 * d / t);
+        if (s < 0.03 || t > 1.5) break;
+        t += clamp(d, 0.03, 0.20);
+      }
+      return clamp(s, 0.0, 1.0);
+    }
     vec4 drawToy(vec2 uv, vec4 T, vec4 D) {
+      // Every branch antialiases its own silhouette, so it needs a pixel size —
+      // and a derivative has to be taken before anything branches on it.
+      float fwid = fwidth(uv.y);
       vec2 p = (uv - T.xy) * vec2(uAsp, 1.0) / T.z;  // local coords, 1 = radius
       float r = length(p);
-      if (r > 1.3) return vec4(0.0);
+      if (r > 1.45) return vec4(0.0);
+      float pw = fwid / T.z;
       float sp = D.z;
-      mat2 rot = mat2(cos(sp), sin(sp), -sin(sp), cos(sp));
-      vec2 q = rot * p;
-      vec3 col; vec3 n; float a;
+      vec3 col; vec3 n; vec3 hp; float a;
+      float sh = 1.0;                 // self-shadowing; a sphere has none
+      vec3 ro, rd; mat3 M;
       if (T.w < 0.5) {
-        // beach ball: 6 vinyl panels on a true 3D orientation — it rolls
-        a = smoothstep(1.0, 0.955, r);
-        if (a <= 0.0) return vec4(0.0);
-        float z = sqrt(max(0.0, 1.0 - min(r * r, 1.0)));
-        n = vec3(p, z);
-        vec3 d = transpose(uBallM) * n;
+        // Beach ball. The one toy that needs no march: a sphere's silhouette
+        // is a circle from every angle and its surface is closed form, so a
+        // single quadratic gives an exact hit and an exact normal. It does not
+        // heel either — turning a ball changes nothing about its shape, only
+        // where its panels point, and uBallM already tracks that off the
+        // contact point. So it takes the camera and nothing else.
+        toyFrame(p, vec2(0.0), 0.0, ro, rd, M);
+        vec3 cen = vec3(0.0, 0.0, 0.62);        // inflated: it rides high
+        vec3 oc = ro - cen;
+        float bb = dot(oc, rd);
+        float h2 = dot(oc, oc) - bb * bb;       // closest approach, squared
+        // Coverage straight off that closest approach: exact, one pixel wide.
+        a = 1.0 - smoothstep(-0.9 * pw, 0.9 * pw, sqrt(max(h2, 0.0)) - 1.0);
+        if (a <= 0.004) return vec4(0.0);
+        hp = ro + rd * (-bb - sqrt(max(1.0 - h2, 0.0)));
+        vec3 nd = normalize(hp - cen);
+        // Six gores cut on the ball's own body frame, tapering to a point at
+        // each pole the way heat-welded panels do — it rolls, so they turn.
+        vec3 d = transpose(uBallM) * nd;
         float ang = fract(atan(d.y, d.x) / 6.2831853 + 0.5);
         float seg = floor(ang * 6.0);
         vec3 acc = seg < 2.0 ? uToyA : (seg < 4.0 ? uToyB : vec3(1.0, 0.82, 0.26));
-        vec3 white = vec3(0.96, 0.94, 0.90);
+        // The white gores are the brightest thing on the toy and the sun is
+        // added on top of them, so they are held under paper-white to leave
+        // the highlight somewhere to climb. At 0.96 it clipped, and the ball
+        // wore one flat blown-out patch spanning three panels.
+        vec3 white = vec3(0.90, 0.885, 0.85);
         col = mod(seg, 2.0) < 0.5 ? white : acc;
-        float cap = smoothstep(0.78, 0.9, abs(d.z));
-        float seam = abs(fract(ang * 6.0) - 0.5);
-        col *= 0.84 + 0.16 * max(smoothstep(0.0, 0.07, seam), cap);
+        // Polar caps: the little discs that close off the point where all six
+        // gores converge. On a real ball they are barely wider than the valve.
+        // The old threshold opened them 39 degrees off the pole, which turned
+        // a third of the ball white and read as a bald patch, not a cap.
+        float cap = smoothstep(0.955, 0.988, abs(d.z));
         col = mix(col, white, cap);
+        // Welded seams, as a ridge rather than a dark line: the panel edges
+        // lift where two sheets are joined, so a seam catches the sun on one
+        // side and shades on the other. The old shading had this inverted —
+        // it darkened the middle of every panel and left the joins at full
+        // brightness, which is what made the gores read as printed stripes.
+        float fs = fract(ang * 6.0);
+        float sdS = fs < 0.5 ? fs : fs - 1.0;        // signed, 0 on the seam
+        col *= 0.90 + 0.10 * smoothstep(0.0, 0.26, abs(sdS));
+        vec3 tA = cross(vec3(0.0, 0.0, 1.0), d);
+        float tl = length(tA);
+        if (tl > 1e-4) {
+          float q = sdS / 0.055;
+          nd = normalize(nd + uBallM * (tA / tl) * (q * exp(-0.5 * q * q))
+                              * 0.085 * (1.0 - cap));
+        }
+        // The valve, set into the cap at one pole: a nub with a flange round
+        // its base and a slot across the top. It is the detail that names the
+        // object, and because it lives on the body frame it rolls out of sight
+        // and back again as the ball goes.
+        float vr = length(d.xy);
+        float vm = (1.0 - smoothstep(0.10, 0.125, vr)) * step(0.0, d.z);
+        col = mix(col, vec3(0.94, 0.93, 0.89), vm * 0.9);
+        col *= 1.0 - 0.30 * vm * smoothstep(0.055, 0.105, vr);   // seated base
+        col *= 1.0 - 0.50 * vm * (1.0 - smoothstep(0.013, 0.026, abs(d.y)));
+        if (vr > 1e-5)
+          nd = normalize(nd + uBallM * vec3(d.xy / vr, 0.0)
+                              * vm * smoothstep(0.03, 0.10, vr) * 0.5);
+        n = M * nd;
+        // Waterline. Only a shallow cap is under, but without the wet band
+        // and the meniscus a ball reads as resting on a sheet of glass.
+        float wz = waterHeight(M, hp);
+        col *= 1.0 - 0.24 * exp(-pow(max(wz, 0.0) / 0.05, 2.0));
+        col += uSky * 0.32 * exp(-pow(wz / 0.020, 2.0));
+        float sub = smoothstep(0.01, -0.10, wz);
+        col = mix(col, col * mix(vec3(1.0), uWater, 0.9) * 1.1, sub);
+        a *= 1.0 - 0.62 * smoothstep(0.0, -0.18, wz);
       } else if (T.w < 1.5) {
-        // doughnut float: frosted torus with a wavy drip line and sprinkles.
-        // sr is signed across the tube (-1 inner edge, +1 outer) and z is the
-        // height on that cross-section, so the frosting is just "high enough".
-        float sr = (r - 0.63) / 0.37;
-        float rr = abs(sr);
-        a = smoothstep(1.0, 0.9, rr);
-        if (a <= 0.0) return vec4(0.0);
-        float z = sqrt(max(0.0, 1.0 - min(rr * rr, 1.0)));
-        vec2 dir = p / max(r, 1e-4);
-        n = normalize(vec3(dir * sr, z + 0.45));
-        // Features live in q, the spin-rotated frame, so they turn with the toy.
-        float th = atan(q.y, q.x);
-        // frosting covers the top of the cross-section down to a drip line
-        // that wobbles around the ring
+        // Doughnut float, sphere-traced. The hole is a real hole: at this
+        // camera you look down into it, the near wall covers the far one, and
+        // the ring lays a shadow across its own middle. The frosting is a
+        // region of the actual surface rather than a band drawn on a disc.
+        toyFrame(p, D.xy, sp, ro, rd, M);
+        vec3 oc = ro - vec3(0.0, 0.0, DZ);
+        float bb = dot(oc, rd);
+        float disc = bb * bb - (dot(oc, oc) - 1.0404);   // bound: DR + DT, loose
+        if (disc < 0.0) return vec4(0.0);
+        float sq = sqrt(disc);
+        float tF = -bb + sq;
+        float tm = max(-bb - sq, 0.0);
+        // Antialias off the closest approach rather than the hit test, so the
+        // edge is a real coverage estimate one pixel wide.
+        float eps = max(0.0015, 0.7 * pw);
+        float md = 1e9, tBest = tm;
+        bool hit = false;
+        for (int i = 0; i < 28; i++) {
+          float ds = doughMap(ro + rd * tm);
+          if (ds < md) { md = ds; tBest = tm; }
+          if (ds < eps) { hit = true; break; }
+          tm += max(ds * 0.92, eps * 0.5);
+          if (tm > tF) break;
+        }
+        a = hit ? 1.0 : 1.0 - smoothstep(eps, eps + 1.8 * pw, md);
+        if (a <= 0.004) return vec4(0.0);
+        hp = ro + rd * tBest;
+        // Torus coordinates of the hit: th around the ring, ph around the
+        // tube. The normal and every feature come out of these, so the icing
+        // and the sprinkles are on the surface instead of on a projection
+        // that happens to line up with it from one angle.
+        float th = atan(hp.y, hp.x);
+        float ph = atan(hp.z - DZ, length(hp.xy) - DR);
+        float cth = cos(th), sth = sin(th), cph = cos(ph), sph = sin(ph);
+        vec3 nd = vec3(cph * cth, cph * sth, sph);      // exact — no gradient
+        vec3 tTh = vec3(-sth, cth, 0.0);                // around the ring
+        vec3 tPh = vec3(-sph * cth, -sph * sth, cph);   // around the tube
+        vec3 sunD = transpose(M) * normalize(vec3(0.42, 0.55, 0.72));
+        sh = 0.30 + 0.70 * doughShadow(hp + nd * 0.008, sunD);
+        // Frosting caps the top of the tube down to a drip line that wobbles
+        // around the ring. sph is the height on the cross-section, so this is
+        // literally "iced above here" — and where the line dips, the drip
+        // hangs over the outer wall and shows up in silhouette.
         float drip = 0.58 + 0.155 * sin(th * 7.0) + 0.075 * sin(th * 13.0 + 1.7);
-        float ice = smoothstep(drip - 0.05, drip + 0.05, z);
+        float ice = smoothstep(drip - 0.05, drip + 0.05, sph);
         vec3 dough = vec3(0.98, 0.82, 0.44);
         vec3 frost = mix(vec3(0.93, 0.17, 0.56), uToyA, 0.18);
         col = mix(dough, frost, ice);
-        // sprinkles: one capsule per cell of a grid wrapped around the ring.
-        // The column index is taken mod the cell count so the seam at +/-pi
-        // hashes the same from both sides.
-        vec2 suv = vec2(th * (22.0 / 6.2831853), sr * 3.2);
-        vec2 cid = vec2(mod(floor(suv.x), 22.0), floor(suv.y));
+        // Sprinkles: one capsule per cell of a grid wrapped around the tube.
+        // 22 cells around the ring against 13 around the tube keeps the cells
+        // square; both indices are taken mod the count so the seams at +/-pi
+        // hash the same from either side.
+        vec2 suv = vec2(th * (22.0 / 6.2831853), ph * (13.0 / 6.2831853));
+        vec2 cid = vec2(mod(floor(suv.x), 22.0), mod(floor(suv.y), 13.0));
         float h1 = hash21(cid + 3.7);
-        float h2 = hash21(cid + 11.3);
+        float h2s = hash21(cid + 11.3);
         float h3 = hash21(cid + 27.1);
-        vec2 lp = fract(suv) - 0.5 - 0.30 * (vec2(h1, h2) - 0.5);
+        vec2 lp = fract(suv) - 0.5 - 0.30 * (vec2(h1, h2s) - 0.5);
         lp.y *= 0.55;
         vec2 sd2 = vec2(cos(h3 * 6.2831853), sin(h3 * 6.2831853));
         float tt = clamp(dot(lp, sd2), -0.15, 0.15);
@@ -344,55 +561,98 @@ const DISPLAY_FS = `#version 300 es
                   : h1 < 0.60 ? vec3(0.25, 0.80, 0.95)
                   : h1 < 0.78 ? vec3(0.35, 0.85, 0.40)
                               : vec3(1.0, 0.45, 0.30);
-        float smask = (1.0 - smoothstep(-0.012, 0.012, sprk)) * ice * step(h2, 0.82);
+        float smask = (1.0 - smoothstep(-0.012, 0.012, sprk)) * ice * step(h2s, 0.82);
         col = mix(col, scol, smask);
-        // Sprinkles sit proud of the icing. Tilt the normal off the capsule's
-        // own distance field so each one catches the sun as a little ridge.
-        // suv runs (tangential, radial), so the bump has to come back through
-        // that basis and then out of the spin frame to meet the shading normal.
+        // Sprinkles sit proud of the icing: tilt the normal off each capsule's
+        // own distance field so it catches the sun as a little ridge. The
+        // gradient is in (around the ring, around the tube), so it comes back
+        // through exactly those two tangents.
         float gd = length(lp - sd2 * tt);
         vec2 gdir = gd > 1e-5 ? (lp - sd2 * tt) / gd : vec2(0.0);
         vec2 bq = gdir * clamp(gd / 0.052, 0.0, 1.0) * smask * 0.9;
-        bq.y /= 0.55;                       // undo the cell squash so it reads round
-        vec2 dq = q / max(r, 1e-4);
-        n = normalize(n + vec3(
-          transpose(rot) * (vec2(-dq.y, dq.x) * bq.x + dq * bq.y), 0.0));
-        // The welded seam, just inside both silhouettes — the line where two
-        // sheets of vinyl are joined. Cheapest single cue that says inflatable.
-        col *= 1.0 - 0.16 * exp(-pow((rr - 0.93) / 0.035, 2.0));
-        col *= 0.86 + 0.14 * z;
+        bq.y /= 0.55;                       // undo the cell squash: reads round
+        nd = normalize(nd + tTh * bq.x + tPh * bq.y);
+        // The welded seams, where two sheets of vinyl are joined: one around
+        // the outer equator of the tube and one around the inner. Cheapest
+        // single cue that says inflatable.
+        float seamD = min(abs(ph), 3.14159265 - abs(ph));
+        col *= 1.0 - 0.16 * exp(-pow(seamD / 0.055, 2.0));
+        // Waterline. hp.z is height above the surface, so this is where the
+        // ring actually sits in it: a wet darkened band just above the line, a
+        // thin meniscus catching the sky right on it, and below it a hull seen
+        // through water — desaturated, low contrast, never a hard edge.
+        float wz = waterHeight(M, hp);
+        col *= 1.0 - 0.26 * exp(-pow(max(wz, 0.0) / 0.05, 2.0));
+        col += uSky * 0.35 * exp(-pow(wz / 0.020, 2.0));
+        float sub = smoothstep(0.01, -0.10, wz);
+        col = mix(col, col * mix(vec3(1.0), uWater, 0.9) * 1.1, sub);
+        // Vinyl stays opaque under water — it loses saturation and contrast,
+        // it does not dissolve. Cutting the alpha as hard as the duck does
+        // eats the near rim, which is the edge doing the work here.
+        a *= 1.0 - 0.45 * smoothstep(0.0, -0.22, wz);
+        sh *= 1.0 - 0.8 * sub;
+        n = M * nd;
       } else {
-        // rubber duck, top-down: body + head + beak + tail as blown-vinyl lobes
-        vec2 bc = vec2(-0.16, 0.0);  vec2 brd = vec2(0.82, 0.62);
-        vec2 hc = vec2(0.40, 0.0);   vec2 hrd = vec2(0.42, 0.42);
-        vec2 kc = vec2(0.87, 0.0);   vec2 krd = vec2(0.27, 0.15);
-        vec2 tc2 = vec2(-0.86, 0.0); vec2 trd = vec2(0.30, 0.34);
-        float fb = 1.0 - length((q - bc) / brd);
-        float fh = 1.0 - length((q - hc) / hrd);
-        float fk = 1.0 - length((q - kc) / krd) - 0.06;
-        float ft = 1.0 - length((q - tc2) / trd) - 0.12;
-        float fm = fb; vec2 pc = bc; vec2 prd = brd; float beakM = 0.0;
-        if (fh > fm) { fm = fh; pc = hc; prd = hrd; }
-        if (fk > fm) { fm = fk; pc = kc; prd = krd; beakM = 1.0; }
-        if (ft > fm) { fm = ft; pc = tc2; prd = trd; }
-        a = smoothstep(0.0, 0.05, fm);
-        if (a <= 0.0) return vec4(0.0);
-        vec2 lu = (q - pc) / prd;
-        float lr = min(length(lu), 1.0);
-        float z = sqrt(1.0 - lr * lr);
-        vec2 n2l = lr > 1e-4 ? normalize(lu) : vec2(0.0);
-        n = normalize(vec3(transpose(rot) * (n2l * lr), z + 0.3));
-        col = mix(vec3(1.0, 0.84, 0.10), vec3(1.0, 0.47, 0.10), beakM);
-        // eyes — both visible from above
-        float eye = min(length(q - vec2(0.46, 0.19)), length(q - vec2(0.46, -0.19)));
-        col = mix(vec3(0.10, 0.07, 0.05), col, smoothstep(0.05, 0.085, eye));
-        // wing creases on the back
-        float wing = min(length((q - vec2(-0.28, 0.36)) / vec2(0.44, 0.22)), length((q - vec2(-0.28, -0.36)) / vec2(0.44, 0.22)));
-        col *= 1.0 - 0.12 * (1.0 - smoothstep(0.8, 1.05, wing));
-        col *= 0.90 + 0.10 * z;
+        // Rubber duck, sphere-traced. The wave slope rotates the duck itself
+        // rather than nudging its shading normal — it heels into a swell, and
+        // the bill swings out over the water when it does.
+        toyFrame(p, D.xy, sp, ro, rd, M);
+        // Bounding sphere first, so the trace only runs where the duck can be
+        // and every step starts already close to the surface.
+        vec3 oc = ro - vec3(0.0, 0.0, 0.25);
+        float bb = dot(oc, rd);
+        float disc = bb * bb - (dot(oc, oc) - 1.3225);
+        if (disc < 0.0) return vec4(0.0);
+        float sq = sqrt(disc);
+        float tF = -bb + sq;
+        float tm = max(-bb - sq, 0.0);
+        // Antialias the silhouette off the closest approach rather than the
+        // hit test, so the edge is a real coverage estimate one pixel wide.
+        float eps = max(0.0015, 0.7 * pw);
+        float md = 1e9, tBest = tm, mid = 0.0;
+        bool hit = false;
+        for (int i = 0; i < 40; i++) {
+          vec2 ms = duckMap(ro + rd * tm);
+          if (ms.x < md) { md = ms.x; tBest = tm; mid = ms.y; }
+          if (ms.x < eps) { hit = true; break; }
+          tm += max(ms.x * 0.9, eps * 0.5);
+          if (tm > tF) break;
+        }
+        a = hit ? 1.0 : 1.0 - smoothstep(eps, eps + 1.8 * pw, md);
+        if (a <= 0.004) return vec4(0.0);
+        hp = ro + rd * tBest;
+        vec3 nd = duckNormal(hp);
+        vec3 sunD = transpose(M) * normalize(vec3(0.42, 0.55, 0.72));
+        sh = 0.26 + 0.74 * duckShadow(hp + nd * 0.006, sunD);
+        n = M * nd;
+        col = mix(vec3(1.0, 0.84, 0.10), vec3(0.98, 0.47, 0.07), mid);
+        // the parting line left where the two halves of the mold met
+        col *= 1.0 - 0.09 * exp(-pow(hp.y / 0.02, 2.0)) * step(0.0, nd.z);
+        // the split between the upper and lower bill, following its droop
+        col *= 1.0 - 0.30 * mid * exp(-pow((hp.z - 0.655 + (hp.x - 0.76) * 0.246) / 0.016, 2.0));
+        // nostrils, two pinpricks on the ridge of the bill
+        col *= 1.0 - 0.45 * mid * (1.0 - smoothstep(0.018, 0.030,
+          min(length(hp - vec3(0.700, 0.055, 0.700)),
+              length(hp - vec3(0.700, -0.055, 0.700)))));
+        // eyes, stamped as spheres so they sit on the curve of the head
+        float eye = min(length(hp - vec3(0.640, 0.205, 0.815)),
+                        length(hp - vec3(0.640, -0.205, 0.815)));
+        col = mix(vec3(0.07, 0.05, 0.045), col, smoothstep(0.052, 0.072, eye));
+        // sun-bleached across the top, still saturated down near the water
+        col *= 1.0 - 0.10 * smoothstep(0.4, 0.9, fbm(hp.xy * 4.3 + 13.0))
+                          * smoothstep(-0.05, 0.4, hp.z);
+        // Waterline, as on the other two.
+        float wz = waterHeight(M, hp);
+        col *= 1.0 - 0.26 * exp(-pow(max(wz, 0.0) / 0.06, 2.0));
+        col += uSky * 0.35 * exp(-pow(wz / 0.022, 2.0));
+        float sub = smoothstep(0.01, -0.10, wz);
+        col = mix(col, col * mix(vec3(1.0), uWater, 0.9) * 1.1, sub);
+        a *= 1.0 - 0.62 * smoothstep(0.0, -0.22, wz);
+        sh *= 1.0 - 0.8 * sub;
       }
-      // ride the wave: tilt the whole toy by the local surface gradient
-      n = normalize(n + vec3(-D.xy * 6.0, 0.0));
+      // No shading-normal fudge for the wave any more: the two toys that can
+      // heel are rotated for real by toyFrame, and the third is a sphere,
+      // which looks the same whichever way it is tipped.
       vec3 sunDir = normalize(vec3(0.42, 0.55, 0.72));
       float dif = max(dot(n, sunDir), 0.0);
       vec3 hv = normalize(sunDir + vec3(0.0, 0.0, 1.0));
@@ -400,12 +660,12 @@ const DISPLAY_FS = `#version 300 es
       // Vinyl, not hard plastic. An inflatable reads as inflatable because the
       // highlight is broad and soft with a small blown-out core sitting in it,
       // and because the skin keeps catching light right out to the silhouette
-      // where it curves away. Both toys and doughnut are the same material.
+      // where it curves away. All three toys are the same material.
       float sheen = pow(max(dot(n, hv), 0.0), 7.0);
       float rim = pow(1.0 - clamp(n.z, 0.0, 1.0), 2.5);
-      col = col * (0.42 + 0.68 * dif)
-          + uSun * spec * 0.85
-          + uSun * sheen * 0.15
+      col = col * (0.42 + 0.68 * dif * sh)
+          + uSun * spec * 0.85 * sh
+          + uSun * sheen * 0.15 * sh
           + uSun * rim * 0.18;
       return vec4(col, a);
     }
@@ -678,6 +938,20 @@ interface Toy {
   /** Smoothed surface gradient under the toy — the slope it slides down. */
   gx: number;
   gy: number;
+  /**
+   * The same gradient again, filtered far harder — the slope the toy leans
+   * on. Drift and heel want different time constants: a toy starts moving on
+   * a slope right away, but it takes real time to tip, and it is still
+   * tipping after the wave has gone by.
+   */
+  tx: number;
+  ty: number;
+  /**
+   * Collision radius as a fraction of the drawn one. A ball and a ring fill
+   * their own circle, but a duck is a long thin thing inside a square, and
+   * charging it the full radius gave it an invisible bumper.
+   */
+  hit: number;
   /** Column-major body-to-world orientation; only the beach ball rolls. */
   M: number[];
 }
@@ -813,6 +1087,7 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
         y: 0.62,
         r: 0.085,
         type: 0,
+        hit: 1.0,
         vx: 0,
         vy: 0,
         spin: 0.4,
@@ -820,13 +1095,16 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
         h: 0,
         gx: 0,
         gy: 0,
+        tx: 0,
+        ty: 0,
         M: identity3(),
       },
       {
         x: 0.66,
         y: 0.38,
-        r: 0.115,
+        r: 0.145,
         type: 1,
+        hit: 1.0,
         vx: 0,
         vy: 0,
         spin: 1.2,
@@ -834,6 +1112,8 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
         h: 0,
         gx: 0,
         gy: 0,
+        tx: 0,
+        ty: 0,
         M: identity3(),
       },
       {
@@ -841,6 +1121,7 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
         y: 0.76,
         r: 0.078,
         type: 2,
+        hit: 0.62,
         vx: 0,
         vy: 0,
         spin: 2.6,
@@ -848,6 +1129,8 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
         h: 0,
         gx: 0,
         gy: 0,
+        tx: 0,
+        ty: 0,
         M: identity3(),
       },
     ];
@@ -1241,6 +1524,13 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
           T.gx = T.gx * 0.7 + smp[1] * 0.3;
           T.gy = T.gy * 0.7 + smp[2] * 0.3;
         }
+        // Rotational inertia. The toy leans on a gradient of its own, chasing
+        // the drift one with a ~0.4s time constant, which is what gives it
+        // mass: chop averages out of it entirely, a swell rolls it late and
+        // lets it back up late, and nothing can snap it over in a frame.
+        const kT = 1 - Math.exp(-dt * 2.6);
+        T.tx += (T.gx - T.tx) * kT;
+        T.ty += (T.gy - T.ty) * kT;
         // Gravity along the surface: a floating body accelerates down the
         // local slope, so the height gradient is the force. The x term is
         // divided by aspect because velocity is carried in uv, not pixels.
@@ -1257,12 +1547,16 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
         T.x += T.vx * dt;
         T.y += T.vy * dt;
         // Cursor is a solid collider: toys bounce off it and pick up its speed.
+        // Contact uses the body's own radius, not the box it is drawn in.
+        // The spin terms below deliberately keep T.r: the contact circle says
+        // where a knock lands, the full extent says how hard it is to turn.
+        const hr = T.r * T.hit;
         if (interactive && this.mx >= 0) {
           const cr = 0.024;
           const dx = (T.x - this.mx) * asp;
           const dy = T.y - this.my;
           const d = Math.hypot(dx, dy);
-          const rs = T.r + cr;
+          const rs = hr + cr;
           if (d < rs && d > 1e-5) {
             const nx = dx / d;
             const ny = dy / d;
@@ -1279,7 +1573,7 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
                 x: T.x,
                 y: T.y,
                 amp: -Math.min(0.5, -rvn * 1.5),
-                rad: Math.max(2.5, T.r * this.simH * 0.6),
+                rad: Math.max(2.5, hr * this.simH * 0.6),
               });
             }
             // Tangential friction scrubs spin into the toy.
@@ -1289,8 +1583,8 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
             T.vs += ((rvt - T.vs * T.r) / T.r) * 0.4;
           }
         }
-        const rx = T.r / asp + 0.012;
-        const ry = T.r + 0.012;
+        const rx = hr / asp + 0.012;
+        const ry = hr + 0.012;
         if (T.x < rx) {
           T.x = rx;
           T.vx = Math.abs(T.vx) * 0.55;
@@ -1341,7 +1635,7 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
           const dx = (b.x - a.x) * asp;
           const dy = b.y - a.y;
           const d = Math.hypot(dx, dy);
-          const rs = a.r + b.r;
+          const rs = a.r * a.hit + b.r * b.hit;
           if (d < rs && d > 1e-5) {
             const nx = dx / d;
             const ny = dy / d;
@@ -1393,8 +1687,14 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
     this.toyD.fill(0);
     if (toysOn)
       this.toys.forEach((t2, i) => {
-        this.toyA.set([t2.x, t2.y, t2.r * (1 + t2.h * 0.018), t2.type], i * 4);
-        this.toyD.set([t2.gx, t2.gy, t2.spin, 0], i * 4);
+        // Heave, as a touch of scale — nearer the camera reads as bigger. It
+        // is an absolute rise, not a fraction of the toy: a ring and a ball on
+        // the same swell lift by the same amount, so charging it per radius
+        // made the largest float pump the hardest, which is backwards. A big
+        // ring is also the worst case for the cue, because scaling moves its
+        // whole outline at once where a compact toy just bobs.
+        this.toyA.set([t2.x, t2.y, t2.r + t2.h * 0.0014, t2.type], i * 4);
+        this.toyD.set([t2.tx, t2.ty, t2.spin, 0], i * 4);
       });
     gl.uniform4fv(this.dispL['uToys[0]']!, this.toyA);
     gl.uniformMatrix3fv(this.dispL.uBallM!, false, this.toys[0].M);
