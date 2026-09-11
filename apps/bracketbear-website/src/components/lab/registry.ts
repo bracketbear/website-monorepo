@@ -3,6 +3,7 @@ import type { AnimationManifest } from '@bracketbear/flateralus';
 import {
   createHalftoneTideAnimation,
   createHeatHazeAnimation,
+  createPixelSunriseAnimation,
   createRdVatAnimation,
   createSignalAlignmentAnimation,
   createSilhouetteFlockAnimation,
@@ -31,6 +32,18 @@ export interface LabEntry {
  * inside each group, so nothing depends on module load order.
  */
 export const REGISTRY: LabEntry[] = [
+  {
+    id: 'pixel-sunrise',
+    section: 'hero',
+    name: 'Pixel Sunrise',
+    tag: '8-bit',
+    blurb:
+      'Ordered-dither sun rising over a pixel skyline of Pittsburgh or Portland. The whole scene steps on a low sim FPS locked to the pixel grid, so pixels never slide. Glitch scene: a cheery daytime city that flash-cuts to a neon night where the Bracket Bear logo hangs where the sun was.',
+    create: (initialControls) =>
+      createPixelSunriseAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
   {
     id: 'silhouette-flock',
     section: 'hero',

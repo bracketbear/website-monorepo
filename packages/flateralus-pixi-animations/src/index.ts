@@ -3,6 +3,7 @@ export * from './code-flow';
 export * from './curious-particle-network';
 export * from './halftone-tide';
 export * from './heat-haze';
+export * from './pixel-sunrise';
 export * from './rd-vat';
 export * from './signal-alignment';
 export * from './silhouette-flock';
