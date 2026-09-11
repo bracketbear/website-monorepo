@@ -97,14 +97,20 @@ Every task below follows this recipe. It is written once here rather than repeat
 ## Progress
 
 Done and verified in the Lab: `signal-alignment`, `led-matrix`, `schematic-lens`, `portal-mark`,
-`visionary-eye`, `goo-lamp`, `kaleido`, `logo-resolve`. Eight of the selected 28.
+`visionary-eye`, `goo-lamp`, `kaleido`, `logo-resolve`, `dmt-tunnel`, `interference-field`,
+`jelly-tank`. Eleven of the selected 28.
 
 Blocked pending a decision: `contour-hood`, `contour-pgh` — see below.
 
 Remaining: `sdf-forge`, `shatter-glass`, `ink-dissolve`, `holo-mark`, `crt-phosphor`,
-`slime-mold`, `jelly-tank`, `scan-terrain`, `dmt-tunnel`, `interference-field`, `caustics-pool`,
-`foil-statement`, `street-pulse`, `atomic-age`, `energy-body`, `block-party`, `sun-arc`,
-`rust-machine`.
+`slime-mold`, `scan-terrain`, `caustics-pool`, `foil-statement`, `street-pulse`, `atomic-age`,
+`energy-body`, `block-party`, `sun-arc`, `rust-machine`.
+
+**Extraction gotcha.** Several prototype shaders are built by concatenation rather than as one
+literal, in the shape `` `...${''}` + HELP + `...` ``. Pulling the text between the first and last
+backtick captures that splice as GLSL and the shader fails to compile. Extract the helper block
+separately and substitute it. `jelly-tank` hit this; check for it before assuming a port is
+verbatim.
 
 Three harness families now exist and are proven, so each remaining shader is mostly its manifest,
 its fragment source and its own uniforms: the plain mask harness (`heat-haze`, `led-matrix`,

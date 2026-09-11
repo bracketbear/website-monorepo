@@ -6,6 +6,7 @@ export * from './goo-lamp';
 export * from './halftone-tide';
 export * from './heat-haze';
 export * from './interference-field';
+export * from './jelly-tank';
 export * from './kaleido';
 export * from './led-matrix';
 export * from './logo-particle-sphere';
