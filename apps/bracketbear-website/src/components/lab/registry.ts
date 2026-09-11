@@ -1,7 +1,9 @@
 import type { PixiAnimation } from '@bracketbear/flateralus-pixi';
 import type { AnimationManifest } from '@bracketbear/flateralus';
 import {
+  createGooLampAnimation,
   createHalftoneTideAnimation,
+  createKaleidoAnimation,
   createHeatHazeAnimation,
   createLedMatrixAnimation,
   createPortalMarkAnimation,
@@ -153,6 +155,30 @@ export const REGISTRY: LabEntry[] = [
       'The site’s halftone pattern, alive: dot radii breathe in slow traveling waves. The cursor inflates the field; clicks drop ripples.',
     create: (initialControls) =>
       createHalftoneTideAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'goo-lamp',
+    section: 'toys',
+    name: 'Goo Lamp',
+    tag: 'glsl toy',
+    blurb:
+      'A metaball field — every pixel sums the inverse-square influence of a dozen orbiting blobs, so they merge, pinch, and split as they pass. Interactive: the cursor is a blob of its own; click to squeeze the whole field for a beat. Ambient: a ghost blob wanders the tank instead.',
+    create: (initialControls) =>
+      createGooLampAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'kaleido',
+    section: 'toys',
+    name: 'Kaleido',
+    tag: 'glsl toy',
+    blurb:
+      'Domain-warped noise folded through an n-way mirror. Interactive: the cursor steers the rotation and its distance from center sets the warp depth; click kicks the zoom and shifts the pattern to a new region of the field. Ambient: it turns and breathes on its own.',
+    create: (initialControls) =>
+      createKaleidoAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

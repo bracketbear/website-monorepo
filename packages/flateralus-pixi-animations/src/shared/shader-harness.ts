@@ -80,7 +80,7 @@ export interface ShaderContext {
   gl: WebGL2RenderingContext;
   program: WebGLProgram;
   locs: Record<string, WebGLUniformLocation | null>;
-  texture: WebGLTexture;
+  texture: WebGLTexture | null;
   texWidth: number;
   texHeight: number;
 }
@@ -128,7 +128,8 @@ function compile(
 export function createShaderContext(
   frag: string,
   extraUniforms: readonly string[],
-  maskCanvas: HTMLCanvasElement,
+  /** Null for effects that sample no mask, such as the toys. */
+  maskCanvas: HTMLCanvasElement | null,
   commonUniforms: readonly string[] = COMMON_UNIFORMS
 ): ShaderContext | null {
   const canvas = document.createElement('canvas');
@@ -161,23 +162,26 @@ export function createShaderContext(
     locs[name] = gl.getUniformLocation(program, name);
   }
 
-  const texture = gl.createTexture()!;
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    maskCanvas
-  );
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.uniform1i(locs.uTex!, 0);
+  let texture: WebGLTexture | null = null;
+  if (maskCanvas) {
+    texture = gl.createTexture()!;
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      maskCanvas
+    );
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    if (locs.uTex) gl.uniform1i(locs.uTex, 0);
+  }
 
   return {
     canvas,
@@ -185,15 +189,15 @@ export function createShaderContext(
     program,
     locs,
     texture,
-    texWidth: maskCanvas.width,
-    texHeight: maskCanvas.height,
+    texWidth: maskCanvas?.width ?? 1,
+    texHeight: maskCanvas?.height ?? 1,
   };
 }
 
 /** Delete every GL object the context owns. */
 export function destroyShaderContext(ctx: ShaderContext): void {
   const { gl } = ctx;
-  gl.deleteTexture(ctx.texture);
+  if (ctx.texture) gl.deleteTexture(ctx.texture);
   gl.deleteProgram(ctx.program);
   gl.getExtension('WEBGL_lose_context')?.loseContext();
 }

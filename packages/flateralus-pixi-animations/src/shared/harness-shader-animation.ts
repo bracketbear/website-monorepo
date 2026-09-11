@@ -46,6 +46,9 @@ export abstract class HarnessShaderAnimation<
    */
   protected abstract mask(): HTMLCanvasElement | null;
 
+  /** False for effects with no mask texture at all, such as the toys. */
+  protected readonly needsMask: boolean = true;
+
   /** Push the effect's own uniforms. Called every frame, after the common ones. */
   protected abstract setUniforms(
     gl: WebGL2RenderingContext,
@@ -78,7 +81,7 @@ export abstract class HarnessShaderAnimation<
 
     if (!this.ctx) {
       const mask = this.mask();
-      if (!mask) return;
+      if (this.needsMask && !mask) return;
       const ctx = createShaderContext(
         this.frag,
         this.extraUniforms,
@@ -137,6 +140,7 @@ export abstract class HarnessShaderAnimation<
     setColor(gl, locs.uCream!, PAL.cream);
     // Declared only by the SDF prelude; harmless where absent.
     if (locs.uTexAR) gl.uniform1f(locs.uTexAR, ctx.texWidth / ctx.texHeight);
+    if (locs.uDeep) setColor(gl, locs.uDeep, PAL.deep);
 
     this.setUniforms(gl, locs, ctx, controls, dt, app);
 
