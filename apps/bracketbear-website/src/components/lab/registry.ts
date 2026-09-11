@@ -4,6 +4,8 @@ import {
   createHalftoneTideAnimation,
   createHeatHazeAnimation,
   createRdVatAnimation,
+  createSignalAlignmentAnimation,
+  createSilhouetteFlockAnimation,
 } from '@bracketbear/flateralus-pixi-animations';
 import type { SectionKey } from './sections';
 
@@ -30,6 +32,18 @@ export interface LabEntry {
  */
 export const REGISTRY: LabEntry[] = [
   {
+    id: 'silhouette-flock',
+    section: 'hero',
+    name: 'Silhouette Flock',
+    tag: 'gen',
+    blurb:
+      'Swifts crossing the sunset, DKC-silhouette style: scythe-winged boids that burst-flap then glide, never slowing down. Fully ambient; the cursor reads as a hawk and scatters them; click to release more.',
+    create: (initialControls) =>
+      createSilhouetteFlockAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
     id: 'heat-haze',
     section: 'hero',
     name: 'Heat Haze',
@@ -50,6 +64,18 @@ export const REGISTRY: LabEntry[] = [
       'The mark dropped into a Gray-Scott reaction–diffusion vat — two chemicals feed and kill each other per pixel in a live feedback buffer, so the seed erodes, blooms, and regrows with real persistent state. Cursor stirs the chemistry; click drops a fresh blob.',
     create: (initialControls) =>
       createRdVatAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'signal-alignment',
+    section: 'intro',
+    name: 'Signal Alignment',
+    tag: 'flow',
+    blurb:
+      'A flow field of ink dashes: noise on one side of the threshold, ordered lanes on the other. The cursor stirs the field.',
+    create: (initialControls) =>
+      createSignalAlignmentAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

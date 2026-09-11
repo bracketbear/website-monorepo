@@ -4,6 +4,8 @@ export * from './curious-particle-network';
 export * from './halftone-tide';
 export * from './heat-haze';
 export * from './rd-vat';
+export * from './signal-alignment';
+export * from './silhouette-flock';
 export * from './logo-particle-sphere';
 export * from './particle-sphere';
 export * from './particle-wave';
