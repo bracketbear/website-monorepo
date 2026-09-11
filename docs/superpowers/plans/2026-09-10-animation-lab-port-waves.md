@@ -97,14 +97,27 @@ Every task below follows this recipe. It is written once here rather than repeat
 ## Progress
 
 Done and verified in the Lab: `signal-alignment`, `led-matrix`, `schematic-lens`, `portal-mark`,
-`visionary-eye`, `goo-lamp`, `kaleido`, `logo-resolve`, `dmt-tunnel`, `interference-field`,
-`jelly-tank`. Eleven of the selected 28.
+`visionary-eye`, `sdf-forge`, `logo-resolve`, `goo-lamp`, `kaleido`, `dmt-tunnel`,
+`interference-field`, `jelly-tank`, `crt-phosphor`. Thirteen of the selected 28, plus
+`signal-alignment` from the earlier plan — fourteen in total.
 
 Blocked pending a decision: `contour-hood`, `contour-pgh` — see below.
 
-Remaining: `sdf-forge`, `shatter-glass`, `ink-dissolve`, `holo-mark`, `crt-phosphor`,
-`slime-mold`, `scan-terrain`, `caustics-pool`, `foil-statement`, `street-pulse`, `atomic-age`,
-`energy-body`, `block-party`, `sun-arc`, `rust-machine`.
+Remaining, with the size of each job:
+
+| Animation                                                                             | Source                | Size and shape                                                                                                                     |
+| ------------------------------------------------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `street-pulse`, `atomic-age`, `energy-body`, `block-party`, `sun-arc`, `rust-machine` | `lab-animations-4.js` | six animations in 1385 lines, sharing the baked OSM, star and solar data. Move `bb-city-data.js` into the repo first.              |
+| `caustics-pool`                                                                       | `lab-shaders-16.js`   | 739 lines. Wave-equation ping-pong plus a CPU pool-toy simulation with its own physics. The largest single job left.               |
+| `ink-dissolve`                                                                        | `lab-shaders-11.js`   | 500 lines. Navier-Stokes with advection, vorticity and a Jacobi pressure solve, so more passes than the two-program ping-pong.     |
+| `shatter-glass`                                                                       | `lab-shaders-7.js`    | 454 lines. Click-driven Voronoi crack networks; watch its teardown.                                                                |
+| `foil-statement`                                                                      | `lab-animations-7.js` | 422 lines of scene graph. Note this file's `sel` helper takes its arguments in a different order than the others.                  |
+| `slime-mold`                                                                          | `lab-shaders-8.js`    | 401 lines across five GL programs, including a vertex-shader deposit pass.                                                         |
+| `holo-mark`                                                                           | `lab-shaders-12.js`   | 378 lines. Builds a logo SDF at load and uses analytic normals.                                                                    |
+| `scan-terrain`                                                                        | `lab-shaders-13.js`   | 260 lines. The only vertex-shader particle system; the harness hardcodes its vertex shader, so it needs a hook or its own program. |
+
+Four harness families are now proven: the plain mask harness, the signed-distance-field harness,
+the mask-less toys harness, and the ping-pong feedback buffers in `shared/ping-pong.ts`.
 
 **Extraction gotcha.** Several prototype shaders are built by concatenation rather than as one
 literal, in the shape `` `...${''}` + HELP + `...` ``. Pulling the text between the first and last
