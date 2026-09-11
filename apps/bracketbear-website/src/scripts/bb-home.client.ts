@@ -262,7 +262,7 @@ import * as filters from 'pixi-filters';
 // 72-BPM lub-dub drives scale-pulse, color flash, glitch, RGB split,
 // and shockwaves that fire OUTSIDE the mask through the chromatic chain.
 // ============================================================
-(function () {
+(async function () {
   const cv = document.getElementById('stage') as HTMLCanvasElement | null;
   if (!cv) return;
   const stageEl = cv.parentElement as HTMLElement;
@@ -300,8 +300,9 @@ import * as filters from 'pixi-filters';
   // Cap at 2× — retina-sharp without 3-4× GPU cost. The metaball pipeline
   // (blur + threshold + masked composite) dominates render time.
   const renderResolution = Math.min(window.devicePixelRatio || 1, 2);
-  const app = new PIXI.Application({
-    view: cv,
+  const app = new PIXI.Application();
+  await app.init({
+    canvas: cv,
     resizeTo: fieldEl,
     backgroundAlpha: 0,
     antialias: true,
@@ -355,9 +356,30 @@ import * as filters from 'pixi-filters';
   // ---- Make displacement noise texture (SVG fractalNoise) ----
   const NOISE_SVG =
     '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><filter id="t"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="3"/></filter><rect width="512" height="512" filter="url(%23t)"/></svg>';
-  const noiseTex = PIXI.Texture.from(
-    'data:image/svg+xml;utf8,' + encodeURIComponent(NOISE_SVG)
-  );
+  // PIXI v8 removed synchronous URL loading from Texture.from — it only
+  // wraps an already-decoded source. Rasterize the SVG ourselves so the
+  // texture is a canvas, same as maskTex and gradTex above.
+  async function makeNoiseTexture() {
+    const url = 'data:image/svg+xml;utf8,' + encodeURIComponent(NOISE_SVG);
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = url;
+    try {
+      await img.decode();
+    } catch {
+      await new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      });
+    }
+    const off = document.createElement('canvas');
+    off.width = 512;
+    off.height = 512;
+    const c = off.getContext('2d')!;
+    if (img.width && img.height) c.drawImage(img, 0, 0, 512, 512);
+    return PIXI.Texture.from(off);
+  }
+  const noiseTex = await makeNoiseTexture();
 
   // ---- 90s/Memphis decorative shapes — ALT-DIMENSION palette ----
   // Electric neons against the void bg. Deliberately off-brand: this is
@@ -384,21 +406,22 @@ import * as filters from 'pixi-filters';
     const g = new PIXI.Graphics();
     // Beefier strokes — line shapes read with more confidence and weight
     const lw = Math.max(3.5, size * 0.18);
+    // PIXI v8: build the path first, then apply fill()/stroke().
+    const fill = { color, alpha: 1 };
+    const stroke = { width: lw, color, alpha: 1 };
     switch (kind) {
       case 'tri':
-        g.beginFill(color, 1);
         g.moveTo(0, -size * 0.7);
         g.lineTo(size * 0.6, size * 0.45);
         g.lineTo(-size * 0.6, size * 0.45);
         g.closePath();
-        g.endFill();
+        g.fill(fill);
         break;
       case 'tri-out':
-        // drawPolygon auto-closes with mitered joins so the apex stays
-        // pointy (vs moveTo/lineTo/lineTo back to start, which leaves
-        // flat butt-caps meeting at the top vertex).
-        g.lineStyle(lw, color, 1);
-        g.drawPolygon([
+        // poly() auto-closes with mitered joins so the apex stays pointy
+        // (vs moveTo/lineTo/lineTo back to start, which leaves flat
+        // butt-caps meeting at the top vertex).
+        g.poly([
           0,
           -size * 0.7,
           size * 0.6,
@@ -406,24 +429,22 @@ import * as filters from 'pixi-filters';
           -size * 0.6,
           size * 0.45,
         ]);
+        g.stroke(stroke);
         break;
       case 'circle':
-        g.beginFill(color, 1);
-        g.drawCircle(0, 0, size * 0.55);
-        g.endFill();
+        g.circle(0, 0, size * 0.55);
+        g.fill(fill);
         break;
       case 'circle-out':
-        g.lineStyle(lw, color, 1);
-        g.drawCircle(0, 0, size * 0.55);
+        g.circle(0, 0, size * 0.55);
+        g.stroke(stroke);
         break;
       case 'plus':
-        g.beginFill(color, 1);
-        g.drawRect(-size * 0.13, -size * 0.55, size * 0.26, size * 1.1);
-        g.drawRect(-size * 0.55, -size * 0.13, size * 1.1, size * 0.26);
-        g.endFill();
+        g.rect(-size * 0.13, -size * 0.55, size * 0.26, size * 1.1);
+        g.rect(-size * 0.55, -size * 0.13, size * 1.1, size * 0.26);
+        g.fill(fill);
         break;
       case 'squiggle': {
-        g.lineStyle(lw, color, 1);
         const steps = 14;
         for (let i = 0; i <= steps; i++) {
           const x = (i / steps - 0.5) * size * 1.7;
@@ -431,10 +452,10 @@ import * as filters from 'pixi-filters';
           if (i === 0) g.moveTo(x, y);
           else g.lineTo(x, y);
         }
+        g.stroke(stroke);
         break;
       }
       case 'zigzag': {
-        g.lineStyle(lw, color, 1);
         const pts = 5;
         for (let i = 0; i < pts; i++) {
           const x = (i / (pts - 1) - 0.5) * size * 1.7;
@@ -442,29 +463,29 @@ import * as filters from 'pixi-filters';
           if (i === 0) g.moveTo(x, y);
           else g.lineTo(x, y);
         }
+        g.stroke(stroke);
         break;
       }
       case 'half':
-        g.beginFill(color, 1);
         g.arc(0, 0, size * 0.55, Math.PI, 0, false);
         g.lineTo(-size * 0.55, 0);
-        g.endFill();
+        g.closePath();
+        g.fill(fill);
         break;
       case 'cross':
-        g.lineStyle(lw, color, 1);
         g.moveTo(-size * 0.55, -size * 0.55);
         g.lineTo(size * 0.55, size * 0.55);
         g.moveTo(size * 0.55, -size * 0.55);
         g.lineTo(-size * 0.55, size * 0.55);
+        g.stroke(stroke);
         break;
       case 'dot':
-        g.beginFill(color, 1);
-        g.drawCircle(0, 0, size * 0.22);
-        g.endFill();
+        g.circle(0, 0, size * 0.22);
+        g.fill(fill);
         break;
       case 'rings':
-        g.lineStyle(Math.max(2.2, size * 0.1), color, 1);
-        for (let r = 1; r <= 3; r++) g.drawCircle(0, 0, size * 0.55 * (r / 3));
+        for (let r = 1; r <= 3; r++) g.circle(0, 0, size * 0.55 * (r / 3));
+        g.stroke({ width: Math.max(2.2, size * 0.1), color, alpha: 1 });
         break;
     }
     return g;
@@ -530,12 +551,12 @@ import * as filters from 'pixi-filters';
   bbShadowSprite.anchor.set(0.5);
   bbShadowSprite.tint = 0x110a08;
   bbShadowSprite.alpha = 0.42;
-  bbShadowSprite.filters = [new PIXI.BlurFilter(9, 2)];
+  bbShadowSprite.filters = [new PIXI.BlurFilter({ strength: 9, quality: 2 })];
   app.stage.addChild(bbShadowSprite);
 
   // Drop shadows for fireflies — drawn behind their cutouts
   const fireflyShadowG = new PIXI.Graphics();
-  fireflyShadowG.filters = [new PIXI.BlurFilter(5, 2)];
+  fireflyShadowG.filters = [new PIXI.BlurFilter({ strength: 5, quality: 2 })];
   app.stage.addChild(fireflyShadowG);
 
   const heartContainer = new PIXI.Container();
@@ -927,7 +948,11 @@ import * as filters from 'pixi-filters';
     // Render off-stage fluidScene → fluidRT (shared by BB + fireflies)
     if (fluidRT) {
       fluidScene.renderable = true;
-      app.renderer.render(fluidScene, { renderTexture: fluidRT, clear: true });
+      app.renderer.render({
+        container: fluidScene,
+        target: fluidRT,
+        clear: true,
+      });
       fluidScene.renderable = false;
     }
 
@@ -1056,16 +1081,14 @@ import * as filters from 'pixi-filters';
           ffAlpha = t * t * (3 - 2 * t); // smoothstep
         }
         if (ffAlpha <= 0) continue;
-        fireflyShadowG.beginFill(0x110a08, 0.42 * ffAlpha);
-        fireflyShadowG.drawCircle(cx + 5, cy + 4, ff.radius * 1.05);
-        fireflyShadowG.endFill();
-        fireflyG.beginTextureFill({
+        fireflyShadowG.circle(cx + 5, cy + 4, ff.radius * 1.05);
+        fireflyShadowG.fill({ color: 0x110a08, alpha: 0.42 * ffAlpha });
+        fireflyG.circle(cx, cy, ff.radius);
+        fireflyG.fill({
           texture: fluidRT,
           matrix: ffMat,
           alpha: ffAlpha,
         });
-        fireflyG.drawCircle(cx, cy, ff.radius);
-        fireflyG.endFill();
       }
     }
 
