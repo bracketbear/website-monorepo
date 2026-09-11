@@ -192,7 +192,6 @@ const DISPLAY_FS = `#version 300 es
     precision highp float;
     in vec2 vUV; out vec4 fragColor;
     uniform sampler2D uH;
-    uniform sampler2D uLogo;
     uniform sampler2D uLock;
     uniform float uTime, uDepth, uCaust, uBump, uAsp;
     uniform vec2 uSim;
@@ -222,14 +221,8 @@ const DISPLAY_FS = `#version 300 es
       float T = texture(uH, uv + vec2(0.0, px.y)).x;
       return vec2(Rv - L, T - B) * 0.5;
     }
-    vec2 swell(vec2 uv) {
-      // faint ambient micro-swell so the surface is never dead flat
-      return 0.0045 * vec2(
-        sin(uv.y * 41.0 + uTime * 1.25) + 0.7 * sin(uv.x * 23.0 - uTime * 0.85) + 0.5 * sin((uv.x + uv.y) * 63.0 + uTime * 1.7),
-        cos(uv.x * 33.0 + uTime * 1.05) + 0.7 * cos(uv.y * 19.0 + uTime * 0.7) + 0.5 * cos((uv.x - uv.y) * 57.0 - uTime * 1.5));
-    }
     vec2 refrUV(vec2 uv) {
-      vec2 g = gradH(uv) * uBump + swell(uv);
+      vec2 g = gradH(uv) * uBump;
       vec3 n = normalize(vec3(-g, 1.0));
       vec3 r = refract(vec3(0.0, 0.0, -1.0), n, 0.7519);
       return uv + r.xy * (uDepth / max(0.35, -r.z));
@@ -314,29 +307,60 @@ const DISPLAY_FS = `#version 300 es
         col *= 0.84 + 0.16 * max(smoothstep(0.0, 0.07, seam), cap);
         col = mix(col, white, cap);
       } else if (T.w < 1.5) {
-        // inner tube: torus cross-section, decals, valve nub
-        float rr = abs(r - 0.63) / 0.37;
+        // doughnut float: frosted torus with a wavy drip line and sprinkles.
+        // sr is signed across the tube (-1 inner edge, +1 outer) and z is the
+        // height on that cross-section, so the frosting is just "high enough".
+        float sr = (r - 0.63) / 0.37;
+        float rr = abs(sr);
         a = smoothstep(1.0, 0.9, rr);
         if (a <= 0.0) return vec4(0.0);
         float z = sqrt(max(0.0, 1.0 - min(rr * rr, 1.0)));
         vec2 dir = p / max(r, 1e-4);
-        n = normalize(vec3(dir * (r - 0.63) / 0.37, z + 0.45));
-        col = uToyA;
-        // four flat printed decals around the ring — straight, not bent to the arc
-        for (int k = 0; k < 4; k++) {
-          float a3 = 1.5707963 * float(k);
-          vec2 rad2 = vec2(cos(a3), sin(a3));
-          vec2 tang = vec2(-rad2.y, rad2.x);
-          vec2 lp = q - rad2 * 0.63;
-          vec2 duv = vec2(dot(lp, tang), dot(lp, rad2));
-          vec2 luv2 = duv / vec2(0.46, 0.287) + 0.5;
-          if (luv2.x > 0.0 && luv2.x < 1.0 && luv2.y > 0.0 && luv2.y < 1.0) {
-            float pm = texture(uLogo, vec2(luv2.x, 1.0 - luv2.y)).a;
-            col = mix(col, vec3(1.0, 0.953, 0.89), pm * 0.95);
-          }
-        }
+        n = normalize(vec3(dir * sr, z + 0.45));
+        // Features live in q, the spin-rotated frame, so they turn with the toy.
+        float th = atan(q.y, q.x);
+        // frosting covers the top of the cross-section down to a drip line
+        // that wobbles around the ring
+        float drip = 0.58 + 0.155 * sin(th * 7.0) + 0.075 * sin(th * 13.0 + 1.7);
+        float ice = smoothstep(drip - 0.05, drip + 0.05, z);
+        vec3 dough = vec3(0.98, 0.82, 0.44);
+        vec3 frost = mix(vec3(0.93, 0.17, 0.56), uToyA, 0.18);
+        col = mix(dough, frost, ice);
+        // sprinkles: one capsule per cell of a grid wrapped around the ring.
+        // The column index is taken mod the cell count so the seam at +/-pi
+        // hashes the same from both sides.
+        vec2 suv = vec2(th * (22.0 / 6.2831853), sr * 3.2);
+        vec2 cid = vec2(mod(floor(suv.x), 22.0), floor(suv.y));
+        float h1 = hash21(cid + 3.7);
+        float h2 = hash21(cid + 11.3);
+        float h3 = hash21(cid + 27.1);
+        vec2 lp = fract(suv) - 0.5 - 0.30 * (vec2(h1, h2) - 0.5);
+        lp.y *= 0.55;
+        vec2 sd2 = vec2(cos(h3 * 6.2831853), sin(h3 * 6.2831853));
+        float tt = clamp(dot(lp, sd2), -0.15, 0.15);
+        float sprk = length(lp - sd2 * tt) - 0.052;
+        vec3 scol = h1 < 0.22 ? vec3(1.0, 0.98, 0.94)
+                  : h1 < 0.42 ? vec3(1.0, 0.86, 0.20)
+                  : h1 < 0.60 ? vec3(0.25, 0.80, 0.95)
+                  : h1 < 0.78 ? vec3(0.35, 0.85, 0.40)
+                              : vec3(1.0, 0.45, 0.30);
+        float smask = (1.0 - smoothstep(-0.012, 0.012, sprk)) * ice * step(h2, 0.82);
+        col = mix(col, scol, smask);
+        // Sprinkles sit proud of the icing. Tilt the normal off the capsule's
+        // own distance field so each one catches the sun as a little ridge.
+        // suv runs (tangential, radial), so the bump has to come back through
+        // that basis and then out of the spin frame to meet the shading normal.
+        float gd = length(lp - sd2 * tt);
+        vec2 gdir = gd > 1e-5 ? (lp - sd2 * tt) / gd : vec2(0.0);
+        vec2 bq = gdir * clamp(gd / 0.052, 0.0, 1.0) * smask * 0.9;
+        bq.y /= 0.55;                       // undo the cell squash so it reads round
+        vec2 dq = q / max(r, 1e-4);
+        n = normalize(n + vec3(
+          transpose(rot) * (vec2(-dq.y, dq.x) * bq.x + dq * bq.y), 0.0));
+        // The welded seam, just inside both silhouettes — the line where two
+        // sheets of vinyl are joined. Cheapest single cue that says inflatable.
+        col *= 1.0 - 0.16 * exp(-pow((rr - 0.93) / 0.035, 2.0));
         col *= 0.86 + 0.14 * z;
-        col = mix(col, vec3(0.82, 0.80, 0.77), smoothstep(0.10, 0.05, length(q - vec2(0.0, 0.63))));
       } else {
         // rubber duck, top-down: body + head + beak + tail as blown-vinyl lobes
         vec2 bc = vec2(-0.16, 0.0);  vec2 brd = vec2(0.82, 0.62);
@@ -373,12 +397,21 @@ const DISPLAY_FS = `#version 300 es
       float dif = max(dot(n, sunDir), 0.0);
       vec3 hv = normalize(sunDir + vec3(0.0, 0.0, 1.0));
       float spec = pow(max(dot(n, hv), 0.0), 70.0);
-      col = col * (0.42 + 0.68 * dif) + uSun * spec * 0.8;
+      // Vinyl, not hard plastic. An inflatable reads as inflatable because the
+      // highlight is broad and soft with a small blown-out core sitting in it,
+      // and because the skin keeps catching light right out to the silhouette
+      // where it curves away. Both toys and doughnut are the same material.
+      float sheen = pow(max(dot(n, hv), 0.0), 7.0);
+      float rim = pow(1.0 - clamp(n.z, 0.0, 1.0), 2.5);
+      col = col * (0.42 + 0.68 * dif)
+          + uSun * spec * 0.85
+          + uSun * sheen * 0.15
+          + uSun * rim * 0.18;
       return vec4(col, a);
     }
     void main() {
       vec2 uv = vUV;
-      vec2 g = gradH(uv) * uBump + swell(uv);
+      vec2 g = gradH(uv) * uBump;
       vec3 n = normalize(vec3(-g, 1.0));
       // refraction map + its Jacobian (3 taps)
       float e = 1.5 / uSim.x;
@@ -603,7 +636,6 @@ const STEP_UNIFORMS = ['uH', 'uC2', 'uDamp', 'uWind', 'uTime', 'uSim'] as const;
 const SPLAT_UNIFORMS = ['uC', 'uAmp', 'uRad', 'uSim'] as const;
 const DISP_UNIFORMS = [
   'uH',
-  'uLogo',
   'uLock',
   'uTime',
   'uDepth',
@@ -718,7 +750,6 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
   private stepL: Locs = {};
   private splatL: Locs = {};
   private dispL: Locs = {};
-  private logoTx: WebGLTexture | null = null;
   private lockTx: WebGLTexture | null = null;
   private failed = false;
 
@@ -850,7 +881,6 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
     this.stepL = locsOf(gl, stepProg, STEP_UNIFORMS);
     this.splatL = locsOf(gl, splatProg, SPLAT_UNIFORMS);
     this.dispL = locsOf(gl, dispProg, DISP_UNIFORMS);
-    this.logoTx = mkTexFrom(gl, logoMask());
     this.lockTx = mkTexFrom(gl, buildLockupCanvas());
     return true;
   }
@@ -1114,7 +1144,7 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
               const f = 0.02 / Math.max(d, 0.05);
               T.vx += ((dx / Math.max(d, 1e-4)) * f) / asp;
               T.vy += (dy / Math.max(d, 1e-4)) * f;
-              T.vs += (Math.random() - 0.5) * 4;
+              T.vs += (Math.random() - 0.5) * 2.5;
             }
           }
       }
@@ -1278,7 +1308,11 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
           T.vy = -Math.abs(T.vy) * 0.55;
         }
         T.spin += T.vs * dt;
-        T.vs *= Math.exp(-dt * 0.45);
+        // Water has real rotational drag. With wind pushing the toys around
+        // constantly they collide far more often than they used to, and each
+        // hit scrubs in spin — at the old 0.45 it outlived the collision that
+        // caused it and everything turned steadily.
+        T.vs *= Math.exp(-dt * 1.2);
       }
       // Ball rolls: angular velocity from translation (contact-point
       // rolling) plus its own z spin, integrated into the orientation.
@@ -1324,8 +1358,8 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
               b.vx += (imp * nx) / asp;
               b.vy += imp * ny;
               const rvt = (b.vx - a.vx) * asp * -ny + (b.vy - a.vy) * nx;
-              a.vs += (rvt / a.r) * 0.22;
-              b.vs += (rvt / b.r) * 0.22;
+              a.vs += (rvt / a.r) * 0.1;
+              b.vs += (rvt / b.r) * 0.1;
             }
           }
         }
@@ -1337,10 +1371,8 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
     gl.viewport(0, 0, W, H);
     gl.useProgram(this.dispProg);
     bindTex(0, this.hTex[this.hi]);
-    bindTex(1, this.logoTx);
     bindTex(2, this.lockTx);
     gl.uniform1i(this.dispL.uH!, 0);
-    gl.uniform1i(this.dispL.uLogo!, 1);
     gl.uniform1i(this.dispL.uLock!, 2);
     gl.uniform1f(this.dispL.uTime!, this.time);
     gl.uniform1f(this.dispL.uDepth!, controls.depth);
@@ -1379,7 +1411,6 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
     if (gl) {
       for (const t of this.hTex) if (t) gl.deleteTexture(t);
       for (const f of this.hFb) if (f) gl.deleteFramebuffer(f);
-      if (this.logoTx) gl.deleteTexture(this.logoTx);
       if (this.lockTx) gl.deleteTexture(this.lockTx);
       if (this.stepProg) gl.deleteProgram(this.stepProg);
       if (this.splatProg) gl.deleteProgram(this.splatProg);
@@ -1402,7 +1433,6 @@ export class CausticsPoolAnimation extends PixiAnimation<typeof MANIFEST> {
     this.stepL = {};
     this.splatL = {};
     this.dispL = {};
-    this.logoTx = null;
     this.lockTx = null;
     this.failed = false;
     this.sprite = null;
