@@ -415,6 +415,9 @@ describe('blink state machine', () => {
     expect(lidCoverage(s)).toBe(0);
   });
 
+  // NOTE: this walk is 0.29s at dt=1/60 = 17 steps, and the opening phase ends
+  // at 11/60 = 0.18333 against OPEN_TIME = 0.18 — true by 3ms. If this ever
+  // goes red, widen the margin here; do NOT move OPEN_TIME to suit it.
   it('refuses to re-blink inside the refractory window', () => {
     // Hold the fraction pinned high the whole time: a chattering measurement
     // must not produce a chattering lid.
@@ -582,10 +585,20 @@ describe('gaze frame', () => {
     expect(Math.hypot(lx, ly)).toBeLessThanOrEqual(1 + 1e-12);
   });
 
-  it('shears gravity as the eye looks aside', () => {
-    // Looking hard left, screen-down is no longer purely local-down.
-    const [lx] = worldToLocal(0, 1, 0.8, 0);
-    expect(Math.abs(lx)).toBeGreaterThan(0);
+  it('foreshortens gravity as the eye looks up', () => {
+    // tx = cross([0,1,0], gd) has y-component a2*b0 - a0*b2 = 0 identically, so
+    // tx[1] is always 0 and a world-down vector can never pick up a local-x
+    // component. Under this basis gravity foreshortens; it never shears.
+    const [lx, ly] = worldToLocal(0, 1, 0, 0.8);
+    expect(lx).toBeCloseTo(0, 12);
+    expect(ly).toBeCloseTo(0.8418, 3);
+    expect(ly).toBeLessThan(1);
+  });
+
+  it('foreshortens a sideways vector as the eye looks aside', () => {
+    const [lx] = worldToLocal(1, 0, 0.8, 0);
+    expect(lx).toBeCloseTo(0.8423, 3);
+    expect(lx).toBeLessThan(1);
   });
 });
 ```
@@ -642,7 +655,7 @@ export function worldToLocal(
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run packages/flateralus-pixi-animations/src/visionary-eye/physics.test.ts`
-Expected: PASS, 23 tests.
+Expected: PASS, 24 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -812,6 +825,8 @@ The first task with a visible result. It ships with a debug view that renders `h
 **Interfaces:**
 
 - Consumes: `GRID`, `STEP`, `KAPPA`, `MOBILITY`, `EVAP`, `GRAVITY`, `DELTA`, `DOMAIN` from `physics.ts`.
+- Consumes: `worldToLocal` from Task 4 — gravity reaches `advance()` as `worldToLocal(0, 1, this.gaze[0], this.gaze[1])`, never as a world vector.
+- Consumes: the `simulate()` hook from Task 5 — `VisionaryEyeAnimation` overrides it, and every sim pass runs from there rather than from `setUniforms`.
 - Produces (display shader, added to `extraUniforms` in `visionaryEyeAnimation.ts` and declared at the top of `EYE_GLOBE`): `uniform sampler2D uFilm`, `uniform float uFilmN` (= `GRID`), `uniform float uDelta`, `uniform float uShowFilm`, `uniform float uFilmOK`. Tasks 10-12 add `uFilmSlope`, `uCaustic`, `uIrisDepth`, `uViewLocal`, `uQuiet` the same way. The film texture binds to **unit 3** — unit 0 is the mask, per Global Constraints.
 - Produces: `class FilmSim` with `static create(gl): FilmSim | null`, `advance(dt: number, gravityLocal: [number, number]): void`, `prime(seed: number): void`, `bindField(unit: number): void`, `readonly ok: boolean`, `destroy(): void`.
 
