@@ -200,3 +200,41 @@ export function lidCoverage(s: BlinkState): number {
 export function isWiping(s: BlinkState): boolean {
   return s.phase !== 'open';
 }
+
+type V3 = [number, number, number];
+
+function norm3(v: V3): V3 {
+  const l = Math.hypot(v[0], v[1], v[2]) || 1;
+  return [v[0] / l, v[1] / l, v[2] / l];
+}
+
+function cross3(a: V3, b: V3): V3 {
+  return [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ];
+}
+
+/**
+ * The corneal-local basis, constructed exactly as the display shader does at
+ * sdf-harness.ts:280-281. If these two drift apart the film drains sideways,
+ * so the shader's version is the specification and this mirrors it.
+ */
+export function gazeFrame(gx: number, gy: number): { tx: V3; ty: V3; gd: V3 } {
+  const gd = norm3([gx * 0.8, gy * 0.8, 1]);
+  const tx = norm3(cross3([0, 1, 0], gd));
+  const ty = cross3(gd, tx);
+  return { tx, ty, gd };
+}
+
+/** Project a world-plane direction onto the corneal tangent basis. */
+export function worldToLocal(
+  wx: number,
+  wy: number,
+  gx: number,
+  gy: number
+): [number, number] {
+  const { tx, ty } = gazeFrame(gx, gy);
+  return [wx * tx[0] + wy * tx[1], wx * ty[0] + wy * ty[1]];
+}

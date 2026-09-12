@@ -18,6 +18,7 @@ import {
   breakupFraction,
   clampMobility,
   efoldSeconds,
+  gazeFrame,
   isWiping,
   lidCoverage,
   mobilityLimit,
@@ -25,6 +26,7 @@ import {
   patchWavelength,
   stepBlink,
   tileInsideCornea,
+  worldToLocal,
   type BlinkState,
 } from './physics';
 
@@ -179,5 +181,52 @@ describe('blink state machine', () => {
     expect(isWiping(newBlinkState())).toBe(false);
     const s = stepBlink(newBlinkState(), 1 / 60, 1);
     expect(isWiping(s)).toBe(true);
+  });
+});
+
+describe('gaze frame', () => {
+  it('is the identity when the eye looks straight out', () => {
+    const { tx, ty, gd } = gazeFrame(0, 0);
+    expect(gd).toEqual([0, 0, 1]);
+    expect(tx[0]).toBeCloseTo(1, 12);
+    expect(tx[1]).toBeCloseTo(0, 12);
+    expect(ty[0]).toBeCloseTo(0, 12);
+    expect(ty[1]).toBeCloseTo(1, 12);
+    expect(worldToLocal(0, 1, 0, 0)[1]).toBeCloseTo(1, 12);
+    expect(worldToLocal(1, 0, 0, 0)[0]).toBeCloseTo(1, 12);
+  });
+
+  it('keeps the basis orthonormal at an off-axis gaze', () => {
+    const { tx, ty, gd } = gazeFrame(0.5, -0.3);
+    const dot = (a: number[], b: number[]) =>
+      a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    expect(dot(tx, tx)).toBeCloseTo(1, 12);
+    expect(dot(ty, ty)).toBeCloseTo(1, 12);
+    expect(dot(gd, gd)).toBeCloseTo(1, 12);
+    expect(dot(tx, ty)).toBeCloseTo(0, 12);
+    expect(dot(tx, gd)).toBeCloseTo(0, 12);
+    expect(dot(ty, gd)).toBeCloseTo(0, 12);
+  });
+
+  it('never lengthens a world vector', () => {
+    // A projection onto a tangent plane can only shorten.
+    const [lx, ly] = worldToLocal(0, 1, 0.6, 0.4);
+    expect(Math.hypot(lx, ly)).toBeLessThanOrEqual(1 + 1e-12);
+  });
+
+  it('foreshortens gravity as the eye looks up', () => {
+    // tx = cross([0,1,0], gd) has y-component a2*b0 - a0*b2 = 0 identically, so
+    // tx[1] is always 0 and a world-down vector can never pick up a local-x
+    // component. Under this basis gravity foreshortens; it never shears.
+    const [lx, ly] = worldToLocal(0, 1, 0, 0.8);
+    expect(lx).toBeCloseTo(0, 12);
+    expect(ly).toBeCloseTo(0.8418, 3);
+    expect(ly).toBeLessThan(1);
+  });
+
+  it('foreshortens a sideways vector as the eye looks aside', () => {
+    const [lx] = worldToLocal(1, 0, 0.8, 0);
+    expect(lx).toBeCloseTo(0.8423, 3);
+    expect(lx).toBeLessThan(1);
   });
 });
