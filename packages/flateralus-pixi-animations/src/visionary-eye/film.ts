@@ -49,6 +49,31 @@ import {
 /** Texture unit the field is read from, in the sim passes and the display. */
 const FILM_UNIT = 3;
 
+/**
+ * TEMPORARY. Once-a-second readback of the field to the console, prefixed
+ * `[film]`, while we work out why the disc shows no patches.
+ *
+ * This is instrumentation, not a feature: flip to false to silence it, and it
+ * comes out entirely once the question is answered. It costs a 1MB synchronous
+ * readPixels per second, which is far too expensive to ship.
+ */
+const FILM_DEBUG = true;
+
+/** Decode an IEEE half into a JS number, for the half-float readback path. */
+function h2f(h: number): number {
+  const s = h & 0x8000 ? -1 : 1;
+  const e = (h >> 10) & 0x1f;
+  const m = h & 0x3ff;
+  if (e === 0) return s * m * Math.pow(2, -24);
+  if (e === 31) return m ? NaN : s * Infinity;
+  return s * (1 + m / 1024) * Math.pow(2, e - 15);
+}
+
+/** Four decimals, and the word rather than a silent NaN. */
+function d4(x: number): string {
+  return Number.isFinite(x) ? x.toFixed(4) : String(x);
+}
+
 const FILM_PRE = `#version 300 es
     precision highp float;
     in vec2 vUV;
@@ -227,6 +252,23 @@ export class FilmSim {
   private i = 0;
   private acc = 0;
 
+  // --- temporary instrumentation, removed with FILM_DEBUG ---
+  /** Which precision the pair actually got. */
+  private fmt = '';
+  /** Whether LINEAR filtering of a float texture is available. */
+  private linear = false;
+  /** Whether EXT_color_buffer_float was present. */
+  private extFloat = false;
+  /** Readback format verdict, probed once. Null means not yet probed. */
+  private readMode: 'float' | 'half' | 'none' | null = null;
+  private readBufF: Float32Array | null = null;
+  private readBufH: Uint16Array | null = null;
+  private readWarned = false;
+  /** Seconds of simulated film time since prime() seeded the sheet. */
+  private simTime = 0;
+  /** Next simTime at which to log. */
+  private nextLog = 0;
+
   private constructor(
     gl: WebGL2RenderingContext,
     muProg: WebGLProgram,
@@ -249,7 +291,8 @@ export class FilmSim {
    */
   static create(gl: WebGL2RenderingContext): FilmSim | null {
     // Without a float colour attachment there is no simulation to run.
-    if (!gl.getExtension('EXT_color_buffer_float')) {
+    const extFloat = !!gl.getExtension('EXT_color_buffer_float');
+    if (!extFloat) {
       console.error('visionary-eye film: EXT_color_buffer_float unavailable');
       return null;
     }
@@ -265,6 +308,7 @@ export class FilmSim {
     }
 
     const sim = new FilmSim(gl, muProg, stepProg, seedProg);
+    sim.extFloat = extFloat;
     if (!sim.allocate()) {
       sim.destroy();
       return null;
@@ -285,6 +329,7 @@ export class FilmSim {
   private allocate(): boolean {
     const gl = this.gl;
     const wantF32 = !!gl.getExtension('OES_texture_float_linear');
+    this.linear = wantF32;
     for (const f32 of wantF32 ? [true, false] : [false]) {
       if (this.build(f32)) return true;
       this.releaseTargets();
@@ -301,6 +346,7 @@ export class FilmSim {
     const gl = this.gl;
     const internal = f32 ? gl.RGBA32F : gl.RGBA16F;
     const type = f32 ? gl.FLOAT : gl.HALF_FLOAT;
+    this.fmt = f32 ? 'RGBA32F' : 'RGBA16F';
     let complete = true;
     for (let n = 0; n < 2; n++) {
       const tx = gl.createTexture();
@@ -418,8 +464,13 @@ export class FilmSim {
       this.acc -= STEP;
       this.pass(this.muProg, this.muL, gravityLocal);
       this.pass(this.stepProg, this.stepL, gravityLocal);
+      this.simTime += STEP;
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    if (FILM_DEBUG && this.simTime >= this.nextLog) {
+      this.nextLog = this.simTime + 1;
+      this.logStats();
+    }
   }
 
   /**
@@ -451,6 +502,110 @@ export class FilmSim {
       this.pass(this.stepProg, this.stepL, g);
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    this.simTime = n * STEP;
+    this.nextLog = this.simTime + 1;
+    if (FILM_DEBUG) {
+      console.log(
+        `[film] primed steps=${n} internalFormat=${this.fmt}` +
+          ` linearFilter=${this.linear ? 'yes' : 'no'}` +
+          ` extFloat=${this.extFloat ? 'yes' : 'no'}`
+      );
+      this.logStats();
+    }
+  }
+
+  /**
+   * TEMPORARY. Read the whole field back and log one summary line.
+   *
+   * `spread` is the number that settles the current question: if it sits near
+   * the seed amplitude while the mean falls, the instability is not growing
+   * and the Cahn-Hilliard term is inert; if it grows while the disc stays
+   * flat, the bug is downstream in the display path.
+   *
+   * The readback *format* is a property of the attachment and varies by
+   * driver, so probe it once and cache the verdict — the pattern
+   * `caustics-pool` uses at causticsPoolAnimation.ts:1239-1287. Task 9's loop
+   * closure depends on this same readback working, so a 'none' verdict here
+   * is a finding in its own right.
+   */
+  private logStats(): void {
+    const gl = this.gl;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb[this.i]);
+    if (this.readMode === null) {
+      const t = gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_TYPE);
+      const f = gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_FORMAT);
+      this.readMode =
+        f === gl.RGBA && t === gl.FLOAT
+          ? 'float'
+          : f === gl.RGBA && t === gl.HALF_FLOAT
+            ? 'half'
+            : 'none';
+    }
+    if (this.readMode === 'none') {
+      if (!this.readWarned) {
+        this.readWarned = true;
+        console.log('[film] readback unavailable');
+      }
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      return;
+    }
+
+    const n = GRID * GRID;
+    let get: ((k: number, c: number) => number) | null = null;
+    try {
+      if (this.readMode === 'float') {
+        if (!this.readBufF) this.readBufF = new Float32Array(n * 4);
+        const b = this.readBufF;
+        gl.readPixels(0, 0, GRID, GRID, gl.RGBA, gl.FLOAT, b);
+        get = (k, c) => b[k * 4 + c];
+      } else {
+        if (!this.readBufH) this.readBufH = new Uint16Array(n * 4);
+        const b = this.readBufH;
+        gl.readPixels(0, 0, GRID, GRID, gl.RGBA, gl.HALF_FLOAT, b);
+        get = (k, c) => h2f(b[k * 4 + c]);
+      }
+    } catch {
+      this.readMode = 'none';
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    if (!get) {
+      if (!this.readWarned) {
+        this.readWarned = true;
+        console.log('[film] readback unavailable');
+      }
+      return;
+    }
+
+    let hMin = Infinity;
+    let hMax = -Infinity;
+    let hSum = 0;
+    let mMin = Infinity;
+    let mMax = -Infinity;
+    let mSum = 0;
+    let nan = 0;
+    for (let k = 0; k < n; k++) {
+      const h = get(k, 0);
+      const m = get(k, 1);
+      if (!Number.isFinite(h)) nan++;
+      else {
+        if (h < hMin) hMin = h;
+        if (h > hMax) hMax = h;
+        hSum += h;
+      }
+      if (!Number.isFinite(m)) nan++;
+      else {
+        if (m < mMin) mMin = m;
+        if (m > mMax) mMax = m;
+        mSum += m;
+      }
+    }
+    console.log(
+      `[film] t=${this.simTime.toFixed(2)}` +
+        ` h.min=${d4(hMin)} h.mean=${d4(hSum / n)} h.max=${d4(hMax)}` +
+        ` spread=${d4(hMax - hMin)}` +
+        ` mu.min=${d4(mMin)} mu.mean=${d4(mSum / n)} mu.max=${d4(mMax)}` +
+        ` nan=${nan}`
+    );
   }
 
   /** Bind the live field for the display pass. */
