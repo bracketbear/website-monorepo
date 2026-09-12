@@ -276,6 +276,41 @@ export function availableEfolds(): number {
  * sample where the anisotropy is gone, the field is fully separated, and film
  * still remains. If EVAP or SEED_AMPLITUDE moves, re-run the trace and read
  * that column — the outer bounds are tested, but only measurement finds this.
+ *
+ * ---
+ *
+ * **KNOWN LIMITATION, and do not "fix" it by moving this constant.**
+ *
+ * At 6.0 the dry phase has percolated: the field is a connected labyrinth of
+ * curving stripes, not isolated dry spots. That is the correct morphology for
+ * Cahn-Hilliard at a near-critical 50/50 composition, which is exactly where
+ * the mean is by then. Isolated minority droplets need a dry fraction below
+ * roughly 0.30, and the field passes through that on its way past:
+ *
+ *     t      dry%   components  largest/dry  circularity  anisotropy
+ *     5.30   10.9       34         0.131        0.474        0.383
+ *     5.35   16.9       51         0.095        0.480        0.334
+ *     5.40   24.0       52         0.078        0.465        0.284
+ *     5.45   30.3       43         0.117        0.410        0.237
+ *     5.70   46.7       11         0.449        0.267        0.102
+ *     6.00   51.2        4         0.928        0.381        0.054
+ *     6.40   55.1        1         1.000        0.012        0.023
+ *
+ * (circularity 0.52 is a perfect digital disc at this resolution, so 0.47 is
+ * round; "largest/dry" near 0 is isolated droplets, 1.0 is one percolating
+ * component.)
+ *
+ * The droplet window is **0.15 seconds wide** — 5.30 to 5.45 — which is too
+ * narrow to prime into: half-float timing drift alone would miss it. Worse,
+ * the two requirements are disjoint. Isotropy needs coarsening (anisotropy
+ * below 0.1 only after t = 5.68); a minority dry phase needs to be early (dry
+ * below 30% only before t = 5.45). **There is no time at which this field is
+ * both isotropic and droplet-like.** A blink does not resolve it either: it
+ * would hold the film in the early, grid-biased part of the range.
+ *
+ * The fix is a change to spec D2 — an asymmetric double well, whose unstable
+ * region sits near the wet state rather than at h = 0 — and it is not made
+ * here. See the task 7 report for the derivation.
  */
 export const PRIME_SECONDS = 6.0;
 
