@@ -1,4 +1,5 @@
 import { VERT } from '../shared/shader-harness';
+import type { LidPose } from './physics';
 import {
   DELTA,
   DOMAIN,
@@ -32,8 +33,8 @@ import {
  * mean in free fall. `mu` is derived every step rather than stored between
  * steps, so **`h` is the only state** — spec D2. Neither pass has a clock in
  * it: the only per-step quantity is the fixed `STEP`, and the defects that
- * nucleate break-up are stamped once by `prime()` (later, by the blink splat)
- * rather than forced every frame — spec D4.
+ * nucleate break-up are stamped by `prime()` at init and by `wipe()` as the
+ * lid crosses, rather than forced every frame — spec D4.
  *
  * Every constant comes from `physics.ts`, which marks which are DERIVED from
  * the stability analysis and which are TUNED. Nothing here re-derives one.
@@ -131,32 +132,89 @@ const STEP_FRAG =
  * the only variable that decides its fate. Everything is interpolated from
  * `physics.ts` rather than written as a GLSL literal, so the shader and
  * `criticalRadiusCells()` cannot drift apart.
+ *
+ * It lives in its own snippet because **the lid lays the same imperfect sheet
+ * every blink**, and the second cycle has to nucleate from something. A fresh
+ * film that were flat at h = 1 would be linearly stable: it would thin
+ * uniformly and never tear again. One copy, two callers.
  */
-const SEED_FRAG = `#version 300 es
-    precision highp float;
-    in vec2 vUV;
-    out vec4 fragColor;
-    uniform vec2 uSeed;
+const NUCLEI_GLSL = `
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
-    void main() {
+    /* 1 at the centre of a defect, 0 on clean film. */
+    float nucleusDip(vec2 uv, vec2 seed) {
       const float SITES = ${NUCLEUS_SITES.toFixed(1)};
       const float UNIT = ${(DOMAIN / NUCLEUS_SITES).toFixed(6)};   // tangent units per site cell
       const float RMIN = ${(NUCLEUS_R_MIN_CELLS * DELTA).toFixed(6)};
       const float RMAX = ${(NUCLEUS_R_MAX_CELLS * DELTA).toFixed(6)};
       const float IFACE = ${interfaceWidth().toFixed(6)};
-      vec2 p = vUV * SITES;
+      vec2 p = uv * SITES;
       vec2 ip = floor(p);
       float dip = 0.0;
       for (int j = -1; j <= 1; j++) {
         for (int i = -1; i <= 1; i++) {
           vec2 g = ip + vec2(float(i), float(j));
-          vec2 o = vec2(hash21(g + uSeed), hash21(g + uSeed + 7.3));
-          float rad = mix(RMIN, RMAX, hash21(g + uSeed + 13.7));
+          vec2 o = vec2(hash21(g + seed), hash21(g + seed + 7.3));
+          float rad = mix(RMIN, RMAX, hash21(g + seed + 13.7));
           float d = length(p - (g + o)) * UNIT;
           dip = max(dip, 0.5 * (1.0 - tanh((d - rad) / IFACE)));
         }
       }
-      fragColor = vec4(1.0 - ${NUCLEUS_DEPTH.toFixed(1)} * dip, 0.0, 0.0, 1.0);
+      return dip;
+    }
+    /* Fresh film: h = 1, dimpled to full well depth at every defect. */
+    float freshFilm(vec2 uv, vec2 seed) {
+      return 1.0 - ${NUCLEUS_DEPTH.toFixed(1)} * nucleusDip(uv, seed);
+    }
+  `;
+
+const SEED_FRAG =
+  `#version 300 es
+    precision highp float;
+    in vec2 vUV;
+    out vec4 fragColor;
+    uniform vec2 uSeed;
+  ` +
+  NUCLEI_GLSL +
+  `
+    void main() {
+      fragColor = vec4(freshFilm(vUV, uSeed), 0.0, 0.0, 1.0);
+    }`;
+
+/**
+ * The lid's wipe: fresh film behind the leading edge, nothing in front of it.
+ *
+ * The edge is a half-plane and not a band, so successive frames nest and the
+ * sweep cannot leave gaps — but it is still stepped across each frame's travel
+ * (see `wipe`), because a dropped frame would otherwise move the soft front by
+ * twenty cells at once and the sweep would read as a cut rather than a wipe.
+ *
+ * **This is a lerp toward fresh film, not an addition to it.** The brief's
+ * `+2.0` predates nucleation: it saturates against the step pass's
+ * `min(nh, 1.0)`, which is exactly what is wanted for the wet sheet and fatal
+ * for the defects in it — every dimple would be clamped back up to 1 and the
+ * next cycle would have nothing to nucleate from. Premultiplied source with
+ * `blendFunc(ONE, ONE_MINUS_SRC_ALPHA)` gives `mix(h, fresh, w)` in the blend
+ * unit instead, which lands the defects at their true depth without reading
+ * the texture it is writing.
+ */
+const WIPE_FRAG =
+  `#version 300 es
+    precision highp float;
+    in vec2 vUV;
+    out vec4 fragColor;
+    uniform vec2 uEdge;     // a point on the lid's leading line, local frame
+    uniform vec2 uNormal;   // unit normal, points at the side already swept
+    uniform vec2 uSeed;
+    uniform float uDelta;   // tangent units per cell
+  ` +
+  NUCLEI_GLSL +
+  `
+    void main() {
+      vec2 l = (vUV - 0.5) * ${DOMAIN.toFixed(6)};
+      float d = dot(l - uEdge, uNormal);
+      // Behind the edge is freshly wetted; the front is soft over ~3 cells.
+      float w = smoothstep(-3.0 * uDelta, 3.0 * uDelta, d);
+      fragColor = vec4(w * freshFilm(vUV, uSeed), 0.0, 0.0, w);
     }`;
 
 const MU_UNIFORMS = ['uH', 'uTexel', 'uDelta', 'uKappa'] as const;
@@ -170,6 +228,7 @@ const STEP_UNIFORMS = [
   'uGravity',
 ] as const;
 const SEED_UNIFORMS = ['uSeed'] as const;
+const WIPE_UNIFORMS = ['uEdge', 'uNormal', 'uSeed', 'uDelta'] as const;
 
 type Locs = Record<string, WebGLUniformLocation | null>;
 
@@ -244,9 +303,11 @@ export class FilmSim {
   private readonly muProg: WebGLProgram;
   private readonly stepProg: WebGLProgram;
   private readonly seedProg: WebGLProgram;
+  private readonly wipeProg: WebGLProgram;
   private readonly muL: Locs;
   private readonly stepL: Locs;
   private readonly seedL: Locs;
+  private readonly wipeL: Locs;
   private tex: (WebGLTexture | null)[] = [null, null];
   private fb: (WebGLFramebuffer | null)[] = [null, null];
   /** Index of the live field. A full step flips it twice, so it is stable. */
@@ -257,15 +318,18 @@ export class FilmSim {
     gl: WebGL2RenderingContext,
     muProg: WebGLProgram,
     stepProg: WebGLProgram,
-    seedProg: WebGLProgram
+    seedProg: WebGLProgram,
+    wipeProg: WebGLProgram
   ) {
     this.gl = gl;
     this.muProg = muProg;
     this.stepProg = stepProg;
     this.seedProg = seedProg;
+    this.wipeProg = wipeProg;
     this.muL = locsOf(gl, muProg, MU_UNIFORMS);
     this.stepL = locsOf(gl, stepProg, STEP_UNIFORMS);
     this.seedL = locsOf(gl, seedProg, SEED_UNIFORMS);
+    this.wipeL = locsOf(gl, wipeProg, WIPE_UNIFORMS);
   }
 
   /**
@@ -283,14 +347,16 @@ export class FilmSim {
     const muProg = program(gl, MU_FRAG, 'mu');
     const stepProg = program(gl, STEP_FRAG, 'step');
     const seedProg = program(gl, SEED_FRAG, 'seed');
-    if (!muProg || !stepProg || !seedProg) {
+    const wipeProg = program(gl, WIPE_FRAG, 'wipe');
+    if (!muProg || !stepProg || !seedProg || !wipeProg) {
       if (muProg) gl.deleteProgram(muProg);
       if (stepProg) gl.deleteProgram(stepProg);
       if (seedProg) gl.deleteProgram(seedProg);
+      if (wipeProg) gl.deleteProgram(wipeProg);
       return null;
     }
 
-    const sim = new FilmSim(gl, muProg, stepProg, seedProg);
+    const sim = new FilmSim(gl, muProg, stepProg, seedProg, wipeProg);
     if (!sim.allocate()) {
       sim.destroy();
       return null;
@@ -310,7 +376,14 @@ export class FilmSim {
    */
   private allocate(): boolean {
     const gl = this.gl;
-    const wantF32 = !!gl.getExtension('OES_texture_float_linear');
+    // `EXT_float_blend` as well as the filter, because `wipe()` blends into
+    // this target. Without the extension a blended draw to a 32F attachment
+    // raises INVALID_OPERATION and draws nothing — so the film would run,
+    // the display would show it, and only the blink would silently do
+    // nothing. 16F blending is core in WebGL2, so the fallback is safe.
+    const wantF32 =
+      !!gl.getExtension('OES_texture_float_linear') &&
+      !!gl.getExtension('EXT_float_blend');
     for (const f32 of wantF32 ? [true, false] : [false]) {
       if (this.build(f32)) return true;
       this.releaseTargets();
@@ -409,6 +482,8 @@ export class FilmSim {
     gl.uniform1f(this.stepL.uM!, clampMobility(MOBILITY));
     gl.uniform1f(this.stepL.uDt!, STEP);
     gl.uniform1f(this.stepL.uEvap!, EVAP);
+    gl.useProgram(this.wipeProg);
+    gl.uniform1f(this.wipeL.uDelta!, DELTA);
   }
 
   /** One draw: read the live field, write the other, swap. */
@@ -471,7 +546,7 @@ export class FilmSim {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb[this.i]);
     gl.viewport(0, 0, GRID, GRID);
     gl.useProgram(this.seedProg);
-    gl.uniform2f(this.seedL.uSeed!, (seed * 0.137) % 97, (seed * 0.311) % 89);
+    this.pushSeed(this.seedL, seed);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     this.acc = 0;
     // Straight down in the local frame: priming happens before any gaze, and
@@ -482,6 +557,56 @@ export class FilmSim {
       this.pass(this.muProg, this.muL, g);
       this.pass(this.stepProg, this.stepL, g);
     }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  }
+
+  /**
+   * Spread one scalar seed over the two hash axes the nucleus field indexes
+   * on. Shared by `prime` and `wipe` so a given seed places the same defects
+   * whichever stamped them.
+   */
+  private pushSeed(L: Locs, seed: number): void {
+    this.gl.uniform2f(L.uSeed!, (seed * 0.137) % 97, (seed * 0.311) % 89);
+  }
+
+  /**
+   * Lay fresh film behind the lid's leading edge, once per pose in `sweep`.
+   *
+   * The poses come from `lidSweep()` already rotated into the corneal tangent
+   * frame — a world-space normal must never reach here or the band tilts as
+   * the eye looks around, and the field is gaze-local.
+   *
+   * `seed` is held fixed for one blink and changed the next, so the defect
+   * layout is steady while the lid crosses the field and different every time
+   * it does. **The defects are the point.** A lid that laid flat film at
+   * h = 1 would lay a linearly stable sheet: it would thin uniformly and never
+   * tear again, and the animation would blink exactly once.
+   *
+   * Writes the live field in place, so the running `advance()` picks it up on
+   * its next substep with no swap to coordinate. `ONE, ONE_MINUS_SRC_ALPHA`
+   * against a premultiplied source is `mix(h, fresh, w)` evaluated in the
+   * blend unit, which is how the defects land at their true depth without
+   * this pass reading the texture it is writing. The colour mask keeps it off
+   * `.y`, where the last mu pass's result is waiting to be read.
+   */
+  wipe(seed: number, sweep: readonly LidPose[]): void {
+    const gl = this.gl;
+    if (sweep.length === 0) return;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb[this.i]);
+    gl.viewport(0, 0, GRID, GRID);
+    gl.useProgram(this.wipeProg);
+    this.pushSeed(this.wipeL, seed);
+    gl.enable(gl.BLEND);
+    gl.blendEquation(gl.FUNC_ADD);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.colorMask(true, false, false, false);
+    for (const pose of sweep) {
+      gl.uniform2f(this.wipeL.uEdge!, pose.edge[0], pose.edge[1]);
+      gl.uniform2f(this.wipeL.uNormal!, pose.normal[0], pose.normal[1]);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+    gl.colorMask(true, true, true, true);
+    gl.disable(gl.BLEND);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
 
@@ -502,6 +627,7 @@ export class FilmSim {
     gl.deleteProgram(this.muProg);
     gl.deleteProgram(this.stepProg);
     gl.deleteProgram(this.seedProg);
+    gl.deleteProgram(this.wipeProg);
   }
 }
 

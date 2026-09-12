@@ -460,3 +460,80 @@ export function worldToLocal(
   const { tx, ty } = gazeFrame(gx, gy);
   return [wx * tx[0] + wy * tx[1], wx * ty[0] + wy * ty[1]];
 }
+
+/**
+ * DERIVED. Half the diagonal of the square field, which is how far the lid's
+ * edge has to travel from "clear of the field" to "past all of it" whatever
+ * angle the gaze leaves the sweep at.
+ */
+export const LID_TRAVEL = DOMAIN * Math.SQRT1_2;
+
+/**
+ * Where the lid's leading edge is, in the corneal-local frame.
+ *
+ * The lid is a half-plane: `normal` is a unit vector pointing at the side the
+ * lid has already passed over, and `edge` is a point on the leading line. At
+ * coverage 0 the edge sits clear of the field on the open side and at 1 it is
+ * clear on the other, so the swept half-plane grows from nothing to all of it.
+ *
+ * **Both come back rotated into the corneal-local frame**, because the field
+ * is gaze-local and the lid is not. A world-space normal handed straight to
+ * the splat makes the band tilt as the eye looks around, which is the one
+ * artefact a viewer spots immediately. World down is `(0, 1)` here, the same
+ * convention `GRAVITY` uses, so the lid closes downward and the covered side
+ * is up.
+ */
+export interface LidPose {
+  /** A point on the lid's leading line, corneal-local. */
+  edge: [number, number];
+  /** Unit normal pointing at the side the lid has already crossed. */
+  normal: [number, number];
+}
+
+export function lidFrame(coverage: number, gx: number, gy: number): LidPose {
+  const down = worldToLocal(0, 1, gx, gy);
+  // Renormalised: worldToLocal foreshortens as the eye turns, and a short
+  // normal would shrink the sweep's travel instead of tilting it.
+  const len = Math.hypot(down[0], down[1]) || 1;
+  const dx = down[0] / len;
+  const dy = down[1] / len;
+  const s = (2 * Math.min(1, Math.max(0, coverage)) - 1) * LID_TRAVEL;
+  return { edge: [dx * s, dy * s], normal: [-dx, -dy] };
+}
+
+/**
+ * TUNED. Ceiling on splats per frame. A frame that stalls through most of the
+ * lid's travel degrades to a coarser sweep rather than spending the next
+ * frame's budget on it; 32 covers a full 60fps closing frame nearly three
+ * times over.
+ */
+export const LID_SPLATS_MAX = 32;
+
+/**
+ * The lid's poses across one frame's travel, from just after `from` to exactly
+ * `to`, spaced about two cells apart.
+ *
+ * The wetted region is a half-plane, so consecutive poses nest and the sweep
+ * cannot literally break into dashes. This exists because the *front* is soft
+ * over about three cells and a 60fps closing frame moves it more than twenty:
+ * one splat per frame would step that soft edge in visible jumps, and a
+ * dropped frame would move it the whole way at once. Stepping it keeps the
+ * wipe reading as a sweep at any frame rate.
+ */
+export function lidSweep(
+  from: number,
+  to: number,
+  gx: number,
+  gy: number
+): LidPose[] {
+  const travel = Math.abs(to - from) * 2 * LID_TRAVEL;
+  const n = Math.max(
+    1,
+    Math.min(LID_SPLATS_MAX, Math.ceil(travel / (2 * DELTA)))
+  );
+  const out: LidPose[] = [];
+  for (let k = 1; k <= n; k++) {
+    out.push(lidFrame(from + (to - from) * (k / n), gx, gy));
+  }
+  return out;
+}

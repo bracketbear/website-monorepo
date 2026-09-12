@@ -11,7 +11,19 @@ import {
 } from '../shared/sdf-harness';
 import { EYE_GLOBE } from './eye';
 import { FILM_TEXTURE_UNIT, FilmSim } from './film';
-import { DELTA, GRID, worldToLocal } from './physics';
+import type { BlinkState } from './physics';
+import {
+  BLINK_FRACTION,
+  DELTA,
+  GRID,
+  PRIME_SECONDS,
+  isWiping,
+  lidCoverage,
+  lidSweep,
+  newBlinkState,
+  stepBlink,
+  worldToLocal,
+} from './physics';
 
 const MANIFEST = createManifest({
   id: 'visionary-eye',
@@ -126,6 +138,18 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
   private nextSaccade = 0;
   private pupil = 0.15;
   private pupilPulse = 0;
+  /**
+   * The gaze the display is actually drawn with: the smoothed gaze plus
+   * Bell's roll. The film's frame has to be this one and not `gaze`, or the
+   * field shears against the cornea it is painted on for the length of a
+   * blink.
+   */
+  private gazeView: [number, number] = [0, 0];
+  private blink: BlinkState = newBlinkState();
+  /** Lid coverage at the end of the previous frame, for the sweep's span. */
+  private lidPrev = 0;
+  /** Defect layout the current blink will lay down. New every blink. */
+  private lidSeed = 0;
 
   constructor(initialControls?: Partial<VisionaryEyeControlValues>) {
     super(MANIFEST, initialControls);
@@ -145,17 +169,32 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     this.nextSaccade = 0;
     this.pupil = 0.15;
     this.pupilPulse = 0;
+    this.gazeView = [0, 0];
+    // TEMPORARY (Task 9): the placeholder fraction below counts from here, and
+    // the film is already PRIME_SECONDS old on the first frame, so the clock
+    // starts there rather than at zero. Goes with the placeholder.
+    this.blink = { ...newBlinkState(), since: PRIME_SECONDS };
+    this.lidPrev = 0;
+    this.lidSeed = Math.random() * 1000;
   }
 
   /**
-   * Build the film on first frame and advance it.
+   * Build the film on first frame, let the lid wipe it, and advance it.
    *
    * Runs before the display program is bound, so the base's own viewport and
-   * useProgram restore the state the sim passes leave behind. Gravity is
-   * handed over already projected onto the corneal tangent basis — a world
-   * vector must never reach the field or it drains sideways as the eye looks
-   * around. The gaze it uses is last frame's, which is one frame of lag on a
-   * direction that turns over hundreds of milliseconds.
+   * useProgram restore the state the sim passes leave behind. Everything
+   * directional is handed over already projected onto the corneal tangent
+   * basis — a world vector must never reach the field or gravity drains
+   * sideways and the lid's band tilts as the eye looks around.
+   *
+   * The frame it projects into is `gazeView`, the one the display was last
+   * drawn with, and not `gaze`: they differ by Bell's roll for the length of a
+   * blink, which is exactly when the lid is laying film. It is last frame's
+   * either way, which is one frame of lag on a direction that turns over
+   * hundreds of milliseconds.
+   *
+   * The wipe goes in before `advance()` so the fresh sheet is what the next
+   * mu pass derives its chemical potential from.
    */
   protected simulate(
     gl: WebGL2RenderingContext,
@@ -172,9 +211,37 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
       return;
     }
     // Reduced motion keeps the primed field but stops it evolving, the same
-    // way the flow time is pinned below.
+    // way the flow time is pinned below. No blinks either: a lid that swept
+    // once a cycle is exactly the motion the setting is asking us not to make.
     if (this.reducedMotion) return;
-    this.film.advance(dt, worldToLocal(0, 1, this.gaze[0], this.gaze[1]));
+
+    // TEMPORARY: Task 9 replaces this with the break-up fraction measured off
+    // the field by the reduction pass. A linear ramp in seconds since the last
+    // blink, scaled so it crosses BLINK_FRACTION at about 4.6s — where the
+    // primed trace in physics.ts actually reaches 35% dry — so the cadence the
+    // Lab shows now is roughly the cadence the measurement will produce.
+    const fraction = Math.min(1, this.blink.since * (BLINK_FRACTION / 4.6));
+
+    const before = this.blink;
+    this.blink = stepBlink(before, dt, fraction);
+    if (before.phase === 'open' && this.blink.phase !== 'open') {
+      // A new layout for every blink. Without this the same patches would come
+      // back in the same places and the eye would read as a loop.
+      this.lidSeed = Math.random() * 1000;
+    }
+    const coverage = lidCoverage(this.blink);
+    if (isWiping(this.blink) || isWiping(before)) {
+      this.film.wipe(
+        this.lidSeed,
+        lidSweep(this.lidPrev, coverage, this.gazeView[0], this.gazeView[1])
+      );
+    }
+    this.lidPrev = coverage;
+
+    this.film.advance(
+      dt,
+      worldToLocal(0, 1, this.gazeView[0], this.gazeView[1])
+    );
   }
 
   protected setUniforms(
@@ -213,7 +280,12 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
       (Math.max(-0.75, Math.min(0.75, this.gazeTarget[0])) - this.gaze[0]) * kg;
     this.gaze[1] +=
       (Math.max(-0.7, Math.min(0.7, this.gazeTarget[1])) - this.gaze[1]) * kg;
-    gl.uniform2f(locs.uGaze!, this.gaze[0], this.gaze[1]);
+    // Bell's phenomenon: the globe rolls up behind a closing lid. Positive
+    // gaze.y looks down, so the roll subtracts. Nobody will be able to say why
+    // this looks right, which is the point.
+    const bell = lidCoverage(this.blink) * 0.35;
+    this.gazeView = [this.gaze[0], this.gaze[1] - bell];
+    gl.uniform2f(locs.uGaze!, this.gazeView[0], this.gazeView[1]);
 
     // The pupil dilates under attention, drifts with slow hippus at rest,
     // and pulses on a saccade.

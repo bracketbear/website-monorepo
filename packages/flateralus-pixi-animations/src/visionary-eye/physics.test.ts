@@ -30,6 +30,10 @@ import {
   gazeFrame,
   isWiping,
   lidCoverage,
+  LID_SPLATS_MAX,
+  LID_TRAVEL,
+  lidFrame,
+  lidSweep,
   mobilityLimit,
   newBlinkState,
   interfaceWidth,
@@ -319,5 +323,105 @@ describe('gaze frame', () => {
     const [lx] = worldToLocal(1, 0, 0.8, 0);
     expect(lx).toBeCloseTo(0.8423, 3);
     expect(lx).toBeLessThan(1);
+  });
+});
+
+describe('lid geometry', () => {
+  it('clears the field at both ends of the travel', () => {
+    // Half the diagonal, so the half-plane covers the square corners and not
+    // only the disc, whatever angle the gaze leaves the sweep at.
+    expect(LID_TRAVEL).toBeGreaterThan(DOMAIN / 2);
+    const open = lidFrame(0, 0, 0);
+    const shut = lidFrame(1, 0, 0);
+    expect(open.edge[1]).toBeCloseTo(-LID_TRAVEL, 12);
+    expect(shut.edge[1]).toBeCloseTo(LID_TRAVEL, 12);
+    // Nothing is covered at 0: the whole field is in front of the edge.
+    const corner: [number, number] = [DOMAIN / 2, -DOMAIN / 2];
+    const ahead =
+      (corner[0] - open.edge[0]) * open.normal[0] +
+      (corner[1] - open.edge[1]) * open.normal[1];
+    expect(ahead).toBeLessThan(0);
+  });
+
+  it('crosses the middle of the field at half coverage', () => {
+    const mid = lidFrame(0.5, 0.4, -0.2);
+    expect(mid.edge[0]).toBeCloseTo(0, 12);
+    expect(mid.edge[1]).toBeCloseTo(0, 12);
+  });
+
+  it('points the normal at the side already swept', () => {
+    // World down is (0, 1), so the covered side is up and the normal is -y.
+    const { normal } = lidFrame(0.5, 0, 0);
+    expect(normal[0]).toBeCloseTo(0, 12);
+    expect(normal[1]).toBeCloseTo(-1, 12);
+  });
+
+  it('keeps the normal a unit vector at every gaze', () => {
+    // Renormalised after the projection: worldToLocal foreshortens, and a
+    // short normal would shorten the sweep instead of tilting it.
+    for (const [gx, gy] of [
+      [0, 0],
+      [0.75, 0],
+      [0, -0.7],
+      [-0.6, 0.5],
+    ]) {
+      const { normal } = lidFrame(0.5, gx, gy);
+      expect(Math.hypot(normal[0], normal[1])).toBeCloseTo(1, 12);
+    }
+  });
+
+  it('holds the sweep square to the world at every gaze', () => {
+    // The basis is built with tx = cross(worldUp, gaze), so tx[1] is
+    // identically zero and world down projects onto ty alone. The lid's local
+    // normal therefore comes out (0, -1) for every gaze — which is the whole
+    // reason the band reads as horizontal on screen while the eye moves. It is
+    // an invariant of the basis, not a coincidence: build tx any other way and
+    // this test is what fails.
+    for (const [gx, gy] of [
+      [0.75, 0],
+      [0, -0.7],
+      [-0.6, 0.5],
+    ]) {
+      const { normal } = lidFrame(0.5, gx, gy);
+      expect(normal[0]).toBeCloseTo(0, 12);
+      expect(normal[1]).toBeCloseTo(-1, 12);
+    }
+  });
+
+  it('does not let the projection foreshorten the travel', () => {
+    // worldToLocal shortens world down as the eye looks up — 0.84 at gy = 0.8.
+    // Left unnormalised the lid would stop short of the far corner and leave a
+    // crescent of stale film behind it.
+    expect(Math.hypot(...worldToLocal(0, 1, 0, 0.8))).toBeLessThan(0.9);
+    expect(lidFrame(1, 0, 0.8).edge[1]).toBeCloseTo(LID_TRAVEL, 12);
+  });
+
+  it('steps the sweep finely enough that the soft front never jumps', () => {
+    // A 60fps closing frame moves the edge about a sixth of the travel.
+    const poses = lidSweep(0, 1 / 6, 0, 0);
+    expect(poses.length).toBeGreaterThan(1);
+    for (let k = 1; k < poses.length; k++) {
+      const step = Math.hypot(
+        poses[k].edge[0] - poses[k - 1].edge[0],
+        poses[k].edge[1] - poses[k - 1].edge[1]
+      );
+      // Inside the ~3-cell soft front, so successive splats overlap.
+      expect(step).toBeLessThanOrEqual(2 * DELTA + 1e-12);
+    }
+  });
+
+  it('ends the sweep exactly where the frame ended', () => {
+    const poses = lidSweep(0.2, 0.8, 0, 0);
+    const last = poses[poses.length - 1];
+    expect(last.edge[1]).toBeCloseTo(lidFrame(0.8, 0, 0).edge[1], 12);
+  });
+
+  it('caps the sweep so a stalled frame degrades instead of spending', () => {
+    expect(lidSweep(0, 1, 0, 0).length).toBeLessThanOrEqual(LID_SPLATS_MAX);
+    expect(lidSweep(0, 1, 0, 0).length).toBe(LID_SPLATS_MAX);
+  });
+
+  it('still lays one splat when the lid did not move', () => {
+    expect(lidSweep(0.5, 0.5, 0, 0)).toHaveLength(1);
   });
 });
