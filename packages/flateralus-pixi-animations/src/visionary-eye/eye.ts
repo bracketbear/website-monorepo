@@ -1,3 +1,12 @@
+import {
+  DOMAIN,
+  DRY_H,
+  FILM_REACH,
+  FILM_REACH_FADE,
+  FILM_SLOPE,
+  WET_H,
+} from './physics';
+
 /**
  * The raytraced globe. Lives here rather than in the SDF harness because
  * visionary-eye is its only consumer — portal-mark imports SHARED_EYE for
@@ -5,6 +14,10 @@
  *
  * Concatenate after SHARED_EYE, which still supplies the uniforms, stars()
  * and visionary().
+ *
+ * Every number the film contributes comes from `physics.ts`, interpolated in
+ * the way `film.ts` already interpolates the simulation's own constants, so
+ * the display and the simulation cannot drift apart.
  */
 export const EYE_GLOBE = `
       // The tear film, in corneal-local tangent coordinates. uFilmOK is 0
@@ -15,6 +28,43 @@ export const EYE_GLOBE = `
       uniform float uDelta;
       uniform float uShowFilm;
       uniform float uFilmOK;
+      /**
+       * The film, fetched smoothly.
+       *
+       * 96 cells across roughly 600 screen pixels is about six pixels a cell,
+       * and hardware bilinear is only C0: its gradient is constant inside a
+       * cell and jumps at every boundary. A colour can carry that. A specular
+       * cannot: pow(dot, 48.0) turns each of those jumps into a visible facet
+       * edge. Smoothstepping the fractional coordinate before the fetch makes
+       * the interpolant C1 at the cell boundaries, because the smoothstep's
+       * own derivative is zero at both ends of the cell.
+       *
+       * The field's texels are LINEAR-filterable by construction: film.ts only
+       * takes RGBA32F when OES_texture_float_linear is present, and otherwise
+       * falls back to RGBA16F, which core WebGL2 filters.
+       */
+      vec2 filmUV(vec2 l) {
+        vec2 p = (l / ${DOMAIN.toFixed(6)} + 0.5) * uFilmN - 0.5;
+        vec2 i = floor(p), f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return (i + f + 0.5) / uFilmN;
+      }
+      /**
+       * 1 where the film may be read, 0 before a fetch would leave its domain.
+       *
+       * A Chebyshev radius, because the field is a square and the failure this
+       * prevents is CLAMP_TO_EDGE extrapolating the boundary texel outward
+       * into long radial streaks. See FILM_REACH in physics.ts for why this is
+       * not the corneal cap: the catchlight sits at |l| = 0.64, outside the
+       * cap's inscribed circle, and a circular mask large enough to be
+       * streak-free would delete the highlight the film exists to drive.
+       */
+      float filmReach(vec2 l) {
+        return 1.0 - smoothstep(
+          ${(FILM_REACH - FILM_REACH_FADE).toFixed(6)},
+          ${FILM_REACH.toFixed(6)},
+          max(abs(l.x), abs(l.y)));
+      }
       float energyH(float lx, float ly, float ang, float t) {
         vec2 dir = vec2(lx, ly) / max(sin(ang), 1e-3);
         float f = fbm(dir * 2.6 + vec2(0.0, ang * 7.0 - t * 0.2) + fbm(vec2(ang * 5.0, t * 0.15)) * 2.0);
@@ -33,7 +83,9 @@ export const EYE_GLOBE = `
         // Debug view: the film height straight onto the cornea, h = -1 black
         // through h = +1 white. This is the verification instrument for the
         // simulation tasks, so it stays in the shipped shader behind a debug
-        // control rather than living in a branch.
+        // control rather than living in a branch. Deliberately unmasked and
+        // unsmoothed: it shows the raw field, clamped streaks and all, which
+        // is what an instrument should do.
         if (uShowFilm > 0.5 && uFilmOK > 0.5 && r < R) {
           float nz = sqrt(max(R * R - r * r, 0.0));
           vec3 n = vec3(q, nz) / R;
@@ -92,9 +144,36 @@ export const EYE_GLOBE = `
           eye += mix(ELEC, uCream, 0.4) * exp(-abs(ang - 0.56) * 26.0) * 0.35;
           vec3 ld = normalize(vec3(-0.45, -0.55, 0.85));
           float dif = clamp(dot(nb, ld), 0.0, 1.0);
+          // Diffuse stays on nb: the energy relief still shapes the shading,
+          // and only the highlight moves onto the film.
           eye *= 0.55 + 0.6 * dif;
-          eye += uCream * pow(dif, 48.0) * 0.9;
-          eye += uCream * pow(dif, 7.0) * 0.07 * (1.0 - irisM); // broad wet sheen on the white
+          // The catchlight, reflected off the film rather than painted on.
+          //
+          // fw is the only gate, and it is written so that fw = 0 collapses
+          // every line below, term by term, back onto the painted specular
+          // this replaced: nf becomes nb, wet becomes 1, and dsp becomes dif.
+          // That matters because fw = 0 is a shipped path and not a
+          // hypothetical - a driver that refuses float render targets leaves
+          // uFilmOK at 0 and the eye has to look exactly as it did.
+          vec2 fl = vec2(lx, ly);
+          float fw = uFilmOK * filmReach(fl);
+          float hC = texture(uFilm, filmUV(fl)).x;
+          // The gradient taps go through filmUV too. Smoothing the value and
+          // not the gradient would smooth the colour and facet the light,
+          // which is the one artefact the smoothing exists to prevent.
+          vec2 gH = (vec2(
+            texture(uFilm, filmUV(fl + vec2(uDelta, 0.0))).x,
+            texture(uFilm, filmUV(fl + vec2(0.0, uDelta))).x) - hC) / uDelta;
+          vec3 nf = fw > 0.0
+            ? normalize(nb - (tx * gH.x + ty * gH.y) * (${FILM_SLOPE.toFixed(6)} * fw))
+            : nb;
+          // Subtractive: a dry patch is the sheen going missing, not light
+          // being added. The sclera is near-white and has no headroom for the
+          // additive reading, and a real dry spot is a dull mark anyway.
+          float wet = mix(1.0, smoothstep(${DRY_H.toFixed(6)}, ${WET_H.toFixed(6)}, hC), fw);
+          float dsp = clamp(dot(nf, ld), 0.0, 1.0);
+          eye += uCream * pow(dsp, 48.0) * 0.9 * wet;
+          eye += uCream * pow(dsp, 7.0) * 0.07 * (1.0 - irisM) * wet; // broad wet sheen on the white
           eye += ELEC * vl * pow(clamp(dot(nb, normalize(vec3(0.3, -0.2, 1.0))), 0.0, 1.0), 8.0) * uBump * 0.55 * irisM;
           eye += ELEC * pow(1.0 - nz / R, 3.0) * 0.18;
           col = eye;

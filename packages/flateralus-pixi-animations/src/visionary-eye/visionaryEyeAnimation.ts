@@ -241,9 +241,11 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     // through the closing and opening phases is never compared against
     // anything.
     //
-    // `null` means the measurement has retired — the driver refused a
-    // readable format, the readback was rejected, or it threw. It is latched,
-    // announced once, and cannot come back. The film still runs and still
+    // `null` is usually the measurement having retired — the driver refused a
+    // readable format, the readback was rejected, or it threw. That is
+    // latched, announced once, and cannot come back. It is also the transient
+    // before the first good value lands, which is not latched and clears
+    // itself. Either way the trigger needs a number. The film still runs and
     // looks right; only the decision has lost its input, so the trigger falls
     // back to a ramp calibrated to the cadence the measurement produces on
     // average. A degraded eye that still blinks, rather than one that stares.

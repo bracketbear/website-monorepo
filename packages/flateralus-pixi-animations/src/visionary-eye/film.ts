@@ -814,7 +814,10 @@ export class FilmSim {
    * frame budget, the cheap fix is to measure every third frame and hold
    * between — not to delete the readback.
    *
-   * Returns a fraction in [0, 1], or `null` once the measurement has retired.
+   * Returns a fraction in [0, 1], or `null` — which is either the measurement
+   * having retired, or the transient before any good value has been captured
+   * at all. Both want the same thing from the caller, a fallback, but only the
+   * first is permanent.
    */
   measure(): number | null {
     const gl = this.gl;

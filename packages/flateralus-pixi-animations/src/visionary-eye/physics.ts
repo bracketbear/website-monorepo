@@ -332,6 +332,117 @@ export const REDUCE = 8;
 /** h at or below this counts as torn. The wells sit at +1 and -1. */
 export const DRY_H = -0.3;
 
+/* ------------------------------------------------------------------ *
+ * The display side of the field: how far it may be read, how hard it
+ * bends the specular normal, and where it stops counting as wet.
+ * ------------------------------------------------------------------ */
+
+/** GLSL's smoothstep, so the display constants can be asserted on the CPU. */
+function smoothstep(a: number, b: number, x: number): number {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+}
+
+/**
+ * DERIVED. How far from the gaze axis, in tangent units, a film-derived term
+ * may still be read — as a **Chebyshev** radius, `max(|lx|, |ly|)`.
+ *
+ * The field is a square, `|lx|, |ly| <= DOMAIN/2`, whose outermost texel
+ * centres sit at `DOMAIN/2 - DELTA/2`. Past that, `CLAMP_TO_EDGE` extrapolates
+ * the boundary texel outward forever, and anything that keeps sampling smears
+ * each edge texel into a long radial streak running out to the silhouette. In
+ * the debug view those streaks are obvious; carried into the specular they
+ * would read as a shader bug. So the reach is the last real texel centre minus
+ * one gradient tap: the furthest sample whose three taps all land on data the
+ * simulation actually wrote.
+ *
+ * **This is a square and not the corneal cap, and the difference is
+ * load-bearing.** The cap is the inscribed circle `|l| <= CORNEA_L = 0.565`.
+ * The specular's own centre sits at `|l| = 0.640`: the light direction
+ * `normalize(-0.45, -0.55, 0.85)` puts the catchlight where the surface normal
+ * equals it, which is `ang = acos(0.767) = 0.70` — on the white, just outside
+ * the limbus. No circular mask can both reach it and stay off the clamp, since
+ * a circle of radius 0.6 is the largest that is streak-free on axis. But the
+ * catchlight is near-diagonal — `l = (-0.406, -0.496)`, each component
+ * comfortably inside the square — so the square keeps it while staying
+ * strictly inside the field's own data. Masking on `ang` alone would be safe
+ * and would also delete the highlight this field exists to drive.
+ */
+export const FILM_REACH = DOMAIN / 2 - DELTA / 2 - DELTA;
+
+/**
+ * TUNED. Width of the fade that lands the film's influence on zero at
+ * `FILM_REACH`.
+ *
+ * **The field is only barely wider than the eye, and that sets this.** The
+ * square's half-width is 0.6, the corneal cap's radius is 0.565, and a
+ * gradient tap costs a cell — so along the four axis directions there is
+ * almost nothing to spare, and every unit of fade is taken out of the cornea's
+ * outer rim. The constraint is that the fade must not begin before the limbus,
+ * which `eye.ts` rings at `ang = 0.56`, i.e. `|l| = 0.531`: inside that the
+ * film has to be at full strength, because that is the iris, the catchlight
+ * and everything anyone looks at. `FILM_REACH - 4*DELTA = 0.531` lands on it.
+ *
+ * What the fade costs, then, is the sliver of cap between the limbus and
+ * `CORNEA_ANG` — an annulus that is already carrying the limbus glow and the
+ * corneal shadow ring, which is the best place on the eye to hide a boundary.
+ * Four cells is 0.05 in tangent units, about 5% of the globe's radius, some
+ * fifteen screen pixels of gradient. Narrow, but a cliff it is not.
+ */
+export const FILM_REACH_FADE = 4 * DELTA;
+
+/** 1 where the film may be read, 0 where the fetch would clamp. */
+export function filmReach(lx: number, ly: number): number {
+  const m = Math.max(Math.abs(lx), Math.abs(ly));
+  return 1 - smoothstep(FILM_REACH - FILM_REACH_FADE, FILM_REACH, m);
+}
+
+/**
+ * TUNED. Tangent-space height gradient to normal tilt, in radians per unit of
+ * `dh/dl`.
+ *
+ * Measured on a CPU mirror of the two shipped passes at `PRIME_SECONDS`, over
+ * the cornea, one-cell forward differences — the same stencil the display uses:
+ *
+ *     |dh/dl| on wet film (h > 0.4)   p50 2.0   p90 14.8   p99 42
+ *     |dh/dl| everywhere              p50 2.5   p90 36.7   p99 50
+ *
+ * The tilt is `|dh/dl| * FILM_SLOPE`, and the sharp lobe is `pow(dot, 48)`,
+ * which is down to half at 0.169 rad. At 0.008 the median of the wet sheet
+ * tilts 0.016 rad — the catchlight keeps its shape and ripples — while the
+ * raised rims around the dry patches, the p90 and above, tilt 0.12 to 0.34 rad
+ * and cut the highlight apart. That split is the whole effect: **the film
+ * shards the catchlight exactly where it is tearing**, and leaves it alone
+ * where it is not.
+ */
+export const FILM_SLOPE = 0.008;
+
+/**
+ * DERIVED-ish. Height at which the film reads as fully wet in the specular.
+ *
+ * The wet well is at +1 and the dry well at -1, so the wetness ramp has to
+ * start somewhere in between. It starts at `DRY_H`, which is the same
+ * threshold the reduction pass counts as torn — so a patch the measurement
+ * calls dry is exactly a patch that reads as a hole in the sheen, and the
+ * lid fires on the thing the eye is showing. 0.7 above it is a little under
+ * half the remaining distance to the wet well, which puts the ramp across the
+ * interface rather than across the flat film on either side of it.
+ */
+export const WET_H = DRY_H + 0.7;
+
+/**
+ * How much sheen a given film height carries: 1 on wet film, 0 on a dry patch.
+ *
+ * **Subtractive, and that is the only thing that works here.** The sclera is
+ * near-white — `vec3(0.965, 0.95, 0.925)` before the light — so it has no
+ * headroom for a dry patch to be drawn by adding light. It has plenty of room
+ * to be drawn by taking the sheen away, which is also what a dry spot on a
+ * real eye is: not a bright mark, a dull one.
+ */
+export function wetness(h: number): number {
+  return smoothstep(DRY_H, WET_H, h);
+}
+
 /** Tangent-space centre of reduction tile (i, j). */
 function tileCentre(i: number, j: number, size: number): [number, number] {
   const s = DOMAIN / size;

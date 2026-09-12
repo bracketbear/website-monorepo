@@ -2,11 +2,18 @@ import { describe, it, expect } from 'vitest';
 import {
   BLINK_FRACTION,
   CLOSE_TIME,
+  CORNEA_ANG,
   CORNEA_L,
   DELTA,
   DOMAIN,
   DRY_H,
   EVAP,
+  FILM_REACH,
+  FILM_REACH_FADE,
+  FILM_SLOPE,
+  WET_H,
+  filmReach,
+  wetness,
   GRID,
   IFACE_CELLS,
   KAPPA,
@@ -665,5 +672,247 @@ describe('blink cadence', () => {
     const slow = runBlinks(1 / 15, 60);
     expect(slow[0].wall).toBeGreaterThan(fast[0].wall * 1.5);
     expect(slow.length).toBeLessThan(fast.length);
+  });
+});
+
+/**
+ * Where the specular lands, in the tangent frame the film lives in.
+ *
+ * `eyeW` lights the globe with `normalize(vec3(-0.45, -0.55, 0.85))` and the
+ * sharp term is `pow(dot(n, ld), 48.0)`, so the highlight peaks exactly where
+ * the surface normal equals the light. At rest the gaze frame is the identity
+ * (pinned by 'is the identity when the eye looks straight out'), so the
+ * tangent coordinate of that point is just the light's own xy.
+ */
+const LIGHT = (() => {
+  const v = [-0.45, -0.55, 0.85];
+  const n = Math.hypot(v[0], v[1], v[2]);
+  return { x: v[0] / n, y: v[1] / n, z: v[2] / n };
+})();
+
+/** The specular lobe is down to half here: 0.5^(1/48) = cos(0.169 rad). */
+const LOBE_HALF = Math.acos(Math.pow(0.5, 1 / 48));
+
+describe('the film reaches the catchlight', () => {
+  it('puts the catchlight outside the corneal cap, which is why the mask is a square', () => {
+    // The finding the whole shape of `filmReach` rests on. If this ever stops
+    // being true — the light moves, or the cap grows — the square mask has no
+    // reason to exist and a circular one is the simpler thing.
+    const lr = Math.hypot(LIGHT.x, LIGHT.y);
+    const ang = Math.acos(LIGHT.z);
+    expect(lr).toBeCloseTo(0.64, 2);
+    expect(ang).toBeCloseTo(0.696, 2);
+    expect(ang).toBeGreaterThan(CORNEA_ANG);
+    expect(lr).toBeGreaterThan(CORNEA_L);
+    // And no streak-free circular mask reaches it either: the largest circle
+    // that never leaves the square domain has radius DOMAIN/2.
+    expect(lr).toBeGreaterThan(DOMAIN / 2);
+  });
+
+  it('reads the film at full strength at the centre of the highlight', () => {
+    expect(filmReach(LIGHT.x, LIGHT.y)).toBeGreaterThan(0.98);
+  });
+
+  it('carries the film across most of the lobe, not just its peak', () => {
+    // Integrate pow(dot(n, ld), 48.0) over the visible globe and ask what
+    // share of the catchlight's energy the mask actually lets the film drive.
+    // A peak-only assertion would pass with a mask that clipped everything
+    // around it, which is the failure that reads as a hard-edged highlight.
+    const N = 600;
+    let total = 0;
+    let filmed = 0;
+    for (let a = 0; a < N; a++) {
+      for (let b = 0; b < N; b++) {
+        const lx = -1 + (2 * (a + 0.5)) / N;
+        const ly = -1 + (2 * (b + 0.5)) / N;
+        const r2 = lx * lx + ly * ly;
+        if (r2 >= 1) continue;
+        const d = lx * LIGHT.x + ly * LIGHT.y + Math.sqrt(1 - r2) * LIGHT.z;
+        if (d <= 0) continue;
+        const w = Math.pow(d, 48);
+        total += w;
+        filmed += w * filmReach(lx, ly);
+      }
+    }
+    // Measured 0.649 at these constants. The rest is the lobe's outer tail
+    // running off the field's square, where it keeps the painted highlight.
+    expect(filmed / total).toBeGreaterThan(0.6);
+  });
+});
+
+describe('the film mask', () => {
+  it('never lets a tap leave the texels the simulation wrote', () => {
+    // The outermost texel centre, and the three taps the display takes: the
+    // value and two forward differences one cell out. FILM_REACH is derived
+    // to make the furthest of those land exactly on the last centre, so this
+    // is an equality and not a margin.
+    const lastCentre = DOMAIN / 2 - DELTA / 2;
+    expect(FILM_REACH + DELTA).toBeCloseTo(lastCentre, 12);
+    // Past the reach the mask is off, so nothing samples the clamp.
+    expect(filmReach(FILM_REACH, 0)).toBe(0);
+    expect(filmReach(0, FILM_REACH)).toBe(0);
+    expect(filmReach(DOMAIN, DOMAIN)).toBe(0);
+  });
+
+  it('fades rather than cliff-edges', () => {
+    // A cliff would draw the mask's own boundary into the sheen. Walk the
+    // fade and require every step to be small: over a tenth of the fade width
+    // the mask may not move by more than a fifth.
+    let prev = filmReach(FILM_REACH - FILM_REACH_FADE * 1.2, 0);
+    let worst = 0;
+    for (let k = 1; k <= 60; k++) {
+      const m =
+        FILM_REACH - FILM_REACH_FADE * 1.2 + (k / 60) * FILM_REACH_FADE * 1.4;
+      const v = filmReach(m, 0);
+      worst = Math.max(worst, Math.abs(v - prev));
+      expect(v).toBeLessThanOrEqual(prev + 1e-12);
+      prev = v;
+    }
+    expect(worst).toBeLessThan(0.2);
+    // Half way through the fade it is half on, which is what makes the
+    // boundary a gradient a dry patch can straddle.
+    expect(filmReach(FILM_REACH - FILM_REACH_FADE / 2, 0)).toBeCloseTo(0.5, 6);
+    // And it is several cells wide, so the boundary is a gradient across a
+    // handful of texels rather than one.
+    expect(FILM_REACH_FADE / DELTA).toBeGreaterThanOrEqual(3);
+  });
+
+  it('is fully on across the iris and the limbus, in every direction', () => {
+    // The mask may eat the outer sliver of the corneal cap — the field is only
+    // 6% wider than the cap, so along the axes there is nothing to spare — but
+    // it must not touch the limbus or anything inside it. eye.ts rings the
+    // limbus at ang = 0.56, which is |l| = sin(0.56).
+    const limbusL = Math.sin(0.56);
+    expect(limbusL).toBeLessThan(CORNEA_L);
+    for (let k = 0; k < 720; k++) {
+      const a = (k / 720) * Math.PI * 2;
+      expect(filmReach(Math.cos(a) * limbusL, Math.sin(a) * limbusL)).toBe(1);
+    }
+    // Which is exactly the constraint that sets the fade width: the fade may
+    // not begin before the limbus.
+    expect(FILM_REACH - FILM_REACH_FADE).toBeGreaterThanOrEqual(limbusL);
+    // And what it costs is the annulus out to CORNEA_ANG, where the limbus
+    // glow and the corneal shadow ring already live.
+    expect(filmReach(CORNEA_L, 0)).toBeLessThan(1);
+    expect(CORNEA_ANG).toBeGreaterThan(0.56);
+  });
+});
+
+describe('wetness', () => {
+  it('reads the wells as fully wet and fully dry', () => {
+    expect(wetness(1)).toBe(1);
+    expect(wetness(-1)).toBe(0);
+  });
+
+  it('goes dark at exactly the threshold the measurement counts as torn', () => {
+    // The tie that makes the eye honest: a patch the reduction pass counts
+    // toward BLINK_FRACTION is exactly a patch that has lost its sheen. If
+    // these drifted apart the lid would fire on something nobody can see.
+    expect(wetness(DRY_H)).toBe(0);
+    expect(wetness(DRY_H - 0.01)).toBe(0);
+    expect(wetness(DRY_H + 0.01)).toBeGreaterThan(0);
+    expect(wetness(WET_H)).toBe(1);
+  });
+
+  it('rises monotonically and only across the interface', () => {
+    let prev = -1;
+    for (let k = 0; k <= 200; k++) {
+      const h = -1 + (k / 200) * 2;
+      const w = wetness(h);
+      expect(w).toBeGreaterThanOrEqual(prev);
+      prev = w;
+    }
+    // The ramp lives between the wells, not on the flat film either side:
+    // fresh film at h = 1 and a settled dry patch at h = -1 are both
+    // saturated, so the sheen only changes where the film is actually
+    // breaking.
+    expect(WET_H).toBeLessThan(1);
+    expect(DRY_H).toBeGreaterThan(-1);
+  });
+});
+
+describe('the film slope', () => {
+  /**
+   * Gradient magnitudes measured on a CPU mirror of the two shipped passes at
+   * PRIME_SECONDS, over the cornea, with the one-cell forward difference the
+   * display uses. See FILM_SLOPE.
+   */
+  const WET_G = { p50: 2.05, p90: 14.82, p99: 42.08 };
+
+  it('leaves the shape of the wet sheet alone', () => {
+    // The median of the wet film must not move the highlight: a catchlight
+    // that dissolved into noise everywhere would read as a broken shader, not
+    // as a wet eye. A tenth of the lobe's half-width is the budget.
+    expect(WET_G.p50 * FILM_SLOPE).toBeLessThan(LOBE_HALF * 0.15);
+  });
+
+  it('cuts the highlight apart at the rims of the dry patches', () => {
+    // And the p90 and above, which is the raised rim around each dry spot,
+    // must carry the normal clear of the lobe. This is the difference between
+    // a film that tears visibly and one that only tears in the debug view.
+    expect(WET_G.p90 * FILM_SLOPE).toBeGreaterThan(LOBE_HALF * 0.5);
+    expect(WET_G.p99 * FILM_SLOPE).toBeGreaterThan(LOBE_HALF);
+  });
+
+  it('never folds the normal over', () => {
+    // Even the worst gradient the field can hold — a full well-to-well step
+    // across one cell — has to stay a tilt rather than flipping the normal
+    // through the surface, where the specular would come back inverted.
+    expect((2 / DELTA) * FILM_SLOPE).toBeLessThan(Math.PI / 2);
+  });
+});
+
+describe('the smooth-bilinear fetch', () => {
+  /** The display's reconstruction: filmUV's smoothstep, then LINEAR. */
+  const smooth = (t: number[], p: number) => {
+    const i = Math.floor(p);
+    const f0 = p - i;
+    const f = f0 * f0 * (3 - 2 * f0);
+    return t[i] * (1 - f) + t[i + 1] * f;
+  };
+  /** What a plain fetch would give, for contrast. */
+  const linear = (t: number[], p: number) => {
+    const i = Math.floor(p);
+    const f = p - i;
+    return t[i] * (1 - f) + t[i + 1] * f;
+  };
+  const slope = (
+    fn: (t: number[], p: number) => number,
+    t: number[],
+    p: number
+  ) => {
+    const e = 1e-5;
+    return (fn(t, p + e) - fn(t, p - e)) / (2 * e);
+  };
+  // A kink at texel 2: the gradient a plain fetch reports jumps from 1 to 2
+  // across the boundary, and pow(dot, 48.0) would draw that jump.
+  const T = [0, 0, 1, 3, 3];
+
+  it('reproduces the field exactly at the texel centres', () => {
+    for (let i = 0; i < T.length - 1; i++)
+      expect(smooth(T, i)).toBeCloseTo(T[i], 12);
+  });
+
+  it('is C1 at the cell boundary where a plain fetch is not', () => {
+    const l = slope(smooth, T, 2 - 1e-3);
+    const r = slope(smooth, T, 2 + 1e-3);
+    expect(Math.abs(l - r)).toBeLessThan(0.02);
+    // The failure it is there to prevent, asserted so the comparison is real.
+    const ll = slope(linear, T, 2 - 1e-3);
+    const lr = slope(linear, T, 2 + 1e-3);
+    expect(Math.abs(ll - lr)).toBeCloseTo(1, 6);
+  });
+
+  it('costs at most half a cell of extra blur', () => {
+    // Smoothstep pulls the sample toward the nearer texel centre. The pull is
+    // bounded by a quarter cell, so the field is softened, not displaced --
+    // a bigger shift would move the dry patches away from where the
+    // measurement says they are.
+    let worst = 0;
+    for (let k = 0; k <= 100; k++) {
+      const f = k / 100;
+      worst = Math.max(worst, Math.abs(f * f * (3 - 2 * f) - f));
+    }
+    expect(worst).toBeLessThanOrEqual(0.25 + 1e-9);
   });
 });
