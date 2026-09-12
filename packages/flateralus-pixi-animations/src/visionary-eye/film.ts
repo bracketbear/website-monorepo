@@ -5,6 +5,7 @@ import {
   GRAVITY,
   GRID,
   KAPPA,
+  MAX_SUBSTEPS,
   MOBILITY,
   PRIME_SECONDS,
   SEED_AMPLITUDE,
@@ -458,7 +459,9 @@ export class FilmSim {
    */
   advance(dt: number, gravityLocal: [number, number]): void {
     const gl = this.gl;
-    this.acc = Math.min(this.acc + dt, 12 * STEP); // cap: 12 steps, never a spiral
+    // Cap the backlog so a slow frame degrades instead of spiralling; the
+    // ceiling is derived from the step rate, not a literal.
+    this.acc = Math.min(this.acc + dt, MAX_SUBSTEPS * STEP);
     if (this.acc < STEP) return;
     while (this.acc >= STEP) {
       this.acc -= STEP;
@@ -477,7 +480,7 @@ export class FilmSim {
    * Stamp a fresh, slightly flawed film and run it forward `PRIME_SECONDS`.
    *
    * Spec D11: the default state must show the best thing, and a flat film is a
-   * mirror. Priming costs ~2160 steps once at init so the eye loads mid-cycle
+   * mirror. Priming costs ~9350 steps once at init so the eye loads mid-cycle
    * with real structure rather than making the viewer wait out a first cycle.
    *
    * The duration is coupled to `EVAP` and lives in `physics.ts` beside it —

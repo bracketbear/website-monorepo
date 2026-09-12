@@ -19,8 +19,17 @@
 /** Tangent-space domain: (lx, ly) in [-0.6, 0.6]. */
 export const DOMAIN = 1.2;
 
-/** Field resolution. Grid size buys patch count; it does NOT buy break-up speed. */
-export const GRID = 128;
+/**
+ * Field resolution. Grid size buys patch count; it does NOT buy break-up
+ * speed — and, less obviously, it does not buy growth either. Substituting
+ * MOBILITY into availableEfolds() gives
+ *
+ *     availableEfolds = C * SAFETY / (8 * dt * n^4 * EVAP)
+ *
+ * in which GRID does not appear at all. So a *coarser* grid is free as far as
+ * break-up is concerned, and it is what pays for the finer timestep below.
+ */
+export const GRID = 96;
 
 /** DERIVED. Tangent units per cell. */
 export const DELTA = DOMAIN / GRID;
@@ -29,17 +38,54 @@ export const DELTA = DOMAIN / GRID;
 export const MM_PER_UNIT = 5.85 / Math.sin(0.6);
 
 /**
- * Interface half-width, in cells. This is the load-bearing number: the e-fold
- * time goes as n^4, so it is the only cheap lever on how fast the film tears.
- * Below ~1.5 the front is under-resolved and patches go square.
+ * Interface half-width, in cells. The load-bearing number: everything about
+ * growth goes as n^-4, so this is by far the strongest lever in the file.
+ *
+ * **The invariant to protect when changing it is `IFACE_CELLS * DELTA`**, the
+ * interface width in *tangent units*. KAPPA, patchWavelength() and therefore
+ * the ~9.6 patches across the cornea all depend on that product and not on
+ * either factor alone. Going from (128, 2.0) to (96, 1.5) holds it at exactly
+ * 0.01875 — identical physics, identical patch size — while cutting n^4 from
+ * 16 to 5.06 and winning 3.2x of growth budget for free. That trade is the
+ * whole reason this file's grid is 96 and not 128.
+ *
+ * 1.5 is the floor: below it the front is under-resolved and patches go
+ * square. Measured on the CPU reference, 1.5 does cost some isotropy — the
+ * 4-fold anisotropy of the interface normals runs ~0.22 against ~0.09 at
+ * n = 2 — which is a mild grid preference, not square patches. Do not go
+ * lower without looking at the patches.
  */
-export const IFACE_CELLS = 2;
+export const IFACE_CELLS = 1.5;
 
 /** DERIVED. Gradient-energy coefficient. Interface half-width sqrt(2*kappa) = n cells. */
 export const KAPPA = Math.pow(IFACE_CELLS * DELTA, 2) / 2;
 
-/** Fixed simulation step. Spec D3: derived with GRID and IFACE_CELLS, not chosen. */
-export const STEP = 1 / 480;
+/**
+ * Fixed simulation step. Spec D3: derived with GRID and IFACE_CELLS, not
+ * chosen.
+ *
+ * Growth goes as 1/dt, because a finer step raises the stability ceiling on
+ * MOBILITY proportionally. Together with n = 1.5 this is what takes
+ * availableEfolds() from 0.27 — where the film provably cannot tear at any
+ * seed — to 2.99, where it separates to the full depth of the well.
+ *
+ * The cost is 96*96*2*1700 = 31.3M fragments/s at 28.3 substeps per 60fps
+ * frame, against 15.7M and 8 substeps for the 128/480 pair it replaces. The
+ * coarser grid pays for most of the finer step: 11x the growth for 2x the
+ * cost.
+ */
+export const STEP = 1 / 1700;
+
+/**
+ * DERIVED. Ceiling on substeps per frame, so a slow frame degrades instead of
+ * spiralling.
+ *
+ * 1.5x what a 60fps frame needs, which is the ratio the original 12-step cap
+ * had to its own 8. The harness clamps its own dt to 0.05s, so this is also
+ * half of the most a single frame can ever ask for: at 20fps the film runs at
+ * half speed rather than taking the frame time with it.
+ */
+export const MAX_SUBSTEPS = Math.round(1.5 / (60 * STEP));
 
 /**
  * TUNED. Fraction of the stability limit the mobility is allowed to use.
@@ -94,21 +140,22 @@ export function patchWavelength(): number {
  * TUNED, but bounded from above. Evaporation, h per second.
  *
  * EVAP does two jobs and they pull against each other. It sets the blink
- * cadence — the cycle runs about 2/EVAP plus the growth time, so ~7.9s here —
- * and it sets how long the mean spends inside the spinodal band, because the
- * mean crosses that band at exactly this rate.
+ * cadence, since the mean crosses the whole well in 2/EVAP, and it sets the
+ * growth budget, since availableEfolds() goes as 1/EVAP — the mean crosses
+ * the unstable band at exactly this rate too, and a fast traverse leaves a
+ * disturbance no time to grow.
  *
- * The second job sets a ceiling. availableEfolds() goes as 1/EVAP, so a fast
- * traverse leaves a disturbance no time to grow — but the dependence is so
- * weak that EVAP cannot be the lever that makes the film tear: reaching three
- * e-folds this way needs EVAP near 0.018 and a two-minute blink cycle. The
- * structure comes from SEED_AMPLITUDE instead, and EVAP is left to do the job
- * it is actually good at.
+ * Raising it therefore trades cadence against whether the film tears at all,
+ * and the invariant test will say so. At 0.20 the budget is 2.99 e-folds:
+ * comfortably above the ~3 needed to grow the seed into patches, and the
+ * traverse takes about 10s with break-up at 5.5s, so the blink cycle lands
+ * near 6s.
  *
- * 0.20 gives a ~10s traverse and a blink cycle near 8s. It remains the single
- * named lever for cadence — spec D6 forbids an interval floor or ceiling on
- * the blink state machine — but note it also moves PRIME_SECONDS, which has
- * to stay inside the window where patches are formed and film remains.
+ * Note that EVAP is a *weak* lever on growth — everything else in the budget
+ * goes as n^-4 or 1/dt. It could not rescue the film on its own when the
+ * budget was 0.27, and it should not be reached for first now. It remains the
+ * single named lever for cadence per spec D6, but it also moves
+ * PRIME_SECONDS, which has to stay inside the break-up window.
  */
 export const EVAP = 0.2;
 
@@ -118,20 +165,22 @@ export const EVAP = 0.2;
  * interpolates this constant into the GLSL rather than repeating the number,
  * so they cannot drift.
  *
- * 0.6 is not a perturbation, and it is not meant to be. availableEfolds()
- * below says the traverse can amplify a disturbance by at most ~1.3x, so
- * **the seed has to carry the structure** — there is no regime on this grid
- * and this step where a small seed grows into patches. Spec D4 already says
- * the lid lays an imperfect film; this is that sentence taken literally
- * rather than decoratively, and it matches how real break-up works, nucleated
- * at mucin defects and lid-wiper irregularities at sites that repeat in the
- * same eye rather than emerging from noise.
+ * This is a *perturbation*, and it has to stay one. With availableEfolds() at
+ * 2.99 the instability amplifies it by ~20x and, more importantly, **selects
+ * its own pattern**: measured on the CPU reference, the correlation between
+ * the seed field and the broken-up field falls from 0.50 before break-up to
+ * 0.00-0.05 after it. The patches are grown, not drawn. A seed large enough
+ * to survive into the final pattern would make this decoration wearing a
+ * physics-shaped wrapper, which is the one outcome worse than a visible
+ * failure, because it looks right and nobody revisits it.
  *
- * Measured on a CPU reference of the exact two-pass arithmetic: peak spread
- * 0.19 at seed 0.25, 0.34 at 0.40, 0.55 at 0.60. 0.6 is the smallest value
- * whose patches reach an amplitude that reads.
+ * 0.06 within a workable range of roughly 0.03-0.09, all of which separate to
+ * the full well depth with correlation near zero. The middle is chosen for
+ * precision headroom: the field may fall back to RGBA16F, where the quantum
+ * near h = 0.5 is about 4.9e-4, and the pre-break-up spread at 0.06 is 0.011
+ * — some 22 quanta, where 0.03 would leave only 11.
  */
-export const SEED_AMPLITUDE = 0.6;
+export const SEED_AMPLITUDE = 0.06;
 
 /**
  * DERIVED. Seconds the mean spends inside the spinodal band, where f''(h) < 0
@@ -174,9 +223,17 @@ export function spinodalResidence(): number {
  * then some — so break-up is a transient that has to be caught mid-traverse.
  * That is what PRIME_SECONDS is for.
  *
- * Here G = 0.267, a gain of 1.31x. It is an upper bound: it assumes every bit
- * of the seed sits at the single best wavelength. The CPU reference measures
- * 1.09x for the actual three-octave seed.
+ * Here G = 2.99, a linear gain of about 20x. Two things about that number:
+ *
+ * - It is the *linear* budget. Once the disturbance is O(1) the double well
+ *   takes over and drives separation the rest of the way to +/-1, so the
+ *   reference measures a total gain nearer 40x. The linear budget is what
+ *   decides whether break-up starts at all, which is the question that
+ *   matters.
+ * - An earlier revision of this file ran at 0.27 — a gain of 1.3 — where the
+ *   instability could not start at any seed, and the film thinned evenly
+ *   forever. The lever that fixed it was n^-4 and 1/dt together (see GRID,
+ *   IFACE_CELLS and STEP), not EVAP and not the seed.
  */
 export const TRANSIENT_GAIN_C = 0.0237555;
 
@@ -193,23 +250,25 @@ export function availableEfolds(): number {
  * break-up is a window, and priming is what lands the viewer inside it.
  *
  * Transport is conservative under the Neumann boundary, so the spatial mean
- * obeys d<h>/dt = -EVAP while film remains. Measured on the CPU reference at
- * SEED_AMPLITUDE = 0.6, EVAP = 0.2 (t, mean, spread, fraction below DRY_H):
+ * obeys d<h>/dt = -EVAP while film remains, and break-up is explosive once it
+ * starts. Measured on the CPU reference at SEED_AMPLITUDE = 0.06, EVAP = 0.2
+ * (t, mean, spread, fraction below DRY_H, correlation with the seed):
  *
- *     3.0   0.096  0.504   0.0%   patches visible, nothing torn yet
- *     4.0  -0.093  0.603   2.3%   first patches reach the dry threshold
- *     4.5  -0.177  0.641  11.5%   <- here: strongest contrast, film remains
- *     5.5  -0.319  0.666  57.9%   past half the cornea, blink is overdue
- *     7.0  -0.469  0.548  98.3%   effectively all dry, contrast collapsing
+ *     3.05   0.359  0.012   0.0%  corr 0.50   flat; thinning evenly
+ *     4.50   0.069  0.131   0.0%  corr 0.26   the instability takes hold
+ *     5.00  -0.028  1.184   1.5%  corr 0.02   tearing, pattern now its own
+ *     5.55  -0.121  1.621  29.4%  corr 0.00   <- here: deep patches, film left
+ *     6.05  -0.181  1.898  51.6%  corr 0.00   past BLINK_FRACTION
+ *     7.55  -0.319  1.950  62.4%  corr 0.05   mostly dry, contrast flattening
  *
- * 4.5s is where the patches are darkest against film that is still light —
- * grey 0.24 against 0.56 on the debug ramp — and it leaves headroom before
- * the break-up fraction crosses BLINK_FRACTION. Too late and the viewer gets
- * a uniformly dry field on the first frame, which reads as a dead shader and
- * is not one. If EVAP or SEED_AMPLITUDE moves, re-run the sweep; the test
- * pins the outer bounds but only measurement finds the best point inside.
+ * 5.5s is where the patches are darkest against film that is still bright —
+ * grey 0.07 against 0.88 on the debug ramp — and it sits just under
+ * BLINK_FRACTION, so the eye loads fully broken up and blinks shortly after.
+ * Note how narrow the window is: at 4.5 there is nothing to see and by 7.5 it
+ * is nearly uniform. If EVAP or SEED_AMPLITUDE moves, re-run the trace; the
+ * test pins the outer bounds but only measurement finds the point inside.
  */
-export const PRIME_SECONDS = 4.5;
+export const PRIME_SECONDS = 5.5;
 
 /** TUNED. Downward drain, 1.5 cells/s, tuned by eye — not derived. */
 export const GRAVITY = 1.5 * DELTA;

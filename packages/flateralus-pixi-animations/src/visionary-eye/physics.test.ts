@@ -10,6 +10,7 @@ import {
   GRID,
   IFACE_CELLS,
   KAPPA,
+  MAX_SUBSTEPS,
   MOBILITY,
   OPEN_TIME,
   PRIME_SECONDS,
@@ -39,26 +40,70 @@ import {
 describe('tear film constants', () => {
   it('derives the cell size from the domain and grid', () => {
     expect(DOMAIN).toBe(1.2);
-    expect(GRID).toBe(128);
-    expect(DELTA).toBeCloseTo(0.009375, 12);
+    expect(GRID).toBe(96);
+    expect(DELTA).toBeCloseTo(0.0125, 12);
+    // The reduction tiles must divide the grid exactly, or breakupFraction is
+    // measuring tiles of unequal area.
+    expect(GRID % REDUCE).toBe(0);
   });
 
-  it('lays a seed that survives the traverse at an amplitude that reads', () => {
-    // THE invariant. The traverse cannot manufacture structure: integrating
-    // sigma(k, t) from the start of the descent — including the stretch above
-    // the spinodal band, where the film is STABLE and actively damps the seed
-    // — caps the gain at availableEfolds(), which here is 0.27, a factor of
-    // 1.31. So whatever the seed is worth on the way in is essentially what
-    // the patches are worth on the way out, and the seed must therefore be
-    // large enough on its own.
-    //
-    // Two earlier revisions failed exactly here, both with a 3% seed: the disc
-    // thinned evenly and never tore. Nothing in the rendering is wrong when
-    // that happens, which is what makes it expensive to find. 0.5 is the
-    // amplitude a patch needs to read against the well depth of 1.0.
+  it('holds the physical interface width while the grid changes', () => {
+    // IFACE_CELLS*DELTA — the interface width in tangent units — is the
+    // invariant, not either factor. It is what KAPPA and therefore the patch
+    // size depend on, so (128, 2.0) and (96, 1.5) are the same physics: the
+    // coarser grid buys n^-4 of growth budget and changes nothing visible.
+    expect(IFACE_CELLS * DELTA).toBeCloseTo(0.01875, 12);
+    expect(IFACE_CELLS * DELTA).toBeCloseTo(2 * (1.2 / 128), 12);
+    expect(Math.sqrt(2 * KAPPA)).toBeCloseTo(IFACE_CELLS * DELTA, 12);
+  });
+
+  it('keeps the growth budget independent of grid resolution', () => {
+    // Substituting MOBILITY into availableEfolds() cancels DELTA entirely:
+    //   availableEfolds = C * SAFETY / (8 * dt * n^4 * EVAP)
+    // Resolution buys patch count and nothing else. Getting this backwards
+    // means refining the grid to make break-up faster and watching nothing
+    // change, which is the trap spec D3 called out and then fell into.
+    expect(availableEfolds()).toBeCloseTo(
+      (TRANSIENT_GAIN_C * SAFETY) /
+        (8 * STEP * Math.pow(IFACE_CELLS, 4) * EVAP),
+      12
+    );
+  });
+
+  it('caps substeps above what a 60fps frame needs', () => {
+    // Derived from the step rate, never a literal: 1.5x a 60fps frame, which
+    // is also half of the most the harness's 0.05s dt clamp can ask for, so a
+    // slow frame runs the film at reduced speed instead of spiralling.
+    expect(MAX_SUBSTEPS).toBe(43);
+    expect(MAX_SUBSTEPS * STEP).toBeGreaterThan(1 / 60);
+    expect(MAX_SUBSTEPS * STEP).toBeLessThan(0.05);
+  });
+
+  it('grows the seed into patches that read', () => {
+    // Lower bound. 0.5 is the amplitude a patch needs to read against a well
+    // depth of 1.0, and the budget has to be able to get the seed there.
+    // Earlier revisions failed exactly here with a 3% seed against 0.27
+    // e-folds: the disc thinned evenly and never tore. Nothing in the
+    // rendering is wrong when that happens, which is what makes it expensive
+    // to find.
     expect(SEED_AMPLITUDE * Math.exp(availableEfolds())).toBeGreaterThanOrEqual(
       0.5
     );
+  });
+
+  it('keeps the seed small enough that the pattern is grown, not drawn', () => {
+    // Upper bound, and the more important half. A seed large enough to be the
+    // final pattern would pass a visual check while being decoration wearing a
+    // physics-shaped wrapper — worse than a visible failure, because it looks
+    // right and nobody revisits it. One revision reached SEED_AMPLITUDE = 0.6
+    // for precisely that reason and had to be rejected on sight.
+    //
+    // So require the instability to supply at least 8x of the final amplitude.
+    // Measured against this: the correlation between the seed field and the
+    // broken-up field falls from 0.50 before break-up to 0.00-0.05 after, so
+    // the patches genuinely do not remember where the seed put them.
+    expect(Math.exp(availableEfolds())).toBeGreaterThanOrEqual(8);
+    expect(SEED_AMPLITUDE).toBeLessThanOrEqual(0.5 / 8);
   });
 
   it('measures the growth budget from the integrated rate, not the residence', () => {
@@ -121,10 +166,15 @@ describe('tear film constants', () => {
   });
 
   it('lands the derived timescale and patch size the spec argued for', () => {
-    // e-fold = 32*dt*n^4/s at the spinodal; the spec's table says 1.78s.
-    expect(efoldSeconds()).toBeCloseTo(1.778, 2);
-    // patch wavelength = 2*pi*n*delta; 0.1178 tangent units = 1.22mm.
+    // e-fold = 32*dt*n^4/s at the spinodal. The re-derived D3 pair puts this
+    // at 0.159s, against 1.78s for the original 128/480/n=2 — 11x faster for
+    // 2x the fragment cost, which is what makes the field tear at all.
+    expect(efoldSeconds()).toBeCloseTo(0.1588, 4);
+    // patch wavelength = 2*pi*n*delta; 0.1178 tangent units = 1.22mm. This is
+    // UNCHANGED by the re-derivation and must stay so: it is the clinical
+    // number (break-up patches run 0.5-2mm) and the reason the trade is free.
     expect(patchWavelength()).toBeCloseTo(0.1178, 4);
+    expect(DOMAIN / patchWavelength()).toBeCloseTo(10.2, 1);
   });
 
   it('puts the cornea inside the domain with margin', () => {
