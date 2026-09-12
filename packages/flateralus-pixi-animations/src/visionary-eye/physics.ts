@@ -89,3 +89,43 @@ export const CORNEA_L = Math.sin(CORNEA_ANG);
 
 /** Iris plane depth behind the corneal apex: 3.6mm in tangent units. */
 export const IRIS_DEPTH = 3.6 / MM_PER_UNIT;
+
+/** Reduction target edge. 64 texels is one small readback instead of 128KB. */
+export const REDUCE = 8;
+
+/** h at or below this counts as torn. The wells sit at +1 and -1. */
+export const DRY_H = -0.3;
+
+/** Tangent-space centre of reduction tile (i, j). */
+function tileCentre(i: number, j: number, size: number): [number, number] {
+  const s = DOMAIN / size;
+  return [-DOMAIN / 2 + (i + 0.5) * s, -DOMAIN / 2 + (j + 0.5) * s];
+}
+
+export function tileInsideCornea(i: number, j: number, size: number): boolean {
+  const [x, y] = tileCentre(i, j, size);
+  return Math.hypot(x, y) <= CORNEA_L;
+}
+
+/**
+ * Fraction of the cornea that has torn, from the per-tile minima of h.
+ *
+ * Minima and not means: a tile is torn as soon as any part of it is, which is
+ * what makes the measurement responsive to a patch opening rather than to the
+ * whole film sagging.
+ */
+export function breakupFraction(
+  tileMin: Float32Array,
+  size: number = REDUCE
+): number {
+  let on = 0;
+  let dry = 0;
+  for (let j = 0; j < size; j++) {
+    for (let i = 0; i < size; i++) {
+      if (!tileInsideCornea(i, j, size)) continue;
+      on++;
+      if (tileMin[j * size + i] <= DRY_H) dry++;
+    }
+  }
+  return on === 0 ? 0 : dry / on;
+}

@@ -3,16 +3,20 @@ import {
   CORNEA_L,
   DELTA,
   DOMAIN,
+  DRY_H,
   GRID,
   IFACE_CELLS,
   KAPPA,
   MOBILITY,
+  REDUCE,
   SAFETY,
   STEP,
+  breakupFraction,
   clampMobility,
   efoldSeconds,
   mobilityLimit,
   patchWavelength,
+  tileInsideCornea,
 } from './physics';
 
 describe('tear film constants', () => {
@@ -54,5 +58,46 @@ describe('tear film constants', () => {
   it('puts the cornea inside the domain with margin', () => {
     expect(CORNEA_L).toBeCloseTo(Math.sin(0.6), 12);
     expect(CORNEA_L).toBeLessThan(DOMAIN / 2);
+  });
+});
+
+describe('break-up fraction', () => {
+  const size = REDUCE;
+  const wet = () => new Float32Array(size * size).fill(1);
+
+  it('counts only tiles whose centre lies on the cornea', () => {
+    // Corner tiles sit outside the cap and must never be counted.
+    expect(tileInsideCornea(0, 0, size)).toBe(false);
+    expect(tileInsideCornea(size - 1, size - 1, size)).toBe(false);
+    // Centre tiles are always on it.
+    expect(tileInsideCornea(size / 2, size / 2, size)).toBe(true);
+  });
+
+  it('is zero for a fully wet film', () => {
+    expect(breakupFraction(wet())).toBe(0);
+  });
+
+  it('is one when every corneal tile has torn', () => {
+    const t = new Float32Array(size * size).fill(-1);
+    expect(breakupFraction(t)).toBe(1);
+  });
+
+  it('ignores dry tiles that fall outside the cornea', () => {
+    const t = wet();
+    t[0] = -1; // a corner, off the cap
+    expect(breakupFraction(t)).toBe(0);
+  });
+
+  it('uses the dry threshold, not the sign of h', () => {
+    const t = wet();
+    const c = (size / 2) * size + size / 2;
+    t[c] = DRY_H + 0.01; // thinning, not yet torn
+    expect(breakupFraction(t)).toBe(0);
+    t[c] = DRY_H - 0.01;
+    expect(breakupFraction(t)).toBeGreaterThan(0);
+  });
+
+  it('returns zero rather than NaN for a degenerate grid', () => {
+    expect(breakupFraction(new Float32Array(0), 0)).toBe(0);
   });
 });
