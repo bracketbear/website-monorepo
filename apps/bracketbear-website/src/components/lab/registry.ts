@@ -10,6 +10,7 @@ import {
   createCrtPhosphorAnimation,
   createDmtTunnelAnimation,
   createEnergyBodyAnimation,
+  createErosionTableAnimation,
   createFoilStatementAnimation,
   createGooLampAnimation,
   createHalftoneTideAnimation,
@@ -453,6 +454,18 @@ export const REGISTRY: LabEntry[] = [
       'A water surface integrated with the 2D wave equation, with caustics computed rather than painted: the display pass measures the Jacobian of the refraction map, so the floor brightens where rays converge. Pool toys ride the result.',
     create: (initialControls) =>
       createCausticsPoolAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'erosion-table',
+    section: 'toys',
+    name: 'Erosion Table',
+    tag: 'glsl sim',
+    blurb:
+      'Mt Hood, baked from real elevation and left out in the rain. Water is routed down the actual surface by a virtual-pipe shallow-water scheme, and the drainage network is measured rather than drawn: flow lifts sediment wherever its capacity beats its load and drops it wherever capacity collapses, so valleys cut themselves and fans spread at the mouths. The terrain routes the water and the water rewrites the terrain, with nothing else in the loop. Drag to rain on it.',
+    create: (initialControls) =>
+      createErosionTableAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

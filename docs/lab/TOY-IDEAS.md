@@ -45,22 +45,23 @@ Do objects read the field and write back into it? Optional, but it is what makes
 
 ## Status
 
-| Idea                                       | Rubric            | Status                          |
-| ------------------------------------------ | ----------------- | ------------------------------- |
-| [Erosion Table](#erosion-table)            | strong on 1, 2, 5 | **recommended next**            |
-| [Lichtenberg](#lichtenberg)                | strong on 2, 4    | ready to spec                   |
-| [Frost](#frost)                            | strong on 1, 2    | ready to spec                   |
-| [Soap Film](#soap-film)                    | strong on 2, 4    | ready to spec                   |
-| [Ember](#ember)                            | strong on 2, 4    | ready to spec                   |
-| [Light Garden](#light-garden)              | strong on 1, 5    | ready to spec                   |
-| [Chladni Plate](#chladni-plate--abandoned) | fails 1, 2, 3     | **abandoned** — see post-mortem |
+| Idea                                       | Rubric            | Status                                |
+| ------------------------------------------ | ----------------- | ------------------------------------- |
+| [Erosion Table](#erosion-table)            | strong on 1, 2, 5 | **built** — shipped to the toys shelf |
+| [Lichtenberg](#lichtenberg)                | strong on 2, 4    | ready to spec                         |
+| [Frost](#frost)                            | strong on 1, 2    | ready to spec                         |
+| [Soap Film](#soap-film)                    | strong on 2, 4    | ready to spec                         |
+| [Ember](#ember)                            | strong on 2, 4    | ready to spec                         |
+| [Light Garden](#light-garden)              | strong on 1, 5    | ready to spec                         |
+| [Chladni Plate](#chladni-plate--abandoned) | fails 1, 2, 3     | **abandoned** — see post-mortem       |
 
 ---
 
-## Erosion Table
+## Erosion Table — built
 
-**Recommended next.** It is the only candidate that is strong on subject,
-legibility and loop closure at once, and the data is already in the build.
+Shipped to the toys shelf. It was the only candidate strong on subject,
+legibility and loop closure at once, and the data was already in the build.
+What follows is the original case for it; the build notes are at the end.
 
 - **State:** heightmap + water depth + suspended sediment, all integrated.
 - **Measured:** drainage networks. Water flows down the gradient, picks up
@@ -75,6 +76,80 @@ legibility and loop closure at once, and the data is already in the build.
   `hood` and `pgh`, so the opening state is a real mountain rather than noise.
 - **No resonance, no Q, no eigenvalues** — nothing that trades beauty against
   interactivity, which is precisely what killed the plate.
+
+### What it cost
+
+All of it held. There is no tension between looking good and responding, the
+subject carried the whole way, and the drainage networks are the simulation's
+answer rather than anyone's texture. What follows is what was not obvious in
+advance.
+
+**Every real bug was found by arithmetic, not by looking.** A CPU mirror of
+the two GPU passes, exercised headlessly, caught four things that would have
+been invisible or misattributed on screen:
+
+1. **The open boundary was a weir, not an edge.** With the ground outside the
+   domain at the same height, the head difference across the rim is only the
+   local water depth, while head differences inside come from the terrain
+   slope and are an order of magnitude larger. The interior fed the rim
+   faster than the rim could drain and the table flooded. An edge has to be a
+   cliff.
+2. **A missing factor of the cell size in the flux update.** The pipe carries
+   depth per second; the momentum equation is written for discharge per unit
+   width. Those differ by one cell size, and the head difference needs
+   another to become a slope. With one dropped, flow speed came out
+   proportional to grid resolution — it would have looked like a plausible
+   river at whatever grid it was tuned on and run seven times slower in
+   production.
+3. **Capacity from the gradient magnitude cannot channelise.** `|grad b|` is
+   largest on the steep _walls_ of a nascent channel, where the water runs
+   along the contour and does no work. Walls then cut back as fast as floors
+   and every channel washes flat as it forms. Stream power is discharge times
+   the downslope gradient _along the flow_, which is zero across a wall.
+4. **Erosion is capacity-limited, so the dissolving rate saturates.**
+   Suspended load reaches capacity within a step or two. Above a dissolving
+   rate of about 40 nothing changes but the stiffness of the integrator, so
+   the Erosion Rate control scales capacity instead.
+
+**The measure has to be chosen as carefully as the model.** The obvious
+channelisation metric — how concentrated the water is — turned out to track
+the weather rather than the landscape. Storm cells land patchily and even
+out, so the number falls over the first minute whether the bed is erodible or
+made of glass, and it read as "no channelisation" for three rounds of
+misdirected tuning. Two measures survived: the correlation between where the
+bed was cut and where discharge accumulated, and the spread of terrain height
+about a local average of it. Both need a control run with erosion switched off
+to mean anything.
+
+**Stream power alone is not a landscape model.** It has no limiter: capacity
+goes as the slope along the flow, so a cell that cuts deeper gets a steeper
+approach and cuts faster, without bound. Measured at a 128-cell grid the
+deepest cell drilled to twelve times the relief of the whole mountain and the
+field stopped being finite. Two terms fix it, and both are physics rather than
+damping:
+
+- **Hillslope creep**, which stops channels being exactly one cell wide.
+  Without it the feedback concentrates on whichever single cell is deepest and
+  the result is a grid of slot canyons that reads as stair-stepped rubbish
+  however it is shaded.
+- **Slope failure at the angle of repose**, which is what actually kills the
+  singularity. Creep can suppress it too, but only at a strength where
+  diffusion outruns stream power and the valleys stop being the story —
+  visible as the correlation between incision and discharge going _negative_,
+  because creep lowers ridges and fills valleys, which is the opposite
+  signature. Slope failure only touches ground already too steep to stand up,
+  so everything gentler keeps whatever the water did to it.
+
+**Seed roughness is measured in slope, not in height.** The bake adds fine
+noise so the channel-forming instability has something to bite on. At 0.4% of
+relief that sounds negligible — and across a single cell it is a 23-degree
+facet, which the hillshade turns into a field of visible blocks. Roughness has
+to stay below what the grid can resolve, and its amplitude has to be judged
+after dividing by the cell size.
+
+**Three of the six tools from the Chladni list would have paid for
+themselves here**, and the one that did was built: the headless harness. The
+float-texture probe and the sim scrub would have shortened the rest.
 
 ## Lichtenberg
 
