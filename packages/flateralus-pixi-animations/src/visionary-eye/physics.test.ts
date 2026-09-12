@@ -6,11 +6,13 @@ import {
   DELTA,
   DOMAIN,
   DRY_H,
+  EVAP,
   GRID,
   IFACE_CELLS,
   KAPPA,
   MOBILITY,
   OPEN_TIME,
+  PRIME_SECONDS,
   REDUCE,
   REFRACTORY,
   SAFETY,
@@ -35,6 +37,18 @@ describe('tear film constants', () => {
     expect(DOMAIN).toBe(1.2);
     expect(GRID).toBe(128);
     expect(DELTA).toBeCloseTo(0.009375, 12);
+  });
+
+  it('stops priming before the film is fully dry', () => {
+    // Transport is conservative, so the spatial mean falls at exactly EVAP
+    // while film remains: <h> goes +1 -> -1 in 2/EVAP seconds. Priming for
+    // longer than that hands the viewer a uniformly dry field on the first
+    // frame, which renders as a black disc and reads as a dead shader.
+    // This is the invariant the first pass at the spec violated.
+    expect(PRIME_SECONDS).toBeLessThan(2 / EVAP);
+    // And it must land after the instability has had time to bite, or there
+    // is nothing to see and priming has bought nothing.
+    expect(PRIME_SECONDS).toBeGreaterThan(1 / EVAP);
   });
 
   it('sets kappa from the interface width in cells', () => {

@@ -6,6 +6,7 @@ import {
   GRID,
   KAPPA,
   MOBILITY,
+  PRIME_SECONDS,
   STEP,
   clampMobility,
 } from './physics';
@@ -93,7 +94,15 @@ const STEP_FRAG =
       float hb = texture(uH, vUV + vec2(0.0, -e)).x;
       float ht = texture(uH, vUV + vec2(0.0,  e)).x;
       vec2 g = vec2(hr - hl, ht - hb) / (2.0 * uDelta);
-      float nh = c.x + uDt * (uM * lapMu - uEvap - dot(uGravity, g));
+      // Evaporation acts only where there is still film. Without this gate the
+      // conservative transport leaves the mean in free fall (d<h>/dt = -E) and
+      // the field marches past the dry well forever. Gating and not clamping:
+      // a max(nh, -1.0) would also stop the runaway, but it clamps the
+      // conservative transport with it and flattens the raised rims around
+      // each dry patch — and those rims are what make dewetting read as holes
+      // rather than as stains.
+      float evap = uEvap * smoothstep(-0.9, 0.1, c.x);
+      float nh = c.x + uDt * (uM * lapMu - evap - dot(uGravity, g));
       fragColor = vec4(min(nh, 1.0), c.y, 0.0, 1.0);
     }`;
 
@@ -412,11 +421,15 @@ export class FilmSim {
   }
 
   /**
-   * Stamp a fresh, slightly flawed film and run it forward ~4s.
+   * Stamp a fresh, slightly flawed film and run it forward `PRIME_SECONDS`.
    *
    * Spec D11: the default state must show the best thing, and a flat film is a
-   * mirror. Priming costs 1920 steps once at init so the eye loads mid-cycle
+   * mirror. Priming costs ~1056 steps once at init so the eye loads mid-cycle
    * with real structure rather than making the viewer wait out a first cycle.
+   *
+   * The duration is coupled to `EVAP` and lives in `physics.ts` beside it —
+   * run past `2/EVAP` and the mean reaches the dry well before first paint,
+   * which paints a uniformly black disc.
    */
   prime(seed: number): void {
     const gl = this.gl;
@@ -429,7 +442,7 @@ export class FilmSim {
     // Straight down in the local frame: priming happens before any gaze, and
     // the direction it ran under stops mattering within a cycle anyway.
     const g: [number, number] = [0, 1];
-    const n = Math.round(4 / STEP);
+    const n = Math.round(PRIME_SECONDS / STEP);
     for (let k = 0; k < n; k++) {
       this.pass(this.muProg, this.muL, g);
       this.pass(this.stepProg, this.stepL, g);

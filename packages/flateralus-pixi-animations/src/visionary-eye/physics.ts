@@ -104,6 +104,24 @@ export function patchWavelength(): number {
  */
 export const EVAP = 0.5;
 
+/**
+ * TUNED. Seconds of real steps run at build time, so the eye loads mid-cycle
+ * rather than as a mirror. Spec D11.
+ *
+ * **Coupled to EVAP.** Transport is conservative under the Neumann boundary,
+ * so it integrates to zero and the spatial mean obeys d<h>/dt = -EVAP exactly
+ * while there is film left to evaporate. From a fresh film at <h> = +1 that
+ * means the mean enters the spinodal at 1/(2*EVAP) = 1s, peaks at 1/EVAP = 2s
+ * and reaches the dry well at 2/EVAP = 4s. Priming past 2/EVAP hands the
+ * viewer a uniformly dry field on the first frame — a black disc, which reads
+ * as a dead shader and is not one.
+ *
+ * So: PRIME_SECONDS must stay below 2/EVAP, and 2.2s puts first paint inside
+ * the window where patches have formed but film still remains. If EVAP moves
+ * to re-cadence the blink, this moves with it; the test pins the invariant.
+ */
+export const PRIME_SECONDS = 2.2;
+
 /** TUNED. Downward drain, 1.5 cells/s, tuned by eye — not derived. */
 export const GRAVITY = 1.5 * DELTA;
 
