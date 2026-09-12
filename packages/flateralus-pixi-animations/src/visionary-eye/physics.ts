@@ -129,3 +129,74 @@ export function breakupFraction(
   }
   return on === 0 ? 0 : dry / on;
 }
+
+/** Corneal break-up share that triggers a blink. */
+export const BLINK_FRACTION = 0.35;
+
+/** Minimum seconds between blinks, so a measurement at the threshold cannot chatter. */
+export const REFRACTORY = 1.5;
+
+/** Lid travel. Real blinks close faster than they open. */
+export const CLOSE_TIME = 0.1;
+export const OPEN_TIME = 0.18;
+
+export type LidPhase = 'open' | 'closing' | 'opening';
+
+export interface BlinkState {
+  phase: LidPhase;
+  /** Seconds elapsed inside the current phase. */
+  t: number;
+  /** Seconds since the last blink began. */
+  since: number;
+}
+
+export function newBlinkState(): BlinkState {
+  return { phase: 'open', t: 0, since: REFRACTORY };
+}
+
+/**
+ * Advance the lid.
+ *
+ * The only input is the measured break-up fraction. There is deliberately no
+ * interval here: if the cadence comes out wrong, the lever is EVAP. A clamped
+ * interval would be a timer wearing the simulation's clothes.
+ */
+export function stepBlink(
+  s: BlinkState,
+  dt: number,
+  fraction: number
+): BlinkState {
+  const t = s.t + dt;
+  const since = s.since + dt;
+  switch (s.phase) {
+    case 'open':
+      if (fraction > BLINK_FRACTION && since >= REFRACTORY) {
+        return { phase: 'closing', t: 0, since: 0 };
+      }
+      return { phase: 'open', t, since };
+    case 'closing':
+      return t >= CLOSE_TIME
+        ? { phase: 'opening', t: 0, since }
+        : { phase: 'closing', t, since };
+    case 'opening':
+      return t >= OPEN_TIME
+        ? { phase: 'open', t: 0, since }
+        : { phase: 'opening', t, since };
+  }
+}
+
+/** 0 fully open, 1 fully closed. Smoothstepped so the lid eases at both ends. */
+export function lidCoverage(s: BlinkState): number {
+  const u =
+    s.phase === 'closing'
+      ? Math.min(1, s.t / CLOSE_TIME)
+      : s.phase === 'opening'
+        ? 1 - Math.min(1, s.t / OPEN_TIME)
+        : 0;
+  return u * u * (3 - 2 * u);
+}
+
+/** Is the lid travelling, and therefore laying film? */
+export function isWiping(s: BlinkState): boolean {
+  return s.phase !== 'open';
+}

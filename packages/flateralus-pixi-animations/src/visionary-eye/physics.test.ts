@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
+  BLINK_FRACTION,
+  CLOSE_TIME,
   CORNEA_L,
   DELTA,
   DOMAIN,
@@ -8,15 +10,22 @@ import {
   IFACE_CELLS,
   KAPPA,
   MOBILITY,
+  OPEN_TIME,
   REDUCE,
+  REFRACTORY,
   SAFETY,
   STEP,
   breakupFraction,
   clampMobility,
   efoldSeconds,
+  isWiping,
+  lidCoverage,
   mobilityLimit,
+  newBlinkState,
   patchWavelength,
+  stepBlink,
   tileInsideCornea,
+  type BlinkState,
 } from './physics';
 
 describe('tear film constants', () => {
@@ -99,5 +108,76 @@ describe('break-up fraction', () => {
 
   it('returns zero rather than NaN for a degenerate grid', () => {
     expect(breakupFraction(new Float32Array(0), 0)).toBe(0);
+  });
+});
+
+describe('blink state machine', () => {
+  const run = (s: BlinkState, seconds: number, fraction: number) => {
+    let cur = s;
+    const dt = 1 / 60;
+    for (let i = 0; i < Math.round(seconds / dt); i++) {
+      cur = stepBlink(cur, dt, fraction);
+    }
+    return cur;
+  };
+
+  it('starts open and stays open while the film holds', () => {
+    const s = run(newBlinkState(), 30, 0);
+    expect(s.phase).toBe('open');
+    expect(lidCoverage(s)).toBe(0);
+  });
+
+  it('closes once the measured fraction crosses the threshold', () => {
+    const s = stepBlink(newBlinkState(), 1 / 60, BLINK_FRACTION + 0.01);
+    expect(s.phase).toBe('closing');
+  });
+
+  it('does not close one tick below the threshold', () => {
+    const s = stepBlink(newBlinkState(), 1 / 60, BLINK_FRACTION - 0.01);
+    expect(s.phase).toBe('open');
+  });
+
+  it('reaches full coverage at the end of the closing phase', () => {
+    let s = stepBlink(newBlinkState(), 1 / 60, 1);
+    s = run(s, CLOSE_TIME, 1);
+    expect(lidCoverage(s)).toBeCloseTo(1, 1);
+  });
+
+  it('re-opens and returns to rest', () => {
+    let s = stepBlink(newBlinkState(), 1 / 60, 1);
+    s = run(s, CLOSE_TIME + OPEN_TIME + 0.05, 0);
+    expect(s.phase).toBe('open');
+    expect(lidCoverage(s)).toBe(0);
+  });
+
+  // NOTE: this walk is 0.29s at dt=1/60 = 17 steps, and the opening phase ends
+  // at 11/60 = 0.18333 against OPEN_TIME = 0.18 — true by 3ms, which floating
+  // point summation of 1/60 six times erodes (it lands a hair under
+  // CLOSE_TIME, costing an extra step). Widened to 0.02 so the wait always
+  // covers the drifted 18-step cycle; do NOT move OPEN_TIME to suit it.
+  it('refuses to re-blink inside the refractory window', () => {
+    // Hold the fraction pinned high the whole time: a chattering measurement
+    // must not produce a chattering lid.
+    let s = stepBlink(newBlinkState(), 1 / 60, 1);
+    s = run(s, CLOSE_TIME + OPEN_TIME + 0.02, 1);
+    expect(s.phase).toBe('open');
+    const before = s.since;
+    s = run(s, REFRACTORY * 0.5, 1);
+    expect(s.phase).toBe('open');
+    expect(s.since).toBeGreaterThan(before);
+    // NOT a further full REFRACTORY: from `before` (~0.3s) that leaves ~45
+    // spare steps after the retrigger — enough to run an entire close/open
+    // cycle (18 steps) and land back on 'open', which would look identical
+    // to "never re-blinked". 0.5s clears the REFRACTORY threshold
+    // (before + REFRACTORY*0.5 + 0.5 > REFRACTORY) with room to spare, but
+    // ends inside the closing phase, catching the retrigger itself.
+    s = run(s, 0.5, 1);
+    expect(s.phase).toBe('closing');
+  });
+
+  it('wipes only while the lid is travelling', () => {
+    expect(isWiping(newBlinkState())).toBe(false);
+    const s = stepBlink(newBlinkState(), 1 / 60, 1);
+    expect(isWiping(s)).toBe(true);
   });
 });
