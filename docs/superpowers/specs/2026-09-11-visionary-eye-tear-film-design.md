@@ -300,13 +300,17 @@ So the seam is clean: `visionary()` and `stars()` stay in `sdf-harness.ts`, `eye
 move into `visionary-eye/`. portal-mark's shader still declares `uPupil` and `uBump` without
 setting them, which defaults them to 0 and leaves `pd = 1.0` — unchanged behaviour.
 
-Three files, not one:
+Four files, not one:
 
 | File                       | Holds                                                        |
 | -------------------------- | ------------------------------------------------------------ |
 | `visionaryEyeAnimation.ts` | class, manifest, gaze/pupil/blink CPU state, readback        |
+| `physics.ts` + `.test.ts`  | the pure numeric core — constants, clamps, reducer, lid      |
 | `film.ts`                  | the four sim programs and the ping-pong resources            |
 | `eye.ts`                   | display GLSL — `eyeW`, `irisUV`, caustics, the film specular |
+
+`physics.ts` follows `chladni-plate` and `erosion-table`: everything testable without a GL
+context lives there, which is exactly the set the Testing section commits to covering.
 
 ### D13 — `HarnessShaderAnimation` gets a `simulate()` hook
 
