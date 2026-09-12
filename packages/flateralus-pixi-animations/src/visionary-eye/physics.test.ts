@@ -11,8 +11,10 @@ import {
   FILM_REACH,
   FILM_REACH_FADE,
   FILM_SLOPE,
+  DRY_DIM,
   WET_H,
   filmReach,
+  surfaceDim,
   wetness,
   GRID,
   IFACE_CELLS,
@@ -914,5 +916,190 @@ describe('the smooth-bilinear fetch', () => {
       worst = Math.max(worst, Math.abs(f * f * (3 - 2 * f) - f));
     }
     expect(worst).toBeLessThanOrEqual(0.25 + 1e-9);
+  });
+});
+
+/**
+ * The sclera, shaded on the CPU exactly as `eyeW` shades it, so the question
+ * "does a dry patch actually change the pixel" can be answered in a number
+ * instead of a screenshot.
+ *
+ * The texture terms — the vein fbm and the grain — collapse into one `noise`
+ * parameter in [0, 1]; `noise = 0` is the brightest the sclera ever gets,
+ * which is the pixel this is about. `visionary()` is not ported, so rows on
+ * the iris stand in a mid-tone for it and are indicative only.
+ */
+function scleraPixel(
+  lx: number,
+  ly: number,
+  wet: number,
+  noise: number,
+  dim: number = DRY_DIM
+) {
+  const CREAM = [1.0, 243 / 255, 227 / 255];
+  const ELEC = [0.3, 0.55, 1.0];
+  const ss = (a: number, b: number, x: number) => {
+    const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  };
+  const mix3 = (a: number[], b: number[], t: number) =>
+    a.map((x, i) => x + (b[i] - x) * t);
+  const lz = Math.sqrt(Math.max(0, 1 - lx * lx - ly * ly));
+  const ang = Math.acos(lz);
+  const vd = ss(0.55, 1.35, ang);
+  let sc = [0.965, 0.95, 0.925];
+  sc = mix3(sc, [0.74, 0.18, 0.15], noise * vd * 0.55);
+  sc = mix3(sc, [0.84, 0.36, 0.3], noise * vd * 0.3);
+  sc = mix3(sc, [0.99, 0.85, 0.79], vd * vd * 0.28);
+  sc = mix3(sc, [0.9, 0.86, 0.74], ss(0.95, 1.5, ang) * 0.22);
+  sc = sc.map((x, i) => x - [0.025, 0.03, 0.02][i] * noise);
+  sc = sc.map((x) => x * (1 - ss(0.9, 1.5, ang) * 0.18));
+  const irisM = ss(0.62, 0.5, ang);
+  let eye = mix3(sc, [0.35, 0.45, 0.75], irisM);
+  eye = eye.map(
+    (x) => x * (1 - ss(0.72, 0.56, ang) * ss(0.5, 0.58, ang) * 0.35)
+  );
+  const lim = [0.58, 0.711, 0.9564].map(
+    (x) => x * Math.exp(-Math.abs(ang - 0.56) * 26) * 0.35
+  );
+  eye = eye.map((x, i) => x + lim[i]);
+  const dif = Math.min(
+    1,
+    Math.max(0, lx * LIGHT.x + ly * LIGHT.y + lz * LIGHT.z)
+  );
+  const diffuse = eye.map(
+    (x) => x * (0.55 + 0.6 * dif) * (1 - dim * (1 - wet))
+  );
+  const sharp = CREAM.map((x) => x * Math.pow(dif, 48) * 0.9 * wet);
+  const broad = CREAM.map(
+    (x) => x * Math.pow(dif, 7) * 0.07 * (1 - irisM) * wet
+  );
+  const rim = ELEC.map((x) => x * Math.pow(1 - lz, 3) * 0.18);
+  const total = diffuse.map((x, i) => x + sharp[i] + broad[i] + rim[i]);
+  return { ang, diffuse, sharp, broad, rim, total };
+}
+
+const lum = (c: number[]) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+/** What the framebuffer keeps: finish() adds grain and a vignette, no tone map. */
+const clipped = (c: number[]) => lum(c.map((x) => Math.min(1, Math.max(0, x))));
+/** Step from the specular peak toward the globe's centre by `d` in tangent units. */
+const towardCentre = (d: number): [number, number] => {
+  const s = 1 - d / Math.hypot(LIGHT.x, LIGHT.y);
+  return [LIGHT.x * s, LIGHT.y * s];
+};
+
+describe('a dry patch has to survive the clamp', () => {
+  it('finds the surface already past white before any specular is added', () => {
+    // The whole reason gating only the added light did nothing. If this ever
+    // stops being true — the sclera is darkened, or a tone map appears — then
+    // DRY_DIM is no longer load-bearing and should be reconsidered.
+    const p = scleraPixel(LIGHT.x, LIGHT.y, 1, 0);
+    for (const c of p.diffuse) expect(c).toBeGreaterThan(1);
+    // And the sharp lobe is not a small term, it is an invisible one: 43% of
+    // the unclipped sum, all of it above the clamp.
+    const t = lum(p.total);
+    expect(lum(p.sharp) / t).toBeGreaterThan(0.4);
+    expect(lum(p.diffuse) / t).toBeGreaterThan(0.5);
+    expect(lum(p.broad) / t).toBeLessThan(0.05);
+  });
+
+  it('shows nothing at the highlight if only the added light is gated', () => {
+    // The bug, pinned. With dim = 0 the dry patch is computed correctly and
+    // thrown away: 2.010 and 1.081 both clip to 1.0.
+    const wet = scleraPixel(LIGHT.x, LIGHT.y, 1, 0, 0);
+    const dry = scleraPixel(LIGHT.x, LIGHT.y, 0, 0, 0);
+    expect(lum(wet.total)).toBeGreaterThan(lum(dry.total) * 1.8);
+    expect(clipped(wet.total) - clipped(dry.total)).toBe(0);
+  });
+
+  it('dims a dry patch visibly everywhere the film can reach', () => {
+    // Measured dips in the clipped framebuffer at the shipped DRY_DIM. The
+    // peak is the hardest case, because it is the most saturated.
+    const dip = (l: [number, number], noise: number) =>
+      clipped(scleraPixel(l[0], l[1], 1, noise).total) -
+      clipped(scleraPixel(l[0], l[1], 0, noise).total);
+    expect(dip([LIGHT.x, LIGHT.y], 0)).toBeGreaterThan(0.05);
+    expect(dip([LIGHT.x, LIGHT.y], 0.5)).toBeGreaterThan(0.08);
+    expect(dip(towardCentre(0.25), 0)).toBeGreaterThan(0.1);
+    expect(dip(towardCentre(0.5), 0)).toBeGreaterThan(0.05);
+    // But not so far that a dry patch reads as a hole punched in the eye.
+    for (const d of [0, 0.1, 0.25, 0.35, 0.5]) {
+      const l =
+        d === 0 ? ([LIGHT.x, LIGHT.y] as [number, number]) : towardCentre(d);
+      expect(dip(l, 0)).toBeLessThan(0.45);
+    }
+  });
+
+  it('leaves a wet eye byte-identical to one with no film at all', () => {
+    // surfaceDim(1) must be exactly 1, not 0.9999999: this multiplies every
+    // pixel of the globe on the no-float-target fallback.
+    expect(surfaceDim(1)).toBe(1);
+    expect(surfaceDim(0)).toBeCloseTo(1 - DRY_DIM, 15);
+    for (const d of [0, 0.1, 0.25, 0.5]) {
+      const l =
+        d === 0 ? ([LIGHT.x, LIGHT.y] as [number, number]) : towardCentre(d);
+      const withFilm = scleraPixel(l[0], l[1], 1, 0);
+      const without = scleraPixel(l[0], l[1], 1, 0, 0);
+      for (let i = 0; i < 3; i++) {
+        expect(withFilm.total[i]).toBe(without.total[i]);
+      }
+    }
+  });
+});
+
+describe('the wet curve against a real interface', () => {
+  /**
+   * A settled dry patch's equilibrium profile, which is what `film.ts` stamps
+   * and what the Cahn-Hilliard energy relaxes back to: h = tanh(d - r / w).
+   * Asserting against this rather than against a numerical run keeps the test
+   * fast and ties it to the physics rather than to one seed.
+   */
+  const profile = (d: number, radius: number) =>
+    Math.tanh((d - radius) / interfaceWidth());
+  /** Measured on the CPU reference at PRIME_SECONDS. */
+  const PATCH_CELLS = 12.6;
+  const H_MIN = -1.008;
+  const H_MAX = 0.942;
+
+  it('reads the interior of a real patch as fully dry, not as a smudge', () => {
+    const radius = (PATCH_CELLS / 2) * DELTA;
+    // Area share of the patch's disc that is fully unwet. A ramp that ate the
+    // patch would make the holes soft and grey instead of dark.
+    let dark = 0;
+    let total = 0;
+    const N = 400;
+    for (let k = 0; k < N; k++) {
+      const d = ((k + 0.5) / N) * radius;
+      const w = 2 * Math.PI * d; // annulus weight
+      total += w;
+      if (wetness(profile(d, radius)) === 0) dark += w;
+    }
+    expect(dark / total).toBeGreaterThan(0.8);
+  });
+
+  it('puts the whole ramp inside the interface', () => {
+    const radius = (PATCH_CELLS / 2) * DELTA;
+    // Where wetness leaves 0 and where it reaches 1, as a distance from the
+    // patch's nominal edge. Both must be inside a couple of interface widths,
+    // or the sheen is fading across flat film rather than across the edge.
+    let lo = radius;
+    let hi = radius;
+    for (let k = 0; k <= 2000; k++) {
+      const d = (k / 2000) * radius * 3;
+      const w = wetness(profile(d, radius));
+      if (w === 0) lo = d;
+      if (w < 1) hi = d;
+    }
+    expect(Math.abs(lo - radius)).toBeLessThan(2 * interfaceWidth());
+    expect(Math.abs(hi - radius)).toBeLessThan(2 * interfaceWidth());
+  });
+
+  it('saturates at both ends of the field the simulation actually produces', () => {
+    // The measured range, not the nominal wells: an overshoot below -1 must
+    // still read dry and the wet plateau at 0.942 must still read fully wet.
+    expect(wetness(H_MIN)).toBe(0);
+    expect(wetness(H_MAX)).toBe(1);
+    expect(H_MAX).toBeGreaterThan(WET_H);
+    expect(H_MIN).toBeLessThan(DRY_H);
   });
 });

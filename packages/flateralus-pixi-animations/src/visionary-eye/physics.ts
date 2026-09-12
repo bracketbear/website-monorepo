@@ -443,6 +443,48 @@ export function wetness(h: number): number {
   return smoothstep(DRY_H, WET_H, h);
 }
 
+/**
+ * TUNED. How much of the surface's own brightness a fully dry patch takes
+ * away — a multiplier on the diffuse-lit colour, not a withheld highlight.
+ *
+ * **Gating only the added light does not work, and the reason is clipping.**
+ * Decomposed at the brightest sclera pixel, which is the specular peak at
+ * `ang = 0.696`, in luminance:
+ *
+ *     diffuse  pow(dsp,48)*0.9  pow(dsp,7)*0.07   rim     total
+ *     1.079    0.863            0.067             0.001   2.010
+ *
+ * The sharp lobe is 43% of that sum, so it is not a small term. It is an
+ * invisible one. The diffuse term **on its own** is `(1.094, 1.078, 1.053)`
+ * per channel — already past white before a single specular term is added —
+ * and `finish()` tone-maps nothing, it only adds grain and a vignette that
+ * cannot exceed 1. So `wet = 1` gives 2.010 and `wet = 0` gives 1.081 and
+ * **both clip to pure white**: measured difference in the framebuffer, 0.0%.
+ * The dry patches were being computed correctly and thrown away by the clamp.
+ *
+ * That is also why a larger `FILM_SLOPE` could never have fixed it. Nothing
+ * additive can darken a pixel that is already over 1. The gate has to reach a
+ * term that scales what is already there, which is the diffuse.
+ *
+ * Physically this is the honest term anyway: a dewetted surface does not
+ * merely stop being glossy, it scatters differently and reads duller. At 0.15
+ * the measured dip in the *clipped* framebuffer is 8% at the specular peak,
+ * 12% on veined sclera there, 18% across the mid-sclera and 9% on the iris —
+ * present everywhere rather than only in the narrow band near the limbus
+ * where the corneal shadow ring happened to leave headroom.
+ */
+export const DRY_DIM = 0.15;
+
+/**
+ * The multiplier a given wetness puts on the surface's diffuse-lit colour.
+ *
+ * Exactly 1 at `wet = 1`, by construction rather than by rounding: this runs
+ * on the no-film fallback, where it must not tint the eye by a last bit.
+ */
+export function surfaceDim(wet: number): number {
+  return 1 - DRY_DIM * (1 - wet);
+}
+
 /** Tangent-space centre of reduction tile (i, j). */
 function tileCentre(i: number, j: number, size: number): [number, number] {
   const s = DOMAIN / size;

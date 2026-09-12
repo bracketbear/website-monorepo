@@ -1,5 +1,6 @@
 import {
   DOMAIN,
+  DRY_DIM,
   DRY_H,
   FILM_REACH,
   FILM_REACH_FADE,
@@ -144,9 +145,6 @@ export const EYE_GLOBE = `
           eye += mix(ELEC, uCream, 0.4) * exp(-abs(ang - 0.56) * 26.0) * 0.35;
           vec3 ld = normalize(vec3(-0.45, -0.55, 0.85));
           float dif = clamp(dot(nb, ld), 0.0, 1.0);
-          // Diffuse stays on nb: the energy relief still shapes the shading,
-          // and only the highlight moves onto the film.
-          eye *= 0.55 + 0.6 * dif;
           // The catchlight, reflected off the film rather than painted on.
           //
           // fw is the only gate, and it is written so that fw = 0 collapses
@@ -167,10 +165,25 @@ export const EYE_GLOBE = `
           vec3 nf = fw > 0.0
             ? normalize(nb - (tx * gH.x + ty * gH.y) * (${FILM_SLOPE.toFixed(6)} * fw))
             : nb;
-          // Subtractive: a dry patch is the sheen going missing, not light
-          // being added. The sclera is near-white and has no headroom for the
-          // additive reading, and a real dry spot is a dull mark anyway.
+          // Subtractive: a dry patch is a dull mark, not a bright one. It
+          // gates all three terms below -- the two highlights it withholds,
+          // and the diffuse it dims, which is the one that actually shows.
           float wet = mix(1.0, smoothstep(${DRY_H.toFixed(6)}, ${WET_H.toFixed(6)}, hC), fw);
+          // Diffuse stays on nb: the energy relief still shapes the shading,
+          // and the highlight is the only thing that moves onto the film's
+          // normal. What the film does to this term is dim it, and that is
+          // not decoration.
+          //
+          // Measured, this pixel at the specular peak: the diffuse term alone
+          // is (1.094, 1.078, 1.053), already past white before a single
+          // specular term is added, and finish() tone-maps nothing. So wet = 1
+          // totals 2.010 and wet = 0 totals 1.081 and both clip to the same
+          // pure white -- the dry patches were computed correctly and thrown
+          // away by the clamp. Nothing additive can darken a pixel that is
+          // already over 1, which is why this multiplies instead. See DRY_DIM.
+          //
+          // wet = 1 leaves it exactly 1.0, so the fallback is untouched.
+          eye *= (0.55 + 0.6 * dif) * (1.0 - ${DRY_DIM.toFixed(6)} * (1.0 - wet));
           float dsp = clamp(dot(nf, ld), 0.0, 1.0);
           eye += uCream * pow(dsp, 48.0) * 0.9 * wet;
           eye += uCream * pow(dsp, 7.0) * 0.07 * (1.0 - irisM) * wet; // broad wet sheen on the white
