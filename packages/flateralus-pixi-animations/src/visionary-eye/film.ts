@@ -387,6 +387,10 @@ export class FilmSim {
   private acc = 0;
   /** Probed on the first `measure()` and cached; see `measure()`. */
   private readMode: ReadMode = null;
+  /** Has the first `readPixels` been checked for a GL error? Once only. */
+  private readChecked = false;
+  /** Last finite fraction, held across a corrupt frame. Cleared on retire. */
+  private lastGood: number | null = null;
   private readBufF: Float32Array | null = null;
   private readBufH: Uint16Array | null = null;
   /** The 64 tile fractions, reused so `measure()` allocates nothing. */
@@ -565,7 +569,7 @@ export class FilmSim {
     if (!tx || !fb) {
       if (tx) gl.deleteTexture(tx);
       if (fb) gl.deleteFramebuffer(fb);
-      this.readMode = 'none';
+      this.retire('could not allocate the measurement target');
       return;
     }
     gl.activeTexture(gl.TEXTURE0 + FILM_UNIT);
@@ -599,8 +603,7 @@ export class FilmSim {
     if (!complete) {
       gl.deleteTexture(tx);
       gl.deleteFramebuffer(fb);
-      console.error('visionary-eye film: measurement target incomplete');
-      this.readMode = 'none';
+      this.retire('measurement target incomplete');
       return;
     }
     this.reduceTex = tx;
@@ -787,18 +790,31 @@ export class FilmSim {
    * and cached. The 8x8 target is allocated once at build time and never
    * resized — the display canvas resizes with the stage, the field and its
    * measurement do not — so there is no resize path that can invalidate the
-   * probe. A `readPixels` that throws retires the measurement permanently
-   * rather than throwing again every frame.
+   * probe.
+   *
+   * **The probe makes a bad readback unlikely, not impossible, and a bad
+   * readback here does not throw.** WebGL2 only throws for a wrong-typed or
+   * undersized view; a driver that refuses the format raises
+   * `INVALID_OPERATION` and leaves the view untouched. That path is the one
+   * genuinely dangerous failure in this file: `tiles` would stay all zeros,
+   * `breakupFraction` would return a perfectly finite 0, the caller's
+   * `?? fallback` would never fire, and the eye would stare forever with no
+   * error anywhere. So the first `readPixels` — and only the first, because
+   * `getError()` is itself a sync point — is checked, with the error queue
+   * drained beforehand so the check reads this call and not somebody else's.
+   * All three failure modes latch through `retire()`, so a refusing driver is
+   * asked once and says so once.
    *
    * 64 texels is one 1KB readback. It is still a GPU sync point, and it runs
-   * every frame: the field moves 28 substeps per 60fps frame, so a stale
-   * fraction is a stale *decision*, and holding it across frames trades the one
-   * thing this pass exists to provide for a stall that 64 texels does not
-   * cause. If it ever does show up in a frame budget, the cheap fix is to
-   * measure every third frame and hold between — not to delete the readback.
+   * on every frame the lid is open — the caller skips it during the sweep,
+   * where `stepBlink` ignores the fraction anyway. The field moves 28 substeps
+   * per 60fps frame, so a stale fraction is a stale *decision*, and holding it
+   * across open frames would trade the one thing this pass exists to provide
+   * for a stall that 64 texels does not cause. If it ever does show up in a
+   * frame budget, the cheap fix is to measure every third frame and hold
+   * between — not to delete the readback.
    *
-   * Returns a fraction in [0, 1]. NaN from a corrupt readback is rejected as
-   * `null`, so a garbage frame falls back rather than blinking on nonsense.
+   * Returns a fraction in [0, 1], or `null` once the measurement has retired.
    */
   measure(): number | null {
     const gl = this.gl;
@@ -809,6 +825,7 @@ export class FilmSim {
     gl.activeTexture(gl.TEXTURE0 + FILM_UNIT);
     gl.bindTexture(gl.TEXTURE_2D, this.tex[this.i]);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+    const check = !this.readChecked;
     try {
       if (this.readMode === null) {
         const t = gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_TYPE);
@@ -820,14 +837,20 @@ export class FilmSim {
               ? 'half'
               : 'none';
         if (this.readMode === 'none') {
-          console.error('visionary-eye film: no readable measurement format');
-          return null;
+          return this.retire('no readable measurement format');
         }
       }
       const n = REDUCE * REDUCE;
+      if (check) {
+        // Anything queued by the rest of the frame would be handed back by the
+        // getError() below and misread as this call's. Bounded, because a lost
+        // context reports CONTEXT_LOST_WEBGL once and NO_ERROR after.
+        for (let k = 0; k < 8 && gl.getError() !== gl.NO_ERROR; k++);
+      }
       if (this.readMode === 'float') {
         if (!this.readBufF) this.readBufF = new Float32Array(n * 4);
         gl.readPixels(0, 0, REDUCE, REDUCE, gl.RGBA, gl.FLOAT, this.readBufF);
+        if (check && !this.acceptRead()) return null;
         for (let k = 0; k < n; k++) this.tiles[k] = this.readBufF[k * 4];
       } else {
         if (!this.readBufH) this.readBufH = new Uint16Array(n * 4);
@@ -840,16 +863,50 @@ export class FilmSim {
           gl.HALF_FLOAT,
           this.readBufH
         );
+        if (check && !this.acceptRead()) return null;
         for (let k = 0; k < n; k++) this.tiles[k] = h2f(this.readBufH[k * 4]);
       }
-    } catch {
-      this.readMode = 'none';
-      return null;
+    } catch (e) {
+      return this.retire(`readback threw: ${e}`);
     } finally {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
     const fraction = breakupFraction(this.tiles, REDUCE);
-    return Number.isFinite(fraction) ? fraction : null;
+    if (Number.isFinite(fraction)) {
+      this.lastGood = fraction;
+      return fraction;
+    }
+    // A single corrupt readback — a half-float NaN, say — is not a reason to
+    // hand the decision to the synthesised ramp. `since` is shared state, so
+    // one substituted frame late in a cycle can fire the lid early, which is a
+    // worse error than one frame of staleness on a field that only moves 28
+    // substeps between frames. Null only before the first good value, when
+    // there is nothing to hold.
+    return this.lastGood;
+  }
+
+  /**
+   * Did the first `readPixels` actually happen? See `measure()` — this is the
+   * failure that would otherwise be silent, so it is checked exactly once.
+   */
+  private acceptRead(): boolean {
+    this.readChecked = true;
+    const err = this.gl.getError();
+    if (err === this.gl.NO_ERROR) return true;
+    this.retire(`readback rejected, gl error 0x${err.toString(16)}`);
+    return false;
+  }
+
+  /**
+   * Retire the measurement permanently, once, with a reason. Every path that
+   * gives up routes through here so a dead loop always says so, and so the
+   * held value cannot outlive the thing that produced it.
+   */
+  private retire(why: string): null {
+    this.readMode = 'none';
+    this.lastGood = null;
+    console.error(`visionary-eye film: ${why}; blink falls back`);
+    return null;
   }
 
   /** Bind the live field for the display pass. */

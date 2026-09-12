@@ -227,19 +227,30 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     // once a cycle is exactly the motion the setting is asking us not to make.
     if (this.reducedMotion) return;
 
+    const before = this.blink;
     // **The measurement, and the reason this animation exists.** The lid is
     // driven by the dry area fraction read back off the field itself, not by
-    // any clock: raise Dryness and the eye blinks sooner, because the film
-    // tears sooner. Spec D6 forbids an interval floor or ceiling here — the
-    // only lever on cadence is EVAP.
+    // any clock: raise EVAP and the eye blinks sooner, because the film tears
+    // sooner. Spec D6 forbids an interval floor or ceiling here — the only
+    // lever on cadence is EVAP.
     //
-    // `null` means the driver refused a readable format from the 8x8 target.
-    // The film still runs and still looks right; only the decision has lost
-    // its input, so the trigger falls back to a ramp calibrated to the cadence
-    // the measurement produces on average. A degraded eye that still blinks,
-    // rather than one that stares.
-    const measured = this.film.measure();
-    const fraction = measured ?? fallbackFraction(this.blink.since);
+    // Only while the lid is open, because `stepBlink` reads the fraction only
+    // in that phase. During the sweep the reduction pass and its readback
+    // would be a GPU sync point bought for a value nothing looks at, on
+    // exactly the frames already spending splats on the wipe. The 0 passed
+    // through the closing and opening phases is never compared against
+    // anything.
+    //
+    // `null` means the measurement has retired — the driver refused a
+    // readable format, the readback was rejected, or it threw. It is latched,
+    // announced once, and cannot come back. The film still runs and still
+    // looks right; only the decision has lost its input, so the trigger falls
+    // back to a ramp calibrated to the cadence the measurement produces on
+    // average. A degraded eye that still blinks, rather than one that stares.
+    const fraction =
+      before.phase === 'open'
+        ? (this.film.measure() ?? fallbackFraction(before.since))
+        : 0;
 
     // **On the film's clock, not the wall's.** The fraction above is a
     // property of the field, so the refractory window and the lid's travel
@@ -248,7 +259,6 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     // fractions of real time the moment the frame rate drops: at 8fps the wall
     // clock covers five seconds while the field ages by one. Driving the blink
     // off dt is what made it look like the lid was never firing at all.
-    const before = this.blink;
     this.blink = stepBlink(before, this.filmDt, fraction);
     if (before.phase === 'open' && this.blink.phase !== 'open') {
       // A new layout for every blink. Without this the same patches would come
