@@ -1,6 +1,6 @@
 # Visionary Eye — tear film, blink loop, corneal caustics
 
-**Status:** proposed
+**Status:** in implementation — D2 amended after a proof, D3/D5/D11 amended after measurement
 **Date:** 2026-09-11
 **Lands as:** a rework of the existing `visionary-eye` hero entry, in place
 
@@ -73,7 +73,70 @@ The cornea subtends about 0.6 rad — the existing limbus already sits at `ang �
 occupies `|l| < sin(0.6) = 0.565`, filling 94% of the domain half-width with a small margin for
 the boundary.
 
-### D2 — Break-up is a dewetting instability, so the equation is Cahn–Hilliard
+### D2 — Break-up is nucleation in the metastable region
+
+**Amended 2026-09-11, after nine fix rounds and a proof. The original text is kept below under
+"What this decision used to say", because the reasoning that failed is worth more than the
+reasoning that worked.**
+
+Break-up is **nucleation and growth**, not spinodal decomposition. The film is held in the
+metastable region — dry fraction between 0 and 0.211 — where it is linearly stable, and
+finite-amplitude defects that exceed the critical nucleus grow into isolated dry spots while
+smaller ones heal.
+
+The critical radius is derived, not chosen:
+
+```
+w  = sqrt(2*kappa) = 1.50 cells          interface width
+sigma = (4/3) * kappa / w = 0.0125       line tension
+R*  = sigma / dOmega,  dOmega = omega(h) - omega(h_d),  omega(x) = f(x) - mu*x
+```
+
+`h_d` is the _other_ root of `f'(x) = f'(h)`, which is -1.064 at mean 0.92 — not -1. Using -1
+puts `R*` out by 8%.
+
+**Why this replaces the original decision.** Isolated droplets are unreachable by spinodal
+decomposition, and that is provable rather than a tuning failure. Substituting `u = h - hm/3`
+into any quartic double well `f'(h) = (h+1)(h-hm)(h-1)` kills the quadratic term:
+
+```
+f'(u) = u^3 - (1 + hm^2/3) u + 2*hm/3
+```
+
+So every quartic double well is the symmetric one plus a linear term, and a linear term never
+moves the common-tangent contact points. Therefore `spinodal/binodal = 1/sqrt(3)` for **every**
+`hm`, and the dry fraction at the onset of instability is `(1 - 1/sqrt(3))/2 = 0.211324865` —
+verified identical to nine decimal places across `hm` in {0, 0.4, 0.55, 0.7, 1.0, 2.0}.
+
+The film is therefore always ~21% dry before it can begin to tear, and past 45% once separated.
+At those fractions Cahn–Hilliard gives bicontinuous labyrinths, not droplets. **The labyrinth was
+structural.** Measured, the droplet window under spinodal decomposition was 0.15s wide, and
+isotropy and droplet morphology were never simultaneously available at any composition.
+
+Nucleation is also the more honest model: clinical tear break-up nucleates at specific,
+reproducible sites — mucin defects, lid-wiper irregularities — it is not spinodal decomposition.
+
+**The anti-decoration test changes with the mechanism.** Under nucleation the sites are seeded, so
+seed-vs-pattern correlation is meaningless. What separates a threshold instability from painted
+dots is that **sub-critical defects heal**:
+
+```
+ seeded R   measured R0   final R   outcome        R* derived = 3.55 cells at mean 0.92
+    3.0        3.19        0.00     HEALED
+    3.5        3.19        0.00     HEALED
+    4.0        4.07        4.07     survives
+    5.0        5.05        5.29     survives, growing
+```
+
+The threshold brackets `R*` exactly, and **moves to track it** when composition changes (`R*` =
+5.40 at mean 0.95). Painted dots do not heal, and do not heal according to a critical radius that
+shifts. Coarsening confirmed independently: components 26 -> 22 -> 20 while mean spot area goes
+31 -> 176 cells.
+
+Honest caveat: ~45% of dry area at prime descends from surviving seeds. The evidence against
+decoration is the healing and the moving threshold, not the placement.
+
+### What this decision used to say
 
 This is the decision the piece stands on.
 
@@ -104,6 +167,21 @@ those belong to the irritation-history slice and an accumulator wired up ahead o
 the kind of thing that stays half-wired.
 
 ### D3 — Grid, step rate and mobility are derived, not chosen
+
+**Amended. The stability limit below is correct and still governs `M`. The growth-budget
+reasoning that followed it was wrong twice and is superseded by D2 — the film no longer traverses
+the spinodal band at all, so `availableEfolds()` and `spinodalResidence()` describe a journey it
+is designed never to make.** `GRID` is now 96 and `STEP` is 1/1700, justified by patch size,
+resolution of the critical radius, and cost — not by a band traverse.
+
+Two errors are recorded here rather than deleted, because both survived review and both looked
+like arithmetic:
+
+1. The original sized the e-fold time against "3.5 e-folds to grow a 3% seed" but never checked
+   that the field stays unstable long enough to deliver them. It does not: residence buys ~1.3.
+2. The correction to that was also wrong — it assumed peak growth throughout the traverse.
+   Integrating `sigma(k,t)` gives roughly 4/9 of the naive figure, and the seed is additionally
+   _damped_ before entry while `f'' > 0` (0.0244 -> 0.0139).
 
 Explicit Euler on `-Mκ∇⁴h`. The 5-point Laplacian has eigenvalues in `[-8/Δ², 0]`, so `∇⁴ = (∇²)²`
 reaches `64/Δ⁴`, and stability requires:
@@ -182,8 +260,14 @@ interface    = n · Δ              tangent units  (n cells)
 patch λ      = 2π · n · Δ         tangent units
 ```
 
-Opening values: `E = 0.5 /s` (2 s to spinodal), `v = 0.0141 u/s` (1.5 cells/s of downward
-drain). Both are tuned by eye; the spec says which numbers are derived and which are not.
+Opening values, **amended**: `EVAP = 0.15`, `v = 0.0141 u/s` (1.5 cells/s of downward drain).
+`EVAP` was 0.5, then 0.2, before the mechanism changed; see D2. Both are tuned by eye, and
+`physics.ts` marks every constant DERIVED or TUNED at its declaration — that distinction is the
+file's whole purpose, because the derived ones cannot be freely moved and the tuned ones can.
+
+**Evaporation is gated on the presence of film** (`EVAP * smoothstep(-0.9, 0.1, h)`). Without
+that gate the conservative transport leaves the mean in free fall — `d<h>/dt = -E` exactly — and
+the field marches past the dry well forever. A dry patch has no film left to evaporate.
 
 ### D6 — The loop closes through an 8×8 reduction and a 64-texel read
 
@@ -284,9 +368,11 @@ term written to make it do any of that.
 The default state must show the best thing. A flat film is a mirror, and a hero that loads as a
 mirror shows none of what makes it good until someone waits eight seconds.
 
-So at build time: stamp a film with a seed and run ~4 s of real steps — 1920 steps, 3840 draws at
-16k px. One-time, a few ms. The eye then loads mid-cycle with real structure. If it hitches
-visibly, slice it across the first 8 frames rather than shortening it.
+So at build time: stamp a film with nucleation sites and run `PRIME_SECONDS` of real steps.
+**Amended: 2.4 s, not 4 s.** Prime duration is not free — it must land inside the droplet window
+(measured [0.85, 3.85] s), and the original 4 s was chosen independently of `EVAP` when the two
+are coupled. At the original `EVAP = 0.5`, 4 s of priming put the mean at exactly -1: a uniformly
+dry film, rendered as a black disc, before the first frame was ever shown.
 
 Re-prime whenever the field is cleared. Per D1 a resize does not clear it, so in practice this is
 init only.
