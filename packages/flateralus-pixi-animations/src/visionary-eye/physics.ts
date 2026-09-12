@@ -98,66 +98,118 @@ export function patchWavelength(): number {
  * and it sets how long the mean spends inside the spinodal band, because the
  * mean crosses that band at exactly this rate.
  *
- * The second job is the binding one. Break-up is only *visible* if the film
- * stays unstable long enough to deliver the e-folds that grow the seed to a
- * readable amplitude: see spinodalResidence() and availableEfolds(), which
- * carry the arithmetic and the test that pins it. At 0.5 the field had 2.31s
- * of residence against a 1.78s e-fold — 1.3 e-folds, a 0.11 amplitude against
- * a well depth of 1.0 — and it thinned evenly without ever tearing. 0.20
- * buys 5.77s of residence and 3.25 e-folds, which reaches 0.77.
+ * The second job sets a ceiling. availableEfolds() goes as 1/EVAP, so a fast
+ * traverse leaves a disturbance no time to grow — but the dependence is so
+ * weak that EVAP cannot be the lever that makes the film tear: reaching three
+ * e-folds this way needs EVAP near 0.018 and a two-minute blink cycle. The
+ * structure comes from SEED_AMPLITUDE instead, and EVAP is left to do the job
+ * it is actually good at.
  *
- * It remains the single named lever for blink cadence. Spec D6 forbids adding
- * an interval floor or ceiling to the blink state machine, so if the cadence
- * ever needs to change, move EVAP and only EVAP — but raising it trades
- * directly against whether the film tears at all, and the test will say so.
+ * 0.20 gives a ~10s traverse and a blink cycle near 8s. It remains the single
+ * named lever for cadence — spec D6 forbids an interval floor or ceiling on
+ * the blink state machine — but note it also moves PRIME_SECONDS, which has
+ * to stay inside the window where patches are formed and film remains.
  */
 export const EVAP = 0.2;
 
 /**
- * Seed amplitude the fresh film is laid with, by SEED_FRAG and later by the
- * blink splat. **Must agree with the shader** — film.ts interpolates this
- * constant into the GLSL rather than repeating the number, so they cannot
- * drift. It is what availableEfolds() has to grow from.
+ * Amplitude of the imperfection the fresh film is laid with, by SEED_FRAG and
+ * later by the blink splat. **Must agree with the shader** — film.ts
+ * interpolates this constant into the GLSL rather than repeating the number,
+ * so they cannot drift.
+ *
+ * 0.6 is not a perturbation, and it is not meant to be. availableEfolds()
+ * below says the traverse can amplify a disturbance by at most ~1.3x, so
+ * **the seed has to carry the structure** — there is no regime on this grid
+ * and this step where a small seed grows into patches. Spec D4 already says
+ * the lid lays an imperfect film; this is that sentence taken literally
+ * rather than decoratively, and it matches how real break-up works, nucleated
+ * at mucin defects and lid-wiper irregularities at sites that repeat in the
+ * same eye rather than emerging from noise.
+ *
+ * Measured on a CPU reference of the exact two-pass arithmetic: peak spread
+ * 0.19 at seed 0.25, 0.34 at 0.40, 0.55 at 0.60. 0.6 is the smallest value
+ * whose patches reach an amplitude that reads.
  */
-export const SEED_AMPLITUDE = 0.03;
+export const SEED_AMPLITUDE = 0.6;
 
 /**
  * DERIVED. Seconds the mean spends inside the spinodal band, where f''(h) < 0
- * and patches can actually grow. The band is |h| < 1/sqrt(3) and the mean
+ * and patches can grow at all. The band is |h| < 1/sqrt(3) and the mean
  * crosses it at rate EVAP.
  *
- * This is the constraint that governs whether break-up is VISIBLE, as opposed
- * to efoldSeconds(), which only says how fast it would grow if it had the
- * time. An earlier revision had a 1.78s e-fold and only 2.31s of residence —
- * 1.3 e-folds — and produced a film that thinned evenly and never tore.
+ * NOTE: this is *not* the growth budget, and reading it as one is the mistake
+ * that cost this task two rounds. See availableEfolds().
  */
 export function spinodalResidence(): number {
   return 2 / Math.sqrt(3) / EVAP;
 }
 
-/** DERIVED. e-folds available before the mean leaves the unstable band. */
+/**
+ * DERIVED. Maximum e-folds any disturbance can collect on the way down.
+ *
+ * The obvious estimate — `spinodalResidence() / efoldSeconds()` — is wrong by
+ * a factor of about 5, and both of the ways it is wrong are invisible until
+ * you integrate:
+ *
+ * 1. **sigma_max is instantaneous.** `M/(4*kappa)` is reached only at h = 0,
+ *    but f''(h) = 3h^2 - 1 varies across the whole traverse and a fixed
+ *    wavelength also pays the kappa*k^2 penalty at every moment.
+ * 2. **The seed is damped before it ever reaches the band.** From h = 1 down
+ *    to 1/sqrt(3) the film is *stable*, so the disturbance is actively
+ *    suppressed on the way in. Nobody rediscovers this by staring at the
+ *    equations: it shows up as the seed spread falling 0.024 -> 0.014 before
+ *    any growth starts, and it is why lowering EVAP helps far less than it
+ *    looks like it should — a slower traverse damps for longer too.
+ *
+ * Integrating sigma(k, t) = -M*k^2*(3h^2 - 1 + kappa*k^2) along h = 1 - E*t
+ * from the start of the traverse, and taking the maximum over both the fixed
+ * wavelength and the stopping time, gives a closed form:
+ *
+ *     G = C * M / (kappa * EVAP),  C = max_x x*((2/(3*sqrt(3)))*(1-x)^1.5 - x)
+ *
+ * where x = kappa*k^2. C = 0.0237555 at x = 0.12419. Note what this says: the
+ * net gain over a *complete* traverse from +1 to -1 is always negative — the
+ * damping on the way in and out exactly cancels the growth in the middle and
+ * then some — so break-up is a transient that has to be caught mid-traverse.
+ * That is what PRIME_SECONDS is for.
+ *
+ * Here G = 0.267, a gain of 1.31x. It is an upper bound: it assumes every bit
+ * of the seed sits at the single best wavelength. The CPU reference measures
+ * 1.09x for the actual three-octave seed.
+ */
+export const TRANSIENT_GAIN_C = 0.0237555;
+
 export function availableEfolds(): number {
-  return spinodalResidence() / efoldSeconds();
+  return (TRANSIENT_GAIN_C * MOBILITY) / (KAPPA * EVAP);
 }
 
 /**
  * TUNED. Seconds of real steps run at build time, so the eye loads mid-cycle
  * rather than as a mirror. Spec D11.
  *
- * **Coupled to EVAP, and squeezed from both sides by it.** Transport is
- * conservative under the Neumann boundary, so it integrates to zero and the
- * spatial mean obeys d<h>/dt = -EVAP exactly while there is film left to
- * evaporate. From a fresh film at <h> = +1 the mean enters the spinodal band
- * at (1 - 1/sqrt(3))/EVAP = 2.1s, leaves it at (1 + 1/sqrt(3))/EVAP = 7.9s
- * and reaches the dry well at 2/EVAP = 10s.
+ * **This is the transient-catcher.** availableEfolds() shows the net gain over
+ * a full traverse is negative, so there is no steady state worth showing:
+ * break-up is a window, and priming is what lands the viewer inside it.
  *
- * Too late and the viewer gets a uniformly dry field on the first frame — a
- * black disc, which reads as a dead shader and is not one. Too early and the
- * patches have not grown yet, so priming has bought nothing. 6.5s lands the
- * patches formed with film still between them. If EVAP moves, this moves with
- * it; the test pins both bounds.
+ * Transport is conservative under the Neumann boundary, so the spatial mean
+ * obeys d<h>/dt = -EVAP while film remains. Measured on the CPU reference at
+ * SEED_AMPLITUDE = 0.6, EVAP = 0.2 (t, mean, spread, fraction below DRY_H):
+ *
+ *     3.0   0.096  0.504   0.0%   patches visible, nothing torn yet
+ *     4.0  -0.093  0.603   2.3%   first patches reach the dry threshold
+ *     4.5  -0.177  0.641  11.5%   <- here: strongest contrast, film remains
+ *     5.5  -0.319  0.666  57.9%   past half the cornea, blink is overdue
+ *     7.0  -0.469  0.548  98.3%   effectively all dry, contrast collapsing
+ *
+ * 4.5s is where the patches are darkest against film that is still light —
+ * grey 0.24 against 0.56 on the debug ramp — and it leaves headroom before
+ * the break-up fraction crosses BLINK_FRACTION. Too late and the viewer gets
+ * a uniformly dry field on the first frame, which reads as a dead shader and
+ * is not one. If EVAP or SEED_AMPLITUDE moves, re-run the sweep; the test
+ * pins the outer bounds but only measurement finds the best point inside.
  */
-export const PRIME_SECONDS = 6.5;
+export const PRIME_SECONDS = 4.5;
 
 /** TUNED. Downward drain, 1.5 cells/s, tuned by eye — not derived. */
 export const GRAVITY = 1.5 * DELTA;

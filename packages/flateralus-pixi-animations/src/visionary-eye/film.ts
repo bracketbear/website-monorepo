@@ -477,7 +477,7 @@ export class FilmSim {
    * Stamp a fresh, slightly flawed film and run it forward `PRIME_SECONDS`.
    *
    * Spec D11: the default state must show the best thing, and a flat film is a
-   * mirror. Priming costs ~3120 steps once at init so the eye loads mid-cycle
+   * mirror. Priming costs ~2160 steps once at init so the eye loads mid-cycle
    * with real structure rather than making the viewer wait out a first cycle.
    *
    * The duration is coupled to `EVAP` and lives in `physics.ts` beside it —

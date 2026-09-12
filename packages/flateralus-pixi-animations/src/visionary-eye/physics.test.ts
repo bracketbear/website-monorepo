@@ -18,6 +18,7 @@ import {
   SAFETY,
   SEED_AMPLITUDE,
   STEP,
+  TRANSIENT_GAIN_C,
   availableEfolds,
   breakupFraction,
   clampMobility,
@@ -42,40 +43,59 @@ describe('tear film constants', () => {
     expect(DELTA).toBeCloseTo(0.009375, 12);
   });
 
-  it('stays unstable long enough for break-up to be visible', () => {
-    // efoldSeconds() says how fast a patch grows; it does NOT say whether the
-    // field stays unstable long enough to finish growing. The field is
-    // spinodal only while |<h>| < 1/sqrt(3), and the mean crosses that band at
-    // rate EVAP, so residence is a hard budget on how many e-folds the seed
-    // can ever collect. An earlier revision spent 2.31s of residence against a
-    // 1.78s e-fold — 1.3 e-folds, growing a 3% seed to 0.11 against a well
-    // depth of 1.0 — and the disc thinned evenly and never tore. Nothing in
-    // the rendering is wrong when that happens, which is what makes it
-    // expensive to find, so it is pinned here: no future tuning of EVAP, STEP
-    // or IFACE_CELLS may quietly reintroduce a film that cannot break up.
-    expect(availableEfolds()).toBeGreaterThanOrEqual(
-      Math.log(0.6 / SEED_AMPLITUDE)
+  it('lays a seed that survives the traverse at an amplitude that reads', () => {
+    // THE invariant. The traverse cannot manufacture structure: integrating
+    // sigma(k, t) from the start of the descent — including the stretch above
+    // the spinodal band, where the film is STABLE and actively damps the seed
+    // — caps the gain at availableEfolds(), which here is 0.27, a factor of
+    // 1.31. So whatever the seed is worth on the way in is essentially what
+    // the patches are worth on the way out, and the seed must therefore be
+    // large enough on its own.
+    //
+    // Two earlier revisions failed exactly here, both with a 3% seed: the disc
+    // thinned evenly and never tore. Nothing in the rendering is wrong when
+    // that happens, which is what makes it expensive to find. 0.5 is the
+    // amplitude a patch needs to read against the well depth of 1.0.
+    expect(SEED_AMPLITUDE * Math.exp(availableEfolds())).toBeGreaterThanOrEqual(
+      0.5
     );
   });
 
-  it('derives the spinodal residence from the band width and EVAP', () => {
-    expect(spinodalResidence()).toBeCloseTo(2 / Math.sqrt(3) / EVAP, 12);
+  it('measures the growth budget from the integrated rate, not the residence', () => {
+    // spinodalResidence()/efoldSeconds() is the seductive wrong answer: it
+    // assumes sigma_max applies for the whole traverse and ignores the damping
+    // before the band. It overstates the budget by about 5x here, which is the
+    // difference between a film that tears and one that does not.
     expect(availableEfolds()).toBeCloseTo(
-      spinodalResidence() / efoldSeconds(),
+      (TRANSIENT_GAIN_C * MOBILITY) / (KAPPA * EVAP),
       12
     );
+    expect(availableEfolds()).toBeLessThan(
+      spinodalResidence() / efoldSeconds()
+    );
+    // The constant is the maximum of x*((2/(3*sqrt(3)))*(1-x)^1.5 - x); pin it
+    // so a transcription slip cannot pass as a tuning change.
+    let c = 0;
+    for (let x = 0.0001; x < 1; x += 0.00001) {
+      const g = x * ((2 / (3 * Math.sqrt(3))) * Math.pow(1 - x, 1.5) - x);
+      if (g > c) c = g;
+    }
+    expect(TRANSIENT_GAIN_C).toBeCloseTo(c, 6);
   });
 
-  it('stops priming before the film is fully dry', () => {
+  it('primes into the window where patches exist and film remains', () => {
     // Transport is conservative, so the spatial mean falls at exactly EVAP
-    // while film remains: <h> goes +1 -> -1 in 2/EVAP seconds. Priming for
-    // longer than that hands the viewer a uniformly dry field on the first
-    // frame, which renders as a black disc and reads as a dead shader.
-    // This is the invariant the first pass at the spec violated.
-    expect(PRIME_SECONDS).toBeLessThan(2 / EVAP);
-    // And it must land after the instability has had time to bite, or there
-    // is nothing to see and priming has bought nothing.
-    expect(PRIME_SECONDS).toBeGreaterThan(1 / EVAP);
+    // while film remains. Priming past the point where the mean reaches the
+    // dry well hands the viewer a uniformly dry field on the first frame,
+    // which renders as a black disc and reads as a dead shader — the first
+    // failure this task hit.
+    const meanAtSeed = 1 - SEED_AMPLITUDE / 2;
+    expect(PRIME_SECONDS).toBeLessThan((meanAtSeed + 1) / EVAP);
+    // And it must land after the mean has entered the spinodal band, or the
+    // patches have not separated yet and priming has bought nothing.
+    expect(PRIME_SECONDS).toBeGreaterThan(
+      (meanAtSeed - 1 / Math.sqrt(3)) / EVAP
+    );
   });
 
   it('sets kappa from the interface width in cells', () => {
