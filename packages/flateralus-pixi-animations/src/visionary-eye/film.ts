@@ -7,6 +7,7 @@ import {
   KAPPA,
   MOBILITY,
   PRIME_SECONDS,
+  SEED_AMPLITUDE,
   STEP,
   clampMobility,
 } from './physics';
@@ -109,11 +110,12 @@ const STEP_FRAG =
 /**
  * A fresh sheet: h = 1 minus a few percent of broadband noise.
  *
- * The amplitude is the 3% seed the stability table costs out — 3.5 e-folds
- * from 3% to O(1) is the ~6.2s that composes with the 2s walk to the spinodal
- * into a ~7s cycle. The spectrum is deliberately broad rather than tuned to
- * the fastest-growing wavelength: letting the instability select its own mode
- * is what makes the patches land irregularly instead of on a lattice.
+ * The amplitude is `SEED_AMPLITUDE`, interpolated in rather than written as a
+ * GLSL literal so the shader and `availableEfolds()` — which measures whether
+ * the spinodal band lasts long enough to grow this seed into something that
+ * reads — cannot drift apart. The spectrum is deliberately broad rather than
+ * tuned to the fastest-growing wavelength: letting the instability select its
+ * own mode is what makes the patches land irregularly instead of on a lattice.
  *
  * `hash21`/`vnoise` are inlined rather than imported. Self-contained shader
  * strings are the convention in this package; the same pair is inlined in
@@ -136,7 +138,7 @@ const SEED_FRAG = `#version 300 es
       float n = vnoise(p) * 0.5
               + vnoise(p * 2.7 + vec2(11.3, 4.1)) * 0.3
               + vnoise(p * 6.1 + vec2(23.7, 17.9)) * 0.2;
-      fragColor = vec4(1.0 - 0.03 * n, 0.0, 0.0, 1.0);
+      fragColor = vec4(1.0 - ${SEED_AMPLITUDE.toFixed(3)} * n, 0.0, 0.0, 1.0);
     }`;
 
 const MU_UNIFORMS = ['uH', 'uTexel', 'uDelta', 'uKappa'] as const;
@@ -424,12 +426,13 @@ export class FilmSim {
    * Stamp a fresh, slightly flawed film and run it forward `PRIME_SECONDS`.
    *
    * Spec D11: the default state must show the best thing, and a flat film is a
-   * mirror. Priming costs ~1056 steps once at init so the eye loads mid-cycle
+   * mirror. Priming costs ~3120 steps once at init so the eye loads mid-cycle
    * with real structure rather than making the viewer wait out a first cycle.
    *
    * The duration is coupled to `EVAP` and lives in `physics.ts` beside it —
    * run past `2/EVAP` and the mean reaches the dry well before first paint,
-   * which paints a uniformly black disc.
+   * which paints a uniformly black disc; stop short of the growth window and
+   * the patches have not formed and priming has bought nothing.
    */
   prime(seed: number): void {
     const gl = this.gl;

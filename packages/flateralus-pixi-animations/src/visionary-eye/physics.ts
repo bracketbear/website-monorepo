@@ -91,36 +91,73 @@ export function patchWavelength(): number {
 }
 
 /**
- * TUNED. Evaporation, h per second, chosen for the resulting blink cadence.
+ * TUNED, but bounded from above. Evaporation, h per second.
  *
- * Time to reach the spinodal from a fresh film is 1/EVAP = 2s. Against the
- * 1.78s e-fold (efoldSeconds()) and the ~3.5 e-folds needed to grow a 3%
- * seed to O(1) (~6.2s), that composes to a blink cycle near 7s.
+ * EVAP does two jobs and they pull against each other. It sets the blink
+ * cadence — the cycle runs about 2/EVAP plus the growth time, so ~7.9s here —
+ * and it sets how long the mean spends inside the spinodal band, because the
+ * mean crosses that band at exactly this rate.
  *
- * This is the single named lever for blink cadence. Spec D6 forbids adding
- * an interval floor or ceiling to the blink state machine, so if the
- * cadence ever needs to change, move EVAP and only EVAP — nothing else in
- * this file is meant to absorb that adjustment.
+ * The second job is the binding one. Break-up is only *visible* if the film
+ * stays unstable long enough to deliver the e-folds that grow the seed to a
+ * readable amplitude: see spinodalResidence() and availableEfolds(), which
+ * carry the arithmetic and the test that pins it. At 0.5 the field had 2.31s
+ * of residence against a 1.78s e-fold — 1.3 e-folds, a 0.11 amplitude against
+ * a well depth of 1.0 — and it thinned evenly without ever tearing. 0.20
+ * buys 5.77s of residence and 3.25 e-folds, which reaches 0.77.
+ *
+ * It remains the single named lever for blink cadence. Spec D6 forbids adding
+ * an interval floor or ceiling to the blink state machine, so if the cadence
+ * ever needs to change, move EVAP and only EVAP — but raising it trades
+ * directly against whether the film tears at all, and the test will say so.
  */
-export const EVAP = 0.5;
+export const EVAP = 0.2;
+
+/**
+ * Seed amplitude the fresh film is laid with, by SEED_FRAG and later by the
+ * blink splat. **Must agree with the shader** — film.ts interpolates this
+ * constant into the GLSL rather than repeating the number, so they cannot
+ * drift. It is what availableEfolds() has to grow from.
+ */
+export const SEED_AMPLITUDE = 0.03;
+
+/**
+ * DERIVED. Seconds the mean spends inside the spinodal band, where f''(h) < 0
+ * and patches can actually grow. The band is |h| < 1/sqrt(3) and the mean
+ * crosses it at rate EVAP.
+ *
+ * This is the constraint that governs whether break-up is VISIBLE, as opposed
+ * to efoldSeconds(), which only says how fast it would grow if it had the
+ * time. An earlier revision had a 1.78s e-fold and only 2.31s of residence —
+ * 1.3 e-folds — and produced a film that thinned evenly and never tore.
+ */
+export function spinodalResidence(): number {
+  return 2 / Math.sqrt(3) / EVAP;
+}
+
+/** DERIVED. e-folds available before the mean leaves the unstable band. */
+export function availableEfolds(): number {
+  return spinodalResidence() / efoldSeconds();
+}
 
 /**
  * TUNED. Seconds of real steps run at build time, so the eye loads mid-cycle
  * rather than as a mirror. Spec D11.
  *
- * **Coupled to EVAP.** Transport is conservative under the Neumann boundary,
- * so it integrates to zero and the spatial mean obeys d<h>/dt = -EVAP exactly
- * while there is film left to evaporate. From a fresh film at <h> = +1 that
- * means the mean enters the spinodal at 1/(2*EVAP) = 1s, peaks at 1/EVAP = 2s
- * and reaches the dry well at 2/EVAP = 4s. Priming past 2/EVAP hands the
- * viewer a uniformly dry field on the first frame — a black disc, which reads
- * as a dead shader and is not one.
+ * **Coupled to EVAP, and squeezed from both sides by it.** Transport is
+ * conservative under the Neumann boundary, so it integrates to zero and the
+ * spatial mean obeys d<h>/dt = -EVAP exactly while there is film left to
+ * evaporate. From a fresh film at <h> = +1 the mean enters the spinodal band
+ * at (1 - 1/sqrt(3))/EVAP = 2.1s, leaves it at (1 + 1/sqrt(3))/EVAP = 7.9s
+ * and reaches the dry well at 2/EVAP = 10s.
  *
- * So: PRIME_SECONDS must stay below 2/EVAP, and 2.2s puts first paint inside
- * the window where patches have formed but film still remains. If EVAP moves
- * to re-cadence the blink, this moves with it; the test pins the invariant.
+ * Too late and the viewer gets a uniformly dry field on the first frame — a
+ * black disc, which reads as a dead shader and is not one. Too early and the
+ * patches have not grown yet, so priming has bought nothing. 6.5s lands the
+ * patches formed with film still between them. If EVAP moves, this moves with
+ * it; the test pins both bounds.
  */
-export const PRIME_SECONDS = 2.2;
+export const PRIME_SECONDS = 6.5;
 
 /** TUNED. Downward drain, 1.5 cells/s, tuned by eye — not derived. */
 export const GRAVITY = 1.5 * DELTA;

@@ -16,7 +16,9 @@ import {
   REDUCE,
   REFRACTORY,
   SAFETY,
+  SEED_AMPLITUDE,
   STEP,
+  availableEfolds,
   breakupFraction,
   clampMobility,
   efoldSeconds,
@@ -26,6 +28,7 @@ import {
   mobilityLimit,
   newBlinkState,
   patchWavelength,
+  spinodalResidence,
   stepBlink,
   tileInsideCornea,
   worldToLocal,
@@ -37,6 +40,30 @@ describe('tear film constants', () => {
     expect(DOMAIN).toBe(1.2);
     expect(GRID).toBe(128);
     expect(DELTA).toBeCloseTo(0.009375, 12);
+  });
+
+  it('stays unstable long enough for break-up to be visible', () => {
+    // efoldSeconds() says how fast a patch grows; it does NOT say whether the
+    // field stays unstable long enough to finish growing. The field is
+    // spinodal only while |<h>| < 1/sqrt(3), and the mean crosses that band at
+    // rate EVAP, so residence is a hard budget on how many e-folds the seed
+    // can ever collect. An earlier revision spent 2.31s of residence against a
+    // 1.78s e-fold — 1.3 e-folds, growing a 3% seed to 0.11 against a well
+    // depth of 1.0 — and the disc thinned evenly and never tore. Nothing in
+    // the rendering is wrong when that happens, which is what makes it
+    // expensive to find, so it is pinned here: no future tuning of EVAP, STEP
+    // or IFACE_CELLS may quietly reintroduce a film that cannot break up.
+    expect(availableEfolds()).toBeGreaterThanOrEqual(
+      Math.log(0.6 / SEED_AMPLITUDE)
+    );
+  });
+
+  it('derives the spinodal residence from the band width and EVAP', () => {
+    expect(spinodalResidence()).toBeCloseTo(2 / Math.sqrt(3) / EVAP, 12);
+    expect(availableEfolds()).toBeCloseTo(
+      spinodalResidence() / efoldSeconds(),
+      12
+    );
   });
 
   it('stops priming before the film is fully dry', () => {
