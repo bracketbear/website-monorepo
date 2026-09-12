@@ -7,7 +7,6 @@ import {
   GRAVITY,
   GRID,
   KAPPA,
-  MAX_SUBSTEPS,
   MOBILITY,
   NUCLEUS_DEPTH,
   NUCLEUS_R_MAX_CELLS,
@@ -16,6 +15,7 @@ import {
   PRIME_SECONDS,
   STEP,
   clampMobility,
+  filmTick,
   interfaceWidth,
 } from './physics';
 
@@ -516,28 +516,22 @@ export class FilmSim {
    * reach here or the film drains sideways as the eye looks around.
    *
    * **Returns the seconds of film time actually integrated, which is not
-   * `dt`.** The backlog is capped at `MAX_SUBSTEPS * STEP` = 0.025s, so below
-   * about 40fps the field ages slower than the wall does — at 8fps it ages at
-   * a fifth of real time. Anything that has to stay in step with the film's
-   * *state* rather than with the clock on the wall has to run on this number:
-   * drive a blink off `dt` instead and its cadence silently becomes a function
-   * of the frame rate.
+   * `dt`.** The accounting is `filmTick()` in `physics.ts`, which is where the
+   * reasoning and the tests live: below about 40fps the field ages slower than
+   * the wall does, and anything tracking the film's state has to run on this
+   * number rather than on the frame's `dt`.
    */
   advance(dt: number, gravityLocal: [number, number]): number {
     const gl = this.gl;
-    // Cap the backlog so a slow frame degrades instead of spiralling; the
-    // ceiling is derived from the step rate, not a literal.
-    this.acc = Math.min(this.acc + dt, MAX_SUBSTEPS * STEP);
-    if (this.acc < STEP) return 0;
-    let ran = 0;
-    while (this.acc >= STEP) {
-      this.acc -= STEP;
-      ran += STEP;
+    const tick = filmTick(this.acc, dt);
+    this.acc = tick.acc;
+    if (tick.steps === 0) return 0;
+    for (let k = 0; k < tick.steps; k++) {
       this.pass(this.muProg, this.muL, gravityLocal);
       this.pass(this.stepProg, this.stepL, gravityLocal);
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    return ran;
+    return tick.ran;
   }
 
   /**

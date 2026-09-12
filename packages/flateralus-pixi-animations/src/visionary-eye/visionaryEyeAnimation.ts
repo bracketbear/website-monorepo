@@ -13,7 +13,6 @@ import { EYE_GLOBE } from './eye';
 import { FILM_TEXTURE_UNIT, FilmSim } from './film';
 import type { BlinkState } from './physics';
 import {
-  BLINK_FRACTION,
   DELTA,
   GRID,
   PRIME_SECONDS,
@@ -21,6 +20,7 @@ import {
   lidCoverage,
   lidSweep,
   newBlinkState,
+  placeholderFraction,
   stepBlink,
   worldToLocal,
 } from './physics';
@@ -92,19 +92,6 @@ export type VisionaryEyeControlValues = ManifestToControlValues<
   typeof MANIFEST
 >;
 
-/**
- * TEMPORARY (Task 9 deletes this with the placeholder that uses it): film
- * seconds between blinks.
- *
- * Film seconds, not wall seconds — see `simulate()`. Short on purpose: the
- * trace in `physics.ts` puts a real 35%-dry crossing at about 4.6s of film
- * time, but this exists only so the lid can be watched before the measurement
- * lands, and on a machine where the field ages at a fifth of real time a 4.6s
- * cadence is most of a minute between sweeps. 3.0 still leaves the primed
- * field on screen for a moment before the first sweep, which spec D11 wants.
- */
-const PLACEHOLDER_BLINK_SECONDS = 3.0;
-
 const FRAG =
   SDF_PRE +
   SHARED_EYE +
@@ -173,7 +160,6 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
    * as the gaze already has.
    */
   private filmDt = 0;
-  private filmTime = 0;
 
   constructor(initialControls?: Partial<VisionaryEyeControlValues>) {
     super(MANIFEST, initialControls);
@@ -201,7 +187,6 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     this.lidPrev = 0;
     this.lidSeed = Math.random() * 1000;
     this.filmDt = 0;
-    this.filmTime = 0;
   }
 
   /**
@@ -239,11 +224,6 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
       this.film = FilmSim.create(gl);
       // Spec D11: load mid-cycle with real structure, not as a flat mirror.
       this.film?.prime(Math.random() * 1000);
-      this.filmTime = PRIME_SECONDS;
-      // TEMPORARY (Task 8 verification) — remove before this task is reviewed.
-      console.log(
-        `[blink] armed film=${!!this.film} reduced=${this.reducedMotion} trigger=${PLACEHOLDER_BLINK_SECONDS}s(film)`
-      );
       return;
     }
     // Reduced motion keeps the primed field but stops it evolving, the same
@@ -252,12 +232,10 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     if (this.reducedMotion) return;
 
     // TEMPORARY: Task 9 replaces this with the break-up fraction measured off
-    // the field by the reduction pass. A linear ramp in film seconds since the
-    // last blink, crossing BLINK_FRACTION at PLACEHOLDER_BLINK_SECONDS.
-    const fraction = Math.min(
-      1,
-      this.blink.since * (BLINK_FRACTION / PLACEHOLDER_BLINK_SECONDS)
-    );
+    // the field by the reduction pass. The ramp lives in `physics.ts` so the
+    // cadence it produces can be driven headlessly, which is the only way this
+    // is verifiable — see the blink cadence tests.
+    const fraction = placeholderFraction(this.blink.since);
 
     // **On the film's clock, not the wall's.** What Task 9 measures is a
     // property of the field, so its stand-in has to age with the field. The
@@ -272,10 +250,6 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
       // A new layout for every blink. Without this the same patches would come
       // back in the same places and the eye would read as a loop.
       this.lidSeed = Math.random() * 1000;
-      // TEMPORARY (Task 8 verification) — remove before this task is reviewed.
-      console.log(
-        `[blink] fired wall=${this.time.toFixed(2)}s film=${this.filmTime.toFixed(2)}s since=${before.since.toFixed(2)} fraction=${fraction.toFixed(3)} phase=${this.blink.phase}`
-      );
     }
     const coverage = lidCoverage(this.blink);
     if (isWiping(this.blink) || isWiping(before)) {
@@ -290,7 +264,6 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
       dt,
       worldToLocal(0, 1, this.gazeView[0], this.gazeView[1])
     );
-    this.filmTime += this.filmDt;
   }
 
   protected setUniforms(

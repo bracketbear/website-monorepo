@@ -28,8 +28,11 @@ import {
   criticalRadius,
   criticalRadiusCells,
   gazeFrame,
+  filmTick,
   isWiping,
   lidCoverage,
+  PLACEHOLDER_BLINK_SECONDS,
+  placeholderFraction,
   LID_SPLATS_MAX,
   LID_TRAVEL,
   lidFrame,
@@ -423,5 +426,144 @@ describe('lid geometry', () => {
 
   it('still lays one splat when the lid did not move', () => {
     expect(lidSweep(0.5, 0.5, 0, 0)).toHaveLength(1);
+  });
+});
+
+describe('the film clock', () => {
+  it('buys less film time than wall time once frames are slow', () => {
+    // The invariant the blink depends on. A 60fps frame is integrated whole; a
+    // slower one is capped, so the field falls behind the wall by a factor
+    // that changes with the frame rate. Everything below exists because that
+    // factor is not 1.
+    const cap = MAX_SUBSTEPS * STEP;
+    expect(filmTick(0, 1 / 60).ran).toBeCloseTo(1 / 60, 3);
+    expect(filmTick(0, 1 / 15).ran).toBeCloseTo(cap, 6);
+    expect(filmTick(0, 0.05).ran).toBeCloseTo(cap, 6);
+    expect(cap).toBeLessThan(0.05);
+  });
+
+  it('carries the remainder rather than dropping or inventing time', () => {
+    let acc = 0;
+    let ran = 0;
+    for (let k = 0; k < 600; k++) {
+      const t = filmTick(acc, 1 / 60);
+      acc = t.acc;
+      ran += t.ran;
+    }
+    // Ten seconds of 60fps frames, all under the cap, so none is lost: the
+    // total is the elapsed time to within the backlog still in hand.
+    expect(ran).toBeGreaterThan(10 - STEP * 2);
+    expect(ran).toBeLessThanOrEqual(10);
+    expect(acc).toBeLessThan(STEP);
+  });
+
+  it('never integrates more than the cap in one frame', () => {
+    // A stalled frame degrades instead of taking the next frame's budget with
+    // it, which is what keeps a slow machine slow rather than stuck.
+    expect(filmTick(0, 10).steps).toBeLessThanOrEqual(MAX_SUBSTEPS);
+    expect(filmTick(1, 1).steps).toBeLessThanOrEqual(MAX_SUBSTEPS);
+  });
+});
+
+/**
+ * Drive the shipped pieces exactly as `simulate()` does — `filmTick` for the
+ * clock, `placeholderFraction` for the trigger, `stepBlink` for the lid, with
+ * the film time carried one frame the way the animation carries it.
+ *
+ * This is the instrument for anything that depends on the animation clock
+ * advancing. It is deterministic and it does not need a GL context, a paint,
+ * or a foreground tab.
+ */
+function runBlinks(
+  dt: number,
+  seconds: number
+): { wall: number; film: number }[] {
+  // The harness clamps its own frame time before the animation sees it.
+  const clamped = Math.min(0.05, dt);
+  let blink: BlinkState = { ...newBlinkState(), since: PRIME_SECONDS };
+  let acc = 0;
+  let filmDt = 0;
+  let film = PRIME_SECONDS;
+  let wall = 0;
+  const fires: { wall: number; film: number }[] = [];
+  for (let k = 0; k < Math.round(seconds / dt); k++) {
+    const before = blink;
+    blink = stepBlink(before, filmDt, placeholderFraction(before.since));
+    if (before.phase === 'open' && blink.phase !== 'open') {
+      fires.push({ wall, film });
+    }
+    const tick = filmTick(acc, clamped);
+    acc = tick.acc;
+    filmDt = tick.ran;
+    film += tick.ran;
+    wall += dt;
+  }
+  return fires;
+}
+
+describe('blink cadence', () => {
+  it('lets the primed field be seen before the first sweep', () => {
+    // Spec D11: the eye loads mid-cycle with real structure, and a lid that
+    // fired on the first frame would wipe that structure away before anyone
+    // saw it. The first blink also has to land while the primed field is still
+    // inside the droplet window — past 3.85s it is a labyrinth.
+    const [first] = runBlinks(1 / 60, 60);
+    expect(first.film).toBeGreaterThan(PRIME_SECONDS);
+    expect(first.film).toBeLessThan(3.85);
+    expect(first.wall).toBeGreaterThan(0);
+  });
+
+  it('holds a steady interblink interval at every frame time', () => {
+    // The interval is the claim, not the absolute time of the nth blink:
+    // `since` resets to zero on a trigger and discards whatever overshot the
+    // threshold, so a coarse clock's leftovers accumulate as a slow drift in
+    // when the nth blink lands. The gap between blinks does not drift, which
+    // is what a cadence means.
+    for (const dt of [1 / 60, 1 / 30, 1 / 15, 1 / 8]) {
+      const fires = runBlinks(dt, 60);
+      expect(fires.length).toBeGreaterThan(3);
+      for (let k = 1; k < fires.length; k++) {
+        const gap = fires[k].film - fires[k - 1].film;
+        // At worst two of the coarse clock's own frames of overshoot: the
+        // threshold can only be crossed on a substep boundary, and the film
+        // time reaches the lid a frame late — the same lag the gaze has.
+        expect(gap).toBeGreaterThanOrEqual(PLACEHOLDER_BLINK_SECONDS);
+        expect(gap).toBeLessThan(
+          PLACEHOLDER_BLINK_SECONDS + 2 * MAX_SUBSTEPS * STEP
+        );
+      }
+    }
+  });
+
+  it('keeps the interval in FILM time when the frame time changes', () => {
+    // **This is the regression.** The blink stands in for a measurement of the
+    // field, so it has to age with the field. Driven from `dt` instead, the
+    // trigger's clock and the film's clock are throttled by different factors
+    // and the lid fires at a dryness that depends on the frame rate. Measured
+    // against the old wiring: at 1/15 the interval collapses to 1.57 film
+    // seconds against 3.03 at 1/60, and the first blink moves by 0.29 — 58x
+    // and 11x this tolerance respectively.
+    const gapOf = (dt: number) => {
+      const f = runBlinks(dt, 60);
+      return (f[f.length - 1].film - f[0].film) / (f.length - 1);
+    };
+    const fine = gapOf(1 / 60);
+    for (const dt of [1 / 30, 1 / 15, 1 / 8]) {
+      expect(Math.abs(gapOf(dt) - fine)).toBeLessThan(MAX_SUBSTEPS * STEP);
+    }
+    // And the first blink lands at the same dryness, to within one frame of
+    // the coarse clock.
+    expect(
+      Math.abs(runBlinks(1 / 15, 60)[0].film - runBlinks(1 / 60, 60)[0].film)
+    ).toBeLessThan(MAX_SUBSTEPS * STEP);
+  });
+
+  it('takes longer in WALL time when the frame time changes, and must', () => {
+    // The other half of the same fact, asserted so the invariance test above
+    // cannot pass by the clocks having quietly become the same thing again.
+    const fast = runBlinks(1 / 60, 60);
+    const slow = runBlinks(1 / 15, 60);
+    expect(slow[0].wall).toBeGreaterThan(fast[0].wall * 1.5);
+    expect(slow.length).toBeLessThan(fast.length);
   });
 });

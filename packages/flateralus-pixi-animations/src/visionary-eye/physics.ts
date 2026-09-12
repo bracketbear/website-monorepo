@@ -362,6 +362,42 @@ export const REFRACTORY = 1.5;
 export const CLOSE_TIME = 0.1;
 export const OPEN_TIME = 0.18;
 
+/** One frame of the film's clock: see `filmTick`. */
+export interface FilmTick {
+  /** Substeps to integrate this frame. */
+  steps: number;
+  /** Backlog carried into the next frame. */
+  acc: number;
+  /** Film seconds this frame buys — `steps * STEP`, and **not** `dt`. */
+  ran: number;
+}
+
+/**
+ * How much film time a frame of wall time actually buys.
+ *
+ * **The film does not age at the rate the wall does, and the gap is a function
+ * of the frame rate.** The backlog is capped at `MAX_SUBSTEPS * STEP` = 0.025s
+ * so a slow frame degrades instead of spiralling, and the harness clamps its
+ * own `dt` to 0.05s before this ever sees it. Together those make the field
+ * age at 1.00x real time at 60fps, 0.76x at 30, 0.38x at 15 and 0.15x at 6.
+ *
+ * Anything that has to stay in step with the film's *state* — the blink, which
+ * stands in for a measurement of that state — has to run on `ran` and not on
+ * `dt`. Drive it from `dt` and the cadence silently becomes a function of the
+ * frame rate: at 8fps the trigger's clock runs at 0.40x while the field runs
+ * at 0.20x, so the lid fires at half the dryness it was calibrated for. That
+ * is a real bug this function exists to make testable without a GL context.
+ */
+export function filmTick(acc: number, dt: number): FilmTick {
+  let left = Math.min(acc + dt, MAX_SUBSTEPS * STEP);
+  let steps = 0;
+  while (left >= STEP) {
+    left -= STEP;
+    steps++;
+  }
+  return { steps, acc: left, ran: steps * STEP };
+}
+
 export type LidPhase = 'open' | 'closing' | 'opening';
 
 export interface BlinkState {
@@ -536,4 +572,29 @@ export function lidSweep(
     out.push(lidFrame(from + (to - from) * (k / n), gx, gy));
   }
   return out;
+}
+
+/**
+ * TEMPORARY. Film seconds between blinks under the placeholder trigger, and
+ * the ramp that produces it. **Task 9 deletes both**, when the reduction pass
+ * makes `breakupFraction()` available from the field itself.
+ *
+ * It lives here rather than in the animation so the cadence can be driven
+ * headlessly — `physics.test.ts` runs the shipped ramp against the shipped
+ * clock — and so Task 9 has one place to remove it from.
+ *
+ * Short on purpose. The trace at `PRIME_SECONDS` puts a genuine 35%-dry
+ * crossing near 4.6s of film time, but this exists only so the lid can be
+ * watched before the measurement lands, and on a throttled tab — or any
+ * machine where the field ages at a fifth of real time — a 4.6s cadence is
+ * most of a minute between sweeps. 3.0 still leaves the primed field on screen
+ * for a beat before the first sweep, which spec D11 wants.
+ */
+export const PLACEHOLDER_BLINK_SECONDS = 3.0;
+
+export function placeholderFraction(sinceFilmSeconds: number): number {
+  return Math.min(
+    1,
+    sinceFilmSeconds * (BLINK_FRACTION / PLACEHOLDER_BLINK_SECONDS)
+  );
 }
