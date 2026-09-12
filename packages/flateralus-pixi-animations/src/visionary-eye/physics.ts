@@ -485,6 +485,208 @@ export function surfaceDim(wet: number): number {
   return 1 - DRY_DIM * (1 - wet);
 }
 
+/* ------------------------------------------------------------------ *
+ * The cornea as a lens: the refraction map, and the caustic that is
+ * the Jacobian of it.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Refractive index of the cornea at the tear film's outer surface, 1.376.
+ *
+ * The step that matters optically is air to tear film (1.336) to corneal
+ * stroma (1.376); the film is thin enough that the two interfaces act as one,
+ * and the standard schematic eye lumps them at 1.376. That single number is
+ * responsible for about two thirds of the eye's total refractive power.
+ */
+export const N_CORNEA = 1.376;
+
+/** DERIVED. `refract`'s eta for a ray entering the cornea from air. */
+export const CORNEA_ETA = 1 / N_CORNEA;
+
+/**
+ * DERIVED. Finite-difference baseline for the Jacobian, in tangent units.
+ *
+ * One cell, and there is no other defensible choice. Shorter, and the
+ * difference measures the curvature of `filmUV`'s smooth-bilinear
+ * reconstruction — an artefact of how the field is read, not of the film.
+ * Longer, and it averages across the interface, whose whole width is
+ * `IFACE_CELLS` = 1.5 cells, which is exactly the structure the caustic comes
+ * from. One cell is the field's own Nyquist and the scale at which it has
+ * something to say.
+ *
+ * It is also what lets the stencil stay inside `FILM_REACH`, which reserves
+ * exactly one cell of margin for a gradient tap.
+ */
+export const JACOBIAN_STEP = DELTA;
+
+/**
+ * DERIVED. The largest irradiance ratio the film can honestly be said to
+ * produce, as a multiple of the unfocused iris.
+ *
+ * A caustic's brightness at a fold is infinite in geometric optics and finite
+ * in every real instrument, bounded by whatever resolves it. Here that is the
+ * stencil: light is gathered onto the iris plane by a displacement field the
+ * film can only push so far, and it is counted in bins one cell wide.
+ *
+ *   deviation per unit of surface tilt   1 - CORNEA_ETA        = 0.2733
+ *   lateral throw at the iris plane      x IRIS_DEPTH          = 0.09495
+ *   tilt per unit of dh/dl               x FILM_SLOPE          = 7.596e-4
+ *   steepest resolved slope              x 1/(IFACE_CELLS*DELTA) = 0.04051
+ *   in cells                             / DELTA               = 3.24
+ *
+ * So the film moves light across at most 3.24 cells, and a fold can therefore
+ * pile at most 3.24 cells' worth of it into the one cell the difference
+ * resolves. Claiming more would be claiming structure finer than the field.
+ *
+ * The same number bounds the **dark** side by its reciprocal: light gathered
+ * onto a crest came off the slope beside it, and the widest that slope can be
+ * stretched is the same 3.24 cells. So the caustic runs from `1/CAUSTIC_MAX`
+ * to `CAUSTIC_MAX` times the unfocused iris, and the two bounds are one
+ * statement of where the light went, not two tuned numbers.
+ */
+export const CAUSTIC_MAX =
+  ((1 - CORNEA_ETA) * IRIS_DEPTH * FILM_SLOPE) / (IFACE_CELLS * DELTA) / DELTA;
+
+/** GLSL's `refract`. Returns the zero vector on total internal reflection. */
+export function refract(i: V3, n: V3, eta: number): V3 {
+  const d = i[0] * n[0] + i[1] * n[1] + i[2] * n[2];
+  const k = 1 - eta * eta * (1 - d * d);
+  if (k < 0) return [0, 0, 0];
+  const a = eta * d + Math.sqrt(k);
+  return [eta * i[0] - a * n[0], eta * i[1] - a * n[1], eta * i[2] - a * n[2]];
+}
+
+/**
+ * The corneal refraction map: where the ray through the tangent point `l`
+ * lands on the iris plane, in the same tangent coordinates.
+ *
+ * `tilt` is the film's contribution to the surface normal — `FILM_SLOPE`
+ * times the height gradient, already scaled — so a zero tilt is the bare
+ * corneal sphere and the whole film drops out of the map by arithmetic rather
+ * than by a branch. `view` is the incident direction in the gaze-local frame,
+ * pointing from the camera into the surface.
+ *
+ * The 0.2 floor on the depth component is a guard for rays that come out
+ * grazing near the silhouette; over the iris the true value never falls below
+ * about 0.91, so it shapes nothing that is visible.
+ */
+export function irisPoint(
+  lx: number,
+  ly: number,
+  tiltX: number,
+  tiltY: number,
+  view: V3 = [0, 0, -1]
+): [number, number] {
+  const nx = lx - tiltX;
+  const ny = ly - tiltY;
+  const nz = Math.sqrt(Math.max(1 - (lx * lx + ly * ly), 1e-4));
+  const m = Math.hypot(nx, ny, nz);
+  const r = refract(view, [nx / m, ny / m, nz / m], CORNEA_ETA);
+  const s = IRIS_DEPTH / Math.max(0.2, -r[2]);
+  return [lx + r[0] * s, ly + r[1] * s];
+}
+
+/**
+ * How much larger the iris looks through the cornea than it is: the
+ * reciprocal of the map's on-axis contraction.
+ *
+ * Not a constant this file uses — it is the check that the map is a cornea and
+ * not an arbitrary warp. Clinical figures for the apparent magnification of
+ * the iris and pupil run 1.12 to 1.15; a single refracting sphere lands a
+ * little under that because the real cornea is aspheric and has a second
+ * surface.
+ */
+export function cornealMagnification(): number {
+  const d = 1e-3;
+  return d / irisPoint(d, 0, 0, 0)[0];
+}
+
+/**
+ * What the film does to the light reaching the iris, as a **fraction of the
+ * unfocused iris** — positive where it concentrates, negative where it
+ * spreads — from the Jacobian of the refraction map.
+ *
+ * `J0` is the same map with the film removed, so this is **zero on a flat
+ * film by construction, not by tuning**. That matters three times over: it is
+ * what makes the term a measurement of the film rather than a wash over the
+ * whole eye; it removes the cornea's own magnification gradient, which runs
+ * from 0.82 on axis to 0.75 at the limbus and would otherwise read as a
+ * permanent glow in the middle of the iris; and it makes the `uFilmOK = 0`
+ * fallback exact, since there `J` and `J0` are the same arithmetic on the
+ * same numbers.
+ *
+ * **The negative half is not an embellishment, it is the other end of the
+ * same conservation law.** A crest of the film is a converging lens and the
+ * light it piles onto a line is light that left the slope beside it. Keeping
+ * only the bright half would be adding light the film never had. Across a
+ * real interface the pair reads as it should: a dim band on the dry side, a
+ * hairline on the wet side.
+ *
+ * `abs` because a strong enough crest folds the map, and a fold is a caustic
+ * with its sign flipped, not an absence of one.
+ */
+export function causticFocus(J: number, J0: number): number {
+  const ratio = J0 / Math.max(Math.abs(J), 1e-6);
+  return Math.min(Math.max(ratio, 1 / CAUSTIC_MAX), CAUSTIC_MAX) - 1;
+}
+
+/**
+ * The refraction map, its Jacobian, and the caustic, at one tangent point.
+ *
+ * Mirrors the shader stencil exactly, including which differences are centred.
+ * The film enters through its **Hessian**: the map is evaluated at `l`,
+ * `l + (e, 0)` and `l + (0, e)`, and the gradient at the two offset points is
+ * extrapolated from the Hessian rather than re-differenced from the field.
+ * That is the same accuracy to first order and it keeps every tap within one
+ * cell of `l`, which is precisely the margin `FILM_REACH` reserves. Taking the
+ * offset gradients by differencing the field directly would need taps two
+ * cells out, and the reach has no second cell to give.
+ */
+export function irisJacobian(
+  lx: number,
+  ly: number,
+  h: (x: number, y: number) => number,
+  slope: number = FILM_SLOPE,
+  view: V3 = [0, 0, -1],
+  e: number = JACOBIAN_STEP
+): { f0: [number, number]; J: number; J0: number; focus: number } {
+  const h00 = h(lx, ly);
+  const h10 = h(lx + e, ly);
+  const hm0 = h(lx - e, ly);
+  const h01 = h(lx, ly + e);
+  const h0m = h(lx, ly - e);
+  const h11 = h(lx + e, ly + e);
+  const gx = (h10 - hm0) / (2 * e);
+  const gy = (h01 - h0m) / (2 * e);
+  const hxx = (h10 - 2 * h00 + hm0) / (e * e);
+  const hyy = (h01 - 2 * h00 + h0m) / (e * e);
+  const hxy = (h11 - h10 - h01 + h00) / (e * e);
+  const det = (a: [number, number], b: [number, number], c: [number, number]) =>
+    ((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) / (e * e);
+
+  const f0 = irisPoint(lx, ly, gx * slope, gy * slope, view);
+  const fx = irisPoint(
+    lx + e,
+    ly,
+    (gx + hxx * e) * slope,
+    (gy + hxy * e) * slope,
+    view
+  );
+  const fy = irisPoint(
+    lx,
+    ly + e,
+    (gx + hxy * e) * slope,
+    (gy + hyy * e) * slope,
+    view
+  );
+  const b0 = irisPoint(lx, ly, 0, 0, view);
+  const bx = irisPoint(lx + e, ly, 0, 0, view);
+  const by = irisPoint(lx, ly + e, 0, 0, view);
+  const J = det(f0, fx, fy);
+  const J0 = det(b0, bx, by);
+  return { f0, J, J0, focus: causticFocus(J, J0) };
+}
+
 /** Tangent-space centre of reduction tile (i, j). */
 function tileCentre(i: number, j: number, size: number): [number, number] {
   const s = DOMAIN / size;

@@ -1,6 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import {
   BLINK_FRACTION,
+  CAUSTIC_MAX,
+  CORNEA_ETA,
+  JACOBIAN_STEP,
+  N_CORNEA,
+  IRIS_DEPTH,
+  causticFocus,
+  cornealMagnification,
+  irisJacobian,
+  irisPoint,
+  refract,
   CLOSE_TIME,
   CORNEA_ANG,
   CORNEA_L,
@@ -1101,5 +1111,600 @@ describe('the wet curve against a real interface', () => {
     expect(wetness(H_MAX)).toBe(1);
     expect(H_MAX).toBeGreaterThan(WET_H);
     expect(H_MIN).toBeLessThan(DRY_H);
+  });
+});
+
+/* ================================================================== *
+ * Task 11: the cornea as a lens, and the caustic that is its Jacobian
+ * ================================================================== */
+
+/** A film that is perfectly flat. The reference every claim is against. */
+const FLAT = () => 0;
+/** `h = c/2 * |l|^2`: a paraboloid, i.e. a lens of constant power `c`. */
+const lens = (c: number) => (x: number, y: number) => (c / 2) * (x * x + y * y);
+/**
+ * The film's own interface, as `film.ts` actually produces it: a tanh front of
+ * half-width `interfaceWidth()` with dry on the left and wet on the right.
+ */
+const front = (at: number) => (x: number) =>
+  Math.tanh((x - at) / (IFACE_CELLS * DELTA));
+
+/**
+ * Analytic small-angle prediction for the Jacobian of a constant-power film.
+ *
+ * A surface tilted by `d` deflects the ray by `(1 - eta) * d` — Snell at small
+ * angles — and that lands `IRIS_DEPTH * (1 - eta) * d` off to the side. With
+ * `h = c/2 |l|^2` the tilt is `FILM_SLOPE * c * l`, so the whole map scales
+ * linearly and its determinant is the square of one factor. This is the check
+ * that the shipped stencil is measuring refraction and not its own arithmetic.
+ */
+const lensRatio = (c: number) => {
+  const k = (1 - CORNEA_ETA) * IRIS_DEPTH;
+  return Math.pow(1 + k * FILM_SLOPE * c, 2);
+};
+
+describe('the corneal refraction map', () => {
+  it('refracts by Snell at the index the cornea actually has', () => {
+    for (const deg of [5, 15, 30, 45, 60]) {
+      const th = (deg * Math.PI) / 180;
+      // Incident ray at th to the surface normal, normal along +z.
+      const i: [number, number, number] = [Math.sin(th), 0, -Math.cos(th)];
+      const r = refract(i, [0, 0, 1], CORNEA_ETA);
+      const out = Math.atan2(r[0], -r[2]);
+      expect(Math.sin(th) / Math.sin(out)).toBeCloseTo(N_CORNEA, 6);
+      expect(Math.hypot(r[0], r[1], r[2])).toBeCloseTo(1, 12);
+    }
+  });
+
+  it('magnifies the iris by about what a real cornea does', () => {
+    // Clinically the pupil and iris look 1.12-1.15x their true size through
+    // the cornea. One refracting sphere lands a little under that, because the
+    // real cornea is aspheric and has a second surface; if this ever leaves
+    // the bracket, the map has stopped being an eye.
+    const m = cornealMagnification();
+    expect(m).toBeGreaterThan(1.08);
+    expect(m).toBeLessThan(1.15);
+    // Which is the same statement as: the lookup is pulled in toward the axis.
+    expect(irisPoint(0.3, 0, 0, 0)[0]).toBeLessThan(0.3);
+  });
+
+  it('contracts harder at the limbus than on axis, which is the thick glass', () => {
+    // The tilt of the surface grows faster than the tangent coordinate does,
+    // so the iris crowds toward the rim. A drawn ring cannot do this; it is
+    // the whole visual difference between a limbus and a circle.
+    const ratio = (r: number) => irisPoint(r, 0, 0, 0)[0] / r;
+    const axis = ratio(0.05);
+    const limbus = ratio(Math.sin(0.56));
+    expect(limbus).toBeLessThan(axis);
+    expect(axis - limbus).toBeGreaterThan(0.01);
+    // Monotone all the way out: no reversal anywhere on the cornea.
+    let prev = axis;
+    for (let k = 1; k <= 40; k++) {
+      const v = ratio(0.05 + (k / 40) * (Math.sin(0.62) - 0.05));
+      expect(v).toBeLessThanOrEqual(prev + 1e-12);
+      prev = v;
+    }
+  });
+
+  it('never leans on the grazing-ray clamp anywhere the iris is drawn', () => {
+    // `max(0.2, -rr.z)` is a guard against the silhouette, not a shaper. If it
+    // ever bit on the iris it would flatten the magnification without saying
+    // so.
+    for (let k = 0; k <= 40; k++) {
+      const l = (k / 40) * Math.sin(0.62);
+      const n = Math.sqrt(1 - l * l);
+      const r = refract([0, 0, -1], [l, 0, n], CORNEA_ETA);
+      expect(-r[2]).toBeGreaterThan(0.9);
+    }
+  });
+
+  it('stays square to the gaze axis, not to the screen', () => {
+    // The map is built in the gaze-local frame, so it must not care which way
+    // round the eye is looking: same radius in, same radius out.
+    const at = (a: number) => {
+      const p = irisPoint(0.4 * Math.cos(a), 0.4 * Math.sin(a), 0, 0);
+      return Math.hypot(p[0], p[1]);
+    };
+    const r0 = at(0);
+    for (let k = 1; k < 12; k++) {
+      expect(at((k * Math.PI) / 6)).toBeCloseTo(r0, 12);
+    }
+  });
+});
+
+describe('the caustic is the Jacobian of that map', () => {
+  it('derives the difference step from the cell size and nothing else', () => {
+    expect(JACOBIAN_STEP).toBe(DELTA);
+    expect(JACOBIAN_STEP).toBe(DOMAIN / GRID);
+    // Not shorter: below a cell the difference reads the curvature of
+    // filmUV's reconstruction rather than the film's.
+    expect(JACOBIAN_STEP).toBeGreaterThanOrEqual(DELTA);
+    // Not longer: the interface is 1.5 cells wide and is the entire subject.
+    expect(JACOBIAN_STEP).toBeLessThan(IFACE_CELLS * DELTA);
+  });
+
+  it('keeps every tap inside the texels the simulation wrote', () => {
+    // FILM_REACH reserves exactly one cell of margin. The stencil is centred
+    // and one cell wide, in both axes and on the diagonal, so it fits — which
+    // is why the Hessian is taken from a centred stencil and not by
+    // re-differencing the field at l + e, which would need two.
+    const furthest = FILM_REACH + JACOBIAN_STEP;
+    expect(furthest).toBeLessThanOrEqual(DOMAIN / 2 - DELTA / 2 + 1e-12);
+    // The diagonal tap is the same one cell away in Chebyshev, which is the
+    // metric filmReach is written in.
+    expect(Math.max(JACOBIAN_STEP, JACOBIAN_STEP)).toBe(JACOBIAN_STEP);
+  });
+
+  it('bounds the brightening by how far the film can throw light', () => {
+    // CAUSTIC_MAX is not a taste number. Rebuild it from its four factors.
+    const throwCells =
+      ((1 - CORNEA_ETA) * IRIS_DEPTH * FILM_SLOPE) /
+      (IFACE_CELLS * DELTA) /
+      DELTA;
+    expect(CAUSTIC_MAX).toBeCloseTo(throwCells, 12);
+    expect(CAUSTIC_MAX).toBeGreaterThan(2);
+    expect(CAUSTIC_MAX).toBeLessThan(5);
+    // And the dark side is its reciprocal: the light has to come from
+    // somewhere, and it is the same somewhere.
+    expect(causticFocus(1e9, 1)).toBeCloseTo(1 / CAUSTIC_MAX - 1, 12);
+    expect(causticFocus(1e-9, 1)).toBeCloseTo(CAUSTIC_MAX - 1, 12);
+  });
+
+  it('is exactly zero on a flat film, by arithmetic and not by rounding', () => {
+    // This is the uFilmOK = 0 fallback. `focus` multiplies the light on every
+    // iris pixel, so a last bit here would tint the whole eye on the path a
+    // driver without float render targets takes.
+    for (const l of [0, 0.1, 0.3, 0.5]) {
+      const j = irisJacobian(l, l * 0.3, FLAT);
+      expect(j.J).toBe(j.J0);
+      expect(j.focus).toBe(0);
+    }
+    // And with the slope gated off, any field at all collapses the same way.
+    for (const l of [0, 0.2, 0.45]) {
+      const j = irisJacobian(l, 0, (x, y) => front(0.2)(x) + y * 13, 0);
+      expect(j.J).toBe(j.J0);
+      expect(j.focus).toBe(0);
+    }
+  });
+
+  it('removes the corneas own magnification instead of reading it as focus', () => {
+    // J0 is not constant: it runs 0.82 on axis to 0.75 at the limbus. Divided
+    // out, a flat film is flat everywhere; left in, the middle of every iris
+    // would carry a permanent glow that has nothing to do with the film.
+    const axis = irisJacobian(0, 0, FLAT).J0;
+    const limbus = irisJacobian(Math.sin(0.56), 0, FLAT).J0;
+    expect(axis).toBeGreaterThan(limbus);
+    expect(axis).toBeCloseTo(0.819, 2);
+    expect(limbus).toBeCloseTo(0.766, 2);
+  });
+
+  it('matches Snell on a film of known, constant curvature', () => {
+    // The synthetic film with an answer: a paraboloid is a thin lens, and its
+    // Jacobian is the square of a linear factor. Agreement is a statement
+    // about the stencil, since nothing in `irisJacobian` knows this formula.
+    for (const c of [-50, -20, 20, 50]) {
+      const j = irisJacobian(0, 0, lens(c));
+      expect(Math.abs(j.J / j.J0 / lensRatio(c) - 1)).toBeLessThan(0.01);
+    }
+    for (const c of [-200, -100, 100, 200]) {
+      expect(
+        Math.abs(
+          irisJacobian(0, 0, lens(c)).J /
+            irisJacobian(0, 0, lens(c)).J0 /
+            lensRatio(c) -
+            1
+        )
+      ).toBeLessThan(0.04);
+    }
+  });
+
+  it('does Snell exactly, and so parts company with the linear version', () => {
+    // The formula above is a small-angle reading of Snell, and by c = -800 the
+    // film is tilting the surface by a third of a radian, where sin is no
+    // longer its argument. The shipped map calls `refract` and keeps the
+    // difference; a linearised map would agree here and be wrong.
+    const c = -800;
+    const exact = irisJacobian(0, 0, lens(c));
+    expect(Math.abs(exact.J / exact.J0 / lensRatio(c) - 1)).toBeGreaterThan(
+      0.2
+    );
+  });
+
+  it('brightens on crests and dims in troughs, never the other way round', () => {
+    // A local maximum of h is a bump on the outer surface, which is a
+    // converging lens. A dip spreads. Getting this backwards would light up
+    // the dry patches themselves rather than their rims.
+    for (const c of [-600, -300, -100]) {
+      expect(irisJacobian(0.1, 0, lens(c)).focus).toBeGreaterThan(0);
+    }
+    for (const c of [100, 300, 600]) {
+      expect(irisJacobian(0.1, 0, lens(c)).focus).toBeLessThan(0);
+    }
+  });
+
+  it('folds where the film is steepest, and clamps rather than diverging', () => {
+    // Geometric optics says infinity at a fold. The film reaches one: the
+    // power that sends J through zero is 1/((1-eta)*IRIS_DEPTH*FILM_SLOPE),
+    // and a resolved interface carries more curvature than that.
+    const foldPower = -1 / ((1 - CORNEA_ETA) * IRIS_DEPTH * FILM_SLOPE);
+    expect(irisJacobian(0.1, 0, lens(foldPower * 0.5)).J).toBeGreaterThan(0);
+    expect(irisJacobian(0.1, 0, lens(foldPower * 1.5)).J).toBeLessThan(0);
+    // Straddling the fold the number stays finite and pinned to the bound.
+    for (const f of [0.97, 0.99, 1.0, 1.01, 1.03]) {
+      const j = irisJacobian(0.1, 0, lens(foldPower * f));
+      expect(Number.isFinite(j.focus)).toBe(true);
+      expect(j.focus).toBeLessThanOrEqual(CAUSTIC_MAX - 1 + 1e-12);
+    }
+  });
+
+  it('draws a hairline on the wet side of a real front and a shadow on the dry', () => {
+    // The shape of the thing, on the interface film.ts actually produces.
+    const at = 0.2;
+    const h = front(at);
+    const sample = (cells: number) =>
+      irisJacobian(at + cells * DELTA, 0, (x) => h(x)).focus;
+    // Wet side (h rising to +1): the crest of the front focuses.
+    expect(sample(2)).toBeGreaterThan(1.5);
+    // Dry side (h falling to -1): the trough spreads the same light.
+    expect(sample(-1)).toBeLessThan(-0.4);
+    // Both die within a handful of cells — it is a filigree, not a wash.
+    expect(Math.abs(sample(8))).toBeLessThan(0.05);
+    expect(Math.abs(sample(-8))).toBeLessThan(0.05);
+    // And dead flat in the middle of a patch, where there is nothing to bend.
+    expect(Math.abs(sample(20))).toBeLessThan(0.01);
+  });
+
+  it('says nothing at all about a quiet wet sheet', () => {
+    // The measured wet film is p50 |dh/dl| = 2.0 over lengths of many cells.
+    // If that produced a caustic the eye would sparkle all the time and the
+    // term would be decoration. A long-wavelength ripple of that slope:
+    const k = 2 * Math.PI * 4; // four cycles across the 1.2-unit domain
+    const quiet = (x: number) => (2.0 / k) * Math.sin(k * x);
+    let worst = 0;
+    for (let i = 0; i <= 400; i++) {
+      const x = -0.5 + i / 400;
+      worst = Math.max(worst, Math.abs(irisJacobian(x, 0, quiet).focus));
+    }
+    // Five percent of the directional light, which is about two percent of the
+    // pixel: under the film grain, and forty-odd times weaker than what a
+    // tearing front does at the same slope. The caustic is a signal that the
+    // film is breaking, not that it exists.
+    expect(worst).toBeLessThan(0.06);
+    let front2 = 0;
+    for (let i = -400; i <= 400; i++) {
+      front2 = Math.max(
+        front2,
+        irisJacobian(0.2 + (i / 40) * DELTA, 0, (x) => front(0.2)(x)).focus
+      );
+    }
+    expect(front2 / worst).toBeGreaterThan(25);
+  });
+
+  it('leaves the iris where it was when the film is flat, and moves it when it is not', () => {
+    // f0 is the lookup, not just the Jacobian's scaffolding. A flat film still
+    // magnifies — that is the cornea — but the film alone displaces it too.
+    const flat = irisJacobian(0.25, 0, FLAT).f0;
+    const bent = irisJacobian(0.25, 0, front(0.25)).f0;
+    expect(Math.hypot(flat[0] - 0.25, flat[1])).toBeGreaterThan(0.02);
+    const moved = Math.hypot(bent[0] - flat[0], bent[1] - flat[1]);
+    // Bounded by the same throw budget CAUSTIC_MAX is derived from — the film
+    // cannot move the lookup further than it can move the light, and here it
+    // spends 2.9 of its 3.2 cells. That bound is what keeps the iris rippling
+    // rather than smearing.
+    expect(moved).toBeGreaterThan(DELTA);
+    expect(moved).toBeLessThan(CAUSTIC_MAX * DELTA);
+  });
+});
+
+/**
+ * `visionary()` and the iris half of `eyeW`, on the CPU.
+ *
+ * Task 10 learned the hard way that a term can be computed correctly and then
+ * clipped away, and its own mirror stopped at the sclera — `visionary()` was
+ * "not ported, so rows on the iris stand in a mid-tone for it". The caustic
+ * lands on the iris, so the mid-tone will not do: this is the real mandala,
+ * every term of it, so the question "is there room for the measurement to be
+ * seen" has an answer instead of a hope.
+ *
+ * The hashes run in float64 here and in float32 on the GPU, so the *particular*
+ * grain differs. Nothing below asks about a particular pixel; it asks about the
+ * distribution over twenty thousand of them, which the precision does not move.
+ */
+const V_IND = [0.09, 0.05, 0.2];
+const V_ELEC = [0.3, 0.55, 1.0];
+const V_VMAG = [0.85, 0.2, 0.75];
+const V_CREAM = [1.0, 243 / 255, 227 / 255];
+const V_INK = [17 / 255, 10 / 255, 8 / 255];
+const V_SUN = [1.0, 194 / 255, 74 / 255];
+
+const gclamp = (x: number, a: number, b: number) => Math.min(b, Math.max(a, x));
+const gfract = (x: number) => x - Math.floor(x);
+const gmod = (x: number, y: number) => x - y * Math.floor(x / y);
+const gss = (a: number, b: number, x: number) => {
+  const t = gclamp((x - a) / (b - a), 0, 1);
+  return t * t * (3 - 2 * t);
+};
+const gmix = (a: number[], b: number[], t: number) =>
+  a.map((x, i) => x + (b[i] - x) * t);
+const ghash = (x: number, y: number) =>
+  gfract(Math.sin(x * 127.1 + y * 311.7) * 43758.5453123);
+function gvnoise(px: number, py: number): number {
+  const ix = Math.floor(px);
+  const iy = Math.floor(py);
+  const fx = px - ix;
+  const fy = py - iy;
+  const ux = fx * fx * (3 - 2 * fx);
+  const uy = fy * fy * (3 - 2 * fy);
+  const a = ghash(ix, iy) + (ghash(ix + 1, iy) - ghash(ix, iy)) * ux;
+  const b =
+    ghash(ix, iy + 1) + (ghash(ix + 1, iy + 1) - ghash(ix, iy + 1)) * ux;
+  return a + (b - a) * uy;
+}
+function gfbm(px: number, py: number): number {
+  let v = 0;
+  let a = 0.5;
+  let x = px;
+  let y = py;
+  for (let i = 0; i < 4; i++) {
+    v += a * gvnoise(x, y);
+    x = x * 2.03 + 17.0;
+    y = y * 2.03 + 9.2;
+    a *= 0.5;
+  }
+  return v;
+}
+function gstars(qx: number, qy: number, density: number, t: number): number {
+  const gx = qx * density;
+  const gy = qy * density;
+  const cx = Math.floor(gx);
+  const cy = Math.floor(gy);
+  const h = ghash(cx, cy);
+  if (h < 0.93) return 0;
+  const d = Math.hypot(
+    gfract(gx) - ghash(cx + 11.3, cy + 11.3),
+    gfract(gy) - ghash(cx + 27.7, cy + 27.7)
+  );
+  const sz = 0.06 + 0.14 * ghash(cx + 41.2, cy + 41.2);
+  const s = gss(sz, 0, d);
+  return (
+    s *
+    s *
+    (0.45 +
+      0.55 * Math.sin(t * (1.2 + 1.5 * ghash(cx + 3, cy + 3)) + h * 40) * 0.5 +
+      0.275)
+  );
+}
+/** `visionary()`, term for term. */
+function visionary(qx: number, qy: number, t: number, pupil: number): number[] {
+  const breath = 0.9 + 0.1 * Math.sin(t * 0.45);
+  const r = Math.hypot(qx, qy) / breath + 1e-4;
+  const a = Math.atan2(qy, qx);
+  const sec = 6.28318 / 12;
+  const af = Math.abs(gmod(a + t * 0.04, sec) - sec * 0.5);
+  let col = V_IND.map(
+    (x) => x * (0.7 + 0.5 * gfbm(qx * 2 + t * 0.05, qy * 2 + t * 0.05))
+  );
+  const fil = gfbm(af * 14 + gfbm(r * 6, t * 0.2) * 2.5, r * 9 - t * 0.5);
+  const lines = Math.pow(gclamp(1 - Math.abs(fil * 2 - 1) * 2.2, 0, 1), 3);
+  const spec = gmix(
+    V_ELEC,
+    V_VMAG,
+    0.5 + 0.5 * Math.sin(r * 9 - t * 0.8 + af * 6)
+  );
+  const pd = 1 + pupil * 1.1;
+  col = col.map(
+    (x, i) => x + spec[i] * lines * gss(0.065 * pd, 0.18, r) * 0.85
+  );
+  const ring = Math.abs(gfract(r * 5.5 - t * 0.16) - 0.5);
+  const rc = gmix(V_VMAG, V_ELEC, 0.5 + 0.5 * Math.sin(t * 0.4));
+  col = col.map(
+    (x, i) => x + rc[i] * gss(0.09, 0, ring) * Math.exp(-r * 1.5) * 0.45
+  );
+  const l1 = Math.sin(Math.hypot(qx - 0.16, qy) * 34 - t * 0.6);
+  const l2 = Math.sin(Math.hypot(qx + 0.16, qy) * 34 - t * 0.6);
+  const l3 = Math.sin(Math.hypot(qx, qy - 0.16) * 34 - t * 0.6);
+  const lat = Math.pow(gclamp(l1 * l2 * l3 * 0.5 + 0.5, 0, 1), 6);
+  col = col.map((x, i) => x + V_SUN[i] * lat * Math.exp(-r * 1.2) * 0.35);
+  const iris = gss(0.22, 0.06 * pd, r);
+  const spokes =
+    0.5 + 0.5 * Math.sin(a * 24 + gfbm(a * 4, r * 20) * 5 + t * 0.5);
+  col = col.map(
+    (x, i) => x + V_ELEC[i] * iris * gss(0.05 * pd, 0.1 * pd, r) * spokes * 0.4
+  );
+  col = col.map((x, i) => x + V_VMAG[i] * iris * 0.15);
+  const pr = 0.055 * pd;
+  col = gmix(
+    col,
+    V_INK.map((x) => x * 0.35),
+    gss(pr + 0.006, pr - 0.006, r)
+  );
+  const pg = gmix(V_ELEC, V_CREAM, 0.35);
+  col = col.map((x, i) => x + pg[i] * Math.exp(-Math.abs(r - pr) * 110) * 0.55);
+  col = col.map(
+    (x, i) => x + V_ELEC[i] * gss(pr + 0.05, pr, r) * (r >= pr ? 1 : 0) * 0.2
+  );
+  const st = gstars(qx, qy, 50, t);
+  col = col.map((x, i) => x + V_CREAM[i] * st * 0.3 * gss(0.3, 0.7, r));
+  return col.map((x) => x * breath);
+}
+function genergyH(lx: number, ly: number, ang: number, t: number): number {
+  const s = Math.max(Math.sin(ang), 1e-3);
+  const off = gfbm(ang * 5, t * 0.15) * 2;
+  const f = gfbm(
+    (lx / s) * 2.6 + off,
+    (ly / s) * 2.6 + ang * 7 - t * 0.2 + off
+  );
+  return Math.pow(gclamp(1 - Math.abs(f * 2 - 1) * 2.6, 0, 1), 3);
+}
+/**
+ * `eyeW`'s iris path at a straight-ahead gaze, where the gaze-local frame is
+ * the world frame. The film is wet and flat, which is the case the caustic has
+ * to be visible against.
+ */
+function irisPixel(lx: number, ly: number, focus: number, t = 7.0) {
+  const PUPIL = 0.15; // the value onInit sets and the rest hover around
+  const BUMP = 0.8; // the shipped Energy Relief default
+  const lz = Math.sqrt(Math.max(0, 1 - lx * lx - ly * ly));
+  const ang = Math.acos(gclamp(lz, -1, 1));
+  const sd = Math.max(Math.sin(ang), 1e-3);
+  const sdx = lx / sd;
+  const sdy = ly / sd;
+  const vl = genergyH(lx, ly, ang, t);
+  const sa2 = Math.atan2(sdy, sdx);
+  const o1 = gfbm(sdx * 3.5, sdy * 3.5) * 1.8;
+  const vein = Math.pow(
+    gclamp(
+      1 - Math.abs(gfbm(sa2 * 5 + o1, ang * 2.2 + o1) * 2 - 1) * 3.4,
+      0,
+      1
+    ),
+    4
+  );
+  const o2 = gfbm(sdx * 6, sdy * 6) * 1.2;
+  const vein2 = Math.pow(
+    gclamp(
+      1 - Math.abs(gfbm(sa2 * 13 + 7.3 + o2, ang * 4.5 + o2) * 2 - 1) * 5.5,
+      0,
+      1
+    ),
+    6
+  );
+  const vd = gss(0.55, 1.35, ang);
+  let sc = [0.965, 0.95, 0.925];
+  sc = gmix(sc, [0.74, 0.18, 0.15], vein * vd * 0.55);
+  sc = gmix(sc, [0.84, 0.36, 0.3], vein2 * vd * 0.3);
+  sc = gmix(sc, [0.99, 0.85, 0.79], vd * vd * 0.28);
+  sc = gmix(sc, [0.9, 0.86, 0.74], gss(0.95, 1.5, ang) * 0.22);
+  const gr = gfbm(sdx * 5, sdy * 5 + ang * 3);
+  sc = sc.map((x, i) => x - [0.025, 0.03, 0.02][i] * gr);
+  sc = sc.map((x) => x * (1 - gss(0.9, 1.5, ang) * 0.18));
+  const ee = 0.06;
+  const pm = gss(0.14, 0.32, ang) * gss(0.68, 0.54, ang);
+  const dhx = ((genergyH(lx + ee, ly, ang, t) - vl) / ee) * pm;
+  const dhy = ((genergyH(lx, ly + ee, ang, t) - vl) / ee) * pm;
+  const nbv = [lx - dhx * BUMP * 0.045, ly - dhy * BUMP * 0.045, lz];
+  const nn = Math.hypot(nbv[0], nbv[1], nbv[2]);
+  const nb = nbv.map((x) => x / nn);
+  // Seen through the cornea, on a flat film: the map with no tilt.
+  const f0 = irisPoint(lx, ly, 0, 0);
+  const ir = visionary(
+    (f0[0] - dhx * BUMP * 0.012) * 0.62,
+    (f0[1] - dhy * BUMP * 0.012) * 0.62,
+    t,
+    PUPIL
+  );
+  const irisM = gss(0.62, 0.5, ang);
+  let eye = gmix(sc, ir, irisM);
+  eye = eye.map(
+    (x) => x * (1 - gss(0.72, 0.56, ang) * gss(0.5, 0.58, ang) * 0.35)
+  );
+  const lim = gmix(V_ELEC, V_CREAM, 0.4);
+  eye = eye.map(
+    (x, i) => x + lim[i] * Math.exp(-Math.abs(ang - 0.56) * 26) * 0.35
+  );
+  const dif = gclamp(nb[0] * LIGHT.x + nb[1] * LIGHT.y + nb[2] * LIGHT.z, 0, 1);
+  let total = eye.map((x) => x * (0.55 + 0.6 * dif * (1 + focus * irisM)));
+  total = total.map((x, i) => x + V_CREAM[i] * Math.pow(dif, 48) * 0.9);
+  total = total.map(
+    (x, i) => x + V_CREAM[i] * Math.pow(dif, 7) * 0.07 * (1 - irisM)
+  );
+  const l2n = Math.hypot(0.3, -0.2, 1.0);
+  const d2 = gclamp((nb[0] * 0.3 + nb[1] * -0.2 + nb[2] * 1.0) / l2n, 0, 1);
+  total = total.map(
+    (x, i) => x + V_ELEC[i] * vl * Math.pow(d2, 8) * BUMP * 0.55 * irisM
+  );
+  total = total.map((x, i) => x + V_ELEC[i] * Math.pow(1 - lz, 3) * 0.18);
+  return { total, irisM };
+}
+
+/** Every pixel of the painted iris, once. */
+const IRIS_FIELD = (() => {
+  const rad = Math.sin(0.5); // irisM == 1 inside here
+  const pts: [number, number][] = [];
+  for (let i = 0; i < 160; i++) {
+    for (let j = 0; j < 160; j++) {
+      const lx = ((i + 0.5) / 160) * 2 * rad - rad;
+      const ly = ((j + 0.5) / 160) * 2 * rad - rad;
+      if (Math.hypot(lx, ly) <= rad) pts.push([lx, ly]);
+    }
+  }
+  return pts;
+})();
+const pct = (a: number[], f: number) =>
+  a.slice().sort((x, y) => x - y)[Math.floor(f * (a.length - 1))];
+
+describe('the headroom the caustic lands in', () => {
+  const base = IRIS_FIELD.map(([x, y]) => irisPixel(x, y, 0).total);
+
+  it('finds the iris nowhere near the clamp the sclera sits on', () => {
+    // The opposite of the sclera, and the reason the spec puts the caustic
+    // here and the wetness dim there. The sclera's diffuse term alone is
+    // (1.094, 1.078, 1.053) before any specular — past white. The iris is a
+    // fifth of that.
+    const L = base.map((c) => lum(c.map((x) => Math.min(1, Math.max(0, x)))));
+    expect(pct(L, 0.5)).toBeGreaterThan(0.1);
+    expect(pct(L, 0.5)).toBeLessThan(0.3);
+    expect(pct(L, 0.9)).toBeLessThan(0.6);
+    // And very little of it is already clipped, unlike the sclera, where
+    // essentially all of it is.
+    const over = base.filter((c) => c.some((x) => x >= 1)).length;
+    expect(over / base.length).toBeLessThan(0.06);
+    // Per channel there is more than half a unit of room at the median.
+    const head = base.map((c) => 1 - Math.max(c[0], c[1], c[2]));
+    expect(pct(head, 0.5)).toBeGreaterThan(0.5);
+  });
+
+  it('shows a measured caustic in the framebuffer, not just in the maths', () => {
+    // The Task 10 test that failed, asked again where the answer is different.
+    // Nothing here is tuned to make it pass: `focus` goes into the light term
+    // at a gain of exactly one.
+    const dip = (focus: number) => {
+      const d = IRIS_FIELD.map(
+        ([x, y], i) =>
+          lum(
+            irisPixel(x, y, focus).total.map((v) => Math.min(1, Math.max(0, v)))
+          ) - lum(base[i].map((v) => Math.min(1, Math.max(0, v))))
+      );
+      return { p10: pct(d, 0.1), p50: pct(d, 0.5), p90: pct(d, 0.9) };
+    };
+    // A modest rim, well short of the fold.
+    const mild = dip(0.5);
+    expect(mild.p50).toBeGreaterThan(0.02);
+    // The fold, at the bound CAUSTIC_MAX puts on it.
+    const peak = dip(CAUSTIC_MAX - 1);
+    expect(peak.p50).toBeGreaterThan(0.1);
+    expect(peak.p10).toBeGreaterThan(0.03);
+    // The dark companion shows too, which on the sclera it could not have.
+    const dark = dip(1 / CAUSTIC_MAX - 1);
+    expect(dark.p50).toBeLessThan(-0.035);
+  });
+
+  it('does not blow the iris out at the brightest the film can get', () => {
+    // Restraint is also a measurement. At full fold the iris roughly doubles
+    // in the light term and still keeps most of its detail out of the clamp;
+    // if this ever fails, the caustic has stopped reporting and started
+    // painting.
+    const peak = IRIS_FIELD.map(
+      ([x, y]) => irisPixel(x, y, CAUSTIC_MAX - 1).total
+    );
+    const over = peak.filter((c) => c.some((v) => v >= 1)).length;
+    // 28% measured, against 2% unfocused. The fold is under a cell wide, so
+    // that is a hairline running hot, not an iris washed out.
+    expect(over / peak.length).toBeLessThan(0.32);
+    expect(over / peak.length).toBeGreaterThan(0.1);
+  });
+
+  it('leaves the pixel untouched when the film is flat', () => {
+    // focus = 0 is the uFilmOK = 0 fallback and the whole quiet film. It has
+    // to be exact, because it multiplies every iris pixel of the eye.
+    for (const [x, y] of [
+      [0, 0],
+      [0.2, -0.1],
+      [0.4, 0.25],
+    ] as [number, number][]) {
+      const a = irisPixel(x, y, 0).total;
+      const b = irisPixel(x, y, causticFocus(0.8, 0.8)).total;
+      for (let i = 0; i < 3; i++) expect(b[i]).toBe(a[i]);
+    }
   });
 });

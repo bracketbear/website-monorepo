@@ -1,10 +1,13 @@
 import {
+  CAUSTIC_MAX,
+  CORNEA_ETA,
   DOMAIN,
   DRY_DIM,
   DRY_H,
   FILM_REACH,
   FILM_REACH_FADE,
   FILM_SLOPE,
+  IRIS_DEPTH,
   WET_H,
 } from './physics';
 
@@ -65,6 +68,34 @@ export const EYE_GLOBE = `
           ${(FILM_REACH - FILM_REACH_FADE).toFixed(6)},
           ${FILM_REACH.toFixed(6)},
           max(abs(l.x), abs(l.y)));
+      }
+      /**
+       * The corneal refraction map: where the ray through the tangent point
+       * l lands on the iris plane, in the same tangent coordinates.
+       *
+       * This is the eye's real optics and not a warp chosen to look like
+       * them. The ray enters air-to-cornea at n = 1.376 and travels
+       * IRIS_DEPTH — 3.6mm — to the plane the iris sits on, and the iris is
+       * then read at where it comes out. On axis that contracts the lookup by
+       * a factor 0.905, so the iris **looks 1.10x larger than it is**, which
+       * is the magnification a real cornea gives, and the contraction tightens
+       * toward the limbus, which is what makes the rim read as the edge of a
+       * thick lens rather than a drawn ring.
+       *
+       * tilt is the film's contribution to the surface normal — the height
+       * gradient already scaled by FILM_SLOPE and the reach — so a zero tilt is
+       * the bare corneal sphere and the film leaves the map by arithmetic
+       * rather than by a branch.
+       *
+       * v is the view direction in the gaze-local frame. The 0.2 floor
+       * catches rays that come out grazing near the silhouette; over the iris
+       * the true value never drops below about 0.91, so it shapes nothing
+       * anyone sees.
+       */
+      vec2 irisUV(vec2 l, vec2 tilt, vec3 v) {
+        vec3 n = normalize(vec3(l - tilt, sqrt(max(1.0 - dot(l, l), 1e-4))));
+        vec3 rr = refract(v, n, ${CORNEA_ETA.toFixed(8)});
+        return l + rr.xy * (${IRIS_DEPTH.toFixed(8)} / max(0.2, -rr.z));
       }
       float energyH(float lx, float ly, float ang, float t) {
         vec2 dir = vec2(lx, ly) / max(sin(ang), 1e-3);
@@ -136,15 +167,6 @@ export const EYE_GLOBE = `
           float dhx = (energyH(lx + ee, ly, ang, t) - vl) / ee * pm;
           float dhy = (energyH(lx, ly + ee, ang, t) - vl) / ee * pm;
           vec3 nb = normalize(n - (tx * dhx + ty * dhy) * uBump * 0.045);
-          // ridges refract the iris slightly where they run
-          vec3 ir = visionary((vec2(lx, ly) - vec2(dhx, dhy) * uBump * 0.012) * 0.62, t);
-          float irisM = smoothstep(0.62, 0.5, ang);
-          vec3 eye = mix(sc, ir, irisM);
-          // corneal shadow ring where the iris meets the white
-          eye *= 1.0 - smoothstep(0.72, 0.56, ang) * smoothstep(0.5, 0.58, ang) * 0.35;
-          eye += mix(ELEC, uCream, 0.4) * exp(-abs(ang - 0.56) * 26.0) * 0.35;
-          vec3 ld = normalize(vec3(-0.45, -0.55, 0.85));
-          float dif = clamp(dot(nb, ld), 0.0, 1.0);
           // The catchlight, reflected off the film rather than painted on.
           //
           // fw is the only gate, and it is written so that fw = 0 collapses
@@ -155,13 +177,17 @@ export const EYE_GLOBE = `
           // uFilmOK at 0 and the eye has to look exactly as it did.
           vec2 fl = vec2(lx, ly);
           float fw = uFilmOK * filmReach(fl);
+          // One cell, the field's own Nyquist -- see JACOBIAN_STEP. Every tap
+          // below is within one cell of fl, which is exactly the margin
+          // FILM_REACH reserves.
+          float e = uDelta;
           float hC = texture(uFilm, filmUV(fl)).x;
           // The gradient taps go through filmUV too. Smoothing the value and
           // not the gradient would smooth the colour and facet the light,
           // which is the one artefact the smoothing exists to prevent.
-          vec2 gH = (vec2(
-            texture(uFilm, filmUV(fl + vec2(uDelta, 0.0))).x,
-            texture(uFilm, filmUV(fl + vec2(0.0, uDelta))).x) - hC) / uDelta;
+          float h10 = texture(uFilm, filmUV(fl + vec2(e, 0.0))).x;
+          float h01 = texture(uFilm, filmUV(fl + vec2(0.0, e))).x;
+          vec2 gH = (vec2(h10, h01) - hC) / e;
           vec3 nf = fw > 0.0
             ? normalize(nb - (tx * gH.x + ty * gH.y) * (${FILM_SLOPE.toFixed(6)} * fw))
             : nb;
@@ -169,6 +195,68 @@ export const EYE_GLOBE = `
           // gates all three terms below -- the two highlights it withholds,
           // and the diffuse it dims, which is the one that actually shows.
           float wet = mix(1.0, smoothstep(${DRY_H.toFixed(6)}, ${WET_H.toFixed(6)}, hC), fw);
+
+          // ---- The cornea as a lens, and the caustic that is its Jacobian.
+          //
+          // Three taps beyond the gradient's own -- one back in each axis and
+          // one on the diagonal -- give the film's Hessian on a stencil that
+          // never leaves the one cell FILM_REACH reserves. The Hessian is what
+          // the caustic is made of: the map bends light by an amount
+          // proportional to dh/dl, so how hard it *concentrates* light is the
+          // derivative of that, and a film with a uniform slope focuses
+          // nothing.
+          float hm0 = texture(uFilm, filmUV(fl - vec2(e, 0.0))).x;
+          float h0m = texture(uFilm, filmUV(fl - vec2(0.0, e))).x;
+          float h11 = texture(uFilm, filmUV(fl + vec2(e, e))).x;
+          // Centred, unlike gH above, which stays exactly as the catchlight
+          // was tuned against it. The two differ by half a cell of shift --
+          // below what either term resolves -- and centring is what lets the
+          // second differences fit inside the reach.
+          vec2 gC = vec2(h10 - hm0, h01 - h0m) / (2.0 * e);
+          float hxx = (h10 - 2.0 * hC + hm0) / (e * e);
+          float hyy = (h01 - 2.0 * hC + h0m) / (e * e);
+          float hxy = (h11 - h10 - h01 + hC) / (e * e);
+          // The view ray, projected onto the gaze-local frame the film lives
+          // in. The globe is drawn orthographically, so in world terms this is
+          // always (0, 0, -1); off-axis gaze is the whole reason it has to be
+          // carried into the local frame rather than assumed.
+          vec3 vw = -vec3(tx.z, ty.z, gd.z);
+          // fw rides on the tilt, so at fw = 0 every irisUV below is called
+          // with a tilt of exactly zero and f0/fx/fy are bit-for-bit b0/bx/by:
+          // J equals J0, the caustic is exactly 0, and what is left is the
+          // bare cornea, which is there with or without a film.
+          float s = ${FILM_SLOPE.toFixed(6)} * fw;
+          vec2 f0 = irisUV(fl, gC * s, vw);
+          vec2 fxu = irisUV(fl + vec2(e, 0.0), (gC + vec2(hxx, hxy) * e) * s, vw);
+          vec2 fyu = irisUV(fl + vec2(0.0, e), (gC + vec2(hxy, hyy) * e) * s, vw);
+          float J = ((fxu.x - f0.x) * (fyu.y - f0.y)
+                   - (fxu.y - f0.y) * (fyu.x - f0.x)) / (e * e);
+          // The same map with the film taken out. Dividing by it rather than
+          // by 1 is what removes the cornea's own magnification -- which runs
+          // 0.82 on axis to 0.75 at the limbus and would otherwise read as a
+          // permanent glow in the middle of the iris -- and leaves only what
+          // the film did.
+          vec2 b0 = irisUV(fl, vec2(0.0), vw);
+          vec2 bxu = irisUV(fl + vec2(e, 0.0), vec2(0.0), vw);
+          vec2 byu = irisUV(fl + vec2(0.0, e), vec2(0.0), vw);
+          float J0 = ((bxu.x - b0.x) * (byu.y - b0.y)
+                    - (bxu.y - b0.y) * (byu.x - b0.x)) / (e * e);
+          // Signed: negative where the film spreads the light it piled onto
+          // the crest next door. Both bounds are the same statement of how far
+          // the film can throw light -- see CAUSTIC_MAX.
+          float focus = clamp(J0 / max(abs(J), 1e-6),
+            ${(1 / CAUSTIC_MAX).toFixed(8)}, ${CAUSTIC_MAX.toFixed(8)}) - 1.0;
+
+          // The iris, seen through the cornea rather than looked up straight.
+          // ridges refract the iris slightly where they run
+          vec3 ir = visionary((f0 - vec2(dhx, dhy) * uBump * 0.012) * 0.62, t);
+          float irisM = smoothstep(0.62, 0.5, ang);
+          vec3 eye = mix(sc, ir, irisM);
+          // corneal shadow ring where the iris meets the white
+          eye *= 1.0 - smoothstep(0.72, 0.56, ang) * smoothstep(0.5, 0.58, ang) * 0.35;
+          eye += mix(ELEC, uCream, 0.4) * exp(-abs(ang - 0.56) * 26.0) * 0.35;
+          vec3 ld = normalize(vec3(-0.45, -0.55, 0.85));
+          float dif = clamp(dot(nb, ld), 0.0, 1.0);
           // Diffuse stays on nb: the energy relief still shapes the shading,
           // and the highlight is the only thing that moves onto the film's
           // normal. What the film does to this term is dim it, and that is
@@ -183,7 +271,25 @@ export const EYE_GLOBE = `
           // already over 1, which is why this multiplies instead. See DRY_DIM.
           //
           // wet = 1 leaves it exactly 1.0, so the fallback is untouched.
-          eye *= (0.55 + 0.6 * dif) * (1.0 - ${DRY_DIM.toFixed(6)} * (1.0 - wet));
+          //
+          // The caustic rides the same term, and for the same reason. It is a
+          // *ratio* of irradiance -- how much more or less light the film put
+          // here than it would have flat -- so the honest place for it is
+          // multiplying the light that is already falling on this pixel, which
+          // is the 0.6 * dif. Adding a coloured glow instead would be adding
+          // light the film does not have, and would clip away on the sclera
+          // exactly as the dry patches did before DRY_DIM. There is no gain in
+          // front of it: (1.0 + focus) is the measurement, unscaled. The 0.55
+          // ambient stays out of it because diffuse fill does not focus.
+          //
+          // irisM is the gate because a caustic needs something to land on,
+          // and behind the sclera there is no iris plane 3.6mm down.
+          //
+          // Measured on the painted iris: median clipped luminance 0.184, only
+          // 2.4% of iris pixels clipping in any channel. So unlike the sclera,
+          // there is room here for the term to be seen.
+          eye *= (0.55 + 0.6 * dif * (1.0 + focus * irisM))
+               * (1.0 - ${DRY_DIM.toFixed(6)} * (1.0 - wet));
           float dsp = clamp(dot(nf, ld), 0.0, 1.0);
           eye += uCream * pow(dsp, 48.0) * 0.9 * wet;
           eye += uCream * pow(dsp, 7.0) * 0.07 * (1.0 - irisM) * wet; // broad wet sheen on the white
