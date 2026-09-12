@@ -3,6 +3,9 @@ import {
   BLINK_FRACTION,
   CAUSTIC_MAX,
   CORNEA_ETA,
+  FILM_LENS,
+  TEAR_FILM_MM,
+  MM_PER_UNIT,
   JACOBIAN_STEP,
   N_CORNEA,
   IRIS_DEPTH,
@@ -1140,8 +1143,18 @@ const front = (at: number) => (x: number) =>
  */
 const lensRatio = (c: number) => {
   const k = (1 - CORNEA_ETA) * IRIS_DEPTH;
-  return Math.pow(1 + k * FILM_SLOPE * c, 2);
+  return Math.pow(1 + k * FILM_LENS * c, 2);
 };
+
+/**
+ * Pupil radius in the map's own coordinates.
+ *
+ * `eyeW` samples `visionary(f0 * 0.62)`, and `visionary` puts the pupil edge at
+ * `r = 0.055 * pd` with `pd = 1 + uPupil * 1.1`. So in the tangent units the
+ * refraction map works in, the pupil is this wide — and any displacement the
+ * map applies is measured against it.
+ */
+const pupilRadius = (uPupil: number) => (0.055 * (1 + uPupil * 1.1)) / 0.62;
 
 describe('the corneal refraction map', () => {
   it('refracts by Snell at the index the cornea actually has', () => {
@@ -1198,6 +1211,53 @@ describe('the corneal refraction map', () => {
     }
   });
 
+  it('displaces nothing at the axis and a tenth of a radius at the limbus', () => {
+    // **The shape of a magnification, and the regression that made this test
+    // exist.** Magnification is a radial stretch: it has to vanish on the
+    // optical axis and grow outward. The first pass fed the map FILM_SLOPE,
+    // an 82.9-micron bump amplitude, and the film's own term was a
+    // near-constant offset that survived to the axis at 45% of a pupil
+    // radius. The pupil came apart, and it deserved to.
+    const displaced = (l: number) => Math.abs(irisPoint(l, 0, 0, 0)[0] - l);
+    expect(displaced(0)).toBe(0);
+    let prev = -1;
+    for (const l of [0.02, 0.05, 0.1, 0.2, 0.3, 0.4, Math.sin(0.56)]) {
+      const frac = displaced(l) / l;
+      // Between 9% and 11% of the radius, everywhere — the clinical figure
+      // for how much larger the cornea makes the iris look.
+      expect(frac).toBeGreaterThan(0.09);
+      expect(frac).toBeLessThan(0.11);
+      // And growing outward, because the surface tilts faster than l does.
+      expect(frac).toBeGreaterThan(prev);
+      prev = frac;
+    }
+  });
+
+  it('keeps the films own throw far inside the pupil it draws', () => {
+    // The film's term, unlike the cornea's, is an offset rather than a
+    // stretch: it does not vanish at the axis, so the only thing keeping it
+    // off the pupil is its size. Measured against the pupil the shader
+    // actually draws, at the steepest slope the grid can resolve.
+    const steepest = 1 / (IFACE_CELLS * DELTA);
+    const at = (slope: number) =>
+      Math.abs(
+        irisPoint(0.05, 0, slope * steepest, 0)[0] - irisPoint(0.05, 0, 0, 0)[0]
+      );
+    const undilated = pupilRadius(0);
+    // Shipped: 1% of a pupil radius, and a fifteenth of a cell.
+    expect(at(FILM_LENS) / undilated).toBeLessThan(0.02);
+    expect(at(FILM_LENS) / DELTA).toBeLessThan(0.1);
+    // What it was: 45%, which is what the Lab render showed.
+    expect(at(FILM_SLOPE) / undilated).toBeGreaterThan(0.4);
+    // The two couplings differ by the ratio of two thicknesses, nothing else.
+    expect(FILM_SLOPE / FILM_LENS).toBeCloseTo(47.4, 1);
+    expect(FILM_LENS * MM_PER_UNIT * 2).toBeCloseTo(TEAR_FILM_MM, 12);
+    // FILM_SLOPE read as a height is 82.9 microns of tear film, which is not
+    // a tear film. As a bump amplitude that is unremarkable; as a
+    // displacement it is the bug.
+    expect(FILM_SLOPE * MM_PER_UNIT * 1000).toBeGreaterThan(80);
+  });
+
   it('stays square to the gaze axis, not to the screen', () => {
     // The map is built in the gaze-local frame, so it must not care which way
     // round the eye is looking: same radius in, same radius out.
@@ -1238,12 +1298,17 @@ describe('the caustic is the Jacobian of that map', () => {
   it('bounds the brightening by how far the film can throw light', () => {
     // CAUSTIC_MAX is not a taste number. Rebuild it from its four factors.
     const throwCells =
-      ((1 - CORNEA_ETA) * IRIS_DEPTH * FILM_SLOPE) /
+      ((1 - CORNEA_ETA) * IRIS_DEPTH * FILM_LENS) /
       (IFACE_CELLS * DELTA) /
       DELTA;
-    expect(CAUSTIC_MAX).toBeCloseTo(throwCells, 12);
-    expect(CAUSTIC_MAX).toBeGreaterThan(2);
-    expect(CAUSTIC_MAX).toBeLessThan(5);
+    expect(CAUSTIC_MAX).toBeCloseTo(1 + throwCells, 12);
+    // The `1 +` is the light that was landing in the cell anyway. Leaving it
+    // out only looks harmless while the throw is large compared to a cell: at
+    // the film's real thickness the throw is 0.068 of one, and the bound
+    // without it would be 0.068 — a caustic that darkens everything by 93%.
+    expect(throwCells).toBeLessThan(0.1);
+    expect(CAUSTIC_MAX).toBeGreaterThan(1);
+    expect(CAUSTIC_MAX).toBeLessThan(1.1);
     // And the dark side is its reciprocal: the light has to come from
     // somewhere, and it is the same somewhere.
     expect(causticFocus(1e9, 1)).toBeCloseTo(1 / CAUSTIC_MAX - 1, 12);
@@ -1282,55 +1347,55 @@ describe('the caustic is the Jacobian of that map', () => {
     // The synthetic film with an answer: a paraboloid is a thin lens, and its
     // Jacobian is the square of a linear factor. Agreement is a statement
     // about the stencil, since nothing in `irisJacobian` knows this formula.
-    for (const c of [-50, -20, 20, 50]) {
+    // At the film's real thickness every tilt in play is well under a degree,
+    // so the linearisation is very good — which is itself the check that the
+    // film is now a weak perturbation on the cornea rather than a rival to it.
+    for (const c of [-2000, -800, -200, 200, 800, 2000]) {
       const j = irisJacobian(0, 0, lens(c));
       expect(Math.abs(j.J / j.J0 / lensRatio(c) - 1)).toBeLessThan(0.01);
-    }
-    for (const c of [-200, -100, 100, 200]) {
-      expect(
-        Math.abs(
-          irisJacobian(0, 0, lens(c)).J /
-            irisJacobian(0, 0, lens(c)).J0 /
-            lensRatio(c) -
-            1
-        )
-      ).toBeLessThan(0.04);
     }
   });
 
   it('does Snell exactly, and so parts company with the linear version', () => {
-    // The formula above is a small-angle reading of Snell, and by c = -800 the
-    // film is tilting the surface by a third of a radian, where sin is no
-    // longer its argument. The shipped map calls `refract` and keeps the
-    // difference; a linearised map would agree here and be wrong.
+    // The formula above is a small-angle reading of Snell. Drive the film at
+    // the bump amplitude the specular uses — 47x the real one — and the tilt
+    // reaches a third of a radian, where sin stops being its argument. The
+    // shipped map calls `refract` and keeps the difference; a linearised map
+    // would agree and be wrong. This also fails loudly if FILM_SLOPE is ever
+    // wired back into the map.
     const c = -800;
-    const exact = irisJacobian(0, 0, lens(c));
-    expect(Math.abs(exact.J / exact.J0 / lensRatio(c) - 1)).toBeGreaterThan(
-      0.2
-    );
+    const k = (1 - CORNEA_ETA) * IRIS_DEPTH;
+    const j = irisJacobian(0, 0, lens(c), FILM_SLOPE);
+    const linear = Math.pow(1 + k * FILM_SLOPE * c, 2);
+    expect(Math.abs(j.J / j.J0 / linear - 1)).toBeGreaterThan(0.2);
   });
 
   it('brightens on crests and dims in troughs, never the other way round', () => {
     // A local maximum of h is a bump on the outer surface, which is a
     // converging lens. A dip spreads. Getting this backwards would light up
     // the dry patches themselves rather than their rims.
-    for (const c of [-600, -300, -100]) {
+    for (const c of [-6000, -3000, -1000]) {
       expect(irisJacobian(0.1, 0, lens(c)).focus).toBeGreaterThan(0);
     }
-    for (const c of [100, 300, 600]) {
+    for (const c of [1000, 3000, 6000]) {
       expect(irisJacobian(0.1, 0, lens(c)).focus).toBeLessThan(0);
     }
   });
 
-  it('folds where the film is steepest, and clamps rather than diverging', () => {
-    // Geometric optics says infinity at a fold. The film reaches one: the
-    // power that sends J through zero is 1/((1-eta)*IRIS_DEPTH*FILM_SLOPE),
-    // and a resolved interface carries more curvature than that.
-    const foldPower = -1 / ((1 - CORNEA_ETA) * IRIS_DEPTH * FILM_SLOPE);
-    expect(irisJacobian(0.1, 0, lens(foldPower * 0.5)).J).toBeGreaterThan(0);
-    expect(irisJacobian(0.1, 0, lens(foldPower * 1.5)).J).toBeLessThan(0);
-    // Straddling the fold the number stays finite and pinned to the bound.
-    for (const f of [0.97, 0.99, 1.0, 1.01, 1.03]) {
+  it('does not fold, because a real tear film is a very weak lens', () => {
+    // This is the finding, and it reversed when the map got the film's real
+    // thickness. The curvature that sends J through zero is
+    // 1/((1-eta)*IRIS_DEPTH*FILM_LENS) = 62000 per tangent unit. A resolved
+    // interface carries about 2200 — a factor of 28 short. At the 82.9-micron
+    // bump amplitude the specular uses, the fold sat at 1300 and the film
+    // cleared it easily, which is why the first pass read as a strong caustic.
+    const foldPower = -1 / ((1 - CORNEA_ETA) * IRIS_DEPTH * FILM_LENS);
+    expect(Math.abs(foldPower)).toBeGreaterThan(50000);
+    const w = IFACE_CELLS * DELTA;
+    const interfaceCurvature = 0.77 / (w * w); // max |h''| of tanh(x/w)
+    expect(Math.abs(foldPower) / interfaceCurvature).toBeGreaterThan(20);
+    // And if one ever did fold, the number stays finite and pinned.
+    for (const f of [0.97, 1.0, 1.03]) {
       const j = irisJacobian(0.1, 0, lens(foldPower * f));
       expect(Number.isFinite(j.focus)).toBe(true);
       expect(j.focus).toBeLessThanOrEqual(CAUSTIC_MAX - 1 + 1e-12);
@@ -1343,15 +1408,16 @@ describe('the caustic is the Jacobian of that map', () => {
     const h = front(at);
     const sample = (cells: number) =>
       irisJacobian(at + cells * DELTA, 0, (x) => h(x)).focus;
-    // Wet side (h rising to +1): the crest of the front focuses.
-    expect(sample(2)).toBeGreaterThan(1.5);
+    // Wet side (h rising to +1): the crest of the front focuses. The shape is
+    // right and the magnitude is 3%, which is what a 3.5-micron film does.
+    expect(sample(2)).toBeGreaterThan(0.02);
     // Dry side (h falling to -1): the trough spreads the same light.
-    expect(sample(-1)).toBeLessThan(-0.4);
+    expect(sample(-1)).toBeLessThan(-0.01);
     // Both die within a handful of cells — it is a filigree, not a wash.
-    expect(Math.abs(sample(8))).toBeLessThan(0.05);
-    expect(Math.abs(sample(-8))).toBeLessThan(0.05);
+    expect(Math.abs(sample(8))).toBeLessThan(0.002);
+    expect(Math.abs(sample(-8))).toBeLessThan(0.002);
     // And dead flat in the middle of a patch, where there is nothing to bend.
-    expect(Math.abs(sample(20))).toBeLessThan(0.01);
+    expect(Math.abs(sample(20))).toBeLessThan(0.0005);
   });
 
   it('says nothing at all about a quiet wet sheet', () => {
@@ -1369,7 +1435,7 @@ describe('the caustic is the Jacobian of that map', () => {
     // pixel: under the film grain, and forty-odd times weaker than what a
     // tearing front does at the same slope. The caustic is a signal that the
     // film is breaking, not that it exists.
-    expect(worst).toBeLessThan(0.06);
+    expect(worst).toBeLessThan(0.002);
     let front2 = 0;
     for (let i = -400; i <= 400; i++) {
       front2 = Math.max(
@@ -1388,11 +1454,12 @@ describe('the caustic is the Jacobian of that map', () => {
     expect(Math.hypot(flat[0] - 0.25, flat[1])).toBeGreaterThan(0.02);
     const moved = Math.hypot(bent[0] - flat[0], bent[1] - flat[1]);
     // Bounded by the same throw budget CAUSTIC_MAX is derived from — the film
-    // cannot move the lookup further than it can move the light, and here it
-    // spends 2.9 of its 3.2 cells. That bound is what keeps the iris rippling
-    // rather than smearing.
-    expect(moved).toBeGreaterThan(DELTA);
-    expect(moved).toBeLessThan(CAUSTIC_MAX * DELTA);
+    // cannot move the lookup further than it can move the light. A sixteenth
+    // of a cell: the iris ripples under the film at a scale nothing resolves,
+    // which is the whole point. At the bump amplitude this was 2.9 cells, and
+    // it tore the pupil apart.
+    expect(moved).toBeGreaterThan(0);
+    expect(moved).toBeLessThan((CAUSTIC_MAX - 1) * DELTA);
   });
 });
 
@@ -1667,16 +1734,23 @@ describe('the headroom the caustic lands in', () => {
       );
       return { p10: pct(d, 0.1), p50: pct(d, 0.5), p90: pct(d, 0.9) };
     };
-    // A modest rim, well short of the fold.
-    const mild = dip(0.5);
-    expect(mild.p50).toBeGreaterThan(0.02);
-    // The fold, at the bound CAUSTIC_MAX puts on it.
+    // The brightest the real film can get, which is the bound CAUSTIC_MAX
+    // puts on it. It moves the pixel, and it moves it by four thousandths.
     const peak = dip(CAUSTIC_MAX - 1);
-    expect(peak.p50).toBeGreaterThan(0.1);
-    expect(peak.p10).toBeGreaterThan(0.03);
-    // The dark companion shows too, which on the sclera it could not have.
+    expect(peak.p50).toBeGreaterThan(0.002);
+    expect(peak.p50).toBeLessThan(0.01);
+    // **And that is under the grain the shader itself adds.** `finish()` puts
+    // +/-0.025 of hash noise on every pixel, so the caustic at full strength is
+    // six times below the eye's own film grain. It is computed correctly, it
+    // survives the clamp, and it is invisible. Task 12 cannot fix this by
+    // quieting the iris; only a larger film can, and the film is 3.5 microns.
+    expect(peak.p50).toBeLessThan(0.025);
+    // The dark companion is the same size, on the other side.
     const dark = dip(1 / CAUSTIC_MAX - 1);
-    expect(dark.p50).toBeLessThan(-0.035);
+    expect(dark.p50).toBeLessThan(-0.002);
+    // For scale: what the term would do if it were free to be as strong as the
+    // first pass made it, which is what tore the pupil apart.
+    expect(dip(2.241).p50).toBeGreaterThan(0.1);
   });
 
   it('does not blow the iris out at the brightest the film can get', () => {
@@ -1688,10 +1762,9 @@ describe('the headroom the caustic lands in', () => {
       ([x, y]) => irisPixel(x, y, CAUSTIC_MAX - 1).total
     );
     const over = peak.filter((c) => c.some((v) => v >= 1)).length;
-    // 28% measured, against 2% unfocused. The fold is under a cell wide, so
-    // that is a hairline running hot, not an iris washed out.
-    expect(over / peak.length).toBeLessThan(0.32);
-    expect(over / peak.length).toBeGreaterThan(0.1);
+    // 2.9% measured, against 2.4% unfocused: the real film barely touches the
+    // clamp. Restraint is also a measurement, and here it is not a choice.
+    expect(over / peak.length).toBeLessThan(0.05);
   });
 
   it('leaves the pixel untouched when the film is flat', () => {

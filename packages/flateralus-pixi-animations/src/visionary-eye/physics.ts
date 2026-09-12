@@ -519,6 +519,48 @@ export const CORNEA_ETA = 1 / N_CORNEA;
  */
 export const JACOBIAN_STEP = DELTA;
 
+/** Thickness of the precorneal tear film, in millimetres. OCT puts it at
+ * 3-4 microns over the cornea; it thins to bare epithelium where it breaks, so
+ * this is also the full height swing across a break. */
+export const TEAR_FILM_MM = 3.5e-3;
+
+/**
+ * DERIVED. Height of the film per unit of `h`, in tangent units — the
+ * **displacement** counterpart of `FILM_SLOPE`.
+ *
+ * **`FILM_SLOPE` is a bump amplitude and this is a displacement amplitude, and
+ * conflating them is what tore the pupil apart.** `FILM_SLOPE` only ever
+ * perturbs a normal — it feeds the specular and nothing else, exactly like the
+ * `uBump` energy relief a few lines above it, which likewise displaces
+ * nothing. A bump amplitude has no absolute length to violate, so Task 10 was
+ * free to tune it against the only scale the specular has, the width of the
+ * `pow(dot, 48)` lobe. It came out at 0.008 tangent units per unit of `h`,
+ * which is **82.9 microns** of film and a surface tilting 24 degrees at a
+ * rim. As a bump that is unremarkable; bump amplitudes routinely run tens of
+ * times the displacement they stand in for, because the eye reads normals far
+ * more sensitively than it reads positions.
+ *
+ * The refraction map is not a bump. It propagates a ray 3.6mm to the iris, so
+ * it has three absolute scales to answer to — the pupil radius, the cell, and
+ * the interface width — and an 82.9 micron film fails all three: measured, the
+ * film alone threw the lookup 45% of a pupil radius at the steepest resolved
+ * slope, 13% at the p90, and it did so at the axis as hard as at the limbus,
+ * where the cornea's own magnification correctly goes to zero. A pupil cannot
+ * survive that, and the Lab render says it did not.
+ *
+ * So the map uses the film's actual height: half the swing, `TEAR_FILM_MM / 2`,
+ * in tangent units. That is 1.75 microns, **47x smaller** than `FILM_SLOPE`,
+ * and it puts the steepest rim at half a degree of tilt and the throw at 1% of
+ * a pupil radius.
+ *
+ * The two now disagree about how thick the film is, and that is worth saying
+ * out loud rather than hiding: the specular's film is stylised and the map's is
+ * measured. Reconciling them means moving `FILM_SLOPE` down by 47x, which
+ * would take the visible catchlight shards with it — Task 10's whole effect.
+ * That is a spec-level call, not one to make while fixing a pupil.
+ */
+export const FILM_LENS = TEAR_FILM_MM / 2 / MM_PER_UNIT;
+
 /**
  * DERIVED. The largest irradiance ratio the film can honestly be said to
  * produce, as a multiple of the unfocused iris.
@@ -528,24 +570,34 @@ export const JACOBIAN_STEP = DELTA;
  * stencil: light is gathered onto the iris plane by a displacement field the
  * film can only push so far, and it is counted in bins one cell wide.
  *
- *   deviation per unit of surface tilt   1 - CORNEA_ETA        = 0.2733
- *   lateral throw at the iris plane      x IRIS_DEPTH          = 0.09495
- *   tilt per unit of dh/dl               x FILM_SLOPE          = 7.596e-4
- *   steepest resolved slope              x 1/(IFACE_CELLS*DELTA) = 0.04051
- *   in cells                             / DELTA               = 3.24
+ *   deviation per unit of surface tilt   1 - CORNEA_ETA          = 0.2733
+ *   lateral throw at the iris plane      x IRIS_DEPTH            = 0.09495
+ *   height per unit of dh/dl             x FILM_LENS             = 1.604e-5
+ *   steepest resolved slope              x 1/(IFACE_CELLS*DELTA) = 8.56e-4
+ *   in cells                             / DELTA                 = 0.068
+ *   light arriving in the one cell       1 +                     = 1.068
  *
- * So the film moves light across at most 3.24 cells, and a fold can therefore
- * pile at most 3.24 cells' worth of it into the one cell the difference
- * resolves. Claiming more would be claiming structure finer than the field.
+ * So the film moves light across at most 0.068 of a cell, and a fold can
+ * therefore pile that much *extra* on top of the cell's own — the `1 +` is
+ * the light that was going to land there anyway, and leaving it out is a
+ * mistake that only hides while the throw is large compared to a cell.
+ * Claiming more would be claiming structure finer than the field.
  *
  * The same number bounds the **dark** side by its reciprocal: light gathered
  * onto a crest came off the slope beside it, and the widest that slope can be
- * stretched is the same 3.24 cells. So the caustic runs from `1/CAUSTIC_MAX`
- * to `CAUSTIC_MAX` times the unfocused iris, and the two bounds are one
- * statement of where the light went, not two tuned numbers.
+ * stretched is the same fraction of a cell. So the caustic runs from
+ * `1/CAUSTIC_MAX` to `CAUSTIC_MAX` times the unfocused iris, and the two
+ * bounds are one statement of where the light went, not two tuned numbers.
+ *
+ * **At the film's real thickness this bound is 1.068, and that is the finding,
+ * not a disappointment.** A tear film is a very weak lens over 3.6mm. It is
+ * also why the visible signature of a breaking film is in the *specular* —
+ * which is a first-order effect on a normal — and not in caustics on the iris,
+ * which is what photographs of real eyes show.
  */
 export const CAUSTIC_MAX =
-  ((1 - CORNEA_ETA) * IRIS_DEPTH * FILM_SLOPE) / (IFACE_CELLS * DELTA) / DELTA;
+  1 +
+  ((1 - CORNEA_ETA) * IRIS_DEPTH * FILM_LENS) / (IFACE_CELLS * DELTA) / DELTA;
 
 /** GLSL's `refract`. Returns the zero vector on total internal reflection. */
 export function refract(i: V3, n: V3, eta: number): V3 {
@@ -646,7 +698,7 @@ export function irisJacobian(
   lx: number,
   ly: number,
   h: (x: number, y: number) => number,
-  slope: number = FILM_SLOPE,
+  slope: number = FILM_LENS,
   view: V3 = [0, 0, -1],
   e: number = JACOBIAN_STEP
 ): { f0: [number, number]; J: number; J0: number; focus: number } {

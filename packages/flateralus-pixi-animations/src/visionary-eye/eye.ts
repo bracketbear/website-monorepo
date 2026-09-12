@@ -6,6 +6,7 @@ import {
   DRY_H,
   FILM_REACH,
   FILM_REACH_FADE,
+  FILM_LENS,
   FILM_SLOPE,
   IRIS_DEPTH,
   WET_H,
@@ -221,11 +222,19 @@ export const EYE_GLOBE = `
           // always (0, 0, -1); off-axis gaze is the whole reason it has to be
           // carried into the local frame rather than assumed.
           vec3 vw = -vec3(tx.z, ty.z, gd.z);
+          // FILM_LENS and not FILM_SLOPE. The specular above perturbs a
+          // normal and displaces nothing, so its amplitude is a bump
+          // amplitude with no absolute length to answer to. This propagates a
+          // ray 3.6mm, and at FILM_SLOPE's 82.9-micron film it threw the iris
+          // lookup 45% of a pupil radius -- at the axis as hard as at the
+          // limbus, where the cornea's own magnification correctly vanishes.
+          // The map gets the film's real height instead. See FILM_LENS.
+          //
           // fw rides on the tilt, so at fw = 0 every irisUV below is called
           // with a tilt of exactly zero and f0/fx/fy are bit-for-bit b0/bx/by:
           // J equals J0, the caustic is exactly 0, and what is left is the
           // bare cornea, which is there with or without a film.
-          float s = ${FILM_SLOPE.toFixed(6)} * fw;
+          float s = ${FILM_LENS.toExponential(8)} * fw;
           vec2 f0 = irisUV(fl, gC * s, vw);
           vec2 fxu = irisUV(fl + vec2(e, 0.0), (gC + vec2(hxx, hxy) * e) * s, vw);
           vec2 fyu = irisUV(fl + vec2(0.0, e), (gC + vec2(hxy, hyy) * e) * s, vw);
