@@ -13,6 +13,7 @@ import {
   MAX_SUBSTEPS,
   MOBILITY,
   NUCLEATION_MEAN,
+  NUCLEUS_SITES,
   NUCLEUS_R_MAX_CELLS,
   NUCLEUS_R_MIN_CELLS,
   OPEN_TIME,
@@ -22,21 +23,16 @@ import {
   SAFETY,
   SPINODAL_ONSET_FRACTION,
   STEP,
-  TRANSIENT_GAIN_C,
-  availableEfolds,
   breakupFraction,
   clampMobility,
   criticalRadius,
   criticalRadiusCells,
-  efoldSeconds,
   gazeFrame,
   isWiping,
   lidCoverage,
   mobilityLimit,
   newBlinkState,
   interfaceWidth,
-  patchWavelength,
-  spinodalResidence,
   surfaceTension,
   stepBlink,
   tileInsideCornea,
@@ -62,19 +58,6 @@ describe('tear film constants', () => {
     expect(IFACE_CELLS * DELTA).toBeCloseTo(0.01875, 12);
     expect(IFACE_CELLS * DELTA).toBeCloseTo(2 * (1.2 / 128), 12);
     expect(Math.sqrt(2 * KAPPA)).toBeCloseTo(IFACE_CELLS * DELTA, 12);
-  });
-
-  it('keeps the growth budget independent of grid resolution', () => {
-    // Substituting MOBILITY into availableEfolds() cancels DELTA entirely:
-    //   availableEfolds = C * SAFETY / (8 * dt * n^4 * EVAP)
-    // Resolution buys patch count and nothing else. Getting this backwards
-    // means refining the grid to make break-up faster and watching nothing
-    // change, which is the trap spec D3 called out and then fell into.
-    expect(availableEfolds()).toBeCloseTo(
-      (TRANSIENT_GAIN_C * SAFETY) /
-        (8 * STEP * Math.pow(IFACE_CELLS, 4) * EVAP),
-      12
-    );
   });
 
   it('caps substeps above what a 60fps frame needs', () => {
@@ -119,37 +102,24 @@ describe('tear film constants', () => {
     expect((1 - NUCLEATION_MEAN) / 2).toBeLessThan(SPINODAL_ONSET_FRACTION);
   });
 
-  it('measures the growth budget from the integrated rate, not the residence', () => {
-    // spinodalResidence()/efoldSeconds() is the seductive wrong answer: it
-    // assumes sigma_max applies for the whole traverse and ignores the damping
-    // before the band. It overstates the budget by about 5x here, which is the
-    // difference between a film that tears and one that does not.
-    expect(availableEfolds()).toBeCloseTo(
-      (TRANSIENT_GAIN_C * MOBILITY) / (KAPPA * EVAP),
-      12
-    );
-    expect(availableEfolds()).toBeLessThan(
-      spinodalResidence() / efoldSeconds()
-    );
-    // The constant is the maximum of x*((2/(3*sqrt(3)))*(1-x)^1.5 - x); pin it
-    // so a transcription slip cannot pass as a tuning change.
-    let c = 0;
-    for (let x = 0.0001; x < 1; x += 0.00001) {
-      const g = x * ((2 / (3 * Math.sqrt(3))) * Math.pow(1 - x, 1.5) - x);
-      if (g > c) c = g;
-    }
-    expect(TRANSIENT_GAIN_C).toBeCloseTo(c, 6);
-  });
-
-  it('primes into the droplet window, not past it', () => {
-    // Dry area grows at about EVAP/2 per second once spots can absorb the
-    // loss, so the 10-30% window is 0.4/EVAP seconds wide and priming must
-    // land inside it. Past it the spots merge and percolate; before it they
-    // have not grown.
-    const windowWidth = 0.4 / EVAP;
-    expect(windowWidth).toBeGreaterThan(2);
-    expect(PRIME_SECONDS).toBeLessThan(windowWidth + 1);
-    expect(PRIME_SECONDS).toBeGreaterThan(0.5);
+  it('primes inside the measured droplet window', () => {
+    // Measured on the CPU reference at these constants: dry fraction crosses
+    // 10% at t = 0.85 and 30% at t = 3.85, and inside that span the spots are
+    // isolated (largest component ~10% of dry area), round (circularity
+    // 0.56-0.61 against 0.52 for a perfect digital disc) and isotropic
+    // (spectral anisotropy -0.04 to +0.04). Before it they have not grown;
+    // after it they percolate into a labyrinth.
+    const WINDOW_OPENS = 0.85;
+    const WINDOW_CLOSES = 3.85;
+    expect(PRIME_SECONDS).toBeGreaterThan(WINDOW_OPENS);
+    expect(PRIME_SECONDS).toBeLessThan(WINDOW_CLOSES);
+    // And it should not sit against either edge, since EVAP moves the window.
+    expect(PRIME_SECONDS).toBeGreaterThan(WINDOW_OPENS + 0.5);
+    expect(PRIME_SECONDS).toBeLessThan(WINDOW_CLOSES - 0.5);
+    // The window scales as 1/EVAP — the lever-rule estimate 0.4/EVAP is 2.67s
+    // against the 3.0s measured. Raising EVAP shrinks it, and these bounds
+    // would then have to be re-measured rather than widened.
+    expect(0.4 / EVAP).toBeGreaterThan(2);
   });
 
   it('sets kappa from the interface width in cells', () => {
@@ -174,16 +144,17 @@ describe('tear film constants', () => {
     expect(clampMobility(Number.NaN)).toBeCloseTo(MOBILITY, 15);
   });
 
-  it('lands the derived timescale and patch size the spec argued for', () => {
-    // e-fold = 32*dt*n^4/s at the spinodal. The re-derived D3 pair puts this
-    // at 0.159s, against 1.78s for the original 128/480/n=2 — 11x faster for
-    // 2x the fragment cost, which is what makes the field tear at all.
-    expect(efoldSeconds()).toBeCloseTo(0.1588, 4);
-    // patch wavelength = 2*pi*n*delta; 0.1178 tangent units = 1.22mm. This is
-    // UNCHANGED by the re-derivation and must stay so: it is the clinical
-    // number (break-up patches run 0.5-2mm) and the reason the trade is free.
-    expect(patchWavelength()).toBeCloseTo(0.1178, 4);
-    expect(DOMAIN / patchWavelength()).toBeCloseTo(10.2, 1);
+  it('resolves the three lengths the mechanism depends on', () => {
+    // GRID is justified by what has to fit on it, not by a growth budget.
+    // Interface < critical nucleus < site spacing, all resolved, in that
+    // order — if they collide the threshold stops being sharp.
+    const iface = interfaceWidth() / DELTA;
+    const rStar = criticalRadiusCells(NUCLEATION_MEAN);
+    const spacing = DOMAIN / NUCLEUS_SITES / DELTA;
+    expect(iface).toBeCloseTo(1.5, 6);
+    expect(rStar).toBeGreaterThan(iface);
+    expect(spacing).toBeGreaterThan(4 * rStar);
+    expect(spacing).toBeCloseTo(13.7, 1);
   });
 
   it('puts the cornea inside the domain with margin', () => {

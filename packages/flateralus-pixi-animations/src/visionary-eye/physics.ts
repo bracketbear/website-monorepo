@@ -16,18 +16,29 @@
  * exact values the way it depends on the derived ones.
  */
 
-/** Tangent-space domain: (lx, ly) in [-0.6, 0.6]. */
+/**
+ * DERIVED. Tangent-space domain: (lx, ly) in [-0.6, 0.6], the corneal cap plus
+ * margin. CORNEA_L = sin(0.6) = 0.565, so the cap fits with room for the
+ * boundary condition to act away from the visible edge.
+ */
 export const DOMAIN = 1.2;
 
 /**
- * Field resolution. Grid size buys patch count; it does NOT buy break-up
- * speed — and, less obviously, it does not buy growth either. Substituting
- * MOBILITY into availableEfolds() gives
+ * TUNED. Field resolution, chosen against what the nucleation mechanism has to
+ * resolve rather than against a growth budget.
  *
- *     availableEfolds = C * SAFETY / (8 * dt * n^4 * EVAP)
+ * Three lengths have to fit on this grid, and 96 is about the smallest
+ * resolution where they all do:
  *
- * in which GRID does not appear at all. So a *coarser* grid is free as far as
- * break-up is concerned, and it is what pays for the finer timestep below.
+ *   - the interface, `interfaceWidth()` = 1.5 cells. Below that the front is
+ *     under-resolved and spots pick up the grid's symmetry.
+ *   - the critical nucleus, `criticalRadiusCells(NUCLEATION_MEAN)` = 2.9
+ *     cells. If R* falls to the interface width the healing threshold stops
+ *     being sharp and every defect survives, which is painting, not physics.
+ *   - the site spacing, `DOMAIN / NUCLEUS_SITES` = 13.7 cells, so neighbouring
+ *     spots are resolved as separate and can be seen to merge.
+ *
+ * Cost is 96*96*2*1700 = 31.3M fragments/s at 28.3 substeps per 60fps frame.
  */
 export const GRID = 96;
 
@@ -38,22 +49,18 @@ export const DELTA = DOMAIN / GRID;
 export const MM_PER_UNIT = 5.85 / Math.sin(0.6);
 
 /**
- * Interface half-width, in cells. The load-bearing number: everything about
- * growth goes as n^-4, so this is by far the strongest lever in the file.
+ * TUNED. Interface half-width, in cells.
  *
  * **The invariant to protect when changing it is `IFACE_CELLS * DELTA`**, the
- * interface width in *tangent units*. KAPPA, patchWavelength() and therefore
- * the ~9.6 patches across the cornea all depend on that product and not on
- * either factor alone. Going from (128, 2.0) to (96, 1.5) holds it at exactly
- * 0.01875 — identical physics, identical patch size — while cutting n^4 from
- * 16 to 5.06 and winning 3.2x of growth budget for free. That trade is the
- * whole reason this file's grid is 96 and not 128.
+ * interface width in *tangent units*, because that is what KAPPA depends on,
+ * and KAPPA sets `surfaceTension()` and therefore `criticalRadius()`. Moving
+ * GRID and IFACE_CELLS together at fixed product leaves the physics alone and
+ * changes only how well it is resolved.
  *
- * 1.5 is the floor: below it the front is under-resolved and patches go
- * square. Measured on the CPU reference, 1.5 does cost some isotropy — the
- * 4-fold anisotropy of the interface normals runs ~0.22 against ~0.09 at
- * n = 2 — which is a mild grid preference, not square patches. Do not go
- * lower without looking at the patches.
+ * 1.5 is the floor for a resolved front: below it the spots pick up the grid's
+ * 4-fold symmetry and R* is no longer comfortably larger than the interface.
+ * Much above 2.5 the interface eats into the critical radius from the other
+ * side, and the threshold blurs again.
  */
 export const IFACE_CELLS = 1.5;
 
@@ -61,18 +68,18 @@ export const IFACE_CELLS = 1.5;
 export const KAPPA = Math.pow(IFACE_CELLS * DELTA, 2) / 2;
 
 /**
- * Fixed simulation step. Spec D3: derived with GRID and IFACE_CELLS, not
- * chosen.
+ * DERIVED. Fixed simulation step, set by how fast the film has to respond.
  *
- * Growth goes as 1/dt, because a finer step raises the stability ceiling on
- * MOBILITY proportionally. Together with n = 1.5 this is what takes
- * availableEfolds() from 0.27 — where the film provably cannot tear at any
- * seed — to 2.99, where it separates to the full depth of the well.
+ * MOBILITY is capped at `SAFETY * DELTA^4 / (32 * STEP * KAPPA)` by explicit
+ * Euler on the biharmonic, so a finer step buys a proportionally larger M and
+ * a proportionally faster field. Under nucleation the requirement is that
+ * *selection* be quick and growth be visible: measured, a sub-critical defect
+ * heals completely within 0.35s and the survivors spread across the droplet
+ * window's 3 seconds. At 1/480 — the rate a spinodal reading of spec D3
+ * arrived at — the same dynamics run 3.5x slower, and healing would take
+ * longer than a blink cycle, leaving dead defects on screen.
  *
- * The cost is 96*96*2*1700 = 31.3M fragments/s at 28.3 substeps per 60fps
- * frame, against 15.7M and 8 substeps for the 128/480 pair it replaces. The
- * coarser grid pays for most of the finer step: 11x the growth for 2x the
- * cost.
+ * The cost is 28.3 substeps per 60fps frame, 31.3M fragments/s.
  */
 export const STEP = 1 / 1700;
 
@@ -121,22 +128,6 @@ export function clampMobility(m: number): number {
 }
 
 /**
- * DERIVED. e-fold time of the spinodal instability, in seconds.
- *
- * sigma_max = M/(4*kappa) at f'' = -1, and with M = s*M_limit this collapses
- * to 32*dt*n^4/s — independent of grid size. Refining the grid to make
- * break-up faster does nothing; only dt and the interface width move it.
- */
-export function efoldSeconds(): number {
-  return (32 * STEP * Math.pow(IFACE_CELLS, 4)) / SAFETY;
-}
-
-/** DERIVED. Fastest-growing wavelength, 2*pi*sqrt(2*kappa), in tangent units. */
-export function patchWavelength(): number {
-  return 2 * Math.PI * Math.sqrt(2 * KAPPA);
-}
-
-/**
  * TUNED. Evaporation, h per second.
  *
  * Under nucleation this does a different job than it did under spinodal
@@ -148,9 +139,12 @@ export function patchWavelength(): number {
  *
  * The wet phase stays pinned near +1 while spots can take up the loss, so the
  * mean falls without the wet film ever approaching the spinodal — measured,
- * the wet-phase composition sits at 0.68-0.84 for the whole run. Dry area then
- * grows at about EVAP/2 per second, which puts the 10-30% window at 3.0s
- * wide. Lower it for a slower cycle; the window scales as 1/EVAP.
+ * the wet-phase composition sits at 0.68-0.84 for the whole run.
+ *
+ * Dry area then grows at roughly EVAP/2 per second, so the lever-rule estimate
+ * of the 10-30% window is 0.4/EVAP = 2.67s. **Measured it is 3.0s**, t = 0.85
+ * to 3.85, the difference being that spots are still nucleating early on.
+ * Lower EVAP for a slower cycle; the window scales as 1/EVAP either way.
  */
 export const EVAP = 0.15;
 
@@ -172,11 +166,14 @@ export const EVAP = 0.15;
  * 1.0-4.5 cells, 23 heal completely within 0.35s and 26 survive and grow.
  */
 
-/** Nucleation sites across the domain, so SITES^2 defects in total. */
+/**
+ * TUNED. Nucleation sites across the domain, so SITES^2 defects in total.
+ * 7 gives 49 candidates and, after healing, roughly 20 spots.
+ */
 export const NUCLEUS_SITES = 7;
 
 /**
- * Defect radius range, in cells. **Must straddle criticalRadiusCells() at the
+ * TUNED. Defect radius range, in cells. **Must straddle criticalRadiusCells() at the
  * operating mean**, or the mechanism is not exercised: entirely above it and
  * every defect survives, which is painting; entirely below and the film never
  * tears. The test pins this.
@@ -184,7 +181,10 @@ export const NUCLEUS_SITES = 7;
 export const NUCLEUS_R_MIN_CELLS = 1.0;
 export const NUCLEUS_R_MAX_CELLS = 4.5;
 
-/** Defect depth. Full depth of the well, so a defect is a genuine nucleus. */
+/**
+ * TUNED. Defect depth: the full depth of the well, so a defect is a genuine
+ * nucleus and its radius alone decides whether it heals or grows.
+ */
 export const NUCLEUS_DEPTH = 2.0;
 
 /** DERIVED. Equilibrium interface width, from kappa h'' = f'(h): tanh(x/w). */
@@ -227,7 +227,7 @@ export function criticalRadiusCells(h: number): number {
 }
 
 /**
- * The mean the film passes through while the defects are being selected.
+ * TUNED. The mean the film passes through while the defects are selected.
  * criticalRadiusCells() here is 2.9 cells, inside the seeded 1.0-4.5 range,
  * which is what makes some defects heal and others grow.
  */
@@ -266,65 +266,6 @@ export const NUCLEATION_MEAN = 0.9;
  * thin-film disjoining pressure, which is not a double well at all.
  */
 export const SPINODAL_ONSET_FRACTION = (1 - 1 / Math.sqrt(3)) / 2;
-
-/**
- * DERIVED. Seconds the mean spends inside the spinodal band, where f''(h) < 0
- * and patches can grow at all. The band is |h| < 1/sqrt(3) and the mean
- * crosses it at rate EVAP.
- *
- * NOTE: this is *not* the growth budget, and reading it as one is the mistake
- * that cost this task two rounds. See availableEfolds().
- */
-export function spinodalResidence(): number {
-  return 2 / Math.sqrt(3) / EVAP;
-}
-
-/**
- * DERIVED. Maximum e-folds any disturbance can collect on the way down.
- *
- * The obvious estimate — `spinodalResidence() / efoldSeconds()` — is wrong by
- * a factor of about 5, and both of the ways it is wrong are invisible until
- * you integrate:
- *
- * 1. **sigma_max is instantaneous.** `M/(4*kappa)` is reached only at h = 0,
- *    but f''(h) = 3h^2 - 1 varies across the whole traverse and a fixed
- *    wavelength also pays the kappa*k^2 penalty at every moment.
- * 2. **The seed is damped before it ever reaches the band.** From h = 1 down
- *    to 1/sqrt(3) the film is *stable*, so the disturbance is actively
- *    suppressed on the way in. Nobody rediscovers this by staring at the
- *    equations: it shows up as the seed spread falling 0.024 -> 0.014 before
- *    any growth starts, and it is why lowering EVAP helps far less than it
- *    looks like it should — a slower traverse damps for longer too.
- *
- * Integrating sigma(k, t) = -M*k^2*(3h^2 - 1 + kappa*k^2) along h = 1 - E*t
- * from the start of the traverse, and taking the maximum over both the fixed
- * wavelength and the stopping time, gives a closed form:
- *
- *     G = C * M / (kappa * EVAP),  C = max_x x*((2/(3*sqrt(3)))*(1-x)^1.5 - x)
- *
- * where x = kappa*k^2. C = 0.0237555 at x = 0.12419. Note what this says: the
- * net gain over a *complete* traverse from +1 to -1 is always negative — the
- * damping on the way in and out exactly cancels the growth in the middle and
- * then some — so break-up is a transient that has to be caught mid-traverse.
- * That is what PRIME_SECONDS is for.
- *
- * Here G = 2.99, a linear gain of about 20x. Two things about that number:
- *
- * - It is the *linear* budget. Once the disturbance is O(1) the double well
- *   takes over and drives separation the rest of the way to +/-1, so the
- *   reference measures a total gain nearer 40x. The linear budget is what
- *   decides whether break-up starts at all, which is the question that
- *   matters.
- * - An earlier revision of this file ran at 0.27 — a gain of 1.3 — where the
- *   instability could not start at any seed, and the film thinned evenly
- *   forever. The lever that fixed it was n^-4 and 1/dt together (see GRID,
- *   IFACE_CELLS and STEP), not EVAP and not the seed.
- */
-export const TRANSIENT_GAIN_C = 0.0237555;
-
-export function availableEfolds(): number {
-  return (TRANSIENT_GAIN_C * MOBILITY) / (KAPPA * EVAP);
-}
 
 /**
  * TUNED. Seconds of real steps run at build time, so the eye loads mid-cycle

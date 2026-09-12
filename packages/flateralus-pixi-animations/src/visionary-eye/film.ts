@@ -19,17 +19,21 @@ import {
 } from './physics';
 
 /**
- * The tear film field: a Cahn-Hilliard sheet on a 128^2 grid in corneal-local
- * tangent coordinates.
+ * The tear film field: a Cahn-Hilliard sheet on a GRID^2 (96^2) grid in
+ * corneal-local tangent coordinates.
  *
  * Two draws per step. Pass A recomputes the chemical potential
  * `mu = h^3 - h - kappa*lap(h)` from `h`; pass B advances
- * `h' = min(h + dt*(M*lap(mu) - E - v.grad(h)), 1)`. `mu` is derived every
- * step rather than stored between steps, so **`h` is the only state** — spec
- * D2. Neither pass has a clock in it: the only per-step quantity is the fixed
- * `STEP`, and the perturbation that seeds the instability is stamped once by
- * `prime()` (later, by the blink splat) rather than forced every frame — spec
- * D4.
+ *
+ *     h' = min(h + dt*(M*lap(mu) - E*g(h) - v.grad(h)), 1)
+ *
+ * where `g(h) = smoothstep(-0.9, 0.1, h)` gates evaporation off where there is
+ * no film left to evaporate — without it the conservative transport leaves the
+ * mean in free fall. `mu` is derived every step rather than stored between
+ * steps, so **`h` is the only state** — spec D2. Neither pass has a clock in
+ * it: the only per-step quantity is the fixed `STEP`, and the defects that
+ * nucleate break-up are stamped once by `prime()` (later, by the blink splat)
+ * rather than forced every frame — spec D4.
  *
  * Every constant comes from `physics.ts`, which marks which are DERIVED from
  * the stability analysis and which are TUNED. Nothing here re-derives one.
@@ -44,8 +48,8 @@ import {
  *    which is what `caustics-pool` ships and is proven here.
  * 2. **h = 0 is the spinodal, not the rest state.** Clearing to zero the way
  *    a wave field does would drop the whole sheet onto the single most
- *    unstable point of the double well, and it would tear instantly and
- *    uniformly — which looks exactly like a broken integrator and is not one.
+ *    unstable point of the double well, and it would decompose into a
+ *    labyrinth — which looks exactly like a broken integrator and is not one.
  *    Fresh film is `h = +1`, so the clear colour is `(1, 0, 0, 1)`.
  *
  * `CLAMP_TO_EDGE` at the domain boundary is the zero-flux (Neumann) condition,
@@ -54,31 +58,6 @@ import {
 
 /** Texture unit the field is read from, in the sim passes and the display. */
 const FILM_UNIT = 3;
-
-/**
- * TEMPORARY. Once-a-second readback of the field to the console, prefixed
- * `[film]`, while we work out why the disc shows no patches.
- *
- * This is instrumentation, not a feature: flip to false to silence it, and it
- * comes out entirely once the question is answered. It costs a 1MB synchronous
- * readPixels per second, which is far too expensive to ship.
- */
-const FILM_DEBUG = true;
-
-/** Decode an IEEE half into a JS number, for the half-float readback path. */
-function h2f(h: number): number {
-  const s = h & 0x8000 ? -1 : 1;
-  const e = (h >> 10) & 0x1f;
-  const m = h & 0x3ff;
-  if (e === 0) return s * m * Math.pow(2, -24);
-  if (e === 31) return m ? NaN : s * Infinity;
-  return s * (1 + m / 1024) * Math.pow(2, e - 15);
-}
-
-/** Four decimals, and the word rather than a silent NaN. */
-function d4(x: number): string {
-  return Number.isFinite(x) ? x.toFixed(4) : String(x);
-}
 
 const FILM_PRE = `#version 300 es
     precision highp float;
@@ -219,9 +198,17 @@ function program(
 ): WebGLProgram | null {
   const vs = compile(gl, gl.VERTEX_SHADER, VERT, tag);
   const fs = compile(gl, gl.FRAGMENT_SHADER, frag, tag);
-  if (!vs || !fs) return null;
+  if (!vs || !fs) {
+    if (vs) gl.deleteShader(vs);
+    if (fs) gl.deleteShader(fs);
+    return null;
+  }
   const p = gl.createProgram();
-  if (!p) return null;
+  if (!p) {
+    gl.deleteShader(vs);
+    gl.deleteShader(fs);
+    return null;
+  }
   gl.attachShader(p, vs);
   gl.attachShader(p, fs);
   gl.linkProgram(p);
@@ -266,23 +253,6 @@ export class FilmSim {
   private i = 0;
   private acc = 0;
 
-  // --- temporary instrumentation, removed with FILM_DEBUG ---
-  /** Which precision the pair actually got. */
-  private fmt = '';
-  /** Whether LINEAR filtering of a float texture is available. */
-  private linear = false;
-  /** Whether EXT_color_buffer_float was present. */
-  private extFloat = false;
-  /** Readback format verdict, probed once. Null means not yet probed. */
-  private readMode: 'float' | 'half' | 'none' | null = null;
-  private readBufF: Float32Array | null = null;
-  private readBufH: Uint16Array | null = null;
-  private readWarned = false;
-  /** Seconds of simulated film time since prime() seeded the sheet. */
-  private simTime = 0;
-  /** Next simTime at which to log. */
-  private nextLog = 0;
-
   private constructor(
     gl: WebGL2RenderingContext,
     muProg: WebGLProgram,
@@ -305,8 +275,7 @@ export class FilmSim {
    */
   static create(gl: WebGL2RenderingContext): FilmSim | null {
     // Without a float colour attachment there is no simulation to run.
-    const extFloat = !!gl.getExtension('EXT_color_buffer_float');
-    if (!extFloat) {
+    if (!gl.getExtension('EXT_color_buffer_float')) {
       console.error('visionary-eye film: EXT_color_buffer_float unavailable');
       return null;
     }
@@ -322,7 +291,6 @@ export class FilmSim {
     }
 
     const sim = new FilmSim(gl, muProg, stepProg, seedProg);
-    sim.extFloat = extFloat;
     if (!sim.allocate()) {
       sim.destroy();
       return null;
@@ -343,7 +311,6 @@ export class FilmSim {
   private allocate(): boolean {
     const gl = this.gl;
     const wantF32 = !!gl.getExtension('OES_texture_float_linear');
-    this.linear = wantF32;
     for (const f32 of wantF32 ? [true, false] : [false]) {
       if (this.build(f32)) return true;
       this.releaseTargets();
@@ -360,7 +327,6 @@ export class FilmSim {
     const gl = this.gl;
     const internal = f32 ? gl.RGBA32F : gl.RGBA16F;
     const type = f32 ? gl.FLOAT : gl.HALF_FLOAT;
-    this.fmt = f32 ? 'RGBA32F' : 'RGBA16F';
     let complete = true;
     for (let n = 0; n < 2; n++) {
       const tx = gl.createTexture();
@@ -384,7 +350,10 @@ export class FilmSim {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       const fb = gl.createFramebuffer();
-      if (!fb) return false;
+      if (!fb) {
+        gl.deleteTexture(tx);
+        return false;
+      }
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
       gl.framebufferTexture2D(
         gl.FRAMEBUFFER,
@@ -434,8 +403,9 @@ export class FilmSim {
     gl.uniform1i(this.stepL.uH!, FILM_UNIT);
     gl.uniform1f(this.stepL.uTexel!, 1 / GRID);
     gl.uniform1f(this.stepL.uDelta!, DELTA);
-    // Clamped even though MOBILITY is already derived below the limit: a
-    // control that can detonate the integrator is a bug with a slider on it.
+    // Clamped even though MOBILITY is already derived below the limit, so
+    // that a future control — or a re-tuned STEP — cannot silently push the
+    // explicit integrator past its stability bound.
     gl.uniform1f(this.stepL.uM!, clampMobility(MOBILITY));
     gl.uniform1f(this.stepL.uDt!, STEP);
     gl.uniform1f(this.stepL.uEvap!, EVAP);
@@ -480,13 +450,8 @@ export class FilmSim {
       this.acc -= STEP;
       this.pass(this.muProg, this.muL, gravityLocal);
       this.pass(this.stepProg, this.stepL, gravityLocal);
-      this.simTime += STEP;
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    if (FILM_DEBUG && this.simTime >= this.nextLog) {
-      this.nextLog = this.simTime + 1;
-      this.logStats();
-    }
   }
 
   /**
@@ -496,10 +461,10 @@ export class FilmSim {
    * mirror. Priming costs ~4080 steps once at init so the eye loads mid-cycle
    * with real structure rather than making the viewer wait out a first cycle.
    *
-   * The duration is coupled to `EVAP` and lives in `physics.ts` beside it —
-   * run past `2/EVAP` and the mean reaches the dry well before first paint,
-   * which paints a uniformly black disc; stop short of the growth window and
-   * the patches have not formed and priming has bought nothing.
+   * The duration lives in `physics.ts` with the trace it was read off. The
+   * ceiling is not drying but **percolation**: past about 3.85s the dry spots
+   * merge into a connected labyrinth and stop reading as spots. The floor is
+   * about 0.85s, before which they have not grown.
    */
   prime(seed: number): void {
     const gl = this.gl;
@@ -518,110 +483,6 @@ export class FilmSim {
       this.pass(this.stepProg, this.stepL, g);
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    this.simTime = n * STEP;
-    this.nextLog = this.simTime + 1;
-    if (FILM_DEBUG) {
-      console.log(
-        `[film] primed steps=${n} internalFormat=${this.fmt}` +
-          ` linearFilter=${this.linear ? 'yes' : 'no'}` +
-          ` extFloat=${this.extFloat ? 'yes' : 'no'}`
-      );
-      this.logStats();
-    }
-  }
-
-  /**
-   * TEMPORARY. Read the whole field back and log one summary line.
-   *
-   * `spread` is the number that settles the current question: if it sits near
-   * the seed amplitude while the mean falls, the instability is not growing
-   * and the Cahn-Hilliard term is inert; if it grows while the disc stays
-   * flat, the bug is downstream in the display path.
-   *
-   * The readback *format* is a property of the attachment and varies by
-   * driver, so probe it once and cache the verdict — the pattern
-   * `caustics-pool` uses at causticsPoolAnimation.ts:1239-1287. Task 9's loop
-   * closure depends on this same readback working, so a 'none' verdict here
-   * is a finding in its own right.
-   */
-  private logStats(): void {
-    const gl = this.gl;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb[this.i]);
-    if (this.readMode === null) {
-      const t = gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_TYPE);
-      const f = gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_FORMAT);
-      this.readMode =
-        f === gl.RGBA && t === gl.FLOAT
-          ? 'float'
-          : f === gl.RGBA && t === gl.HALF_FLOAT
-            ? 'half'
-            : 'none';
-    }
-    if (this.readMode === 'none') {
-      if (!this.readWarned) {
-        this.readWarned = true;
-        console.log('[film] readback unavailable');
-      }
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      return;
-    }
-
-    const n = GRID * GRID;
-    let get: ((k: number, c: number) => number) | null = null;
-    try {
-      if (this.readMode === 'float') {
-        if (!this.readBufF) this.readBufF = new Float32Array(n * 4);
-        const b = this.readBufF;
-        gl.readPixels(0, 0, GRID, GRID, gl.RGBA, gl.FLOAT, b);
-        get = (k, c) => b[k * 4 + c];
-      } else {
-        if (!this.readBufH) this.readBufH = new Uint16Array(n * 4);
-        const b = this.readBufH;
-        gl.readPixels(0, 0, GRID, GRID, gl.RGBA, gl.HALF_FLOAT, b);
-        get = (k, c) => h2f(b[k * 4 + c]);
-      }
-    } catch {
-      this.readMode = 'none';
-    }
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    if (!get) {
-      if (!this.readWarned) {
-        this.readWarned = true;
-        console.log('[film] readback unavailable');
-      }
-      return;
-    }
-
-    let hMin = Infinity;
-    let hMax = -Infinity;
-    let hSum = 0;
-    let mMin = Infinity;
-    let mMax = -Infinity;
-    let mSum = 0;
-    let nan = 0;
-    for (let k = 0; k < n; k++) {
-      const h = get(k, 0);
-      const m = get(k, 1);
-      if (!Number.isFinite(h)) nan++;
-      else {
-        if (h < hMin) hMin = h;
-        if (h > hMax) hMax = h;
-        hSum += h;
-      }
-      if (!Number.isFinite(m)) nan++;
-      else {
-        if (m < mMin) mMin = m;
-        if (m > mMax) mMax = m;
-        mSum += m;
-      }
-    }
-    console.log(
-      `[film] t=${this.simTime.toFixed(2)}` +
-        ` h.min=${d4(hMin)} h.mean=${d4(hSum / n)} h.max=${d4(hMax)}` +
-        ` spread=${d4(hMax - hMin)}` +
-        ` mu.min=${d4(mMin)} mu.mean=${d4(mSum / n)} mu.max=${d4(mMax)}` +
-        ` nan=${nan}`
-    );
   }
 
   /** Bind the live field for the display pass. */

@@ -239,10 +239,11 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     gl.uniform1f(locs.uDelta!, DELTA);
     gl.uniform1f(locs.uShowFilm!, controls.showFilm ? 1 : 0);
     gl.uniform1f(locs.uFilmOK!, this.film?.ok ? 1 : 0);
-    if (this.film) {
-      this.film.bindField(FILM_TEXTURE_UNIT);
-      gl.uniform1i(locs.uFilm!, FILM_TEXTURE_UNIT);
-    }
+    // Always point uFilm at its own unit, even with no film to bind. Left
+    // unset it defaults to 0, which is the SDF mask — harmless while uFilmOK
+    // gates every read, but a trap for the passes Tasks 10-12 add.
+    gl.uniform1i(locs.uFilm!, FILM_TEXTURE_UNIT);
+    if (this.film) this.film.bindField(FILM_TEXTURE_UNIT);
   }
 
   onDestroy(): void {
