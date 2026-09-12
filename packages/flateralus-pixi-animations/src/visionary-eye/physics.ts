@@ -177,8 +177,16 @@ export const EVAP = 0.2;
  * 0.06 within a workable range of roughly 0.03-0.09, all of which separate to
  * the full well depth with correlation near zero. The middle is chosen for
  * precision headroom: the field may fall back to RGBA16F, where the quantum
- * near h = 0.5 is about 4.9e-4, and the pre-break-up spread at 0.06 is 0.011
- * — some 22 quanta, where 0.03 would leave only 11.
+ * near h = 0.5 is about 4.9e-4.
+ *
+ * **The seed's spectrum is load-bearing and SEED_FRAG must stay white.** Value
+ * noise sits on an axis-aligned lattice at roughly the wavelength the
+ * instability selects, so the film amplifies the lattice and tears into
+ * grid-aligned lamellae: spectral anisotropy 0.59 against 0.05 for white noise
+ * in the same simulation. Raising the amplitude makes it worse, not better —
+ * 0.06 white measures 0.05, 0.15 measures 0.40, 0.30 measures 0.20 and
+ * plateaus — because a larger seed leaves fewer e-folds of coarsening to
+ * relax whatever bias is there. Small and structureless is the requirement.
  */
 export const SEED_AMPLITUDE = 0.06;
 
@@ -251,24 +259,25 @@ export function availableEfolds(): number {
  *
  * Transport is conservative under the Neumann boundary, so the spatial mean
  * obeys d<h>/dt = -EVAP while film remains, and break-up is explosive once it
- * starts. Measured on the CPU reference at SEED_AMPLITUDE = 0.06, EVAP = 0.2
- * (t, mean, spread, fraction below DRY_H, correlation with the seed):
+ * starts. Measured on the CPU reference at SEED_AMPLITUDE = 0.06 white,
+ * EVAP = 0.2 (t, mean, spread, fraction below DRY_H, correlation with the
+ * seed, and the spectral anisotropy of the pattern):
  *
- *     3.05   0.359  0.012   0.0%  corr 0.50   flat; thinning evenly
- *     4.50   0.069  0.131   0.0%  corr 0.26   the instability takes hold
- *     5.00  -0.028  1.184   1.5%  corr 0.02   tearing, pattern now its own
- *     5.55  -0.121  1.621  29.4%  corr 0.00   <- here: deep patches, film left
- *     6.05  -0.181  1.898  51.6%  corr 0.00   past BLINK_FRACTION
- *     7.55  -0.319  1.950  62.4%  corr 0.05   mostly dry, contrast flattening
+ *     4.50   0.070  0.052   0.0%  corr 0.02  aniso 0.47   still flat
+ *     5.00  -0.028  0.708   0.3%  corr 0.00  aniso 0.53   tearing
+ *     5.50  -0.113  1.687  35.6%  corr 0.00  aniso 0.20   grid bias relaxing
+ *     6.00  -0.174  1.961  51.2%  corr 0.01  aniso 0.05   <- here
+ *     6.50  -0.229  1.959  56.1%  corr 0.01  aniso 0.02
+ *     7.00  -0.281  1.982  59.8%  corr 0.01  aniso -0.02
  *
- * 5.5s is where the patches are darkest against film that is still bright —
- * grey 0.07 against 0.88 on the debug ramp — and it sits just under
- * BLINK_FRACTION, so the eye loads fully broken up and blinks shortly after.
- * Note how narrow the window is: at 4.5 there is nothing to see and by 7.5 it
- * is nearly uniform. If EVAP or SEED_AMPLITUDE moves, re-run the trace; the
- * test pins the outer bounds but only measurement finds the point inside.
+ * **The anisotropy column is why this is 6.0 and not 5.5.** The pattern is
+ * laid down grid-biased and then relaxes as it coarsens; priming into the
+ * moment of break-up shows the viewer the biased picture. 6.0 is the first
+ * sample where the anisotropy is gone, the field is fully separated, and film
+ * still remains. If EVAP or SEED_AMPLITUDE moves, re-run the trace and read
+ * that column — the outer bounds are tested, but only measurement finds this.
  */
-export const PRIME_SECONDS = 5.5;
+export const PRIME_SECONDS = 6.0;
 
 /** TUNED. Downward drain, 1.5 cells/s, tuned by eye — not derived. */
 export const GRAVITY = 1.5 * DELTA;
