@@ -3,6 +3,7 @@ import type { LidPose } from './physics';
 import {
   DELTA,
   DOMAIN,
+  DRY_H,
   EVAP,
   GRAVITY,
   GRID,
@@ -13,7 +14,9 @@ import {
   NUCLEUS_R_MIN_CELLS,
   NUCLEUS_SITES,
   PRIME_SECONDS,
+  REDUCE,
   STEP,
+  breakupFraction,
   clampMobility,
   filmTick,
   interfaceWidth,
@@ -217,6 +220,64 @@ const WIPE_FRAG =
       fragColor = vec4(w * freshFilm(vUV, uSeed), 0.0, 0.0, w);
     }`;
 
+/** Cells per side of one reduction tile. GRID % REDUCE === 0 is pinned by a test. */
+const TILE = GRID / REDUCE;
+
+/**
+ * The measurement: an 8x8 target whose every texel is the **dry area fraction
+ * of its own 12x12 tile**, `mean(step(h, DRY_H))`.
+ *
+ * A mean and not a minimum, which is the whole reason this pass is worth
+ * writing — `breakupFraction()` carries the measurement that settled it. A
+ * per-tile minimum saturates at this tile size against patches this size and
+ * reads ~1.0 while the cornea is a tenth dry; a mean is an exact area fraction
+ * at any tile size, so the target stays at 8x8 and the readback stays 64
+ * texels.
+ *
+ * `step(h, DRY_H)` and not `step(DRY_H, h)`: GLSL's `step(edge, x)` is
+ * `x < edge ? 0 : 1`, so passing `h` as the edge gives 1 exactly where
+ * `h <= DRY_H`, matching `breakupFraction`'s CPU-side threshold test.
+ *
+ * `texelFetch` rather than `texture`, so the sum is over cells and not over
+ * whatever the filter interpolates — a LINEAR fetch straddling a tile edge
+ * would count neighbouring cells into the wrong tile.
+ */
+const REDUCE_FRAG = `#version 300 es
+    precision highp float;
+    // Declared, not defaulted: fragment-stage \`int\` defaults to mediump, and
+    // the tile arithmetic indexes a 96-wide grid through texelFetch.
+    precision highp int;
+    in vec2 vUV;
+    out vec4 fragColor;
+    uniform sampler2D uH;
+    const int TILE = ${TILE};
+    const float DRY_H = ${DRY_H.toFixed(6)};
+    void main() {
+      ivec2 base = ivec2(vUV * ${REDUCE.toFixed(1)}) * TILE;
+      float dry = 0.0;
+      for (int j = 0; j < TILE; j++) {
+        for (int i = 0; i < TILE; i++) {
+          dry += step(texelFetch(uH, base + ivec2(i, j), 0).x, DRY_H);
+        }
+      }
+      fragColor = vec4(dry / float(TILE * TILE), 0.0, 0.0, 1.0);
+    }`;
+
+/**
+ * Decode an IEEE half into a JS number, for the `readPixels` measurement.
+ *
+ * Duplicated from `caustics-pool`, deliberately: the two animations share no
+ * module and hoisting eight lines into one would couple them for no gain.
+ */
+function h2f(h: number): number {
+  const s = h & 0x8000 ? -1 : 1;
+  const e = (h >> 10) & 0x1f;
+  const m = h & 0x3ff;
+  if (e === 0) return s * m * Math.pow(2, -24);
+  if (e === 31) return m ? NaN : s * Infinity;
+  return s * (1 + m / 1024) * Math.pow(2, e - 15);
+}
+
 const MU_UNIFORMS = ['uH', 'uTexel', 'uDelta', 'uKappa'] as const;
 const STEP_UNIFORMS = [
   'uH',
@@ -229,6 +290,13 @@ const STEP_UNIFORMS = [
 ] as const;
 const SEED_UNIFORMS = ['uSeed'] as const;
 const WIPE_UNIFORMS = ['uEdge', 'uNormal', 'uSeed', 'uDelta'] as const;
+const REDUCE_UNIFORMS = ['uH'] as const;
+
+/**
+ * What `readPixels` will accept from the reduction target. `null` until the
+ * driver has been asked, `'none'` once it has refused.
+ */
+type ReadMode = 'float' | 'half' | 'none' | null;
 
 type Locs = Record<string, WebGLUniformLocation | null>;
 
@@ -304,32 +372,46 @@ export class FilmSim {
   private readonly stepProg: WebGLProgram;
   private readonly seedProg: WebGLProgram;
   private readonly wipeProg: WebGLProgram;
+  private readonly reduceProg: WebGLProgram;
   private readonly muL: Locs;
   private readonly stepL: Locs;
   private readonly seedL: Locs;
   private readonly wipeL: Locs;
   private tex: (WebGLTexture | null)[] = [null, null];
   private fb: (WebGLFramebuffer | null)[] = [null, null];
+  /** The 8x8 measurement target and its attachment. */
+  private reduceTex: WebGLTexture | null = null;
+  private reduceFb: WebGLFramebuffer | null = null;
   /** Index of the live field. A full step flips it twice, so it is stable. */
   private i = 0;
   private acc = 0;
+  /** Probed on the first `measure()` and cached; see `measure()`. */
+  private readMode: ReadMode = null;
+  private readBufF: Float32Array | null = null;
+  private readBufH: Uint16Array | null = null;
+  /** The 64 tile fractions, reused so `measure()` allocates nothing. */
+  private readonly tiles = new Float32Array(REDUCE * REDUCE);
 
   private constructor(
     gl: WebGL2RenderingContext,
     muProg: WebGLProgram,
     stepProg: WebGLProgram,
     seedProg: WebGLProgram,
-    wipeProg: WebGLProgram
+    wipeProg: WebGLProgram,
+    reduceProg: WebGLProgram
   ) {
     this.gl = gl;
     this.muProg = muProg;
     this.stepProg = stepProg;
     this.seedProg = seedProg;
     this.wipeProg = wipeProg;
+    this.reduceProg = reduceProg;
     this.muL = locsOf(gl, muProg, MU_UNIFORMS);
     this.stepL = locsOf(gl, stepProg, STEP_UNIFORMS);
     this.seedL = locsOf(gl, seedProg, SEED_UNIFORMS);
     this.wipeL = locsOf(gl, wipeProg, WIPE_UNIFORMS);
+    const reduceL = locsOf(gl, reduceProg, REDUCE_UNIFORMS);
+    gl.uniform1i(reduceL.uH!, FILM_UNIT);
   }
 
   /**
@@ -348,19 +430,32 @@ export class FilmSim {
     const stepProg = program(gl, STEP_FRAG, 'step');
     const seedProg = program(gl, SEED_FRAG, 'seed');
     const wipeProg = program(gl, WIPE_FRAG, 'wipe');
-    if (!muProg || !stepProg || !seedProg || !wipeProg) {
+    const reduceProg = program(gl, REDUCE_FRAG, 'reduce');
+    if (!muProg || !stepProg || !seedProg || !wipeProg || !reduceProg) {
       if (muProg) gl.deleteProgram(muProg);
       if (stepProg) gl.deleteProgram(stepProg);
       if (seedProg) gl.deleteProgram(seedProg);
       if (wipeProg) gl.deleteProgram(wipeProg);
+      if (reduceProg) gl.deleteProgram(reduceProg);
       return null;
     }
 
-    const sim = new FilmSim(gl, muProg, stepProg, seedProg, wipeProg);
+    const sim = new FilmSim(
+      gl,
+      muProg,
+      stepProg,
+      seedProg,
+      wipeProg,
+      reduceProg
+    );
     if (!sim.allocate()) {
       sim.destroy();
       return null;
     }
+    // Deliberately not fatal. A film that cannot be measured still draws, and
+    // the caller falls back to a synthesised fraction rather than losing the
+    // scene — see `measure()`.
+    sim.buildReduce();
     sim.pushConstants();
     return sim;
   }
@@ -395,11 +490,15 @@ export class FilmSim {
     return false;
   }
 
+  /** Which precision `build()` settled on, so the 8x8 target matches it. */
+  private f32 = false;
+
   /** One attempt at the texture/FBO pair in a given precision. */
   private build(f32: boolean): boolean {
     const gl = this.gl;
     const internal = f32 ? gl.RGBA32F : gl.RGBA16F;
     const type = f32 ? gl.FLOAT : gl.HALF_FLOAT;
+    this.f32 = f32;
     let complete = true;
     for (let n = 0; n < 2; n++) {
       const tx = gl.createTexture();
@@ -449,6 +548,63 @@ export class FilmSim {
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     return complete;
+  }
+
+  /**
+   * The 8x8 measurement target, in the same precision the field landed on.
+   *
+   * NEAREST, because nothing samples it — it exists to be read back. No
+   * mipmaps and no filtering means an 8x8 float attachment is complete on
+   * anything that got this far, but the status is still checked: a driver that
+   * refuses it costs the loop its input, not the scene.
+   */
+  private buildReduce(): void {
+    const gl = this.gl;
+    const tx = gl.createTexture();
+    const fb = gl.createFramebuffer();
+    if (!tx || !fb) {
+      if (tx) gl.deleteTexture(tx);
+      if (fb) gl.deleteFramebuffer(fb);
+      this.readMode = 'none';
+      return;
+    }
+    gl.activeTexture(gl.TEXTURE0 + FILM_UNIT);
+    gl.bindTexture(gl.TEXTURE_2D, tx);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      this.f32 ? gl.RGBA32F : gl.RGBA16F,
+      REDUCE,
+      REDUCE,
+      0,
+      gl.RGBA,
+      this.f32 ? gl.FLOAT : gl.HALF_FLOAT,
+      null
+    );
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    gl.framebufferTexture2D(
+      gl.FRAMEBUFFER,
+      gl.COLOR_ATTACHMENT0,
+      gl.TEXTURE_2D,
+      tx,
+      0
+    );
+    const complete =
+      gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    if (!complete) {
+      gl.deleteTexture(tx);
+      gl.deleteFramebuffer(fb);
+      console.error('visionary-eye film: measurement target incomplete');
+      this.readMode = 'none';
+      return;
+    }
+    this.reduceTex = tx;
+    this.reduceFb = fb;
   }
 
   private releaseTargets(): void {
@@ -615,6 +771,87 @@ export class FilmSim {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
 
+  /**
+   * **The loop closure.** Reduce the field to 64 tile dry-fractions, read them
+   * back, and return the corneal break-up fraction — or `null` if the driver
+   * will not hand back a readable format.
+   *
+   * This is the only thing in the animation that reads the simulation. Without
+   * it the eye is a decorated sphere with extra passes and a timer; with it the
+   * lid fires because the film measurably tore. Delete it and nothing looks
+   * different for one cycle, which is exactly why it is worth a comment this
+   * long.
+   *
+   * **The format is a property of the attachment, not of the context**, so it
+   * is probed against the reduction target itself, with that framebuffer bound,
+   * and cached. The 8x8 target is allocated once at build time and never
+   * resized — the display canvas resizes with the stage, the field and its
+   * measurement do not — so there is no resize path that can invalidate the
+   * probe. A `readPixels` that throws retires the measurement permanently
+   * rather than throwing again every frame.
+   *
+   * 64 texels is one 1KB readback. It is still a GPU sync point, and it runs
+   * every frame: the field moves 28 substeps per 60fps frame, so a stale
+   * fraction is a stale *decision*, and holding it across frames trades the one
+   * thing this pass exists to provide for a stall that 64 texels does not
+   * cause. If it ever does show up in a frame budget, the cheap fix is to
+   * measure every third frame and hold between — not to delete the readback.
+   *
+   * Returns a fraction in [0, 1]. NaN from a corrupt readback is rejected as
+   * `null`, so a garbage frame falls back rather than blinking on nonsense.
+   */
+  measure(): number | null {
+    const gl = this.gl;
+    if (this.readMode === 'none' || !this.reduceFb) return null;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.reduceFb);
+    gl.viewport(0, 0, REDUCE, REDUCE);
+    gl.useProgram(this.reduceProg);
+    gl.activeTexture(gl.TEXTURE0 + FILM_UNIT);
+    gl.bindTexture(gl.TEXTURE_2D, this.tex[this.i]);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    try {
+      if (this.readMode === null) {
+        const t = gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_TYPE);
+        const f = gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_FORMAT);
+        this.readMode =
+          f === gl.RGBA && t === gl.FLOAT
+            ? 'float'
+            : f === gl.RGBA && t === gl.HALF_FLOAT
+              ? 'half'
+              : 'none';
+        if (this.readMode === 'none') {
+          console.error('visionary-eye film: no readable measurement format');
+          return null;
+        }
+      }
+      const n = REDUCE * REDUCE;
+      if (this.readMode === 'float') {
+        if (!this.readBufF) this.readBufF = new Float32Array(n * 4);
+        gl.readPixels(0, 0, REDUCE, REDUCE, gl.RGBA, gl.FLOAT, this.readBufF);
+        for (let k = 0; k < n; k++) this.tiles[k] = this.readBufF[k * 4];
+      } else {
+        if (!this.readBufH) this.readBufH = new Uint16Array(n * 4);
+        gl.readPixels(
+          0,
+          0,
+          REDUCE,
+          REDUCE,
+          gl.RGBA,
+          gl.HALF_FLOAT,
+          this.readBufH
+        );
+        for (let k = 0; k < n; k++) this.tiles[k] = h2f(this.readBufH[k * 4]);
+      }
+    } catch {
+      this.readMode = 'none';
+      return null;
+    } finally {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    }
+    const fraction = breakupFraction(this.tiles, REDUCE);
+    return Number.isFinite(fraction) ? fraction : null;
+  }
+
   /** Bind the live field for the display pass. */
   bindField(unit: number): void {
     const gl = this.gl;
@@ -629,10 +866,15 @@ export class FilmSim {
   destroy(): void {
     const gl = this.gl;
     this.releaseTargets();
+    if (this.reduceTex) gl.deleteTexture(this.reduceTex);
+    if (this.reduceFb) gl.deleteFramebuffer(this.reduceFb);
+    this.reduceTex = null;
+    this.reduceFb = null;
     gl.deleteProgram(this.muProg);
     gl.deleteProgram(this.stepProg);
     gl.deleteProgram(this.seedProg);
     gl.deleteProgram(this.wipeProg);
+    gl.deleteProgram(this.reduceProg);
   }
 }
 

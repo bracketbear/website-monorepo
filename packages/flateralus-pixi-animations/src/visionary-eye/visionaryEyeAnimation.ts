@@ -15,12 +15,11 @@ import type { BlinkState } from './physics';
 import {
   DELTA,
   GRID,
-  PRIME_SECONDS,
+  fallbackFraction,
   isWiping,
   lidCoverage,
   lidSweep,
   newBlinkState,
-  placeholderFraction,
   stepBlink,
   worldToLocal,
 } from './physics';
@@ -154,10 +153,10 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
    * Film seconds integrated on the previous frame, and the running total.
    *
    * The blink runs on this clock and not on `dt`. Below about 40fps the film
-   * ages slower than the wall — `FilmSim.advance` caps the backlog — so a
-   * blink driven by `dt` drifts away from the dryness it is standing in for,
-   * by a factor that changes with the frame rate. One frame of lag, the same
-   * as the gaze already has.
+   * ages slower than the wall — `FilmSim.advance` caps the backlog — so a lid
+   * driven by `dt` would run its refractory window and its travel against a
+   * clock the measured dryness is not on, by a factor that changes with the
+   * frame rate. One frame of lag, the same as the gaze already has.
    */
   private filmDt = 0;
 
@@ -180,10 +179,7 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     this.pupil = 0.15;
     this.pupilPulse = 0;
     this.gazeView = [0, 0];
-    // TEMPORARY (Task 9): the placeholder fraction below counts from here, and
-    // the film is already PRIME_SECONDS old on the first frame, so the clock
-    // starts there rather than at zero. Goes with the placeholder.
-    this.blink = { ...newBlinkState(), since: PRIME_SECONDS };
+    this.blink = newBlinkState();
     this.lidPrev = 0;
     this.lidSeed = Math.random() * 1000;
     this.filmDt = 0;
@@ -231,18 +227,26 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     // once a cycle is exactly the motion the setting is asking us not to make.
     if (this.reducedMotion) return;
 
-    // TEMPORARY: Task 9 replaces this with the break-up fraction measured off
-    // the field by the reduction pass. The ramp lives in `physics.ts` so the
-    // cadence it produces can be driven headlessly, which is the only way this
-    // is verifiable — see the blink cadence tests.
-    const fraction = placeholderFraction(this.blink.since);
+    // **The measurement, and the reason this animation exists.** The lid is
+    // driven by the dry area fraction read back off the field itself, not by
+    // any clock: raise Dryness and the eye blinks sooner, because the film
+    // tears sooner. Spec D6 forbids an interval floor or ceiling here — the
+    // only lever on cadence is EVAP.
+    //
+    // `null` means the driver refused a readable format from the 8x8 target.
+    // The film still runs and still looks right; only the decision has lost
+    // its input, so the trigger falls back to a ramp calibrated to the cadence
+    // the measurement produces on average. A degraded eye that still blinks,
+    // rather than one that stares.
+    const measured = this.film.measure();
+    const fraction = measured ?? fallbackFraction(this.blink.since);
 
-    // **On the film's clock, not the wall's.** What Task 9 measures is a
-    // property of the field, so its stand-in has to age with the field. The
-    // harness clamps dt to 0.05s and `advance` caps the backlog at 0.025s, so
-    // the two clocks run at different fractions of real time the moment the
-    // frame rate drops: at 8fps the wall clock reaches this threshold in 5.6s
-    // and the field is only 1.2s older than it was at load. Driving the blink
+    // **On the film's clock, not the wall's.** The fraction above is a
+    // property of the field, so the refractory window and the lid's travel
+    // have to age with the field too. The harness clamps dt to 0.05s and
+    // `advance` caps the backlog at 0.025s, so the two clocks run at different
+    // fractions of real time the moment the frame rate drops: at 8fps the wall
+    // clock covers five seconds while the field ages by one. Driving the blink
     // off dt is what made it look like the lid was never firing at all.
     const before = this.blink;
     this.blink = stepBlink(before, this.filmDt, fraction);

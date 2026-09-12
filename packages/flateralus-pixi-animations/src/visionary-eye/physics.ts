@@ -145,6 +145,28 @@ export function clampMobility(m: number): number {
  * of the 10-30% window is 0.4/EVAP = 2.67s. **Measured it is 3.0s**, t = 0.85
  * to 3.85, the difference being that spots are still nucleating early on.
  * Lower EVAP for a slower cycle; the window scales as 1/EVAP either way.
+ *
+ * **Since the loop closed this is also the only lever on blink cadence**, and
+ * spec D6 says it stays the only one: no interval floor, no ceiling, nothing
+ * that would make the trigger a timer in the simulation's clothes. Measured on
+ * the CPU reference, closed loop, 60 film seconds per run, three runs each:
+ *
+ *     EVAP   interblink mean   sd     range         dry at fire
+ *     0.10       4.39s        0.47   3.18-5.35        0.261
+ *     0.15       3.18s        0.33   2.33-3.93        0.261    <- here
+ *     0.20       2.56s        0.25   1.90-3.18        0.261
+ *     0.25       2.18s        0.20   1.60-2.73        0.263
+ *
+ * Raising it makes the eye blink sooner, with nothing else changed — the film
+ * dries faster, so it reaches the threshold sooner. The product EVAP*interval
+ * drifts from 0.44 to 0.55 across that range rather than holding constant,
+ * because the nucleation delay before the spots start growing is set by the
+ * defect radii and does not scale with evaporation.
+ *
+ * 0.15 gives 19 blinks a minute, which is the middle of the physiological
+ * resting rate. Past about 0.25 the REFRACTORY debounce starts to bind on the
+ * shortest intervals and the fraction overshoots the threshold, which is the
+ * upper end of the useful range.
  */
 export const EVAP = 0.15;
 
@@ -322,14 +344,31 @@ export function tileInsideCornea(i: number, j: number, size: number): boolean {
 }
 
 /**
- * Fraction of the cornea that has torn, from the per-tile minima of h.
+ * Fraction of the cornea that has torn, from the per-tile **area means** of
+ * the dry indicator — each input texel is already `mean(step(h, DRY_H))` over
+ * its own tile, so this is a plain average of averages over equal-area tiles.
  *
- * Minima and not means: a tile is torn as soon as any part of it is, which is
- * what makes the measurement responsive to a patch opening rather than to the
- * whole film sagging.
+ * **Means and not minima, and this is load-bearing.** The first draft took
+ * `min(h)` per tile: a tile counted as torn as soon as any part of it was.
+ * That reads as the responsive choice and is in fact a saturating one. At
+ * `REDUCE = 8` on a 96 grid the tiles are 12x12 cells and the dry patches are
+ * about 12.6 cells across, so a single patch touching a tile marks the whole
+ * tile dry, and the fraction reaches ~1.0 while the cornea is nearer a tenth
+ * dry than a third. Measured against the CPU reference, the minimum-based
+ * statistic converges to "fraction of tiles touching any patch" rather than to
+ * a dry area.
+ *
+ * Shrinking the tiles makes it worse, not better — smaller tiles against a
+ * fixed patch size means a *larger* share of tiles overlap something, so the
+ * saturation is harder. The statistic was wrong, not the resolution. An area
+ * mean is exact at any tile size, which is why `REDUCE` stays at 8 and its
+ * 64-texel readback stays one small `readPixels`.
+ *
+ * Tiles whose centre falls off the corneal cap are skipped, so this is the dry
+ * share of the cornea rather than of the square domain the field lives on.
  */
 export function breakupFraction(
-  tileMin: Float32Array,
+  tileDry: Float32Array,
   size: number = REDUCE
 ): number {
   let on = 0;
@@ -338,14 +377,46 @@ export function breakupFraction(
     for (let i = 0; i < size; i++) {
       if (!tileInsideCornea(i, j, size)) continue;
       on++;
-      if (tileMin[j * size + i] <= DRY_H) dry++;
+      dry += tileDry[j * size + i];
     }
   }
   return on === 0 ? 0 : dry / on;
 }
 
-/** TUNED. Corneal break-up share that triggers a blink, picked by eye. */
-export const BLINK_FRACTION = 0.35;
+/**
+ * TUNED. Corneal dry-area share that triggers a blink.
+ *
+ * **The constraint is that the blink must fire while the dry phase is still a
+ * minority.** Under nucleation the film passes through isolated droplets and
+ * then, left alone, coarsens and percolates into a connected labyrinth. A lid
+ * that fires late holds the film in the percolated regime permanently, because
+ * every cycle starts from the same wipe and takes the same time to get there.
+ * The droplet window is dry fraction 0.10-0.30 — see `PRIME_SECONDS` for the
+ * trace and `SPINODAL_ONSET_FRACTION` for why 0.30 is a hard ceiling.
+ *
+ * 0.26 sits inside that window with room on both sides: above the 0.194 the
+ * primed field already carries at load, so the eye is not wiped before anyone
+ * has seen it (spec D11), and below the 0.295 at which the spots start to
+ * merge.
+ *
+ * Measured on a CPU reference of the two shipped passes, driven through the
+ * shipped clock and this state machine at dt = 1/60 for 60 film seconds, three
+ * runs, 54 intervals:
+ *
+ *     interblink   mean 3.18s   sd 0.33   range 2.33-3.93
+ *     dry at fire  mean 0.261   range 0.260-0.262
+ *
+ * The dry fraction at firing overshoots the threshold by about 0.001, which is
+ * one frame of film time at the rate the field dries — so the lid is firing on
+ * the crossing and not late. The interval is **not constant**, and that is the
+ * evidence that the measurement reaches the decision: the spread is the run to
+ * run difference in which defects survive, since each blink lays a new layout.
+ *
+ * The earlier 0.35 was calibrated against the minimum-based statistic and
+ * against the spinodal mechanism that preceded nucleation; it is past the
+ * window on both counts.
+ */
+export const BLINK_FRACTION = 0.26;
 
 /**
  * TUNED. Minimum seconds between blinks, picked by eye.
@@ -381,12 +452,13 @@ export interface FilmTick {
  * own `dt` to 0.05s before this ever sees it. Together those make the field
  * age at 1.00x real time at 60fps, 0.76x at 30, 0.38x at 15 and 0.15x at 6.
  *
- * Anything that has to stay in step with the film's *state* — the blink, which
- * stands in for a measurement of that state — has to run on `ran` and not on
+ * Anything that has to stay in step with the film's *state* — the blink, whose
+ * trigger is a measurement of that state — has to run on `ran` and not on
  * `dt`. Drive it from `dt` and the cadence silently becomes a function of the
  * frame rate: at 8fps the trigger's clock runs at 0.40x while the field runs
- * at 0.20x, so the lid fires at half the dryness it was calibrated for. That
- * is a real bug this function exists to make testable without a GL context.
+ * at 0.20x, so the refractory window and the lid's travel are timed against a
+ * clock the dryness is not on. That is a real bug this function exists to make
+ * testable without a GL context.
  */
 export function filmTick(acc: number, dt: number): FilmTick {
   let left = Math.min(acc + dt, MAX_SUBSTEPS * STEP);
@@ -575,26 +647,35 @@ export function lidSweep(
 }
 
 /**
- * TEMPORARY. Film seconds between blinks under the placeholder trigger, and
- * the ramp that produces it. **Task 9 deletes both**, when the reduction pass
- * makes `breakupFraction()` available from the field itself.
+ * DEGRADED PATH ONLY. Film seconds between blinks when the field cannot be
+ * measured, and the ramp that produces it.
+ *
+ * `FilmSim.measure()` returns null when the driver will not hand back a
+ * readable format from the reduction target. The film still runs and still
+ * looks right — it is the *decision* that has lost its input. Rather than
+ * freeze the lid open (a staring eye, which reads as broken) or wire in an
+ * interval (spec D6: no timer), the trigger falls back to a ramp calibrated so
+ * that it crosses `BLINK_FRACTION` at the cadence the measurement produces on
+ * average. Same threshold, same state machine, same film clock; only the
+ * fraction is synthesised.
+ *
+ * **This is not a floor or a ceiling on the measured path.** It is reached
+ * only when `measure()` has returned null, and nothing blends the two.
+ *
+ * 3.18 is the mean interblink interval measured on the CPU reference at
+ * EVAP = 0.15 — see `BLINK_FRACTION`. `newBlinkState()` starts `since` at
+ * `REFRACTORY`, so the first degraded blink lands 1.6 film seconds after load,
+ * with the primed field on screen until then (spec D11).
  *
  * It lives here rather than in the animation so the cadence can be driven
  * headlessly — `physics.test.ts` runs the shipped ramp against the shipped
- * clock — and so Task 9 has one place to remove it from.
- *
- * Short on purpose. The trace at `PRIME_SECONDS` puts a genuine 35%-dry
- * crossing near 4.6s of film time, but this exists only so the lid can be
- * watched before the measurement lands, and on a throttled tab — or any
- * machine where the field ages at a fifth of real time — a 4.6s cadence is
- * most of a minute between sweeps. 3.0 still leaves the primed field on screen
- * for a beat before the first sweep, which spec D11 wants.
+ * clock, which is what pins the blink to film time rather than wall time.
  */
-export const PLACEHOLDER_BLINK_SECONDS = 3.0;
+export const FALLBACK_BLINK_SECONDS = 3.18;
 
-export function placeholderFraction(sinceFilmSeconds: number): number {
+export function fallbackFraction(sinceFilmSeconds: number): number {
   return Math.min(
     1,
-    sinceFilmSeconds * (BLINK_FRACTION / PLACEHOLDER_BLINK_SECONDS)
+    sinceFilmSeconds * (BLINK_FRACTION / FALLBACK_BLINK_SECONDS)
   );
 }

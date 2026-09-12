@@ -31,8 +31,8 @@ import {
   filmTick,
   isWiping,
   lidCoverage,
-  PLACEHOLDER_BLINK_SECONDS,
-  placeholderFraction,
+  FALLBACK_BLINK_SECONDS,
+  fallbackFraction,
   LID_SPLATS_MAX,
   LID_TRAVEL,
   lidFrame,
@@ -172,7 +172,31 @@ describe('tear film constants', () => {
 
 describe('break-up fraction', () => {
   const size = REDUCE;
-  const wet = () => new Float32Array(size * size).fill(1);
+  const TILE = GRID / size;
+  /** Every input texel is one tile's dry area share, so wet film is all zeros. */
+  const wet = () => new Float32Array(size * size);
+
+  /**
+   * The reduction pass, on the CPU: reduce a full GRID^2 field of `h` to the
+   * per-tile dry means the GPU pass emits, so the statistic can be checked
+   * against a field whose dry area is known exactly rather than against
+   * hand-written tile values.
+   */
+  const reduce = (h: Float32Array) => {
+    const t = new Float32Array(size * size);
+    for (let tj = 0; tj < size; tj++) {
+      for (let ti = 0; ti < size; ti++) {
+        let dry = 0;
+        for (let j = 0; j < TILE; j++) {
+          for (let i = 0; i < TILE; i++) {
+            if (h[(tj * TILE + j) * GRID + (ti * TILE + i)] <= DRY_H) dry++;
+          }
+        }
+        t[tj * size + ti] = dry / (TILE * TILE);
+      }
+    }
+    return t;
+  };
 
   it('counts only tiles whose centre lies on the cornea', () => {
     // Corner tiles sit outside the cap and must never be counted.
@@ -187,23 +211,74 @@ describe('break-up fraction', () => {
   });
 
   it('is one when every corneal tile has torn', () => {
-    const t = new Float32Array(size * size).fill(-1);
-    expect(breakupFraction(t)).toBe(1);
+    expect(breakupFraction(new Float32Array(size * size).fill(1))).toBe(1);
   });
 
-  it('ignores dry tiles that fall outside the cornea', () => {
+  it('ignores dry area that falls outside the cornea', () => {
     const t = wet();
-    t[0] = -1; // a corner, off the cap
+    t[0] = 1; // a corner, off the cap
     expect(breakupFraction(t)).toBe(0);
   });
 
   it('uses the dry threshold, not the sign of h', () => {
-    const t = wet();
-    const c = (size / 2) * size + size / 2;
-    t[c] = DRY_H + 0.01; // thinning, not yet torn
-    expect(breakupFraction(t)).toBe(0);
-    t[c] = DRY_H - 0.01;
-    expect(breakupFraction(t)).toBeGreaterThan(0);
+    const h = new Float32Array(GRID * GRID).fill(1);
+    const centre = (GRID / 2) * GRID + GRID / 2;
+    h[centre] = DRY_H + 0.01; // thinning, not yet torn
+    expect(breakupFraction(reduce(h))).toBe(0);
+    h[centre] = DRY_H - 0.01;
+    expect(breakupFraction(reduce(h))).toBeGreaterThan(0);
+  });
+
+  /**
+   * **The statistic is an exact area fraction, and that is the point.** The
+   * first draft took `min(h)` per tile, so one patch anywhere in a 12x12 tile
+   * marked all 144 cells dry. Against patches about 12.6 cells across that
+   * saturates to ~1.0 while the cornea is nearer a tenth dry, and shrinking
+   * the tiles saturates it harder. Here a synthetic field with a known dry
+   * area is reduced by the shipped tile arithmetic and has to come back as
+   * that area, to the resolution of a cell.
+   */
+  it('reads back the true dry area of a synthetic field', () => {
+    // Dry every cell whose tangent radius is under r, and count how many of
+    // those fall in tiles the measurement actually looks at, so the expected
+    // value is the same corneal region breakupFraction() averages over.
+    for (const r of [0.1, 0.2, 0.3, CORNEA_L]) {
+      const h = new Float32Array(GRID * GRID).fill(1);
+      let dry = 0;
+      let on = 0;
+      for (let j = 0; j < GRID; j++) {
+        for (let i = 0; i < GRID; i++) {
+          const inTile = tileInsideCornea(
+            Math.floor(i / TILE),
+            Math.floor(j / TILE),
+            size
+          );
+          if (inTile) on++;
+          const x = DOMAIN * ((i + 0.5) / GRID - 0.5);
+          const y = DOMAIN * ((j + 0.5) / GRID - 0.5);
+          if (Math.hypot(x, y) <= r) {
+            h[j * GRID + i] = -1;
+            if (inTile) dry++;
+          }
+        }
+      }
+      // Exact up to storage: both sides are the same count of cells over the
+      // same count of cells, and the only slack is that the tile fractions
+      // arrive in a Float32Array — which is what the readback hands back too.
+      expect(breakupFraction(reduce(h))).toBeCloseTo(dry / on, 8);
+    }
+  });
+
+  it('stays an area mean where a minimum would saturate', () => {
+    // One dry cell per tile: a per-tile minimum reads 1.0, an area mean reads
+    // 1/144. This is the failure the statistic was changed to remove.
+    const h = new Float32Array(GRID * GRID).fill(1);
+    for (let tj = 0; tj < size; tj++) {
+      for (let ti = 0; ti < size; ti++) {
+        h[tj * TILE * GRID + ti * TILE] = -1;
+      }
+    }
+    expect(breakupFraction(reduce(h))).toBeCloseTo(1 / (TILE * TILE), 8);
   });
 
   it('returns zero rather than NaN for a degenerate grid', () => {
@@ -466,13 +541,17 @@ describe('the film clock', () => {
 });
 
 /**
- * Drive the shipped pieces exactly as `simulate()` does — `filmTick` for the
- * clock, `placeholderFraction` for the trigger, `stepBlink` for the lid, with
- * the film time carried one frame the way the animation carries it.
+ * Drive the shipped pieces exactly as `simulate()` does on the **degraded**
+ * path — `filmTick` for the clock, `fallbackFraction` for the trigger,
+ * `stepBlink` for the lid, with the film time carried one frame the way the
+ * animation carries it.
  *
- * This is the instrument for anything that depends on the animation clock
- * advancing. It is deterministic and it does not need a GL context, a paint,
- * or a foreground tab.
+ * The measured path cannot be driven without a GL context, so what these tests
+ * pin is the wiring the two paths share: that the lid runs on the film's clock
+ * and not the wall's, which was a real bug. The measured path's own cadence is
+ * verified against the CPU reference — see `BLINK_FRACTION`.
+ *
+ * Deterministic, and it needs no GL context, no paint and no foreground tab.
  */
 function runBlinks(
   dt: number,
@@ -480,7 +559,7 @@ function runBlinks(
 ): { wall: number; film: number }[] {
   // The harness clamps its own frame time before the animation sees it.
   const clamped = Math.min(0.05, dt);
-  let blink: BlinkState = { ...newBlinkState(), since: PRIME_SECONDS };
+  let blink: BlinkState = newBlinkState();
   let acc = 0;
   let filmDt = 0;
   let film = PRIME_SECONDS;
@@ -488,7 +567,7 @@ function runBlinks(
   const fires: { wall: number; film: number }[] = [];
   for (let k = 0; k < Math.round(seconds / dt); k++) {
     const before = blink;
-    blink = stepBlink(before, filmDt, placeholderFraction(before.since));
+    blink = stepBlink(before, filmDt, fallbackFraction(before.since));
     if (before.phase === 'open' && blink.phase !== 'open') {
       fires.push({ wall, film });
     }
@@ -505,12 +584,31 @@ describe('blink cadence', () => {
   it('lets the primed field be seen before the first sweep', () => {
     // Spec D11: the eye loads mid-cycle with real structure, and a lid that
     // fired on the first frame would wipe that structure away before anyone
-    // saw it. The first blink also has to land while the primed field is still
-    // inside the droplet window — past 3.85s it is a labyrinth.
+    // saw it. `since` starts at REFRACTORY, so the degraded path's first blink
+    // lands FALLBACK_BLINK_SECONDS - REFRACTORY film seconds after load — a
+    // beat of primed field first, and short of a full interval, which is right
+    // for a field that is already PRIME_SECONDS old when it appears.
     const [first] = runBlinks(1 / 60, 60);
     expect(first.film).toBeGreaterThan(PRIME_SECONDS);
-    expect(first.film).toBeLessThan(3.85);
+    expect(first.film - PRIME_SECONDS).toBeCloseTo(
+      FALLBACK_BLINK_SECONDS - REFRACTORY,
+      1
+    );
     expect(first.wall).toBeGreaterThan(0);
+  });
+
+  it('fires while the dry phase is still a minority', () => {
+    // **The constraint the threshold exists to satisfy.** Under nucleation the
+    // film goes isolated droplets -> coarsening -> percolation, and a lid that
+    // fires after percolation holds it there forever, because every cycle
+    // starts from the same wipe. The window is the trace in PRIME_SECONDS'
+    // comment: dry 0.104 at t = 0.85 when it opens, 0.295 at t = 3.85 when the
+    // spots start merging.
+    expect(BLINK_FRACTION).toBeGreaterThan(0.104);
+    expect(BLINK_FRACTION).toBeLessThan(0.295);
+    // And above the dryness the primed field already carries at load, or the
+    // eye is wiped before anyone has seen it.
+    expect(BLINK_FRACTION).toBeGreaterThan(0.194);
   });
 
   it('holds a steady interblink interval at every frame time', () => {
@@ -527,9 +625,9 @@ describe('blink cadence', () => {
         // At worst two of the coarse clock's own frames of overshoot: the
         // threshold can only be crossed on a substep boundary, and the film
         // time reaches the lid a frame late — the same lag the gaze has.
-        expect(gap).toBeGreaterThanOrEqual(PLACEHOLDER_BLINK_SECONDS);
+        expect(gap).toBeGreaterThanOrEqual(FALLBACK_BLINK_SECONDS);
         expect(gap).toBeLessThan(
-          PLACEHOLDER_BLINK_SECONDS + 2 * MAX_SUBSTEPS * STEP
+          FALLBACK_BLINK_SECONDS + 2 * MAX_SUBSTEPS * STEP
         );
       }
     }
@@ -551,11 +649,13 @@ describe('blink cadence', () => {
     for (const dt of [1 / 30, 1 / 15, 1 / 8]) {
       expect(Math.abs(gapOf(dt) - fine)).toBeLessThan(MAX_SUBSTEPS * STEP);
     }
-    // And the first blink lands at the same dryness, to within one frame of
-    // the coarse clock.
+    // And the first blink lands at the same dryness, to within two frames of
+    // the coarse clock: the threshold can only be crossed on a substep
+    // boundary, and the film time reaches the lid a frame late. The bug this
+    // pins moved it by 0.29 — nearly six times this tolerance.
     expect(
       Math.abs(runBlinks(1 / 15, 60)[0].film - runBlinks(1 / 60, 60)[0].film)
-    ).toBeLessThan(MAX_SUBSTEPS * STEP);
+    ).toBeLessThan(2 * MAX_SUBSTEPS * STEP);
   });
 
   it('takes longer in WALL time when the frame time changes, and must', () => {
