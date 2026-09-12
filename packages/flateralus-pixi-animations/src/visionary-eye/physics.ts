@@ -137,58 +137,101 @@ export function patchWavelength(): number {
 }
 
 /**
- * TUNED, but bounded from above. Evaporation, h per second.
+ * TUNED. Evaporation, h per second.
  *
- * EVAP does two jobs and they pull against each other. It sets the blink
- * cadence, since the mean crosses the whole well in 2/EVAP, and it sets the
- * growth budget, since availableEfolds() goes as 1/EVAP — the mean crosses
- * the unstable band at exactly this rate too, and a fast traverse leaves a
- * disturbance no time to grow.
+ * Under nucleation this does a different job than it did under spinodal
+ * decomposition, and a gentler one. It no longer has to carry the mean across
+ * the unstable band — it must NOT, since crossing the spinodal at h = 0.577
+ * decomposes the whole film into a labyrinth (see SPINODAL_ONSET_FRACTION).
+ * Instead it removes the mass that the growing dry spots absorb, so it sets
+ * how fast they spread and therefore the blink cadence.
  *
- * Raising it therefore trades cadence against whether the film tears at all,
- * and the invariant test will say so. At 0.20 the budget is 2.99 e-folds:
- * comfortably above the ~3 needed to grow the seed into patches, and the
- * traverse takes about 10s with break-up at 5.5s, so the blink cycle lands
- * near 6s.
- *
- * Note that EVAP is a *weak* lever on growth — everything else in the budget
- * goes as n^-4 or 1/dt. It could not rescue the film on its own when the
- * budget was 0.27, and it should not be reached for first now. It remains the
- * single named lever for cadence per spec D6, but it also moves
- * PRIME_SECONDS, which has to stay inside the break-up window.
+ * The wet phase stays pinned near +1 while spots can take up the loss, so the
+ * mean falls without the wet film ever approaching the spinodal — measured,
+ * the wet-phase composition sits at 0.68-0.84 for the whole run. Dry area then
+ * grows at about EVAP/2 per second, which puts the 10-30% window at 3.0s
+ * wide. Lower it for a slower cycle; the window scales as 1/EVAP.
  */
-export const EVAP = 0.2;
+export const EVAP = 0.15;
 
 /**
- * Amplitude of the imperfection the fresh film is laid with, by SEED_FRAG and
- * later by the blink splat. **Must agree with the shader** — film.ts
- * interpolates this constant into the GLSL rather than repeating the number,
- * so they cannot drift.
+ * The film tears by NUCLEATION, not by spinodal decomposition.
  *
- * This is a *perturbation*, and it has to stay one. With availableEfolds() at
- * 2.99 the instability amplifies it by ~20x and, more importantly, **selects
- * its own pattern**: measured on the CPU reference, the correlation between
- * the seed field and the broken-up field falls from 0.50 before break-up to
- * 0.00-0.05 after it. The patches are grown, not drawn. A seed large enough
- * to survive into the final pattern would make this decoration wearing a
- * physics-shaped wrapper, which is the one outcome worse than a visible
- * failure, because it looks right and nobody revisits it.
+ * SPINODAL_ONSET_FRACTION proves the spinodal route can only ever produce a
+ * labyrinth. So the film is held in the *metastable* range instead — dry
+ * fraction between 0 and 0.211, where a uniform film is linearly stable — and
+ * break-up is started by localised defects. A defect larger than the critical
+ * nucleus grows; a smaller one heals. That threshold is what makes this a
+ * simulation rather than a painting: **painted spots cannot heal.**
  *
- * 0.06 within a workable range of roughly 0.03-0.09, all of which separate to
- * the full well depth with correlation near zero. The middle is chosen for
- * precision headroom: the field may fall back to RGBA16F, where the quantum
- * near h = 0.5 is about 4.9e-4.
+ * It is also what tear break-up physically is. It nucleates at mucin defects
+ * and lid-wiper irregularities, at sites that repeat within the same eye; it
+ * is not a spontaneous decomposition of the whole sheet.
  *
- * **The seed's spectrum is load-bearing and SEED_FRAG must stay white.** Value
- * noise sits on an axis-aligned lattice at roughly the wavelength the
- * instability selects, so the film amplifies the lattice and tears into
- * grid-aligned lamellae: spectral anisotropy 0.59 against 0.05 for white noise
- * in the same simulation. Raising the amplitude makes it worse, not better —
- * 0.06 white measures 0.05, 0.15 measures 0.40, 0.30 measures 0.20 and
- * plateaus — because a larger seed leaves fewer e-folds of coarsening to
- * relax whatever bias is there. Small and structureless is the requirement.
+ * Measured on the CPU reference: of 49 seeded defects with radii spanning
+ * 1.0-4.5 cells, 23 heal completely within 0.35s and 26 survive and grow.
  */
-export const SEED_AMPLITUDE = 0.06;
+
+/** Nucleation sites across the domain, so SITES^2 defects in total. */
+export const NUCLEUS_SITES = 7;
+
+/**
+ * Defect radius range, in cells. **Must straddle criticalRadiusCells() at the
+ * operating mean**, or the mechanism is not exercised: entirely above it and
+ * every defect survives, which is painting; entirely below and the film never
+ * tears. The test pins this.
+ */
+export const NUCLEUS_R_MIN_CELLS = 1.0;
+export const NUCLEUS_R_MAX_CELLS = 4.5;
+
+/** Defect depth. Full depth of the well, so a defect is a genuine nucleus. */
+export const NUCLEUS_DEPTH = 2.0;
+
+/** DERIVED. Equilibrium interface width, from kappa h'' = f'(h): tanh(x/w). */
+export function interfaceWidth(): number {
+  return Math.sqrt(2 * KAPPA);
+}
+
+/**
+ * DERIVED. Interface energy per unit length, integral of kappa*(dh/dx)^2 over
+ * the tanh profile: (4/3)*kappa/w.
+ */
+export function surfaceTension(): number {
+  return ((4 / 3) * KAPPA) / interfaceWidth();
+}
+
+/**
+ * DERIVED. Critical nucleus radius in tangent units, for a film whose mean is
+ * `h` — the classical 2D result R* = sigma / dOmega.
+ *
+ * dOmega is the grand-potential difference between the film and the droplet
+ * phase at the film's own chemical potential, so the droplet interior is the
+ * *other* root of f'(x) = f'(h) and not simply -1.
+ *
+ * R* diverges at the binodal (h = 1, nothing can nucleate) and collapses
+ * toward the interface width at the spinodal (everything nucleates). The
+ * useful range is where R* is a few cells: h around 0.90-0.95.
+ */
+export function criticalRadius(h: number): number {
+  const mu = h * h * h - h;
+  // f'(x) - mu factors as (x - h)(x^2 + h*x + h^2 - 1); take the lower root.
+  const hd = (-h - Math.sqrt(h * h - 4 * (h * h - 1))) / 2;
+  const f = (x: number) => Math.pow(x * x - 1, 2) / 4;
+  const omega = (x: number) => f(x) - mu * x;
+  return surfaceTension() / (omega(h) - omega(hd));
+}
+
+/** DERIVED. criticalRadius() in cells, which is how the defects are sized. */
+export function criticalRadiusCells(h: number): number {
+  return criticalRadius(h) / DELTA;
+}
+
+/**
+ * The mean the film passes through while the defects are being selected.
+ * criticalRadiusCells() here is 2.9 cells, inside the seeded 1.0-4.5 range,
+ * which is what makes some defects heal and others grow.
+ */
+export const NUCLEATION_MEAN = 0.9;
 
 /**
  * DERIVED, and the hard limit on this whole approach. **Read this before
@@ -287,66 +330,26 @@ export function availableEfolds(): number {
  * TUNED. Seconds of real steps run at build time, so the eye loads mid-cycle
  * rather than as a mirror. Spec D11.
  *
- * **This is the transient-catcher.** availableEfolds() shows the net gain over
- * a full traverse is negative, so there is no steady state worth showing:
- * break-up is a window, and priming is what lands the viewer inside it.
+ * Measured on the CPU reference with the nucleation seed, EVAP = 0.15
+ * (dry fraction, component count, largest component's share of dry area,
+ * circularity against a perfect digital disc at 0.52, spectral anisotropy):
  *
- * Transport is conservative under the Neumann boundary, so the spatial mean
- * obeys d<h>/dt = -EVAP while film remains, and break-up is explosive once it
- * starts. Measured on the CPU reference at SEED_AMPLITUDE = 0.06 white,
- * EVAP = 0.2 (t, mean, spread, fraction below DRY_H, correlation with the
- * seed, and the spectral anisotropy of the pattern):
+ *     t      dry%   comps  largest  circ   aniso
+ *     0.10    8.8     26    0.109   0.592  -0.067   49 seeded, 23 already healed
+ *     0.85   10.4     22    0.111   0.610  -0.037   window opens
+ *     1.60   14.7     21    0.095   0.607  -0.018
+ *     2.40   19.4     20    0.104   0.594   0.000   <- here
+ *     3.10   24.2     20    0.098   0.595   0.006
+ *     3.85   29.5     21    0.102   0.560   0.040   window closes
+ *     5.60   41.2     20    0.137   0.543   0.059
  *
- *     4.50   0.070  0.052   0.0%  corr 0.02  aniso 0.47   still flat
- *     5.00  -0.028  0.708   0.3%  corr 0.00  aniso 0.53   tearing
- *     5.50  -0.113  1.687  35.6%  corr 0.00  aniso 0.20   grid bias relaxing
- *     6.00  -0.174  1.961  51.2%  corr 0.01  aniso 0.05   <- here
- *     6.50  -0.229  1.959  56.1%  corr 0.01  aniso 0.02
- *     7.00  -0.281  1.982  59.8%  corr 0.01  aniso -0.02
+ * The droplet window is **3.0 seconds** and the middle of it is unambiguous,
+ * which is the difference from the spinodal route, where it was 0.15s. 2.4s
+ * sits at the centre with the spots round, isolated and isotropic.
  *
- * **The anisotropy column is why this is 6.0 and not 5.5.** The pattern is
- * laid down grid-biased and then relaxes as it coarsens; priming into the
- * moment of break-up shows the viewer the biased picture. 6.0 is the first
- * sample where the anisotropy is gone, the field is fully separated, and film
- * still remains. If EVAP or SEED_AMPLITUDE moves, re-run the trace and read
- * that column — the outer bounds are tested, but only measurement finds this.
- *
- * ---
- *
- * **KNOWN LIMITATION, and do not "fix" it by moving this constant.**
- *
- * At 6.0 the dry phase has percolated: the field is a connected labyrinth of
- * curving stripes, not isolated dry spots. That is the correct morphology for
- * Cahn-Hilliard at a near-critical 50/50 composition, which is exactly where
- * the mean is by then. Isolated minority droplets need a dry fraction below
- * roughly 0.30, and the field passes through that on its way past:
- *
- *     t      dry%   components  largest/dry  circularity  anisotropy
- *     5.30   10.9       34         0.131        0.474        0.383
- *     5.35   16.9       51         0.095        0.480        0.334
- *     5.40   24.0       52         0.078        0.465        0.284
- *     5.45   30.3       43         0.117        0.410        0.237
- *     5.70   46.7       11         0.449        0.267        0.102
- *     6.00   51.2        4         0.928        0.381        0.054
- *     6.40   55.1        1         1.000        0.012        0.023
- *
- * (circularity 0.52 is a perfect digital disc at this resolution, so 0.47 is
- * round; "largest/dry" near 0 is isolated droplets, 1.0 is one percolating
- * component.)
- *
- * The droplet window is **0.15 seconds wide** — 5.30 to 5.45 — which is too
- * narrow to prime into: half-float timing drift alone would miss it. Worse,
- * the two requirements are disjoint. Isotropy needs coarsening (anisotropy
- * below 0.1 only after t = 5.68); a minority dry phase needs to be early (dry
- * below 30% only before t = 5.45). **There is no time at which this field is
- * both isotropic and droplet-like.** A blink does not resolve it either: it
- * would hold the film in the early, grid-biased part of the range.
- *
- * The fix is a change to spec D2 — an asymmetric double well, whose unstable
- * region sits near the wet state rather than at h = 0 — and it is not made
- * here. See the task 7 report for the derivation.
+ * Priming costs 4080 steps, about 75M fragments once at init.
  */
-export const PRIME_SECONDS = 6.0;
+export const PRIME_SECONDS = 2.4;
 
 /** TUNED. Downward drain, 1.5 cells/s, tuned by eye — not derived. */
 export const GRAVITY = 1.5 * DELTA;

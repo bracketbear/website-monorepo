@@ -12,26 +12,32 @@ import {
   KAPPA,
   MAX_SUBSTEPS,
   MOBILITY,
+  NUCLEATION_MEAN,
+  NUCLEUS_R_MAX_CELLS,
+  NUCLEUS_R_MIN_CELLS,
   OPEN_TIME,
   PRIME_SECONDS,
   REDUCE,
   REFRACTORY,
   SAFETY,
-  SEED_AMPLITUDE,
   SPINODAL_ONSET_FRACTION,
   STEP,
   TRANSIENT_GAIN_C,
   availableEfolds,
   breakupFraction,
   clampMobility,
+  criticalRadius,
+  criticalRadiusCells,
   efoldSeconds,
   gazeFrame,
   isWiping,
   lidCoverage,
   mobilityLimit,
   newBlinkState,
+  interfaceWidth,
   patchWavelength,
   spinodalResidence,
+  surfaceTension,
   stepBlink,
   tileInsideCornea,
   worldToLocal,
@@ -80,52 +86,37 @@ describe('tear film constants', () => {
     expect(MAX_SUBSTEPS * STEP).toBeLessThan(0.05);
   });
 
-  it('grows the seed into patches that read', () => {
-    // Lower bound. 0.5 is the amplitude a patch needs to read against a well
-    // depth of 1.0, and the budget has to be able to get the seed there.
-    // Earlier revisions failed exactly here with a 3% seed against 0.27
-    // e-folds: the disc thinned evenly and never tore. Nothing in the
-    // rendering is wrong when that happens, which is what makes it expensive
-    // to find.
-    expect(SEED_AMPLITUDE * Math.exp(availableEfolds())).toBeGreaterThanOrEqual(
-      0.5
+  it('derives a critical nucleus radius the defects straddle', () => {
+    // R* = sigma/dOmega. It must land INSIDE the seeded radius range, or the
+    // threshold is never exercised: entirely above and every defect heals,
+    // entirely below and every defect survives, which is painting.
+    const rStar = criticalRadiusCells(NUCLEATION_MEAN);
+    expect(rStar).toBeGreaterThan(NUCLEUS_R_MIN_CELLS);
+    expect(rStar).toBeLessThan(NUCLEUS_R_MAX_CELLS);
+    // Measured against the reference: seeded defects below ~3.2 cells healed
+    // completely and those above ~4.1 survived, at a mean where R* = 3.55.
+    expect(criticalRadiusCells(0.92)).toBeCloseTo(3.55, 1);
+    expect(criticalRadiusCells(0.95)).toBeCloseTo(5.4, 1);
+  });
+
+  it('resolves the critical nucleus on the grid', () => {
+    // R* below the interface width is not a nucleus, it is a rounding error,
+    // and the threshold stops being sharp. It diverges at the binodal and
+    // collapses at the spinodal, so the operating mean has to sit between.
+    expect(criticalRadius(NUCLEATION_MEAN)).toBeGreaterThan(interfaceWidth());
+    expect(interfaceWidth()).toBeCloseTo(IFACE_CELLS * DELTA, 12);
+    expect(surfaceTension()).toBeCloseTo(
+      ((4 / 3) * KAPPA) / interfaceWidth(),
+      12
     );
   });
 
-  it('cannot reach the droplet regime with any quartic double well', () => {
-    // The film is already 21% dry before it can begin to tear, so isolated
-    // minority droplets are out of reach and the separated field is always a
-    // labyrinth. The tempting escape — an asymmetric well with the unstable
-    // region near the wet state — provably does not work: for
-    // f'(h) = (h+1)(h-hm)(h-1), substituting u = h - hm/3 gives
-    // f''(u) = 3u^2 - (3m^2+1), a symmetric well in u, so the spinodal and
-    // binodal scale together and their ratio is 1/sqrt(3) for every hm.
-    expect(SPINODAL_ONSET_FRACTION).toBeCloseTo(0.211325, 6);
-    for (const hm of [0, 0.4, 0.55, 0.7, 1.0, 2.0]) {
-      const m = hm / 3;
-      const spinodal = Math.sqrt((3 * m * m + 1) / 3);
-      const binodal = Math.sqrt(3 * m * m + 1);
-      expect(spinodal / binodal).toBeCloseTo(1 / Math.sqrt(3), 12);
-      expect((binodal - spinodal) / (2 * binodal)).toBeCloseTo(
-        SPINODAL_ONSET_FRACTION,
-        12
-      );
-    }
-  });
-
-  it('keeps the seed small enough that the pattern is grown, not drawn', () => {
-    // Upper bound, and the more important half. A seed large enough to be the
-    // final pattern would pass a visual check while being decoration wearing a
-    // physics-shaped wrapper — worse than a visible failure, because it looks
-    // right and nobody revisits it. One revision reached SEED_AMPLITUDE = 0.6
-    // for precisely that reason and had to be rejected on sight.
-    //
-    // So require the instability to supply at least 8x of the final amplitude.
-    // Measured against this: the correlation between the seed field and the
-    // broken-up field falls from 0.50 before break-up to 0.00-0.05 after, so
-    // the patches genuinely do not remember where the seed put them.
-    expect(Math.exp(availableEfolds())).toBeGreaterThanOrEqual(8);
-    expect(SEED_AMPLITUDE).toBeLessThanOrEqual(0.5 / 8);
+  it('holds the film out of the spinodal, where only labyrinths live', () => {
+    // The whole point of nucleation here: stay metastable. If the mean ever
+    // crossed 1/sqrt(3) the sheet would decompose and the morphology would be
+    // the labyrinth that SPINODAL_ONSET_FRACTION documents.
+    expect(NUCLEATION_MEAN).toBeGreaterThan(1 / Math.sqrt(3));
+    expect((1 - NUCLEATION_MEAN) / 2).toBeLessThan(SPINODAL_ONSET_FRACTION);
   });
 
   it('measures the growth budget from the integrated rate, not the residence', () => {
@@ -150,19 +141,15 @@ describe('tear film constants', () => {
     expect(TRANSIENT_GAIN_C).toBeCloseTo(c, 6);
   });
 
-  it('primes into the window where patches exist and film remains', () => {
-    // Transport is conservative, so the spatial mean falls at exactly EVAP
-    // while film remains. Priming past the point where the mean reaches the
-    // dry well hands the viewer a uniformly dry field on the first frame,
-    // which renders as a black disc and reads as a dead shader — the first
-    // failure this task hit.
-    const meanAtSeed = 1 - SEED_AMPLITUDE / 2;
-    expect(PRIME_SECONDS).toBeLessThan((meanAtSeed + 1) / EVAP);
-    // And it must land after the mean has entered the spinodal band, or the
-    // patches have not separated yet and priming has bought nothing.
-    expect(PRIME_SECONDS).toBeGreaterThan(
-      (meanAtSeed - 1 / Math.sqrt(3)) / EVAP
-    );
+  it('primes into the droplet window, not past it', () => {
+    // Dry area grows at about EVAP/2 per second once spots can absorb the
+    // loss, so the 10-30% window is 0.4/EVAP seconds wide and priming must
+    // land inside it. Past it the spots merge and percolate; before it they
+    // have not grown.
+    const windowWidth = 0.4 / EVAP;
+    expect(windowWidth).toBeGreaterThan(2);
+    expect(PRIME_SECONDS).toBeLessThan(windowWidth + 1);
+    expect(PRIME_SECONDS).toBeGreaterThan(0.5);
   });
 
   it('sets kappa from the interface width in cells', () => {

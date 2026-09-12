@@ -1,16 +1,21 @@
 import { VERT } from '../shared/shader-harness';
 import {
   DELTA,
+  DOMAIN,
   EVAP,
   GRAVITY,
   GRID,
   KAPPA,
   MAX_SUBSTEPS,
   MOBILITY,
+  NUCLEUS_DEPTH,
+  NUCLEUS_R_MAX_CELLS,
+  NUCLEUS_R_MIN_CELLS,
+  NUCLEUS_SITES,
   PRIME_SECONDS,
-  SEED_AMPLITUDE,
   STEP,
   clampMobility,
+  interfaceWidth,
 } from './physics';
 
 /**
@@ -134,28 +139,19 @@ const STEP_FRAG =
     }`;
 
 /**
- * A fresh sheet: h = 1 minus per-texel white noise.
+ * A fresh sheet at h = 1, dimpled by a scattering of localised defects.
  *
- * **The spectrum matters more than the amplitude, and it is not a free
- * choice.** This started out as three octaves of value noise, which looked
- * like the obvious "broadband seed" and was anything but. Value noise is
- * built on an axis-aligned lattice, and its energy sits close to the
- * wavelength the instability selects — so the film spent its whole growth
- * budget amplifying that lattice, and broke up into grid-aligned lamellae
- * instead of patches. Measured spectrally, the anisotropy of the broken-up
- * field was 0.59 against 0.05 for the same simulation seeded with white
- * noise. Nothing about the operator or the constants had to change; the seed
- * was telling the film which way to tear.
+ * **This is the nucleation seed, and its whole point is that most of it
+ * disappears.** A defect wider than the critical nucleus grows into a dry
+ * spot; a narrower one heals and leaves no trace. The radii are drawn across
+ * that threshold on purpose — measured, 23 of 49 heal within 0.35s — so the
+ * spots that survive are selected by the physics rather than placed by the
+ * shader. Painted spots cannot heal; that asymmetry is the acceptance test.
  *
- * White noise has no preferred direction and no length scale, so the mode
- * that grows is the one the physics picks. Note it also means only a fraction
- * of `SEED_AMPLITUDE` lands in the band that can actually grow — which is
- * fine, and why the amplitude is unchanged from the value that was tuned for
- * a band-limited seed.
- *
- * The amplitude is interpolated in rather than written as a GLSL literal so
- * the shader and `availableEfolds()` cannot drift apart. `hash21` is inlined;
- * self-contained shader strings are the convention in this package.
+ * A defect is full depth and has the equilibrium tanh profile, so radius is
+ * the only variable that decides its fate. Everything is interpolated from
+ * `physics.ts` rather than written as a GLSL literal, so the shader and
+ * `criticalRadiusCells()` cannot drift apart.
  */
 const SEED_FRAG = `#version 300 es
     precision highp float;
@@ -164,8 +160,24 @@ const SEED_FRAG = `#version 300 es
     uniform vec2 uSeed;
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
     void main() {
-      float n = hash21(gl_FragCoord.xy + uSeed);
-      fragColor = vec4(1.0 - ${SEED_AMPLITUDE.toFixed(3)} * n, 0.0, 0.0, 1.0);
+      const float SITES = ${NUCLEUS_SITES.toFixed(1)};
+      const float UNIT = ${(DOMAIN / NUCLEUS_SITES).toFixed(6)};   // tangent units per site cell
+      const float RMIN = ${(NUCLEUS_R_MIN_CELLS * DELTA).toFixed(6)};
+      const float RMAX = ${(NUCLEUS_R_MAX_CELLS * DELTA).toFixed(6)};
+      const float IFACE = ${interfaceWidth().toFixed(6)};
+      vec2 p = vUV * SITES;
+      vec2 ip = floor(p);
+      float dip = 0.0;
+      for (int j = -1; j <= 1; j++) {
+        for (int i = -1; i <= 1; i++) {
+          vec2 g = ip + vec2(float(i), float(j));
+          vec2 o = vec2(hash21(g + uSeed), hash21(g + uSeed + 7.3));
+          float rad = mix(RMIN, RMAX, hash21(g + uSeed + 13.7));
+          float d = length(p - (g + o)) * UNIT;
+          dip = max(dip, 0.5 * (1.0 - tanh((d - rad) / IFACE)));
+        }
+      }
+      fragColor = vec4(1.0 - ${NUCLEUS_DEPTH.toFixed(1)} * dip, 0.0, 0.0, 1.0);
     }`;
 
 const MU_UNIFORMS = ['uH', 'uTexel', 'uDelta', 'uKappa'] as const;
@@ -481,7 +493,7 @@ export class FilmSim {
    * Stamp a fresh, slightly flawed film and run it forward `PRIME_SECONDS`.
    *
    * Spec D11: the default state must show the best thing, and a flat film is a
-   * mirror. Priming costs ~10200 steps once at init so the eye loads mid-cycle
+   * mirror. Priming costs ~4080 steps once at init so the eye loads mid-cycle
    * with real structure rather than making the viewer wait out a first cycle.
    *
    * The duration is coupled to `EVAP` and lives in `physics.ts` beside it —
