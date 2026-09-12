@@ -1781,3 +1781,115 @@ describe('the headroom the caustic lands in', () => {
     }
   });
 });
+
+/**
+ * Peak `focus` across a tanh front of width `W`, at a coupling small enough
+ * that nothing clips, normalised by that coupling. This is what the **shipped
+ * stencil** reports, not what calculus says — which is the whole point.
+ */
+const peakAcrossFront = (W: number) => {
+  const s = FILM_LENS * 1e-3;
+  let hi = 0;
+  for (let i = -800; i <= 800; i++) {
+    hi = Math.max(
+      hi,
+      irisJacobian(
+        0.2 + (i / 80) * DELTA,
+        0,
+        (x) => Math.tanh((x - 0.2) / W),
+        s
+      ).focus
+    );
+  }
+  return hi / s;
+};
+/** Interface width in tangent units, from a width in microns. */
+const umToUnits = (um: number) => um / 1000 / MM_PER_UNIT;
+const W_SIM = IFACE_CELLS * DELTA;
+
+describe('why the shortfall is not a grid artifact', () => {
+  it('reads curvature as 1/W^2 only while the stencil can see the interface', () => {
+    // The naive argument for a sub-grid correction is that curvature goes as
+    // 1/W^2, so a grid that smears the interface under-reports by (Wsim/Wr)^2.
+    // That is true, and it stops being true at exactly the width where the
+    // correction would start to matter.
+    const expo = (a: number, b: number) =>
+      Math.log(peakAcrossFront(b * DELTA) / peakAcrossFront(a * DELTA)) /
+      Math.log(b / a);
+    // Comfortably resolved: the algebra is exact.
+    expect(expo(8, 4)).toBeLessThan(-1.9);
+    expect(expo(4, 3)).toBeLessThan(-1.9);
+    // At this film's own interface it has already started to roll off.
+    expect(expo(2, 1.5)).toBeGreaterThan(-1.9);
+    // Below one cell — where every defensible W_real lives — it is gone.
+    expect(expo(0.5, 0.35)).toBeGreaterThan(-1.0);
+    expect(expo(0.35, 0.25)).toBeGreaterThan(-0.6);
+  });
+
+  it('saturates, so a sub-grid multiplier past a cell is a gain not a correction', () => {
+    // The difference baseline is one cell. Sharpen the interface past that and
+    // the measured response stops moving, however much sharper it gets.
+    const base = peakAcrossFront(W_SIM);
+    const at = (um: number) => peakAcrossFront(umToUnits(um)) / base;
+    const naive = (um: number) => Math.pow(W_SIM / umToUnits(um), 2);
+    // A ceiling, not a ramp: 30um and 10um differ by 9x in the algebra and by
+    // almost nothing in the pipeline.
+    expect(at(10) / at(30)).toBeLessThan(1.1);
+    expect(at(10)).toBeLessThan(7);
+    // And the algebra over-states by more and more, without bound.
+    expect(naive(50) / at(50)).toBeGreaterThan(2);
+    expect(naive(20) / at(20)).toBeGreaterThan(10);
+    expect(naive(10) / at(10)).toBeGreaterThan(40);
+    // The grid cannot store a 50um interface either: it is under half a cell.
+    expect(umToUnits(50) / DELTA).toBeLessThan(0.5);
+  });
+
+  it('lets the pupil cap any multiplier below what a sharper interface would want', () => {
+    // One coupling drives the displacement and the curvature together, so the
+    // correction has to pass the same pupil test FILM_LENS exists to pass.
+    const steepest = 1 / W_SIM;
+    const throwFrac = (mult: number) =>
+      Math.abs(
+        irisPoint(0.05, 0, FILM_LENS * mult * steepest, 0)[0] -
+          irisPoint(0.05, 0, 0, 0)[0]
+      ) / pupilRadius(0);
+    expect(throwFrac(1)).toBeLessThan(0.01);
+    // What the naive correction would cost at the two ends of the defensible
+    // range for a dewetting rim. The second is the original bug, restored.
+    expect(throwFrac(15.1)).toBeGreaterThan(0.14);
+    expect(throwFrac(41.8)).toBeGreaterThan(0.39);
+    // Largest multiplier that keeps the throw a modulation rather than a smear.
+    let cap = 1;
+    while (throwFrac(cap * 1.001) < 0.05) cap *= 1.001;
+    expect(cap).toBeGreaterThan(5);
+    expect(cap).toBeLessThan(5.5);
+  });
+
+  it('draws the filigree ahead of the rim, which is the part that is right', () => {
+    // Morphology is not what the honest coupling costs. On a real front the
+    // bright line leads on the wet side and the dark companion trails on the
+    // dry side, a cell out either way — the shape the spec asked for.
+    const front = (x: number) => Math.tanh((x - 0.2) / W_SIM);
+    let hi = 0;
+    let hiAt = 0;
+    let lo = 0;
+    let loAt = 0;
+    for (let i = -800; i <= 800; i++) {
+      const x = 0.2 + (i / 80) * DELTA;
+      const f = irisJacobian(x, 0, front).focus;
+      if (f > hi) {
+        hi = f;
+        hiAt = x;
+      }
+      if (f < lo) {
+        lo = f;
+        loAt = x;
+      }
+    }
+    expect((hiAt - 0.2) / DELTA).toBeGreaterThan(0.8); // wet side
+    expect((hiAt - 0.2) / DELTA).toBeLessThan(1.5);
+    expect((loAt - 0.2) / DELTA).toBeLessThan(-0.8); // dry side
+    expect((loAt - 0.2) / DELTA).toBeGreaterThan(-1.5);
+    expect(hi).toBeGreaterThan(-lo); // the crest gathers more than the slope loses
+  });
+});

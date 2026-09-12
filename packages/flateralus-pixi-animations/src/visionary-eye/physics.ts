@@ -593,7 +593,40 @@ export const FILM_LENS = TEAR_FILM_MM / 2 / MM_PER_UNIT;
  * not a disappointment.** A tear film is a very weak lens over 3.6mm. It is
  * also why the visible signature of a breaking film is in the *specular* —
  * which is a first-order effect on a normal — and not in caustics on the iris,
- * which is what photographs of real eyes show.
+ * which is what photographs of real eyes show. Clinical tear break-up time is
+ * read off a specular reflection at a slit lamp for exactly this reason.
+ *
+ * **A sub-grid correction was considered for the shortfall and rejected.** The
+ * argument for one is real: curvature goes as `thickness / W^2`, this grid
+ * resolves the interface at 194 microns, and a dewetting rim in a 3.5 micron
+ * film is nearer 10-50. Scaling the coupling by `(W_sim / W_real)^2` is the
+ * textbook move. Measured, it does not work here, and the tests below pin
+ * each reason:
+ *
+ *   - **`1/W^2` holds only while the stencil can see the interface.** Measured
+ *     exponent: -1.97 at W >= 4 cells, -1.80 at the 1.5 this film has, -1.07
+ *     at half a cell, -0.34 at a quarter. The difference baseline is one cell,
+ *     so below that the measured curvature saturates — at 6.7x the current
+ *     peak, *no matter how sharp the interface gets*. The algebra says 15x at
+ *     50 microns and the pipeline delivers 5.4x; it says 377x at 10 microns
+ *     and the pipeline still delivers 6.7x. Past about one cell the multiplier
+ *     is not recovering structure the grid is hiding. It is a gain.
+ *   - **The pupil forbids it in any case.** One coupling drives displacement
+ *     and curvature together, so a 15x throws the iris lookup 14.6% of a pupil
+ *     radius and a 42x throws it 40% — which is the bug this constant's
+ *     neighbour `FILM_LENS` exists to describe. The pupil caps any multiplier
+ *     at 5.2x.
+ *   - **`W_sim` is not blur, it is this film's interface.** `IFACE_CELLS *
+ *     DELTA` sets `KAPPA`, hence `surfaceTension()`, hence `criticalRadius()`,
+ *     hence the droplet window and the blink cadence. Correcting the optics to
+ *     a 50 micron film while the dynamics integrate a 194 micron one is the
+ *     same two-films-in-one-shader error as using a bump amplitude for a
+ *     displacement, one layer up.
+ *
+ * What the honest value does deliver is the right *shape*: measured on a real
+ * front, the bright line sits 1.11 cells to the wet side and the dark
+ * companion 1.11 cells to the dry side, so the filigree leads the rim exactly
+ * as the spec wanted. Only the amplitude is under the grain.
  */
 export const CAUSTIC_MAX =
   1 +
