@@ -8,6 +8,12 @@
  * Units: the film lives in corneal-local tangent coordinates, where the eye's
  * surface normal projects to (lx, ly). One tangent unit is about 10.35mm —
  * the cornea's 5.85mm half-chord subtends sin(0.6 rad) = 0.565 units.
+ *
+ * DERIVED vs TUNED: constants marked DERIVED follow from the stability
+ * analysis or the corneal geometry — they are not free to move without
+ * redoing that math. Constants marked TUNED were picked by eye against the
+ * Lab and can be freely re-tuned; nothing else in this file depends on their
+ * exact values the way it depends on the derived ones.
  */
 
 /** Tangent-space domain: (lx, ly) in [-0.6, 0.6]. */
@@ -16,7 +22,7 @@ export const DOMAIN = 1.2;
 /** Field resolution. Grid size buys patch count; it does NOT buy break-up speed. */
 export const GRID = 128;
 
-/** Tangent units per cell. */
+/** DERIVED. Tangent units per cell. */
 export const DELTA = DOMAIN / GRID;
 
 /** Millimetres per tangent unit: 5.85mm cornea half-chord at sin(0.6). */
@@ -29,17 +35,25 @@ export const MM_PER_UNIT = 5.85 / Math.sin(0.6);
  */
 export const IFACE_CELLS = 2;
 
-/** Gradient-energy coefficient. Interface half-width sqrt(2*kappa) = n cells. */
+/** DERIVED. Gradient-energy coefficient. Interface half-width sqrt(2*kappa) = n cells. */
 export const KAPPA = Math.pow(IFACE_CELLS * DELTA, 2) / 2;
 
 /** Fixed simulation step. Spec D3: derived with GRID and IFACE_CELLS, not chosen. */
 export const STEP = 1 / 480;
 
-/** Fraction of the stability limit the mobility is allowed to use. */
+/**
+ * TUNED. Fraction of the stability limit the mobility is allowed to use.
+ *
+ * Not 1.0: the field is stored at half-float precision in the worst case,
+ * and rounding in h must not be able to push the effective mobility over
+ * the limit mid-run. 0.6 leaves enough headroom below the hard limit that
+ * rounding can't tip it over.
+ */
 export const SAFETY = 0.6;
 
 /**
- * Explicit-Euler stability limit for the biharmonic term -M*kappa*grad^4.
+ * DERIVED. Explicit-Euler stability limit for the biharmonic term
+ * -M*kappa*grad^4.
  *
  * The 5-point Laplacian has eigenvalues in [-8/d^2, 0], so grad^4 = (grad^2)^2
  * reaches 64/d^4. The amplification factor 1 - dt*M*kappa*lambda stays inside
@@ -52,6 +66,7 @@ export function mobilityLimit(): number {
   return Math.pow(DELTA, 4) / (32 * STEP * KAPPA);
 }
 
+/** DERIVED. SAFETY held below mobilityLimit(); see both for the reasoning. */
 export const MOBILITY = SAFETY * mobilityLimit();
 
 export function clampMobility(m: number): number {
@@ -60,7 +75,7 @@ export function clampMobility(m: number): number {
 }
 
 /**
- * e-fold time of the spinodal instability, in seconds.
+ * DERIVED. e-fold time of the spinodal instability, in seconds.
  *
  * sigma_max = M/(4*kappa) at f'' = -1, and with M = s*M_limit this collapses
  * to 32*dt*n^4/s — independent of grid size. Refining the grid to make
@@ -70,24 +85,35 @@ export function efoldSeconds(): number {
   return (32 * STEP * Math.pow(IFACE_CELLS, 4)) / SAFETY;
 }
 
-/** Fastest-growing wavelength, 2*pi*sqrt(2*kappa), in tangent units. */
+/** DERIVED. Fastest-growing wavelength, 2*pi*sqrt(2*kappa), in tangent units. */
 export function patchWavelength(): number {
   return 2 * Math.PI * Math.sqrt(2 * KAPPA);
 }
 
-/** Evaporation, h per second. Time to reach the spinodal from a fresh film is 1/EVAP. */
+/**
+ * TUNED. Evaporation, h per second, chosen for the resulting blink cadence.
+ *
+ * Time to reach the spinodal from a fresh film is 1/EVAP = 2s. Against the
+ * 1.78s e-fold (efoldSeconds()) and the ~3.5 e-folds needed to grow a 3%
+ * seed to O(1) (~6.2s), that composes to a blink cycle near 7s.
+ *
+ * This is the single named lever for blink cadence. Spec D6 forbids adding
+ * an interval floor or ceiling to the blink state machine, so if the
+ * cadence ever needs to change, move EVAP and only EVAP — nothing else in
+ * this file is meant to absorb that adjustment.
+ */
 export const EVAP = 0.5;
 
-/** Downward drain, tangent units per second. 1.5 cells/s. */
+/** TUNED. Downward drain, 1.5 cells/s, tuned by eye — not derived. */
 export const GRAVITY = 1.5 * DELTA;
 
 /** Corneal cap half-angle. The existing limbus sits at ang = 0.56. */
 export const CORNEA_ANG = 0.6;
 
-/** Tangent radius of the cap. */
+/** DERIVED. Tangent radius of the cap. */
 export const CORNEA_L = Math.sin(CORNEA_ANG);
 
-/** Iris plane depth behind the corneal apex: 3.6mm in tangent units. */
+/** DERIVED. Iris plane depth behind the corneal apex: 3.6mm in tangent units. */
 export const IRIS_DEPTH = 3.6 / MM_PER_UNIT;
 
 /** Reduction target edge. 64 texels is one small readback instead of 128KB. */
@@ -130,13 +156,21 @@ export function breakupFraction(
   return on === 0 ? 0 : dry / on;
 }
 
-/** Corneal break-up share that triggers a blink. */
+/** TUNED. Corneal break-up share that triggers a blink, picked by eye. */
 export const BLINK_FRACTION = 0.35;
 
-/** Minimum seconds between blinks, so a measurement at the threshold cannot chatter. */
+/**
+ * TUNED. Minimum seconds between blinks, picked by eye.
+ *
+ * Exists so a measurement sitting on BLINK_FRACTION cannot itself produce a
+ * chattering lid — it is a debounce on the trigger, not a cadence control.
+ */
 export const REFRACTORY = 1.5;
 
-/** Lid travel. Real blinks close faster than they open. */
+/**
+ * TUNED. Lid travel, in seconds. Physiological, not derived: real blinks
+ * close in roughly 100ms and take roughly 150-200ms to come back up.
+ */
 export const CLOSE_TIME = 0.1;
 export const OPEN_TIME = 0.18;
 
