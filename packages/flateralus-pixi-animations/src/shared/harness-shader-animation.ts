@@ -70,6 +70,25 @@ export abstract class HarnessShaderAnimation<
     app: PIXI.Application
   ): void;
 
+  /**
+   * Run simulation passes before the display program is bound.
+   *
+   * Called after the canvas has been sized and before the base binds the
+   * display program and viewport, so the base's own `gl.viewport` and
+   * `gl.useProgram` restore the state an implementation leaves behind — there
+   * is no save/restore dance to get wrong.
+   *
+   * Texture units are free. `createShaderContext` binds the mask to unit 0
+   * once at creation and never re-binds, so the base re-binds it below rather
+   * than asking every implementation to remember that unit 0 is spoken for.
+   */
+  protected simulate(
+    _gl: WebGL2RenderingContext,
+    _ctx: ShaderContext,
+    _controls: TControlValues,
+    _dt: number
+  ): void {}
+
   protected ctx: ShaderContext | null = null;
   protected time = 0;
   /** Set once the context cannot be built, so we stop retrying every frame. */
@@ -129,6 +148,8 @@ export abstract class HarnessShaderAnimation<
     this.sprite.width = sw;
     this.sprite.height = sh;
 
+    this.simulate(ctx.gl, ctx, controls, dt);
+
     const { gl, locs } = ctx;
     gl.viewport(0, 0, W, H);
     gl.useProgram(ctx.program);
@@ -157,6 +178,13 @@ export abstract class HarnessShaderAnimation<
     if (locs.uDeep) setColor(gl, locs.uDeep, PAL.deep);
 
     this.setUniforms(gl, locs, ctx, controls, dt, app);
+
+    // Unit 0 is the mask, bound once at context creation. A simulate() pass
+    // may have left something else there.
+    if (ctx.texture) {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, ctx.texture);
+    }
 
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     this.texture?.source.update();
