@@ -92,6 +92,19 @@ export type VisionaryEyeControlValues = ManifestToControlValues<
   typeof MANIFEST
 >;
 
+/**
+ * TEMPORARY (Task 9 deletes this with the placeholder that uses it): film
+ * seconds between blinks.
+ *
+ * Film seconds, not wall seconds — see `simulate()`. Short on purpose: the
+ * trace in `physics.ts` puts a real 35%-dry crossing at about 4.6s of film
+ * time, but this exists only so the lid can be watched before the measurement
+ * lands, and on a machine where the field ages at a fifth of real time a 4.6s
+ * cadence is most of a minute between sweeps. 3.0 still leaves the primed
+ * field on screen for a moment before the first sweep, which spec D11 wants.
+ */
+const PLACEHOLDER_BLINK_SECONDS = 3.0;
+
 const FRAG =
   SDF_PRE +
   SHARED_EYE +
@@ -150,6 +163,17 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
   private lidPrev = 0;
   /** Defect layout the current blink will lay down. New every blink. */
   private lidSeed = 0;
+  /**
+   * Film seconds integrated on the previous frame, and the running total.
+   *
+   * The blink runs on this clock and not on `dt`. Below about 40fps the film
+   * ages slower than the wall — `FilmSim.advance` caps the backlog — so a
+   * blink driven by `dt` drifts away from the dryness it is standing in for,
+   * by a factor that changes with the frame rate. One frame of lag, the same
+   * as the gaze already has.
+   */
+  private filmDt = 0;
+  private filmTime = 0;
 
   constructor(initialControls?: Partial<VisionaryEyeControlValues>) {
     super(MANIFEST, initialControls);
@@ -176,6 +200,8 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     this.blink = { ...newBlinkState(), since: PRIME_SECONDS };
     this.lidPrev = 0;
     this.lidSeed = Math.random() * 1000;
+    this.filmDt = 0;
+    this.filmTime = 0;
   }
 
   /**
@@ -195,6 +221,11 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
    *
    * The wipe goes in before `advance()` so the fresh sheet is what the next
    * mu pass derives its chemical potential from.
+   *
+   * The blink is stepped on the **film's** clock — the seconds `advance()`
+   * reports having integrated — and not on `dt`. Below about 40fps those two
+   * diverge, and a lid driven by the wall clock fires at a dryness that
+   * depends on the frame rate.
    */
   protected simulate(
     gl: WebGL2RenderingContext,
@@ -208,6 +239,11 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
       this.film = FilmSim.create(gl);
       // Spec D11: load mid-cycle with real structure, not as a flat mirror.
       this.film?.prime(Math.random() * 1000);
+      this.filmTime = PRIME_SECONDS;
+      // TEMPORARY (Task 8 verification) — remove before this task is reviewed.
+      console.log(
+        `[blink] armed film=${!!this.film} reduced=${this.reducedMotion} trigger=${PLACEHOLDER_BLINK_SECONDS}s(film)`
+      );
       return;
     }
     // Reduced motion keeps the primed field but stops it evolving, the same
@@ -216,18 +252,30 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     if (this.reducedMotion) return;
 
     // TEMPORARY: Task 9 replaces this with the break-up fraction measured off
-    // the field by the reduction pass. A linear ramp in seconds since the last
-    // blink, scaled so it crosses BLINK_FRACTION at about 4.6s — where the
-    // primed trace in physics.ts actually reaches 35% dry — so the cadence the
-    // Lab shows now is roughly the cadence the measurement will produce.
-    const fraction = Math.min(1, this.blink.since * (BLINK_FRACTION / 4.6));
+    // the field by the reduction pass. A linear ramp in film seconds since the
+    // last blink, crossing BLINK_FRACTION at PLACEHOLDER_BLINK_SECONDS.
+    const fraction = Math.min(
+      1,
+      this.blink.since * (BLINK_FRACTION / PLACEHOLDER_BLINK_SECONDS)
+    );
 
+    // **On the film's clock, not the wall's.** What Task 9 measures is a
+    // property of the field, so its stand-in has to age with the field. The
+    // harness clamps dt to 0.05s and `advance` caps the backlog at 0.025s, so
+    // the two clocks run at different fractions of real time the moment the
+    // frame rate drops: at 8fps the wall clock reaches this threshold in 5.6s
+    // and the field is only 1.2s older than it was at load. Driving the blink
+    // off dt is what made it look like the lid was never firing at all.
     const before = this.blink;
-    this.blink = stepBlink(before, dt, fraction);
+    this.blink = stepBlink(before, this.filmDt, fraction);
     if (before.phase === 'open' && this.blink.phase !== 'open') {
       // A new layout for every blink. Without this the same patches would come
       // back in the same places and the eye would read as a loop.
       this.lidSeed = Math.random() * 1000;
+      // TEMPORARY (Task 8 verification) — remove before this task is reviewed.
+      console.log(
+        `[blink] fired wall=${this.time.toFixed(2)}s film=${this.filmTime.toFixed(2)}s since=${before.since.toFixed(2)} fraction=${fraction.toFixed(3)} phase=${this.blink.phase}`
+      );
     }
     const coverage = lidCoverage(this.blink);
     if (isWiping(this.blink) || isWiping(before)) {
@@ -238,10 +286,11 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     }
     this.lidPrev = coverage;
 
-    this.film.advance(
+    this.filmDt = this.film.advance(
       dt,
       worldToLocal(0, 1, this.gazeView[0], this.gazeView[1])
     );
+    this.filmTime += this.filmDt;
   }
 
   protected setUniforms(

@@ -514,19 +514,30 @@ export class FilmSim {
    * `gravityLocal` is world down already projected onto the corneal tangent
    * basis — `worldToLocal(0, 1, gazeX, gazeY)`. A world vector must never
    * reach here or the film drains sideways as the eye looks around.
+   *
+   * **Returns the seconds of film time actually integrated, which is not
+   * `dt`.** The backlog is capped at `MAX_SUBSTEPS * STEP` = 0.025s, so below
+   * about 40fps the field ages slower than the wall does — at 8fps it ages at
+   * a fifth of real time. Anything that has to stay in step with the film's
+   * *state* rather than with the clock on the wall has to run on this number:
+   * drive a blink off `dt` instead and its cadence silently becomes a function
+   * of the frame rate.
    */
-  advance(dt: number, gravityLocal: [number, number]): void {
+  advance(dt: number, gravityLocal: [number, number]): number {
     const gl = this.gl;
     // Cap the backlog so a slow frame degrades instead of spiralling; the
     // ceiling is derived from the step rate, not a literal.
     this.acc = Math.min(this.acc + dt, MAX_SUBSTEPS * STEP);
-    if (this.acc < STEP) return;
+    if (this.acc < STEP) return 0;
+    let ran = 0;
     while (this.acc >= STEP) {
       this.acc -= STEP;
+      ran += STEP;
       this.pass(this.muProg, this.muL, gravityLocal);
       this.pass(this.stepProg, this.stepL, gravityLocal);
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    return ran;
   }
 
   /**
