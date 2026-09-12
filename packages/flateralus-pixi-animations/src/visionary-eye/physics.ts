@@ -191,6 +191,40 @@ export const EVAP = 0.2;
 export const SEED_AMPLITUDE = 0.06;
 
 /**
+ * DERIVED, and the hard limit on this whole approach. **Read this before
+ * proposing a different double well.**
+ *
+ * The dry area fraction the film already has by the time it first becomes
+ * spinodally unstable. Isolated round droplets need a minority phase below
+ * roughly 0.30; this says the film cannot even begin to tear until it is
+ * 0.211 dry, and separation then takes seconds more, during which the fraction
+ * climbs past 0.45. That is why the field is a labyrinth by the time it has
+ * separated, and no tuning reaches the droplet regime.
+ *
+ * **Asymmetry cannot move it.** The obvious escape is a well whose unstable
+ * region sits near the wet state — f'(h) = (h+1)(h-hm)(h-1) with hm > 0. But
+ * substituting u = h - hm/3 gives f''(u) = 3u^2 - (3*(hm/3)^2 + 1), which is
+ * a *symmetric* double well in u. So:
+ *
+ *     spinodal at  u = +/- sqrt((3m^2+1)/3),  binodal at  u = +/- sqrt(3m^2+1)
+ *     ratio = 1/sqrt(3) exactly, for every hm
+ *
+ * and the lever rule at the upper spinodal gives (1 - 1/sqrt(3))/2 — the same
+ * number for hm = 0 and hm = 2 alike. Every quartic double well is the
+ * symmetric one under an affine change of variable; asymmetry relocates the
+ * physics on the h axis and rescales it, and changes nothing about the
+ * relationship between "separated" and "what volume fraction". Verified
+ * numerically across hm in [0, 2] and by simulation at hm = 0.4, 0.55, 0.7.
+ *
+ * Escaping this needs a different mechanism, not a different well:
+ * nucleation in the metastable region (0 < fraction < 0.211), where the
+ * uniform film is linearly stable but finite-amplitude defects grow into
+ * isolated dry spots — which is what tear break-up physically is — or a
+ * thin-film disjoining pressure, which is not a double well at all.
+ */
+export const SPINODAL_ONSET_FRACTION = (1 - 1 / Math.sqrt(3)) / 2;
+
+/**
  * DERIVED. Seconds the mean spends inside the spinodal band, where f''(h) < 0
  * and patches can grow at all. The band is |h| < 1/sqrt(3) and the mean
  * crosses it at rate EVAP.

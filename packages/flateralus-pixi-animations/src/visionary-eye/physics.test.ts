@@ -18,6 +18,7 @@ import {
   REFRACTORY,
   SAFETY,
   SEED_AMPLITUDE,
+  SPINODAL_ONSET_FRACTION,
   STEP,
   TRANSIENT_GAIN_C,
   availableEfolds,
@@ -89,6 +90,27 @@ describe('tear film constants', () => {
     expect(SEED_AMPLITUDE * Math.exp(availableEfolds())).toBeGreaterThanOrEqual(
       0.5
     );
+  });
+
+  it('cannot reach the droplet regime with any quartic double well', () => {
+    // The film is already 21% dry before it can begin to tear, so isolated
+    // minority droplets are out of reach and the separated field is always a
+    // labyrinth. The tempting escape — an asymmetric well with the unstable
+    // region near the wet state — provably does not work: for
+    // f'(h) = (h+1)(h-hm)(h-1), substituting u = h - hm/3 gives
+    // f''(u) = 3u^2 - (3m^2+1), a symmetric well in u, so the spinodal and
+    // binodal scale together and their ratio is 1/sqrt(3) for every hm.
+    expect(SPINODAL_ONSET_FRACTION).toBeCloseTo(0.211325, 6);
+    for (const hm of [0, 0.4, 0.55, 0.7, 1.0, 2.0]) {
+      const m = hm / 3;
+      const spinodal = Math.sqrt((3 * m * m + 1) / 3);
+      const binodal = Math.sqrt(3 * m * m + 1);
+      expect(spinodal / binodal).toBeCloseTo(1 / Math.sqrt(3), 12);
+      expect((binodal - spinodal) / (2 * binodal)).toBeCloseTo(
+        SPINODAL_ONSET_FRACTION,
+        12
+      );
+    }
   });
 
   it('keeps the seed small enough that the pattern is grown, not drawn', () => {
