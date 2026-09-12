@@ -9,6 +9,7 @@ import {
   SHARED_EYE,
   sdfMask,
 } from '../shared/sdf-harness';
+import { EYE_GLOBE } from './eye';
 
 const MANIFEST = createManifest({
   id: 'visionary-eye',
@@ -73,6 +74,7 @@ export type VisionaryEyeControlValues = ManifestToControlValues<
 const FRAG =
   SDF_PRE +
   SHARED_EYE +
+  EYE_GLOBE +
   `
       uniform float uSpeed;
       uniform float uScale;
