@@ -10,6 +10,8 @@ import {
   sdfMask,
 } from '../shared/sdf-harness';
 import { EYE_GLOBE } from './eye';
+import { FILM_TEXTURE_UNIT, FilmSim } from './film';
+import { DELTA, GRID, worldToLocal } from './physics';
 
 const MANIFEST = createManifest({
   id: 'visionary-eye',
@@ -64,6 +66,13 @@ const MANIFEST = createManifest({
       defaultValue: true,
       debug: true,
     },
+    {
+      name: 'showFilm',
+      type: 'boolean',
+      label: 'Show Film',
+      defaultValue: false,
+      debug: true,
+    },
   ],
 } as const);
 
@@ -97,11 +106,20 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     'uScale',
     'uPupil',
     'uBump',
+    'uFilm',
+    'uFilmN',
+    'uDelta',
+    'uShowFilm',
+    'uFilmOK',
   ] as const;
   protected readonly commonUniforms = SDF_COMMON_UNIFORMS;
 
   /** Honours the OS reduced-motion setting by freezing the flow. */
   private reducedMotion = false;
+  /** The tear film field. Null where the float render target is unavailable. */
+  private film: FilmSim | null = null;
+  /** Set once FilmSim.create has been tried, so a failure is not retried. */
+  private filmTried = false;
   /** Smoothed gaze, and the target it is chasing. */
   private gaze: [number, number] = [0, 0];
   private gazeTarget: [number, number] = [0, 0];
@@ -127,6 +145,36 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     this.nextSaccade = 0;
     this.pupil = 0.15;
     this.pupilPulse = 0;
+  }
+
+  /**
+   * Build the film on first frame and advance it.
+   *
+   * Runs before the display program is bound, so the base's own viewport and
+   * useProgram restore the state the sim passes leave behind. Gravity is
+   * handed over already projected onto the corneal tangent basis — a world
+   * vector must never reach the field or it drains sideways as the eye looks
+   * around. The gaze it uses is last frame's, which is one frame of lag on a
+   * direction that turns over hundreds of milliseconds.
+   */
+  protected simulate(
+    gl: WebGL2RenderingContext,
+    _ctx: ShaderContext,
+    _controls: VisionaryEyeControlValues,
+    dt: number
+  ): void {
+    if (!this.film) {
+      if (this.filmTried) return;
+      this.filmTried = true;
+      this.film = FilmSim.create(gl);
+      // Spec D11: load mid-cycle with real structure, not as a flat mirror.
+      this.film?.prime(Math.random() * 1000);
+      return;
+    }
+    // Reduced motion keeps the primed field but stops it evolving, the same
+    // way the flow time is pinned below.
+    if (this.reducedMotion) return;
+    this.film.advance(dt, worldToLocal(0, 1, this.gaze[0], this.gaze[1]));
   }
 
   protected setUniforms(
@@ -184,6 +232,25 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
         : Math.max(0, this.pupil + this.pupilPulse + hippus)
     );
     gl.uniform1f(locs.uBump!, controls.bump);
+
+    // The film. Bound here rather than in simulate() because the display
+    // program is only current from this point on.
+    gl.uniform1f(locs.uFilmN!, GRID);
+    gl.uniform1f(locs.uDelta!, DELTA);
+    gl.uniform1f(locs.uShowFilm!, controls.showFilm ? 1 : 0);
+    gl.uniform1f(locs.uFilmOK!, this.film?.ok ? 1 : 0);
+    if (this.film) {
+      this.film.bindField(FILM_TEXTURE_UNIT);
+      gl.uniform1i(locs.uFilm!, FILM_TEXTURE_UNIT);
+    }
+  }
+
+  onDestroy(): void {
+    // Before super, which loses the context these objects live in.
+    this.film?.destroy();
+    this.film = null;
+    this.filmTried = false;
+    super.onDestroy();
   }
 }
 

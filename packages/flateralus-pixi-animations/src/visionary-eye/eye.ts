@@ -7,6 +7,14 @@
  * and visionary().
  */
 export const EYE_GLOBE = `
+      // The tear film, in corneal-local tangent coordinates. uFilmOK is 0
+      // whenever the simulation could not be built, so every consumer of the
+      // field has one place to fall back from.
+      uniform sampler2D uFilm;
+      uniform float uFilmN;
+      uniform float uDelta;
+      uniform float uShowFilm;
+      uniform float uFilmOK;
       float energyH(float lx, float ly, float ang, float t) {
         vec2 dir = vec2(lx, ly) / max(sin(ang), 1e-3);
         float f = fbm(dir * 2.6 + vec2(0.0, ang * 7.0 - t * 0.2) + fbm(vec2(ang * 5.0, t * 0.15)) * 2.0);
@@ -22,6 +30,19 @@ export const EYE_GLOBE = `
         vec2 gz = uGaze + vec2(vnoise(vec2(t * 3.5, 1.0)) - 0.5, vnoise(vec2(4.0, t * 3.5)) - 0.5) * 0.025;
         gz = clamp(gz, -0.8, 0.8);
         vec3 gd = normalize(vec3(gz * 0.8, 1.0));
+        // Debug view: the film height straight onto the cornea, h = -1 black
+        // through h = +1 white. This is the verification instrument for the
+        // simulation tasks, so it stays in the shipped shader behind a debug
+        // control rather than living in a branch.
+        if (uShowFilm > 0.5 && uFilmOK > 0.5 && r < R) {
+          float nz = sqrt(max(R * R - r * r, 0.0));
+          vec3 n = vec3(q, nz) / R;
+          vec3 tx = normalize(cross(vec3(0.0, 1.0, 0.0), gd));
+          vec3 ty = cross(gd, tx);
+          vec2 l = vec2(dot(n, tx), dot(n, ty));
+          float h = texture(uFilm, l / 1.2 + 0.5).x;
+          return vec3(0.5 + 0.5 * h);
+        }
         vec3 col = IND * (0.55 + 0.45 * fbm(q * 2.2 + t * 0.05));
         float a = atan(q.y, q.x);
         float fil = fbm(vec2(a * 5.0, r * 6.0 - t * 0.45));
