@@ -1316,6 +1316,43 @@ export const AURORA_SEED_ANG0 = 0.38;
 export const AURORA_SEED_TAPS = 5;
 
 /**
+ * DERIVED. The annulus over which the film stops being **shown**.
+ *
+ * **This is a display bound, not a simulation bound, and it is a second one.**
+ * `FILM_REACH` says where the field may be *read* without sampling a clamped
+ * texel; this says where it may be *seen*. The simulation is untouched: the
+ * sheet still covers the whole square, still tears, and still fires the blink
+ * on the same measurement.
+ *
+ * The reason is that the dry patches were being drawn on the **white**, and on
+ * a near-white matte surface a round patch of differing brightness reads as a
+ * bead of water sitting on the eye rather than as a hole in a film. The
+ * precorneal film is on the cornea; that is where it is observed and that is
+ * where it now shows, as gloss variation rather than as beads.
+ *
+ * The band is exactly `AURORA_SEED_ANG0` to `AURORA_SEED_ANG1`, and that is by
+ * construction rather than by coincidence: **the annulus where the film stops
+ * being visible is the annulus whose break-up the aurora consumes.** The same
+ * five taps that read it for the seed are the ones fading it out of the
+ * render, so the energy does not disappear at the limbus, it changes form
+ * there.
+ *
+ * `FILM_REACH` still does its own job underneath this — a tap outside it would
+ * still streak — so the two multiply rather than one replacing the other.
+ *
+ * What it costs is measured in the task report: the specular peak sits at
+ * `ang = 0.696`, outside the limbus, so the catchlight keeps the film's
+ * shattering only on its inner skirt.
+ */
+export const FILM_SHOW_ANG0 = AURORA_SEED_ANG0;
+export const FILM_SHOW_ANG1 = AURORA_SEED_ANG1;
+
+/** 1 where the film is drawn at full strength, 0 on the white. */
+export function filmShow(ang: number): number {
+  return 1 - smoothstep(FILM_SHOW_ANG0, FILM_SHOW_ANG1, ang);
+}
+
+/**
  * DERIVED. How many rows deep the seed is injected. Two, softened across
  * them, so the injection is resolved without becoming a band.
  */
@@ -1399,35 +1436,57 @@ export function auroraTick(acc: number, dt: number): FilmTick {
 export const AURORA_COOL = AURORA_TAU;
 
 /**
- * DERIVED, against Task 12's headroom map. Emission per unit excitation.
+ * DERIVED, against contrast on the white rather than against headroom.
  *
- * **The constraint is that the aurora must not clip.** A clipped aurora is a
- * white smear, which is the one failure that would read as painted, and Task
- * 12 measured exactly how much room there is: worst-channel additive budget 0
- * inside the specular lobe, 0.155 at mid-sclera, 0.275 grazing, 0.549 on the
- * unlit limb, area-weighted mean 0.344 with 86% of the white above 0.1.
+ * **This is a deliberate overdrive and the trade was made with eyes open.**
+ * The first value, 0.35, was the largest that kept the brightest hundredth of
+ * the white inside Task 12's additive budget. It was also invisible: measured
+ * against the sclera away from the catchlight, the peak of a curtain lifted
+ * mid-sclera luminance by **3.5%** and grazing by 2.7%. The user could not see
+ * it. Offered the choice between dimming the whites, pushing the aurora past
+ * physical level, and having it darken what it crosses, they chose to keep the
+ * whites white and push. The energy is therefore a graphic overlay rather than
+ * light you could believe in, and that is the piece's call, not the
+ * simulation's — the field underneath is unchanged.
  *
- * Measured on the shipped scheme driven by the shipped film, 34 frames spread
- * over 40 seconds, worst case over every azimuth and both ends of the colour
- * ramp:
+ * What makes the overdrive work rather than smear is the hue-preserving
+ * compression in `eye.ts`: past the point where the brightest channel reaches
+ * 1, more gain stops buying luminance and starts buying **colour**. So the
+ * curve has a knee, and the gain is derived off it. Measured on the shipped
+ * field, three azimuths away from the catchlight, 34 frames:
  *
- *     gain   p50 emission   p99 emission   p99 share of that pixel's budget
- *     0.14      0.0020         0.0322          22%
- *     0.25      0.0035         0.0575          38%
- *     0.35      0.0049         0.0805          54%
- *     0.50      0.0071         0.1150          77%
- *     0.70      0.0099         0.1610         108%   <- clips
+ *     gain   near-limbus     mid-sclera      grazing        max
+ *            contr / sat     contr / sat     contr / sat    channel
+ *     0.35    9.2% / 0.07     3.6% / 0.06     2.7% / 0.08     0.75
+ *     1.00   26.3% / 0.19    10.2% / 0.12     7.8% / 0.14     0.94
+ *     1.50   32.2% / 0.26    15.3% / 0.15    11.6% / 0.17     1.09
+ *     2.00   30.5% / 0.30    20.5% / 0.19    15.5% / 0.21     1.23
+ *     2.50   25.9% / 0.34    25.6% / 0.22    19.4% / 0.23     1.38
+ *     2.75   24.0% / 0.35    28.1% / 0.23    21.3% / 0.25     1.45
+ *     3.00   22.2% / 0.37    30.7% / 0.25    23.3% / 0.26     1.53
+ *     3.50   19.2% / 0.39    35.8% / 0.27    27.2% / 0.28     1.67
  *
- * 0.35 is the largest value that leaves the brightest hundredth of the white
- * with half its budget still in hand. The clipped share of the sclera goes
- * from 8.53% — the catchlight, which was already clipped before the aurora
- * existed — to 8.76%, so the aurora widens the highlight by a quarter of a
- * percentage point of the white and clips nowhere else.
+ * Base saturation on the white is 0.024, 0.023 and 0.063 at those three
+ * points, so every row above is several times more coloured than the surface
+ * it sits on. Near the limbus the contrast *falls* past gain 1.5, because that
+ * is where the knee is reached first: the light there is already being
+ * converted to hue rather than to brightness.
  *
- * The median is two orders below the peak because the field is *sparse*: most
- * of the white is not under a curtain at any moment, which is the point.
+ * **2.75 is the smallest gain at which all three points clear 20% luminance
+ * contrast**, which is the bottom of the band the piece asked for — 2.50
+ * leaves the grazing point at 19.4%. Over the whole white it lifts 29.8% of
+ * the sclera by more than 0.02 of luminance at any moment and raises mean
+ * saturation from 0.044 to 0.075.
+ *
+ * It makes 2.81% of the sclera *darker*, worst case -0.196 of luminance, and
+ * 69% of that is inside the catchlight's already-clipped core with the rest in
+ * its immediate skirt. That is what divide-by-maximum means: a blue curtain
+ * crossing a white-hot highlight tints it and pulls it down, which is also
+ * what a coloured light in front of a highlight does. It is the visible face
+ * of the overlay trade and it is confined to the one place on the eye that was
+ * already at the ceiling.
  */
-export const AURORA_GAIN = 0.35;
+export const AURORA_GAIN = 2.75;
 
 /** Cell-centre angle of row `j`. */
 export function auroraAngOf(j: number): number {

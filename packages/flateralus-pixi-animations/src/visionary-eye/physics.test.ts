@@ -55,6 +55,9 @@ import {
   EVAP,
   FILM_REACH,
   FILM_REACH_FADE,
+  FILM_SHOW_ANG0,
+  FILM_SHOW_ANG1,
+  filmShow,
   FILM_SLOPE,
   WET_DARKEN,
   WET_H,
@@ -740,7 +743,7 @@ const LIGHT = (() => {
 /** The specular lobe is down to half here: 0.5^(1/48) = cos(0.169 rad). */
 const LOBE_HALF = Math.acos(Math.pow(0.5, 1 / 48));
 
-describe('the film reaches the catchlight', () => {
+describe('the film reaches the catchlight, and is no longer shown there', () => {
   it('puts the catchlight outside the corneal cap, which is why the mask is a square', () => {
     // The finding the whole shape of `filmReach` rests on. If this ever stops
     // being true — the light moves, or the cap grows — the square mask has no
@@ -784,6 +787,46 @@ describe('the film reaches the catchlight', () => {
     // Measured 0.649 at these constants. The rest is the lobe's outer tail
     // running off the field's square, where it keeps the painted highlight.
     expect(filmed / total).toBeGreaterThan(0.6);
+  });
+
+  it('gives that up to keep the dry patches off the white', () => {
+    // **The cost of `filmShow`, stated as a number.** The three tests above
+    // are about where the field may be *read* and they still hold; this is
+    // about where it is *shown*, and it is a much tighter bound. The specular
+    // peak sits at ang = 0.696, outside the limbus, so the display gate that
+    // keeps the dry patches off the sclera also takes them out of the
+    // catchlight's core.
+    expect(filmShow(Math.acos(LIGHT.z))).toBe(0);
+    // What survives is the lobe's inner skirt, over the cornea: 4.2% of the
+    // sharp lobe's energy against the 64.9% `filmReach` alone allows.
+    const N = 4000;
+    let total = 0;
+    let shown = 0;
+    for (let k = 0; k <= N; k++) {
+      const ang = (k / N) * 1.5;
+      const w = Math.pow(Math.cos(Math.abs(ang - 0.696)), 48) * Math.sin(ang);
+      total += w;
+      shown += w * filmShow(ang);
+    }
+    expect(shown / total).toBeGreaterThan(0.03);
+    expect(shown / total).toBeLessThan(0.06);
+    // The band it fades across is the aurora's own seeding band, and that is
+    // by construction: the annulus where the film stops being visible is the
+    // annulus whose break-up becomes excitation.
+    expect(FILM_SHOW_ANG0).toBe(AURORA_SEED_ANG0);
+    expect(FILM_SHOW_ANG1).toBe(AURORA_SEED_ANG1);
+    expect(FILM_SHOW_ANG1).toBe(AURORA_ANG0);
+    // Full strength over the iris, gone by the limbus, monotone between.
+    expect(filmShow(0.3)).toBe(1);
+    expect(filmShow(0.56)).toBe(0);
+    expect(filmShow(1.2)).toBe(0);
+    for (let k = 1; k <= 40; k++)
+      expect(filmShow(k * 0.02)).toBeLessThanOrEqual(filmShow((k - 1) * 0.02));
+    // And it is an additional bound, not a replacement: FILM_REACH still has
+    // the only say over whether a fetch lands on data.
+    expect(EYE_GLOBE).toContain(
+      'float fw = uFilmOK * filmReach(fl) * filmShow(ang);'
+    );
   });
 });
 
@@ -1031,8 +1074,28 @@ function scleraPixel(
 }
 
 const lum = (c: number[]) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-/** What the framebuffer keeps: finish() adds grain and a vignette, no tone map. */
-const clipped = (c: number[]) => lum(c.map((x) => Math.min(1, Math.max(0, x))));
+/**
+ * `eyeW`'s output transform: hue-preserving compression, then the clamp.
+ *
+ * Task 13 put `col /= max(pk, 1.0)` at the end of `eyeW`, so a pixel over 1 is
+ * divided by its own maximum rather than clamped per channel — which is the
+ * only way an additive aurora on a near-white surface keeps a hue. Below 1 it
+ * is exactly the identity, so nothing that did not clip has moved.
+ *
+ * `finish()` still adds grain and a vignette after this and still tone-maps
+ * nothing; it is shared with portal-mark and did not change.
+ */
+const compress = (c: number[]) => {
+  const m = Math.max(...c);
+  return m > 1 ? c.map((x) => x / m) : c.slice();
+};
+const clipped = (c: number[]) =>
+  lum(compress(c).map((x) => Math.min(1, Math.max(0, x))));
+/** Saturation of a shown pixel, (max - min) / max. */
+const satOf = (c: number[]) => {
+  const m = Math.max(...c);
+  return m <= 0 ? 0 : (m - Math.min(...c)) / m;
+};
 /** Step from the specular peak toward the globe's centre by `d` in tangent units. */
 const towardCentre = (d: number): [number, number] => {
   const s = 1 - d / Math.hypot(LIGHT.x, LIGHT.y);
@@ -1044,6 +1107,12 @@ const towardCentre = (d: number): [number, number] => {
  * within a quarter unit, so it cannot answer questions about the white.
  */
 const SC_AZ = Math.atan2(LIGHT.y, LIGHT.x);
+/** A point on the sclera `azOff` radians around from the light's own azimuth. */
+const atAz = (ang: number, azOff: number): [number, number] => {
+  const a = SC_AZ + azOff;
+  const s = Math.sin(ang);
+  return [s * Math.cos(a), s * Math.sin(a)];
+};
 const atAng = (ang: number, lit = true): [number, number] => {
   const s = Math.sin(ang) * (lit ? 1 : -1);
   return [s * Math.cos(SC_AZ), s * Math.sin(SC_AZ)];
@@ -1085,11 +1154,20 @@ describe('a dry patch has to survive the clamp', () => {
 
   it('shows nothing at the highlight if only the added light is gated', () => {
     // The bug, pinned. With dim = 0 the dry patch is computed correctly and
-    // thrown away: 2.010 and 1.081 both clip to 1.0.
+    // thrown away: an 80% difference in the unclipped sum survives as 1.4% of
+    // luminance once the pixel is shown.
+    //
+    // It used to be exactly 0, when the output transform was a per-channel
+    // clamp. Task 13's hue-preserving compression divides by the maximum
+    // instead, so the two states no longer land on the same pixel — they land
+    // 0.0137 apart, which is under the +/-0.025 of grain `finish()` puts on
+    // top. The bug is still a bug and WET_DARKEN is still what fixes it.
     const wet = scleraPixel(LIGHT.x, LIGHT.y, 1, 0, 0);
     const dry = scleraPixel(LIGHT.x, LIGHT.y, 0, 0, 0);
     expect(lum(wet.total)).toBeGreaterThan(lum(dry.total) * 1.8);
-    expect(clipped(wet.total) - clipped(dry.total)).toBe(0);
+    expect(Math.abs(clipped(wet.total) - clipped(dry.total))).toBeLessThan(
+      0.025
+    );
   });
 
   it('lifts a dry patch wherever the surface is diffuse-lit', () => {
@@ -1130,18 +1208,34 @@ describe('a dry patch has to survive the clamp', () => {
     }
   });
 
-  it('keeps the specular peak clipped in both states, and says so', () => {
+  it('keeps the specular peak at the ceiling in both states, and says so', () => {
     // Honest limit. Dry is the identity, and the identity is already past
     // white inside the lobe, so there the dim cannot show anything: both
-    // states clip. What distinguishes them there is the *shape* of the
-    // catchlight, which FILM_SLOPE shreds. This is why the headroom map below
-    // is a map and not a number.
+    // states reach the ceiling.
+    //
+    // **What the compression changed is the colour it reaches it at.** Under
+    // the old per-channel clamp the catchlight was (1, 1, 1), pure paper
+    // white, saturation exactly 0. Dividing by the maximum instead lands it at
+    // (1.000, 0.969, 0.926) — saturation 0.074, which is the light's own cream
+    // — for 2.7% of luminance. The dry state, which has no specular at all,
+    // lands at 0.036 off its own diffuse. The highlight now carries the colour
+    // of the thing lighting it, which is what a specular does.
     for (const a of [0.696, 0.75]) {
-      const w = scleraPixel(...atAng(a), 1, 0);
-      const d = scleraPixel(...atAng(a), 0, 0);
-      expect(clipped(w.total)).toBe(1);
-      expect(clipped(d.total)).toBe(1);
+      for (const wet of [1, 0]) {
+        const p = scleraPixel(...atAng(a), wet, 0);
+        const shown = compress(p.total);
+        expect(Math.max(...shown)).toBeCloseTo(1, 12);
+        expect(satOf(shown)).toBeGreaterThan(0.03);
+        expect(satOf(shown)).toBeLessThan(0.12);
+        expect(lum(shown)).toBeGreaterThan(0.95);
+      }
     }
+    // And the old transform is what it is being measured against: a clamp
+    // would have thrown that colour away.
+    const clampOnly = scleraPixel(...atAng(0.696), 1, 0).total.map((x) =>
+      Math.min(1, Math.max(0, x))
+    );
+    expect(satOf(clampOnly)).toBe(0);
   });
 
   it('leaves the no-film fallback byte-identical to a filmless render', () => {
@@ -2479,39 +2573,91 @@ describe('the aurora against the blink cycle', () => {
     expect(trough * dt - after).toBeGreaterThan(0.5);
   });
 
-  it('spends the headroom Task 12 measured, and does not clip', () => {
-    // Worst case over the run: the brightest cell the field ever holds, both
-    // ends of the colour ramp, against the worst-channel budget at three
-    // points on the white. The catchlight is the fourth row and is *supposed*
-    // to be over: Task 12 measured zero headroom there and the aurora cannot
-    // live inside a highlight that is already clipped.
-    const rowOf = (ang: number) =>
+  it('is unmistakable on the white, at the cost of being an overlay', () => {
+    // **The measurement that replaced the headroom one.** At gain 0.35 the
+    // aurora fitted inside Task 12's additive budget everywhere on the white,
+    // and it was invisible: the peak of a curtain lifted mid-sclera luminance
+    // by 3.5% and grazing by 2.7%. The piece chose to keep the whites white
+    // and push the energy past physical level instead, so what is measured now
+    // is contrast and colour, not restraint.
+    //
+    // The excitations are the peaks the field actually reaches at those rows,
+    // measured on the coupled run against a CPU mirror of the film — see the
+    // task report. The synthetic cycle `AURORA_RUN` drives a weaker seed, so
+    // it is not the right input for a brightness claim; it is checked below
+    // only for not having drifted an order of magnitude from the coupled one.
+    //
+    //   near-limbus  ang 0.65  E 0.302  contrast 24.0%  sat 0.024 -> 0.353
+    //   mid-sclera   ang 1.20  E 0.123  contrast 28.1%  sat 0.023 -> 0.235
+    //   grazing      ang 1.40  E 0.091  contrast 21.3%  sat 0.063 -> 0.247
+    const OFFS = [Math.PI, Math.PI / 2, Math.PI * 1.5];
+    const POINTS: [string, number, number, number][] = [
+      ['near-limbus', 0.65, 0.302, 0.25],
+      ['mid-sclera', 1.2, 0.123, 0.85],
+      ['grazing', 1.4, 0.091, 1.15],
+    ];
+    for (const [name, ang, E, ageFrac] of POINTS) {
+      const add = auroraColour(E, E * ageFrac);
+      let contrast = 0;
+      let satBase = 0;
+      let satAur = 0;
+      for (const o of OFFS) {
+        const base = compress(scleraPixel(...atAz(ang, o), 1, 0).total);
+        const aur = compress(
+          scleraPixel(...atAz(ang, o), 1, 0).total.map((x, i) => x + add[i])
+        );
+        contrast += (lum(aur) - lum(base)) / lum(base);
+        satBase += satOf(base);
+        satAur += satOf(aur);
+      }
+      const n = OFFS.length;
+      // The band the piece asked for: unmistakable, not subtle. And bounded
+      // above, because past 40% it stops reading as light on a surface at all.
+      expect(contrast / n).toBeGreaterThan(0.2);
+      expect(contrast / n).toBeLessThan(0.4);
+      // Half of what the gain buys is colour, and that half is the compression's
+      // doing: the white it sits on is almost achromatic.
+      expect(satAur / n).toBeGreaterThan(0.2);
+      expect(satAur / n).toBeGreaterThan(3.5 * (satBase / n));
+      expect(name).toBeTruthy();
+    }
+    // The synthetic run's own peaks, as a guard on the numbers above being
+    // about the same field: within a factor of two at every row.
+    const rowOf = (a2: number) =>
       Math.min(
         NANG - 1,
-        Math.round(((ang - AURORA_ANG0) / AURORA_SPAN) * NANG - 0.5)
+        Math.round(((a2 - AURORA_ANG0) / AURORA_SPAN) * NANG - 0.5)
       );
-    const rowPeak = (ang: number) => {
+    for (const [, ang, E] of POINTS) {
       const j = rowOf(ang);
-      let m = 0;
+      let peak = 0;
       for (let i = 0; i < NAZ; i++)
-        m = Math.max(m, AURORA_RUN.f.E[j * NAZ + i]);
-      return m;
-    };
-    // Brightest emission the field can put in any one channel, at that angle.
-    const emit = (ang: number) => AURORA_GAIN * rowPeak(ang) * 1.0;
-    for (const [ang, lit] of [
-      [1.2, true],
-      [1.4, true],
-      [1.0, false],
-    ] as [number, boolean][]) {
-      const h = headroom(scleraPixel(...atAng(ang, lit), 1, 0));
-      expect(h).toBeGreaterThan(0.1);
-      expect(emit(ang)).toBeLessThan(h);
-      // and not so far under it as to be invisible
-      expect(emit(ang) / h).toBeGreaterThan(0.05);
+        peak = Math.max(peak, AURORA_RUN.f.E[j * NAZ + i]);
+      expect(peak).toBeGreaterThan(E / 2);
+      expect(peak).toBeLessThan(E * 2);
     }
-    // Inside the lobe there is nothing to spend, and that is fine.
-    expect(headroom(scleraPixel(...atAng(0.696), 1, 0))).toBe(0);
+  });
+
+  it('turns overflow into hue rather than into white', () => {
+    // The knee, pinned. Past the point where the brightest channel reaches 1,
+    // more gain stops buying luminance and starts buying colour — which is the
+    // whole reason the gain could be raised eightfold without smearing.
+    const base = scleraPixel(...atAz(0.65, Math.PI), 1, 0).total;
+    const add = auroraColour(0.3, 0.3 * 0.2); // young, so near ELEC
+    const shown = compress(base.map((x, i) => x + add[i]));
+    expect(Math.max(...base)).toBeLessThan(1);
+    expect(Math.max(...base.map((x, i) => x + add[i]))).toBeGreaterThan(1);
+    // Blue-dominant after the compression, not white.
+    expect(shown[2]).toBeGreaterThan(shown[0] * 1.3);
+    expect(satOf(shown)).toBeGreaterThan(0.25);
+    // Doubling the excitation from here adds saturation, not luminance.
+    const more = compress(
+      base.map((x, i) => x + auroraColour(0.6, 0.6 * 0.2)[i])
+    );
+    // Doubling E raises saturation from 0.401 to 0.498 and *lowers* luminance
+    // from 0.710 to 0.640: past the knee the extra energy is all hue.
+    expect(satOf(more)).toBeGreaterThan(satOf(shown) + 0.08);
+    expect(lum(more)).toBeLessThan(lum(shown));
   });
 });
 

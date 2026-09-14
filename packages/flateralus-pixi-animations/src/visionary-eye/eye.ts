@@ -1,5 +1,7 @@
 import {
   AURORA_ANG0,
+  FILM_SHOW_ANG0,
+  FILM_SHOW_ANG1,
   AURORA_COOL,
   AURORA_DANG,
   AURORA_GAIN,
@@ -77,6 +79,24 @@ export const EYE_GLOBE = `
           ${(FILM_REACH - FILM_REACH_FADE).toFixed(6)},
           ${FILM_REACH.toFixed(6)},
           max(abs(l.x), abs(l.y)));
+      }
+      /**
+       * 1 where the film is drawn, 0 on the white.
+       *
+       * **A second bound, and a display one.** filmReach says where the field
+       * may be read; this says where it may be seen. The simulation is
+       * untouched -- the sheet still covers the whole cornea, still tears, and
+       * still fires the blink on the same measurement.
+       *
+       * On a near-white matte surface a round patch of differing brightness
+       * reads as a bead of water sitting on the eye. The precorneal film is on
+       * the cornea, which is where it is actually observed and where it now
+       * shows. The band it fades across is the same one the aurora reads its
+       * seed from -- see FILM_SHOW_ANG0 -- so the energy does not vanish at
+       * the limbus, it changes form there.
+       */
+      float filmShow(float ang) {
+        return 1.0 - smoothstep(${FILM_SHOW_ANG0.toFixed(6)}, ${FILM_SHOW_ANG1.toFixed(6)}, ang);
       }
       /**
        * The corneal refraction map: where the ray through the tangent point
@@ -184,7 +204,12 @@ export const EYE_GLOBE = `
           // hypothetical - a driver that refuses float render targets leaves
           // uFilmOK at 0 and the eye has to look exactly as it did.
           vec2 fl = vec2(lx, ly);
-          float fw = uFilmOK * filmReach(fl);
+          // Three gates, and they are three different statements: the field
+          // exists (uFilmOK), the fetch lands on data (filmReach), and this is
+          // cornea rather than white (filmShow). fw = 0 still collapses every
+          // term below onto the pre-film render, which is now what the whole
+          // sclera gets.
+          float fw = uFilmOK * filmReach(fl) * filmShow(ang);
           // One cell, the field's own Nyquist -- see JACOBIAN_STEP. Every tap
           // below is within one cell of fl, which is exactly the margin
           // FILM_REACH reserves.
@@ -362,6 +387,25 @@ export const EYE_GLOBE = `
           eye += ELEC * pow(1.0 - nz / R, 3.0) * 0.18;
           col = eye;
         }
+        // ---- Hue-preserving highlight compression.
+        //
+        // **Additive light on a near-white surface has no colour.** The sclera
+        // sits at (0.93, 0.92, 0.90) before anything is added, so a per-channel
+        // clamp turns every bright aurora pixel into the same white smear:
+        // (1.0, 1.0, 1.0) + (0.0, 0.1, 0.5) clamps to (1, 1, 1) and the blue is
+        // gone. Dividing the triple by its own maximum instead keeps the ratios
+        // that carry the hue, and the same pixel lands at (0.67, 0.73, 1.0) --
+        // a real blue, at the brightness the display can actually reach.
+        //
+        // It lives here and **not in finish()**, which is shared with
+        // portal-mark and several other animations and must not move.
+        //
+        // Exactly the identity below 1: max(pk, 1.0) is 1.0 for any pixel that
+        // was not going to clip anyway, and x / 1.0 is x to the last bit. So
+        // this changes only the pixels a clamp was about to flatten, and the
+        // uFilmOK = 0 fallback is as untouched by it as every other pixel.
+        float pk = max(max(col.r, col.g), col.b);
+        col /= max(pk, 1.0);
         return col;
       }
   `;
