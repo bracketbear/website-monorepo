@@ -1,7 +1,9 @@
 import {
   AURORA_ANG0,
-  FILM_SHOW_ANG0,
-  FILM_SHOW_ANG1,
+  FILM_DIM_ANG0,
+  FILM_DIM_ANG1,
+  FILM_GLOSS_ANG0,
+  FILM_GLOSS_ANG1,
   AURORA_COOL,
   AURORA_DANG,
   AURORA_GAIN,
@@ -81,22 +83,34 @@ export const EYE_GLOBE = `
           max(abs(l.x), abs(l.y)));
       }
       /**
-       * 1 where the film is drawn, 0 on the white.
+       * Where the film is drawn, in two bounds, because the two things it does
+       * to the surface read differently and want different limits.
        *
-       * **A second bound, and a display one.** filmReach says where the field
-       * may be read; this says where it may be seen. The simulation is
-       * untouched -- the sheet still covers the whole cornea, still tears, and
-       * still fires the blink on the same measurement.
+       * **filmDim: the diffuse darkening, and with it the broad sheen.**
+       * WET_DARKEN multiplies the lit colour, so a dry patch is a round region
+       * of surface at a different brightness -- and on flat near-white sclera
+       * that reads as a bead of water sitting on the eye. Bounded to the
+       * cornea, where a precorneal film actually is. The broad sheen rides
+       * this too: its lobe is 0.438 rad wide, so it is a wash across the white
+       * rather than a highlight, and a patch in it is another round step.
        *
-       * On a near-white matte surface a round patch of differing brightness
-       * reads as a bead of water sitting on the eye. The precorneal film is on
-       * the cornea, which is where it is actually observed and where it now
-       * shows. The band it fades across is the same one the aurora reads its
-       * seed from -- see FILM_SHOW_ANG0 -- so the energy does not vanish at
-       * the limbus, it changes form there.
+       * **filmGloss: the sharp highlight's gating and its normal.** Inside a
+       * bright catchlight a dry patch reads as the gloss failing, not as a
+       * bead -- which is what a tearing film looks like. The catchlight sits
+       * at ang 0.696, outside the limbus, so this is bounded by the lobe and
+       * not by the cornea: full through the peak, zero exactly where the lobe
+       * itself is down to half power.
+       *
+       * Both still ride filmReach, which is the only thing deciding whether a
+       * fetch lands on data the simulation wrote. None of this touches the
+       * simulation, which still covers the whole cornea and still fires the
+       * blink on the same measurement.
        */
-      float filmShow(float ang) {
-        return 1.0 - smoothstep(${FILM_SHOW_ANG0.toFixed(6)}, ${FILM_SHOW_ANG1.toFixed(6)}, ang);
+      float filmDim(float ang) {
+        return 1.0 - smoothstep(${FILM_DIM_ANG0.toFixed(6)}, ${FILM_DIM_ANG1.toFixed(6)}, ang);
+      }
+      float filmGloss(float ang) {
+        return 1.0 - smoothstep(${FILM_GLOSS_ANG0.toFixed(6)}, ${FILM_GLOSS_ANG1.toFixed(6)}, ang);
       }
       /**
        * The corneal refraction map: where the ray through the tangent point
@@ -195,21 +209,22 @@ export const EYE_GLOBE = `
           vec3 nb = normalize(n - (tx * dhx + ty * dhy) * uBump * 0.045);
           // The catchlight, reflected off the film rather than painted on.
           //
-          // fw is the spatial gate, and it is written so that fw = 0 collapses
-          // every line below, term by term, back onto the painted specular
-          // this replaced: nf becomes nb, wet becomes 1, and dsp becomes dif.
-          // The one term that does not gate on fw is the wetness darkening,
+          // The spatial gates are written so that a gate of 0 collapses every
+          // line below, term by term, back onto the painted specular this
+          // replaced: nf becomes nb, both wets become 1, and dsp becomes dif.
+          // The one term that does not gate on them is the wetness darkening,
           // which gates on uFilmOK alone -- see wetD below for why.
           // That matters because uFilmOK = 0 is a shipped path and not a
           // hypothetical - a driver that refuses float render targets leaves
           // uFilmOK at 0 and the eye has to look exactly as it did.
           vec2 fl = vec2(lx, ly);
-          // Three gates, and they are three different statements: the field
-          // exists (uFilmOK), the fetch lands on data (filmReach), and this is
-          // cornea rather than white (filmShow). fw = 0 still collapses every
-          // term below onto the pre-film render, which is now what the whole
-          // sclera gets.
-          float fw = uFilmOK * filmReach(fl) * filmShow(ang);
+          // The field exists, and the fetch lands on data the simulation
+          // wrote. Everything below rides one of the two display bounds on top
+          // of this; either at zero collapses its own terms back onto the
+          // pre-film render, term by term.
+          float fr = uFilmOK * filmReach(fl);
+          float fwDim = fr * filmDim(ang);
+          float fwGloss = fr * filmGloss(ang);
           // One cell, the field's own Nyquist -- see JACOBIAN_STEP. Every tap
           // below is within one cell of fl, which is exactly the margin
           // FILM_REACH reserves.
@@ -221,8 +236,10 @@ export const EYE_GLOBE = `
           float h10 = texture(uFilm, filmUV(fl + vec2(e, 0.0))).x;
           float h01 = texture(uFilm, filmUV(fl + vec2(0.0, e))).x;
           vec2 gH = (vec2(h10, h01) - hC) / e;
-          vec3 nf = fw > 0.0
-            ? normalize(nb - (tx * gH.x + ty * gH.y) * (${FILM_SLOPE.toFixed(6)} * fw))
+          // The highlight's *shape*, and now nothing else: FILM_SLOPE was
+          // derived against pow(dot, 48) and it belongs to that term alone.
+          vec3 nf = fwGloss > 0.0
+            ? normalize(nb - (tx * gH.x + ty * gH.y) * (${FILM_SLOPE.toFixed(6)} * fwGloss))
             : nb;
           // A dry patch is a matte mark, not a glossy one. wet gates all three
           // terms below -- the two highlights it withholds, and the diffuse,
@@ -233,7 +250,10 @@ export const EYE_GLOBE = `
           // edge of the square, and "wet" is the state to assume there. That
           // is what keeps the reach boundary invisible now that the darkening
           // rides on this term -- inside and outside agree.
-          float wet = mix(1.0, smoothstep(${DRY_H.toFixed(6)}, ${WET_H.toFixed(6)}, hC), fw);
+          // Same curve, two bounds. wetGloss gates the sharp lobe; wetDim
+          // gates the broad sheen and, through wetD, the darkening.
+          float wetGloss = mix(1.0, smoothstep(${DRY_H.toFixed(6)}, ${WET_H.toFixed(6)}, hC), fwGloss);
+          float wetDim = mix(1.0, smoothstep(${DRY_H.toFixed(6)}, ${WET_H.toFixed(6)}, hC), fwDim);
           // ...but the no-film fallback is a different question, and it wants
           // the opposite answer. uFilmOK = 0 must leave the globe bit-identical
           // to a render with no film at all, so the darkening -- and only the
@@ -241,7 +261,7 @@ export const EYE_GLOBE = `
           // uniform, 0 or 1 and fixed for the life of the context, so unlike
           // fw it cannot draw a ring anywhere. The highlights keep using wet
           // itself, which collapses to 1 and restores the painted catchlight.
-          float wetD = uFilmOK * wet;
+          float wetD = uFilmOK * wetDim;
 
           // ---- The cornea as a lens, and the caustic that is its Jacobian.
           //
@@ -276,11 +296,11 @@ export const EYE_GLOBE = `
           // limbus, where the cornea's own magnification correctly vanishes.
           // The map gets the film's real height instead. See FILM_LENS.
           //
-          // fw rides on the tilt, so at fw = 0 every irisUV below is called
+          // fwGloss rides on the tilt, so at 0 every irisUV below is called
           // with a tilt of exactly zero and f0/fx/fy are bit-for-bit b0/bx/by:
           // J equals J0, the caustic is exactly 0, and what is left is the
           // bare cornea, which is there with or without a film.
-          float s = ${FILM_LENS.toExponential(8)} * fw;
+          float s = ${FILM_LENS.toExponential(8)} * fwGloss;
           vec2 f0 = irisUV(fl, gC * s, vw);
           vec2 fxu = irisUV(fl + vec2(e, 0.0), (gC + vec2(hxx, hxy) * e) * s, vw);
           vec2 fyu = irisUV(fl + vec2(0.0, e), (gC + vec2(hxy, hyy) * e) * s, vw);
@@ -351,8 +371,12 @@ export const EYE_GLOBE = `
           eye *= (0.55 + 0.6 * dif * (1.0 + focus * irisM))
                * (1.0 - ${WET_DARKEN.toFixed(6)} * wetD);
           float dsp = clamp(dot(nf, ld), 0.0, 1.0);
-          eye += uCream * pow(dsp, 48.0) * 0.9 * wet;
-          eye += uCream * pow(dsp, 7.0) * 0.07 * (1.0 - irisM) * wet; // broad wet sheen on the white
+          eye += uCream * pow(dsp, 48.0) * 0.9 * wetGloss;
+          // The broad sheen on the *bare* normal and the tight bound. It is a
+          // wash across the white, not a highlight, so neither the film's
+          // gating nor its tilt belongs on it -- measured, the tilt alone put
+          // steps of up to 0.029 of luminance on the white off the catchlight.
+          eye += uCream * pow(dif, 7.0) * 0.07 * (1.0 - irisM) * wetDim;
           eye += ELEC * vl * pow(clamp(dot(nb, normalize(vec3(0.3, -0.2, 1.0))), 0.0, 1.0), 8.0) * uBump * 0.55 * irisM;
           // ---- The aurora: what the white does instead of veins.
           //

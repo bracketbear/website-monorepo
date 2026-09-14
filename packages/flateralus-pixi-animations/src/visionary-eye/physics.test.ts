@@ -55,9 +55,15 @@ import {
   EVAP,
   FILM_REACH,
   FILM_REACH_FADE,
-  FILM_SHOW_ANG0,
-  FILM_SHOW_ANG1,
-  filmShow,
+  FILM_DIM_ANG0,
+  FILM_DIM_ANG1,
+  FILM_GLOSS_ANG0,
+  FILM_GLOSS_ANG1,
+  SHEEN_LOBE_HALF,
+  SPEC_ANG,
+  SPEC_LOBE_HALF,
+  filmDim,
+  filmGloss,
   FILM_SLOPE,
   WET_DARKEN,
   WET_H,
@@ -789,44 +795,156 @@ describe('the film reaches the catchlight, and is no longer shown there', () => 
     expect(filmed / total).toBeGreaterThan(0.6);
   });
 
-  it('gives that up to keep the dry patches off the white', () => {
-    // **The cost of `filmShow`, stated as a number.** The three tests above
-    // are about where the field may be *read* and they still hold; this is
-    // about where it is *shown*, and it is a much tighter bound. The specular
-    // peak sits at ang = 0.696, outside the limbus, so the display gate that
-    // keeps the dry patches off the sclera also takes them out of the
-    // catchlight's core.
-    expect(filmShow(Math.acos(LIGHT.z))).toBe(0);
-    // What survives is the lobe's inner skirt, over the cornea: 4.2% of the
-    // sharp lobe's energy against the 64.9% `filmReach` alone allows.
-    const N = 4000;
-    let total = 0;
-    let shown = 0;
-    for (let k = 0; k <= N; k++) {
-      const ang = (k / N) * 1.5;
-      const w = Math.pow(Math.cos(Math.abs(ang - 0.696)), 48) * Math.sin(ang);
-      total += w;
-      shown += w * filmShow(ang);
+  it('keeps the highlight, and still keeps the beads off the white', () => {
+    // **Two bounds, because the film does two things to the surface and they
+    // read differently.** Task 13's first pass used one, at the limbus, and it
+    // cost the catchlight almost everything: the specular peak is at 0.696,
+    // outside the limbus, so a corneal bound takes the film out of the
+    // highlight's core. That is Task 10's whole deliverable.
+    //
+    // `filmDim` is the bound on the *diffuse darkening*, which is what makes a
+    // round patch of differing brightness on flat white read as a bead. Tight,
+    // and it must stay tight. `filmGloss` is the bound on the *sharp lobe's
+    // gating and its normal*, which in a bright highlight reads as gloss
+    // failing rather than as a bead. Bounded by the lobe instead.
+    expect(SPEC_ANG).toBeCloseTo(Math.acos(LIGHT.z), 12);
+    expect(SPEC_LOBE_HALF).toBeCloseTo(LOBE_HALF, 12);
+    expect(SPEC_ANG).toBeGreaterThan(FILM_DIM_ANG1);
+    expect(FILM_GLOSS_ANG0).toBe(SPEC_ANG);
+    expect(FILM_GLOSS_ANG1).toBeCloseTo(SPEC_ANG + SPEC_LOBE_HALF, 12);
+    expect(FILM_GLOSS_ANG1).toBeCloseTo(0.866, 3);
+
+    // What each bound leaves of the sharp lobe's energy, over the globe, with
+    // filmReach applied as it always is. 64.9% is the ceiling filmReach sets.
+    const share = (gate: (a: number) => number) => {
+      const N = 500;
+      let total = 0;
+      let filmed = 0;
+      for (let a = 0; a < N; a++) {
+        for (let b = 0; b < N; b++) {
+          const lx = -1 + (2 * (a + 0.5)) / N;
+          const ly = -1 + (2 * (b + 0.5)) / N;
+          const r2 = lx * lx + ly * ly;
+          if (r2 >= 1) continue;
+          const lz = Math.sqrt(1 - r2);
+          const d = lx * LIGHT.x + ly * LIGHT.y + lz * LIGHT.z;
+          if (d <= 0) continue;
+          const w = Math.pow(d, 48);
+          total += w;
+          filmed += w * filmReach(lx, ly) * gate(Math.acos(lz));
+        }
+      }
+      return filmed / total;
+    };
+    // 64.9% ceiling, 6.2% under the tight bound, 59.5% under the gloss bound.
+    expect(share(() => 1)).toBeGreaterThan(0.6);
+    expect(share(filmDim)).toBeLessThan(0.1);
+    expect(share(filmGloss)).toBeGreaterThan(0.55);
+    // Nine tenths of what filmReach allows at all is back.
+    expect(share(filmGloss) / share(() => 1)).toBeGreaterThan(0.9);
+  });
+
+  it('leaves a dry patch invisible on the white away from the catchlight', () => {
+    // **The check the split has to pass.** 0.56 to 0.866 is on the *white*, so
+    // the gloss gating now acts there. Off the highlight it has to come to
+    // nothing, or the split has simply moved the beads outward.
+    //
+    // Worst case over azimuth and over the rim tilt — `FILM_SLOPE`'s comment
+    // measures |dh/dl| at p50 2.5, p90 36.7, p99 50, and a patch's rim is the
+    // p90 — of what a dry patch does to a pixel's luminance:
+    //
+    //   distance from the light   sharp term   p50 tilt  p90 tilt  p99 tilt
+    //     0.00 - 0.30 rad            0.900       0.251     0.251     0.251
+    //     0.30 - 0.45 rad            0.100       0.096     0.146     0.215
+    //     0.45 - 0.60 rad            0.006       0.005     0.053     0.119
+    //     0.60 - 0.80 rad            0.000       0.000     0.006     0.024
+    //     0.80 - pi   rad            0.000       0.000     0.000     0.001
+    //
+    // Inside the lobe it is a highlight breaking up, which is the point.
+    // Beyond 0.6 rad from the light it is under the +/-0.025 of grain
+    // `finish()` adds even at the rarest rim, and beyond 0.8 rad it is gone.
+    const SPEC_COL = [1.0, 243 / 255, 227 / 255]; // uCream, as eyeW lights it
+    const step = (ang: number, azOff: number, tilt: number) => {
+      const [lx, ly] = atAz(ang, azOff);
+      const lz = Math.sqrt(Math.max(0, 1 - lx * lx - ly * ly));
+      const dif = Math.max(0, lx * LIGHT.x + ly * LIGHT.y + lz * LIGHT.z);
+      const off = Math.acos(Math.min(1, dif));
+      const g = filmReach(lx, ly) * filmGloss(ang);
+      let worst = 0;
+      for (const sgn of [1, -1]) {
+        // The sharp lobe on the tilted normal and the dry gate; the broad
+        // sheen and the darkening are on the tight bound and do not move.
+        const dsp = Math.max(0, Math.min(1, Math.cos(off + sgn * tilt * g)));
+        const wetPx = scleraPixel(lx, ly, 1, 0);
+        const dryPx = {
+          total: wetPx.diffuse.map(
+            (x, i) =>
+              x +
+              SPEC_COL[i] * Math.pow(dsp, 48) * 0.9 * (1 - g) +
+              wetPx.broad[i] +
+              wetPx.rim[i]
+          ),
+        };
+        worst = Math.max(
+          worst,
+          Math.abs(lum(compress(wetPx.total)) - lum(compress(dryPx.total)))
+        );
+      }
+      return { off, worst };
+    };
+    const RIM = 36.7 * FILM_SLOPE; // the p90 tilt, which is a patch's rim
+    let inLobe = 0;
+    let far = 0;
+    let veryFar = 0;
+    for (let ia = 0; ia <= 40; ia++) {
+      const ang = FILM_DIM_ANG1 + (ia / 40) * (FILM_GLOSS_ANG1 - FILM_DIM_ANG1);
+      for (let io = 0; io < 120; io++) {
+        const r = step(ang, (io / 120) * 2 * Math.PI, RIM);
+        if (r.off < 0.3) inLobe = Math.max(inLobe, r.worst);
+        else if (r.off > 0.8) veryFar = Math.max(veryFar, r.worst);
+        else if (r.off > 0.6) far = Math.max(far, r.worst);
+      }
     }
-    expect(shown / total).toBeGreaterThan(0.03);
-    expect(shown / total).toBeLessThan(0.06);
-    // The band it fades across is the aurora's own seeding band, and that is
-    // by construction: the annulus where the film stops being visible is the
-    // annulus whose break-up becomes excitation.
-    expect(FILM_SHOW_ANG0).toBe(AURORA_SEED_ANG0);
-    expect(FILM_SHOW_ANG1).toBe(AURORA_SEED_ANG1);
-    expect(FILM_SHOW_ANG1).toBe(AURORA_ANG0);
-    // Full strength over the iris, gone by the limbus, monotone between.
-    expect(filmShow(0.3)).toBe(1);
-    expect(filmShow(0.56)).toBe(0);
-    expect(filmShow(1.2)).toBe(0);
-    for (let k = 1; k <= 40; k++)
-      expect(filmShow(k * 0.02)).toBeLessThanOrEqual(filmShow((k - 1) * 0.02));
-    // And it is an additional bound, not a replacement: FILM_REACH still has
-    // the only say over whether a fetch lands on data.
+    // The highlight visibly breaks up...
+    expect(inLobe).toBeGreaterThan(0.15);
+    // ...and off it, nothing a viewer could call a droplet.
+    expect(far).toBeLessThan(0.025);
+    expect(veryFar).toBeLessThan(0.002);
+  });
+
+  it('keeps the two bounds apart, because they answer different questions', () => {
+    // The tight one is the aurora's own seeding band, by construction: where
+    // the film stops darkening the surface is where its break-up becomes
+    // excitation.
+    expect(FILM_DIM_ANG0).toBe(AURORA_SEED_ANG0);
+    expect(FILM_DIM_ANG1).toBe(AURORA_SEED_ANG1);
+    expect(FILM_DIM_ANG1).toBe(AURORA_ANG0);
+    // Full over the iris, gone by the limbus, monotone between.
+    expect(filmDim(0.3)).toBe(1);
+    expect(filmDim(0.56)).toBe(0);
+    expect(filmDim(1.2)).toBe(0);
+    expect(filmGloss(0.56)).toBe(1);
+    expect(filmGloss(0.9)).toBe(0);
+    for (let k = 1; k <= 60; k++) {
+      expect(filmDim(k * 0.02)).toBeLessThanOrEqual(filmDim((k - 1) * 0.02));
+      expect(filmGloss(k * 0.02)).toBeLessThanOrEqual(
+        filmGloss((k - 1) * 0.02)
+      );
+    }
+    // The broad sheen is on the tight bound and on the *bare* normal, because
+    // its lobe is 2.6x the sharp one's -- a wash across the white, not a
+    // highlight, so a patch in it is a bead rather than a broken gloss.
+    expect(SHEEN_LOBE_HALF).toBeGreaterThan(2.5 * SPEC_LOBE_HALF);
     expect(EYE_GLOBE).toContain(
-      'float fw = uFilmOK * filmReach(fl) * filmShow(ang);'
+      'eye += uCream * pow(dif, 7.0) * 0.07 * (1.0 - irisM) * wetDim;'
     );
+    expect(EYE_GLOBE).toContain(
+      'eye += uCream * pow(dsp, 48.0) * 0.9 * wetGloss;'
+    );
+    // Both still ride filmReach, which alone decides whether a fetch clamps.
+    expect(EYE_GLOBE).toContain('float fr = uFilmOK * filmReach(fl);');
+    expect(EYE_GLOBE).toContain('float fwDim = fr * filmDim(ang);');
+    expect(EYE_GLOBE).toContain('float fwGloss = fr * filmGloss(ang);');
   });
 });
 
@@ -1017,6 +1135,12 @@ describe('the smooth-bilinear fetch', () => {
  * to carry the painted veins too, until Task 13 deleted them.) `visionary()` is not ported, so rows on
  * the iris stand in a mid-tone for it and are indicative only.
  *
+ * `wet` gates the **sharp** lobe, on `filmGloss`'s bound; `wetB` gates the
+ * broad sheen, which Task 13 moved onto `filmDim`'s tight bound and onto the
+ * bare normal, so on the white it is 1 whatever the film is doing. It
+ * defaults to `wet` because most callers ask about a pixel where the two
+ * bounds agree.
+ *
  * `wetD` is the shader's separate darkening gate. It is normally `wet`, but
  * on the no-float-target fallback the two part company: `wet` collapses to 1
  * so the painted catchlight comes back, while `wetD` collapses to 0 so the
@@ -1029,7 +1153,8 @@ function scleraPixel(
   wet: number,
   noise: number,
   dim: number = WET_DARKEN,
-  wetD: number = wet
+  wetD: number = wet,
+  wetB: number = wet
 ) {
   const CREAM = [1.0, 243 / 255, 227 / 255];
   const ELEC = [0.3, 0.55, 1.0];
@@ -1066,7 +1191,7 @@ function scleraPixel(
   const diffuse = eye.map((x) => x * (0.55 + 0.6 * dif) * (1 - dim * wetD));
   const sharp = CREAM.map((x) => x * Math.pow(dif, 48) * 0.9 * wet);
   const broad = CREAM.map(
-    (x) => x * Math.pow(dif, 7) * 0.07 * (1 - irisM) * wet
+    (x) => x * Math.pow(dif, 7) * 0.07 * (1 - irisM) * wetB
   );
   const rim = ELEC.map((x) => x * Math.pow(1 - lz, 3) * 0.18);
   const total = diffuse.map((x, i) => x + sharp[i] + broad[i] + rim[i]);
@@ -1195,16 +1320,22 @@ describe('a dry patch has to survive the clamp', () => {
     }
   });
 
-  it('takes the gloss with it, so dry reads matte and not merely lighter', () => {
-    // The specular terms are gated on wet, so a dry pixel keeps none of them.
-    // Where the highlight lands that is half the pixel's luminance — a change
-    // of material, not of brightness.
+  it('takes the sharp gloss with it, so dry reads matte and not merely lighter', () => {
+    // A dry pixel keeps none of the sharp lobe. Where the highlight lands that
+    // is a third of the pixel's luminance — a change of material, not of
+    // brightness.
+    //
+    // **The broad sheen no longer goes with it**, and that is Task 13's split:
+    // the sheen's lobe is 0.438 rad wide, so it is a wash over the white
+    // rather than a highlight, and a round hole in it is a bead. It rides the
+    // tight bound now, where it is 1 on the white whatever the film does.
     for (const a of [0.696, 0.75, 0.63]) {
       const w = scleraPixel(...atAng(a), 1, 0);
-      const d = scleraPixel(...atAng(a), 0, 0);
-      const spec = lum(w.sharp) + lum(w.broad);
-      expect(spec / lum(w.total)).toBeGreaterThan(0.3);
-      expect(lum(d.sharp) + lum(d.broad)).toBe(0);
+      const d = scleraPixel(...atAng(a), 0, 0, WET_DARKEN, 0, 1);
+      expect(lum(w.sharp) / lum(w.total)).toBeGreaterThan(0.3);
+      expect(lum(d.sharp)).toBe(0);
+      expect(lum(d.broad)).toBe(lum(w.broad));
+      expect(lum(d.broad)).toBeGreaterThan(0);
     }
   });
 
@@ -1264,13 +1395,16 @@ describe('a dry patch has to survive the clamp', () => {
     // a circle at FILM_REACH — a second, larger version of exactly the relief
     // the user objected to. uFilmOK is a uniform, 0 or 1 and fixed for the
     // life of the context, so it has no spatial structure to draw.
-    expect(EYE_GLOBE).toContain('float wetD = uFilmOK * wet;');
+    expect(EYE_GLOBE).toContain('float wetD = uFilmOK * wetDim;');
     expect(EYE_GLOBE).toContain(`* (1.0 - ${WET_DARKEN.toFixed(6)} * wetD)`);
-    // Outside the reach fw is 0, wet collapses to 1, and the surface is as
-    // dark as a wet pixel inside it: the boundary is invisible.
-    expect(EYE_GLOBE).toContain(
-      `float wet = mix(1.0, smoothstep(${DRY_H.toFixed(6)}, ${WET_H.toFixed(6)}, hC), fw);`
-    );
+    // Outside its own bound the gate is 0, the wetness collapses to 1, and the
+    // surface is as dark as a wet pixel inside it: the boundary is invisible.
+    // That holds for both bounds, which is why they can differ without either
+    // drawing an edge.
+    for (const g of ['fwGloss', 'fwDim'])
+      expect(EYE_GLOBE).toContain(
+        `mix(1.0, smoothstep(${DRY_H.toFixed(6)}, ${WET_H.toFixed(6)}, hC), ${g});`
+      );
     // And the old sign is gone for good.
     expect(EYE_GLOBE).not.toContain('(1.0 - wet)');
   });

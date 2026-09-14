@@ -418,6 +418,30 @@ export function filmReach(lx: number, ly: number): number {
 export const FILM_SLOPE = 0.008;
 
 /**
+ * DERIVED. Where the sharp catchlight sits, and how wide it is.
+ *
+ * `eyeW` lights the globe with `normalize(vec3(-0.45, -0.55, 0.85))` and the
+ * sharp term is `pow(dot(n, ld), 48.0)`, so the highlight peaks exactly where
+ * the surface normal equals the light — `acos(0.767) = 0.696` from the gaze
+ * axis, which is **outside the limbus, on the white**. That fact is why
+ * `FILM_REACH` is a square and it is why `FILM_GLOSS_ANG1` is not 0.56.
+ *
+ * The lobe is down to half at `acos(0.5^(1/48)) = 0.169` rad off the light.
+ */
+const LIGHT_LEN = Math.hypot(0.45, 0.55, 0.85);
+export const SPEC_ANG = Math.acos(0.85 / LIGHT_LEN);
+export const SPEC_LOBE_HALF = Math.acos(Math.pow(0.5, 1 / 48));
+
+/**
+ * DERIVED. Half-width of the **broad** sheen, `pow(dot(n, ld), 7.0)`.
+ *
+ * 0.438 rad — two and a half times the sharp lobe's. It is not a highlight;
+ * it is a wide low wash across most of the lit white, which is why it is
+ * bounded with the diffuse rather than with the gloss. See `FILM_GLOSS_ANG0`.
+ */
+export const SHEEN_LOBE_HALF = Math.acos(Math.pow(0.5, 1 / 7));
+
+/**
  * DERIVED-ish. Height at which the film reads as fully wet in the specular.
  *
  * The wet well is at +1 and the dry well at -1, so the wetness ramp has to
@@ -1316,19 +1340,13 @@ export const AURORA_SEED_ANG0 = 0.38;
 export const AURORA_SEED_TAPS = 5;
 
 /**
- * DERIVED. The annulus over which the film stops being **shown**.
+ * DERIVED. Where the film's **diffuse darkening** stops being drawn.
  *
- * **This is a display bound, not a simulation bound, and it is a second one.**
- * `FILM_REACH` says where the field may be *read* without sampling a clamped
- * texel; this says where it may be *seen*. The simulation is untouched: the
- * sheet still covers the whole square, still tears, and still fires the blink
- * on the same measurement.
- *
- * The reason is that the dry patches were being drawn on the **white**, and on
- * a near-white matte surface a round patch of differing brightness reads as a
- * bead of water sitting on the eye rather than as a hole in a film. The
- * precorneal film is on the cornea; that is where it is observed and that is
- * where it now shows, as gloss variation rather than as beads.
+ * **This is the bound that answers "beads".** `WET_DARKEN` multiplies the
+ * diffuse-lit colour, so a dry patch is a round region of the surface at a
+ * different brightness — and on flat near-white sclera that reads as a bead of
+ * water sitting on the eye rather than as a hole in a film. The precorneal
+ * film is on the cornea; this keeps its darkening there.
  *
  * The band is exactly `AURORA_SEED_ANG0` to `AURORA_SEED_ANG1`, and that is by
  * construction rather than by coincidence: **the annulus where the film stops
@@ -1337,19 +1355,58 @@ export const AURORA_SEED_TAPS = 5;
  * render, so the energy does not disappear at the limbus, it changes form
  * there.
  *
- * `FILM_REACH` still does its own job underneath this — a tap outside it would
- * still streak — so the two multiply rather than one replacing the other.
- *
- * What it costs is measured in the task report: the specular peak sits at
- * `ang = 0.696`, outside the limbus, so the catchlight keeps the film's
- * shattering only on its inner skirt.
+ * The **broad sheen** rides this bound too, and for the same reason. It looks
+ * like a specular term and is not one: `SHEEN_LOBE_HALF` is 0.438 rad, so it
+ * is a wide low wash over most of the lit white rather than a highlight, and a
+ * patch in it is a round brightness step on flat white — a bead again.
+ * Measured, leaving it on the gloss bound instead put steps of up to 0.029 of
+ * luminance on the white away from the catchlight; on this bound they are
+ * 0.0000.
  */
-export const FILM_SHOW_ANG0 = AURORA_SEED_ANG0;
-export const FILM_SHOW_ANG1 = AURORA_SEED_ANG1;
+export const FILM_DIM_ANG0 = AURORA_SEED_ANG0;
+export const FILM_DIM_ANG1 = AURORA_SEED_ANG1;
 
-/** 1 where the film is drawn at full strength, 0 on the white. */
-export function filmShow(ang: number): number {
-  return 1 - smoothstep(FILM_SHOW_ANG0, FILM_SHOW_ANG1, ang);
+/**
+ * DERIVED. Where the film's **sharp gloss gating** stops being drawn.
+ *
+ * **A different question, so a different bound.** Inside a bright highlight a
+ * dry patch does not read as a bead; it reads as the *gloss* failing, which is
+ * what a tearing tear film actually looks like and what a clinician reads a
+ * break-up time off. That effect is Task 10's whole deliverable and it lives
+ * on the white, because `SPEC_ANG` is 0.696 and the limbus is 0.56.
+ *
+ * So this is bounded by the lobe rather than by the limbus: full strength in
+ * to and through the peak, falling to nothing exactly where the sharp lobe
+ * itself falls to half power, `SPEC_ANG + SPEC_LOBE_HALF = 0.866`. The film
+ * modulates the highlight wherever the highlight is bright, and nowhere else.
+ *
+ * Measured, the share of the sharp lobe's energy the film still modulates:
+ *
+ *     filmReach alone (the ceiling)      64.9%
+ *     x filmDim, the tight bound          6.2%
+ *     x filmGloss                        59.5%
+ *
+ * The film-tilted normal `nf` rides this bound as well — it is the *shape* of
+ * the highlight and it feeds nothing else now that the broad sheen is back on
+ * the bare normal — and so does the lens coupling behind the caustic, which
+ * `irisM` closes at 0.62 regardless.
+ *
+ * **Do not collapse this with `FILM_DIM_ANG1`.** One is bounded by where a
+ * round brightness step reads as a droplet on flat white; the other by where
+ * the specular lobe stops being bright. They are answering different
+ * questions and they happen to be on either side of the limbus.
+ */
+export const FILM_GLOSS_ANG0 = SPEC_ANG;
+export const FILM_GLOSS_ANG1 = SPEC_ANG + SPEC_LOBE_HALF;
+
+/** 1 where the film darkens the surface, 0 on the white. */
+export function filmDim(ang: number): number {
+  return 1 - smoothstep(FILM_DIM_ANG0, FILM_DIM_ANG1, ang);
+}
+
+/** 1 where the film gates the sharp highlight, 0 past the lobe. */
+export function filmGloss(ang: number): number {
+  return 1 - smoothstep(FILM_GLOSS_ANG0, FILM_GLOSS_ANG1, ang);
 }
 
 /**
