@@ -1,28 +1,17 @@
 import { VERT } from '../shared/shader-harness';
 import type { LidPose } from './physics';
 import {
-  AURORA_ANG,
   AURORA_ANG0,
-  AURORA_AZ,
-  AURORA_DANG,
-  AURORA_DAZ,
-  AURORA_D_ANG,
-  AURORA_D_AZ,
-  AURORA_PRIME_SECONDS,
-  AURORA_SEED,
+  AURORA_COOL,
+  AURORA_GAIN,
   AURORA_SEED_ANG0,
   AURORA_SEED_ANG1,
-  AURORA_SEED_ROWS,
   AURORA_SEED_TAPS,
-  AURORA_SELF,
-  AURORA_SPAN,
-  AURORA_STEP,
-  AURORA_TAU,
-  AURORA_V,
   DELTA,
   DOMAIN,
   DRY_H,
   EVAP,
+  EYE_R,
   GRAVITY,
   GRID,
   KAPPA,
@@ -34,11 +23,27 @@ import {
   PRIME_SECONDS,
   REDUCE,
   STEP,
-  auroraTick,
+  WIND_DIR,
+  WIND_FADE,
+  WIND_HALF_XY,
+  WIND_HALF_Z,
+  WIND_MARCH,
+  WIND_NX,
+  WIND_NY,
+  WIND_NZ,
+  WIND_PRIME_SECONDS,
+  WIND_RELEASE,
+  WIND_RELEASE_DANG,
+  WIND_RELEASE_H,
+  WIND_SIGMA,
+  WIND_STEP,
+  WIND_TAU,
+  WIND_U,
   breakupFraction,
   clampMobility,
   filmTick,
   interfaceWidth,
+  windTick,
 } from './physics';
 
 /**
@@ -958,119 +963,237 @@ export class FilmSim {
 }
 
 /* ------------------------------------------------------------------ *
- * The aurora: a second field, over the white.
+ * The wind: a volume the eye is an obstacle in.
  * ------------------------------------------------------------------ */
 
 /**
- * Texture unit the excitation field lives on. Not 0 — that is the SDF mask —
- * and not FILM_UNIT, which the step pass below reads at the same time.
+ * Texture units. Not 0 — that is the SDF mask — and not `FILM_UNIT`, which the
+ * step pass reads at the same time as the volume.
+ *
+ * `WIND_UNIT` carries the 3D volume for the step pass and the march;
+ * `MARCH_UNIT` carries the march's own quarter-resolution result, which is the
+ * only one `eyeW` ever sees. The display never touches the volume itself.
  */
-const AURORA_UNIT = 4;
+const WIND_UNIT = 4;
+const MARCH_UNIT = 5;
+
+/** A vec3 literal, so a derived direction is never retyped as digits. */
+const glVec3 = (v: readonly number[]) =>
+  `vec3(${v[0].toFixed(8)}, ${v[1].toFixed(8)}, ${v[2].toFixed(8)})`;
 
 /**
- * One aurora step, in (azimuth, angle) over the sclera.
- *
- * A transcription of `auroraStep()` in `physics.ts`, which is where the scheme,
- * its conservation argument and its derivations live. Every constant is
- * interpolated from there rather than written as a literal, so the shipped
- * shader and the reference that is tested headlessly cannot drift apart.
- *
- * **The stencil is the five-point cross and nothing more.** A face's flux
- * depends only on the two cells it separates, which is what makes the sum
- * telescope; the cell needs its own value and its four neighbours, and the
- * corners never come into it.
- *
- * **No clock.** The only per-step quantity is the fixed `AURORA_STEP`. What
- * makes the field evolve is the film tearing underneath it — spec D4, the same
- * rule the film's own passes live by. Delete `uTime` from this animation and
- * the aurora still breathes, because the thing driving it is a measurement.
- *
- * The seed is the causal coupling and is the reason this pass reads `uH`:
- * `AURORA_SEED_TAPS` samples across a band of cornea one dry-patch deep, just
- * inside the limbus, at this column's own azimuth. `step(h, DRY_H)` is GLSL's
- * `x < edge ? 0 : 1` with `h` as the edge, so it is 1 exactly where the film
- * is at or below the same threshold the reduction pass counts as torn — the
- * blink and the aurora fire on the same definition of a hole.
- *
- * The azimuth is the corneal-local one, so the taps land wherever the cornea
- * is *now*: the aurora rides the globe with the gaze because the film does.
+ * The box, and the map from a point in globe radii into the 3D texture's own
+ * frame. Shared, because the step pass and the march have to agree about it
+ * exactly or the volume shifts by a texel between writing and reading.
  */
-const AURORA_FRAG = `#version 300 es
-    precision highp float;
-    in vec2 vUV;
-    out vec4 fragColor;
-    uniform sampler2D uE;   // the excitation field itself
-    uniform sampler2D uH;   // the tear film, for the causal seed
-    const float NANG = ${AURORA_ANG.toFixed(1)};
-    const float DANG = ${AURORA_DANG.toFixed(8)};
-    const float DAZ  = ${AURORA_DAZ.toFixed(8)};
-    const float ANG0 = ${AURORA_ANG0.toFixed(6)};
-    const float SPAN = ${AURORA_SPAN.toFixed(8)};
-    const float DT   = ${AURORA_STEP.toExponential(8)};
-    const float V    = ${AURORA_V.toFixed(6)};
-    const float SELF = ${AURORA_SELF.toFixed(6)};
-    const float TAU  = ${AURORA_TAU.toFixed(6)};
-    const float DA   = ${AURORA_D_ANG.toFixed(8)};
-    const float DZ   = ${AURORA_D_AZ.toFixed(8)};
-    const float SEED = ${AURORA_SEED.toFixed(6)};
-    const float ROWS = ${AURORA_SEED_ROWS.toFixed(1)};
-    void main() {
-      float ez = 1.0 / ${AURORA_AZ.toFixed(1)};
-      float eg = 1.0 / NANG;
-      // vUV is the texel centre, so this is exactly the cell-centre angle.
-      float ang = ANG0 + vUV.y * SPAN;
-      float sc = sin(ang);
-      float sp = sin(ang + 0.5 * DANG);
-      float sm = sin(ang - 0.5 * DANG);
-      bool inner = vUV.y < eg;
-      bool outer = vUV.y > 1.0 - eg;
-      // REPEAT on the azimuth wraps the two side taps; CLAMP_TO_EDGE on the
-      // angle makes the out-of-range taps harmless, because both boundary
-      // faces are handled explicitly below and never read them.
-      vec2 c = texture(uE, vUV).xy;
-      vec2 n = texture(uE, vUV + vec2(0.0, eg)).xy;
-      vec2 s = texture(uE, vUV - vec2(0.0, eg)).xy;
-      vec2 e = texture(uE, vUV + vec2(ez, 0.0)).xy;
-      vec2 w = texture(uE, vUV - vec2(ez, 0.0)).xy;
-      // Outward face. v(E) = V*(1 + SELF*E) is positive everywhere, so the
-      // upwind cell is always the inner one and the scheme stays monotone.
-      // At the silhouette the ghost is empty: free outflow, no diffusive term.
-      float uo = V * (1.0 + SELF * (outer ? c.x : 0.5 * (c.x + n.x)));
-      vec2 fOut = uo * c - (outer ? 0.0 : DA / DANG) * (n - c);
-      // Inward face, which is the outer face of the cell below and computed by
-      // the same formula there. Closed at the limbus: seeding is the only way in.
-      float ui = V * (1.0 + SELF * 0.5 * (s.x + c.x));
-      vec2 fIn = inner ? vec2(0.0) : (ui * s - (DA / DANG) * (c - s));
-      // Azimuthal faces carry diffusion only -- see AURORA_SELF for the
-      // measurement that removed the advective term.
-      float arc = sc * DAZ;
-      vec2 fR = -(DZ / arc) * (e - c);
-      vec2 fL = -(DZ / arc) * (c - w);
-      vec2 div = (sp * fOut - sm * fIn) / (sc * DANG) + (fR - fL) / (sc * DAZ);
-      // The causal seed: this sector's own slice of the film, read in the
-      // corneal-local frame the film is stored in.
-      float az = (vUV.x - 0.5) * 6.28318530718;
-      vec2 dir = vec2(cos(az), sin(az));
-      float dry = 0.0;
-      for (int k = 0; k < ${AURORA_SEED_TAPS}; k++) {
-        float a = ${AURORA_SEED_ANG0.toFixed(6)}
-          + (float(k) + 0.5) / ${AURORA_SEED_TAPS.toFixed(1)}
-          * ${(AURORA_SEED_ANG1 - AURORA_SEED_ANG0).toFixed(6)};
-        vec2 l = sin(a) * dir;
-        dry += step(texture(uH, l / ${DOMAIN.toFixed(6)} + 0.5).x, ${DRY_H.toFixed(6)});
-      }
-      dry /= ${AURORA_SEED_TAPS.toFixed(1)};
-      // vUV.y * NANG is the row index plus a half, which is what the reference
-      // gates on. Two rows deep, softened across them.
-      float S = SEED * dry * (1.0 - smoothstep(0.0, ROWS, vUV.y * NANG));
-      // A gains E per second, which is what makes A/E an age in seconds.
-      fragColor = vec4(c + DT * (-div - c / TAU + vec2(S, c.x)), 0.0, 1.0);
+const WIND_BOX = `
+    const float HXY = ${WIND_HALF_XY.toFixed(8)};
+    const float HZ = ${WIND_HALF_Z.toFixed(8)};
+    vec3 windUVW(vec3 p) {
+      return (p + vec3(HXY, HXY, HZ)) / vec3(2.0 * HXY, 2.0 * HXY, 2.0 * HZ);
     }`;
 
-const AURORA_UNIFORMS = ['uE', 'uH'] as const;
+/**
+ * The analytic wind. Used by the step pass alone -- the march reads the
+ * volume the wind has already made and never evaluates it.
+ *
+ * A transcription of windFlow() in physics.ts, where the derivation and the
+ * three properties that matter -- stagnation, 1.5 U at the equator, and the
+ * sphere being a streamsurface -- are set out.
+ */
+const WIND_FLOW = `
+    const vec3 WDIR = ${glVec3(WIND_DIR)};
+    const float WU = ${WIND_U.toFixed(8)};
+    vec3 windFlow(vec3 p) {
+      float len = max(length(p), 1e-6);
+      float r = max(len, 1.0);
+      vec3 n = p / len;
+      vec3 w = WDIR * WU;
+      return w - (0.5 / (r * r * r)) * (3.0 * dot(w, n) * n - w);
+    }`;
+/**
+ * One wind step, on one z-slice of the volume.
+ *
+ * A transcription of `windStep()` in `physics.ts`, which is where the scheme
+ * and its derivations live. Every constant is interpolated from there rather
+ * than written as a literal, so the shipped shader and the reference that is
+ * tested headlessly cannot drift apart.
+ *
+ * **One slice per draw.** WebGL2 has no geometry shader and therefore no
+ * layered rendering, so a 3D target is written a layer at a time through
+ * `framebufferTextureLayer`. That is 48 draws a frame of 96x96 each — 442368
+ * fragments, the same work a single 665x665 pass would be, split up.
+ *
+ * **No clock.** The only per-step quantity is the fixed `WIND_STEP`. What
+ * makes the volume evolve is the film tearing at the limbus — spec D4, the
+ * same rule the film's own passes live by. Delete `uTime` from this animation
+ * and the wisps still breathe, because the thing driving them is a
+ * measurement.
+ *
+ * **`uGaze` carries the CPU gaze and not the rendered one.** `eyeW` adds a
+ * fixation micro-tremor of +-0.0125 on top; at the volume's cell size of
+ * 0.0333 radii that is a third of a cell and below anything this grid can
+ * hold, and reading it here would mean reading a clock in a step pass.
+ *
+ * The release is the causal coupling and is the reason this pass reads `uH`:
+ * `AURORA_SEED_TAPS` samples across a band of cornea one dry-patch deep, just
+ * inside the limbus, at this cell's own azimuth. `step(h, DRY_H)` is GLSL's
+ * `x < edge ? 0 : 1` with `h` as the edge, so it is 1 exactly where the film
+ * is at or below the same threshold the reduction pass counts as torn — the
+ * blink and the release fire on the same definition of a hole.
+ *
+ * The azimuth is the corneal-local one, so the taps land wherever the cornea
+ * is *now*: the **source** rides the globe with the gaze. The **wind** does
+ * not, which is the whole asymmetry of the piece.
+ */
+export const WIND_FRAG = `#version 300 es
+    precision highp float;
+    precision highp sampler3D;
+    in vec2 vUV;
+    out vec4 fragColor;
+    uniform sampler3D uV;   // the volume itself
+    uniform sampler2D uH;   // the tear film, for the causal release
+    uniform float uSlice;   // (k + 0.5) / NZ of the layer being written
+    uniform vec2 uGaze;
+    ${WIND_BOX}${WIND_FLOW}
+    const float DT = ${WIND_STEP.toExponential(8)};
+    const float DEC = ${Math.exp(-WIND_STEP / WIND_TAU).toFixed(8)};
+    const float RATE = ${WIND_RELEASE.toFixed(6)};
+    const float ANG0 = ${AURORA_ANG0.toFixed(6)};
+    const float RH = ${WIND_RELEASE_H.toFixed(8)};
+    const float RDA = ${WIND_RELEASE_DANG.toFixed(8)};
+    void main() {
+      vec3 p = vec3((vUV - 0.5) * (2.0 * HXY), (uSlice - 0.5) * (2.0 * HZ));
+      float r = length(p);
+      // Inside the globe. Nothing lives here and the march never reads it.
+      if (r < 1.0) { fragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
+      // RK2 backtrace. The midpoint matters: the streamlines are at their most
+      // curved exactly where the material is, hugging the sphere.
+      vec3 pm = p - 0.5 * DT * windFlow(p);
+      vec3 q = p - DT * windFlow(pm);
+      float qr = length(q);
+      // windFlow has no radial component at r = 1, so no streamline crosses
+      // the surface; RK2 on a curved one can still land a hair inside, and
+      // that point belongs back on the surface it came along.
+      if (qr < 1.0 && qr > 0.0) q /= qr;
+      vec2 s = texture(uV, windUVW(q)).xy;
+      float e = s.x * DEC;
+      float a = (s.y + DT * s.x) * DEC;
+      // The release: a ring of air just outside the limbus, in the gaze frame.
+      float gr = 1.0 - smoothstep(0.0, RH, r - 1.0);
+      if (gr > 0.0) {
+        vec3 gd = normalize(vec3(uGaze * 0.8, 1.0));
+        vec3 tx = normalize(cross(vec3(0.0, 1.0, 0.0), gd));
+        vec3 ty = cross(gd, tx);
+        vec3 n = p / r;
+        float ang = acos(clamp(dot(n, gd), -1.0, 1.0));
+        float ga = smoothstep(ANG0 - RDA, ANG0, ang)
+          * (1.0 - smoothstep(ANG0, ANG0 + RDA, ang));
+        if (ga > 0.0) {
+          float az = atan(dot(n, ty), dot(n, tx));
+          vec2 dir = vec2(cos(az), sin(az));
+          float dry = 0.0;
+          for (int k = 0; k < ${AURORA_SEED_TAPS}; k++) {
+            float ca = ${AURORA_SEED_ANG0.toFixed(6)}
+              + (float(k) + 0.5) / ${AURORA_SEED_TAPS.toFixed(1)}
+              * ${(AURORA_SEED_ANG1 - AURORA_SEED_ANG0).toFixed(6)};
+            vec2 l = sin(ca) * dir;
+            dry += step(texture(uH, l / ${DOMAIN.toFixed(6)} + 0.5).x, ${DRY_H.toFixed(6)});
+          }
+          e += DT * RATE * (dry / ${AURORA_SEED_TAPS.toFixed(1)}) * gr * ga;
+        }
+      }
+      fragColor = vec4(e, a, 0.0, 1.0);
+    }`;
+
+const WIND_UNIFORMS = ['uV', 'uH', 'uSlice', 'uGaze'] as const;
 
 /**
- * The excitation field over the white.
+ * The march: the volume, integrated along the view ray, at quarter resolution.
+ *
+ * A transcription of `windMarch()` in `physics.ts`. It runs in its own pass
+ * rather than inside `eyeW` for one reason: **it is the most expensive thing
+ * in the animation and it is the one thing that can afford to be soft.**
+ * 480x270 by 16 samples at 60fps is 124.4M trilinear fetches a second; the
+ * same march inside `eyeW` at full resolution would be sixteen times that.
+ *
+ * **The sorting is exact.** The ray stops at the analytic sphere intersection,
+ * so everything behind the globe is never sampled and is occluded by
+ * construction rather than by comparison. Everything this accumulates is in
+ * front of the globe, which is why `eyeW` composites it with one `mix` at the
+ * very end and needs no depth of its own.
+ *
+ * The dither is a 4x4 Bayer value of the march pixel, **not** of time — see
+ * `WIND_MARCH` for why 16 samples needs one and why it cannot be temporal.
+ */
+export const MARCH_FRAG = `#version 300 es
+    precision highp float;
+    precision highp sampler3D;
+    in vec2 vUV;
+    out vec4 fragColor;
+    uniform sampler3D uV;
+    uniform vec2 uRes;
+    uniform float uScale;
+    ${WIND_BOX}
+    const float R = ${EYE_R.toFixed(6)};
+    const float SIG = ${WIND_SIGMA.toFixed(6)};
+    const float GAIN = ${AURORA_GAIN.toFixed(6)};
+    const float COOL = ${AURORA_COOL.toFixed(6)};
+    const float FADE = ${WIND_FADE.toFixed(8)};
+    const float N = ${WIND_MARCH.toFixed(1)};
+    /** The 4x4 Bayer value of this march pixel, in [0,1). Matches bayer4. */
+    float bayer4(vec2 c) {
+      float M[16] = float[16](
+         0.0,  8.0,  2.0, 10.0,
+        12.0,  4.0, 14.0,  6.0,
+         3.0, 11.0,  1.0,  9.0,
+        15.0,  7.0, 13.0,  5.0);
+      ivec2 f = ivec2(mod(c, 4.0));
+      return M[f.y * 4 + f.x] * 0.0625;
+    }
+    void main() {
+      // The same q as the display pass, from the same uRes and uScale.
+      vec2 p2 = vec2(vUV.x, 1.0 - vUV.y) * uRes;
+      vec2 q = (p2 - uRes * 0.5) / (min(uRes.x, uRes.y) * 0.5) * (0.44 / uScale);
+      vec2 xy = q / R;
+      fragColor = vec4(0.0, 0.0, 0.0, 0.0);
+      if (abs(xy.x) >= HXY || abs(xy.y) >= HXY) return;
+      float d2 = dot(xy, xy);
+      // The globe's near surface where the ray hits it, the box's far face
+      // where it does not. One expression, and it is both the occlusion and
+      // the exit test.
+      float zStop = d2 < 1.0 ? sqrt(1.0 - d2) : -HZ;
+      float span = HZ - zStop;
+      if (span <= 0.0) return;
+      float ds = span / N;
+      float dith = bayer4(gl_FragCoord.xy);
+      vec3 acc = vec3(0.0);
+      float T = 1.0;
+      for (int i = 0; i < ${WIND_MARCH}; i++) {
+        vec3 pt = vec3(xy, HZ - (float(i) + dith) * ds);
+        vec2 s = texture(uV, windUVW(pt)).xy;
+        vec3 ax = abs(pt);
+        float fade = smoothstep(0.0, FADE, HXY - ax.x)
+          * smoothstep(0.0, FADE, HXY - ax.y)
+          * smoothstep(0.0, FADE, HZ - ax.z);
+        float e = max(s.x, 0.0) * fade;
+        // Colour from the field's state, not from a ramp: s.y/s.x is the mean
+        // age of the energy here, in seconds, so young emits at ELEC and
+        // cooled at VMAG. The fade scales E and A together, so the ratio --
+        // and therefore the hue -- is untouched by it.
+        float age = s.y / max(s.x, 1e-4);
+        vec3 em = mix(vec3(0.3, 0.55, 1.0), vec3(0.85, 0.2, 0.75),
+          smoothstep(0.0, COOL, age)) * (GAIN * e);
+        acc += T * em * ds;
+        T *= exp(-SIG * e * ds);
+      }
+      fragColor = vec4(acc, 1.0 - T);
+    }`;
+
+const MARCH_UNIFORMS = ['uV', 'uRes', 'uScale'] as const;
+
+/**
+ * The wind volume, and the march that renders it.
  *
  * Same shape as `FilmSim` — a ping-pong pair, a fixed-step accumulator, a
  * float target with a half-float fallback — and deliberately a separate class
@@ -1078,41 +1201,66 @@ const AURORA_UNIFORMS = ['uE', 'uH'] as const;
  * conditions and no step rate, and the only thing that passes between them is
  * a texture unit.
  *
- * **The wrap is not symmetric and that is the point.** Azimuth is `REPEAT`,
- * because the sclera closes on itself and a curtain that crosses the seam has
- * to arrive on the other side; angle is `CLAMP_TO_EDGE`, because the limbus
- * and the silhouette are real edges. Get these the wrong way round and either
- * a seam appears at the back of the eye or the field wraps the silhouette onto
- * the limbus.
+ * **What is not here is a wrap.** Task 13's field closed on itself in azimuth
+ * and had a seam to get right. This one is a box of air with still air outside
+ * it: every face is `CLAMP_TO_EDGE`, every face is empty because material only
+ * ever enters at the limbus, and the march fades the last `WIND_FADE` of each
+ * face to nothing so the box cannot show an edge.
  */
-export class AuroraSim {
+export class WindSim {
   readonly ok: boolean = true;
 
   private readonly gl: WebGL2RenderingContext;
   private readonly prog: WebGLProgram;
+  private readonly marchProg: WebGLProgram;
+  private readonly sliceL: WebGLUniformLocation | null;
+  private readonly gazeL: WebGLUniformLocation | null;
+  private readonly resL: WebGLUniformLocation | null;
+  private readonly scaleL: WebGLUniformLocation | null;
   private tex: (WebGLTexture | null)[] = [null, null];
-  private fb: (WebGLFramebuffer | null)[] = [null, null];
+  private fb: WebGLFramebuffer | null = null;
+  private marchTex: WebGLTexture | null = null;
+  private marchFb: WebGLFramebuffer | null = null;
+  private mw = 0;
+  private mh = 0;
   private i = 0;
   private acc = 0;
+  private gaze: [number, number] = [0, 0];
 
-  private constructor(gl: WebGL2RenderingContext, prog: WebGLProgram) {
+  private constructor(
+    gl: WebGL2RenderingContext,
+    prog: WebGLProgram,
+    marchProg: WebGLProgram
+  ) {
     this.gl = gl;
     this.prog = prog;
-    const L = locsOf(gl, prog, AURORA_UNIFORMS);
-    gl.uniform1i(L.uE!, AURORA_UNIT);
+    this.marchProg = marchProg;
+    const L = locsOf(gl, prog, WIND_UNIFORMS);
+    gl.uniform1i(L.uV!, WIND_UNIT);
     gl.uniform1i(L.uH!, FILM_UNIT);
+    this.sliceL = L.uSlice;
+    this.gazeL = L.uGaze;
+    const M = locsOf(gl, marchProg, MARCH_UNIFORMS);
+    gl.uniform1i(M.uV!, WIND_UNIT);
+    this.resL = M.uRes;
+    this.scaleL = M.uScale;
   }
 
   /**
-   * Build the field. Returns null when the program or the float target is
+   * Build the volume. Returns null when the program or the float target is
    * unavailable, exactly as `FilmSim.create` does, so the caller records the
-   * failure once and the display's `uAuroraOK` stays 0.
+   * failure once and the display's `uWindOK` stays 0.
    */
-  static create(gl: WebGL2RenderingContext): AuroraSim | null {
+  static create(gl: WebGL2RenderingContext): WindSim | null {
     if (!gl.getExtension('EXT_color_buffer_float')) return null;
-    const prog = program(gl, AURORA_FRAG, 'aurora');
+    const prog = program(gl, WIND_FRAG, 'wind');
     if (!prog) return null;
-    const sim = new AuroraSim(gl, prog);
+    const marchProg = program(gl, MARCH_FRAG, 'wind march');
+    if (!marchProg) {
+      gl.deleteProgram(prog);
+      return null;
+    }
+    const sim = new WindSim(gl, prog, marchProg);
     if (!sim.allocate()) {
       sim.destroy();
       return null;
@@ -1122,105 +1270,131 @@ export class AuroraSim {
 
   private allocate(): boolean {
     const gl = this.gl;
-    // The display filters this field, so 32F is only taken when it is
-    // filterable -- the same rule and the same fallback as the film.
+    // The march filters the volume, so 32F is only taken when it is
+    // filterable -- the same rule and the same fallback as the film. At
+    // 442368 cells the difference is 7.1MB against 14.2MB for the pair, so
+    // the half-float path is also the one to prefer on its own merits; it is
+    // taken second only because 32F costs nothing where it is already there.
     const wantF32 = !!gl.getExtension('OES_texture_float_linear');
     for (const f32 of wantF32 ? [true, false] : [false]) {
       if (this.build(f32)) return true;
       this.release();
     }
-    console.error('visionary-eye aurora: no complete float target');
+    console.error('visionary-eye wind: no complete float target');
     return false;
   }
 
   private build(f32: boolean): boolean {
     const gl = this.gl;
-    let complete = true;
+    const fb = gl.createFramebuffer();
+    if (!fb) return false;
+    this.fb = fb;
     for (let n = 0; n < 2; n++) {
       const tx = gl.createTexture();
       if (!tx) return false;
-      gl.activeTexture(gl.TEXTURE0 + AURORA_UNIT);
-      gl.bindTexture(gl.TEXTURE_2D, tx);
-      gl.texImage2D(
-        gl.TEXTURE_2D,
+      gl.activeTexture(gl.TEXTURE0 + WIND_UNIT);
+      gl.bindTexture(gl.TEXTURE_3D, tx);
+      gl.texImage3D(
+        gl.TEXTURE_3D,
         0,
         f32 ? gl.RGBA32F : gl.RGBA16F,
-        AURORA_AZ,
-        AURORA_ANG,
+        WIND_NX,
+        WIND_NY,
+        WIND_NZ,
         0,
         gl.RGBA,
         f32 ? gl.FLOAT : gl.HALF_FLOAT,
         null
       );
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      // The sclera closes on itself in azimuth and does not in angle.
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      const fb = gl.createFramebuffer();
-      if (!fb) {
-        gl.deleteTexture(tx);
-        return false;
-      }
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-      gl.framebufferTexture2D(
-        gl.FRAMEBUFFER,
-        gl.COLOR_ATTACHMENT0,
-        gl.TEXTURE_2D,
-        tx,
-        0
-      );
-      if (
-        gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE
-      ) {
-        complete = false;
-      }
-      // Unlike the film, an empty field is the rest state here: no excitation
-      // is the honest starting condition, and `prime()` fills it from the film.
-      gl.viewport(0, 0, AURORA_AZ, AURORA_ANG);
-      gl.clearColor(0, 0, 0, 1);
-      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      // Still air outside the test section, on every face. Nothing wraps:
+      // material only ever enters at the limbus, so the faces are empty and
+      // clamping them extends nothing.
+      gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE);
       this.tex[n] = tx;
-      this.fb[n] = fb;
+      // An empty volume is the rest state: still air is the honest starting
+      // condition, and `prime()` fills it from the film.
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+      gl.viewport(0, 0, WIND_NX, WIND_NY);
+      for (let k = 0; k < WIND_NZ; k++) {
+        gl.framebufferTextureLayer(
+          gl.FRAMEBUFFER,
+          gl.COLOR_ATTACHMENT0,
+          tx,
+          0,
+          k
+        );
+        if (
+          k === 0 &&
+          gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE
+        ) {
+          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+          return false;
+        }
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+      }
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    return complete;
+    return true;
   }
 
   private release(): void {
     const gl = this.gl;
     for (let n = 0; n < 2; n++) {
       if (this.tex[n]) gl.deleteTexture(this.tex[n]);
-      if (this.fb[n]) gl.deleteFramebuffer(this.fb[n]);
       this.tex[n] = null;
-      this.fb[n] = null;
     }
+    if (this.fb) gl.deleteFramebuffer(this.fb);
+    this.fb = null;
+    if (this.marchTex) gl.deleteTexture(this.marchTex);
+    if (this.marchFb) gl.deleteFramebuffer(this.marchFb);
+    this.marchTex = null;
+    this.marchFb = null;
+    this.mw = 0;
+    this.mh = 0;
   }
 
-  /** One draw: read the live field and the film, write the other, swap. */
+  /** One step: read the live volume and the film, write the other, swap. */
   private pass(): void {
     const gl = this.gl;
     const dst = 1 - this.i;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb[dst]);
-    gl.viewport(0, 0, AURORA_AZ, AURORA_ANG);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb);
+    gl.viewport(0, 0, WIND_NX, WIND_NY);
     gl.useProgram(this.prog);
-    gl.activeTexture(gl.TEXTURE0 + AURORA_UNIT);
-    gl.bindTexture(gl.TEXTURE_2D, this.tex[this.i]);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.uniform2f(this.gazeL!, this.gaze[0], this.gaze[1]);
+    gl.activeTexture(gl.TEXTURE0 + WIND_UNIT);
+    gl.bindTexture(gl.TEXTURE_3D, this.tex[this.i]);
+    for (let k = 0; k < WIND_NZ; k++) {
+      gl.framebufferTextureLayer(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        this.tex[dst],
+        0,
+        k
+      );
+      gl.uniform1f(this.sliceL!, (k + 0.5) / WIND_NZ);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
     this.i = dst;
   }
 
   /**
-   * Advance by wall-clock `dt` in fixed steps, with `film` bound as the seed.
+   * Advance by wall-clock `dt` in fixed steps, with `film` bound as the
+   * release and `gaze` placing the release band.
    *
-   * The backlog cap is `AURORA_MAX_SUBSTEPS * AURORA_STEP`, deliberately the
-   * same 0.025s the film's is, so the two fields age by the same amount on a
-   * slow frame and the aurora's seed stays in step with the break-up that
-   * produced it. Returns the aurora seconds actually integrated.
+   * The backlog cap is `WIND_MAX_SUBSTEPS * WIND_STEP`, as close as a 60Hz
+   * step can come to the film's 0.0253s, so the two fields age by nearly the
+   * same amount on a slow frame and the release stays in step with the
+   * break-up that produced it. Returns the wind seconds actually integrated.
    */
-  advance(dt: number, film: FilmSim): number {
+  advance(dt: number, film: FilmSim, gaze: [number, number]): number {
     const gl = this.gl;
-    const tick = auroraTick(this.acc, dt);
+    this.gaze = gaze;
+    const tick = windTick(this.acc, dt);
     this.acc = tick.acc;
     if (tick.steps === 0) return 0;
     film.bindField(FILM_UNIT);
@@ -1230,33 +1404,88 @@ export class AuroraSim {
   }
 
   /**
-   * Fill the field from an already-primed film, so the white is not blank on
-   * the first frame. See `AURORA_PRIME_SECONDS`.
+   * Fill the volume from an already-primed film, so the air is not empty on
+   * the first frame. See `WIND_PRIME_SECONDS`.
    */
-  prime(film: FilmSim): void {
+  prime(film: FilmSim, gaze: [number, number]): void {
     const gl = this.gl;
     this.acc = 0;
+    this.gaze = gaze;
     film.bindField(FILM_UNIT);
-    const n = Math.round(AURORA_PRIME_SECONDS / AURORA_STEP);
+    const n = Math.round(WIND_PRIME_SECONDS / WIND_STEP);
     for (let k = 0; k < n; k++) this.pass();
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
 
-  /** Bind the live field for the display pass. */
-  bindField(unit: number): void {
+  /**
+   * Render the volume into its quarter-resolution target, then bind that for
+   * the display pass. `w` and `h` are the **full** canvas size.
+   *
+   * The target is reallocated only when the quarter size actually changes, so
+   * a resize costs one allocation and a steady canvas costs none.
+   */
+  march(w: number, h: number, scale: number, unit: number): void {
     const gl = this.gl;
+    const mw = Math.max(1, Math.ceil(w / 4));
+    const mh = Math.max(1, Math.ceil(h / 4));
+    if (mw !== this.mw || mh !== this.mh) {
+      if (this.marchTex) gl.deleteTexture(this.marchTex);
+      if (this.marchFb) gl.deleteFramebuffer(this.marchFb);
+      this.marchTex = gl.createTexture();
+      this.marchFb = gl.createFramebuffer();
+      gl.activeTexture(gl.TEXTURE0 + unit);
+      gl.bindTexture(gl.TEXTURE_2D, this.marchTex);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA16F,
+        mw,
+        mh,
+        0,
+        gl.RGBA,
+        gl.HALF_FLOAT,
+        null
+      );
+      // LINEAR is the upsample: a quarter-resolution march read bilinearly is
+      // a four-pixel blur on media that is already soft, and it is what keeps
+      // the cost where it is.
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.marchFb);
+      gl.framebufferTexture2D(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        gl.TEXTURE_2D,
+        this.marchTex,
+        0
+      );
+      this.mw = mw;
+      this.mh = mh;
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.marchFb);
+    gl.viewport(0, 0, mw, mh);
+    gl.useProgram(this.marchProg);
+    gl.uniform2f(this.resL!, w, h);
+    gl.uniform1f(this.scaleL!, scale);
+    gl.activeTexture(gl.TEXTURE0 + WIND_UNIT);
+    gl.bindTexture(gl.TEXTURE_3D, this.tex[this.i]);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.activeTexture(gl.TEXTURE0 + unit);
-    gl.bindTexture(gl.TEXTURE_2D, this.tex[this.i]);
+    gl.bindTexture(gl.TEXTURE_2D, this.marchTex);
   }
 
   destroy(): void {
     this.release();
     this.gl.deleteProgram(this.prog);
+    this.gl.deleteProgram(this.marchProg);
   }
 }
 
-/** The texture unit the display shader expects the excitation field on. */
-export const AURORA_TEXTURE_UNIT = AURORA_UNIT;
+/** The texture unit the display shader expects the march's result on. */
+export const MARCH_TEXTURE_UNIT = MARCH_UNIT;
 
-/** The texture unit the display shader expects the field on. */
+/** The texture unit the display shader expects the film on. */
 export const FILM_TEXTURE_UNIT = FILM_UNIT;

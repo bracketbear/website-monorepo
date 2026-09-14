@@ -1,22 +1,24 @@
 import {
   AURORA_ANG0,
+  AURORA_SEED_ANG0,
+  AURORA_SEED_ANG1,
+  AURORA_SEED_TAPS,
   FILM_DIM_ANG0,
   FILM_DIM_ANG1,
   FILM_GLOSS_ANG0,
   FILM_GLOSS_ANG1,
-  AURORA_COOL,
-  AURORA_DANG,
-  AURORA_GAIN,
-  AURORA_SPAN,
   CAUSTIC_MAX,
   CORNEA_ETA,
   DOMAIN,
   DRY_H,
+  EYE_R,
   FILM_REACH,
   FILM_REACH_FADE,
   FILM_LENS,
   FILM_SLOPE,
   IRIS_DEPTH,
+  ROOT_DANG,
+  ROOT_GAIN,
   WET_DARKEN,
   WET_H,
 } from './physics';
@@ -42,9 +44,11 @@ export const EYE_GLOBE = `
       uniform float uDelta;
       uniform float uShowFilm;
       uniform float uFilmOK;
-      // The excitation field over the white, and its own 0/1 gate.
-      uniform sampler2D uAurora;
-      uniform float uAuroraOK;
+      // The march's result -- the wind volume already integrated along the
+      // view ray at quarter resolution -- and its own 0/1 gate. The display
+      // never sees the volume itself; see MARCH_FRAG in film.ts.
+      uniform sampler2D uMarch;
+      uniform float uWindOK;
       /**
        * The film, fetched smoothly.
        *
@@ -149,7 +153,7 @@ export const EYE_GLOBE = `
         vec3 IND = vec3(0.09, 0.05, 0.20);
         vec3 ELEC = vec3(0.30, 0.55, 1.0);
         vec3 VMAG = vec3(0.85, 0.20, 0.75);
-        float R = 0.36;
+        float R = ${EYE_R.toFixed(6)};
         float r = length(q);
         // gaze from CPU (saccades + pursuit) plus fixation micro-tremor
         vec2 gz = uGaze + vec2(vnoise(vec2(t * 3.5, 1.0)) - 0.5, vnoise(vec2(4.0, t * 3.5)) - 0.5) * 0.025;
@@ -378,39 +382,65 @@ export const EYE_GLOBE = `
           // steps of up to 0.029 of luminance on the white off the catchlight.
           eye += uCream * pow(dif, 7.0) * 0.07 * (1.0 - irisM) * wetDim;
           eye += ELEC * vl * pow(clamp(dot(nb, normalize(vec3(0.3, -0.2, 1.0))), 0.0, 1.0), 8.0) * uBump * 0.55 * irisM;
-          // ---- The aurora: what the white does instead of veins.
+          // ---- The root: where the energy leaves the eye.
           //
-          // The excitation field, in (azimuth, angle) about the gaze axis.
-          // sa2 is the corneal-local azimuth -- the same frame the film lives
-          // in -- so the curtains ride the globe with the gaze for free, and
-          // the sector lit here is the sector whose cornea is tearing.
+          // **Not an aurora on the sclera.** Task 13's surface field is
+          // retired; what the white carries now is a short glow on the limbus
+          // at the sectors that are actually shedding, and everything else is
+          // in the air. Without this the wisps would appear in mid-air with no
+          // visible origin and the causal story -- the film drives them --
+          // would be invisible even though it is still true.
           //
-          // The azimuth is REPEAT, so u simply runs off the end and comes back:
-          // there is no seam to hide. The angle is CLAMP_TO_EDGE and this fades
-          // in over three cells from ANG0 so the inner boundary lands under the
-          // limbal glow rather than as an edge on the white.
+          // The taps are auroraSeedTap exactly: AURORA_SEED_TAPS samples
+          // across a band of cornea one dry-patch deep just inside the limbus,
+          // at this pixel's own azimuth, thresholded at the same DRY_H the
+          // blink and the release fire on. So this is not a *depiction* of the
+          // release, it is the same measurement the volume's step pass makes,
+          // evaluated at the same place.
           //
-          // Colour from the field's state, not from a ramp. A.x is the
-          // excitation and A.y is its age *density*, so A.y/A.x is the mean age
-          // of the light in this cell, in seconds: young excitation emits at
-          // ELEC and cooled excitation at VMAG, and the layering that produces
-          // is a consequence of how long the energy has been travelling rather
-          // than of how far out the pixel is. A parcel that stalls near the
-          // limbus cools there.
+          // ELEC with no VMAG term, because energy at the root is by
+          // definition new: AURORA_COOL maps age zero to ELEC, and writing
+          // the mix out would be writing mix(ELEC, VMAG, 0.0).
           //
-          // uAuroraOK is 0 or 1 and fixed for the life of the context, and the
-          // clamp keeps the factor finite, so at 0 this adds exactly vec3(0.0)
-          // and the no-field render is bit-identical -- the same contract
-          // uFilmOK carries, and for the same reason.
-          vec2 auv = vec2(sa2 * 0.15915494 + 0.5, (ang - ${AURORA_ANG0.toFixed(6)}) * ${(1 / AURORA_SPAN).toFixed(8)});
-          vec2 ex = texture(uAurora, auv).xy;
-          float exE = clamp(ex.x, 0.0, 4.0) * uAuroraOK
-            * smoothstep(${AURORA_ANG0.toFixed(6)}, ${(AURORA_ANG0 + 3 * AURORA_DANG).toFixed(6)}, ang);
-          eye += mix(ELEC, VMAG, smoothstep(0.0, ${AURORA_COOL.toFixed(6)}, ex.y / max(ex.x, 1e-4)))
-            * exE * ${AURORA_GAIN.toFixed(6)};
+          // rootGate is ROOT_DANG either side of AURORA_ANG0, so its inner
+          // half sits under the limbal ring above and cannot show a boundary.
+          // uFilmOK gates it, so the no-film fallback is untouched.
+          float rg = smoothstep(${(AURORA_ANG0 - ROOT_DANG).toFixed(6)}, ${AURORA_ANG0.toFixed(6)}, ang)
+            * (1.0 - smoothstep(${AURORA_ANG0.toFixed(6)}, ${(AURORA_ANG0 + ROOT_DANG).toFixed(6)}, ang));
+          if (rg > 0.0 && uFilmOK > 0.5) {
+            vec2 rdir = vec2(cos(sa2), sin(sa2));
+            float dry = 0.0;
+            for (int k = 0; k < ${AURORA_SEED_TAPS}; k++) {
+              float ca = ${AURORA_SEED_ANG0.toFixed(6)}
+                + (float(k) + 0.5) / ${AURORA_SEED_TAPS.toFixed(1)}
+                * ${(AURORA_SEED_ANG1 - AURORA_SEED_ANG0).toFixed(6)};
+              vec2 rl = sin(ca) * rdir;
+              dry += step(texture(uFilm, rl / ${DOMAIN.toFixed(6)} + 0.5).x, ${DRY_H.toFixed(6)});
+            }
+            eye += ELEC * (dry / ${AURORA_SEED_TAPS.toFixed(1)}) * rg * ${ROOT_GAIN.toFixed(6)};
+          }
           eye += ELEC * pow(1.0 - nz / R, 3.0) * 0.18;
           col = eye;
         }
+        // ---- The wind, composited over everything.
+        //
+        // The march has already integrated the volume from the box's near face
+        // to whichever comes first, the globe's surface or the box's far face,
+        // so **everything in this texel is in front of the globe** and the
+        // composite is one mix with no depth test of its own. Material behind
+        // the eye was never sampled; it is occluded by construction rather
+        // than by comparison. See MARCH_FRAG.
+        //
+        // Premultiplied, so wv.rgb is added rather than mixed in: the wisps
+        // emit *and* extinguish, and wv.a is the extinction alone.
+        //
+        // The whole vec4 is multiplied by uWindOK rather than just the colour.
+        // At 0 that has to leave alpha at 0 as well, or an unbound sampler's
+        // (0,0,0,1) would multiply the eye away to black -- the fallback here
+        // is not a dimmer aurora, it is a differently-lit eye, and it has to
+        // be bit-identical.
+        vec4 wv = texture(uMarch, vUV) * uWindOK;
+        col = col * (1.0 - wv.a) + wv.rgb;
         // ---- Hue-preserving highlight compression.
         //
         // **Additive light on a near-white surface has no colour.** The sclera

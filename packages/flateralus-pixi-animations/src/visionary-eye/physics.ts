@@ -1162,175 +1162,87 @@ export function fallbackFraction(sinceFilmSeconds: number): number {
 }
 
 /* ------------------------------------------------------------------ *
- * The aurora: excitation streaming off the limbus.
+ * The aurora, and the wind it blows in.
  *
- * A second field, over the **sclera** rather than the cornea, in
- * (azimuth, angle) about the gaze axis. It is fed by the film's break-up in
- * the matching angular sector — where the sheet is tearing near the limbus,
- * energy is released over the white — and then advected outward toward the
- * silhouette, sheared by a velocity it induces itself, diffused
- * anisotropically and decayed.
+ * Energy is released where the film tears, at the limbus, into a **wind that
+ * does not belong to the eye**. The eye is an obstacle in a tunnel: the flow
+ * parts at its upwind face, accelerates around it, and closes downwind, and
+ * what it carries is stretched as it accelerates. That stretching is the whole
+ * of the wispiness — there is no noise term anywhere in this file and none in
+ * the GLSL that transcribes it.
  *
- * Everything below is transcribed into GLSL by `film.ts` from these same
- * constants, exactly as the film's passes are, so the reference and the
- * shipped shader cannot drift apart. `auroraStep()` at the bottom is the
- * specification: it is the scheme, written where it can be driven headlessly.
+ * **What was retired, and why.** Task 13 shipped a second *surface* field in
+ * (azimuth, angle) over the sclera: flux-form advection outward from the
+ * limbus, anisotropic diffusion, Burgers self-steepening, an exactly
+ * conservative divergence, a periodic azimuthal seam. It worked and it was
+ * measured — transport within 2.4e-7 of conservative, the seam bit-identical,
+ * a x1.91 breathing swing lagging the blink by 1.26s. It is gone because the
+ * piece changed shape, not because it failed: **you cannot have two transports
+ * carrying the same energy**, and a wind that goes around the globe is the
+ * better one for what the piece is now. The measurements stand as prior art in
+ * the task reports. What survives here is the causal chain the user chose —
+ * the film tap, the azimuthal sparsity it produces, and the release band —
+ * plus the colour-by-age, which the volume carries unchanged.
+ *
+ * Everything below is transcribed into GLSL by `film.ts` and `eye.ts` from
+ * these same constants, so the reference and the shipped shaders cannot drift.
+ * `windStep()` is the specification for the simulation and `windMarch()` for
+ * the render; both are written where they can be driven headlessly.
+ *
+ * **Units.** Lengths in this section are in **globe radii**, not in the `q`
+ * units `eyeW` draws in. The globe is the unit sphere at the origin, `z` is
+ * toward the viewer, and `x`/`y` are screen right and up. Nothing here knows
+ * the value of `eye.ts`'s `R`, which is what keeps the two from having to
+ * agree about a number.
  * ------------------------------------------------------------------ */
 
 /**
- * DERIVED. Inner edge of the field: the limbus, where the cornea ends and the
- * white begins.
+ * DERIVED. The limbus, where the cornea ends and the white begins — and now
+ * the ring the energy is released from.
  *
  * `eye.ts` rings the limbus at `ang = 0.56` — `exp(-abs(ang - 0.56) * 26.0)` —
  * and fades the iris out across `smoothstep(0.62, 0.5, ang)`. 0.56 is the same
- * number, so the aurora's inner boundary lands underneath the limbal glow,
- * which is the one place on the globe where a boundary can hide.
+ * number, so the release boundary lands underneath the limbal glow, which is
+ * the one place on the globe where a boundary can hide.
  */
 export const AURORA_ANG0 = 0.56;
 
-/** DERIVED. Outer edge: the silhouette, where the globe turns away. */
-export const AURORA_ANG1 = Math.PI / 2;
-
-/** DERIVED. Angular span of the white, 1.011 rad. */
-export const AURORA_SPAN = AURORA_ANG1 - AURORA_ANG0;
+/**
+ * The globe's radius in `eyeW`'s `q` units.
+ *
+ * It lives here because two shaders need it now — `eyeW` draws the sphere and
+ * the march has to turn a pixel into globe radii — and a number that two
+ * shaders must agree about is a number neither of them should spell out. Both
+ * interpolate it; a test asserts they do.
+ */
+export const EYE_R = 0.36;
 
 /**
  * DERIVED. Azimuthal extent of one source, in radians — the angular width a
  * single dry patch of film subtends at the seeding band.
  *
- * This is the number the azimuthal resolution is derived from, and it is not
- * free: `breakupFraction()`'s comment measures the dry patches at **12.6
- * cells** across, and `AURORA_SEED_ANG0/1` puts the band at a mean angle of
- * 0.47 rad from the gaze axis, where the tangent radius is `sin(0.47)`. A
- * patch of diameter `12.6 * DELTA` there covers
+ * `breakupFraction`'s comment measures the patches at **12.6 `DELTA` cells**
+ * across, and `AURORA_SEED_ANG0/1` puts the band at a mean angle of 0.47 rad,
+ * where the tangent plane the film is stored in is foreshortened by
+ * `sin(0.47)`. So one dry patch is `12.6 * DELTA / sin(0.47) = 0.348 rad` of
+ * azimuth — about 20 degrees, some eighteen source-widths around the limbus.
  *
- *     12.6 * DELTA / sin(0.47) = 0.348 rad, about 20 degrees.
- *
- * So there are about eighteen source-widths around the limbus and, with the
- * twenty-odd patches the film carries spread over the whole cornea, six or
- * seven of them lit at any moment. **The sources are sparse and discrete
- * because the film's break-up is**, which is the whole reason the seed is
- * taken from the field rather than from a noise function.
+ * **This is the largest structure the volume has to carry**, and dividing it
+ * by the flow's own stretching is what sizes the grid. See `WIND_NX`.
  */
 export const AURORA_SOURCE_WIDTH = (12.6 * DELTA) / Math.sin((0.38 + 0.56) / 2);
 
 /**
- * DERIVED. Azimuthal cells.
+ * DERIVED. Inner and outer angle of the band on the **cornea** whose break-up
+ * feeds the release above it, and how many taps read it.
  *
- * The narrowest filament the field has to carry is about a **quarter** of the
- * source width — that is what advection under the self-induced shear thins a
- * source down to before the across-flow diffusion stops it (`AURORA_D_AZ`
- * spreads a filament by `sqrt(2*D*T) = 0.045 rad` over one transit, which is
- * half of that quarter, so the thinning is arrested rather than erased).
- *
- * A filament wants at least **4 cells** across it: fewer and first-order
- * upwind advection eats it within a transit, and the across-flow diffusion
- * has nothing to act on but the grid.
- *
- *     2*pi / (AURORA_SOURCE_WIDTH / 4 / 4) = 289
- *
- * 320 is the next multiple of 64 above it. The angle axis gets a fifth of
- * that, because the azimuth is where the structure is: along the flow the
- * field is stretched and smooth, across it the field is filaments.
- */
-export const AURORA_AZ = 320;
-
-/**
- * DERIVED. Angle cells, from isotropy on the sphere rather than from a second
- * structural argument.
- *
- * An azimuth cell spans `sin(ang) * dAz` of arc and an angle cell spans
- * `dAng`. Averaged over the white, `<sin> = 0.838`, so square cells want
- *
- *     dAng = 0.838 * 2*pi/320 = 0.01646  ->  AURORA_SPAN / dAng = 61.4
- *
- * 64 rounds that up and keeps the two axes a clean 5:1. Square cells are what
- * makes `AURORA_D_ANG / AURORA_D_AZ` an anisotropy of the *physics* rather
- * than an anisotropy of the grid.
- */
-export const AURORA_ANG = 64;
-
-/** DERIVED. Radians of azimuth per cell. */
-export const AURORA_DAZ = (2 * Math.PI) / AURORA_AZ;
-
-/** DERIVED. Radians of angle per cell. */
-export const AURORA_DANG = AURORA_SPAN / AURORA_ANG;
-
-/**
- * TUNED. Outward drift, radians of angle per second.
- *
- * With `AURORA_TAU` it fixes the decay length: `V * TAU = 0.72 rad`, which is
- * 71% of the span, so a curtain is down to `1/e` about seven tenths of the way
- * to the silhouette and the white's outer edge is dim rather than banded. The
- * transit time is `AURORA_SPAN / AURORA_V = 1.68s`.
- */
-export const AURORA_V = 0.6;
-
-/** TUNED. Decay time in seconds. See `AURORA_V` for the pair. */
-export const AURORA_TAU = 1.2;
-
-/**
- * TUNED. Diffusivity **along** the flow, rad^2/s.
- *
- * Along-flow diffusion is the larger of the two on purpose: it smears a source
- * into a streak in the direction it is travelling while leaving its edges
- * sharp, which is what makes filaments instead of blobs. Over one transit it
- * spreads a parcel by `sqrt(2*D*T) = 0.142 rad`, a seventh of the span.
- */
-export const AURORA_D_ANG = 0.006;
-
-/**
- * TUNED. Diffusivity **across** the flow, rad^2/s — a tenth of the along-flow
- * value.
- *
- * Over one transit this widens a filament by `sqrt(2*D*T) = 0.045 rad`, half
- * of the 0.084 rad narrowest filament the resolution is derived for. Small
- * enough that the filament survives; large enough that the upwind scheme's
- * grid-scale noise does not.
- */
-export const AURORA_D_AZ = 0.0006;
-
-/**
- * TUNED. How much the field's own amplitude adds to its outward drift.
- *
- * **This is the shear, and it is the field's own.** A parcel travels at
- * `AURORA_V * (1 + AURORA_SELF * E)`, so the bright core of a curtain outruns
- * its dim flanks: the leading edge steepens into a front and the trailing edge
- * is drawn out into a wisp. It is Burgers' self-steepening, written on the
- * radial flux, and the upwind flux form keeps it monotone — it makes fronts,
- * not overshoots.
- *
- * At 1.0 the spread in speed across a curtain is the spread in `E` across it,
- * about 45% at the amplitudes the seed produces, which over one transit is
- * 0.45 rad of differential travel — half the span. Measured on the coupled
- * run, that is worth a rise in the field's structure-tensor anisotropy from
- * 0.897 to 0.923 and in its along-flow correlation at 0.08 rad from 0.853 to
- * 0.884: a real effect, and a modest one.
- *
- * **What this replaced, and why.** The first form was the obvious one: advect
- * the field by the perpendicular gradient of a stream function `psi = k*E`, an
- * active scalar in the surface-quasigeostrophic style. Measured, it did
- * nothing — at `k` large enough to make the self-velocity 0.68 rad/s, larger
- * than the mean drift itself, the field's structure-tensor axis moved by 0.67
- * degrees and its anisotropy by 0.013. It could not have done anything: a
- * velocity that is the perpendicular gradient of `E` is everywhere **tangent
- * to E's own contours**, so `u . grad E` is identically zero and the term is a
- * no-op on everything except the discretisation error that implements it. SQG
- * escapes that because its stream function is an inverse Laplacian of the
- * scalar and not the scalar. A term that measurably does nothing is worse than
- * no term, so it is gone.
- */
-export const AURORA_SELF = 1.0;
-
-/**
- * DERIVED. Inner and outer angle of the band on the **cornea** whose
- * break-up feeds the sector above it, and how many taps read it.
- *
- * The band is one dry-patch diameter deep — `12.6 * DELTA / cos(0.47) = 0.18
- * rad` — so a patch either fills its sector's band or it does not, and the
- * seed stays discrete. It ends at the limbus and is entirely inside
- * `FILM_REACH`: the furthest tap sits at `sin(0.56) = 0.531`, against a reach
- * of 0.581, so no tap ever reads a clamped texel.
+ * Unchanged from Task 13, and this is the piece of it that matters most: it is
+ * the whole of the causal coupling. The band is one dry-patch diameter deep —
+ * `12.6 * DELTA / cos(0.47) = 0.18 rad` — so a patch either fills its sector's
+ * band or it does not, and the release stays discrete. It ends at the limbus
+ * and is entirely inside `FILM_REACH`: the furthest tap sits at
+ * `sin(0.56) = 0.531` against a reach of 0.581, so no tap ever reads a clamped
+ * texel.
  *
  * Five taps put 0.036 rad — 2.6 cells of film — between samples, against
  * patches 12.6 cells across.
@@ -1410,161 +1322,16 @@ export function filmGloss(ang: number): number {
 }
 
 /**
- * DERIVED. How many rows deep the seed is injected. Two, softened across
- * them, so the injection is resolved without becoming a band.
- */
-export const AURORA_SEED_ROWS = 2;
-
-/**
- * DERIVED. Injection rate, excitation per second per unit of dry fraction.
- *
- * Fixed by wanting a **fully torn sector to hold E = 1 at the inner edge**, so
- * the field's natural scale is 1 and the display gain has one meaning. A
- * parcel's residence time in the injection rows is `AURORA_SEED_ROWS *
- * AURORA_DANG / AURORA_V`, and steady state is injection times residence, so
- * the rate is the reciprocal.
- */
-export const AURORA_SEED = AURORA_V / (AURORA_SEED_ROWS * AURORA_DANG);
-
-/**
- * DERIVED. Fixed aurora step, from the CFL condition rather than from the
- * film's.
- *
- * The fastest thing on this grid is the drift plus the self-velocity, about
- * 0.9 rad/s against `AURORA_DANG = 0.0158`, so the advective limit is 57Hz.
- * Explicit diffusion wants `dt * (2*D_ang/dAng^2 + 2*D_az/dAzArc^2) <= 1`,
- * which is 1/985 of a second per unit of that sum — at 240Hz it comes to
- * 0.247, a factor four inside the bound.
- *
- * 1/240 is four substeps per 60fps frame against the film's 28, on a grid of
- * 20480 cells: 4.9M fragments per second, a sixth of what the film costs.
- */
-export const AURORA_STEP = 1 / 240;
-
-/**
- * DERIVED. Substep ceiling, chosen so the aurora's backlog cap is the **same
- * number of seconds** as the film's.
- *
- * `MAX_SUBSTEPS * STEP` is 0.0253s; six aurora steps is 0.0250s. The two
- * fields therefore age by the same amount on a slow frame, which is what keeps
- * the aurora's seed in step with the break-up that produced it. Diverge these
- * and the aurora runs at a different fraction of real time from the film it is
- * driven by, which is the bug `filmTick`'s comment describes, one field over.
- */
-export const AURORA_MAX_SUBSTEPS = Math.round(
-  (MAX_SUBSTEPS * STEP) / AURORA_STEP
-);
-
-/**
- * DERIVED. Seconds of aurora run at init, so the white is not blank on the
- * first frame.
- *
- * Spec D11 again, one field over: `FilmSim.prime` hands the display a cornea
- * that is already mid-cycle, and an empty sclera beside it would be the same
- * mistake. One transit plus one decay time is when the field stops changing
- * under a held seed — the leading edge has reached the silhouette and the
- * oldest material behind it has faded.
- *
- * 692 steps on 20480 cells, 14M fragments once at init, against the film's 75M.
- */
-export const AURORA_PRIME_SECONDS = AURORA_SPAN / AURORA_V + AURORA_TAU;
-
-/** One frame of the aurora's clock. Same shape as `filmTick`, own step. */
-export function auroraTick(acc: number, dt: number): FilmTick {
-  let left = Math.min(acc + dt, AURORA_MAX_SUBSTEPS * AURORA_STEP);
-  let steps = 0;
-  while (left >= AURORA_STEP) {
-    left -= AURORA_STEP;
-    steps++;
-  }
-  return { steps, acc: left, ran: steps * AURORA_STEP };
-}
-
-/**
- * DERIVED. Age, in seconds, at which emission has run all the way from `ELEC`
- * to `VMAG`.
- *
- * One decay time. A parcel that has lived as long as the field's own memory
- * has cooled; one freshly released has not. **The colour is a function of the
- * field's state and not of where the pixel is**, so a parcel that stalls near
- * the limbus cools there and one that is flung outward fast arrives still
- * blue. Layering by emission energy is what a real aurora does.
- */
-export const AURORA_COOL = AURORA_TAU;
-
-/**
- * DERIVED, against contrast on the white rather than against headroom.
- *
- * **This is a deliberate overdrive and the trade was made with eyes open.**
- * The first value, 0.35, was the largest that kept the brightest hundredth of
- * the white inside Task 12's additive budget. It was also invisible: measured
- * against the sclera away from the catchlight, the peak of a curtain lifted
- * mid-sclera luminance by **3.5%** and grazing by 2.7%. The user could not see
- * it. Offered the choice between dimming the whites, pushing the aurora past
- * physical level, and having it darken what it crosses, they chose to keep the
- * whites white and push. The energy is therefore a graphic overlay rather than
- * light you could believe in, and that is the piece's call, not the
- * simulation's — the field underneath is unchanged.
- *
- * What makes the overdrive work rather than smear is the hue-preserving
- * compression in `eye.ts`: past the point where the brightest channel reaches
- * 1, more gain stops buying luminance and starts buying **colour**. So the
- * curve has a knee, and the gain is derived off it. Measured on the shipped
- * field, three azimuths away from the catchlight, 34 frames:
- *
- *     gain   near-limbus     mid-sclera      grazing        max
- *            contr / sat     contr / sat     contr / sat    channel
- *     0.35    9.2% / 0.07     3.6% / 0.06     2.7% / 0.08     0.75
- *     1.00   26.3% / 0.19    10.2% / 0.12     7.8% / 0.14     0.94
- *     1.50   32.2% / 0.26    15.3% / 0.15    11.6% / 0.17     1.09
- *     2.00   30.5% / 0.30    20.5% / 0.19    15.5% / 0.21     1.23
- *     2.50   25.9% / 0.34    25.6% / 0.22    19.4% / 0.23     1.38
- *     2.75   24.0% / 0.35    28.1% / 0.23    21.3% / 0.25     1.45
- *     3.00   22.2% / 0.37    30.7% / 0.25    23.3% / 0.26     1.53
- *     3.50   19.2% / 0.39    35.8% / 0.27    27.2% / 0.28     1.67
- *
- * Base saturation on the white is 0.024, 0.023 and 0.063 at those three
- * points, so every row above is several times more coloured than the surface
- * it sits on. Near the limbus the contrast *falls* past gain 1.5, because that
- * is where the knee is reached first: the light there is already being
- * converted to hue rather than to brightness.
- *
- * **2.75 is the smallest gain at which all three points clear 20% luminance
- * contrast**, which is the bottom of the band the piece asked for — 2.50
- * leaves the grazing point at 19.4%. Over the whole white it lifts 29.8% of
- * the sclera by more than 0.02 of luminance at any moment and raises mean
- * saturation from 0.044 to 0.075.
- *
- * It makes 2.81% of the sclera *darker*, worst case -0.196 of luminance, and
- * 69% of that is inside the catchlight's already-clipped core with the rest in
- * its immediate skirt. That is what divide-by-maximum means: a blue curtain
- * crossing a white-hot highlight tints it and pulls it down, which is also
- * what a coloured light in front of a highlight does. It is the visible face
- * of the overlay trade and it is confined to the one place on the eye that was
- * already at the ceiling.
- */
-export const AURORA_GAIN = 2.75;
-
-/** Cell-centre angle of row `j`. */
-export function auroraAngOf(j: number): number {
-  return AURORA_ANG0 + (j + 0.5) * AURORA_DANG;
-}
-
-/** Cell-centre azimuth of column `i`, in [-pi, pi). */
-export function auroraAzOf(i: number): number {
-  return ((i + 0.5) / AURORA_AZ - 0.5) * 2 * Math.PI;
-}
-
-/**
- * Where tap `k` of the seed reads the film, in corneal-local tangent
+ * Where tap `k` of the release reads the film, in corneal-local tangent
  * coordinates, for a sector at azimuth `az`.
  *
- * **This is the whole of the causal coupling, and it is why the aurora rides
- * the globe with the gaze.** The film is stored in the corneal-local tangent
- * frame `gazeFrame()` builds; this maps a sector of the aurora into that same
- * frame, so when the eye turns, the sector that lights up is the one over the
- * part of the cornea that is actually tearing. Nothing here knows about world
- * axes, for the same reason `lidFrame` does not.
+ * **This is the whole of the causal coupling.** The film is stored in the
+ * corneal-local tangent frame `gazeFrame()` builds; this maps a sector of the
+ * limbus into that same frame, so when the eye turns, the sector that sheds
+ * energy is the one over the part of the cornea that is actually tearing.
+ * Nothing here knows about world axes, for the same reason `lidFrame` does
+ * not — and that is exactly the asymmetry that makes the piece work now: the
+ * **source** rides the gaze and the **wind** does not.
  */
 export function auroraSeedTap(az: number, k: number): [number, number] {
   const ang =
@@ -1574,8 +1341,312 @@ export function auroraSeedTap(az: number, k: number): [number, number] {
   return [s * Math.cos(az), s * Math.sin(az)];
 }
 
-/** The two-channel excitation field. `E` is excitation, `A` is age-density. */
-export interface AuroraField {
+/* ---- The wind ---------------------------------------------------- */
+
+/**
+ * TUNED, in the two places a direction can be tuned and nowhere else.
+ *
+ * **In the screen plane**, because that is where a wind tunnel's flow can be
+ * seen: the streamlines part at one limb, accelerate over the top and bottom
+ * of the disc, and close at the other. A wind blowing along the view axis
+ * would be radially symmetric on screen and would read as a sunburst.
+ *
+ * **Tilted 16 degrees into the screen** (the negative `z`), because a purely
+ * in-plane wind leaves the density field mirror-symmetric in depth: the
+ * material in front of the globe and the material behind it are the same
+ * shape, and the front/behind sorting, though correct, buys nothing you can
+ * see. Tilting it away from the viewer means a wisp crosses in **front** of
+ * the eye and then goes **behind** it, which is the single clearest statement
+ * that it is a separate thing in space and not a decal.
+ *
+ * **It is in world space and does not turn with the gaze.** That is the
+ * point. Wind that turns when the model turns is attached to the model however
+ * well it is rendered; the film-driven source rides the gaze, the wind does
+ * not, and the two meeting is what the piece is.
+ */
+export const WIND_DIR: [number, number, number] = (() => {
+  const v: [number, number, number] = [0.82, 0.5, -0.28];
+  const m = Math.hypot(v[0], v[1], v[2]);
+  return [v[0] / m, v[1] / m, v[2] / m];
+})();
+
+/**
+ * DERIVED. Half-extents of the tunnel's test section, in globe radii.
+ *
+ * Across the screen: 1.6, so there is 0.6 of a globe radius of clear air
+ * around the disc for the wisps to stand off into. At the shipped framing
+ * (`R = 0.36` against a half-frame of 0.44) that is 49% of the way from the
+ * silhouette to the top of the frame, so the volume runs off the top and
+ * bottom of a 16:9 frame and cannot show an edge there.
+ *
+ * Along the view: 1.4, fewer radii and — see `WIND_NZ` — far fewer cells,
+ * because the march integrates along this axis and blurs it.
+ *
+ * The left and right faces **are** inside a 16:9 frame (half-width 0.782 in
+ * `q` against the box's 0.576), so the march fades the density out over
+ * `WIND_FADE` at every face rather than cutting it. The decay does most of the
+ * work already: material reaching the downwind face has been in flight
+ * `2 * WIND_HALF_XY / WIND_U` and is down to 8% of what was released.
+ */
+export const WIND_HALF_XY = 1.6;
+export const WIND_HALF_Z = 1.4;
+
+/**
+ * DERIVED. Cells across the volume: **96 x 96 x 48**, 442368 of them.
+ *
+ * The structure this has to carry is one dry patch of film, released at the
+ * limbus and then thinned by the flow. `AURORA_SOURCE_WIDTH` is 0.348 rad, so
+ * a source is 0.348 globe radii of arc when it leaves; potential flow past a
+ * sphere accelerates a surface parcel from rest at the forward stagnation
+ * point to `1.5 U` at the equator, and a material element stretched along the
+ * flow by that ratio is thinned across it by the same ratio. So the narrowest
+ * filament the volume must hold is about `0.348 / 1.5 = 0.232` radii.
+ *
+ * Four cells across that wants `0.058` radii. `2 * 1.6 / 96 = 0.0333` gives
+ * **seven**, which is more margin than the derivation demands and is what the
+ * budget allows rather than what it insists on; the honest measurement of what
+ * the field actually reaches is in the test, not here.
+ *
+ * The view axis gets half the cells — `2 * 1.4 / 48 = 0.0583` radii, **3.97**
+ * across a filament — because the march integrates along it. It is the one
+ * axis allowed under the four-cell floor, and the only one where a cell is
+ * never resolved on its own.
+ *
+ * **Cost: 442368 cells at 60Hz is 26.5M fragments per second**, against the
+ * film's 31.3M. The simulation is the cheap half of this task; the march is
+ * the expensive one. See `WIND_MARCH`.
+ */
+export const WIND_NX = 96;
+export const WIND_NY = 96;
+export const WIND_NZ = 48;
+
+/** Cell size, in globe radii. The two screen axes share one; the view axis does not. */
+export const WIND_DX = (2 * WIND_HALF_XY) / WIND_NX;
+export const WIND_DZ = (2 * WIND_HALF_Z) / WIND_NZ;
+
+/**
+ * DERIVED. Freestream speed, in globe radii per second.
+ *
+ * Fixed by wanting the test section to **turn over in 2.5 seconds** — three
+ * quarters of the 3.35s mean interblink `BLINK_FRACTION` produces. One blink's
+ * release therefore crosses the frame and has largely faded before the blink
+ * after next arrives, so what you see is a succession of puffs rather than a
+ * steady plume, and the rhythm of the film survives into the air.
+ *
+ * `2 * WIND_HALF_XY / 2.5 = 1.28`. The flow reaches `1.5 * 1.28 = 1.92` at the
+ * equator, which is what sets the step.
+ */
+export const WIND_U = (2 * WIND_HALF_XY) / 2.5;
+
+/**
+ * DERIVED. Decay time, in seconds.
+ *
+ * **Set against the breathing, which is the one thing about the rhythm the
+ * piece has already been judged on.** The blink wipes every source at once,
+ * and how much of that squareness survives is set by the volume's memory:
+ * this plus the transit. Measured on the coupled run at the shipped step, 30
+ * seconds and nine blinks each:
+ *
+ *     tau    swing    largest change in 1/6s     trough lag    aspect
+ *            /trough   as a share of the swing
+ *     1.6     x3.18            0.505               1.23s        4.27
+ *     2.2     x2.99            0.480               1.30s        4.22
+ *     2.8     x2.90            0.464               1.37s        4.19
+ *
+ * The third column is the number that separates breathing from switching — a
+ * switch puts the whole swing into a frame or two — and Task 13 shipped at
+ * 0.40 against a bound of 0.5. **2.2 is the shortest memory that clears that
+ * bound**, and the structure is indifferent to it: the aspect moves by 2% over
+ * the whole sweep, because what makes the filaments is the flow and not the
+ * decay.
+ *
+ * It also sets how far material gets: `WIND_U * WIND_TAU = 2.82` radii, which
+ * is most of the test section, so a wisp is still visible when it leaves the
+ * frame and `WIND_FADE` has real work to do.
+ */
+export const WIND_TAU = 2.2;
+
+/**
+ * DERIVED. Fixed step — and it is the **largest** the trajectory will carry,
+ * not the smallest the flow will allow. This is the opposite of the usual rule
+ * and the measurement that overturned it is below.
+ *
+ * Semi-Lagrangian advection is unconditionally stable, so the CFL number does
+ * not bound the step. What it costs instead is **one trilinear interpolation
+ * per step**, and every interpolation is a low-pass filter: the scheme's
+ * numerical diffusion is per-step, not per-second. Halve the step rate and you
+ * halve the smearing — and halve the cost with it. Measured on the coupled
+ * run, 10 seconds each, correlation lengths of the advected material:
+ *
+ *     rate    along   across   aspect   mean |grad E| / mean E
+ *     60Hz    0.527   0.410     1.29           2.455
+ *     30Hz    0.504   0.316     1.59           2.705
+ *     20Hz    0.480   0.277     1.73           2.803
+ *     15Hz    0.433   0.250     1.74           3.031
+ *
+ * **The filaments get thinner as the step gets longer**, which is the whole of
+ * the wispiness argument and is why there is no noise term anywhere near this
+ * file: the structure was already there and the scheme was eating it.
+ *
+ * What bounds it is the **trajectory**, not the interpolation. RK2 on a flow
+ * this curved drifts, and a parcel that ends a transit in the wrong cell is
+ * carrying structure to the wrong place. Measured against a 64x-refined
+ * reference over one 2.5s transit:
+ *
+ *     rate    drift          in cells of WIND_DX
+ *     60Hz    0.00164 radii        0.05
+ *     30Hz    0.01269 radii        0.38
+ *     20Hz    0.03971 radii        1.19
+ *     15Hz    0.09329 radii        2.80
+ *
+ * **1/30 is the largest step that lands a parcel inside the cell it belongs to
+ * after crossing the whole test section.** 20Hz buys another 0.14 of aspect
+ * and spends 1.2 cells of position for it, which is a worse trade than it
+ * looks: the drift is systematic and rotates the whole plume.
+ *
+ * Cost: 442368 cells at 30Hz is **13.3M fragments per second**, against the
+ * film's 31.3M. The simulation is less than half the film and the march is
+ * nine times the simulation; see `WIND_MARCH`.
+ */
+export const WIND_STEP = 1 / 30;
+
+/**
+ * DERIVED. Substep ceiling: **one**, and the honest note is that this is the
+ * closest a 1/30 step can come to the film's backlog cap rather than a match.
+ *
+ * `MAX_SUBSTEPS * STEP` is 0.0253s; one wind step is 0.0333s. So on a slow
+ * frame the volume can age 0.008s more than the film does — a third of a step,
+ * against a memory of `WIND_TAU = 1.6s`, which is half a percent. The reason
+ * to care at all is the one `filmTick` sets out: two coupled fields that
+ * throttle by different factors drift apart, and the release would stop being
+ * in step with the break-up that produced it. Half a percent is not that.
+ */
+export const WIND_MAX_SUBSTEPS = Math.max(
+  1,
+  Math.round((MAX_SUBSTEPS * STEP) / WIND_STEP)
+);
+
+/**
+ * DERIVED. Seconds of wind run at init, so the air is not empty on the first
+ * frame.
+ *
+ * One traverse plus one decay time is when the volume stops changing under a
+ * held release: the leading edge has crossed the test section and the oldest
+ * material behind it has faded. 4.7s is 141 steps, 62M fragments once, against
+ * the film's 75M.
+ */
+export const WIND_PRIME_SECONDS = (2 * WIND_HALF_XY) / WIND_U + WIND_TAU;
+
+/** One frame of the wind's clock. Same shape as `filmTick`, own step. */
+export function windTick(acc: number, dt: number): FilmTick {
+  let left = Math.min(acc + dt, WIND_MAX_SUBSTEPS * WIND_STEP);
+  let steps = 0;
+  while (left >= WIND_STEP) {
+    left -= WIND_STEP;
+    steps++;
+  }
+  return { steps, acc: left, ran: steps * WIND_STEP };
+}
+
+/**
+ * **Potential flow past a sphere of radius 1.** This is the wind tunnel, and
+ * it is analytic rather than approximated.
+ *
+ *     u = U - (1 / (2 r^3)) * ( 3 (U . n) n - U )        n = p / |p|
+ *
+ * which is the gradient of `phi = U.p (1 + 1/(2 r^3))`, the classical
+ * dipole-plus-uniform solution. Its three properties are the three things that
+ * make the picture read as a wind tunnel, and none of them is tuned:
+ *
+ * - **It stagnates at the upwind pole.** `U . n = U` there and the two terms
+ *   cancel exactly, so the flow comes to rest against the eye.
+ * - **It reaches exactly `1.5 U` at the equator.** `U . n = 0` there, so
+ *   `u = U + U/2`. That factor is the stretching budget — see `WIND_NX` — and
+ *   it is the number the test measures the field against.
+ * - **It never enters the sphere.** `u . n = U cos(theta) (1 - 1/r^3)`, which
+ *   is identically zero at `r = 1` whatever the direction. The globe is a
+ *   streamsurface, so nothing has to be done to keep material out of it.
+ *
+ * Inside the sphere the dipole diverges; `r` is clamped to 1, which is where
+ * the only callers — a backtrace that has stepped slightly inside — belong
+ * anyway.
+ */
+export function windFlow(
+  p: [number, number, number],
+  u = WIND_U
+): [number, number, number] {
+  const len = Math.max(Math.hypot(p[0], p[1], p[2]), 1e-6);
+  const r = Math.max(len, 1);
+  const n: [number, number, number] = [p[0] / len, p[1] / len, p[2] / len];
+  const w: [number, number, number] = [
+    WIND_DIR[0] * u,
+    WIND_DIR[1] * u,
+    WIND_DIR[2] * u,
+  ];
+  const d = w[0] * n[0] + w[1] * n[1] + w[2] * n[2];
+  const k = 1 / (2 * r * r * r);
+  return [
+    w[0] - k * (3 * d * n[0] - w[0]),
+    w[1] - k * (3 * d * n[1] - w[1]),
+    w[2] - k * (3 * d * n[2] - w[2]),
+  ];
+}
+
+/* ---- The release ------------------------------------------------- */
+
+/**
+ * DERIVED. How thick a shell above the surface the energy enters, and how wide
+ * a ring in angle — both two cells, in radii and in radians respectively.
+ *
+ * **Two cells and not zero, because the sphere is a streamsurface.** `windFlow`
+ * has no radial velocity at `r = 1` at all, so anything released exactly on the
+ * surface stays there forever. Energy has to enter the air above the eye, and
+ * the thinnest layer the grid can hold it in is the one it is resolved on.
+ */
+export const WIND_RELEASE_H = 2 * WIND_DX;
+export const WIND_RELEASE_DANG = 2 * WIND_DX;
+
+/**
+ * DERIVED. Release rate, energy per second per unit of dry fraction.
+ *
+ * The same contract `AURORA_SEED` carried: fixed by wanting a **fully torn
+ * sector to hold E = 1 in the release band in steady state**, so the field's
+ * natural scale is 1 and the display gain has one meaning rather than being a
+ * free brightness knob. Steady state is rate times residence, and residence is
+ * the band's arc divided by the speed that carries material out of it.
+ *
+ * That speed is the tangential flow at the surface, `1.5 * WIND_U * sin(theta)`
+ * against the wind axis, and the limbus ring sweeps through every `theta` as
+ * the gaze moves, so the honest figure is its mean over the sphere:
+ * `<sin(theta)> = pi/4`. Hence `1.5 * U * pi/4 = 1.508` radii per second,
+ * a residence of 0.044s, and a rate of 22.6.
+ */
+export const WIND_RELEASE = (1.5 * WIND_U * Math.PI) / 4 / WIND_RELEASE_DANG;
+
+/**
+ * The release gate at a point: 1 in the ring of air just outside the limbus,
+ * 0 everywhere else, smooth at both boundaries.
+ *
+ * `r` is the distance from the globe's centre in radii and `ang` the angle
+ * from the gaze axis. The angular profile peaks **exactly at the limbus**, so
+ * its inner half is over the cornea where `eye.ts`'s limbal ring is already
+ * glowing and its boundary cannot be seen.
+ */
+export function windReleaseGate(r: number, ang: number): number {
+  const gr = 1 - smoothstep(0, WIND_RELEASE_H, r - 1);
+  const ga =
+    smoothstep(AURORA_ANG0 - WIND_RELEASE_DANG, AURORA_ANG0, ang) *
+    (1 - smoothstep(AURORA_ANG0, AURORA_ANG0 + WIND_RELEASE_DANG, ang));
+  return Math.max(0, gr) * ga;
+}
+
+/* ---- The volume -------------------------------------------------- */
+
+/** The two-channel volume. `E` is energy density, `A` is age-density. */
+export interface WindField {
+  nx: number;
+  ny: number;
+  nz: number;
   E: Float32Array;
   A: Float32Array;
   /** Scratch for the step's output; swapped in, not reallocated. */
@@ -1583,9 +1654,21 @@ export interface AuroraField {
   A1: Float32Array;
 }
 
-export function newAuroraField(): AuroraField {
-  const n = AURORA_AZ * AURORA_ANG;
+/**
+ * A volume. The shipped one is `WIND_NX x WIND_NY x WIND_NZ`; the tests drive
+ * coarser ones for the dynamics checks, which is the only reason the
+ * dimensions live on the field rather than being read from the constants.
+ */
+export function newWindField(
+  nx = WIND_NX,
+  ny = WIND_NY,
+  nz = WIND_NZ
+): WindField {
+  const n = nx * ny * nz;
   return {
+    nx,
+    ny,
+    nz,
     E: new Float32Array(n),
     A: new Float32Array(n),
     E1: new Float32Array(n),
@@ -1593,130 +1676,173 @@ export function newAuroraField(): AuroraField {
   };
 }
 
-/** Overrides for `auroraStep`, so the scheme can be driven term by term. */
-export interface AuroraOpts {
-  dt?: number;
-  v?: number;
-  /** Seconds. `Infinity` switches decay off. */
-  tau?: number;
-  self?: number;
-  dAng?: number;
-  dAz?: number;
-  seed?: number;
+/** Centre of cell `(i, j, k)`, in globe radii. */
+export function windCell(
+  f: WindField,
+  i: number,
+  j: number,
+  k: number
+): [number, number, number] {
+  return [
+    -WIND_HALF_XY + ((i + 0.5) / f.nx) * 2 * WIND_HALF_XY,
+    -WIND_HALF_XY + ((j + 0.5) / f.ny) * 2 * WIND_HALF_XY,
+    -WIND_HALF_Z + ((k + 0.5) / f.nz) * 2 * WIND_HALF_Z,
+  ];
 }
 
 /**
- * One aurora step. **This is the specification the GLSL transcribes.**
+ * Trilinear fetch at a point in radii, **clamped at the faces** — exactly what
+ * `CLAMP_TO_EDGE` on the 3D texture does, so the reference and the shader
+ * agree to the last bit of the interpolation.
  *
- * Finite volume on the sphere, in flux form:
- *
- *     dE/dt = -(1/sin) [ d(sin * Ftheta)/dtheta + d(Fphi)/dphi ] - E/tau + S(phi)
- *     dA/dt = (the same transport, on A)                         - A/tau + E
- *
- *     Ftheta = v(E) * E_upwind - D_ang * dE/dtheta        outward, self-steepened
- *     Fphi   =                 - D_az  * dE/d(arc)        across the flow only
- *     v(E)   = AURORA_V * (1 + AURORA_SELF * E_face)
- *
- * **Advection and diffusion share one divergence, so both are conservative by
- * construction.** The `sin(theta +- dAng/2)` weights are the face areas, and a
- * face's flux is computed by one formula whichever of its two cells asks for
- * it, so the sum telescopes exactly and the only losses are at the boundaries.
- * `v` is positive everywhere, so the upwind cell is always the inner one and
- * the scheme is monotone: the self-steepening sharpens fronts and cannot
- * overshoot into a ringing one.
- *
- * There is no azimuthal *advection*. That is the measurement in
- * `AURORA_SELF`'s comment, not an omission: the one self-generated azimuthal
- * velocity worth writing — the perpendicular gradient of the field — is
- * tangent to the field's own contours and therefore does nothing at all. What
- * sweeps the curtains sideways instead is the sources themselves moving, as
- * gravity drains the film that makes them.
- *
- * Boundaries: the inner face at the limbus carries **zero flux** — seeding is
- * the only way in — and the outer face at the silhouette is free outflow, with
- * no diffusive term, so nothing flows back in. Azimuth is periodic.
- *
- * `A` is the age density: `A/E` is the mean age of the excitation in a cell,
- * in seconds. It is transported by the same fluxes, decays at the same rate —
- * so the ratio is decay-invariant — and gains `E` per second, which is what
- * makes it an age. Seeding injects `E` with no `A`, so new material is new.
- *
- * `dry` is the per-sector dry fraction of the film's seeding band, length
- * `AURORA_AZ`; `null` switches seeding off, which is what the conservation
- * check needs.
+ * Clamping is safe here only because of where the material comes from: it
+ * enters at the limbus and leaves downwind, so every face cell is empty and
+ * extending it extends nothing. A backtrace that exits the box exits through
+ * an **upwind** face by construction, and picks up the zero that is there.
+ * The march's own `windFade` is what stops the box showing an edge on screen.
  */
-export function auroraStep(
-  f: AuroraField,
-  dry: Float32Array | null,
-  o: AuroraOpts = {}
-): void {
-  const dt = o.dt ?? AURORA_STEP;
-  const V = o.v ?? AURORA_V;
-  const tau = o.tau ?? AURORA_TAU;
-  const self = o.self ?? AURORA_SELF;
-  const dAng = o.dAng ?? AURORA_D_ANG;
-  const dAz = o.dAz ?? AURORA_D_AZ;
-  const seed = o.seed ?? AURORA_SEED;
-  const NAZ = AURORA_AZ;
-  const NANG = AURORA_ANG;
-  const { E, A, E1, A1 } = f;
-
-  // The flux through the theta face **above** row `jl`, at column `i`. Cell j
-  // asks for `jl = j` and `jl = j - 1`; the cell below asks for the same face
-  // with the same argument, which is what makes the sum telescope.
-  const thetaFlux = (i: number, jl: number, out: [number, number]) => {
-    if (jl < 0) {
-      out[0] = 0;
-      out[1] = 0;
-      return;
+export function windSample(
+  f: WindField,
+  p: [number, number, number]
+): [number, number] {
+  const gx = ((p[0] + WIND_HALF_XY) / (2 * WIND_HALF_XY)) * f.nx - 0.5;
+  const gy = ((p[1] + WIND_HALF_XY) / (2 * WIND_HALF_XY)) * f.ny - 0.5;
+  const gz = ((p[2] + WIND_HALF_Z) / (2 * WIND_HALF_Z)) * f.nz - 0.5;
+  const i0 = Math.floor(gx);
+  const j0 = Math.floor(gy);
+  const k0 = Math.floor(gz);
+  const fx = gx - i0;
+  const fy = gy - j0;
+  const fz = gz - k0;
+  const cl = (v: number, n: number) => Math.min(n - 1, Math.max(0, v));
+  let e = 0;
+  let a = 0;
+  for (let dk = 0; dk < 2; dk++) {
+    const k = cl(k0 + dk, f.nz);
+    const wk = dk ? fz : 1 - fz;
+    for (let dj = 0; dj < 2; dj++) {
+      const j = cl(j0 + dj, f.ny);
+      const wj = dj ? fy : 1 - fy;
+      for (let di = 0; di < 2; di++) {
+        const i = cl(i0 + di, f.nx);
+        const w = (di ? fx : 1 - fx) * wj * wk;
+        const n = (k * f.ny + j) * f.nx + i;
+        e += w * f.E[n];
+        a += w * f.A[n];
+      }
     }
-    const a = jl * NAZ + i;
-    const outer = jl >= NANG - 1;
-    const b = outer ? a : a + NAZ;
-    // Free outflow: the ghost beyond the silhouette is empty, so the face
-    // takes the last row's own state and carries no diffusive term.
-    const eFace = outer ? E[a] : 0.5 * (E[a] + E[b]);
-    const u = V * (1 + self * eFace);
-    const d = outer ? 0 : dAng / AURORA_DANG;
-    out[0] = u * E[a] - d * (E[b] - E[a]);
-    out[1] = u * A[a] - d * (A[b] - A[a]);
-  };
+  }
+  return [e, a];
+}
 
-  // The phi face above column `il`, at row `j`. Diffusive only.
-  const phiFlux = (il: number, j: number, out: [number, number]) => {
-    const a = j * NAZ + (((il % NAZ) + NAZ) % NAZ);
-    const b = j * NAZ + ((il + 1) % NAZ);
-    const d = dAz / (Math.sin(auroraAngOf(j)) * AURORA_DAZ);
-    out[0] = -d * (E[b] - E[a]);
-    out[1] = -d * (A[b] - A[a]);
-  };
+/** Overrides for `windStep`, so the scheme can be driven term by term. */
+export interface WindOpts {
+  dt?: number;
+  u?: number;
+  /** Seconds. `Infinity` switches decay off. */
+  tau?: number;
+  rate?: number;
+  /** Unit gaze direction. Defaults to straight at the viewer. */
+  gaze?: [number, number, number];
+}
 
-  const fOut: [number, number] = [0, 0];
-  const fIn: [number, number] = [0, 0];
-  const fR: [number, number] = [0, 0];
-  const fL: [number, number] = [0, 0];
-  for (let j = 0; j < NANG; j++) {
-    const ang = auroraAngOf(j);
-    const sc = Math.sin(ang);
-    const sp = Math.sin(ang + AURORA_DANG / 2);
-    const sm = Math.sin(ang - AURORA_DANG / 2);
-    // Two rows deep, softened across them: resolved, not a band.
-    const gate = 1 - smoothstep(0, AURORA_SEED_ROWS, j + 0.5);
-    for (let i = 0; i < NAZ; i++) {
-      thetaFlux(i, j, fOut);
-      thetaFlux(i, j - 1, fIn);
-      phiFlux(i, j, fR);
-      phiFlux(i - 1, j, fL);
-      const k = j * NAZ + i;
-      const divE =
-        (sp * fOut[0] - sm * fIn[0]) / (sc * AURORA_DANG) +
-        (fR[0] - fL[0]) / (sc * AURORA_DAZ);
-      const divA =
-        (sp * fOut[1] - sm * fIn[1]) / (sc * AURORA_DANG) +
-        (fR[1] - fL[1]) / (sc * AURORA_DAZ);
-      const S = dry ? seed * dry[i] * gate : 0;
-      E1[k] = E[k] + dt * (-divE - E[k] / tau + S);
-      A1[k] = A[k] + dt * (-divA - A[k] / tau + E[k]);
+/**
+ * One wind step. **This is the specification the GLSL transcribes.**
+ *
+ * Semi-Lagrangian: each cell asks where its contents came from, backtraces
+ * along the analytic flow with RK2, and fetches there. Then decay, then
+ * release. It is unconditionally stable, it needs no pressure solve because
+ * `windFlow` is already divergence-free, and — the reason it is the right
+ * scheme here rather than a flux form — it carries a filament through a
+ * shearing flow without the directional bias an upwind stencil would give it.
+ *
+ * **What it does not do is diffuse.** There is no explicit diffusion term
+ * anywhere: the only smoothing is the trilinear fetch's own, which is the
+ * minimum a grid can have. Task 13 needed diffusion to keep an upwind scheme
+ * from ringing; this one is monotone by interpolation and does not.
+ *
+ * **The backtrace cannot leave the globe's interior with anything**, because
+ * `windFlow` has no radial component at the surface, so no streamline crosses
+ * it. RK2 can still land a hair inside on a curved streamline; such a point is
+ * projected back out radially, which is where the parcel actually was.
+ *
+ * `A` is age density: `A/E` is the mean age of the energy in a cell, in
+ * seconds. It rides the same backtrace, decays at the same rate — so the ratio
+ * is decay-invariant — and gains `E` per second. Release injects `E` with no
+ * `A`, so new material is new.
+ *
+ * `dry` gives the dry fraction of the film's seeding band at an azimuth, in
+ * the gaze frame; `null` switches release off, which is what the transport
+ * checks need.
+ */
+export function windStep(
+  f: WindField,
+  dry: ((az: number) => number) | null,
+  o: WindOpts = {}
+): void {
+  const dt = o.dt ?? WIND_STEP;
+  const u = o.u ?? WIND_U;
+  const tau = o.tau ?? WIND_TAU;
+  const rate = o.rate ?? WIND_RELEASE;
+  const gd = o.gaze ?? [0, 0, 1];
+  const dec = Math.exp(-dt / tau);
+  const { E, A, E1, A1 } = f;
+  // The gaze frame, exactly as `gazeFrame` and `eyeW` build it.
+  const tx = norm3(cross3([0, 1, 0], gd));
+  const ty = cross3(gd, tx);
+  for (let k = 0; k < f.nz; k++) {
+    for (let j = 0; j < f.ny; j++) {
+      for (let i = 0; i < f.nx; i++) {
+        const n = (k * f.ny + j) * f.nx + i;
+        const p = windCell(f, i, j, k);
+        const r = Math.hypot(p[0], p[1], p[2]);
+        if (r < 1) {
+          // Inside the globe. Nothing lives here and the march never reads it.
+          E1[n] = 0;
+          A1[n] = 0;
+          continue;
+        }
+        // RK2 backtrace. The midpoint matters: the streamlines are at their
+        // most curved exactly where the material is, hugging the sphere.
+        const v0 = windFlow(p, u);
+        const pm: [number, number, number] = [
+          p[0] - 0.5 * dt * v0[0],
+          p[1] - 0.5 * dt * v0[1],
+          p[2] - 0.5 * dt * v0[2],
+        ];
+        const vm = windFlow(pm, u);
+        let q: [number, number, number] = [
+          p[0] - dt * vm[0],
+          p[1] - dt * vm[1],
+          p[2] - dt * vm[2],
+        ];
+        const qr = Math.hypot(q[0], q[1], q[2]);
+        if (qr < 1 && qr > 0) q = [q[0] / qr, q[1] / qr, q[2] / qr];
+        const [e0, a0] = windSample(f, q);
+        let e = e0 * dec;
+        const a = (a0 + dt * e0) * dec;
+        if (dry) {
+          const g = windReleaseGate(r, 0);
+          // The gate is separable, so the radial half is worth computing
+          // before the angular half asks for an acos.
+          if (g > 0 || r <= 1 + WIND_RELEASE_H) {
+            const nx = p[0] / r;
+            const ny = p[1] / r;
+            const nz = p[2] / r;
+            const ang = Math.acos(
+              Math.min(1, Math.max(-1, nx * gd[0] + ny * gd[1] + nz * gd[2]))
+            );
+            const az = Math.atan2(
+              nx * ty[0] + ny * ty[1] + nz * ty[2],
+              nx * tx[0] + ny * tx[1] + nz * tx[2]
+            );
+            const gate = windReleaseGate(r, ang);
+            if (gate > 0) e += dt * rate * dry(az) * gate;
+          }
+        }
+        E1[n] = e;
+        A1[n] = a;
+      }
     }
   }
   f.E = E1;
@@ -1725,23 +1851,164 @@ export function auroraStep(
   f.A1 = A;
 }
 
-/**
- * The field's total, area-weighted by `sin(ang)` — the quantity the flux form
- * conserves. Zero seeding and zero decay must leave this alone.
- */
-export function auroraMass(f: AuroraField): number {
+/** The volume's total energy. Zero release and zero decay must leave it alone. */
+export function windMass(f: WindField): number {
   let m = 0;
-  for (let j = 0; j < AURORA_ANG; j++) {
-    const w = Math.sin(auroraAngOf(j));
-    for (let i = 0; i < AURORA_AZ; i++) m += f.E[j * AURORA_AZ + i] * w;
-  }
-  return m * AURORA_DANG * AURORA_DAZ;
+  for (let n = 0; n < f.E.length; n++) m += f.E[n];
+  return m;
+}
+
+/* ---- The render -------------------------------------------------- */
+
+/**
+ * DERIVED. Age, in seconds, at which emission has run all the way from `ELEC`
+ * to `VMAG`.
+ *
+ * One decay time — `WIND_TAU` now rather than `AURORA_TAU`, but the same
+ * statement. A parcel that has lived as long as the air's own memory has
+ * cooled; one freshly released has not. **The colour is a function of the
+ * field's state and not of where the pixel is**, so a wisp that stalls at the
+ * upwind stagnation point cools there while one flung around the equator
+ * arrives still blue. That layering is now a consequence of the flow.
+ */
+export const AURORA_COOL = WIND_TAU;
+
+/**
+ * DERIVED. March samples per ray. **16**, with a spatial dither.
+ *
+ * The cost, honestly: the march runs at **quarter linear resolution** and is
+ * bilinearly upsampled, so at 1920x1080 it is 480x270 pixels, 16 samples each,
+ * 60 times a second — **124.4M samples per second**, one hardware-trilinear 3D
+ * fetch apiece. For scale, the film's step pass is 31.3M fragments per second
+ * of roughly five fetches each, so this is below the film's own texture
+ * traffic and it is the largest single thing the render does.
+ *
+ * Quarter resolution rather than fewer samples because **resolution is what
+ * preserves a filament** — the narrowest wisp is seven cells across and a
+ * sixth-res march would mush exactly the thing the piece is about — while
+ * banding from a short march is what a dither is for, on media this soft.
+ *
+ * The chord is up to `2 * WIND_HALF_Z = 2.8` radii, so 16 samples is a step of
+ * 0.175 radii against a view-axis cell of 0.0583: **three cells a step**. That
+ * is undersampled on purpose and the dither is not decoration — without it the
+ * volume would show 16 shells. The dither is a 4x4 Bayer value of the march
+ * pixel's own coordinates, **not of time**: a temporal jitter would need
+ * accumulation to resolve, and there is none.
+ */
+export const WIND_MARCH = 16;
+
+/** The 4x4 Bayer value of a march pixel, in [0, 1). */
+export function bayer4(x: number, y: number): number {
+  const M = [
+    [0, 8, 2, 10],
+    [12, 4, 14, 6],
+    [3, 11, 1, 9],
+    [15, 7, 13, 5],
+  ];
+  return M[((y % 4) + 4) % 4][((x % 4) + 4) % 4] / 16;
 }
 
 /**
- * Emission colour for a cell, from its own state: `ELEC` where the excitation
- * is young, `VMAG` where it has aged. `eye.ts` carries the same two constants
- * and the same mix.
+ * DERIVED. How far in from each face the density is faded to zero, in radii.
+ *
+ * **Four cells, because `WIND_TAU` grew.** The box's top and bottom faces are
+ * outside a 16:9 frame, but its left and right faces are inside it, and a
+ * volume that stops on a plane reads as a volume in a box. At a 1.6s memory
+ * material reaches the downwind face at 21% of what was released — not the 8%
+ * a one-second memory left there — so the decay no longer hides the box by
+ * itself and this has real work to do. Four cells is 0.133 radii, a fifth of
+ * the clear air between the silhouette and the box.
+ */
+export const WIND_FADE = 4 * WIND_DX;
+
+/**
+ * DERIVED. Extinction per unit of energy density per radius of path.
+ *
+ * **This is what makes the wisps occupy space rather than glow through it.**
+ * A wisp in front of the eye dims what is behind it, which is the strongest
+ * statement available that it is between you and the globe; one behind the eye
+ * is not drawn at all, which the march handles by stopping at the sphere.
+ *
+ * The number is measured rather than chosen. Optical depth of the densest
+ * rays, over the whole box, on the coupled run:
+ *
+ *     sigma    alpha p90   p99     max
+ *      0.55      0.0018   0.0105  0.031
+ *      4         0.0128   0.0742  0.206
+ *      8         0.0254   0.1429  0.369
+ *     16         0.0502   0.2655  0.602
+ *
+ * 5.0 puts the **densest ray in the frame at about a quarter** — visible as
+ * depth, nowhere near a grey veil over a white eye — while the ninetieth
+ * percentile is under 2%, so the overwhelming majority of the air is
+ * effectively transparent and the volume reads as emission with occasional
+ * body rather than as fog.
+ *
+ * Setting it to 0 leaves a purely emissive volume and changes nothing else.
+ */
+export const WIND_SIGMA = 5.0;
+
+/**
+ * DERIVED, against contrast on the white rather than against headroom.
+ *
+ * **The overdrive is inherited from Task 13 and the trade is the same one.**
+ * Physical brightness put the energy below the threshold of visibility on a
+ * near-white sclera; the piece chose to keep the whites white and push. What
+ * makes the overdrive read as colour rather than as a smear is the
+ * hue-preserving compression at the end of `eyeW`: past the point where the
+ * brightest channel reaches 1, more gain stops buying luminance and starts
+ * buying hue.
+ *
+ * What changed is what the gain multiplies. Task 13's 2.75 scaled a **surface**
+ * value read once per pixel; this scales an **emission density integrated
+ * along a chord**, in units of energy per radius of path. The two are not
+ * comparable and this was re-derived from scratch, against the same three
+ * points on the white and the same 20-40% band.
+ *
+ * **Measured where the wisps are, not averaged around the ring.** The wind is
+ * directional and fixed in world space, so unlike Task 13's field the aurora
+ * is *not* azimuthally uniform: there are bearings that are permanently
+ * downwind and bearings that are permanently upwind. Averaging contrast around
+ * the ring therefore measures mostly empty air — 4% where the p95 is 29% — and
+ * it is the p95 that says whether a viewer can see a wisp. Both are reported;
+ * the gain is derived off the p95, at the median phase of the blink cycle:
+ *
+ *     gain   near-limbus     mid-sclera      grazing
+ *            contr / sat     contr / sat     contr / sat
+ *      24    21.9% / 0.24    10.7% / 0.11     9.8% / 0.16
+ *      30    28.9% / 0.27    13.9% / 0.13    12.7% / 0.17
+ *      36    33.8% / 0.31    17.1% / 0.15    15.7% / 0.19
+ *      42    36.1% / 0.33    20.3% / 0.17    18.6% / 0.20
+ *      50    34.4% / 0.36    24.6% / 0.19    22.6% / 0.22
+ *      58    34.8% / 0.39    28.9% / 0.21    26.5% / 0.23
+ *      68    37.1% / 0.42    34.3% / 0.23    31.4% / 0.25
+ *
+ * Base saturation on the white is 0.024, 0.023 and 0.063 at those points, so
+ * every row is several times more coloured than the surface it sits on. Near
+ * the limbus the contrast stops rising past 42 — that is the compression's
+ * knee, reached there first, exactly as Task 13 found.
+ *
+ * **50 is the smallest gain at which all three points clear 20%** — 42 leaves
+ * the grazing point at 18.6%. That is the same rule Task 13 derived 2.75 by.
+ *
+ * The field breathes by a factor of three, so no single gain holds all three
+ * points inside the band at every phase, and this one does not pretend to.
+ * Across the cycle at this gain the three points run:
+ *
+ *     trough   33% / 11% / 10%
+ *     median   34% / 25% / 23%
+ *     peak     38% / 46% / 49%
+ *
+ * The outer two points fall out of the bottom of the band at the trough and
+ * the middle one goes over the top at the peak. That spread **is** the
+ * breathing; flattening it would mean flattening the thing the blink does.
+ */
+export const AURORA_GAIN = 50;
+
+/**
+ * Emission colour for a sample, from its own state: `ELEC` where the energy is
+ * young, `VMAG` where it has aged. `eye.ts` carries the same two constants and
+ * the same mix.
  */
 export function auroraColour(E: number, A: number): [number, number, number] {
   const ELEC = [0.3, 0.55, 1.0];
@@ -1753,4 +2020,115 @@ export function auroraColour(E: number, A: number): [number, number, number] {
     (ELEC[1] + (VMAG[1] - ELEC[1]) * t) * g,
     (ELEC[2] + (VMAG[2] - ELEC[2]) * t) * g,
   ];
+}
+
+/** The box fade at a point: 1 in the interior, 0 at every face. */
+export function windFade(p: [number, number, number]): number {
+  const f = (v: number, half: number) =>
+    smoothstep(0, WIND_FADE, half - Math.abs(v));
+  return f(p[0], WIND_HALF_XY) * f(p[1], WIND_HALF_XY) * f(p[2], WIND_HALF_Z);
+}
+
+/**
+ * One ray of the march. **This is the specification `eye.ts` transcribes.**
+ *
+ * `x` and `y` are the pixel in globe radii — `q / R` — and the view is
+ * orthographic, so the ray is `(x, y, z)` with `z` running from the box's near
+ * face toward the viewer's far side. Front to back, so the accumulated
+ * transmittance is available to weight each sample as it is taken.
+ *
+ * **The sorting is exact and is the whole reason the wisps read as being in
+ * space.** The ray stops at the analytic sphere intersection when there is
+ * one, so everything behind the globe is never sampled and the globe occludes
+ * it by construction rather than by comparison; and everything the march
+ * *does* accumulate is in front of the globe, so the result composites over
+ * `eyeW`'s colour with a single `mix`. There is no depth buffer and no
+ * approximation in it.
+ *
+ * Returns premultiplied colour and the coverage `1 - T`.
+ */
+export function windMarch(
+  f: WindField,
+  x: number,
+  y: number,
+  dither = 0.5,
+  samples = WIND_MARCH
+): { rgb: [number, number, number]; alpha: number } {
+  const rgb: [number, number, number] = [0, 0, 0];
+  if (Math.abs(x) >= WIND_HALF_XY || Math.abs(y) >= WIND_HALF_XY) {
+    return { rgb, alpha: 0 };
+  }
+  const zStart = WIND_HALF_Z;
+  const d2 = x * x + y * y;
+  // The globe's near surface where the ray hits it, the box's far face where
+  // it does not. One `max`, and it is both the occlusion and the exit test.
+  const zStop = d2 < 1 ? Math.sqrt(1 - d2) : -WIND_HALF_Z;
+  const span = zStart - zStop;
+  if (span <= 0) return { rgb, alpha: 0 };
+  const ds = span / samples;
+  let T = 1;
+  for (let i = 0; i < samples; i++) {
+    const z = zStart - (i + dither) * ds;
+    const p: [number, number, number] = [x, y, z];
+    const [e0, a0] = windSample(f, p);
+    const e = Math.max(e0, 0) * windFade(p);
+    // The hue is the *unfaded* age ratio: the fade scales E and A together, so
+    // dimming a wisp at the box face must not also cool it.
+    const age = a0 / Math.max(e0, 1e-4);
+    const em = auroraColour(e, age * e);
+    for (let c = 0; c < 3; c++) rgb[c] += T * em[c] * ds;
+    T *= Math.exp(-WIND_SIGMA * e * ds);
+  }
+  return { rgb, alpha: 1 - T };
+}
+
+/* ---- The root ---------------------------------------------------- */
+
+/**
+ * DERIVED. The half-width of the glow left on the surface where the energy
+ * leaves it, in radians of angle from the gaze axis.
+ *
+ * **Without it the wisps appear in mid-air with no visible origin**, and the
+ * causal story the user chose — the aurora is driven by the film — becomes
+ * invisible even though it is still true. A short bright root at the limbus is
+ * what makes a viewer read the wisps as *shed by the eye* rather than blowing
+ * past it.
+ *
+ * It is exactly `WIND_RELEASE_DANG`, the angular half-width of the release
+ * band itself, so the glow is the release and not a second aurora. Two cells
+ * of the volume, 0.0667 rad, 3.8 degrees — and centred on `AURORA_ANG0`, so
+ * its inner half sits under `eye.ts`'s limbal ring.
+ */
+export const ROOT_DANG = WIND_RELEASE_DANG;
+
+/**
+ * DERIVED. The root's gain, against the volume's.
+ *
+ * **A third of the contrast the volume reaches**, so it says where the energy
+ * comes from without becoming a second aurora. Measured on the white at the
+ * limbus, mean over three azimuths:
+ *
+ *     ROOT_GAIN   contrast   saturation   max channel
+ *       0.10        9.8%        0.33         0.84
+ *       0.20       19.5%        0.37         0.94
+ *       0.30       26.0%        0.41         1.04
+ *       0.46       27.3%        0.45         1.20
+ *       0.70       22.1%        0.49         1.44
+ *
+ * The volume's own p95 contrast at the three sclera points is 34%, 25% and
+ * 23%; 0.10 puts the root at 9.8%, which is between a third and a half of the
+ * dimmest of them. It is also the last row that stays **under** the
+ * compression knee — max channel 0.84 — so the root lifts luminance rather
+ * than trading it for hue, which is what a bright root has to do. Past 0.30
+ * the contrast goes backwards for exactly the reason `AURORA_GAIN`'s table
+ * does.
+ */
+export const ROOT_GAIN = 0.1;
+
+/** The root's profile at an angle from the gaze axis: a band on the limbus. */
+export function rootGate(ang: number): number {
+  return (
+    smoothstep(AURORA_ANG0 - ROOT_DANG, AURORA_ANG0, ang) *
+    (1 - smoothstep(AURORA_ANG0, AURORA_ANG0 + ROOT_DANG, ang))
+  );
 }

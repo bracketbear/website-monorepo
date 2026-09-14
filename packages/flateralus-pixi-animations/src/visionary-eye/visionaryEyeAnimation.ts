@@ -11,10 +11,10 @@ import {
 } from '../shared/sdf-harness';
 import { EYE_GLOBE } from './eye';
 import {
-  AURORA_TEXTURE_UNIT,
-  AuroraSim,
   FILM_TEXTURE_UNIT,
   FilmSim,
+  MARCH_TEXTURE_UNIT,
+  WindSim,
 } from './film';
 import type { BlinkState } from './physics';
 import {
@@ -127,8 +127,8 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     'uDelta',
     'uShowFilm',
     'uFilmOK',
-    'uAurora',
-    'uAuroraOK',
+    'uMarch',
+    'uWindOK',
   ] as const;
   protected readonly commonUniforms = SDF_COMMON_UNIFORMS;
 
@@ -139,10 +139,10 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
   /** Set once FilmSim.create has been tried, so a failure is not retried. */
   private filmTried = false;
   /**
-   * The excitation field over the white. Null when the film is — it has
+   * The wind volume the eye stands in. Null when the film is — it has
    * nothing to be driven by without one — or when its own target failed.
    */
-  private aurora: AuroraSim | null = null;
+  private wind: WindSim | null = null;
   /** Smoothed gaze, and the target it is chasing. */
   private gaze: [number, number] = [0, 0];
   private gazeTarget: [number, number] = [0, 0];
@@ -222,8 +222,8 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
    */
   protected simulate(
     gl: WebGL2RenderingContext,
-    _ctx: ShaderContext,
-    _controls: VisionaryEyeControlValues,
+    ctx: ShaderContext,
+    controls: VisionaryEyeControlValues,
     dt: number
   ): void {
     if (!this.film) {
@@ -232,12 +232,12 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
       this.film = FilmSim.create(gl);
       // Spec D11: load mid-cycle with real structure, not as a flat mirror.
       this.film?.prime(Math.random() * 1000);
-      // The aurora is seeded by the film, so it is only worth building when
+      // The wind is released by the film, so it is only worth building when
       // there is one, and it is primed from the film that was just primed —
       // a blank sclera beside a mid-cycle cornea would be the same mistake.
       if (this.film) {
-        this.aurora = AuroraSim.create(gl);
-        if (this.aurora) this.aurora.prime(this.film);
+        this.wind = WindSim.create(gl);
+        if (this.wind) this.wind.prime(this.film, this.gazeView);
       }
       return;
     }
@@ -299,10 +299,25 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
       dt,
       worldToLocal(0, 1, this.gazeView[0], this.gazeView[1])
     );
-    // After the film, so the excitation is seeded by the break-up as it stands
+    // After the film, so the release is driven by the break-up as it stands
     // this frame rather than as it stood last. Its own fixed step and its own
-    // backlog, capped at the same 0.025s the film's is — see AURORA_STEP.
-    this.aurora?.advance(dt, this.film);
+    // backlog, as close to the film's 0.025s as 60Hz comes — see WIND_STEP.
+    //
+    // `gazeView` and not `gaze`: the release band is placed in the frame the
+    // display was last drawn with, which is the frame the film is stored in.
+    // The **wind** in there is in world space and does not take a gaze at all.
+    this.wind?.advance(dt, this.film, this.gazeView);
+    // The march, here rather than in setUniforms, because this is the one
+    // place the display program is not current: it switches programs and
+    // framebuffers, and the harness makes `ctx.program` current again on the
+    // line after simulate() returns. It runs at quarter of the canvas, which
+    // is why it needs the canvas rather than the sprite.
+    this.wind?.march(
+      ctx.canvas.width,
+      ctx.canvas.height,
+      controls.eyeScale,
+      MARCH_TEXTURE_UNIT
+    );
   }
 
   protected setUniforms(
@@ -377,18 +392,18 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     // gates every read, but a trap for the passes Tasks 10-12 add.
     gl.uniform1i(locs.uFilm!, FILM_TEXTURE_UNIT);
     if (this.film) this.film.bindField(FILM_TEXTURE_UNIT);
-    // Same contract for the aurora: its sampler always points at its own unit
-    // so it can never fall back to the SDF mask, and uAuroraOK gates every
-    // read. At 0 the emission term is exactly zero and the white is the white.
-    gl.uniform1f(locs.uAuroraOK!, this.aurora ? 1 : 0);
-    gl.uniform1i(locs.uAurora!, AURORA_TEXTURE_UNIT);
-    this.aurora?.bindField(AURORA_TEXTURE_UNIT);
+    // Same contract for the wind: its sampler always points at its own unit
+    // so it can never fall back to the SDF mask, and uWindOK gates the read.
+    // At 0 the whole composited vec4 is zero — colour *and* coverage — so the
+    // eye is the eye. The march itself already bound the texture.
+    gl.uniform1f(locs.uWindOK!, this.wind ? 1 : 0);
+    gl.uniform1i(locs.uMarch!, MARCH_TEXTURE_UNIT);
   }
 
   onDestroy(): void {
     // Before super, which loses the context these objects live in.
-    this.aurora?.destroy();
-    this.aurora = null;
+    this.wind?.destroy();
+    this.wind = null;
     this.film?.destroy();
     this.film = null;
     this.filmTried = false;
