@@ -1,6 +1,37 @@
 import { describe, it, expect } from 'vitest';
 import { EYE_GLOBE } from './eye';
 import {
+  AURORA_ANG,
+  AURORA_ANG0,
+  AURORA_ANG1,
+  AURORA_AZ,
+  AURORA_COOL,
+  AURORA_DANG,
+  AURORA_DAZ,
+  AURORA_D_ANG,
+  AURORA_D_AZ,
+  AURORA_GAIN,
+  AURORA_MAX_SUBSTEPS,
+  AURORA_PRIME_SECONDS,
+  AURORA_SEED,
+  AURORA_SEED_ANG0,
+  AURORA_SEED_ANG1,
+  AURORA_SEED_ROWS,
+  AURORA_SEED_TAPS,
+  AURORA_SELF,
+  AURORA_SOURCE_WIDTH,
+  AURORA_SPAN,
+  AURORA_STEP,
+  AURORA_TAU,
+  AURORA_V,
+  auroraAngOf,
+  auroraAzOf,
+  auroraColour,
+  auroraMass,
+  auroraSeedTap,
+  auroraStep,
+  auroraTick,
+  newAuroraField,
   BLINK_FRACTION,
   CAUSTIC_MAX,
   CORNEA_ETA,
@@ -938,9 +969,9 @@ describe('the smooth-bilinear fetch', () => {
  * "does a dry patch actually change the pixel" can be answered in a number
  * instead of a screenshot.
  *
- * The texture terms — the vein fbm and the grain — collapse into one `noise`
- * parameter in [0, 1]; `noise = 0` is the brightest the sclera ever gets,
- * which is the pixel this is about. `visionary()` is not ported, so rows on
+ * The grain collapses into one `noise` parameter in [0, 1]; `noise = 0` is the
+ * brightest the sclera ever gets, which is the pixel this is about. (It used
+ * to carry the painted veins too, until Task 13 deleted them.) `visionary()` is not ported, so rows on
  * the iris stand in a mid-tone for it and are indicative only.
  *
  * `wetD` is the shader's separate darkening gate. It is normally `wet`, but
@@ -969,8 +1000,9 @@ function scleraPixel(
   const ang = Math.acos(lz);
   const vd = ss(0.55, 1.35, ang);
   let sc = [0.965, 0.95, 0.925];
-  sc = mix3(sc, [0.74, 0.18, 0.15], noise * vd * 0.55);
-  sc = mix3(sc, [0.84, 0.36, 0.3], noise * vd * 0.3);
+  // No vein mixes: Task 13 deleted the painted capillaries. They were
+  // identity at `noise = 0` anyway, so every headroom number measured on the
+  // brightest pixel is unchanged by their going.
   sc = mix3(sc, [0.99, 0.85, 0.79], vd * vd * 0.28);
   sc = mix3(sc, [0.9, 0.86, 0.74], ss(0.95, 1.5, ang) * 0.22);
   sc = sc.map((x, i) => x - [0.025, 0.03, 0.02][i] * noise);
@@ -1764,29 +1796,10 @@ function irisPixel(lx: number, ly: number, focus: number, t = 7.0) {
   const sdx = lx / sd;
   const sdy = ly / sd;
   const vl = genergyH(lx, ly, ang, t);
-  const sa2 = Math.atan2(sdy, sdx);
-  const o1 = gfbm(sdx * 3.5, sdy * 3.5) * 1.8;
-  const vein = Math.pow(
-    gclamp(
-      1 - Math.abs(gfbm(sa2 * 5 + o1, ang * 2.2 + o1) * 2 - 1) * 3.4,
-      0,
-      1
-    ),
-    4
-  );
-  const o2 = gfbm(sdx * 6, sdy * 6) * 1.2;
-  const vein2 = Math.pow(
-    gclamp(
-      1 - Math.abs(gfbm(sa2 * 13 + 7.3 + o2, ang * 4.5 + o2) * 2 - 1) * 5.5,
-      0,
-      1
-    ),
-    6
-  );
   const vd = gss(0.55, 1.35, ang);
   let sc = [0.965, 0.95, 0.925];
-  sc = gmix(sc, [0.74, 0.18, 0.15], vein * vd * 0.55);
-  sc = gmix(sc, [0.84, 0.36, 0.3], vein2 * vd * 0.3);
+  // The vein mixes are gone with the shader's — see `scleraPixel`. Over the
+  // iris `vd` was 0.02 anyway, so nothing measured here moves.
   sc = gmix(sc, [0.99, 0.85, 0.79], vd * vd * 0.28);
   sc = gmix(sc, [0.9, 0.86, 0.74], gss(0.95, 1.5, ang) * 0.22);
   const gr = gfbm(sdx * 5, sdy * 5 + ang * 3);
@@ -2044,5 +2057,501 @@ describe('why the shortfall is not a grid artifact', () => {
     expect((loAt - 0.2) / DELTA).toBeLessThan(-0.8); // dry side
     expect((loAt - 0.2) / DELTA).toBeGreaterThan(-1.5);
     expect(hi).toBeGreaterThan(-lo); // the crest gathers more than the slope loses
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * The aurora.
+ *
+ * The scheme in `auroraStep` is the specification `film.ts` transcribes into
+ * GLSL, so driving it here drives the shipped thing. What cannot be driven
+ * here is the *coupling* — the seed comes from the film, and the film needs a
+ * GL context — so the time course and the coherence below run against a
+ * synthetic cycle built out of the shipped blink ramp. The coupled
+ * measurement, against a CPU mirror of the film's two shipped passes, is in
+ * the task report; where the two overlap they agree.
+ * ------------------------------------------------------------------ */
+
+const NAZ = AURORA_AZ;
+const NANG = AURORA_ANG;
+
+/** A Gaussian blob of excitation, for the transport checks. */
+function auroraBlob(i0: number, j0: number, w = 0.05) {
+  const f = newAuroraField();
+  for (let j = 0; j < NANG; j++) {
+    for (let i = 0; i < NAZ; i++) {
+      const di = Math.min(Math.abs(i - i0), NAZ - Math.abs(i - i0));
+      const r2 =
+        Math.pow((di * AURORA_DAZ) / w, 2) +
+        Math.pow(((j - j0) * AURORA_DANG) / w, 2);
+      f.E[j * NAZ + i] = Math.exp(-r2);
+    }
+  }
+  return f;
+}
+
+/**
+ * A blink cycle's worth of sector dryness, without a GL context.
+ *
+ * The film cannot run here, so the *shape* of the seed is synthesised from the
+ * pieces that can: `fallbackFraction` is the shipped ramp, calibrated to the
+ * cadence the measured path produces, and `stepBlink` is the shipped state
+ * machine. Six sources of `AURORA_SOURCE_WIDTH` stand in for the six or seven
+ * dry patches the band actually carries — measured on the coupled run: 4 to 6
+ * discrete sources, 0.12 to 0.30 rad wide.
+ *
+ * What this pins is the field's *response*, which is the part that lives in
+ * `auroraStep`: how much of the seed's rhythm survives the transit and the
+ * decay. It does not pin the seed's own rhythm, which is the film's.
+ */
+function syntheticCycles(seconds: number) {
+  const dry = new Float32Array(NAZ);
+  const f = newAuroraField();
+  const mean: number[] = [];
+  const fires: number[] = [];
+  const SOURCES = 6;
+  const half = AURORA_SOURCE_WIDTH / 2;
+  let blink: BlinkState = newBlinkState();
+  let acc = 0;
+  let t = 0;
+  const DT = 1 / 60;
+  for (let n = 0; n < Math.round(seconds / DT); n++) {
+    const before = blink;
+    blink = stepBlink(before, DT, fallbackFraction(before.since));
+    if (before.phase === 'open' && blink.phase !== 'open') fires.push(t);
+    // The band dries as the cycle runs and is wiped when the lid crosses.
+    const wet = isWiping(blink)
+      ? 0
+      : fallbackFraction(blink.since) / BLINK_FRACTION;
+    for (let i = 0; i < NAZ; i++) {
+      const az = auroraAzOf(i);
+      let on = 0;
+      for (let k = 0; k < SOURCES; k++) {
+        const c = (k / SOURCES) * 2 * Math.PI - Math.PI + 0.31 * k;
+        let d = Math.abs(az - c);
+        if (d > Math.PI) d = 2 * Math.PI - d;
+        if (d < half * (0.4 + 0.6 * wet)) on = 1;
+      }
+      dry[i] = on * wet;
+    }
+    const tick = auroraTick(acc, DT);
+    acc = tick.acc;
+    for (let k = 0; k < tick.steps; k++) auroraStep(f, dry);
+    let s = 0;
+    for (let i = 0; i < f.E.length; i++) s += f.E[i];
+    mean.push(s / f.E.length);
+    t += DT;
+  }
+  return { f, mean, fires, dt: DT };
+}
+
+/** Normalised autocorrelation of E at a matched **arc** lag, along and across. */
+function auroraCorr(E: Float32Array, arc: number): [number, number] {
+  const n = NAZ * NANG;
+  let mu = 0;
+  for (let i = 0; i < n; i++) mu += E[i];
+  mu /= n;
+  let v = 0;
+  for (let i = 0; i < n; i++) v += Math.pow(E[i] - mu, 2);
+  v /= n;
+  const L = Math.max(1, Math.round(arc / AURORA_DANG));
+  let al = 0;
+  let ca = 0;
+  for (let j = 0; j + L < NANG; j++) {
+    for (let i = 0; i < NAZ; i++) {
+      al += (E[j * NAZ + i] - mu) * (E[(j + L) * NAZ + i] - mu);
+      ca++;
+    }
+  }
+  let ac = 0;
+  for (let j = 0; j < NANG; j++) {
+    const di = Math.max(
+      1,
+      Math.round(arc / (Math.sin(auroraAngOf(j)) * AURORA_DAZ))
+    );
+    for (let i = 0; i < NAZ; i++) {
+      ac += (E[j * NAZ + i] - mu) * (E[j * NAZ + ((i + di) % NAZ)] - mu);
+    }
+  }
+  return [al / ca / v, ac / (NAZ * NANG) / v];
+}
+
+const AURORA_RUN = syntheticCycles(11);
+
+describe('the aurora field and its domain', () => {
+  it('derives the azimuth from the width of one source', () => {
+    // The source is a dry patch of film seen from the seeding band, and its
+    // width is not a free number: `breakupFraction` measures the patches at
+    // 12.6 cells and the band sits at a mean angle of 0.47 rad.
+    expect(AURORA_SOURCE_WIDTH).toBeCloseTo(0.348, 3);
+    // Four cells across the narrowest filament, which is a quarter of that.
+    const narrow = AURORA_SOURCE_WIDTH / 4;
+    expect(narrow / AURORA_DAZ).toBeGreaterThanOrEqual(4);
+    // And not extravagantly more: 320 is the next multiple of 64 above 289.
+    expect(narrow / AURORA_DAZ).toBeLessThan(5);
+    // Azimuth carries the structure, so it gets the cells.
+    expect(AURORA_AZ).toBe(5 * AURORA_ANG);
+  });
+
+  it('keeps the cells square on the sphere, which is what makes D anisotropic', () => {
+    // `sin(ang) * dAz` against `dAng`, averaged over the white. If these drift
+    // apart, AURORA_D_ANG / AURORA_D_AZ stops being an anisotropy of the
+    // physics and becomes one of the grid.
+    const meanSin =
+      (Math.cos(AURORA_ANG0) - Math.cos(AURORA_ANG1)) / AURORA_SPAN;
+    expect((meanSin * AURORA_DAZ) / AURORA_DANG).toBeGreaterThan(0.95);
+    expect((meanSin * AURORA_DAZ) / AURORA_DANG).toBeLessThan(1.1);
+  });
+
+  it('starts at the limbus the shader already rings and ends at the silhouette', () => {
+    expect(AURORA_ANG0).toBe(0.56);
+    expect(EYE_GLOBE).toContain('exp(-abs(ang - 0.56) * 26.0)');
+    expect(AURORA_ANG1).toBe(Math.PI / 2);
+  });
+
+  it('is stable at its own step, advectively and diffusively', () => {
+    // Advective CFL at the fastest the drift ever runs. The self-steepening
+    // rides on E, and E stays under 1 by construction of AURORA_SEED.
+    const cfl =
+      (AURORA_V * (1 + AURORA_SELF * 1.0) * AURORA_STEP) / AURORA_DANG;
+    expect(cfl).toBeLessThan(0.5);
+    // Explicit diffusion, at the tightest cell — the azimuthal arc is
+    // shortest at the limbus.
+    const arc = Math.sin(AURORA_ANG0) * AURORA_DAZ;
+    const dnum =
+      AURORA_STEP *
+      ((2 * AURORA_D_ANG) / (AURORA_DANG * AURORA_DANG) +
+        (2 * AURORA_D_AZ) / (arc * arc));
+    expect(dnum).toBeCloseTo(0.246, 3);
+    expect(dnum).toBeLessThan(0.5);
+    // Along the flow and not across it. This is the sign that makes filaments.
+    expect(AURORA_D_ANG).toBeGreaterThan(AURORA_D_AZ * 5);
+  });
+
+  it('ages at the same rate as the film on a slow frame', () => {
+    // **The two fields have to throttle by the same factor**, or the aurora
+    // runs at a different fraction of real time from the break-up driving it —
+    // the bug `filmTick`'s comment describes, one field over. The caps are the
+    // same number of seconds to within one aurora step.
+    const filmCap = MAX_SUBSTEPS * STEP;
+    const aurCap = AURORA_MAX_SUBSTEPS * AURORA_STEP;
+    expect(Math.abs(aurCap - filmCap)).toBeLessThan(AURORA_STEP);
+    for (const dt of [1 / 60, 1 / 30, 1 / 15, 1 / 8, 0.05]) {
+      const a = filmTick(0, dt).ran;
+      const b = auroraTick(0, dt).ran;
+      expect(Math.abs(a - b)).toBeLessThan(AURORA_STEP);
+    }
+    // And it carries its remainder rather than dropping it, same as the film.
+    let acc = 0;
+    let ran = 0;
+    for (let k = 0; k < 600; k++) {
+      const t = auroraTick(acc, 1 / 60);
+      acc = t.acc;
+      ran += t.ran;
+    }
+    expect(ran).toBeGreaterThan(10 - AURORA_STEP * 2);
+    expect(ran).toBeLessThanOrEqual(10 + 1e-9);
+  });
+
+  it('reads the film only where the film has data', () => {
+    // Every seed tap has to land inside FILM_REACH or it samples a clamped
+    // texel and the sector lights up from an extrapolation. The furthest tap
+    // is at the limbus itself.
+    for (let k = 0; k < AURORA_SEED_TAPS; k++) {
+      for (let i = 0; i < NAZ; i += 7) {
+        const [lx, ly] = auroraSeedTap(auroraAzOf(i), k);
+        expect(Math.max(Math.abs(lx), Math.abs(ly))).toBeLessThan(FILM_REACH);
+        expect(filmReach(lx, ly)).toBe(1);
+      }
+    }
+    // The band is one dry-patch diameter deep, measured at its own angle.
+    const patch = (12.6 * DELTA) / Math.cos(0.47);
+    expect(AURORA_SEED_ANG1 - AURORA_SEED_ANG0).toBeCloseTo(patch, 2);
+    expect(AURORA_SEED_ANG1).toBe(AURORA_ANG0);
+  });
+
+  it('injects at a rate that makes E = 1 the natural scale', () => {
+    // A fully torn sector holds E = 1 at the inner edge in steady state, so
+    // AURORA_GAIN has one meaning rather than being a free brightness knob.
+    expect(AURORA_SEED * ((AURORA_SEED_ROWS * AURORA_DANG) / AURORA_V)).toBe(1);
+  });
+});
+
+describe('the aurora transports without leaking or inventing', () => {
+  it('conserves the area-weighted total under zero seeding and zero decay', () => {
+    // **The standard check, and the reason the scheme is written in flux
+    // form.** The `sin(ang +- dAng/2)` weights are the face areas and a face's
+    // flux is one formula whichever cell asks for it, so the sum telescopes
+    // exactly. The blob starts and finishes clear of both boundaries, so
+    // nothing legitimately leaves.
+    for (const o of [
+      { v: 0, tau: Infinity },
+      { tau: Infinity },
+      { tau: Infinity, dAng: 0, dAz: 0 },
+    ]) {
+      const f = auroraBlob(17, 10);
+      const m0 = auroraMass(f);
+      for (let k = 0; k < 120; k++) auroraStep(f, null, o);
+      expect(Math.abs(auroraMass(f) / m0 - 1)).toBeLessThan(1e-5);
+      // and it really did stay off the outer boundary, so this is not
+      // conservation by the field having gone nowhere.
+      let edge = 0;
+      for (let i = 0; i < NAZ; i++)
+        edge = Math.max(edge, f.E[(NANG - 1) * NAZ + i]);
+      expect(edge).toBeLessThan(1e-4);
+    }
+  });
+
+  it('holds nothing back at the limbus and lets the silhouette drain', () => {
+    // Zero flux in, free outflow out. A blob parked on the inner rows must
+    // not leak inward, and a blob run long enough must leave entirely.
+    const f = auroraBlob(17, 1);
+    const m0 = auroraMass(f);
+    for (let k = 0; k < 24; k++) auroraStep(f, null, { v: 0, tau: Infinity });
+    expect(Math.abs(auroraMass(f) / m0 - 1)).toBeLessThan(1e-5);
+    const g = auroraBlob(17, 10);
+    for (let k = 0; k < 1200; k++) auroraStep(g, null, { tau: Infinity });
+    expect(auroraMass(g) / auroraMass(auroraBlob(17, 10))).toBeLessThan(0.01);
+  });
+
+  it('decays on the clock AURORA_TAU names', () => {
+    const f = auroraBlob(17, 20);
+    const m0 = auroraMass(f);
+    const n = Math.round(AURORA_TAU / AURORA_STEP);
+    for (let k = 0; k < n; k++) auroraStep(f, null, { v: 0, dAng: 0, dAz: 0 });
+    const ratio = auroraMass(f) / m0;
+    // Explicit Euler undershoots the exponential by half a step's worth.
+    expect(-AURORA_TAU / Math.log(ratio)).toBeCloseTo(AURORA_TAU, 2);
+    // And the decay length is 0.72 rad, 71% of the white.
+    expect((AURORA_V * AURORA_TAU) / AURORA_SPAN).toBeCloseTo(0.712, 3);
+  });
+
+  it('advects at the speed AURORA_V names, in cells per step', () => {
+    // A pulse so faint the self-steepening cannot act, so this measures the
+    // base drift alone: 0.1577 cells/step measured against 0.1583 predicted.
+    const f = newAuroraField();
+    for (let j = 0; j < NANG; j++)
+      for (let i = 0; i < NAZ; i++)
+        f.E[j * NAZ + i] =
+          1e-4 * Math.exp(-Math.pow(((j - 12) * AURORA_DANG) / 0.06, 2));
+    const centroid = () => {
+      let s = 0;
+      let w = 0;
+      for (let j = 0; j < NANG; j++) {
+        let r = 0;
+        for (let i = 0; i < NAZ; i++) r += f.E[j * NAZ + i];
+        s += r * j;
+        w += r;
+      }
+      return s / w;
+    };
+    const c0 = centroid();
+    const N = 240;
+    for (let k = 0; k < N; k++)
+      auroraStep(f, null, { tau: Infinity, dAng: 0, dAz: 0 });
+    const cells = (centroid() - c0) / N;
+    const predicted = (AURORA_V * AURORA_STEP) / AURORA_DANG;
+    expect(cells).toBeCloseTo(predicted, 2);
+    expect(cells * (AURORA_DANG / AURORA_STEP)).toBeCloseTo(AURORA_V, 1);
+  });
+
+  it('is seamless around the azimuth', () => {
+    // **REPEAT, and it has to be exact.** Nothing in the scheme depends on
+    // azimuth — `sin(ang)` is the only metric term and it is a function of the
+    // other axis — so the same blob on the seam and half a turn away must
+    // evolve to the same field, cell for cell.
+    const a = auroraBlob(0, 20);
+    const b = auroraBlob(NAZ / 2, 20);
+    for (let k = 0; k < 480; k++) {
+      auroraStep(a, null);
+      auroraStep(b, null);
+    }
+    let worst = 0;
+    let peak = 0;
+    for (let j = 0; j < NANG; j++) {
+      for (let i = 0; i < NAZ; i++) {
+        const va = a.E[j * NAZ + i];
+        const vb = b.E[j * NAZ + ((i + NAZ / 2) % NAZ)];
+        worst = Math.max(worst, Math.abs(va - vb));
+        peak = Math.max(peak, vb);
+      }
+    }
+    expect(peak).toBeGreaterThan(0);
+    expect(worst).toBe(0);
+  });
+});
+
+describe('the aurora makes curtains rather than noise', () => {
+  it('stays coherent along the flow long after it has lost coherence across it', () => {
+    // **The measure that separates a curtain from a stain.** Correlation of
+    // the field with itself at a matched *arc* lag, along the flow and across
+    // it. Noise would be near zero both ways at every lag; a blob field would
+    // be near one both ways; a curtain holds on in one direction and lets go
+    // in the other, and the ratio has to *grow* with the lag.
+    //
+    //   arc    along  across  ratio
+    //   0.03   0.955  0.918   1.04
+    //   0.08   0.880  0.688   1.28
+    //   0.20   0.706  0.107   6.58
+    //   0.45   0.445 -0.017     --
+    //
+    // On the coupled run, driven by a CPU mirror of the real film rather than
+    // by the synthetic cycle: correlation length 0.486 rad along against
+    // 0.093 across, an aspect of 5.2, and a structure-tensor anisotropy of
+    // 0.923.
+    const E = AURORA_RUN.f.E;
+    const lags = [0.03, 0.05, 0.08, 0.12, 0.2];
+    const c = lags.map((a) => auroraCorr(E, a));
+    // Structure, not noise: close in the field is correlated both ways.
+    expect(c[0][0]).toBeGreaterThan(0.8);
+    expect(c[0][1]).toBeGreaterThan(0.8);
+    // Filaments, not blobs: the two directions part company, monotonically.
+    for (let k = 1; k < c.length; k++)
+      expect(c[k][0] / c[k][1]).toBeGreaterThan(c[k - 1][0] / c[k - 1][1]);
+    expect(c[4][0] / c[4][1]).toBeGreaterThan(2.5);
+    // The across-flow correlation length is the one the resolution was derived
+    // for — it is through 1/e by 0.20 rad, a little over twice the 0.084 rad
+    // narrowest filament — while along the flow the field is still correlated
+    // at half the width of the whole white.
+    expect(c[4][1]).toBeLessThan(Math.exp(-1));
+    expect(c[4][0]).toBeGreaterThan(0.6);
+    expect(auroraCorr(E, AURORA_SPAN / 2)[0]).toBeGreaterThan(Math.exp(-1));
+  });
+
+  it('keeps the field sparse, because the sources are', () => {
+    // Most of the white is dark at any moment — the curtains are a small part
+    // of a large surface, which is why the median pixel spends almost none of
+    // its headroom while the brightest hundredth spends half of it.
+    const E = Array.from(AURORA_RUN.f.E).sort((a, b) => a - b);
+    const q = (p: number) => E[Math.floor(p * (E.length - 1))];
+    expect(q(0.99) / Math.max(q(0.5), 1e-9)).toBeGreaterThan(10);
+  });
+
+  it('colours by the age the field itself carries, not by where the pixel is', () => {
+    // Same excitation, different age: the colour has to move. And the same
+    // age at two radii has to give the same colour, or it is a ramp.
+    const young = auroraColour(0.4, 0.4 * 0.05);
+    const old = auroraColour(0.4, 0.4 * 2.0);
+    expect(young[2]).toBeGreaterThan(young[0]); // ELEC is blue-dominant
+    expect(old[0]).toBeGreaterThan(old[2]); // VMAG is magenta
+    expect(AURORA_COOL).toBe(AURORA_TAU);
+    // Emission is linear in E at fixed age, so brightness is the field.
+    const half = auroraColour(0.2, 0.2 * 2.0);
+    for (let i = 0; i < 3; i++) expect(half[i]).toBeCloseTo(old[i] / 2, 12);
+  });
+});
+
+describe('the aurora against the blink cycle', () => {
+  it('breathes rather than switching', () => {
+    // **The risk this task was asked to measure.** The seed is at its
+    // strongest just before a blink and is wiped to nothing by it, so the
+    // question is how much of that squareness survives the transit and the
+    // decay. Phase-averaged over the cycles, on the coupled run:
+    //
+    //   peak at phase 0.96 (just before the lid), x1.91 of the trough
+    //   trough at phase 0.38, which is 1.26s *after* the blink, not at it
+    //   largest change in any 1/6s of any cycle: 40% of the swing, which is
+    //   26% of the mean level
+    //
+    // A switch would put the whole swing into a frame or two. This is a factor
+    // of two, spread over a second and a quarter falling and two rising, and
+    // the trough lags the lid by more than a second because the field's own
+    // memory outlives the sources that filled it.
+    const { mean, fires, dt } = AURORA_RUN;
+    expect(fires.length).toBeGreaterThanOrEqual(2);
+    const from = Math.ceil(fires[0] / dt);
+    const seg = mean.slice(from);
+    const lo = Math.min(...seg);
+    const hi = Math.max(...seg);
+    // Never anywhere near dark: the swing is a factor, not a switch.
+    expect(hi / lo).toBeGreaterThan(1.3);
+    expect(hi / lo).toBeLessThan(4);
+    // And no frame-scale step. A sixth of a second is the shortest interval a
+    // viewer reads as an event rather than as motion.
+    let fastest = 0;
+    for (let k = 0; k + 10 < seg.length; k++)
+      fastest = Math.max(fastest, Math.abs(seg[k + 10] - seg[k]));
+    expect(fastest / (hi - lo)).toBeLessThan(0.5);
+    // The trough lags the blink, which is the field's own memory and is what
+    // makes it read as breathing rather than as a light being switched off.
+    const trough = from + seg.indexOf(lo);
+    const after = fires.filter((f) => f / dt < trough).pop()!;
+    expect(trough * dt - after).toBeGreaterThan(0.5);
+  });
+
+  it('spends the headroom Task 12 measured, and does not clip', () => {
+    // Worst case over the run: the brightest cell the field ever holds, both
+    // ends of the colour ramp, against the worst-channel budget at three
+    // points on the white. The catchlight is the fourth row and is *supposed*
+    // to be over: Task 12 measured zero headroom there and the aurora cannot
+    // live inside a highlight that is already clipped.
+    const rowOf = (ang: number) =>
+      Math.min(
+        NANG - 1,
+        Math.round(((ang - AURORA_ANG0) / AURORA_SPAN) * NANG - 0.5)
+      );
+    const rowPeak = (ang: number) => {
+      const j = rowOf(ang);
+      let m = 0;
+      for (let i = 0; i < NAZ; i++)
+        m = Math.max(m, AURORA_RUN.f.E[j * NAZ + i]);
+      return m;
+    };
+    // Brightest emission the field can put in any one channel, at that angle.
+    const emit = (ang: number) => AURORA_GAIN * rowPeak(ang) * 1.0;
+    for (const [ang, lit] of [
+      [1.2, true],
+      [1.4, true],
+      [1.0, false],
+    ] as [number, boolean][]) {
+      const h = headroom(scleraPixel(...atAng(ang, lit), 1, 0));
+      expect(h).toBeGreaterThan(0.1);
+      expect(emit(ang)).toBeLessThan(h);
+      // and not so far under it as to be invisible
+      expect(emit(ang) / h).toBeGreaterThan(0.05);
+    }
+    // Inside the lobe there is nothing to spend, and that is fine.
+    expect(headroom(scleraPixel(...atAng(0.696), 1, 0))).toBe(0);
+  });
+});
+
+describe('the shipped shader is the reference', () => {
+  it('interpolates the aurora constants rather than writing them out', () => {
+    expect(EYE_GLOBE).toContain(
+      `smoothstep(0.0, ${AURORA_COOL.toFixed(6)}, ex.y / max(ex.x, 1e-4))`
+    );
+    expect(EYE_GLOBE).toContain(`* exE * ${AURORA_GAIN.toFixed(6)};`);
+    // The domain map, and the fade that hides the inner boundary under the
+    // limbal ring.
+    expect(EYE_GLOBE).toContain(
+      `(ang - ${AURORA_ANG0.toFixed(6)}) * ${(1 / AURORA_SPAN).toFixed(8)}`
+    );
+    expect(EYE_GLOBE).toContain(
+      `smoothstep(${AURORA_ANG0.toFixed(6)}, ${(AURORA_ANG0 + 3 * AURORA_DANG).toFixed(6)}, ang)`
+    );
+    // Azimuth is 1/(2*pi) of the corneal-local angle, the same frame the film
+    // is stored in, which is what makes the curtains ride the gaze.
+    expect(EYE_GLOBE).toContain('sa2 * 0.15915494 + 0.5');
+  });
+
+  it('leaves a render with no field bit-identical', () => {
+    // uAuroraOK = 0 must add exactly nothing, the same contract uFilmOK
+    // carries. The clamp is what guarantees the factor is finite, so the
+    // multiply is an exact zero rather than a possible NaN.
+    expect(EYE_GLOBE).toContain('clamp(ex.x, 0.0, 4.0) * uAuroraOK');
+  });
+
+  it('has deleted the painted capillaries', () => {
+    for (const gone of ['float vein', 'float vein2', 'vec3(0.74, 0.18, 0.15)'])
+      expect(EYE_GLOBE).not.toContain(gone);
+    // And the sclera's own shading is still there.
+    expect(EYE_GLOBE).toContain(
+      'sc = mix(sc, vec3(0.99, 0.85, 0.79), vd * vd * 0.28);'
+    );
+  });
+
+  it('primes long enough for the field to fill the white', () => {
+    expect(AURORA_PRIME_SECONDS).toBeGreaterThan(AURORA_SPAN / AURORA_V);
+    expect(Math.round(AURORA_PRIME_SECONDS / AURORA_STEP)).toBe(692);
   });
 });

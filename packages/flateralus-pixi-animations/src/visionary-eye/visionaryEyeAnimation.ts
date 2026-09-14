@@ -10,7 +10,12 @@ import {
   sdfMask,
 } from '../shared/sdf-harness';
 import { EYE_GLOBE } from './eye';
-import { FILM_TEXTURE_UNIT, FilmSim } from './film';
+import {
+  AURORA_TEXTURE_UNIT,
+  AuroraSim,
+  FILM_TEXTURE_UNIT,
+  FilmSim,
+} from './film';
 import type { BlinkState } from './physics';
 import {
   DELTA,
@@ -122,6 +127,8 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     'uDelta',
     'uShowFilm',
     'uFilmOK',
+    'uAurora',
+    'uAuroraOK',
   ] as const;
   protected readonly commonUniforms = SDF_COMMON_UNIFORMS;
 
@@ -131,6 +138,11 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
   private film: FilmSim | null = null;
   /** Set once FilmSim.create has been tried, so a failure is not retried. */
   private filmTried = false;
+  /**
+   * The excitation field over the white. Null when the film is — it has
+   * nothing to be driven by without one — or when its own target failed.
+   */
+  private aurora: AuroraSim | null = null;
   /** Smoothed gaze, and the target it is chasing. */
   private gaze: [number, number] = [0, 0];
   private gazeTarget: [number, number] = [0, 0];
@@ -220,6 +232,13 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
       this.film = FilmSim.create(gl);
       // Spec D11: load mid-cycle with real structure, not as a flat mirror.
       this.film?.prime(Math.random() * 1000);
+      // The aurora is seeded by the film, so it is only worth building when
+      // there is one, and it is primed from the film that was just primed —
+      // a blank sclera beside a mid-cycle cornea would be the same mistake.
+      if (this.film) {
+        this.aurora = AuroraSim.create(gl);
+        if (this.aurora) this.aurora.prime(this.film);
+      }
       return;
     }
     // Reduced motion keeps the primed field but stops it evolving, the same
@@ -280,6 +299,10 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
       dt,
       worldToLocal(0, 1, this.gazeView[0], this.gazeView[1])
     );
+    // After the film, so the excitation is seeded by the break-up as it stands
+    // this frame rather than as it stood last. Its own fixed step and its own
+    // backlog, capped at the same 0.025s the film's is — see AURORA_STEP.
+    this.aurora?.advance(dt, this.film);
   }
 
   protected setUniforms(
@@ -354,10 +377,18 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     // gates every read, but a trap for the passes Tasks 10-12 add.
     gl.uniform1i(locs.uFilm!, FILM_TEXTURE_UNIT);
     if (this.film) this.film.bindField(FILM_TEXTURE_UNIT);
+    // Same contract for the aurora: its sampler always points at its own unit
+    // so it can never fall back to the SDF mask, and uAuroraOK gates every
+    // read. At 0 the emission term is exactly zero and the white is the white.
+    gl.uniform1f(locs.uAuroraOK!, this.aurora ? 1 : 0);
+    gl.uniform1i(locs.uAurora!, AURORA_TEXTURE_UNIT);
+    this.aurora?.bindField(AURORA_TEXTURE_UNIT);
   }
 
   onDestroy(): void {
     // Before super, which loses the context these objects live in.
+    this.aurora?.destroy();
+    this.aurora = null;
     this.film?.destroy();
     this.film = null;
     this.filmTried = false;

@@ -1,4 +1,9 @@
 import {
+  AURORA_ANG0,
+  AURORA_COOL,
+  AURORA_DANG,
+  AURORA_GAIN,
+  AURORA_SPAN,
   CAUSTIC_MAX,
   CORNEA_ETA,
   DOMAIN,
@@ -33,6 +38,9 @@ export const EYE_GLOBE = `
       uniform float uDelta;
       uniform float uShowFilm;
       uniform float uFilmOK;
+      // The excitation field over the white, and its own 0/1 gate.
+      uniform sampler2D uAurora;
+      uniform float uAuroraOK;
       /**
        * The film, fetched smoothly.
        *
@@ -143,19 +151,16 @@ export const EYE_GLOBE = `
           float lx = dot(n, tx), ly = dot(n, ty), lz = dot(n, gd);
           float ang = acos(clamp(lz, -1.0, 1.0));
           vec2 sdir = vec2(lx, ly) / max(sin(ang), 1e-3);
-          // white sclera: warm wet white, radial capillaries branching in from the rim
+          // The white. **No capillaries.** They were two fbm ridge functions
+          // dressed as anatomy -- a shape that cannot tear, cannot heal and
+          // cannot answer to anything the eye is doing -- and the sclera is
+          // now a clean ground for the excitation field, which can. The
+          // subsurface flush and the far-edge cast stay: those are the globe's
+          // own shading, not drawn vessels.
           vec3 sc = vec3(0.965, 0.95, 0.925);
           float vl = energyH(lx, ly, ang, t);
           float sa2 = atan(sdir.y, sdir.x);
-          // primary veins run radially (constant angle around gaze axis), wobbled by fbm
-          float vf = fbm(vec2(sa2 * 5.0, ang * 2.2) + fbm(sdir * 3.5) * 1.8);
-          float vein = pow(clamp(1.0 - abs(vf * 2.0 - 1.0) * 3.4, 0.0, 1.0), 4.0);
-          // finer secondary capillaries
-          float vf2 = fbm(vec2(sa2 * 13.0 + 7.3, ang * 4.5) + fbm(sdir * 6.0) * 1.2);
-          float vein2 = pow(clamp(1.0 - abs(vf2 * 2.0 - 1.0) * 5.5, 0.0, 1.0), 6.0);
           float vd = smoothstep(0.55, 1.35, ang);
-          sc = mix(sc, vec3(0.74, 0.18, 0.15), vein * vd * 0.55);
-          sc = mix(sc, vec3(0.84, 0.36, 0.30), vein2 * vd * 0.3);
           // subsurface flush toward the rim, slight yellow cast at the far edge
           sc = mix(sc, vec3(0.99, 0.85, 0.79), vd * vd * 0.28);
           sc = mix(sc, vec3(0.9, 0.86, 0.74), smoothstep(0.95, 1.5, ang) * 0.22);
@@ -324,6 +329,36 @@ export const EYE_GLOBE = `
           eye += uCream * pow(dsp, 48.0) * 0.9 * wet;
           eye += uCream * pow(dsp, 7.0) * 0.07 * (1.0 - irisM) * wet; // broad wet sheen on the white
           eye += ELEC * vl * pow(clamp(dot(nb, normalize(vec3(0.3, -0.2, 1.0))), 0.0, 1.0), 8.0) * uBump * 0.55 * irisM;
+          // ---- The aurora: what the white does instead of veins.
+          //
+          // The excitation field, in (azimuth, angle) about the gaze axis.
+          // sa2 is the corneal-local azimuth -- the same frame the film lives
+          // in -- so the curtains ride the globe with the gaze for free, and
+          // the sector lit here is the sector whose cornea is tearing.
+          //
+          // The azimuth is REPEAT, so u simply runs off the end and comes back:
+          // there is no seam to hide. The angle is CLAMP_TO_EDGE and this fades
+          // in over three cells from ANG0 so the inner boundary lands under the
+          // limbal glow rather than as an edge on the white.
+          //
+          // Colour from the field's state, not from a ramp. A.x is the
+          // excitation and A.y is its age *density*, so A.y/A.x is the mean age
+          // of the light in this cell, in seconds: young excitation emits at
+          // ELEC and cooled excitation at VMAG, and the layering that produces
+          // is a consequence of how long the energy has been travelling rather
+          // than of how far out the pixel is. A parcel that stalls near the
+          // limbus cools there.
+          //
+          // uAuroraOK is 0 or 1 and fixed for the life of the context, and the
+          // clamp keeps the factor finite, so at 0 this adds exactly vec3(0.0)
+          // and the no-field render is bit-identical -- the same contract
+          // uFilmOK carries, and for the same reason.
+          vec2 auv = vec2(sa2 * 0.15915494 + 0.5, (ang - ${AURORA_ANG0.toFixed(6)}) * ${(1 / AURORA_SPAN).toFixed(8)});
+          vec2 ex = texture(uAurora, auv).xy;
+          float exE = clamp(ex.x, 0.0, 4.0) * uAuroraOK
+            * smoothstep(${AURORA_ANG0.toFixed(6)}, ${(AURORA_ANG0 + 3 * AURORA_DANG).toFixed(6)}, ang);
+          eye += mix(ELEC, VMAG, smoothstep(0.0, ${AURORA_COOL.toFixed(6)}, ex.y / max(ex.x, 1e-4)))
+            * exE * ${AURORA_GAIN.toFixed(6)};
           eye += ELEC * pow(1.0 - nz / R, 3.0) * 0.18;
           col = eye;
         }

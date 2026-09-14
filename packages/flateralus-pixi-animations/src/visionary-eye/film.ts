@@ -1,6 +1,24 @@
 import { VERT } from '../shared/shader-harness';
 import type { LidPose } from './physics';
 import {
+  AURORA_ANG,
+  AURORA_ANG0,
+  AURORA_AZ,
+  AURORA_DANG,
+  AURORA_DAZ,
+  AURORA_D_ANG,
+  AURORA_D_AZ,
+  AURORA_PRIME_SECONDS,
+  AURORA_SEED,
+  AURORA_SEED_ANG0,
+  AURORA_SEED_ANG1,
+  AURORA_SEED_ROWS,
+  AURORA_SEED_TAPS,
+  AURORA_SELF,
+  AURORA_SPAN,
+  AURORA_STEP,
+  AURORA_TAU,
+  AURORA_V,
   DELTA,
   DOMAIN,
   DRY_H,
@@ -16,6 +34,7 @@ import {
   PRIME_SECONDS,
   REDUCE,
   STEP,
+  auroraTick,
   breakupFraction,
   clampMobility,
   filmTick,
@@ -937,6 +956,307 @@ export class FilmSim {
     gl.deleteProgram(this.reduceProg);
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * The aurora: a second field, over the white.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Texture unit the excitation field lives on. Not 0 — that is the SDF mask —
+ * and not FILM_UNIT, which the step pass below reads at the same time.
+ */
+const AURORA_UNIT = 4;
+
+/**
+ * One aurora step, in (azimuth, angle) over the sclera.
+ *
+ * A transcription of `auroraStep()` in `physics.ts`, which is where the scheme,
+ * its conservation argument and its derivations live. Every constant is
+ * interpolated from there rather than written as a literal, so the shipped
+ * shader and the reference that is tested headlessly cannot drift apart.
+ *
+ * **The stencil is the five-point cross and nothing more.** A face's flux
+ * depends only on the two cells it separates, which is what makes the sum
+ * telescope; the cell needs its own value and its four neighbours, and the
+ * corners never come into it.
+ *
+ * **No clock.** The only per-step quantity is the fixed `AURORA_STEP`. What
+ * makes the field evolve is the film tearing underneath it — spec D4, the same
+ * rule the film's own passes live by. Delete `uTime` from this animation and
+ * the aurora still breathes, because the thing driving it is a measurement.
+ *
+ * The seed is the causal coupling and is the reason this pass reads `uH`:
+ * `AURORA_SEED_TAPS` samples across a band of cornea one dry-patch deep, just
+ * inside the limbus, at this column's own azimuth. `step(h, DRY_H)` is GLSL's
+ * `x < edge ? 0 : 1` with `h` as the edge, so it is 1 exactly where the film
+ * is at or below the same threshold the reduction pass counts as torn — the
+ * blink and the aurora fire on the same definition of a hole.
+ *
+ * The azimuth is the corneal-local one, so the taps land wherever the cornea
+ * is *now*: the aurora rides the globe with the gaze because the film does.
+ */
+const AURORA_FRAG = `#version 300 es
+    precision highp float;
+    in vec2 vUV;
+    out vec4 fragColor;
+    uniform sampler2D uE;   // the excitation field itself
+    uniform sampler2D uH;   // the tear film, for the causal seed
+    const float NANG = ${AURORA_ANG.toFixed(1)};
+    const float DANG = ${AURORA_DANG.toFixed(8)};
+    const float DAZ  = ${AURORA_DAZ.toFixed(8)};
+    const float ANG0 = ${AURORA_ANG0.toFixed(6)};
+    const float SPAN = ${AURORA_SPAN.toFixed(8)};
+    const float DT   = ${AURORA_STEP.toExponential(8)};
+    const float V    = ${AURORA_V.toFixed(6)};
+    const float SELF = ${AURORA_SELF.toFixed(6)};
+    const float TAU  = ${AURORA_TAU.toFixed(6)};
+    const float DA   = ${AURORA_D_ANG.toFixed(8)};
+    const float DZ   = ${AURORA_D_AZ.toFixed(8)};
+    const float SEED = ${AURORA_SEED.toFixed(6)};
+    const float ROWS = ${AURORA_SEED_ROWS.toFixed(1)};
+    void main() {
+      float ez = 1.0 / ${AURORA_AZ.toFixed(1)};
+      float eg = 1.0 / NANG;
+      // vUV is the texel centre, so this is exactly the cell-centre angle.
+      float ang = ANG0 + vUV.y * SPAN;
+      float sc = sin(ang);
+      float sp = sin(ang + 0.5 * DANG);
+      float sm = sin(ang - 0.5 * DANG);
+      bool inner = vUV.y < eg;
+      bool outer = vUV.y > 1.0 - eg;
+      // REPEAT on the azimuth wraps the two side taps; CLAMP_TO_EDGE on the
+      // angle makes the out-of-range taps harmless, because both boundary
+      // faces are handled explicitly below and never read them.
+      vec2 c = texture(uE, vUV).xy;
+      vec2 n = texture(uE, vUV + vec2(0.0, eg)).xy;
+      vec2 s = texture(uE, vUV - vec2(0.0, eg)).xy;
+      vec2 e = texture(uE, vUV + vec2(ez, 0.0)).xy;
+      vec2 w = texture(uE, vUV - vec2(ez, 0.0)).xy;
+      // Outward face. v(E) = V*(1 + SELF*E) is positive everywhere, so the
+      // upwind cell is always the inner one and the scheme stays monotone.
+      // At the silhouette the ghost is empty: free outflow, no diffusive term.
+      float uo = V * (1.0 + SELF * (outer ? c.x : 0.5 * (c.x + n.x)));
+      vec2 fOut = uo * c - (outer ? 0.0 : DA / DANG) * (n - c);
+      // Inward face, which is the outer face of the cell below and computed by
+      // the same formula there. Closed at the limbus: seeding is the only way in.
+      float ui = V * (1.0 + SELF * 0.5 * (s.x + c.x));
+      vec2 fIn = inner ? vec2(0.0) : (ui * s - (DA / DANG) * (c - s));
+      // Azimuthal faces carry diffusion only -- see AURORA_SELF for the
+      // measurement that removed the advective term.
+      float arc = sc * DAZ;
+      vec2 fR = -(DZ / arc) * (e - c);
+      vec2 fL = -(DZ / arc) * (c - w);
+      vec2 div = (sp * fOut - sm * fIn) / (sc * DANG) + (fR - fL) / (sc * DAZ);
+      // The causal seed: this sector's own slice of the film, read in the
+      // corneal-local frame the film is stored in.
+      float az = (vUV.x - 0.5) * 6.28318530718;
+      vec2 dir = vec2(cos(az), sin(az));
+      float dry = 0.0;
+      for (int k = 0; k < ${AURORA_SEED_TAPS}; k++) {
+        float a = ${AURORA_SEED_ANG0.toFixed(6)}
+          + (float(k) + 0.5) / ${AURORA_SEED_TAPS.toFixed(1)}
+          * ${(AURORA_SEED_ANG1 - AURORA_SEED_ANG0).toFixed(6)};
+        vec2 l = sin(a) * dir;
+        dry += step(texture(uH, l / ${DOMAIN.toFixed(6)} + 0.5).x, ${DRY_H.toFixed(6)});
+      }
+      dry /= ${AURORA_SEED_TAPS.toFixed(1)};
+      // vUV.y * NANG is the row index plus a half, which is what the reference
+      // gates on. Two rows deep, softened across them.
+      float S = SEED * dry * (1.0 - smoothstep(0.0, ROWS, vUV.y * NANG));
+      // A gains E per second, which is what makes A/E an age in seconds.
+      fragColor = vec4(c + DT * (-div - c / TAU + vec2(S, c.x)), 0.0, 1.0);
+    }`;
+
+const AURORA_UNIFORMS = ['uE', 'uH'] as const;
+
+/**
+ * The excitation field over the white.
+ *
+ * Same shape as `FilmSim` — a ping-pong pair, a fixed-step accumulator, a
+ * float target with a half-float fallback — and deliberately a separate class
+ * rather than a refactor of it: the two fields share no grid, no boundary
+ * conditions and no step rate, and the only thing that passes between them is
+ * a texture unit.
+ *
+ * **The wrap is not symmetric and that is the point.** Azimuth is `REPEAT`,
+ * because the sclera closes on itself and a curtain that crosses the seam has
+ * to arrive on the other side; angle is `CLAMP_TO_EDGE`, because the limbus
+ * and the silhouette are real edges. Get these the wrong way round and either
+ * a seam appears at the back of the eye or the field wraps the silhouette onto
+ * the limbus.
+ */
+export class AuroraSim {
+  readonly ok: boolean = true;
+
+  private readonly gl: WebGL2RenderingContext;
+  private readonly prog: WebGLProgram;
+  private tex: (WebGLTexture | null)[] = [null, null];
+  private fb: (WebGLFramebuffer | null)[] = [null, null];
+  private i = 0;
+  private acc = 0;
+
+  private constructor(gl: WebGL2RenderingContext, prog: WebGLProgram) {
+    this.gl = gl;
+    this.prog = prog;
+    const L = locsOf(gl, prog, AURORA_UNIFORMS);
+    gl.uniform1i(L.uE!, AURORA_UNIT);
+    gl.uniform1i(L.uH!, FILM_UNIT);
+  }
+
+  /**
+   * Build the field. Returns null when the program or the float target is
+   * unavailable, exactly as `FilmSim.create` does, so the caller records the
+   * failure once and the display's `uAuroraOK` stays 0.
+   */
+  static create(gl: WebGL2RenderingContext): AuroraSim | null {
+    if (!gl.getExtension('EXT_color_buffer_float')) return null;
+    const prog = program(gl, AURORA_FRAG, 'aurora');
+    if (!prog) return null;
+    const sim = new AuroraSim(gl, prog);
+    if (!sim.allocate()) {
+      sim.destroy();
+      return null;
+    }
+    return sim;
+  }
+
+  private allocate(): boolean {
+    const gl = this.gl;
+    // The display filters this field, so 32F is only taken when it is
+    // filterable -- the same rule and the same fallback as the film.
+    const wantF32 = !!gl.getExtension('OES_texture_float_linear');
+    for (const f32 of wantF32 ? [true, false] : [false]) {
+      if (this.build(f32)) return true;
+      this.release();
+    }
+    console.error('visionary-eye aurora: no complete float target');
+    return false;
+  }
+
+  private build(f32: boolean): boolean {
+    const gl = this.gl;
+    let complete = true;
+    for (let n = 0; n < 2; n++) {
+      const tx = gl.createTexture();
+      if (!tx) return false;
+      gl.activeTexture(gl.TEXTURE0 + AURORA_UNIT);
+      gl.bindTexture(gl.TEXTURE_2D, tx);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        f32 ? gl.RGBA32F : gl.RGBA16F,
+        AURORA_AZ,
+        AURORA_ANG,
+        0,
+        gl.RGBA,
+        f32 ? gl.FLOAT : gl.HALF_FLOAT,
+        null
+      );
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      // The sclera closes on itself in azimuth and does not in angle.
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      const fb = gl.createFramebuffer();
+      if (!fb) {
+        gl.deleteTexture(tx);
+        return false;
+      }
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+      gl.framebufferTexture2D(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        gl.TEXTURE_2D,
+        tx,
+        0
+      );
+      if (
+        gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE
+      ) {
+        complete = false;
+      }
+      // Unlike the film, an empty field is the rest state here: no excitation
+      // is the honest starting condition, and `prime()` fills it from the film.
+      gl.viewport(0, 0, AURORA_AZ, AURORA_ANG);
+      gl.clearColor(0, 0, 0, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      this.tex[n] = tx;
+      this.fb[n] = fb;
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    return complete;
+  }
+
+  private release(): void {
+    const gl = this.gl;
+    for (let n = 0; n < 2; n++) {
+      if (this.tex[n]) gl.deleteTexture(this.tex[n]);
+      if (this.fb[n]) gl.deleteFramebuffer(this.fb[n]);
+      this.tex[n] = null;
+      this.fb[n] = null;
+    }
+  }
+
+  /** One draw: read the live field and the film, write the other, swap. */
+  private pass(): void {
+    const gl = this.gl;
+    const dst = 1 - this.i;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb[dst]);
+    gl.viewport(0, 0, AURORA_AZ, AURORA_ANG);
+    gl.useProgram(this.prog);
+    gl.activeTexture(gl.TEXTURE0 + AURORA_UNIT);
+    gl.bindTexture(gl.TEXTURE_2D, this.tex[this.i]);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    this.i = dst;
+  }
+
+  /**
+   * Advance by wall-clock `dt` in fixed steps, with `film` bound as the seed.
+   *
+   * The backlog cap is `AURORA_MAX_SUBSTEPS * AURORA_STEP`, deliberately the
+   * same 0.025s the film's is, so the two fields age by the same amount on a
+   * slow frame and the aurora's seed stays in step with the break-up that
+   * produced it. Returns the aurora seconds actually integrated.
+   */
+  advance(dt: number, film: FilmSim): number {
+    const gl = this.gl;
+    const tick = auroraTick(this.acc, dt);
+    this.acc = tick.acc;
+    if (tick.steps === 0) return 0;
+    film.bindField(FILM_UNIT);
+    for (let k = 0; k < tick.steps; k++) this.pass();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    return tick.ran;
+  }
+
+  /**
+   * Fill the field from an already-primed film, so the white is not blank on
+   * the first frame. See `AURORA_PRIME_SECONDS`.
+   */
+  prime(film: FilmSim): void {
+    const gl = this.gl;
+    this.acc = 0;
+    film.bindField(FILM_UNIT);
+    const n = Math.round(AURORA_PRIME_SECONDS / AURORA_STEP);
+    for (let k = 0; k < n; k++) this.pass();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  }
+
+  /** Bind the live field for the display pass. */
+  bindField(unit: number): void {
+    const gl = this.gl;
+    gl.activeTexture(gl.TEXTURE0 + unit);
+    gl.bindTexture(gl.TEXTURE_2D, this.tex[this.i]);
+  }
+
+  destroy(): void {
+    this.release();
+    this.gl.deleteProgram(this.prog);
+  }
+}
+
+/** The texture unit the display shader expects the excitation field on. */
+export const AURORA_TEXTURE_UNIT = AURORA_UNIT;
 
 /** The texture unit the display shader expects the field on. */
 export const FILM_TEXTURE_UNIT = FILM_UNIT;
