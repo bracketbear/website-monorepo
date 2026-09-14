@@ -444,45 +444,62 @@ export function wetness(h: number): number {
 }
 
 /**
- * TUNED. How much of the surface's own brightness a fully dry patch takes
- * away — a multiplier on the diffuse-lit colour, not a withheld highlight.
+ * DERIVED, bracketed. How much of the surface's own brightness the **wet**
+ * film takes away — a multiplier on the diffuse-lit colour.
  *
- * **Gating only the added light does not work, and the reason is clipping.**
- * Decomposed at the brightest sclera pixel, which is the specular peak at
- * `ang = 0.696`, in luminance:
+ * **Wetting darkens.** This replaces `DRY_DIM`, which had the sign backwards
+ * and darkened the dry side. Darker on a sphere reads as shading and shading
+ * reads as geometry, so dry patches looked like dents pressed into the globe.
+ * They are not dents. A tear film is a smooth dielectric sheet over a
+ * scattering substrate: light that leaves the substrate and meets the
+ * film-air interface from inside at more than the critical angle is totally
+ * internally reflected and sent back down for another chance at absorption.
+ * The wet surface is darker and glossier; the dry patch is lighter and matte.
  *
- *     diffuse  pow(dsp,48)*0.9  pow(dsp,7)*0.07   rim     total
- *     1.079    0.863            0.067             0.001   2.010
+ * Lekner & Dorf's result for a Lambertian source under a smooth film gives
+ * the fraction returned at that interface as `r = 1 - 1/n²`, and with the
+ * tear film's `n = 1.336` that is **0.4397** — 44% of the escaping light
+ * turned back. After the multiple-scattering sum the ratio is
  *
- * The sharp lobe is 43% of that sum, so it is not a small term. It is an
- * invisible one. The diffuse term **on its own** is `(1.094, 1.078, 1.053)`
- * per channel — already past white before a single specular term is added —
- * and `finish()` tone-maps nothing, it only adds grain and a vignette that
- * cannot exceed 1. So `wet = 1` gives 2.010 and `wet = 0` gives 1.081 and
- * **both clip to pure white**: measured difference in the framebuffer, 0.0%.
- * The dry patches were being computed correctly and thrown away by the clamp.
+ *     R_wet / R_dry = (1 - r) / (1 - R₀·r)
  *
- * That is also why a larger `FILM_SLOPE` could never have fixed it. Nothing
- * additive can darken a pixel that is already over 1. The gate has to reach a
- * term that scales what is already there, which is the diffuse.
+ * which is albedo-dependent, and the globe spans a lot of albedo. Evaluated
+ * on this eye's own colours:
  *
- * Physically this is the honest term anyway: a dewetted surface does not
- * merely stop being glossy, it scatters differently and reads duller. At 0.15
- * the measured dip in the *clipped* framebuffer is 8% at the specular peak,
- * 12% on veined sclera there, 18% across the mid-sclera and 9% on the iris —
- * present everywhere rather than only in the narrow band near the limbus
- * where the corneal shadow ring happened to leave headroom.
+ *     sclera R/G/B (0.965, 0.950, 0.925)      2.7%   3.8%   5.6%
+ *     limbal rim / vein red   (0.74)                16.9%
+ *     iris (0.35, 0.45, 0.75)                33.8%  30.2%  16.4%
+ *     pupil (0.05)                                  42.7%
+ *
+ * Area-weighted over the disc the film reaches, on the shader's own colour
+ * build: **9.5% across the sclera alone, 22.7% including the iris.** A single
+ * scalar cannot be right on both, and 0.15 is the value between them — inside
+ * the physical bracket everywhere on the globe, and the same magnitude of
+ * variation the previous, inverted form already shipped, so the only change
+ * anyone sees is the sign.
+ *
+ * The clipping finding from `DRY_DIM` still holds and still selects this term
+ * over any additive one. At the specular peak the diffuse term alone is
+ * `(1.094, 1.078, 1.053)` per channel — past white before a single specular
+ * term is added — and `finish()` tone-maps nothing. Nothing additive can move
+ * a pixel that is already over 1; only a multiplier on what is already there
+ * can. What the inverted sign changes is *which* side sits at the clamp: the
+ * wet majority is now pulled down off it, which is where Task 13's aurora
+ * gets the room to exist.
  */
-export const DRY_DIM = 0.15;
+export const WET_DARKEN = 0.15;
 
 /**
  * The multiplier a given wetness puts on the surface's diffuse-lit colour.
  *
- * Exactly 1 at `wet = 1`, by construction rather than by rounding: this runs
- * on the no-film fallback, where it must not tint the eye by a last bit.
+ * Exactly 1 at `wet = 0`, by construction rather than by rounding. The
+ * identity moved here from `wet = 1` when the sign inverted, and it still has
+ * to be exact: the shader feeds this a wetness that collapses to 0 on the
+ * no-float-target fallback, where it multiplies every pixel of the globe and
+ * must not tint it by a last bit.
  */
 export function surfaceDim(wet: number): number {
-  return 1 - DRY_DIM * (1 - wet);
+  return 1 - WET_DARKEN * wet;
 }
 
 /* ------------------------------------------------------------------ *

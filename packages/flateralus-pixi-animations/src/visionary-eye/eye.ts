@@ -2,13 +2,13 @@ import {
   CAUSTIC_MAX,
   CORNEA_ETA,
   DOMAIN,
-  DRY_DIM,
   DRY_H,
   FILM_REACH,
   FILM_REACH_FADE,
   FILM_LENS,
   FILM_SLOPE,
   IRIS_DEPTH,
+  WET_DARKEN,
   WET_H,
 } from './physics';
 
@@ -170,10 +170,12 @@ export const EYE_GLOBE = `
           vec3 nb = normalize(n - (tx * dhx + ty * dhy) * uBump * 0.045);
           // The catchlight, reflected off the film rather than painted on.
           //
-          // fw is the only gate, and it is written so that fw = 0 collapses
+          // fw is the spatial gate, and it is written so that fw = 0 collapses
           // every line below, term by term, back onto the painted specular
           // this replaced: nf becomes nb, wet becomes 1, and dsp becomes dif.
-          // That matters because fw = 0 is a shipped path and not a
+          // The one term that does not gate on fw is the wetness darkening,
+          // which gates on uFilmOK alone -- see wetD below for why.
+          // That matters because uFilmOK = 0 is a shipped path and not a
           // hypothetical - a driver that refuses float render targets leaves
           // uFilmOK at 0 and the eye has to look exactly as it did.
           vec2 fl = vec2(lx, ly);
@@ -192,10 +194,24 @@ export const EYE_GLOBE = `
           vec3 nf = fw > 0.0
             ? normalize(nb - (tx * gH.x + ty * gH.y) * (${FILM_SLOPE.toFixed(6)} * fw))
             : nb;
-          // Subtractive: a dry patch is a dull mark, not a bright one. It
-          // gates all three terms below -- the two highlights it withholds,
-          // and the diffuse it dims, which is the one that actually shows.
+          // A dry patch is a matte mark, not a glossy one. wet gates all three
+          // terms below -- the two highlights it withholds, and the diffuse,
+          // which it now *lifts* rather than dims. See WET_DARKEN.
+          //
+          // Outside the film's reach wet collapses to 1, which is the truth:
+          // the film covers the whole cornea, we simply have no data past the
+          // edge of the square, and "wet" is the state to assume there. That
+          // is what keeps the reach boundary invisible now that the darkening
+          // rides on this term -- inside and outside agree.
           float wet = mix(1.0, smoothstep(${DRY_H.toFixed(6)}, ${WET_H.toFixed(6)}, hC), fw);
+          // ...but the no-film fallback is a different question, and it wants
+          // the opposite answer. uFilmOK = 0 must leave the globe bit-identical
+          // to a render with no film at all, so the darkening -- and only the
+          // darkening -- gates on uFilmOK alone rather than on fw. It is a
+          // uniform, 0 or 1 and fixed for the life of the context, so unlike
+          // fw it cannot draw a ring anywhere. The highlights keep using wet
+          // itself, which collapses to 1 and restores the painted catchlight.
+          float wetD = uFilmOK * wet;
 
           // ---- The cornea as a lens, and the caustic that is its Jacobian.
           //
@@ -273,13 +289,18 @@ export const EYE_GLOBE = `
           //
           // Measured, this pixel at the specular peak: the diffuse term alone
           // is (1.094, 1.078, 1.053), already past white before a single
-          // specular term is added, and finish() tone-maps nothing. So wet = 1
-          // totals 2.010 and wet = 0 totals 1.081 and both clip to the same
-          // pure white -- the dry patches were computed correctly and thrown
-          // away by the clamp. Nothing additive can darken a pixel that is
-          // already over 1, which is why this multiplies instead. See DRY_DIM.
+          // specular term is added, and finish() tone-maps nothing. Nothing
+          // additive can move a pixel that is already over 1, which is why
+          // this multiplies instead. See WET_DARKEN.
           //
-          // wet = 1 leaves it exactly 1.0, so the fallback is untouched.
+          // The sign: wetting *darkens*. The film traps light by internal
+          // reflection, so the wet cornea is darker and glossier and a dry
+          // patch is lighter and matte. The previous form darkened the dry
+          // side, and darker on a sphere reads as shading, and shading reads
+          // as geometry -- the patches looked like dents. Same magnitude of
+          // variation, opposite state darkened.
+          //
+          // wetD = 0 leaves this exactly 1.0, so the fallback is untouched.
           //
           // The caustic rides the same term, and for the same reason. It is a
           // *ratio* of irradiance -- how much more or less light the film put
@@ -287,7 +308,7 @@ export const EYE_GLOBE = `
           // multiplying the light that is already falling on this pixel, which
           // is the 0.6 * dif. Adding a coloured glow instead would be adding
           // light the film does not have, and would clip away on the sclera
-          // exactly as the dry patches did before DRY_DIM. There is no gain in
+          // exactly as the dry patches did before WET_DARKEN. There is no gain in
           // front of it: (1.0 + focus) is the measurement, unscaled. The 0.55
           // ambient stays out of it because diffuse fill does not focus.
           //
@@ -298,7 +319,7 @@ export const EYE_GLOBE = `
           // 2.4% of iris pixels clipping in any channel. So unlike the sclera,
           // there is room here for the term to be seen.
           eye *= (0.55 + 0.6 * dif * (1.0 + focus * irisM))
-               * (1.0 - ${DRY_DIM.toFixed(6)} * (1.0 - wet));
+               * (1.0 - ${WET_DARKEN.toFixed(6)} * wetD);
           float dsp = clamp(dot(nf, ld), 0.0, 1.0);
           eye += uCream * pow(dsp, 48.0) * 0.9 * wet;
           eye += uCream * pow(dsp, 7.0) * 0.07 * (1.0 - irisM) * wet; // broad wet sheen on the white

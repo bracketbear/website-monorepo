@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { EYE_GLOBE } from './eye';
 import {
   BLINK_FRACTION,
   CAUSTIC_MAX,
@@ -24,7 +25,7 @@ import {
   FILM_REACH,
   FILM_REACH_FADE,
   FILM_SLOPE,
-  DRY_DIM,
+  WET_DARKEN,
   WET_H,
   filmReach,
   surfaceDim,
@@ -941,13 +942,20 @@ describe('the smooth-bilinear fetch', () => {
  * parameter in [0, 1]; `noise = 0` is the brightest the sclera ever gets,
  * which is the pixel this is about. `visionary()` is not ported, so rows on
  * the iris stand in a mid-tone for it and are indicative only.
+ *
+ * `wetD` is the shader's separate darkening gate. It is normally `wet`, but
+ * on the no-float-target fallback the two part company: `wet` collapses to 1
+ * so the painted catchlight comes back, while `wetD` collapses to 0 so the
+ * darkening switches off and the globe is bit-identical to a filmless render.
+ * Passing them separately is the only way to model that path.
  */
 function scleraPixel(
   lx: number,
   ly: number,
   wet: number,
   noise: number,
-  dim: number = DRY_DIM
+  dim: number = WET_DARKEN,
+  wetD: number = wet
 ) {
   const CREAM = [1.0, 243 / 255, 227 / 255];
   const ELEC = [0.3, 0.55, 1.0];
@@ -980,9 +988,7 @@ function scleraPixel(
     1,
     Math.max(0, lx * LIGHT.x + ly * LIGHT.y + lz * LIGHT.z)
   );
-  const diffuse = eye.map(
-    (x) => x * (0.55 + 0.6 * dif) * (1 - dim * (1 - wet))
-  );
+  const diffuse = eye.map((x) => x * (0.55 + 0.6 * dif) * (1 - dim * wetD));
   const sharp = CREAM.map((x) => x * Math.pow(dif, 48) * 0.9 * wet);
   const broad = CREAM.map(
     (x) => x * Math.pow(dif, 7) * 0.07 * (1 - irisM) * wet
@@ -1000,13 +1006,28 @@ const towardCentre = (d: number): [number, number] => {
   const s = 1 - d / Math.hypot(LIGHT.x, LIGHT.y);
   return [LIGHT.x * s, LIGHT.y * s];
 };
+/**
+ * A point on the sclera at a given angle from the gaze axis, along the
+ * light's own azimuth. `towardCentre` dives off the sclera and onto the iris
+ * within a quarter unit, so it cannot answer questions about the white.
+ */
+const SC_AZ = Math.atan2(LIGHT.y, LIGHT.x);
+const atAng = (ang: number, lit = true): [number, number] => {
+  const s = Math.sin(ang) * (lit ? 1 : -1);
+  return [s * Math.cos(SC_AZ), s * Math.sin(SC_AZ)];
+};
+/** Additive budget left in the worst channel: what Task 13's aurora can spend. */
+const headroom = (p: { total: number[] }) =>
+  Math.min(...p.total.map((x) => 1 - Math.min(1, Math.max(0, x))));
 
 describe('a dry patch has to survive the clamp', () => {
   it('finds the surface already past white before any specular is added', () => {
-    // The whole reason gating only the added light did nothing. If this ever
-    // stops being true — the sclera is darkened, or a tone map appears — then
-    // DRY_DIM is no longer load-bearing and should be reconsidered.
-    const p = scleraPixel(LIGHT.x, LIGHT.y, 1, 0);
+    // The whole reason gating only the added light did nothing. Measured on
+    // the *undarkened* surface, which is what a dry patch now is: if this ever
+    // stops being true — a tone map appears, or the sclera's own colour is
+    // dropped — then WET_DARKEN is no longer load-bearing and should be
+    // reconsidered.
+    const p = scleraPixel(LIGHT.x, LIGHT.y, 1, 0, 0);
     for (const c of p.diffuse) expect(c).toBeGreaterThan(1);
     // And the sharp lobe is not a small term, it is an invisible one: 43% of
     // the unclipped sum, all of it above the clamp.
@@ -1014,6 +1035,20 @@ describe('a dry patch has to survive the clamp', () => {
     expect(lum(p.sharp) / t).toBeGreaterThan(0.4);
     expect(lum(p.diffuse) / t).toBeGreaterThan(0.5);
     expect(lum(p.broad) / t).toBeLessThan(0.05);
+  });
+
+  it('pulls the wet majority down off the clamp', () => {
+    // The point of inverting the sign, beyond the dents: the state almost
+    // every pixel is in is now the darkened one, so the sclera's base sits
+    // under white instead of on it. At the peak the diffuse term goes from
+    // (1.094, 1.078, 1.053) to (0.930, 0.916, 0.895).
+    const wet = scleraPixel(LIGHT.x, LIGHT.y, 1, 0);
+    const dry = scleraPixel(LIGHT.x, LIGHT.y, 0, 0);
+    for (const c of wet.diffuse) expect(c).toBeLessThan(1);
+    for (const c of dry.diffuse) expect(c).toBeGreaterThan(1);
+    // Dry is the identity now, exactly — the same pixel as no film at all.
+    const none = scleraPixel(LIGHT.x, LIGHT.y, 0, 0, 0);
+    for (let i = 0; i < 3; i++) expect(dry.diffuse[i]).toBe(none.diffuse[i]);
   });
 
   it('shows nothing at the highlight if only the added light is gated', () => {
@@ -1025,38 +1060,150 @@ describe('a dry patch has to survive the clamp', () => {
     expect(clipped(wet.total) - clipped(dry.total)).toBe(0);
   });
 
-  it('dims a dry patch visibly everywhere the film can reach', () => {
-    // Measured dips in the clipped framebuffer at the shipped DRY_DIM. The
-    // peak is the hardest case, because it is the most saturated.
-    const dip = (l: [number, number], noise: number) =>
-      clipped(scleraPixel(l[0], l[1], 1, noise).total) -
-      clipped(scleraPixel(l[0], l[1], 0, noise).total);
-    expect(dip([LIGHT.x, LIGHT.y], 0)).toBeGreaterThan(0.05);
-    expect(dip([LIGHT.x, LIGHT.y], 0.5)).toBeGreaterThan(0.08);
-    expect(dip(towardCentre(0.25), 0)).toBeGreaterThan(0.1);
-    expect(dip(towardCentre(0.5), 0)).toBeGreaterThan(0.05);
-    // But not so far that a dry patch reads as a hole punched in the eye.
-    for (const d of [0, 0.1, 0.25, 0.35, 0.5]) {
-      const l =
-        d === 0 ? ([LIGHT.x, LIGHT.y] as [number, number]) : towardCentre(d);
-      expect(dip(l, 0)).toBeLessThan(0.45);
+  it('lifts a dry patch wherever the surface is diffuse-lit', () => {
+    // Wetting darkens, so dry is the *lighter* state. Measured per channel in
+    // the clipped framebuffer, away from the specular lobe.
+    const gain = (l: [number, number], c: number) =>
+      Math.min(1, Math.max(0, scleraPixel(l[0], l[1], 0, 0).total[c])) -
+      Math.min(1, Math.max(0, scleraPixel(l[0], l[1], 1, 0).total[c]));
+    for (const l of [atAng(0.62, false), atAng(0.45, false), atAng(0.3)]) {
+      for (let c = 0; c < 3; c++) expect(gain(l, c)).toBeGreaterThan(0.03);
+    }
+    // The unlit cornea, where nothing but the diffuse term is in play, is the
+    // cleanest read: +0.081 in every channel, no chroma shift, no shading.
+    const u = atAng(0.62, false);
+    for (let c = 0; c < 3; c++) {
+      expect(gain(u, c)).toBeGreaterThan(0.06);
+      expect(gain(u, c)).toBeLessThan(0.12);
+    }
+    // And never so far that a dry patch is a hole punched out of the eye.
+    for (const a of [0.3, 0.45, 0.62, 0.75]) {
+      for (const lit of [true, false]) {
+        for (let c = 0; c < 3; c++)
+          expect(gain(atAng(a, lit), c)).toBeLessThan(0.3);
+      }
     }
   });
 
-  it('leaves a wet eye byte-identical to one with no film at all', () => {
-    // surfaceDim(1) must be exactly 1, not 0.9999999: this multiplies every
-    // pixel of the globe on the no-float-target fallback.
-    expect(surfaceDim(1)).toBe(1);
-    expect(surfaceDim(0)).toBeCloseTo(1 - DRY_DIM, 15);
+  it('takes the gloss with it, so dry reads matte and not merely lighter', () => {
+    // The specular terms are gated on wet, so a dry pixel keeps none of them.
+    // Where the highlight lands that is half the pixel's luminance — a change
+    // of material, not of brightness.
+    for (const a of [0.696, 0.75, 0.63]) {
+      const w = scleraPixel(...atAng(a), 1, 0);
+      const d = scleraPixel(...atAng(a), 0, 0);
+      const spec = lum(w.sharp) + lum(w.broad);
+      expect(spec / lum(w.total)).toBeGreaterThan(0.3);
+      expect(lum(d.sharp) + lum(d.broad)).toBe(0);
+    }
+  });
+
+  it('keeps the specular peak clipped in both states, and says so', () => {
+    // Honest limit. Dry is the identity, and the identity is already past
+    // white inside the lobe, so there the dim cannot show anything: both
+    // states clip. What distinguishes them there is the *shape* of the
+    // catchlight, which FILM_SLOPE shreds. This is why the headroom map below
+    // is a map and not a number.
+    for (const a of [0.696, 0.75]) {
+      const w = scleraPixel(...atAng(a), 1, 0);
+      const d = scleraPixel(...atAng(a), 0, 0);
+      expect(clipped(w.total)).toBe(1);
+      expect(clipped(d.total)).toBe(1);
+    }
+  });
+
+  it('leaves the no-film fallback byte-identical to a filmless render', () => {
+    // The identity moved with the sign: surfaceDim(0), not surfaceDim(1), must
+    // be exactly 1 — not 0.9999999, since it multiplies every pixel of the
+    // globe on the no-float-target path.
+    expect(surfaceDim(0)).toBe(1);
+    expect(surfaceDim(1)).toBeCloseTo(1 - WET_DARKEN, 15);
+    // And the path itself. uFilmOK = 0 sends `wet` to 1, which restores the
+    // painted catchlight, and `wetD` to 0, which switches the darkening off.
+    // Both at once, or the fallback ships a 15% darker eye.
     for (const d of [0, 0.1, 0.25, 0.5]) {
       const l =
         d === 0 ? ([LIGHT.x, LIGHT.y] as [number, number]) : towardCentre(d);
-      const withFilm = scleraPixel(l[0], l[1], 1, 0);
-      const without = scleraPixel(l[0], l[1], 1, 0, 0);
+      const fallback = scleraPixel(l[0], l[1], 1, 0, WET_DARKEN, 0);
+      const filmless = scleraPixel(l[0], l[1], 1, 0, 0);
       for (let i = 0; i < 3; i++) {
-        expect(withFilm.total[i]).toBe(without.total[i]);
+        expect(fallback.total[i]).toBe(filmless.total[i]);
       }
     }
+  });
+
+  it('gates the darkening on uFilmOK and not on the reach, so it draws no ring', () => {
+    // The trap this avoids. filmReach fades to 0 at the edge of the field, so
+    // gating the darkening on `fw` would step the surface 15% brighter around
+    // a circle at FILM_REACH — a second, larger version of exactly the relief
+    // the user objected to. uFilmOK is a uniform, 0 or 1 and fixed for the
+    // life of the context, so it has no spatial structure to draw.
+    expect(EYE_GLOBE).toContain('float wetD = uFilmOK * wet;');
+    expect(EYE_GLOBE).toContain(`* (1.0 - ${WET_DARKEN.toFixed(6)} * wetD)`);
+    // Outside the reach fw is 0, wet collapses to 1, and the surface is as
+    // dark as a wet pixel inside it: the boundary is invisible.
+    expect(EYE_GLOBE).toContain(
+      `float wet = mix(1.0, smoothstep(${DRY_H.toFixed(6)}, ${WET_H.toFixed(6)}, hC), fw);`
+    );
+    // And the old sign is gone for good.
+    expect(EYE_GLOBE).not.toContain('(1.0 - wet)');
+  });
+
+  it('buys the sclera headroom for an additive term, and maps where', () => {
+    // Task 13 adds light to this surface. Clipping is local to the lobe, so
+    // what matters is the map. Worst-channel additive budget, wet state:
+    //
+    //   specular peak  ang 0.696   0.000  (was 0.000)
+    //   sheen skirt    ang 0.80    0.000  (was 0.000)
+    //   mid-sclera     ang 1.20    0.170  (was 0.031)
+    //   grazing        ang 1.40    0.288  (was 0.169)
+    //   unlit limb     ang 1.00    0.556  (was 0.479)
+    const now = (a: number, lit = true) =>
+      headroom(scleraPixel(...atAng(a, lit), 1, 0));
+    const was = (a: number, lit = true) =>
+      headroom(scleraPixel(...atAng(a, lit), 1, 0, 0));
+    expect(now(0.696)).toBe(0);
+    expect(now(0.8)).toBe(0);
+    expect(now(1.2)).toBeGreaterThan(0.15);
+    expect(now(1.4)).toBeGreaterThan(0.27);
+    expect(now(1.0, false)).toBeGreaterThan(0.5);
+    // Every one of them strictly better than before, except inside the lobe
+    // where nothing could have helped.
+    for (const a of [1.2, 1.4]) expect(now(a)).toBeGreaterThan(was(a) + 0.1);
+    for (const a of [1.0, 1.4])
+      expect(now(a, false)).toBeGreaterThan(was(a, false) + 0.05);
+  });
+
+  it('leaves most of the sclera spendable, screen-area weighted', () => {
+    // The map as one number, twice: the mean worst-channel budget over the
+    // white, and the share of it with more than 0.1 to spend.
+    let n = 0;
+    let sum = 0;
+    let sumWas = 0;
+    let ok = 0;
+    let okWas = 0;
+    const M = 240;
+    for (let i = 0; i < M; i++) {
+      for (let j = 0; j < M; j++) {
+        const lx = ((i + 0.5) / M) * 2 - 1;
+        const ly = ((j + 0.5) / M) * 2 - 1;
+        const r2 = lx * lx + ly * ly;
+        if (r2 >= 1) continue;
+        if (Math.acos(Math.sqrt(1 - r2)) <= 0.62) continue;
+        const h = headroom(scleraPixel(lx, ly, 1, 0));
+        const hw = headroom(scleraPixel(lx, ly, 1, 0, 0));
+        n++;
+        sum += h;
+        sumWas += hw;
+        if (h > 0.1) ok++;
+        if (hw > 0.1) okWas++;
+      }
+    }
+    // 0.344 against 0.253, and 86% of the white against 70%.
+    expect(sum / n).toBeGreaterThan(0.33);
+    expect(sum / n).toBeGreaterThan(sumWas / n + 0.08);
+    expect(ok / n).toBeGreaterThan(0.85);
+    expect(ok / n).toBeGreaterThan(okWas / n + 0.15);
   });
 });
 
@@ -1670,7 +1817,13 @@ function irisPixel(lx: number, ly: number, focus: number, t = 7.0) {
     (x, i) => x + lim[i] * Math.exp(-Math.abs(ang - 0.56) * 26) * 0.35
   );
   const dif = gclamp(nb[0] * LIGHT.x + nb[1] * LIGHT.y + nb[2] * LIGHT.z, 0, 1);
-  let total = eye.map((x) => x * (0.55 + 0.6 * dif * (1 + focus * irisM)));
+  // Fully wet, which is what this mirror is for, so the darkening is on at
+  // full strength: surfaceDim(1), not 1. Under the old sign wet = 1 was the
+  // identity and this factor was absent; leaving it absent now would model a
+  // permanently dry eye and quietly overstate the iris's clipping.
+  let total = eye.map(
+    (x) => x * (0.55 + 0.6 * dif * (1 + focus * irisM)) * surfaceDim(1)
+  );
   total = total.map((x, i) => x + V_CREAM[i] * Math.pow(dif, 48) * 0.9);
   total = total.map(
     (x, i) => x + V_CREAM[i] * Math.pow(dif, 7) * 0.07 * (1 - irisM)
