@@ -1382,7 +1382,74 @@ git commit -m "feat(visionary-eye): the white streams energy where the film tear
 
 ---
 
-### Task 14: Quiet the iris
+### Task 14: Lift the aurora off the globe
+
+User feedback: _"this is a nice start. the auroras should be elevated off of the eye and whispy."_
+
+The aurora currently reads as painted on the sclera because it **is** on the sclera — it is the
+surface's colour. The decisive cue it is missing: a real aurora seen at a planet's limb **extends
+past the disc into space**. Ours stops dead at the silhouette, which is exactly what a decal does.
+
+**Files:**
+
+- Modify: `packages/flateralus-pixi-animations/src/visionary-eye/eye.ts`
+- Modify: `packages/flateralus-pixi-animations/src/visionary-eye/physics.ts`
+- Test: `packages/flateralus-pixi-animations/src/visionary-eye/physics.test.ts`
+
+**Interfaces:**
+
+- Consumes: the excitation field and its `(azimuth, ang)` parameterisation from Task 13.
+- Produces: `AURORA_HEIGHT`, an altitude emission profile, and a shell-intersection path in `eyeW`.
+
+- [ ] **Step 1: Put the field on a shell, not on the surface**
+
+The excitation occupies a spherical shell from `R` to `R * (1 + AURORA_HEIGHT)`. For each pixel,
+intersect the view ray with the shell analytically — it is a quadratic, not a march — and
+integrate emission along the chord, sampling the field at each sample's `(azimuth, ang)` in the
+gaze frame.
+
+**The far wall of the shell is occluded by the globe; the near wall is not.** Get that right or
+the eye will glow through itself.
+
+- [ ] **Step 2: Let it leave the silhouette**
+
+This is the step that does the work. Outside the globe's disc but inside the shell's, the ray
+passes through the shell twice and misses the globe entirely — so the aurora is visible against
+the starfield beyond the eye's edge, and the chord is long there, so it is **brighter at the limb**.
+Limb brightening is free and it is the thing that will make it read as elevated.
+
+Structurally this means aurora emission has to reach the **background** path in `eyeW`, not only
+the `r < R` branch. Composite it over the starfield and nebula additively.
+
+- [ ] **Step 3: Rays, from an altitude profile**
+
+Emission falls off with altitude, and the falloff scale depends on the local energy, so strong
+curtains reach higher. That is why real aurora has rays rather than a uniform band, and it gives
+the vertical structure for free rather than painting striations.
+
+- [ ] **Step 4: Whispier**
+
+Thinner filaments: reduce cross-flow diffusion so the anisotropy rises above the 0.923 measured in
+Task 13, and report the new aspect ratio. Softer: the chord integration through a shell of varying
+altitude already blurs and layers the structure, so lower the per-sample opacity rather than the
+field's own amplitude. Do not reach for noise.
+
+- [ ] **Step 5: Verify**
+
+Report: the aspect ratio before and after; the limb brightening as a ratio of on-limb to
+face-on emission; sample count and its cost; and confirmation that the globe occludes the far wall.
+Keep the 20-40% contrast band from Task 13 — it is what made the aurora visible at all.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add packages/flateralus-pixi-animations/src/visionary-eye/
+git commit -m "feat(visionary-eye): the aurora stands off the globe and reaches past the limb"
+```
+
+---
+
+### Task 15: Quiet the iris
 
 Additive light is legible only against headroom. Spec D9.
 
@@ -1418,7 +1485,7 @@ git commit -m "feat(visionary-eye): quiet the painted iris so the measured light
 
 ---
 
-### Task 15: Degradation, reduced motion, teardown
+### Task 16: Degradation, reduced motion, teardown
 
 **Files:**
 
@@ -1479,7 +1546,7 @@ git commit -m "feat(visionary-eye): degrade cleanly without float targets or mot
 
 ---
 
-### Task 16: Controls, copy, and the Lab pass
+### Task 17: Controls, copy, and the Lab pass
 
 **Files:**
 
