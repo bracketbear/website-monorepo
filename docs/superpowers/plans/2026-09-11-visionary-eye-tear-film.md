@@ -1238,7 +1238,151 @@ git commit -m "feat(visionary-eye): caustics from the Jacobian of the corneal re
 
 ---
 
-### Task 12: Quiet the iris
+### Task 12: The wetness channel, and headroom for the sclera
+
+The dry patches currently read as **dents pressed into the globe**, not as dry spots. The cause is
+physical, not cosmetic: `DRY_DIM` makes dry patches _darker_, and darker on a sphere reads as
+shading, which reads as geometry.
+
+**Wetting a surface darkens it.** A tear film traps light by internal reflection, so wet cornea is
+darker and glossier and a dry patch is _lighter and matte_. We have the sign backwards.
+
+**Files:**
+
+- Modify: `packages/flateralus-pixi-animations/src/visionary-eye/eye.ts`
+- Modify: `packages/flateralus-pixi-animations/src/visionary-eye/physics.ts`
+- Test: `packages/flateralus-pixi-animations/src/visionary-eye/physics.test.ts`
+
+**Interfaces:**
+
+- Consumes: `wet` and the `FILM_REACH` gating from Task 10.
+- Produces: `WET_DARKEN` replacing `DRY_DIM`; `surfaceDim()` re-derived so `wet = 0` is the
+  identity rather than `wet = 1`.
+
+- [ ] **Step 1: Invert the assignment**
+
+```glsl
+      // Wetting darkens: the film traps light by internal reflection, so the
+      // wet cornea is darker and glossier and a dry patch is lighter and matte.
+      // The previous form darkened the DRY side, which reads as a dent.
+      eye *= (0.55 + 0.6 * dif) * (1.0 - WET_DARKEN * wet);
+```
+
+The variation is the same magnitude; only which state is darkened changes. The fallback identity
+moves with it: `wet = 0` must now yield exactly 1.0, so the `uFilmOK = 0` path stays bit-identical.
+**That property is pinned by an existing test — update it, do not delete it.**
+
+- [ ] **Step 2: Take the gloss with it**
+
+A dry patch is matte. Beyond the diffuse sign, the specular terms must fall to zero across a dry
+patch — they are already gated on `wet`, so confirm the combination reads as _matte_, not merely
+_dim_, and report the measured contrast between a wet and a dry pixel in each channel.
+
+- [ ] **Step 3: Confirm the headroom this buys**
+
+Darkening the wet majority lowers the sclera's base. Measure and report the resulting headroom
+across the sclera — at the specular peak, mid-sclera, and grazing. Task 13's aurora is additive
+light on this surface and cannot exist without it. Clipping is local to the highlight (diffuse is
+1.110 at `dif = 1` but 0.820 at `dif = 0.5`), so report the map, not a single number.
+
+- [ ] **Step 4: Verification**
+
+Type-check, tests, and tell me what to look for. I will confirm in the Lab that the patches read as
+matte rather than as relief.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add packages/flateralus-pixi-animations/src/visionary-eye/
+git commit -m "fix(visionary-eye): wetting darkens, so a dry patch is matte and not a dent"
+```
+
+---
+
+### Task 13: The aurora — energy streaming off the limbus
+
+Replace the painted capillaries on the whites with a **simulated excitation field** that streams
+outward from the limbus toward the silhouette and wisps like an aurora. Driven by the tear film:
+where the film tears, energy leaks out over the white.
+
+This is a second field, and it must be simulated rather than painted. A curl-noise flow or a
+scrolling texture is exactly what this piece exists not to do.
+
+**Files:**
+
+- Modify: `packages/flateralus-pixi-animations/src/visionary-eye/film.ts` (the field and its passes)
+- Modify: `packages/flateralus-pixi-animations/src/visionary-eye/eye.ts` (display; remove vessels)
+- Modify: `packages/flateralus-pixi-animations/src/visionary-eye/physics.ts` (constants, derivations)
+- Test: `packages/flateralus-pixi-animations/src/visionary-eye/physics.test.ts`
+
+**Interfaces:**
+
+- Consumes: the film field and its break-up measurement; `FilmSim`'s existing ping-pong plumbing.
+- Produces: an excitation field bound to its own texture unit (NOT 0, which is the SDF mask, and
+  NOT 3, which is the film).
+
+- [ ] **Step 1: The field and its domain**
+
+Excitation `E` over the sclera in `(azimuth, angle)`, from the limbus (`ang ~= 0.56`) to the
+silhouette (`ang -> pi/2`). **Azimuth wraps** — use `REPEAT` on that axis and `CLAMP_TO_EDGE` on
+the other. Resolution is yours to derive: azimuth carries the curtain structure and needs more
+cells than angle. Justify it from the curtain width you intend, the way `GRID` is justified.
+
+- [ ] **Step 2: The dynamics**
+
+```
+E' = E + dt * ( -v * dE/d(ang)        // advection outward, toward the silhouette
+                + D * lap(E)          // diffusion, anisotropic: more along the flow
+                - decay * E
+                + S(azimuth) )        // seeding at the inner edge only
+```
+
+Curtains and wisps must emerge from advection, sparse discrete sources and decay — not from noise
+added to make it look wispy. If you need folding, derive it from a shear the field itself produces
+(self-advection in azimuth), not from a painted swirl. Fixed timestep, capped accumulator, and
+**no `uTime` in the step pass** — the same rule the film lives by.
+
+- [ ] **Step 3: The causal seed**
+
+`S(azimuth)` comes from the film's break-up in the matching angular sector: where the film is
+tearing near the limbus, energy is released. The eye glows where it is drying, and a blink calms
+it. Derive the sector mapping from the existing corneal-local frame so the aurora rides the globe
+with the gaze, exactly as the film does.
+
+**The rhythm this produces is the risk, and it is worth measuring before it is worth tuning.**
+Report the excitation's time course against the blink cycle: quiet after a wipe, building as
+break-up spreads, brightest just before a blink. If it reads as flicking on and off rather than
+breathing, say so with the numbers rather than adding a floor.
+
+- [ ] **Step 4: Colour from the field, not from a gradient**
+
+Map emission colour to the field's own state — energy near the limbus, older and cooler outward —
+so the layering is a consequence rather than a painted ramp. `ELEC` near the source through `VMAG`
+outward keeps the existing palette. Real aurora layers by emission energy; this is the same idea.
+
+- [ ] **Step 5: Remove the painted vessels**
+
+Delete the capillary terms from the sclera. The whites become a clean ground for the aurora.
+`visionary()` and `stars()` are shared with `portal-mark` and **must not change** — confirm the
+vessels live in `eyeW` and not in the shared code before touching anything.
+
+- [ ] **Step 6: Verification**
+
+The aurora is additive light on the sclera and depends on Task 12's headroom. Report the measured
+brightness against the available headroom at three points on the sclera. Assert what you can
+headlessly — advection speed in cells per step, decay time, the azimuthal wrap, conservation under
+zero seeding and zero decay.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add packages/flateralus-pixi-animations/src/visionary-eye/
+git commit -m "feat(visionary-eye): the white streams energy where the film tears"
+```
+
+---
+
+### Task 14: Quiet the iris
 
 Additive light is legible only against headroom. Spec D9.
 
@@ -1274,7 +1418,7 @@ git commit -m "feat(visionary-eye): quiet the painted iris so the measured light
 
 ---
 
-### Task 13: Degradation, reduced motion, teardown
+### Task 15: Degradation, reduced motion, teardown
 
 **Files:**
 
@@ -1335,7 +1479,7 @@ git commit -m "feat(visionary-eye): degrade cleanly without float targets or mot
 
 ---
 
-### Task 14: Controls, copy, and the Lab pass
+### Task 16: Controls, copy, and the Lab pass
 
 **Files:**
 
