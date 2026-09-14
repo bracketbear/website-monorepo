@@ -9,25 +9,6 @@ import {
   SHARED_EYE,
   sdfMask,
 } from '../shared/sdf-harness';
-import { EYE_GLOBE } from './eye';
-import {
-  FILM_TEXTURE_UNIT,
-  FilmSim,
-  MARCH_TEXTURE_UNIT,
-  WindSim,
-} from './film';
-import type { BlinkState } from './physics';
-import {
-  DELTA,
-  GRID,
-  fallbackFraction,
-  isWiping,
-  lidCoverage,
-  lidSweep,
-  newBlinkState,
-  stepBlink,
-  worldToLocal,
-} from './physics';
 
 const MANIFEST = createManifest({
   id: 'visionary-eye',
@@ -82,13 +63,6 @@ const MANIFEST = createManifest({
       defaultValue: true,
       debug: true,
     },
-    {
-      name: 'showFilm',
-      type: 'boolean',
-      label: 'Show Film',
-      defaultValue: false,
-      debug: true,
-    },
   ],
 } as const);
 
@@ -99,7 +73,6 @@ export type VisionaryEyeControlValues = ManifestToControlValues<
 const FRAG =
   SDF_PRE +
   SHARED_EYE +
-  EYE_GLOBE +
   `
       uniform float uSpeed;
       uniform float uScale;
@@ -122,55 +95,17 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     'uScale',
     'uPupil',
     'uBump',
-    'uFilm',
-    'uFilmN',
-    'uDelta',
-    'uShowFilm',
-    'uFilmOK',
-    'uMarch',
-    'uWindOK',
   ] as const;
   protected readonly commonUniforms = SDF_COMMON_UNIFORMS;
 
   /** Honours the OS reduced-motion setting by freezing the flow. */
   private reducedMotion = false;
-  /** The tear film field. Null where the float render target is unavailable. */
-  private film: FilmSim | null = null;
-  /** Set once FilmSim.create has been tried, so a failure is not retried. */
-  private filmTried = false;
-  /**
-   * The wind volume the eye stands in. Null when the film is — it has
-   * nothing to be driven by without one — or when its own target failed.
-   */
-  private wind: WindSim | null = null;
   /** Smoothed gaze, and the target it is chasing. */
   private gaze: [number, number] = [0, 0];
   private gazeTarget: [number, number] = [0, 0];
   private nextSaccade = 0;
   private pupil = 0.15;
   private pupilPulse = 0;
-  /**
-   * The gaze the display is actually drawn with: the smoothed gaze plus
-   * Bell's roll. The film's frame has to be this one and not `gaze`, or the
-   * field shears against the cornea it is painted on for the length of a
-   * blink.
-   */
-  private gazeView: [number, number] = [0, 0];
-  private blink: BlinkState = newBlinkState();
-  /** Lid coverage at the end of the previous frame, for the sweep's span. */
-  private lidPrev = 0;
-  /** Defect layout the current blink will lay down. New every blink. */
-  private lidSeed = 0;
-  /**
-   * Film seconds integrated on the previous frame, and the running total.
-   *
-   * The blink runs on this clock and not on `dt`. Below about 40fps the film
-   * ages slower than the wall — `FilmSim.advance` caps the backlog — so a lid
-   * driven by `dt` would run its refractory window and its travel against a
-   * clock the measured dryness is not on, by a factor that changes with the
-   * frame rate. One frame of lag, the same as the gaze already has.
-   */
-  private filmDt = 0;
 
   constructor(initialControls?: Partial<VisionaryEyeControlValues>) {
     super(MANIFEST, initialControls);
@@ -190,134 +125,6 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
     this.nextSaccade = 0;
     this.pupil = 0.15;
     this.pupilPulse = 0;
-    this.gazeView = [0, 0];
-    this.blink = newBlinkState();
-    this.lidPrev = 0;
-    this.lidSeed = Math.random() * 1000;
-    this.filmDt = 0;
-  }
-
-  /**
-   * Build the film on first frame, let the lid wipe it, and advance it.
-   *
-   * Runs before the display program is bound, so the base's own viewport and
-   * useProgram restore the state the sim passes leave behind. Everything
-   * directional is handed over already projected onto the corneal tangent
-   * basis — a world vector must never reach the field or gravity drains
-   * sideways and the lid's band tilts as the eye looks around.
-   *
-   * The frame it projects into is `gazeView`, the one the display was last
-   * drawn with, and not `gaze`: they differ by Bell's roll for the length of a
-   * blink, which is exactly when the lid is laying film. It is last frame's
-   * either way, which is one frame of lag on a direction that turns over
-   * hundreds of milliseconds.
-   *
-   * The wipe goes in before `advance()` so the fresh sheet is what the next
-   * mu pass derives its chemical potential from.
-   *
-   * The blink is stepped on the **film's** clock — the seconds `advance()`
-   * reports having integrated — and not on `dt`. Below about 40fps those two
-   * diverge, and a lid driven by the wall clock fires at a dryness that
-   * depends on the frame rate.
-   */
-  protected simulate(
-    gl: WebGL2RenderingContext,
-    ctx: ShaderContext,
-    controls: VisionaryEyeControlValues,
-    dt: number
-  ): void {
-    if (!this.film) {
-      if (this.filmTried) return;
-      this.filmTried = true;
-      this.film = FilmSim.create(gl);
-      // Spec D11: load mid-cycle with real structure, not as a flat mirror.
-      this.film?.prime(Math.random() * 1000);
-      // The wind is released by the film, so it is only worth building when
-      // there is one, and it is primed from the film that was just primed —
-      // a blank sclera beside a mid-cycle cornea would be the same mistake.
-      if (this.film) {
-        this.wind = WindSim.create(gl);
-        if (this.wind) this.wind.prime(this.film, this.gazeView);
-      }
-      return;
-    }
-    // Reduced motion keeps the primed field but stops it evolving, the same
-    // way the flow time is pinned below. No blinks either: a lid that swept
-    // once a cycle is exactly the motion the setting is asking us not to make.
-    if (this.reducedMotion) return;
-
-    const before = this.blink;
-    // **The measurement, and the reason this animation exists.** The lid is
-    // driven by the dry area fraction read back off the field itself, not by
-    // any clock: raise EVAP and the eye blinks sooner, because the film tears
-    // sooner. Spec D6 forbids an interval floor or ceiling here — the only
-    // lever on cadence is EVAP.
-    //
-    // Only while the lid is open, because `stepBlink` reads the fraction only
-    // in that phase. During the sweep the reduction pass and its readback
-    // would be a GPU sync point bought for a value nothing looks at, on
-    // exactly the frames already spending splats on the wipe. The 0 passed
-    // through the closing and opening phases is never compared against
-    // anything.
-    //
-    // `null` is usually the measurement having retired — the driver refused a
-    // readable format, the readback was rejected, or it threw. That is
-    // latched, announced once, and cannot come back. It is also the transient
-    // before the first good value lands, which is not latched and clears
-    // itself. Either way the trigger needs a number. The film still runs and
-    // looks right; only the decision has lost its input, so the trigger falls
-    // back to a ramp calibrated to the cadence the measurement produces on
-    // average. A degraded eye that still blinks, rather than one that stares.
-    const fraction =
-      before.phase === 'open'
-        ? (this.film.measure() ?? fallbackFraction(before.since))
-        : 0;
-
-    // **On the film's clock, not the wall's.** The fraction above is a
-    // property of the field, so the refractory window and the lid's travel
-    // have to age with the field too. The harness clamps dt to 0.05s and
-    // `advance` caps the backlog at 0.025s, so the two clocks run at different
-    // fractions of real time the moment the frame rate drops: at 8fps the wall
-    // clock covers five seconds while the field ages by one. Driving the blink
-    // off dt is what made it look like the lid was never firing at all.
-    this.blink = stepBlink(before, this.filmDt, fraction);
-    if (before.phase === 'open' && this.blink.phase !== 'open') {
-      // A new layout for every blink. Without this the same patches would come
-      // back in the same places and the eye would read as a loop.
-      this.lidSeed = Math.random() * 1000;
-    }
-    const coverage = lidCoverage(this.blink);
-    if (isWiping(this.blink) || isWiping(before)) {
-      this.film.wipe(
-        this.lidSeed,
-        lidSweep(this.lidPrev, coverage, this.gazeView[0], this.gazeView[1])
-      );
-    }
-    this.lidPrev = coverage;
-
-    this.filmDt = this.film.advance(
-      dt,
-      worldToLocal(0, 1, this.gazeView[0], this.gazeView[1])
-    );
-    // After the film, so the release is driven by the break-up as it stands
-    // this frame rather than as it stood last. Its own fixed step and its own
-    // backlog, as close to the film's 0.025s as 60Hz comes — see WIND_STEP.
-    //
-    // `gazeView` and not `gaze`: the release band is placed in the frame the
-    // display was last drawn with, which is the frame the film is stored in.
-    // The **wind** in there is in world space and does not take a gaze at all.
-    this.wind?.advance(dt, this.film, this.gazeView);
-    // The march, here rather than in setUniforms, because this is the one
-    // place the display program is not current: it switches programs and
-    // framebuffers, and the harness makes `ctx.program` current again on the
-    // line after simulate() returns. It runs at quarter of the canvas, which
-    // is why it needs the canvas rather than the sprite.
-    this.wind?.march(
-      ctx.canvas.width,
-      ctx.canvas.height,
-      controls.eyeScale,
-      MARCH_TEXTURE_UNIT
-    );
   }
 
   protected setUniforms(
@@ -356,12 +163,7 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
       (Math.max(-0.75, Math.min(0.75, this.gazeTarget[0])) - this.gaze[0]) * kg;
     this.gaze[1] +=
       (Math.max(-0.7, Math.min(0.7, this.gazeTarget[1])) - this.gaze[1]) * kg;
-    // Bell's phenomenon: the globe rolls up behind a closing lid. Positive
-    // gaze.y looks down, so the roll subtracts. Nobody will be able to say why
-    // this looks right, which is the point.
-    const bell = lidCoverage(this.blink) * 0.35;
-    this.gazeView = [this.gaze[0], this.gaze[1] - bell];
-    gl.uniform2f(locs.uGaze!, this.gazeView[0], this.gazeView[1]);
+    gl.uniform2f(locs.uGaze!, this.gaze[0], this.gaze[1]);
 
     // The pupil dilates under attention, drifts with slow hippus at rest,
     // and pulses on a saccade.
@@ -380,34 +182,6 @@ export class VisionaryEyeAnimation extends HarnessShaderAnimation<
         : Math.max(0, this.pupil + this.pupilPulse + hippus)
     );
     gl.uniform1f(locs.uBump!, controls.bump);
-
-    // The film. Bound here rather than in simulate() because the display
-    // program is only current from this point on.
-    gl.uniform1f(locs.uFilmN!, GRID);
-    gl.uniform1f(locs.uDelta!, DELTA);
-    gl.uniform1f(locs.uShowFilm!, controls.showFilm ? 1 : 0);
-    gl.uniform1f(locs.uFilmOK!, this.film?.ok ? 1 : 0);
-    // Always point uFilm at its own unit, even with no film to bind. Left
-    // unset it defaults to 0, which is the SDF mask — harmless while uFilmOK
-    // gates every read, but a trap for the passes Tasks 10-12 add.
-    gl.uniform1i(locs.uFilm!, FILM_TEXTURE_UNIT);
-    if (this.film) this.film.bindField(FILM_TEXTURE_UNIT);
-    // Same contract for the wind: its sampler always points at its own unit
-    // so it can never fall back to the SDF mask, and uWindOK gates the read.
-    // At 0 the whole composited vec4 is zero — colour *and* coverage — so the
-    // eye is the eye. The march itself already bound the texture.
-    gl.uniform1f(locs.uWindOK!, this.wind ? 1 : 0);
-    gl.uniform1i(locs.uMarch!, MARCH_TEXTURE_UNIT);
-  }
-
-  onDestroy(): void {
-    // Before super, which loses the context these objects live in.
-    this.wind?.destroy();
-    this.wind = null;
-    this.film?.destroy();
-    this.film = null;
-    this.filmTried = false;
-    super.onDestroy();
   }
 }
 
