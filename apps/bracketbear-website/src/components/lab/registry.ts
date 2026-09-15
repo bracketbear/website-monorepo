@@ -259,7 +259,7 @@ export const REGISTRY: LabEntry[] = [
     name: 'Jelly Tank',
     tag: 'glsl sim',
     blurb:
-      'A jellyfish smack with pulse-jet locomotion simulated for real: thrust only fires while the bell contracts, the jelly sinks between pulses, and headings wander with a bias toward the light. Your cursor is a lure nearby jellies turn toward; click to send a pressure wave that startles the whole smack into a jet.',
+      'A jellyfish smack in a tank of real water. The column is a wave field integrated on the GPU, so disturbances interfere, reflect off the glass and fade on their own. Jellies swim by pulse-jet — thrust only fires while the bell contracts — and every contraction shoves water backward, so a jelly leaves a wake the others can feel. They read the slope they are sitting on and ride it, which means the only way to reach a jelly is to move the water it lives in.',
     create: (initialControls) =>
       createJellyTankAnimation(
         initialControls as never
