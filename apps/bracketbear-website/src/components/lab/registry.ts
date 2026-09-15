@@ -19,6 +19,7 @@ import {
   createInkDissolveAnimation,
   createInterferenceFieldAnimation,
   createJellyTankAnimation,
+  createIronBloomAnimation,
   createKaleidoAnimation,
   createLedMatrixAnimation,
   createLogoResolveAnimation,
@@ -262,6 +263,18 @@ export const REGISTRY: LabEntry[] = [
       'A jellyfish smack in a tank of real water. The column is a wave field integrated on the GPU, so disturbances interfere, reflect off the glass and fade on their own. Jellies swim by pulse-jet — thrust only fires while the bell contracts — and every contraction shoves water backward, so a jelly leaves a wake the others can feel. They read the slope they are sitting on and ride it, which means the only way to reach a jelly is to move the water it lives in.',
     create: (initialControls) =>
       createJellyTankAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'iron-bloom',
+    section: 'toys',
+    name: 'Iron Bloom',
+    tag: 'glsl toy',
+    blurb:
+      'A sunflower head cast in black metal. The seeds sit on a real phyllotaxis lattice, so the spiral arms are parastichies and their count climbs outward on its own; each seed carries a hexagonal socket that tips further out of the plane the further it sits from the axis. Almost nothing is lit — the faces stay black and the picture is carried by Fresnel on the socket rims catching two hard softboxes. Interactive: the cursor presses the sockets open where it rests, and a click sends a ring of opening travelling out from the socket it landed on. Ambient: the bloom breathes on its own.',
+    create: (initialControls) =>
+      createIronBloomAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

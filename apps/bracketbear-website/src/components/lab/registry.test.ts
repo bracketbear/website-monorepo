@@ -40,6 +40,7 @@ const SELECTED = [
   'caustics-pool',
   'erosion-table',
   'chladni-plate',
+  'iron-bloom',
 ];
 
 /**

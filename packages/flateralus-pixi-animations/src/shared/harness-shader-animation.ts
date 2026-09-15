@@ -1,8 +1,9 @@
 import * as PIXI from 'pixi.js';
-import { PAL } from '@bracketbear/flateralus';
+import { PAL, resolveLever } from '@bracketbear/flateralus';
 import type {
   AnimationManifest,
   ManifestToControlValues,
+  QualityLever,
 } from '@bracketbear/flateralus';
 import { PixiAnimation } from '@bracketbear/flateralus-pixi';
 import {
@@ -50,14 +51,40 @@ export abstract class HarnessShaderAnimation<
   protected readonly needsMask: boolean = true;
 
   /**
+   * Bounds for the resolution lever. `max` is what this effect renders at
+   * when there is headroom, `min` the least it will accept under load.
+   * Effects with a per-pixel cost heavy enough that native is out of reach
+   * narrow this; the default gives everything else a modest safety margin.
+   */
+  protected readonly renderScaleLever: QualityLever = { min: 0.6, max: 1 };
+
+  /**
    * Framebuffer pixels per CSS pixel. 1 means the offscreen canvas matches
    * the stage exactly, which is what the mask-based effects want because
-   * their uRect is in CSS pixels. Effects that want device-resolution
-   * rendering override this; the sprite is still laid out in CSS pixels, so
-   * the only visible difference is sharpness and cost.
+   * their uRect is in CSS pixels. The sprite is always laid out in CSS
+   * pixels, so the only visible difference is sharpness and cost.
+   *
+   * Driven by the quality controller for maskless effects, and still capped
+   * by `dpr` so an effect that declared a ceiling keeps it.
+   *
+   * Mask effects are held at their previous scale. They compare
+   * `p = uvS * uRes`, in framebuffer pixels, against a `uRect` measured in
+   * stage pixels, and the two only agree at scale 1 — scaled down, the mask
+   * shrinks into the top-left corner. Moving them onto the lever means
+   * giving them a stage-space resolution uniform first.
    */
   protected get renderScale(): number {
-    return this.dpr ?? 1;
+    const cap = this.dpr ?? 1;
+    if (this.needsMask) return cap;
+    return Math.min(
+      cap,
+      resolveLever(this.renderScaleLever, this.getQuality())
+    );
+  }
+
+  /** Resolution is the lever people ask about, so it is reported too. */
+  getResolvedLevers(): Record<string, number> {
+    return { renderScale: this.renderScale, ...super.getResolvedLevers() };
   }
 
   /** Push the effect's own uniforms. Called every frame, after the common ones. */

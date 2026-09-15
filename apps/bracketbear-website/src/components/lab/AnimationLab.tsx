@@ -16,6 +16,7 @@ import LabHeader from './LabHeader';
 import LabNav from './LabNav';
 import LabStage from './LabStage';
 import LabInspector from './LabInspector';
+import LabPerf from './LabPerf';
 
 /** Animations bake layout at init, so a resize rebuilds rather than reflows. */
 const RESIZE_DEBOUNCE_MS = 250;
@@ -238,6 +239,7 @@ export default function AnimationLab() {
             manifest={manifest}
             values={values}
             onChange={handleControl}
+            perf={<LabPerf animRef={animRef} />}
           />
         )}
       </div>

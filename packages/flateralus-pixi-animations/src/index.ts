@@ -18,6 +18,7 @@ export * from './heat-haze';
 export * from './holo-mark';
 export * from './ink-dissolve';
 export * from './interference-field';
+export * from './iron-bloom';
 export * from './jelly-tank';
 export * from './kaleido';
 export * from './led-matrix';

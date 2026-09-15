@@ -10,6 +10,8 @@ interface Props {
   manifest: AnimationManifest;
   values: Record<string, unknown>;
   onChange: (name: string, value: Value) => void;
+  /** Frame statistics and the quality lever, rendered below the controls. */
+  perf?: React.ReactNode;
 }
 
 const labelRow: React.CSSProperties = {
@@ -63,6 +65,7 @@ export default function LabInspector({
   manifest,
   values,
   onChange,
+  perf,
 }: Props) {
   return (
     <aside
@@ -220,6 +223,8 @@ export default function LabInspector({
         Controls marked ⟲ rebuild the scene when changed. Everything else
         updates live.
       </p>
+
+      {perf}
     </aside>
   );
 }
