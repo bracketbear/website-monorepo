@@ -277,6 +277,20 @@ beats vivid every time. This is also why `docs/brand/BRAND.md` bans "polished
 like a hotel" as metaphor-fluff — the rule is the same on both sides, it was
 just only ever written down on the brand side.
 
+**The bound on this rule — added 2026-09-15 from a second output test.** The ban
+is on _images_, not on _precision_. A draft of the Fireside talk-announcement
+post rewrote his own rough-draft phrase "a collection of sensory inputs" as
+"just stuff you see and hear and touch," reading the abstract noun as corny.
+**He put it back** — the published line is "a combination of sensory inputs." It
+was never figurative; it was the accurate word for the thing, and §2.1's honest
+counter-evidence already says he is not allergic to business words ("Here are
+solutions that I can provide," "by leveraging my professional connections"). The failure mode this rule exists to stop is the
+line that reaches for a picture to make a point feel bigger. Swapping an exact
+term for a folksier circumlocution is the _opposite_ error and §2.1 names it:
+**do not overcorrect into folksiness.** Test: if the phrase names the thing
+precisely, keep it however abstract it sounds. Only cut it if it is standing in
+for the thing with a picture of something else.
+
 **3. Operator-flex.** Performing toughness, insider-fluency, or hard-won
 weariness instead of just saying the thing. "quietly holding up the entire show"
 is the rejected example. `BRAND.md` bans this category at length — "five tools
@@ -293,10 +307,30 @@ to perform. **Floor compliance is not a substitute for having something to
 say**; when the two come apart, the floors produce costume. The gate against
 this is §3 — check it before drafting, not after.
 
-**Caveat on the evidence.** One sort of six posts, n=1 rejection. The rules
-above are corpus-corroborated (§1 item 6's five quotes, §2.1's metaphor count),
-which is why they are stated as rules rather than as a note — but the sort
-itself is a single data point and should be re-run.
+**Caveat on the evidence.** Two output tests now, and they do not point the same
+way. The 2026-08-22 sort (six drafts, n=1 rejection) produced the three rules
+above. The 2026-09-15 test — one draft, the Fireside talk announcement, revised
+by Harrison and posted — **confirmed rule 1 and bounded rule 2.** The rules
+remain corpus-corroborated (§1 item 6's five quotes, §2.1's metaphor count),
+which is why they are stated as rules rather than as a note, but the sample is
+still small and the direction of error has now flipped once.
+
+**What the 2026-09-15 test showed, in his own edits:**
+
+- **Rule 1 held, and the bar is lower than the draft judged it.** The draft
+  flagged "why some folks land and others just can't get traction" as
+  borderline-knowing and kept it anyway. **He cut the line entirely** and
+  replaced it with a habit instead of a diagnosis: "Everywhere I go, I'm always
+  thinking about the 'why' and 'how' of the moment I'm in at the time."
+  Describing what he does clears; explaining who succeeds and why does not.
+  "Borderline but acceptable" is the wrong call on this rule — see §6 q12.
+- **Rule 2 was over-applied.** See the bound above: he restored "sensory
+  inputs."
+- **Two things the draft had left out, which he added back.** A first-person
+  opener ("I'm speaking at…" where the draft had a bare participle), and an
+  outward thank-you to the host with its own exclamation point and his
+  arm's-length quotes — a big "thank you" for having us! 🔥 (§1 item 4, §2.6).
+  A post that names a host and doesn't thank them is missing a beat.
 
 ## 2. Personal LinkedIn register
 
@@ -1334,6 +1368,7 @@ by someone else.
 | Keep Register C bone-dry: zero `!`, zero hype words across all 8 corpus instances (`2026-08-05`, `2025-01-09`, `2023-06-19`, …)                                                                         | Sprinkle `folks!` and an exclamation point on a layoff, disaster, memorial, or observance post to make it "sound more like him."                                                                                                 |
 | Say you don't know: "I'm not a marketing expert, but…" (`2023-07-24`); "I was today years old when I found out my company has worked with the world's biggest Youtube star." (`2024-03-14`)             | Write from seen-it-all expertise: "Every one of these starts the same way," "Still my favorite problem to walk into," "which usually means something real is happening." Rejected verbatim in the 2026-08-22 output test (§1.1). |
 | Use the plain phrase: "think about it from a different angle" (his own edit, 2026-08-22)                                                                                                                | Reach for an image: "look at it from across the room," "polished like a hotel." One recurring metaphor in 192 posts (§2.1).                                                                                                      |
+| Keep the precise word even when it's abstract: "a combination of sensory inputs" (his own restore, 2026-09-15)                                                                                          | Fold an exact term into something folksier to sound plainer: "just stuff you see and hear and touch." The ban is on images, not on precision (§1.1 item 2).                                                                      |
 | Just say the thing the work is                                                                                                                                                                          | Perform toughness or insider-fluency: "quietly holding up the entire show," "the integrations nobody else wants to touch." If it could be a HackerNews flex, cut it (§1.1).                                                      |
 
 ## 6. Anti-AI-tells self-check
@@ -1441,12 +1476,22 @@ to Harrison rejecting a draft that passed every one of them. **A draft can clear
     draft's lines: "Every one of these starts the same way," "Still my favorite
     problem to walk into." His own edit replaced signal-reading ("which usually
     means something real is happening") with an admission of ignorance ("I've
-    never known really who they were or what they were all about"). Fix: §1
-    item 6 — participant, not authority.
+    never known really who they were or what they were all about"). **Confirmed
+    2026-09-15:** a draft that flagged "why some folks land and others just
+    can't get traction" as borderline and shipped it anyway had the line cut
+    outright; he replaced the diagnosis with a habit ("Everywhere I go, I'm
+    always thinking about the 'why' and 'how' of the moment I'm in"). **There is
+    no borderline pass on this question** — if the line explains other people's
+    outcomes, cut it or turn it into something he does. Fix: §1 item 6 —
+    participant, not authority.
 13. **Is there a metaphor or a figurative image in it?** He does not use them:
     one recurring metaphor in 192 posts (§2.1). His words: "I'm not a metaphor
     guy, typically." He struck "look at it from across the room" for "think
     about it from a different angle." Fix: §1.1 item 2 — use the plain phrase.
+    **But read item 2's bound before cutting anything:** this question asks
+    whether a line reaches for a _picture_, not whether it uses an abstract or
+    technical noun. He restored "sensory inputs" over a folksier rewrite
+    (2026-09-15). Precision is not a metaphor.
 14. **Is any line performing toughness or insider-fluency instead of just saying
     the thing?** "quietly holding up the entire show" was the rejected example.
     Test: if the line could be a HackerNews comment posted as a flex, it's
