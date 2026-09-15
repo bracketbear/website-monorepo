@@ -41,7 +41,18 @@ export class PixiApplication extends BaseApplication<PixiApp> {
     // PIXI handles its own render loop through the ticker
     this.pixiApp.ticker.add(this.updateAnimation, this);
     this.pixiApp.ticker.start();
+
+    // A hidden tab reports frame intervals in seconds. Without telling the
+    // monitor, coming back from another tab would look like a scene that had
+    // suddenly collapsed, and the quality controller would act on it.
+    if (typeof document !== 'undefined' && !this.onVisibility) {
+      this.onVisibility = () => this.animation?.notifyDiscontinuity?.();
+      document.addEventListener('visibilitychange', this.onVisibility);
+    }
   }
+
+  /** Listener handle, so it can be removed again on teardown. */
+  private onVisibility: (() => void) | null = null;
 
   /**
    * Stop the PIXI render loop
@@ -51,6 +62,11 @@ export class PixiApplication extends BaseApplication<PixiApp> {
 
     this.pixiApp.ticker.remove(this.updateAnimation, this);
     this.pixiApp.ticker.stop();
+
+    if (this.onVisibility && typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.onVisibility);
+      this.onVisibility = null;
+    }
   }
 
   /**

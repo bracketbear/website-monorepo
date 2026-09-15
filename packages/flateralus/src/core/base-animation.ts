@@ -20,6 +20,17 @@ import { createControlValuesSchema } from '../utils/create-control-values-schema
  * Extend this class and implement the lifecycle methods to create a new animation.
  * Use an adapter (e.g., PixiAnimation) for framework-specific logic.
  */
+import { FrameMonitor, type FrameStats } from '../perf/frame-monitor';
+import { QualityController } from '../perf/quality-controller';
+import { resolveLevers, type QualityLevers } from '../perf/quality';
+
+/**
+ * How often the quality controller is consulted. Reading frame statistics
+ * sorts the sample window, so it is deliberately not done per frame — and
+ * the controller's own cooldowns are longer than this anyway.
+ */
+const QUALITY_INTERVAL_MS = 250;
+
 export abstract class BaseAnimation<
   TManifest extends AnimationManifest,
   TControlValues extends
@@ -32,6 +43,17 @@ export abstract class BaseAnimation<
   protected previousControlValues: TControlValues;
   protected isInitialized = false;
   protected lastUpdateTime = 0;
+
+  /**
+   * What this animation is willing to trade for frame rate. Declaring
+   * nothing — the default — leaves behaviour exactly as it was; the host
+   * still scales render resolution generically.
+   */
+  protected readonly qualityLevers: QualityLevers = {};
+
+  private frameMonitor = new FrameMonitor();
+  private qualityController = new QualityController();
+  private lastQualityCheck = 0;
   protected manifest: TManifest;
   protected isResetting = false;
   private onControlsUpdated?: (values: TControlValues) => void;
@@ -191,7 +213,13 @@ export abstract class BaseAnimation<
   init(context: TContext): void {
     this.context = context;
     this.isInitialized = true;
-    this.lastUpdateTime = Date.now();
+    // performance.now(), matching update(). Seeding this from a different
+    // clock than the one update() reads would hand the first frame a
+    // deltaTime of about fifty-six years.
+    this.lastUpdateTime = performance.now();
+    this.lastQualityCheck = this.lastUpdateTime;
+    this.frameMonitor.reset();
+    this.qualityController.reset();
 
     // Call lifecycle hook
     this.onInit(context, this.controlValues);
@@ -203,12 +231,75 @@ export abstract class BaseAnimation<
   update(): void {
     if (!this.isInitialized || !this.context) return;
 
-    const currentTime = Date.now();
+    // performance.now() rather than Date.now(): the latter is quantised to
+    // whole milliseconds, which is coarser than the frame times being
+    // measured.
+    const currentTime = performance.now();
     const deltaTime = (currentTime - this.lastUpdateTime) / 1000; // Convert to seconds
     this.lastUpdateTime = currentTime;
 
+    this.frameMonitor.record(currentTime);
+    if (currentTime - this.lastQualityCheck >= QUALITY_INTERVAL_MS) {
+      this.lastQualityCheck = currentTime;
+      const before = this.qualityController.quality;
+      const after = this.qualityController.update(
+        this.frameMonitor.stats(),
+        currentTime
+      );
+      // Acting on quality costs a frame or two — a render target gets
+      // reallocated — and measuring those would feed the controller its own
+      // adjustment as evidence the scene had slowed down.
+      if (after !== before) this.frameMonitor.discontinuity(3);
+    }
+
     // Call lifecycle hook if implemented
     this.onUpdate(this.context, this.controlValues, deltaTime);
+  }
+
+  /**
+   * How the render loop has been behaving for this animation.
+   *
+   * Frame interval, not work time: an animation's update returns as soon as
+   * it issues its draw call and the GPU does the expensive part afterwards,
+   * so a scene costing sixteen seconds a frame on the GPU still reports
+   * about a millisecond of CPU work.
+   */
+  getFrameStats(): FrameStats {
+    return this.frameMonitor.stats();
+  }
+
+  /** Current quality in [0, 1]. */
+  getQuality(): number {
+    return this.qualityController.quality;
+  }
+
+  getQualityMode(): 'auto' | 'fixed' {
+    return this.qualityController.mode;
+  }
+
+  /**
+   * Pin quality, or hand it back to the controller.
+   *
+   * Pinning is not a nicety: automatic scaling moving the resolution around
+   * while someone is tuning a material makes the tuning impossible.
+   */
+  setQualityMode(mode: 'auto' | 'fixed', quality?: number): void {
+    if (quality !== undefined) this.qualityController.setQuality(quality);
+    this.qualityController.mode = mode;
+  }
+
+  /** Declared levers resolved against the current quality. */
+  getResolvedLevers(): Record<string, number> {
+    return resolveLevers(this.qualityLevers, this.getQuality());
+  }
+
+  /**
+   * Tell the monitor that the next interval is meaningless — the tab was
+   * hidden, or the animation was remounted. A backgrounded tab reports
+   * intervals in seconds, and that is not the scene being slow.
+   */
+  notifyDiscontinuity(): void {
+    this.frameMonitor.discontinuity();
   }
 
   /**

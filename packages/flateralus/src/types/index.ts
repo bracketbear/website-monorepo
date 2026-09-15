@@ -1,3 +1,4 @@
+import type { FrameStats } from '../perf/frame-monitor';
 import type { DeepReadonly, ObjectKeys, ObjectValues } from '@bracketbear/core';
 import { z } from 'zod';
 import type {
@@ -175,6 +176,23 @@ export interface Animation<
 
   /** Update the animation (called each frame) */
   update(): void;
+
+  /**
+   * Frame statistics for this animation, and the quality it is rendering at.
+   * Optional so an implementation outside BaseAnimation is not forced to
+   * carry a monitor it does not want.
+   */
+  getFrameStats?(): FrameStats;
+  getQuality?(): number;
+  getQualityMode?(): 'auto' | 'fixed';
+  setQualityMode?(mode: 'auto' | 'fixed', quality?: number): void;
+  getResolvedLevers?(): Record<string, number>;
+
+  /**
+   * Tell the frame monitor that the next interval is meaningless, because
+   * the tab was hidden or the animation was remounted.
+   */
+  notifyDiscontinuity?(): void;
 
   /** Reset the animation to default or specified control values */
   reset(controls?: Partial<TControlValues>): void;
