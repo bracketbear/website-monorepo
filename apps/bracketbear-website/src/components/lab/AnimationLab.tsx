@@ -22,9 +22,20 @@ import LabPerf from './LabPerf';
 const RESIZE_DEBOUNCE_MS = 250;
 const WATCHDOG_INTERVAL_MS = 1500;
 const CONTEXT_DIM = 0.45;
+/** Query param holding the selected animation, so a reload lands on it. */
+const ANIMATION_PARAM = 'animation';
+
+/** The client:only mount means window is always present here. */
+function initialActiveId(): string {
+  const requested = new URLSearchParams(window.location.search).get(
+    ANIMATION_PARAM
+  );
+  if (requested && REGISTRY.some((e) => e.id === requested)) return requested;
+  return REGISTRY[0]?.id ?? '';
+}
 
 export default function AnimationLab() {
-  const [activeId, setActiveId] = useState(REGISTRY[0]?.id ?? '');
+  const [activeId, setActiveId] = useState(initialActiveId);
   const [theme, setTheme] = useState<ThemeId>('sunset');
   // Defaults to Bare: the context overlays are not built yet, so "In
   // context" would only dim the stage with nothing rendered over it.
@@ -119,6 +130,15 @@ export default function AnimationLab() {
   useEffect(() => {
     if (ready) mount();
   }, [activeId, ready, mount]);
+
+  // Mirror the selection into the URL. replaceState, not pushState: picking
+  // through the nav should not fill the back button with every animation.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get(ANIMATION_PARAM) === activeId) return;
+    url.searchParams.set(ANIMATION_PARAM, activeId);
+    window.history.replaceState(null, '', url);
+  }, [activeId]);
 
   // A theme change rebuilds with the values already dialled in — many
   // pieces read the palette at build time, so recoloring needs a rebuild.
