@@ -60,6 +60,16 @@ const MANIFEST = createManifest({
       defaultValue: true,
       debug: true,
     },
+    {
+      // The city / sunrise / daylight readout. Off when the piece runs under
+      // copy that owns the top of the frame, as in the talk runner.
+      name: 'labels',
+      type: 'boolean',
+      label: 'Show Readout',
+      defaultValue: true,
+      debug: true,
+      resetsAnimation: true,
+    },
   ],
 } as const);
 
@@ -255,6 +265,7 @@ export class SunArcAnimation extends PixiAnimation<typeof MANIFEST> {
     );
     this.title.x = this.mx;
     this.title.y = h * 0.06;
+    this.title.visible = this.getControlValues().labels !== false;
     root.addChild(this.title);
 
     // Moon, at the phase of the pinned date.

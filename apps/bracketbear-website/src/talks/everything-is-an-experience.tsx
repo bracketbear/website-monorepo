@@ -48,7 +48,10 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
     },
     {
       id: 'hospitality',
-      animation: { id: 'sun-arc' },
+      animation: {
+        id: 'sun-arc',
+        controls: { city: 'pdx', labels: false, moon: false, now: false },
+      },
       light: true,
       render: () => (
         <SlideBig
