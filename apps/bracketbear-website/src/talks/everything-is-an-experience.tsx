@@ -17,7 +17,7 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
   slides: [
     {
       id: 'title',
-      animation: { id: 'logo-resolve' },
+      animation: { id: 'caustics-pool' },
       render: () => (
         <SlideBig
           eyebrow="FIRESIDE · PORTLAND"
