@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { L_APPROACH } from './geometry';
+import { L_APPROACH, L_EXIT } from './geometry';
 import {
   DEFAULT_PARAMS,
   KINDS,
@@ -8,6 +8,9 @@ import {
   step,
   vehiclesOn,
   poseOf,
+  isGridlocked,
+  setCop,
+  occupiesBox,
   type TrafficParams,
   type TrafficState,
 } from './traffic';
@@ -191,5 +194,94 @@ describe('the crossing', () => {
       for (const g of laneGaps(S, 0)) if (g < -0.05) crashes++;
     }
     expect(crashes).toBe(0);
+  });
+});
+
+describe('the cop', () => {
+  it('a held line is a wall even with nothing crossing', () => {
+    const S = createTraffic(9);
+    const p = params();
+    setCop(S, { present: true, held: [true, false, false, false] });
+    const c = addVehicle(S, 0, 'straight', 'car', 50, 8);
+    run(S, p, 30);
+    expect(c.phase).toBe('approach');
+    expect(c.stopped).toBe(true);
+  });
+
+  it('a waved stream enters without stopping', () => {
+    const S = createTraffic(10);
+    const p = params();
+    setCop(S, { present: true, waved: 0 });
+    const c = addVehicle(S, 0, 'straight', 'car', 30, 8);
+    run(S, p, 15);
+    expect(c.phase).not.toBe('approach');
+    expect(c.stopped).toBe(false);
+    expect(c.waved).toBe(true);
+  });
+
+  it('a wave holds the crossing streams', () => {
+    const S = createTraffic(11);
+    const p = params();
+    setCop(S, { present: true, waved: 0 });
+    const e = addVehicle(S, 1, 'straight', 'car', 50, 8);
+    run(S, p, 20);
+    expect(e.phase).toBe('approach');
+  });
+
+  it('the first left after a release does not yield to oncoming', () => {
+    const S = createTraffic(12);
+    const p = params();
+    // Both stopped, the left-turner a hair earlier: a Pittsburgh left.
+    const l = addVehicle(S, 0, 'left', 'car', L_APPROACH - 0.2, 0);
+    l.stopped = true;
+    l.arrivedAt = 0;
+    const o = addVehicle(S, 2, 'straight', 'car', L_APPROACH - 0.2, 0);
+    o.stopped = true;
+    o.arrivedAt = 0.1;
+    let lEnter = -1;
+    let oEnter = -1;
+    for (let t = 0; t < 15; t += p.dt) {
+      step(S, p);
+      if (lEnter < 0 && l.phase !== 'approach') lEnter = t;
+      if (oEnter < 0 && o.phase !== 'approach') oEnter = t;
+    }
+    expect(l.pittsburghLeft).toBe(true);
+    expect(lEnter).toBeGreaterThan(0);
+    expect(lEnter).toBeLessThanOrEqual(oEnter);
+  });
+
+  it('a bus waved through late gridlocks the box, and a clear resolves it', () => {
+    const S = createTraffic(13);
+    // The far side of the south road is backed up.
+    const p = params({ exitBlocked: [false, false, true, false] });
+    // Cars already stuck on the south exit lane, up to the box edge.
+    for (let i = 0; i < 6; i++) {
+      const c = addVehicle(S, 0, 'straight', 'car', 0, 0);
+      c.phase = 'exit';
+      c.s = L_EXIT - 4 - i * 6.5;
+      c.granted = true;
+    }
+    setCop(S, { present: true, waved: 0 });
+    const bus = addVehicle(S, 0, 'straight', 'bus', L_APPROACH - 12, 6);
+    // A car wanting to cross east-west, which the bus will block.
+    const e = addVehicle(S, 1, 'straight', 'car', L_APPROACH - 20, 8);
+    let lockedAt = -1;
+    for (let t = 0; t < 15; t += p.dt) {
+      step(S, p);
+      if (lockedAt < 0 && isGridlocked(S)) lockedAt = t;
+    }
+    expect(lockedAt).toBeGreaterThan(0);
+    expect(occupiesBox(bus)).toBe(true);
+    expect(e.phase).toBe('approach');
+    // Now the far side drains and the cop clears the box.
+    const open = params();
+    setCop(S, { present: true, waved: null, clearing: true });
+    let clearedAt = -1;
+    for (let t = 0; t < 15; t += open.dt) {
+      step(S, open);
+      if (clearedAt < 0 && !S.vehicles.some(occupiesBox)) clearedAt = t;
+    }
+    expect(clearedAt).toBeGreaterThan(0);
+    expect(S.cop.clearing).toBe(false);
   });
 });

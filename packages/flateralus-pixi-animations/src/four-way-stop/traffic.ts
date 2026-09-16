@@ -267,6 +267,20 @@ export function addVehicle(
   return veh;
 }
 
+/** Set the cop's gesture. Fields omitted keep their value. */
+export function setCop(S: TrafficState, cop: Partial<Cop>): void {
+  Object.assign(S.cop, cop);
+}
+
+/**
+ * The box has seized: someone has been stopped inside it for a while. Not
+ * prevented — it is the failure state the negotiation is about — and it
+ * resolves by the cop clearing the box or by patience inside it.
+ */
+export function isGridlocked(S: TrafficState): boolean {
+  return S.vehicles.some((v) => occupiesBox(v) && v.boxWait > 3);
+}
+
 export function pathOf(v: Vehicle): Path {
   return PATHS[v.from][v.turn];
 }
@@ -276,6 +290,17 @@ export function boxS(v: Vehicle): number {
   if (v.phase === 'approach') return v.s - L_APPROACH;
   if (v.phase === 'box') return v.s;
   return pathOf(v).len + v.s;
+}
+
+/**
+ * Whether any of a vehicle's body is inside the box: its front is on a
+ * box path, or its front is out on the exit lane but its tail is not yet
+ * past the seam. A bus is nearly as long as the box, so the front bumper
+ * alone says it has left while the crossing is still blocked.
+ */
+export function occupiesBox(v: Vehicle): boolean {
+  if (v.phase === 'box') return true;
+  return v.phase === 'exit' && v.s < KINDS[v.kind].len;
 }
 
 export function poseOf(v: Vehicle): Pose {
@@ -328,9 +353,8 @@ export function criticalGap(v: Vehicle, p: TrafficParams): number {
 
 /**
  * Whether the vehicles already committed to the box leave this driver a
- * gap. For each committed vehicle whose path conflicts with mine: if it has
- * passed the conflict point, ignore it; if it is on the point, no; else the
- * time it needs to reach the point must exceed my critical gap.
+ * gap. For each committed vehicle whose path conflicts with mine: passed,
+ * on it (cleared in time, or not), or approaching within the critical gap.
  */
 export function gapAccepted(
   v: Vehicle,
@@ -341,14 +365,23 @@ export function gapAccepted(
   const mine = pathOf(v);
   for (const o of S.vehicles) {
     if (o === v || o.from === v.from) continue;
-    if (o.phase === 'exit') continue;
+    if (o.phase === 'exit' && o.s >= KINDS[o.kind].len) continue;
     if (o.phase === 'approach' && !o.granted) continue;
     const c = conflictBetween(mine, pathOf(o));
     if (!c) continue;
     const so = boxS(o);
     const len = KINDS[o.kind].len;
-    if (so > c.sb + 1) continue; // passed
-    if (so >= c.sb - len - 1) return false; // on it
+    if (so - len > c.sb + 1) continue; // its tail is past the point: clear
+    if (so > c.sb - 1) {
+      // Its front is at or past the point, so its body is on it. Clear only
+      // if the tail is gone before I can get there from rest; a stopped
+      // vehicle on the point never clears.
+      const tClear = (c.sb + len + 1 - so) / Math.max(o.v, 0.3);
+      const tArrive = Math.sqrt((2 * Math.max(c.sa, 0.5)) / KINDS[v.kind].a);
+      if (tClear >= tArrive) return false;
+      continue;
+    }
+    // Approaching: it must not reach the point inside my critical gap.
     if ((c.sb - so) / Math.max(o.v, 0.3) < tc) return false;
   }
   return true;
@@ -464,7 +497,11 @@ function leaderOf(
         }
         continue;
       }
-      if (o.phase === 'exit' || (o.phase === 'approach' && !o.granted))
+      // An exit-phase vehicle still counts until its tail clears the seam.
+      if (
+        (o.phase === 'exit' && o.s >= len(o)) ||
+        (o.phase === 'approach' && !o.granted)
+      )
         continue;
       const c = conflictBetween(mine, pathOf(o));
       if (!c || c.sa <= ms) continue;
@@ -536,6 +573,13 @@ function grant(S: TrafficState, p: TrafficParams): void {
     }
     const f = frontOf(S, a);
     if (!f || !f.stopped) continue;
+    // The Pittsburgh left: a left-turner who stopped before the oncoming
+    // driver takes the crossing first instead of yielding to them.
+    if (f.turn === 'left' && !f.pittsburghLeft) {
+      const o = frontOf(S, ((a + 2) % 4) as Approach);
+      if (o && o.stopped && o.turn !== 'left' && f.arrivedAt <= o.arrivedAt)
+        f.pittsburghLeft = true;
+    }
     if (!hasPriority(f, S, p)) continue;
     if (!gapAccepted(f, S, p)) continue;
     f.granted = true;
@@ -630,14 +674,24 @@ export function step(S: TrafficState, p: TrafficParams): void {
     }
     if (v.phase === 'box') {
       const len = pathOf(v).len;
-      if (v.v < 0.15) v.boxWait += p.dt;
-      else v.boxWait = 0;
       if (v.s >= len) {
         v.phase = 'exit';
         v.s -= len;
       }
     }
+    if (occupiesBox(v)) {
+      if (v.v < 0.15) v.boxWait += p.dt;
+      else v.boxWait = 0;
+    }
   });
   S.vehicles = S.vehicles.filter((v) => !(v.phase === 'exit' && v.s > L_EXIT));
+  // Clearing ends itself when the box is empty.
+  if (S.cop.clearing && !S.vehicles.some(occupiesBox)) S.cop.clearing = false;
+  // Gridlock is an event once, when it begins.
+  if (isGridlocked(S)) {
+    if (S.gridlockT === 0)
+      S.events.push({ type: 'gridlock', id: 0, x: 0, y: 0, hx: 0, hy: 1 });
+    S.gridlockT += p.dt;
+  } else S.gridlockT = 0;
   spawn(S, p);
 }
