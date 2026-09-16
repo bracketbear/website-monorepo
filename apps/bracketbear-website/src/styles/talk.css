@@ -1,0 +1,72 @@
+@import '@fontsource/anton/400.css';
+@import '@fontsource/archivo-black/400.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+
+/* ============================================================
+   talk.css — Talk runner shell. Scoped under .bb-talk.
+   ============================================================ */
+
+.bb-talk {
+  --orange: #ff5f1f;
+  --cream: #fff3e3;
+  --ink: #110a08;
+  --cyan: #7df9ff;
+  --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* Letterboxed 16:9 stage. cqw units in the slide layouts resolve here. */
+.bb-talk-stage {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  container-type: size;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+.bb-talk-fade {
+  transition: opacity 0.2s ease;
+}
+
+.bb-talk-notes {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: rgba(17, 10, 8, 0.94);
+  border-top: 1px solid rgba(255, 243, 227, 0.14);
+  padding: 1rem 1.5rem 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  align-items: start;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--cream);
+}
+
+.bb-talk-notes .clock {
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--orange);
+  font-variant-numeric: tabular-nums;
+}
