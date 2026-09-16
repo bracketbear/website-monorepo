@@ -12,6 +12,7 @@ import {
   createEnergyBodyAnimation,
   createErosionTableAnimation,
   createFoilStatementAnimation,
+  createFourWayStopAnimation,
   createGooLampAnimation,
   createHalftoneTideAnimation,
   createHeatHazeAnimation,
@@ -491,6 +492,18 @@ export const REGISTRY: LabEntry[] = [
       'A driven plate with sand on it. Placeholder blurb — rewritten in Task 9 using the bb-voice skill.',
     create: (initialControls) =>
       createChladniPlateAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'four-way-stop',
+    section: 'toys',
+    name: 'Four-Way Stop',
+    tag: 'traffic sim',
+    blurb:
+      'A Pittsburgh corner at night in the rain, no light, a cop in the middle. Two streams of cars want the same crossing. Every car follows the Intelligent Driver Model, so braking waves run backward up a queue and jams appear from nothing, and drivers at the line take gaps by a critical gap that shrinks the longer they wait: a driver who has waited long enough forces one, and the crossing car brakes, and that runs back up the other queue. Wet asphalt is a mirror, so every light is reflected by mirroring its geometry through the road. Hover an approach to hold it, click to wave it through, click the box to clear it. Leave, and the four-way-stop rule runs the corner on its own.',
+    create: (initialControls) =>
+      createFourWayStopAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

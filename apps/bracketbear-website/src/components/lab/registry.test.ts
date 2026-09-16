@@ -41,6 +41,7 @@ const SELECTED = [
   'erosion-table',
   'chladni-plate',
   'iron-bloom',
+  'four-way-stop',
 ];
 
 /**

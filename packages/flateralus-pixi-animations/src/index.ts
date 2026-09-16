@@ -12,6 +12,7 @@ export * from './dmt-tunnel';
 export * from './energy-body';
 export * from './erosion-table';
 export * from './foil-statement';
+export * from './four-way-stop';
 export * from './goo-lamp';
 export * from './halftone-tide';
 export * from './heat-haze';
