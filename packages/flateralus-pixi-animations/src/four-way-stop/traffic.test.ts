@@ -7,6 +7,7 @@ import {
   addVehicle,
   step,
   vehiclesOn,
+  poseOf,
   type TrafficParams,
   type TrafficState,
 } from './traffic';
@@ -82,5 +83,113 @@ describe('the approach lane', () => {
       expect(stopAt[i] - stopAt[i - 1]).toBeGreaterThan(0.2);
       expect(stopAt[i] - stopAt[i - 1]).toBeLessThan(4);
     }
+  });
+});
+
+describe('the crossing', () => {
+  it('a lone car at the line crosses when nothing is coming', () => {
+    const S = createTraffic(4);
+    const p = params();
+    const c = addVehicle(S, 0, 'straight', 'car', 50, 8);
+    run(S, p, 25);
+    expect(['box', 'exit']).toContain(c.phase);
+    expect(c.stopped).toBe(true); // it did stop first
+  });
+
+  it('waits for a crossing car to clear', () => {
+    const S = createTraffic(5);
+    const p = params();
+    const n = addVehicle(S, 0, 'straight', 'car', L_APPROACH - 0.2, 0);
+    n.stopped = true;
+    n.arrivedAt = 0;
+    // An eastbound car already committed, about to enter the box.
+    const e = addVehicle(S, 1, 'straight', 'car', L_APPROACH - 6, 9);
+    e.granted = true;
+    e.stopped = true;
+    e.arrivedAt = -5;
+    let nEnteredAt = -1;
+    let eClearedAt = -1;
+    for (let t = 0; t < 12; t += p.dt) {
+      step(S, p);
+      if (nEnteredAt < 0 && n.phase !== 'approach') nEnteredAt = t;
+      if (eClearedAt < 0 && e.phase === 'exit') eClearedAt = t;
+    }
+    expect(nEnteredAt).toBeGreaterThan(0);
+    // It went once the crossing car had passed the conflict, not before.
+    expect(eClearedAt).toBeGreaterThan(0);
+    expect(nEnteredAt).toBeGreaterThan(eClearedAt - 1.5);
+  });
+
+  it('patience runs out: a driver forces a gap and the crossing car brakes', () => {
+    const S = createTraffic(6);
+    const p = params({ tc0: 4, tcMin: 0.8, tau: 6 });
+    const n = addVehicle(S, 0, 'straight', 'car', L_APPROACH - 0.2, 0);
+    n.stopped = true;
+    n.arrivedAt = 0;
+    // A relentless eastbound stream at a 2.4 s headway, every car granted.
+    let nextSpawn = 0;
+    let entered = -1;
+    let hardestBrake = 0;
+    for (let t = 0; t < 40; t += p.dt) {
+      if (t >= nextSpawn) {
+        const e = addVehicle(S, 1, 'straight', 'car', L_APPROACH - 30, 10);
+        e.granted = true;
+        e.stopped = true;
+        e.arrivedAt = -10;
+        nextSpawn += 2.4;
+      }
+      step(S, p);
+      if (entered < 0 && n.phase !== 'approach') entered = t;
+      if (entered >= 0)
+        for (const o of S.vehicles)
+          if (o.from === 1) hardestBrake = Math.min(hardestBrake, o.accel);
+    }
+    // A fresh driver refuses a 2.4 s gap (tc0 = 4); a worn one takes it.
+    expect(entered).toBeGreaterThan(2);
+    expect(entered).toBeLessThan(30);
+    expect(hardestBrake).toBeLessThan(-1.5);
+  });
+
+  it('no approach starves and no wait passes twenty seconds', () => {
+    const S = createTraffic(7);
+    const p = params({ demand: DEFAULT_PARAMS.demand });
+    const served = [0, 0, 0, 0];
+    const worst = [0, 0, 0, 0];
+    const seen = new Set<number>();
+    for (let t = 0; t < 180; t += p.dt) {
+      step(S, p);
+      for (const v of S.vehicles) {
+        worst[v.from] = Math.max(worst[v.from], v.wait);
+        if (v.phase !== 'approach' && !seen.has(v.id)) {
+          seen.add(v.id);
+          served[v.from]++;
+        }
+      }
+    }
+    for (const a of [0, 1, 2, 3]) {
+      expect(served[a]).toBeGreaterThan(8);
+      expect(worst[a]).toBeLessThan(20);
+    }
+  });
+
+  it('never overlaps two bodies at a conflict point', () => {
+    const S = createTraffic(8);
+    const p = params({ demand: DEFAULT_PARAMS.demand * 1.3 });
+    let crashes = 0;
+    for (let t = 0; t < 180; t += p.dt) {
+      step(S, p);
+      const inBox = S.vehicles.filter((v) => v.phase === 'box');
+      for (let i = 0; i < inBox.length; i++)
+        for (let j = i + 1; j < inBox.length; j++) {
+          const a = inBox[i];
+          const b = inBox[j];
+          const pa = poseOf(a);
+          const pb = poseOf(b);
+          // Centres closer than half a car: bodies overlap.
+          if (Math.hypot(pa.x - pb.x, pa.y - pb.y) < 1.6) crashes++;
+        }
+      for (const g of laneGaps(S, 0)) if (g < -0.05) crashes++;
+    }
+    expect(crashes).toBe(0);
   });
 });

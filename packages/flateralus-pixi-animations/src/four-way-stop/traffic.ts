@@ -15,10 +15,13 @@
  * in about thirty. The IDM's shape survives, because only its constants move.
  */
 import {
+  APPROACHES,
   L_APPROACH,
   L_EXIT,
   PATHS,
   approachPose,
+  approachToRight,
+  conflictBetween,
   destination,
   exitPose,
   pathPose,
@@ -318,10 +321,99 @@ function closer(a: Leader | null, gap: number, dv: number): Leader {
   return a;
 }
 
+/** The critical gap a driver will accept, after `wait` seconds at the line. */
+export function criticalGap(v: Vehicle, p: TrafficParams): number {
+  return Math.max(p.tcMin, p.tc0 * Math.exp(-v.wait / p.tau));
+}
+
+/**
+ * Whether the vehicles already committed to the box leave this driver a
+ * gap. For each committed vehicle whose path conflicts with mine: if it has
+ * passed the conflict point, ignore it; if it is on the point, no; else the
+ * time it needs to reach the point must exceed my critical gap.
+ */
+export function gapAccepted(
+  v: Vehicle,
+  S: TrafficState,
+  p: TrafficParams
+): boolean {
+  const tc = criticalGap(v, p);
+  const mine = pathOf(v);
+  for (const o of S.vehicles) {
+    if (o === v || o.from === v.from) continue;
+    if (o.phase === 'exit') continue;
+    if (o.phase === 'approach' && !o.granted) continue;
+    const c = conflictBetween(mine, pathOf(o));
+    if (!c) continue;
+    const so = boxS(o);
+    const len = KINDS[o.kind].len;
+    if (so > c.sb + 1) continue; // passed
+    if (so >= c.sb - len - 1) return false; // on it
+    if ((c.sb - so) / Math.max(o.v, 0.3) < tc) return false;
+  }
+  return true;
+}
+
+/** The vehicle nearest the line on an approach that has not been granted. */
+export function frontOf(S: TrafficState, from: Approach): Vehicle | null {
+  let best: Vehicle | null = null;
+  for (const v of S.vehicles)
+    if (
+      v.from === from &&
+      v.phase === 'approach' &&
+      !v.granted &&
+      (!best || v.s > best.s)
+    )
+      best = v;
+  return best;
+}
+
+/**
+ * The four-way-stop rule between the drivers stopped at their lines. First
+ * to stop goes first. Within a beat of each other: a left yields to the
+ * oncoming car, and otherwise the driver on the right goes. The Pittsburgh
+ * left is a driver who has been told not to yield. Patience overrides
+ * everything at twice tau, which is what breaks a ring of four rights.
+ */
+export function hasPriority(
+  v: Vehicle,
+  S: TrafficState,
+  p: TrafficParams
+): boolean {
+  if (v.wait > 2 * p.tau) return true;
+  const mine = pathOf(v);
+  for (const a of APPROACHES) {
+    if (a === v.from) continue;
+    const o = frontOf(S, a);
+    if (!o || !o.stopped) continue;
+    if (!conflictBetween(mine, pathOf(o))) continue;
+    const d = o.arrivedAt - v.arrivedAt;
+    if (d < -0.4) return false;
+    if (d > 0.4) continue;
+    const oncoming = o.from === (v.from + 2) % 4;
+    if (v.turn === 'left' && oncoming && o.turn !== 'left' && !v.pittsburghLeft)
+      return false;
+    if (o.from === approachToRight(v.from)) return false;
+  }
+  return true;
+}
+
 /**
  * What a vehicle is following, as the nearest constraint ahead of it.
- * On the approach that is the vehicle ahead on the same lane and, unless
- * granted, the stop line as a stopped leader. Task 3 adds the box.
+ *
+ * Approach: the vehicle ahead on the lane, and the stop line as a stopped
+ * leader unless granted. Box: the vehicle ahead on the same path, a vehicle
+ * heading for the same exit lane followed by remaining distance (a merge is
+ * car-following, not a crossing), anything physically on a conflict point
+ * ahead of me — resolved by entry order when we are both on it, so a
+ * mutual standoff does not freeze us both — and — unless my patience in the
+ * box has run out — anyone who entered before me and has not yet cleared a
+ * conflict point I am heading for. Exit: the vehicle ahead on the exit
+ * lane, and the test hook's wall at its end.
+ *
+ * Physical occupancy always counts. That is how a forced gap reaches the
+ * crossing car: the forcer is simply there, on the point, and the IDM does
+ * the rest.
  */
 function leaderOf(
   v: Vehicle,
@@ -330,6 +422,7 @@ function leaderOf(
 ): Leader | null {
   let L: Leader | null = null;
   const len = (o: Vehicle) => KINDS[o.kind].len;
+  const dest = destination(v.from, v.turn);
   if (v.phase === 'approach') {
     for (const o of S.vehicles) {
       if (o === v || o.from !== v.from) continue;
@@ -338,12 +431,165 @@ function leaderOf(
       else if (o.phase === 'box')
         L = closer(L, L_APPROACH + o.s - len(o) - v.s, v.v - o.v);
     }
-    // The line is a stopped leader one jam gap beyond the line itself, so the IDM's
-    // equilibrium lands the bumper on the line; the clamp in `step` catches overshoot.
+    // The line is a stopped leader one jam gap beyond the line itself, so
+    // the IDM's equilibrium lands the bumper on the line; the clamp in
+    // `step` catches overshoot.
     if (!v.granted || p.lineIsWall)
       L = closer(L, L_APPROACH + KINDS[v.kind].s0 - v.s, v.v);
+    return L;
   }
+  const mine = pathOf(v);
+  const ms = boxS(v);
+  if (v.phase === 'box') {
+    const yielding = v.boxWait < p.boxTau && !S.cop.clearing;
+    for (const o of S.vehicles) {
+      if (o === v) continue;
+      if (o.from === v.from && o.turn === v.turn) {
+        const os = boxS(o);
+        if (os > ms) L = closer(L, os - len(o) - ms, v.v - o.v);
+        continue;
+      }
+      // A merge is car-following, not a crossing: two paths into one exit
+      // lane are one lane from the seam back, so whoever has less path
+      // left is ahead and the other follows it. Measured in distance to
+      // the seam, because the two paths are different lengths.
+      if (destination(o.from, o.turn) === dest) {
+        if (o.phase === 'exit') {
+          L = closer(L, mine.len + o.s - len(o) - ms, v.v - o.v);
+        } else if (o.phase === 'box') {
+          const remO = pathOf(o).len - boxS(o);
+          const remMe = mine.len - ms;
+          if (remO < remMe || (remO === remMe && o.id < v.id))
+            L = closer(L, remMe - remO - len(o), v.v - o.v);
+        }
+        continue;
+      }
+      if (o.phase === 'exit' || (o.phase === 'approach' && !o.granted))
+        continue;
+      const c = conflictBetween(mine, pathOf(o));
+      if (!c || c.sa <= ms) continue;
+      const os = boxS(o);
+      const onIt = os > c.sb - len(o) - 1 && os < c.sb + 1;
+      if (onIt) {
+        // If we are both on the point, a failed forced gap must not freeze
+        // us both: the earlier entrant carries on and the later one waits.
+        const meOn = ms > c.sa - len(v) - 1 && ms < c.sa + 1;
+        const iLead =
+          meOn &&
+          (v.enteredAt < o.enteredAt ||
+            (v.enteredAt === o.enteredAt && v.id < o.id));
+        if (!iLead) {
+          L = closer(L, c.sa - ms - 1, v.v);
+          continue;
+        }
+      }
+      if (yielding && o.enteredAt < v.enteredAt && os < c.sb) {
+        const tClear = (c.sb + len(o) - os) / Math.max(o.v, 1);
+        const tMine = (c.sa - ms) / Math.max(v.v, 1);
+        if (tMine < tClear + 0.5) L = closer(L, c.sa - ms - 1.5, v.v);
+      }
+    }
+    return L;
+  }
+  // exit
+  for (const o of S.vehicles) {
+    if (o === v || o.phase !== 'exit') continue;
+    if (destination(o.from, o.turn) !== dest || o.s <= v.s) continue;
+    L = closer(L, o.s - len(o) - v.s, v.v - o.v);
+  }
+  if (p.exitBlocked[dest]) L = closer(L, L_EXIT - 4 - v.s, v.v);
   return L;
+}
+
+/** Whether approach `a`'s line is open to gap acceptance this step. */
+function lineMode(S: TrafficState, a: Approach): 'wall' | 'wave' | 'rule' {
+  const c = S.cop;
+  if (!c.present) return 'rule';
+  if (c.clearing) return 'wall';
+  if (c.waved === a) return 'wave';
+  if (c.waved !== null || c.held[a]) return 'wall';
+  return 'rule';
+}
+
+/** Decide who may cross this step. */
+function grant(S: TrafficState, p: TrafficParams): void {
+  if (p.lineIsWall) return;
+  for (const a of APPROACHES) {
+    const mode = lineMode(S, a);
+    if (mode === 'wall') continue;
+    if (mode === 'wave') {
+      for (const v of S.vehicles)
+        if (v.from === a && v.phase === 'approach' && !v.granted) {
+          v.granted = true;
+          v.waved = true;
+          const q = poseOf(v);
+          S.events.push({
+            type: 'enter',
+            id: v.id,
+            x: q.x,
+            y: q.y,
+            hx: q.hx,
+            hy: q.hy,
+          });
+        }
+      continue;
+    }
+    const f = frontOf(S, a);
+    if (!f || !f.stopped) continue;
+    if (!hasPriority(f, S, p)) continue;
+    if (!gapAccepted(f, S, p)) continue;
+    f.granted = true;
+    const q = poseOf(f);
+    S.events.push({
+      type: 'enter',
+      id: f.id,
+      x: q.x,
+      y: q.y,
+      hx: q.hx,
+      hy: q.hy,
+    });
+  }
+}
+
+/** Turn choice: most go straight. */
+function pickTurn(S: TrafficState): Turn {
+  const r = S.rng();
+  return r < 0.6 ? 'straight' : r < 0.85 ? 'right' : 'left';
+}
+
+/**
+ * Poisson arrivals at the top of each approach, if there is room. A new
+ * vehicle appears with its front bumper one length in, at most of its
+ * desired speed, behind whatever is already there.
+ */
+function spawn(S: TrafficState, p: TrafficParams): void {
+  for (const a of APPROACHES) {
+    if (S.rng() >= demandAt(S, a, p) * p.dt) continue;
+    const street = a % 2;
+    let kind: Kind = 'car';
+    if (p.busEvery > 0 && S.busTimer[street] <= 0) {
+      kind = 'bus';
+      S.busTimer[street] = p.busEvery;
+    } else if (S.rng() < p.bikeShare) kind = 'bike';
+    const k = KINDS[kind];
+    let rearmost = Infinity;
+    let rearKind: Kind = 'car';
+    for (const v of S.vehicles)
+      if (v.from === a && v.phase === 'approach' && v.s < rearmost) {
+        rearmost = v.s;
+        rearKind = v.kind;
+      }
+    if (rearmost - KINDS[rearKind].len < k.len + k.s0 + 2) continue;
+    addVehicle(S, a, pickTurn(S), kind, k.len, k.v0 * 0.8);
+  }
+  S.busTimer[0] -= p.dt;
+  S.busTimer[1] -= p.dt;
+}
+
+/** Arrival rate on approach `a` right now, vehicles/s. Flat until Task 5. */
+function demandAt(S: TrafficState, _a: Approach, p: TrafficParams): number {
+  void S;
+  return p.demand;
 }
 
 /**
@@ -355,6 +601,7 @@ function leaderOf(
 export function step(S: TrafficState, p: TrafficParams): void {
   S.clock += p.dt;
   S.events.length = 0;
+  grant(S, p);
   const acc = new Float64Array(S.vehicles.length);
   S.vehicles.forEach((v, i) => {
     const L = leaderOf(v, S, p);
@@ -392,4 +639,5 @@ export function step(S: TrafficState, p: TrafficParams): void {
     }
   });
   S.vehicles = S.vehicles.filter((v) => !(v.phase === 'exit' && v.s > L_EXIT));
+  spawn(S, p);
 }
