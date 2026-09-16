@@ -42,6 +42,9 @@ export const SHADOW_LIGHT =
   '0 2px 6px rgba(255, 210, 160, 0.55), 0 12px 40px rgba(255, 190, 120, 0.4)';
 export const shadow = (light?: boolean): string =>
   light ? SHADOW_LIGHT : SHADOW_DARK;
+/** For type over the busiest animations. */
+export const SHADOW_HEAVY =
+  '0 2px 8px rgba(17, 10, 8, 0.95), 0 10px 30px rgba(17, 10, 8, 0.9), 0 0 90px rgba(17, 10, 8, 0.85)';
 
 function Headline({
   text,
@@ -341,20 +344,27 @@ export function SlideQuote({
   text,
   quote,
   quoteCredit,
+  heavy,
+  low,
 }: {
   text: string;
   quote?: string;
   quoteCredit?: string;
+  /** Heavier shadow for a busy animation underneath. */
+  heavy?: boolean;
+  /** Sit low on the slide instead of centered. */
+  low?: boolean;
 }) {
+  const textShadow = heavy ? SHADOW_HEAVY : SHADOW_DARK;
   return (
     <div
       style={{
         ...fill,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
+        justifyContent: low ? 'flex-end' : 'center',
         gap: u(56),
-        padding: `0 ${u(72)}`,
+        padding: `0 ${u(72)} ${low ? u(150) : 0}`,
       }}
     >
       <p
@@ -366,7 +376,7 @@ export function SlideQuote({
           textWrap: 'pretty',
           whiteSpace: 'pre-line',
           color: CREAM,
-          textShadow: SHADOW_DARK,
+          textShadow,
         }}
       >
         {text}
@@ -391,7 +401,7 @@ export function SlideQuote({
               {quote}
             </div>
           )}
-          <div style={{ ...mono, fontSize: u(16), color: ORANGE }}>
+          <div style={{ ...mono, fontSize: u(16), color: ORANGE, textShadow }}>
             {quoteCredit}
           </div>
         </div>

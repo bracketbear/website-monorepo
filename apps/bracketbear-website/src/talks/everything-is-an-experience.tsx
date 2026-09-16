@@ -153,6 +153,8 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
             'Embrace this moment. Remember.\nWe are eternal, all this pain is an illusion.'
           }
           quoteCredit="TOOL · PARABOLA · 2001"
+          heavy
+          low
         />
       ),
       notes:
