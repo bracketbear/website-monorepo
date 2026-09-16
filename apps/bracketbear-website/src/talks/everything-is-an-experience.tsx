@@ -1,5 +1,6 @@
 import type { Talk } from './types';
 import {
+  SlideAsk,
   SlideBig,
   SlideList,
   SlideBook,
@@ -10,6 +11,18 @@ import {
  * Copy is verbatim from docs/talks/everything-is-an-experience/build-slides.mjs
  * (the storyboard canvas source). If that file changes, this one follows it.
  */
+
+/**
+ * Slide 12 runs Ink Dissolve either way. This picks what the dye is made of.
+ *
+ * false — the mark dissolves and re-forms behind the headline, the same
+ *   relationship every other slide has with its animation.
+ * true — the line itself is the ink. The headline comes off the slide,
+ *   because the words should read once, and only the question stays. The
+ *   dissolve does the work: stir it and the sentence smears, leave it and it
+ *   pulls itself back together.
+ */
+const PHRASE_IN_THE_INK = false;
 export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
   slug: 'everything-is-an-experience',
   title: 'EVERYTHING IS AN EXPERIENCE',
@@ -168,12 +181,41 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
     },
     {
       id: 'impression',
-      render: () => (
-        <SlideBig
-          head="LEAVE A GREAT IMPRESSION."
-          sub="What will make them remember you over the next person?"
-        />
-      ),
+      // Ambient, so the ink keeps moving without anyone touching the mouse,
+      // and gentler than the lab default: the subject should drift and
+      // re-form rather than churn. When the line is the ink it gets quieter
+      // still and re-forms harder, because letterforms go illegible long
+      // before the mark does.
+      animation: {
+        id: 'ink-dissolve',
+        controls: PHRASE_IN_THE_INK
+          ? {
+              subject: 'phrase',
+              phrase: 'LEAVE A GREAT IMPRESSION.',
+              mode: 0,
+              // Letterforms go illegible long before the mark does, so the
+              // stirrer is gentle and the bursts are the smallest the
+              // control allows. Re-form and body stay near their defaults:
+              // pushed much past them the dye saturates the whole tank and
+              // the words disappear into the flood.
+              stir: 0.5,
+              vort: 9,
+              reform: 1.9,
+              body: 0.995,
+              burst: 150,
+            }
+          : { mode: 0, stir: 0.7, vort: 11, reform: 1.1 },
+      },
+      render: () =>
+        PHRASE_IN_THE_INK ? (
+          <SlideAsk sub="What will make them remember you over the next person?" />
+        ) : (
+          <SlideBig
+            head="LEAVE A GREAT IMPRESSION."
+            sub="What will make them remember you over the next person?"
+            heavy
+          />
+        ),
       notes:
         "The ask. If you want the 'better than yesterday' line, say it here, out loud.",
     },

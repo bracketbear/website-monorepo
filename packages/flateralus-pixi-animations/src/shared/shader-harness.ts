@@ -1,4 +1,7 @@
-import { logoMask } from './logo';
+import { logoMask, LOGO_VIEWBOX } from './logo';
+
+/** The mark's aspect, the shape every mask-driven effect was tuned around. */
+const LOGO_ASPECT = LOGO_VIEWBOX.w / LOGO_VIEWBOX.h;
 
 export { logoMask };
 
@@ -279,6 +282,140 @@ export function headlineMask(): HTMLCanvasElement | null {
     }
   }
   return headCanvas;
+}
+
+// ---------------------------------------------------------------------------
+// Phrase mask: an arbitrary line of copy, set in Anton, as a mask.
+// ---------------------------------------------------------------------------
+
+const phraseCache = new Map<string, HTMLCanvasElement>();
+
+/**
+ * Break `words` into `n` lines, balancing measured width across the lines.
+ *
+ * Greedy rather than optimal: it fills a line until adding the next word
+ * would push it past its share of the total, which for phrases of the four
+ * to six words a slide can carry lands on the same split an optimal pass
+ * would pick, without the quadratic table.
+ */
+function balanceLines(
+  measure: (t: string) => number,
+  words: string[],
+  n: number
+): string[] | null {
+  if (n > words.length) return null;
+  const share = measure(words.join(' ')) / n;
+  const lines: string[] = [];
+  let cur = words[0];
+  for (let i = 1; i < words.length; i++) {
+    const remaining = words.length - i;
+    const linesLeft = n - lines.length - 1;
+    // Always leave enough words to fill the lines that are still empty.
+    const mustBreak = remaining === linesLeft;
+    if (
+      !mustBreak &&
+      linesLeft > 0 &&
+      measure(`${cur} ${words[i]}`) <= share * 1.12
+    ) {
+      cur = `${cur} ${words[i]}`;
+    } else if (linesLeft > 0) {
+      lines.push(cur);
+      cur = words[i];
+    } else {
+      cur = `${cur} ${words[i]}`;
+    }
+  }
+  lines.push(cur);
+  return lines.length === n ? lines : null;
+}
+
+/** Anton stacks tightly; this is the baseline-to-baseline step per em. */
+export const LEADING = 0.86;
+
+/**
+ * Choose how to break `text` across up to four lines so the block it makes
+ * comes closest to `targetAspect`.
+ *
+ * `measure` reports a string's width in ems, which is what keeps this
+ * independent of the size the caller lands on: the block's aspect is
+ * `widest line / (LEADING * lines)` at any font size.
+ *
+ * Split out from the rasterizer so the choice is testable without a canvas.
+ */
+export function planPhraseLines(
+  text: string,
+  measure: (t: string) => number,
+  targetAspect: number
+): string[] {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return [];
+  let best: { lines: string[]; score: number } | null = null;
+  for (let n = 1; n <= Math.min(4, words.length); n++) {
+    const lines = balanceLines(measure, words, n);
+    if (!lines) continue;
+    const widest = Math.max(...lines.map(measure));
+    const score = Math.abs(Math.log(widest / (LEADING * n) / targetAspect));
+    if (!best || score < best.score) best = { lines, score };
+  }
+  return best?.lines ?? [text];
+}
+
+function buildPhrase(text: string, targetAspect: number): HTMLCanvasElement {
+  const cv = document.createElement('canvas');
+  const g = cv.getContext('2d')!;
+  // Measured at a nominal 100px, so `em` reports widths in ems.
+  g.font = '100px Anton';
+  const em = (t: string) => g.measureText(t).width / 100;
+  const lines = planPhraseLines(text, em, targetAspect);
+
+  // Rasterize wide enough that the letterforms survive the dye grid, then
+  // let the caller letterbox it. 1600px across is ~1.5 dye texels per source
+  // pixel at DW = 1024, which is where the edges stop crawling.
+  const W = 1600;
+  const pad = Math.round(W * 0.03);
+  const size = Math.round((W - pad * 2) / Math.max(...lines.map(em)));
+  cv.width = W;
+  cv.height = Math.round(size * LEADING * lines.length + pad * 2);
+  // Resizing the canvas resets the context, so restate everything.
+  g.font = `${size}px Anton`;
+  g.fillStyle = '#fff';
+  g.textAlign = 'center';
+  g.textBaseline = 'alphabetic';
+  lines.forEach((l, i) => {
+    // 0.72 em is Anton's cap height; it centres the caps in the line box.
+    g.fillText(l, W / 2, pad + size * (LEADING * i + 0.72));
+  });
+  return cv;
+}
+
+/**
+ * An arbitrary phrase rasterized white on transparent, broken onto however
+ * many lines land closest to `targetAspect` (the mark's 1.6 by default, so
+ * a phrase drops into an effect built around the mark without relayout).
+ *
+ * Returns null until Anton has loaded — callers should keep asking each
+ * frame rather than caching the null.
+ */
+export function phraseMask(
+  text: string,
+  targetAspect = LOGO_ASPECT
+): HTMLCanvasElement | null {
+  const key = `${targetAspect.toFixed(3)}|${text}`;
+  const hit = phraseCache.get(key);
+  if (hit) return hit;
+  // headlineMask kicks the Anton load; reuse that readiness signal.
+  if (!headlineMask()) return null;
+  try {
+    const cv = buildPhrase(text, targetAspect);
+    // A handful of phrases per session at most, but a control that types a
+    // character at a time would otherwise grow this without bound.
+    if (phraseCache.size > 24) phraseCache.clear();
+    phraseCache.set(key, cv);
+    return cv;
+  } catch (e) {
+    console.error('phrase mask:', e);
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------

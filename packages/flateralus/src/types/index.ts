@@ -38,6 +38,7 @@ export const CONTROL_TYPES_TO_VALUE_TYPE = {
   boolean: 'boolean',
   color: 'string',
   select: 'string',
+  text: 'string',
   group: 'array',
 } as const;
 export const CONTROL_TYPES = Object.keys(
@@ -130,6 +131,7 @@ type ControlTypeToValueTypeMap = {
   boolean: boolean;
   color: string;
   select: string | number;
+  text: string;
   group: AnyControlValue[];
 };
 

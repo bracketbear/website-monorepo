@@ -59,5 +59,7 @@ export type ManifestToStageControlValues<
         ? string
         : TControl extends { type: 'select' }
           ? string | number
-          : never;
+          : TControl extends { type: 'text' }
+            ? string
+            : never;
 };

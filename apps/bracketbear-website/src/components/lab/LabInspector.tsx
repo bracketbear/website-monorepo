@@ -53,7 +53,10 @@ function display(
 ) {
   let text: string;
   if (control.type === 'boolean') text = value ? 'ON' : 'OFF';
-  else if (control.type === 'select') {
+  else if (control.type === 'text') {
+    // The input below already shows the phrase; the readout would only wrap.
+    text = `${String(value ?? '').length}`;
+  } else if (control.type === 'select') {
     const opt = control.options.find((o) => o.value === value);
     text = opt ? opt.label : String(value);
   } else text = String(value);
@@ -173,6 +176,30 @@ export default function LabInspector({
                     </button>
                   ))}
                 </div>
+              )}
+
+              {control.type === 'text' && (
+                <input
+                  id={inputId}
+                  type="text"
+                  aria-label={control.label ?? control.name}
+                  value={(value as string) ?? ''}
+                  maxLength={control.maxLength}
+                  placeholder={control.placeholder}
+                  onChange={(e) => onChange(control.name, e.target.value)}
+                  style={{
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    fontFamily: MONO,
+                    fontSize: '0.66rem',
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    padding: '0.4rem 0.5rem',
+                    border: '1px solid rgba(255,243,227,0.25)',
+                    background: '#110a08',
+                    color: '#fff3e3',
+                  }}
+                />
               )}
 
               {control.type === 'select' && (

@@ -72,6 +72,40 @@ function Headline({
   );
 }
 
+/**
+ * A slide whose headline is in the animation rather than on the slide.
+ *
+ * Only the question sits in the foreground, low and small, so the ink has
+ * the whole frame to smear and re-form in. Used by slide 12 when Ink
+ * Dissolve is carrying the line itself.
+ */
+export function SlideAsk({ sub, light }: { sub: string; light?: boolean }) {
+  return (
+    <div
+      style={{
+        ...fill,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+        padding: `0 ${u(72)} ${u(150)}`,
+      }}
+    >
+      <p
+        style={{
+          ...body,
+          fontSize: u(40),
+          lineHeight: 1.3,
+          color: light ? INK : CREAM,
+          maxWidth: u(1640),
+          textShadow: SHADOW_HEAVY,
+        }}
+      >
+        {sub}
+      </p>
+    </div>
+  );
+}
+
 /** Title, giant-type, and sunset slides: bottom-aligned headline with optional lines. */
 export function SlideBig({
   head,

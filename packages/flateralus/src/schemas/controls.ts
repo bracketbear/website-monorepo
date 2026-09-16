@@ -5,7 +5,7 @@ import z from 'zod';
  */
 export const BaseControlSchema = z.object({
   name: z.string(),
-  type: z.enum(['number', 'boolean', 'color', 'select', 'group']),
+  type: z.enum(['number', 'boolean', 'color', 'select', 'text', 'group']),
   label: z.string().optional(),
   description: z.string().optional(),
   debug: z.boolean().default(false).optional(),
@@ -37,6 +37,21 @@ export const BooleanControlSchema = BaseControlSchema.extend({
 export const ColorControlSchema = BaseControlSchema.extend({
   type: z.literal('color'),
   defaultValue: z.union([z.string(), z.number()]), // Changed from z.string() to accept both
+});
+
+/**
+ * Text control schema
+ *
+ * A free-typed string. Animations that rasterize copy into a mask take the
+ * phrase this way, so the words are a control rather than a constant baked
+ * into the package.
+ */
+export const TextControlSchema = BaseControlSchema.extend({
+  type: z.literal('text'),
+  /** Soft limit the UI enforces; long phrases set too small to read. */
+  maxLength: z.number().optional(),
+  placeholder: z.string().optional(),
+  defaultValue: z.string(),
 });
 
 /**
@@ -215,6 +230,7 @@ export const ControlSchema = z.union([
   BooleanControlSchema,
   ColorControlSchema,
   SelectControlSchema,
+  TextControlSchema,
   HomogeneousGroupControlSchema,
   MixedGroupControlSchema,
 ]);
@@ -236,6 +252,7 @@ export type NumberControl = z.infer<typeof NumberControlSchema>;
 export type BooleanControl = z.infer<typeof BooleanControlSchema>;
 export type ColorControl = z.infer<typeof ColorControlSchema>;
 export type SelectControl = z.infer<typeof SelectControlSchema>;
+export type TextControl = z.infer<typeof TextControlSchema>;
 export type GroupControl = z.infer<typeof GroupControlSchema>;
 export type Control = z.infer<typeof ControlSchema>;
 export type AnimationManifest = z.infer<typeof AnimationManifestSchema>;

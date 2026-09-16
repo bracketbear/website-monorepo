@@ -25,7 +25,7 @@ describe('talks', () => {
     }
   });
 
-  it('puts an animation on exactly the nine storyboard slides', () => {
+  it('puts an animation on exactly the ten storyboard slides', () => {
     const talk = findTalk('everything-is-an-experience')!;
     const withAnim = talk.slides.filter((s) => s.animation).map((s) => s.id);
     expect(withAnim).toEqual([
@@ -37,8 +37,17 @@ describe('talks', () => {
       'touch-point',
       'bad-ux',
       'habit',
+      'impression',
       'thanks',
     ]);
+  });
+
+  it('runs the impression slide ambient, so it moves on its own', () => {
+    const talk = findTalk('everything-is-an-experience')!;
+    const slide = talk.slides.find((s) => s.id === 'impression')!;
+    expect(slide.animation?.id).toBe('ink-dissolve');
+    // Nobody is dragging through the ink mid-talk; mode 0 is the stirrer.
+    expect(slide.animation?.controls?.mode).toBe(0);
   });
 
   it('gives every slide a speaker beat', () => {

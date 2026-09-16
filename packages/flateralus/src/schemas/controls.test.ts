@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { SelectControlSchema } from './controls';
+import { SelectControlSchema, TextControlSchema } from './controls';
 import { createManifest } from '../utils/create-manifest';
 import { createControlValuesSchema } from '../utils/create-control-values-schema';
+import { getManifestDefaultControlValues } from '../utils/get-manifest-default-control-values';
+import { getRandomControlValues } from '../utils/randomize-controls';
 import {
   createGroupControl,
   ColorGroupControlSchema,
@@ -470,5 +472,63 @@ describe('numeric selects survive animation construction', () => {
     expect(schema.safeParse({ stage: 1 }).success).toBe(true);
     expect(schema.safeParse({ stage: 0 }).success).toBe(true);
     expect(schema.safeParse({ stage: 7 }).success).toBe(false);
+  });
+});
+
+describe('text controls', () => {
+  const manifest = createManifest({
+    id: 'phrase',
+    name: 'Phrase',
+    description: 'An animation that rasterizes a typed line',
+    controls: [
+      {
+        name: 'phrase',
+        type: 'text',
+        label: 'Phrase',
+        maxLength: 24,
+        placeholder: 'LEAVE A GREAT IMPRESSION.',
+        defaultValue: 'BRACKET BEAR',
+      },
+    ],
+  });
+
+  it('parses as a control', () => {
+    const parsed = TextControlSchema.safeParse({
+      name: 'phrase',
+      type: 'text',
+      label: 'Phrase',
+      defaultValue: 'BRACKET BEAR',
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it('requires a string default', () => {
+    const parsed = TextControlSchema.safeParse({
+      name: 'phrase',
+      type: 'text',
+      defaultValue: 12,
+    });
+    expect(parsed.success).toBe(false);
+  });
+
+  it('carries its default through the manifest', () => {
+    expect(getManifestDefaultControlValues(manifest)).toEqual({
+      phrase: 'BRACKET BEAR',
+    });
+  });
+
+  it('accepts any string up to maxLength and rejects past it', () => {
+    const schema = createControlValuesSchema(manifest);
+    expect(schema.safeParse({ phrase: '' }).success).toBe(true);
+    expect(schema.safeParse({ phrase: 'ANY LINE AT ALL' }).success).toBe(true);
+    expect(schema.safeParse({ phrase: 'X'.repeat(24) }).success).toBe(true);
+    expect(schema.safeParse({ phrase: 'X'.repeat(25) }).success).toBe(false);
+    expect(schema.safeParse({ phrase: 7 }).success).toBe(false);
+  });
+
+  it('is left alone by randomize, which has no string to invent', () => {
+    expect(getRandomControlValues(manifest)).toEqual({
+      phrase: 'BRACKET BEAR',
+    });
   });
 });
