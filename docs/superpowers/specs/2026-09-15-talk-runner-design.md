@@ -74,13 +74,14 @@ schema.
 
 **D4 — Keyboard and URL.**
 
-| Key                    | Action              |
-| ---------------------- | ------------------- |
-| `→` `Space` `PageDown` | next slide          |
-| `←` `PageUp`           | previous slide      |
-| `Home` / `End`         | first / last        |
-| `N`                    | toggle notes drawer |
-| `F`                    | toggle fullscreen   |
+| Key                    | Action                                                                 |
+| ---------------------- | ---------------------------------------------------------------------- |
+| `→` `Space` `PageDown` | next slide                                                             |
+| `←` `PageUp`           | previous slide                                                         |
+| `Home` / `End`         | first / last                                                           |
+| `N`                    | toggle notes drawer                                                    |
+| `T`                    | hide or show the slide text (also a button at the bottom of the stage) |
+| `F`                    | toggle fullscreen                                                      |
 
 The current slide is mirrored to `?slide=<id>` with `replaceState`, mirroring the lab's
 `?animation=` behavior, so a deep link opens on the right slide and refresh does not lose your
@@ -142,6 +143,7 @@ Animation assignments:
 | --------------- | -------------------------- |
 | 01 title        | `logo-resolve`             |
 | 04 hospitality  | `sun-arc` (light)          |
+| 05 beyond       | `rd-vat`                   |
 | 06 experiential | `jelly-tank`               |
 | 07 touch point  | `portal-mark`              |
 | 14 thanks       | `silhouette-flock` (light) |
