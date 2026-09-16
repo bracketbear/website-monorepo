@@ -29,6 +29,17 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
         'Title stays up while folks settle. Say hi, say what you do at Bracket Bear in one sentence, and that this talk is ten minutes.',
     },
     {
+      id: 'statement',
+      // No foreground: the piece sets the line itself, in foil.
+      animation: {
+        id: 'foil-statement',
+        controls: { material: 'gold', frameStyle: 'none', hud: false },
+      },
+      render: () => null,
+      notes:
+        'Beat of silence. Let the sheen rake across it once, then say the line out loud: everything is an experience, and that includes this. Move your cursor to tilt the sheet; click for a flash pass if the room wants it.',
+    },
+    {
       id: 'ux',
       animation: { id: 'contour-hood', cover: 1.8 },
       render: () => (

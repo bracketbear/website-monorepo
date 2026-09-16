@@ -29,15 +29,15 @@ const check = (ok, msg) => (ok ? console.log('ok  ', msg) : failures.push(msg));
 await page.goto(url, { waitUntil: 'networkidle' });
 await page.waitForSelector('canvas', { timeout: 20000 }).catch(() => null);
 check((await page.locator('canvas').count()) > 0, 'a canvas mounts');
-check(await page.getByText('01 / 13').isVisible(), 'counter reads 01 / 14');
+check(await page.getByText('01 / 14').isVisible(), 'counter reads 01 / 14');
 
 await page.keyboard.press('ArrowRight');
 await page.waitForTimeout(400);
 check(
-  await page.getByText('02 / 13').isVisible(),
+  await page.getByText('02 / 14').isVisible(),
   'ArrowRight advances to 02 / 14'
 );
-check(page.url().includes('slide=ux'), 'URL carries ?slide=ux');
+check(page.url().includes('slide=statement'), 'URL carries ?slide=statement');
 
 await page.keyboard.press('n');
 await page.waitForTimeout(100);
@@ -58,7 +58,7 @@ await page.keyboard.press('t');
 
 if (shots) {
   await page.keyboard.press('Home');
-  for (let i = 1; i <= 13; i++) {
+  for (let i = 1; i <= 14; i++) {
     await page.waitForTimeout(i === 1 ? 3500 : 1800);
     await page.screenshot({
       path: `${shots}/slide-${String(i).padStart(2, '0')}.png`,
@@ -69,7 +69,10 @@ if (shots) {
 
 await page.keyboard.press('End');
 await page.waitForTimeout(400);
-check(await page.getByText('13 / 13').isVisible(), 'End lands on the last slide');
+check(
+  await page.getByText('14 / 14').isVisible(),
+  'End lands on the last slide'
+);
 check(page.url().includes('slide=thanks'), 'URL carries ?slide=thanks');
 
 await browser.close();

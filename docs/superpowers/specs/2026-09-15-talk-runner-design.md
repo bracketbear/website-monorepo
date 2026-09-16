@@ -2,7 +2,7 @@
 
 **Status:** implemented (branch talk-runner, 2026-09-15)
 **Date:** 2026-09-15
-**First content:** "Everything Is an Experience" (Fireside, ~10 min, 13 slides). Storyboard and
+**First content:** "Everything Is an Experience" (Fireside, ~10 min, 14 slides). Storyboard and
 speaker beats live on the design canvas; working files are in
 `docs/talks/everything-is-an-experience/`.
 
