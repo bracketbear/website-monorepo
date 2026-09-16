@@ -146,6 +146,7 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
     },
     {
       id: 'habit',
+      animation: { id: 'energy-body' },
       render: () => (
         <SlideQuote
           text={
