@@ -11,6 +11,7 @@ import {
   isGridlocked,
   setCop,
   occupiesBox,
+  demandAt,
   type TrafficParams,
   type TrafficState,
 } from './traffic';
@@ -283,5 +284,42 @@ describe('the cop', () => {
     }
     expect(clearedAt).toBeGreaterThan(0);
     expect(S.cop.clearing).toBe(false);
+  });
+});
+
+describe('weather', () => {
+  it('demand swings between the two streets over minutes', () => {
+    const S = createTraffic(14);
+    const p = params({ demand: 0.3 });
+    let maxDiff = 0;
+    let flipped = false;
+    let lastSign = 0;
+    for (let t = 0; t < 300; t += 1) {
+      S.clock = t;
+      const ns = demandAt(S, 0, p);
+      const ew = demandAt(S, 1, p);
+      maxDiff = Math.max(maxDiff, Math.abs(ns - ew));
+      const sign = Math.sign(ns - ew);
+      if (lastSign && sign && sign !== lastSign) flipped = true;
+      if (sign) lastSign = sign;
+      expect(ns).toBeGreaterThan(0.05 * p.demand);
+      expect(ns).toBeLessThanOrEqual(p.demand + 1e-9);
+    }
+    expect(maxDiff).toBeGreaterThan(0.25 * p.demand);
+    expect(flipped).toBe(true);
+  });
+
+  it('a hard brake is an event with a pose', () => {
+    const S = createTraffic(15);
+    const p = params({ lineIsWall: true });
+    const c = addVehicle(S, 0, 'straight', 'car', L_APPROACH - 14, 11);
+    let skid = null;
+    for (let t = 0; t < 5; t += p.dt) {
+      step(S, p);
+      skid = skid ?? S.events.find((e) => e.type === 'skid') ?? null;
+    }
+    expect(skid).not.toBeNull();
+    expect(skid!.id).toBe(c.id);
+    expect(Math.hypot(skid!.hx, skid!.hy)).toBeCloseTo(1, 4);
   });
 });

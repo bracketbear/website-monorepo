@@ -173,7 +173,7 @@ export const DEFAULT_PARAMS: TrafficParams = {
   tcMin: 0.8,
   tau: 8,
   boxTau: 4,
-  demand: 0.22,
+  demand: 0.2,
   busEvery: 45,
   bikeShare: 0.12,
   headwayScale: 1,
@@ -630,10 +630,32 @@ function spawn(S: TrafficState, p: TrafficParams): void {
   S.busTimer[1] -= p.dt;
 }
 
-/** Arrival rate on approach `a` right now, vehicles/s. Flat until Task 5. */
-function demandAt(S: TrafficState, _a: Approach, p: TrafficParams): number {
-  void S;
-  return p.demand;
+/** Value noise on a line, for the demand clock. */
+function noise1(x: number): number {
+  const i = Math.floor(x);
+  const f = x - i;
+  const u = f * f * (3 - 2 * f);
+  const h = (n: number) => {
+    const s = Math.sin(n * 127.1 + 311.7) * 43758.5453123;
+    return s - Math.floor(s);
+  };
+  return h(i) + (h(i + 1) - h(i)) * u;
+}
+
+/**
+ * Arrival rate on approach `a` right now, vehicles/s. The two streets ride
+ * two slow noise tracks, so over minutes the pressure swings from one to
+ * the other and the corner has weather. Driven by the simulation clock,
+ * never wall time.
+ */
+export function demandAt(
+  S: TrafficState,
+  a: Approach,
+  p: TrafficParams
+): number {
+  const street = a % 2;
+  const n = noise1(S.clock * 0.011 + street * 57.3);
+  return p.demand * (0.15 + 0.85 * n);
 }
 
 /**
@@ -653,6 +675,17 @@ export function step(S: TrafficState, p: TrafficParams): void {
   });
   S.vehicles.forEach((v, i) => {
     v.accel = acc[i];
+    if (acc[i] < -KINDS[v.kind].b * 1.6 && v.v > 4) {
+      const q = poseOf(v);
+      S.events.push({
+        type: 'skid',
+        id: v.id,
+        x: q.x,
+        y: q.y,
+        hx: q.hx,
+        hy: q.hy,
+      });
+    }
     v.v = Math.max(0, v.v + acc[i] * p.dt);
     v.s += v.v * p.dt;
     if (v.phase === 'approach') {
