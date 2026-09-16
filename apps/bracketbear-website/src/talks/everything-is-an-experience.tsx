@@ -135,6 +135,7 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
     },
     {
       id: 'bad-ux',
+      animation: { id: 'rust-machine' },
       render: () => (
         <SlideBig
           head="BAD USER EXPERIENCE IS STILL AN EXPERIENCE."

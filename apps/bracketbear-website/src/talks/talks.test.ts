@@ -25,7 +25,7 @@ describe('talks', () => {
     }
   });
 
-  it('puts an animation on exactly the seven storyboard slides', () => {
+  it('puts an animation on exactly the eight storyboard slides', () => {
     const talk = findTalk('everything-is-an-experience')!;
     const withAnim = talk.slides.filter((s) => s.animation).map((s) => s.id);
     expect(withAnim).toEqual([
@@ -34,6 +34,7 @@ describe('talks', () => {
       'beyond',
       'experiential',
       'touch-point',
+      'bad-ux',
       'habit',
       'thanks',
     ]);
