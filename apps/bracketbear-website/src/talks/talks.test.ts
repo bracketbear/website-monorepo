@@ -38,8 +38,17 @@ describe('talks', () => {
       'touch-point',
       'bad-ux',
       'habit',
+      'impression',
       'thanks',
     ]);
+  });
+
+  it('runs the impression slide ambient, so it moves on its own', () => {
+    const talk = findTalk('everything-is-an-experience')!;
+    const slide = talk.slides.find((s) => s.id === 'impression')!;
+    expect(slide.animation?.id).toBe('ink-dissolve');
+    // Nobody is dragging through the ink mid-talk; mode 0 is the stirrer.
+    expect(slide.animation?.controls?.mode).toBe(0);
   });
 
   it('gives every slide a speaker beat', () => {

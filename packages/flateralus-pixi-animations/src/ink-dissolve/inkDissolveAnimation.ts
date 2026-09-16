@@ -2,14 +2,34 @@ import * as PIXI from 'pixi.js';
 import { createManifest, PAL } from '@bracketbear/flateralus';
 import type { ManifestToControlValues } from '@bracketbear/flateralus';
 import { PixiAnimation, rand } from '@bracketbear/flateralus-pixi';
-import { logoMask, setColor } from '../shared/shader-harness';
+import { logoMask, phraseMask, setColor } from '../shared/shader-harness';
 
 const MANIFEST = createManifest({
   id: 'ink-dissolve',
   name: 'Ink Dissolve (GLSL)',
   description:
-    'The mark as dye in a real Navier–Stokes solver — semi-Lagrangian advection, vorticity confinement, and a full Jacobi pressure projection run every frame on the GPU. Drag through it and your stroke becomes actual vorticity: the ink rolls up into eddies, smears downstream, and — because the mark is continuously re-injected — pulls itself back together when the flow dies down. Click for a radial burst that blows it apart. Ambient: an invisible stirrer wanders the tank.',
+    'The mark as dye in a real Navier–Stokes solver — semi-Lagrangian advection, vorticity confinement, and a full Jacobi pressure projection run every frame on the GPU. Drag through it and your stroke becomes actual vorticity: the ink rolls up into eddies, smears downstream, and — because the mark is continuously re-injected — pulls itself back together when the flow dies down. Click for a radial burst that blows it apart. Ambient: an invisible stirrer wanders the tank. Subject switches the dye between the mark and any phrase you type.',
   controls: [
+    {
+      name: 'subject',
+      type: 'select',
+      label: 'Subject',
+      options: [
+        { value: 'mark', label: 'Mark' },
+        { value: 'phrase', label: 'Phrase' },
+      ],
+      defaultValue: 'mark',
+      debug: true,
+    },
+    {
+      name: 'phrase',
+      type: 'text',
+      label: 'Phrase',
+      placeholder: 'LEAVE A GREAT IMPRESSION.',
+      maxLength: 64,
+      defaultValue: 'LEAVE A GREAT IMPRESSION.',
+      debug: true,
+    },
     {
       name: 'mode',
       type: 'select',
@@ -99,6 +119,14 @@ const SH = 288;
 /** Dye grid, at twice the sim resolution so the mark keeps its edges. */
 const DW = 1024;
 const DH = 576;
+/**
+ * Half-extents of the box the subject is injected into, in the shader's
+ * aspect-corrected units. These were the mark's hard-coded numbers; anything
+ * else letterboxes inside them so a phrase sits where the mark sat.
+ */
+const FIT_W = 0.62;
+const FIT_H = 0.3875;
+const LOGO_ASPECT = 400.89 / 249.73;
 
 /**
  * Every shader below is carried across from the prototype verbatim. Do not
@@ -235,13 +263,14 @@ const ADVECT_DYE = `#version 300 es
     uniform sampler2D uVel;
     uniform sampler2D uLogo;
     uniform float uDt, uDiss, uInj, uAsp;
+    uniform vec2 uFit;   // half-extents of the subject, aspect-corrected units
     const vec2 SIM = vec2(512.0, 288.0);
     void main() {
       vec2 v = texture(uVel, vUV).xy;
       vec2 back = vUV - uDt * v / SIM;
       float d = texture(uDye, back).x * uDiss;
       vec2 q = (vUV - 0.5) * vec2(uAsp, 1.0);
-      vec2 luv = q / vec2(0.62, 0.3875) + 0.5;
+      vec2 luv = q / uFit + 0.5;
       float m = 0.0;
       if (luv.x > 0.0 && luv.x < 1.0 && luv.y > 0.0 && luv.y < 1.0)
         m = texture(uLogo, vec2(luv.x, 1.0 - luv.y)).a;
@@ -388,6 +417,9 @@ export class InkDissolveAnimation extends PixiAnimation<typeof MANIFEST> {
   private divT: WebGLTexture | null = null;
   private divFb: WebGLFramebuffer | null = null;
   private logoTx: WebGLTexture | null = null;
+  /** Which mask is currently in `logoTx`; null forces an upload next frame. */
+  private maskKey: string | null = null;
+  private maskAspect = LOGO_ASPECT;
   private vi = 0;
   private pi = 0;
   private di = 0;
@@ -495,16 +527,24 @@ export class InkDissolveAnimation extends PixiAnimation<typeof MANIFEST> {
       return fb;
     };
 
+    // One transparent texel, so nothing is injected until syncMask has put
+    // the subject the controls actually asked for in here. Seeding the mark
+    // instead would flash it for the frames a phrase spends waiting on the
+    // font, and that dye then hangs around for the length of a dissolve.
     const logoTx = gl.createTexture()!;
+    this.maskKey = null;
     gl.bindTexture(gl.TEXTURE_2D, logoTx);
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
       gl.RGBA,
+      1,
+      1,
+      0,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
-      logoMask()
+      new Uint8Array([0, 0, 0, 0])
     );
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -545,6 +585,7 @@ export class InkDissolveAnimation extends PixiAnimation<typeof MANIFEST> {
       'uDiss',
       'uInj',
       'uAsp',
+      'uFit',
     ]);
     this.lDisp = locsOf(gl, pDisp, [
       'uDye',
@@ -573,6 +614,31 @@ export class InkDissolveAnimation extends PixiAnimation<typeof MANIFEST> {
     return true;
   }
 
+  /**
+   * Point the dye injector at whatever the Subject control asks for.
+   *
+   * Re-uploads only when the answer changes, which matters because the
+   * phrase rasterizer returns null until Anton has loaded: the mark stays in
+   * the texture until the letterforms are actually ready, so the dissolve
+   * never blinks through an empty frame on the way there.
+   */
+  private syncMask(
+    gl: WebGL2RenderingContext,
+    controls: InkDissolveControlValues
+  ): void {
+    const wantPhrase = controls.subject === 'phrase';
+    const key = wantPhrase ? `phrase:${controls.phrase}` : 'mark';
+    if (key === this.maskKey) return;
+
+    const src = wantPhrase ? phraseMask(controls.phrase) : logoMask();
+    if (!src) return; // font still loading — keep what is up there
+    gl.bindTexture(gl.TEXTURE_2D, this.logoTx);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+    this.maskAspect = src.width / Math.max(1, src.height);
+    this.maskKey = key;
+  }
+
   onUpdate(
     app: PIXI.Application,
     controls: InkDissolveControlValues,
@@ -584,6 +650,7 @@ export class InkDissolveAnimation extends PixiAnimation<typeof MANIFEST> {
       return;
     }
     const gl = this.gl!;
+    this.syncMask(gl, controls);
 
     if (!this.sprite) {
       this.texture = PIXI.Texture.from(this.canvas!);
@@ -648,7 +715,11 @@ export class InkDissolveAnimation extends PixiAnimation<typeof MANIFEST> {
       if (dt > 0) {
         const fx = ((ax - this.ax) * SW) / dt;
         const fy = ((ay - this.ay) * SH) / dt;
-        splats.push({ x: ax, y: ay, fx: fx * 1.6, fy: fy * 1.6, rad: 26 });
+        // Stir Strength drives the stirrer as well as the pointer; it used
+        // to be a flat 1.6 here, so the control did nothing in Ambient.
+        // Normalising by the default keeps the ambient look it always had.
+        const k = (1.6 / 1.2) * controls.stir;
+        splats.push({ x: ax, y: ay, fx: fx * k, fy: fy * k, rad: 26 });
       }
       this.ax = ax;
       this.ay = ay;
@@ -781,6 +852,10 @@ export class InkDissolveAnimation extends PixiAnimation<typeof MANIFEST> {
       gl.uniform1f(this.lDye.uDiss!, controls.body);
       gl.uniform1f(this.lDye.uInj!, controls.reform);
       gl.uniform1f(this.lDye.uAsp!, sw / Math.max(1, sh));
+      // The mark's old hard-coded box, now a frame the subject fits inside.
+      const a = this.maskAspect;
+      const fw = a > FIT_W / FIT_H ? FIT_W : FIT_H * a;
+      gl.uniform2f(this.lDye.uFit!, fw, fw / a);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       this.di = 1 - this.di;
     }
