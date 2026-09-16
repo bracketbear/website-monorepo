@@ -338,7 +338,10 @@ function leaderOf(
       else if (o.phase === 'box')
         L = closer(L, L_APPROACH + o.s - len(o) - v.s, v.v - o.v);
     }
-    if (!v.granted || p.lineIsWall) L = closer(L, L_APPROACH - v.s, v.v);
+    // The line is a stopped leader one jam gap beyond the line itself, so the IDM's
+    // equilibrium lands the bumper on the line; the clamp in `step` catches overshoot.
+    if (!v.granted || p.lineIsWall)
+      L = closer(L, L_APPROACH + KINDS[v.kind].s0 - v.s, v.v);
   }
   return L;
 }
