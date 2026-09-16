@@ -178,6 +178,27 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
         "The ask. If you want the 'better than yesterday' line, say it here, out loud.",
     },
     {
+      id: 'foil',
+      animation: {
+        id: 'foil-statement',
+        // The piece punches the statement and frame out of an ink plate and
+        // lights the foil under it, so the slide carries no type of its own
+        // and runs bare. The default margin is set for the lab's canvas; on
+        // a 16:9 stage it clips the top medallion, hence the wider one here.
+        // The annotation layer is a lab affordance; off for the room.
+        controls: {
+          material: 'gold',
+          frameStyle: 'plate',
+          margin: 0.12,
+          hud: false,
+        },
+      },
+      bare: true,
+      render: () => null,
+      notes:
+        'The name, pressed in foil. Move the cursor and the light rakes across it; click once for a full flash. Read the three lines out loud, then go.',
+    },
+    {
       id: 'thanks',
       animation: { id: 'silhouette-flock' },
       light: true,

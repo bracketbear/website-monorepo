@@ -6,7 +6,7 @@ describe('talks', () => {
   it('registers the Fireside talk under its slug', () => {
     const talk = findTalk('everything-is-an-experience');
     expect(talk).toBeDefined();
-    expect(talk?.slides).toHaveLength(13);
+    expect(talk?.slides).toHaveLength(14);
   });
 
   it('gives every slide a unique id', () => {
@@ -25,7 +25,7 @@ describe('talks', () => {
     }
   });
 
-  it('puts an animation on exactly the nine storyboard slides', () => {
+  it('puts an animation on exactly the ten storyboard slides', () => {
     const talk = findTalk('everything-is-an-experience')!;
     const withAnim = talk.slides.filter((s) => s.animation).map((s) => s.id);
     expect(withAnim).toEqual([
@@ -37,6 +37,7 @@ describe('talks', () => {
       'touch-point',
       'bad-ux',
       'habit',
+      'foil',
       'thanks',
     ]);
   });

@@ -26,6 +26,11 @@ export interface Slide {
   animation?: SlideAnimation;
   /** Ink type on an orange stage (the two sunset slides). */
   light?: boolean;
+  /**
+   * Drop the running header and footer for this slide. For pieces that
+   * carry their own frame and wordmark and want the full stage.
+   */
+  bare?: boolean;
   /** Speaker beat shown in the notes drawer. */
   notes?: string;
 }

@@ -303,13 +303,15 @@ export default function TalkRunner({ slug }: Props) {
         cover={slide.animation?.cover ?? 1}
       >
         {slide.render()}
-        <TalkChrome
-          title={talk.title}
-          index={index}
-          count={count}
-          light={light}
-          animationName={error ?? entry?.name ?? null}
-        />
+        {!slide.bare && (
+          <TalkChrome
+            title={talk.title}
+            index={index}
+            count={count}
+            light={light}
+            animationName={error ?? entry?.name ?? null}
+          />
+        )}
       </TalkStage>
       <button
         type="button"

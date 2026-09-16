@@ -52,6 +52,19 @@ const MANIFEST = createManifest({
       resetsAnimation: true,
     },
     {
+      name: 'margin',
+      type: 'number',
+      label: 'Edge margin',
+      // Fraction of the short side held clear around the frame. Wide, short
+      // stages need more than the default or the top medallion runs off.
+      min: 0.02,
+      max: 0.18,
+      step: 0.005,
+      defaultValue: 0.055,
+      debug: true,
+      resetsAnimation: true,
+    },
+    {
       name: 'sheenWidth',
       type: 'number',
       label: 'Sheen width',
@@ -470,7 +483,7 @@ export class FoilStatementAnimation extends PixiAnimation<typeof MANIFEST> {
     g.fillStyle = '#fff';
     g.strokeStyle = '#fff';
     const mn = Math.min(w, h);
-    const m = mn * 0.055;
+    const m = mn * Number(controls.margin);
     const bw = mn * 0.022;
 
     const dot = (x: number, y: number, r: number): void => {
