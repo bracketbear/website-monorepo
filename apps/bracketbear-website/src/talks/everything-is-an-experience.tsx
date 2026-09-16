@@ -143,7 +143,7 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
       animation: { id: 'rust-machine' },
       render: () => (
         <SlideBig
-          head="BAD USER EXPERIENCE IS STILL AN EXPERIENCE."
+          head="EVERYTHING'S BLUE IN THIS WORLD."
           sub="They just might not come back next time."
         />
       ),
