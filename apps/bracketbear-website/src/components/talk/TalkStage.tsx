@@ -6,6 +6,8 @@ interface Props {
   hostRef: RefObject<HTMLDivElement | null>;
   light: boolean;
   fading: boolean;
+  /** Hide the slide text so the animation shows alone. */
+  textHidden: boolean;
   children: ReactNode;
 }
 
@@ -24,6 +26,7 @@ export default function TalkStage({
   hostRef,
   light,
   fading,
+  textHidden,
   children,
 }: Props) {
   return (
@@ -45,7 +48,8 @@ export default function TalkStage({
           position: 'absolute',
           inset: 0,
           zIndex: 2,
-          opacity: fading ? 0 : 1,
+          opacity: fading || textHidden ? 0 : 1,
+          pointerEvents: textHidden ? 'none' : undefined,
         }}
       >
         {children}

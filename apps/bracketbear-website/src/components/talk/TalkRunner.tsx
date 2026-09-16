@@ -39,6 +39,7 @@ export default function TalkRunner({ slug }: Props) {
   const [ready, setReady] = useState(false);
   const [fading, setFading] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
+  const [textHidden, setTextHidden] = useState(false);
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,54 +49,56 @@ export default function TalkRunner({ slug }: Props) {
   const pointerRef = useRef<PointerService>(new PointerService());
   const animRef = useRef<PixiAnimation<AnimationManifest> | null>(null);
   const mountedIdRef = useRef<string | null>(null);
+  const slidesRef = useRef(slides);
+  slidesRef.current = slides;
+  const indexRef = useRef(index);
+  indexRef.current = index;
 
   const slide = slides[index];
 
   /**
-   * Swap the stage animation to match the slide. Same id keeps running;
+   * Swap the stage animation to match a slide. Same id keeps running;
    * a different id rebuilds; none clears the stage. setAnimation destroys
-   * whatever was mounted, so this doubles as teardown.
+   * whatever was mounted, so this doubles as teardown. Reads slides through
+   * a ref so its identity never changes and no effect re-subscribes on it.
    */
-  const syncAnimation = useCallback(
-    (force = false) => {
-      const app = appRef.current;
-      if (!app) return;
-      const want = slides[index]?.animation ?? null;
-      if (!force && (want?.id ?? null) === mountedIdRef.current) return;
+  const syncAnimation = useCallback((target: number, force = false) => {
+    const app = appRef.current;
+    if (!app) return;
+    const want = slidesRef.current[target]?.animation ?? null;
+    if (!force && (want?.id ?? null) === mountedIdRef.current) return;
 
-      pointerRef.current.clearClicks();
-      if (!want) {
-        app.setAnimation(null);
-        animRef.current = null;
-        mountedIdRef.current = null;
-        setError(null);
-        return;
-      }
-      const entry = REGISTRY.find((e) => e.id === want.id);
-      if (!entry) {
-        console.error('talk: unknown animation', want.id);
-        app.setAnimation(null);
-        animRef.current = null;
-        mountedIdRef.current = null;
-        setError(`MISSING · ${want.id}`);
-        return;
-      }
-      try {
-        const animation = entry.create(want.controls);
-        animation.setPointerService(pointerRef.current);
-        app.setAnimation(animation);
-        animRef.current = animation;
-        mountedIdRef.current = want.id;
-        setError(null);
-      } catch (e) {
-        console.error(want.id, e);
-        animRef.current = null;
-        mountedIdRef.current = null;
-        setError(`${want.id}: ${(e as Error).message}`);
-      }
-    },
-    [slides, index]
-  );
+    pointerRef.current.clearClicks();
+    if (!want) {
+      app.setAnimation(null);
+      animRef.current = null;
+      mountedIdRef.current = null;
+      setError(null);
+      return;
+    }
+    const entry = REGISTRY.find((e) => e.id === want.id);
+    if (!entry) {
+      console.error('talk: unknown animation', want.id);
+      app.setAnimation(null);
+      animRef.current = null;
+      mountedIdRef.current = null;
+      setError(`MISSING · ${want.id}`);
+      return;
+    }
+    try {
+      const animation = entry.create(want.controls);
+      animation.setPointerService(pointerRef.current);
+      app.setAnimation(animation);
+      animRef.current = animation;
+      mountedIdRef.current = want.id;
+      setError(null);
+    } catch (e) {
+      console.error(want.id, e);
+      animRef.current = null;
+      mountedIdRef.current = null;
+      setError(`${want.id}: ${(e as Error).message}`);
+    }
+  }, []);
 
   // Boot gate: wait for the host element and a talk with slides.
   useEffect(() => {
@@ -141,9 +144,9 @@ export default function TalkRunner({ slug }: Props) {
     return () => pointer.detach();
   }, [ready]);
 
-  // Slide change: sync the animation once the stage is up.
+  // First mount once the stage is up. Later slides mount from go().
   useEffect(() => {
-    if (ready) syncAnimation();
+    if (ready) syncAnimation(indexRef.current);
   }, [ready, syncAnimation]);
 
   // Mirror the slide into the URL. replaceState so the back button stays clean.
@@ -155,14 +158,29 @@ export default function TalkRunner({ slug }: Props) {
     window.history.replaceState(null, '', url);
   }, [slide]);
 
-  // Debounced remount on resize: animations bake layout at init.
+  // Debounced remount on a real resize: animations bake layout at init.
+  // Subscribed once per boot. A fresh ResizeObserver fires on observe(),
+  // so the first callback is recorded, not acted on.
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage || !ready) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const ro = new ResizeObserver(() => {
+    let last: { w: number; h: number } | null = null;
+    const ro = new ResizeObserver((entries) => {
+      const r = entries[0]?.contentRect;
+      if (!r) return;
+      const size = { w: Math.round(r.width), h: Math.round(r.height) };
+      if (last === null) {
+        last = size;
+        return;
+      }
+      if (size.w === last.w && size.h === last.h) return;
+      last = size;
       clearTimeout(timer);
-      timer = setTimeout(() => syncAnimation(true), RESIZE_DEBOUNCE_MS);
+      timer = setTimeout(
+        () => syncAnimation(indexRef.current, true),
+        RESIZE_DEBOUNCE_MS
+      );
     });
     ro.observe(stage);
     return () => {
@@ -191,19 +209,23 @@ export default function TalkRunner({ slug }: Props) {
     return () => clearInterval(id);
   }, [ready]);
 
-  /** Crossfade the foreground, then move. The animation cuts on its own. */
+  /**
+   * Fade the foreground out, swap the animation while nothing is on top
+   * of it (the shader compile hitch lands here, unseen), then move.
+   */
   const go = useCallback(
     (target: number) => {
       const clamped = clampIndex(target, count);
       if (clamped === index) return;
       setStartedAt((t) => t ?? Date.now());
       setFading(true);
+      requestAnimationFrame(() => syncAnimation(clamped));
       setTimeout(() => {
         setIndex(clamped);
         setFading(false);
       }, FADE_MS);
     },
-    [count, index]
+    [count, index, syncAnimation]
   );
 
   useEffect(() => {
@@ -232,6 +254,10 @@ export default function TalkRunner({ slug }: Props) {
         case 'n':
         case 'N':
           setNotesOpen((v) => !v);
+          break;
+        case 't':
+        case 'T':
+          setTextHidden((v) => !v);
           break;
         case 'f':
         case 'F':
@@ -266,6 +292,7 @@ export default function TalkRunner({ slug }: Props) {
         hostRef={hostRef}
         light={light}
         fading={fading}
+        textHidden={textHidden}
       >
         {slide.render()}
         <TalkChrome
@@ -276,6 +303,14 @@ export default function TalkRunner({ slug }: Props) {
           animationName={error ?? entry?.name ?? null}
         />
       </TalkStage>
+      <button
+        type="button"
+        className="bb-talk-toggle"
+        aria-pressed={textHidden}
+        onClick={() => setTextHidden((v) => !v)}
+      >
+        {textHidden ? 'SHOW TEXT' : 'HIDE TEXT'}
+      </button>
       {notesOpen && <TalkNotes notes={slide.notes} startedAt={startedAt} />}
     </div>
   );

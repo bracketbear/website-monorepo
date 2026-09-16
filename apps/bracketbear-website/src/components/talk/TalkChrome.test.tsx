@@ -15,7 +15,7 @@ describe('TalkChrome', () => {
     );
     expect(screen.getByText('EVERYTHING IS AN EXPERIENCE')).toBeInTheDocument();
     expect(screen.getByText('02 / 14')).toBeInTheDocument();
-    expect(screen.getByText('[BB] BRACKET BEAR')).toBeInTheDocument();
+    expect(screen.getByText('BRACKET BEAR')).toBeInTheDocument();
   });
 
   it('shows the Flateralus chip only when a slide carries an animation', () => {

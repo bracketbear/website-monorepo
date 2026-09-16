@@ -1,5 +1,6 @@
 import { formatCounter } from '../../talks/talk-model';
 import { u, mono, INK, CREAM, ORANGE } from './layouts';
+import TalkMark from './TalkMark';
 
 interface Props {
   title: string;
@@ -51,16 +52,19 @@ export default function TalkChrome({
           pointerEvents: 'none',
         }}
       >
-        <div
-          style={{
-            fontFamily: "'Archivo Black', 'Helvetica Neue', sans-serif",
-            textTransform: 'uppercase',
-            letterSpacing: '0.02em',
-            fontSize: u(18),
-            color: light ? INK : CREAM,
-          }}
-        >
-          [BB] BRACKET BEAR
+        <div style={{ display: 'flex', alignItems: 'center', gap: u(14) }}>
+          <TalkMark color={light ? INK : CREAM} />
+          <div
+            style={{
+              fontFamily: "'Archivo Black', 'Helvetica Neue', sans-serif",
+              textTransform: 'uppercase',
+              letterSpacing: '0.02em',
+              fontSize: u(18),
+              color: light ? INK : CREAM,
+            }}
+          >
+            BRACKET BEAR
+          </div>
         </div>
         {animationName && (
           <div

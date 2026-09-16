@@ -66,10 +66,11 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
     },
     {
       id: 'beyond',
+      animation: { id: 'rd-vat' },
       render: () => (
         <SlideBig
           head="GO BEYOND EXPECTATION."
-          sub="Like, to a ridiculous extreme."
+          sub="Break through mediocrity."
         />
       ),
       notes:
@@ -81,7 +82,7 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
       render: () => (
         <SlideBig
           head="THEN, EXPERIENTIAL TECHNOLOGY."
-          sub="A combination of sensory inputs."
+          sub="More than just the look and sound, but also the feel."
         />
       ),
       notes:
@@ -92,8 +93,8 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
       animation: { id: 'portal-mark' },
       render: () => (
         <SlideBig
-          head="EVERY TOUCH POINT IS PART OF THE EXPERIENCE."
-          sub="The install. The client call. The invoice."
+          head="EVERYTHING IS PART OF THE EXPERIENCE."
+          sub="This? Part of the experience. That over there? You guessed it: more experience."
         />
       ),
       notes:
@@ -104,7 +105,7 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
       render: () => (
         <SlideList
           head="A BUSINESS."
-          items={['THE FIRST EMAIL', 'THE QUOTE', 'THE INVOICE']}
+          items={['THE BRAND', 'THE VOICE', 'THE PRODUCTS']}
         />
       ),
       notes:
@@ -137,7 +138,7 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
       render: () => (
         <SlideBig
           head="BAD USER EXPERIENCE IS STILL AN EXPERIENCE."
-          sub="Nobody designed the wait, and everybody felt it."
+          sub="They just might not come back next time."
         />
       ),
       notes:
@@ -147,20 +148,21 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
       id: 'habit',
       render: () => (
         <SlideQuote
-          text="Ten years behind a bar taught me to stand where the guest stands. I still do it on every install, and I read every invoice the way the client will."
-          quote='"Embrace this moment."'
+          text={
+            'Embrace this moment. Remember.\nWe are eternal, all this pain is an illusion.'
+          }
           quoteCredit="TOOL · PARABOLA · 2001"
         />
       ),
       notes:
-        'What you do about it. One real example of standing where the guest stands on an install, and one of reading your own invoice as the client. The Parabola line is there if you want to say it out loud.',
+        'The lyric is the slide. Say the habit over it: ten years behind a bar taught you to stand where the guest stands, and you still do it on every install.',
     },
     {
       id: 'impression',
       render: () => (
         <SlideBig
           head="LEAVE A GREAT IMPRESSION."
-          sub="Pick one thing you hand to somebody else this week. Look at it from their side."
+          sub="What will make them remember you over the next person?"
         />
       ),
       notes:

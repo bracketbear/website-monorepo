@@ -47,6 +47,15 @@ check(
 );
 await page.keyboard.press('n');
 
+await page.keyboard.press('t');
+await page.waitForTimeout(300);
+check(
+  (await page.locator('.bb-talk-toggle').innerText()) === 'SHOW TEXT',
+  'T hides the text and the toggle flips'
+);
+if (shots) await page.screenshot({ path: `${shots}/slide-02-hidden.png` });
+await page.keyboard.press('t');
+
 if (shots) {
   await page.keyboard.press('Home');
   for (let i = 1; i <= 14; i++) {

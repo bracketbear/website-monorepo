@@ -35,6 +35,14 @@ const body: CSSProperties = {
 
 const fill: CSSProperties = { position: 'absolute', inset: 0 };
 
+/** Lifts type off the animations. Dark halo under cream, light halo under ink. */
+export const SHADOW_DARK =
+  '0 2px 6px rgba(17, 10, 8, 0.55), 0 12px 40px rgba(17, 10, 8, 0.45)';
+export const SHADOW_LIGHT =
+  '0 2px 6px rgba(255, 210, 160, 0.55), 0 12px 40px rgba(255, 190, 120, 0.4)';
+export const shadow = (light?: boolean): string =>
+  light ? SHADOW_LIGHT : SHADOW_DARK;
+
 function Headline({
   text,
   size,
@@ -51,6 +59,7 @@ function Headline({
         fontSize: u(size),
         color: light ? INK : CREAM,
         maxWidth: u(1560),
+        textShadow: shadow(light),
       }}
     >
       {text}
@@ -91,11 +100,29 @@ export function SlideBig({
       }}
     >
       {eyebrow && (
-        <div style={{ ...mono, fontSize: u(22), color: accent }}>{eyebrow}</div>
+        <div
+          style={{
+            ...mono,
+            fontSize: u(22),
+            color: accent,
+            textShadow: shadow(light),
+          }}
+        >
+          {eyebrow}
+        </div>
       )}
       <Headline text={head} size={size} light={light} />
       {sub && subIsMono && (
-        <div style={{ ...mono, fontSize: u(26), color: accent }}>{sub}</div>
+        <div
+          style={{
+            ...mono,
+            fontSize: u(26),
+            color: accent,
+            textShadow: shadow(light),
+          }}
+        >
+          {sub}
+        </div>
       )}
       {sub && !subIsMono && (
         <p
@@ -105,13 +132,21 @@ export function SlideBig({
             lineHeight: 1.3,
             color: light ? INK : CREAM,
             maxWidth: u(1640),
+            textShadow: shadow(light),
           }}
         >
           {sub}
         </p>
       )}
       {tag && (
-        <div style={{ ...mono, fontSize: u(20), color: light ? INK : CYAN }}>
+        <div
+          style={{
+            ...mono,
+            fontSize: u(20),
+            color: light ? INK : CYAN,
+            textShadow: shadow(light),
+          }}
+        >
           {tag}
         </div>
       )}
@@ -156,6 +191,7 @@ export function SlideList({ head, items }: { head: string; items: string[] }) {
                 fontSize: u(96),
                 color: CREAM,
                 whiteSpace: 'nowrap',
+                textShadow: SHADOW_DARK,
               }}
             >
               {t}
@@ -205,27 +241,16 @@ export function SlideBook({
           </p>
         )}
       </div>
-      <div
+      <img
+        src="/talks/dont-make-me-think.jpg"
+        alt="Don't Make Me Think, Revisited by Steve Krug"
         style={{
-          width: u(420),
-          height: u(600),
-          background: CREAM,
-          color: INK,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          padding: `${u(44)} ${u(40)}`,
-          boxSizing: 'border-box',
+          width: u(380),
+          height: 'auto',
+          display: 'block',
           boxShadow: `${u(24)} ${u(24)} 0 ${ORANGE}`,
         }}
-      >
-        <div style={{ ...display, fontSize: u(76), color: INK }}>
-          DON'T MAKE ME THINK
-        </div>
-        <div style={{ ...mono, fontSize: u(16), color: INK, fontWeight: 500 }}>
-          A COMMON SENSE APPROACH TO WEB USABILITY
-        </div>
-      </div>
+      />
     </div>
   );
 }
@@ -339,12 +364,14 @@ export function SlideQuote({
           lineHeight: 1.14,
           maxWidth: u(1700),
           textWrap: 'pretty',
+          whiteSpace: 'pre-line',
           color: CREAM,
+          textShadow: SHADOW_DARK,
         }}
       >
         {text}
       </p>
-      {quote && (
+      {(quote || quoteCredit) && (
         <div
           style={{
             display: 'flex',
@@ -353,15 +380,17 @@ export function SlideQuote({
             marginTop: u(24),
           }}
         >
-          <div
-            style={{
-              ...body,
-              fontSize: u(32),
-              color: 'rgba(255, 243, 227, 0.6)',
-            }}
-          >
-            {quote}
-          </div>
+          {quote && (
+            <div
+              style={{
+                ...body,
+                fontSize: u(32),
+                color: 'rgba(255, 243, 227, 0.6)',
+              }}
+            >
+              {quote}
+            </div>
+          )}
           <div style={{ ...mono, fontSize: u(16), color: ORANGE }}>
             {quoteCredit}
           </div>
