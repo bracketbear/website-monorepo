@@ -2,7 +2,7 @@
 
 **Status:** implemented (branch talk-runner, 2026-09-15)
 **Date:** 2026-09-15
-**First content:** "Everything Is an Experience" (Fireside, ~10 min, 14 slides). Storyboard and
+**First content:** "Everything Is an Experience" (Fireside, ~10 min, 13 slides). Storyboard and
 speaker beats live on the design canvas; working files are in
 `docs/talks/everything-is-an-experience/`.
 
@@ -20,7 +20,7 @@ There is no authoring UI, no CMS, no export. Those were considered and cut (see 
 
 The slide chrome and type follow the storyboard canvas exactly: Anton display, Plus Jakarta Sans
 body, JetBrains Mono labels, Archivo Black wordmark, sunset palette from `lab.css` (`#ff5f1f`,
-`#fff3e3`, `#110a08`, cyan at ~5%). The running header (talk title, `NN / 14`) and footer
+`#fff3e3`, `#110a08`, cyan at ~5%). The running header (talk title, `NN / 13`) and footer
 (`[BB] BRACKET BEAR`, `FLATERALUS · <name>` chip) are the same elements the canvas shows.
 
 ## Decisions
@@ -56,7 +56,7 @@ type Slide = {
   id: string; // stable, used for ?slide= and keys
   render: () => ReactNode; // the slide's foreground
   animation?: { id: string; controls?: Record<string, unknown> };
-  light?: boolean; // ink type on an orange animation (slides 04, 14)
+  light?: boolean; // ink type on an orange animation (slide 13)
   notes?: string; // speaker beats, shown in the drawer
 };
 
@@ -68,7 +68,7 @@ Talks live in `apps/bracketbear-website/src/talks/<slug>.tsx` and are collected 
 that index and mounts `<TalkRunner talk={...} client:only="react" />`.
 
 Rejected: a JSON/schema slide model with a fixed set of layouts. The storyboard already needs
-six layouts across fourteen slides (title over still, list, book, wireframe, quote, giant type).
+six layouts across thirteen slides (title over still, list, book, wireframe, quote, giant type).
 A schema would either grow to match React or constrain the next talk. Components are the
 schema.
 
@@ -136,17 +136,20 @@ apps/bracketbear-website/src/
 
 ## First content: Everything Is an Experience
 
-Fourteen slides, copied from the canvas artboards in `docs/talks/everything-is-an-experience/`.
+Thirteen slides, copied from the canvas artboards in `docs/talks/everything-is-an-experience/`.
 Animation assignments:
 
-| Slide           | Animation                  |
-| --------------- | -------------------------- |
-| 01 title        | `logo-resolve`             |
-| 04 hospitality  | `sun-arc` (light)          |
-| 05 beyond       | `rd-vat`                   |
-| 06 experiential | `jelly-tank`               |
-| 07 touch point  | `portal-mark`              |
-| 14 thanks       | `silhouette-flock` (light) |
+| Slide           | Animation                             |
+| --------------- | ------------------------------------- |
+| 01 title        | `caustics-pool`                       |
+| 02 ux           | `contour-hood` (cover 1.8)            |
+| 03 hospitality  | `block-party` (Pittsburgh, cover 1.6) |
+| 04 beyond       | `rd-vat` (noise seed, speed 5)        |
+| 05 experiential | `jelly-tank` (neon palette override)  |
+| 06 touch point  | `portal-mark`                         |
+| 10 bad ux       | `rust-machine`                        |
+| 11 habit        | `energy-body`                         |
+| 13 thanks       | `silhouette-flock` (light)            |
 
 Speaker beats from the canvas sticky notes become each slide's `notes`.
 
@@ -156,7 +159,7 @@ Speaker beats from the canvas sticky notes become each slide's `notes`.
   `?slide=` round-trip, unknown id falls back to 0.
 - Playwright smoke, run the way the lab is probed today (headless Chromium against the dev
   server on 4321): open `/talks/everything-is-an-experience`, assert a `<canvas>` mounts, press
-  `→`, assert the counter reads `02 / 14` and the URL carries `?slide=`.
+  `→`, assert the counter reads `02 / 13` and the URL carries `?slide=`.
 - Manual: present it once end to end on a projector-shaped viewport (1920×1080) and confirm the
   five animation slides boot within a second of arriving.
 

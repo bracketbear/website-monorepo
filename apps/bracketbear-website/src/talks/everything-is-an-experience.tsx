@@ -3,7 +3,6 @@ import {
   SlideBig,
   SlideList,
   SlideBook,
-  SlideWireframe,
   SlideQuote,
 } from '../components/talk/layouts';
 
@@ -23,6 +22,7 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
           eyebrow="FIRESIDE · PORTLAND"
           head="EVERYTHING IS AN EXPERIENCE."
           sub="Harrison Callahan · Bracket Bear"
+          heavy
         />
       ),
       notes:
@@ -30,35 +30,25 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
     },
     {
       id: 'ux',
-      render: () => <SlideWireframe head="USER EXPERIENCE" />,
-      notes:
-        "Ask the room what they picture when they hear 'user experience.' Most of us picture this: a website, a wireframe, a Figma file. That's where I started too.",
-    },
-    {
-      id: 'krug',
+      animation: { id: 'contour-hood', cover: 1.8 },
       render: () => (
         <SlideBook
-          head="DON'T MAKE ME THINK."
-          credit="Steve Krug · 2000"
-          body="The book is about how a website feels to use."
+          head="USER EXPERIENCE"
+          credit="Steve Krug · Don't Make Me Think · 2000"
         />
       ),
       notes:
-        "Mention it and move on. Thought's fine, thinking is encouraged. The part of the book that stuck is the feeling: you shouldn't have to fight the thing in front of you.",
+        "Ask the room what they picture when they hear 'user experience.' A website, a wireframe, a Figma file. That's where I started too, with this book. Thought's fine, thinking is encouraged. The part that stuck is the feeling: you shouldn't have to fight the thing in front of you.",
     },
     {
       id: 'hospitality',
-      animation: {
-        id: 'sun-arc',
-        controls: { city: 'pdx', labels: false, moon: false, now: false },
-      },
-      light: true,
+      animation: { id: 'block-party', controls: { city: 'pgh' }, cover: 1.6 },
       render: () => (
         <SlideBig
           head="TEN YEARS IN HOSPITALITY."
           sub="SERVER, BARTENDER, FOH MANAGER"
           mono
-          light
+          heavy
         />
       ),
       notes:
@@ -75,6 +65,7 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
         <SlideBig
           head="GO BEYOND EXPECTATION."
           sub="Break through mediocrity."
+          heavy
         />
       ),
       notes:

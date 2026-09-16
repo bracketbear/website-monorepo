@@ -11,6 +11,11 @@ export interface SlideAnimation {
    * slide is up and the next slide restores the brand.
    */
   palette?: Partial<PaletteColors>;
+  /**
+   * Oversize the animation canvas by this factor (1 = exact fit) so a piece
+   * that composes to its center still covers the whole slide.
+   */
+  cover?: number;
 }
 
 export interface Slide {

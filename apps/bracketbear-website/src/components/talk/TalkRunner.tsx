@@ -300,6 +300,7 @@ export default function TalkRunner({ slug }: Props) {
         light={light}
         fading={fading}
         textHidden={textHidden}
+        cover={slide.animation?.cover ?? 1}
       >
         {slide.render()}
         <TalkChrome

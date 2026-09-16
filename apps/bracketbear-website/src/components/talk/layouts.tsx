@@ -50,10 +50,12 @@ function Headline({
   text,
   size,
   light,
+  textShadow,
 }: {
   text: string;
   size: number;
   light?: boolean;
+  textShadow?: string;
 }) {
   return (
     <h1
@@ -62,7 +64,7 @@ function Headline({
         fontSize: u(size),
         color: light ? INK : CREAM,
         maxWidth: u(1560),
-        textShadow: shadow(light),
+        textShadow: textShadow ?? shadow(light),
       }}
     >
       {text}
@@ -79,6 +81,7 @@ export function SlideBig({
   light,
   mono: subIsMono,
   headSize,
+  heavy,
 }: {
   head: string;
   sub?: string;
@@ -87,10 +90,13 @@ export function SlideBig({
   light?: boolean;
   mono?: boolean;
   headSize?: number;
+  /** Heavier shadow for a busy animation underneath. */
+  heavy?: boolean;
 }) {
   const size =
     headSize ?? (head.length > 36 ? 170 : head.length > 30 ? 190 : 240);
   const accent = light ? INK : ORANGE;
+  const sh = heavy ? SHADOW_HEAVY : shadow(light);
   return (
     <div
       style={{
@@ -108,20 +114,20 @@ export function SlideBig({
             ...mono,
             fontSize: u(22),
             color: accent,
-            textShadow: shadow(light),
+            textShadow: sh,
           }}
         >
           {eyebrow}
         </div>
       )}
-      <Headline text={head} size={size} light={light} />
+      <Headline text={head} size={size} light={light} textShadow={sh} />
       {sub && subIsMono && (
         <div
           style={{
             ...mono,
             fontSize: u(26),
             color: accent,
-            textShadow: shadow(light),
+            textShadow: sh,
           }}
         >
           {sub}
@@ -135,7 +141,7 @@ export function SlideBig({
             lineHeight: 1.3,
             color: light ? INK : CREAM,
             maxWidth: u(1640),
-            textShadow: shadow(light),
+            textShadow: sh,
           }}
         >
           {sub}
@@ -147,7 +153,7 @@ export function SlideBig({
             ...mono,
             fontSize: u(20),
             color: light ? INK : CYAN,
-            textShadow: shadow(light),
+            textShadow: sh,
           }}
         >
           {tag}

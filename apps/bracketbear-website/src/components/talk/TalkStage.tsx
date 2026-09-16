@@ -8,6 +8,8 @@ interface Props {
   fading: boolean;
   /** Hide the slide text so the animation shows alone. */
   textHidden: boolean;
+  /** Oversize factor for the animation canvas; 1 fits the stage exactly. */
+  cover: number;
   children: ReactNode;
 }
 
@@ -27,8 +29,10 @@ export default function TalkStage({
   light,
   fading,
   textHidden,
+  cover,
   children,
 }: Props) {
+  const bleed = `${(-(cover - 1) / 2) * 100}%`;
   return (
     <div ref={stageRef} className="bb-talk-stage">
       <div
@@ -40,7 +44,7 @@ export default function TalkStage({
       />
       <div
         ref={hostRef}
-        style={{ position: 'absolute', inset: 0, zIndex: 1 }}
+        style={{ position: 'absolute', inset: bleed, zIndex: 1 }}
       />
       <div
         className="bb-talk-fade"
