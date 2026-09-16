@@ -43,17 +43,30 @@ decoration with extra steps.
 Do objects read the field and write back into it? Optional, but it is what makes
 `caustics-pool` the one people single out.
 
+**0. Is it a different animal?**
+Asked before the five, and after the sandbox. A new toy carries the pool's
+_qualities_ — a place, tools not instructions, consequences that travel, parts
+that play alone, differing parts, honest material, nothing precious — and none
+of its _anatomy_. If the candidate can be described as "the pool but with X
+instead of water", reject it and start over. The cheapest way to force a
+different animal is to change the verb of play: the pool is
+poke-and-watch-it-settle; build, tend, chase, feed, race and negotiate are all
+open. Name the rejected sibling in the spec so the next reader sees the test
+was run.
+
 ## Status
 
-| Idea                                       | Rubric            | Status                                |
-| ------------------------------------------ | ----------------- | ------------------------------------- |
-| [Erosion Table](#erosion-table)            | strong on 1, 2, 5 | **built** — shipped to the toys shelf |
-| [Lichtenberg](#lichtenberg)                | strong on 2, 4    | ready to spec                         |
-| [Frost](#frost)                            | strong on 1, 2    | ready to spec                         |
-| [Soap Film](#soap-film)                    | strong on 2, 4    | ready to spec                         |
-| [Ember](#ember)                            | strong on 2, 4    | ready to spec                         |
-| [Light Garden](#light-garden)              | strong on 1, 5    | ready to spec                         |
-| [Chladni Plate](#chladni-plate--abandoned) | fails 1, 2, 3     | **abandoned** — see post-mortem       |
+| Idea                                       | Rubric            | Status                                                                             |
+| ------------------------------------------ | ----------------- | ---------------------------------------------------------------------------------- |
+| [Erosion Table](#erosion-table)            | strong on 1, 2, 5 | **built** — shipped to the toys shelf                                              |
+| [Sandbox](#sandbox)                        | strong on 1, 2, 5 | **built** — spec in `docs/superpowers/specs/2026-09-15-sandbox-design.md`; fails 0 |
+| [Four-Way Stop](#four-way-stop)            | strong on 0, 2, 5 | **specced** — `docs/superpowers/specs/2026-09-16-four-way-stop-design.md`          |
+| [Lichtenberg](#lichtenberg)                | strong on 2, 4    | ready to spec                                                                      |
+| [Frost](#frost)                            | strong on 1, 2    | ready to spec                                                                      |
+| [Soap Film](#soap-film)                    | strong on 2, 4    | ready to spec                                                                      |
+| [Ember](#ember)                            | strong on 2, 4    | ready to spec                                                                      |
+| [Light Garden](#light-garden)              | strong on 1, 5    | ready to spec                                                                      |
+| [Chladni Plate](#chladni-plate--abandoned) | fails 1, 2, 3     | **abandoned** — see post-mortem                                                    |
 
 ---
 
@@ -150,6 +163,40 @@ after dividing by the cell size.
 **Three of the six tools from the Chladni list would have paid for
 themselves here**, and the one that did was built: the headless harness. The
 float-texture probe and the sim scrub would have shortened the rest.
+
+## Sandbox — built
+
+The first toy chosen by reading the pool as a toy rather than as a
+simulation. The seven reasons the pool is a complete package — a place with
+a history, tools not instructions, consequences that travel, parts that play
+with each other unattended, loose parts that differ, honest light, nothing
+precious — are in the spec. Sand was picked because it has the one thing the
+pool cannot: memory. A wake is gone in seconds; a track stays.
+
+- **State:** sand height plus moisture, one float target, mass-conserving.
+- **Measured:** wind ripples from a nonlocal saltation flux (the linear
+  stability picks a wavelength between the hop length and twice it), slope
+  failure at a moisture-dependent angle of repose, and cast shadows marched
+  across the height field toward a low sun.
+- **Input:** drag plows — sand is displaced into a bow wave, never deleted;
+  click stamps a damp bucket castle with its moat dug from around it.
+- **Loop closure:** a beach ball reads the slope and rolls, cuts a rut, the
+  rut shadows the wind, the ripples reorganise around it; gusts roll the
+  ball, so the loop runs unattended.
+- **History:** turned sand is dark because it is damp, and dries pale over a
+  minute. Damp sand stands steep, so a castle holds and then crumbles.
+- **Subject:** a sandbox at golden hour, with the box floor and the mark
+  printed on it waiting under the sand.
+
+## Four-Way Stop — specced
+
+The first _negotiate_ toy: two streams of cars want one crossing, and you are
+the cop. Car-following is the Intelligent Driver Model, so braking waves and
+phantom jams are emergent; drivers accept gaps by a critical gap that shrinks
+as their patience runs out, which is where the standoff comes from. Wet
+asphalt reflects every light by mirroring its geometry through the road
+plane. Chosen over two cats and one sunbeam, and one door and two crowds,
+because the cursor's job is unmistakable in the first second.
 
 ## Lichtenberg
 
