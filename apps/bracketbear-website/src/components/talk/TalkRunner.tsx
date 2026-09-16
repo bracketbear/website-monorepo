@@ -13,6 +13,7 @@ import { REGISTRY } from '../lab/registry';
 import { findTalk } from '../../talks';
 import { indexFromParam, next, prev, clampIndex } from '../../talks/talk-model';
 import TalkStage from './TalkStage';
+import { sizeStageFor } from './stage-cover';
 import TalkChrome from './TalkChrome';
 import TalkNotes from './TalkNotes';
 
@@ -53,6 +54,7 @@ export default function TalkRunner({ slug }: Props) {
   const pointerRef = useRef<PointerService>(new PointerService());
   const animRef = useRef<PixiAnimation<AnimationManifest> | null>(null);
   const mountedIdRef = useRef<string | null>(null);
+  const mountedCoverRef = useRef(1);
   const slidesRef = useRef(slides);
   slidesRef.current = slides;
   const indexRef = useRef(index);
@@ -61,16 +63,27 @@ export default function TalkRunner({ slug }: Props) {
   const slide = slides[index];
 
   /**
-   * Swap the stage animation to match a slide. Same id keeps running;
-   * a different id rebuilds; none clears the stage. setAnimation destroys
-   * whatever was mounted, so this doubles as teardown. Reads slides through
-   * a ref so its identity never changes and no effect re-subscribes on it.
+   * Swap the stage animation to match a slide. The same id at the same cover
+   * keeps running; anything else rebuilds; none clears the stage. setAnimation
+   * destroys whatever was mounted, so this doubles as teardown. Reads slides
+   * through a ref so its identity never changes and no effect re-subscribes.
+   *
+   * The stage is sized before the animation is built, never after: an
+   * animation bakes its layout from the surface it is handed at init, so one
+   * mounted against the outgoing slide's box paints at the wrong scale.
    */
   const syncAnimation = useCallback((target: number, force = false) => {
     const app = appRef.current;
-    if (!app) return;
+    const host = hostRef.current;
+    if (!app || !host) return;
     const want = slidesRef.current[target]?.animation ?? null;
-    if (!force && (want?.id ?? null) === mountedIdRef.current) return;
+    const cover = want?.cover ?? 1;
+    sizeStageFor(host, app, cover);
+
+    const sameAnimation =
+      (want?.id ?? null) === mountedIdRef.current &&
+      cover === mountedCoverRef.current;
+    if (!force && sameAnimation) return;
 
     pointerRef.current.clearClicks();
     // Every slide starts from the brand theme; a slide may override roles.
@@ -80,6 +93,7 @@ export default function TalkRunner({ slug }: Props) {
       app.setAnimation(null);
       animRef.current = null;
       mountedIdRef.current = null;
+      mountedCoverRef.current = cover;
       setError(null);
       return;
     }
@@ -89,6 +103,7 @@ export default function TalkRunner({ slug }: Props) {
       app.setAnimation(null);
       animRef.current = null;
       mountedIdRef.current = null;
+      mountedCoverRef.current = cover;
       setError(`MISSING · ${want.id}`);
       return;
     }
@@ -98,11 +113,13 @@ export default function TalkRunner({ slug }: Props) {
       app.setAnimation(animation);
       animRef.current = animation;
       mountedIdRef.current = want.id;
+      mountedCoverRef.current = cover;
       setError(null);
     } catch (e) {
       console.error(want.id, e);
       animRef.current = null;
       mountedIdRef.current = null;
+      mountedCoverRef.current = cover;
       setError(`${want.id}: ${(e as Error).message}`);
     }
   }, []);
@@ -143,11 +160,14 @@ export default function TalkRunner({ slug }: Props) {
     };
   }, [count]);
 
-  // Pointer input listens on the stage wrapper.
+  // Pointer input listens on the stage wrapper, because the foreground layer
+  // sits above the host and events only bubble as far as their ancestor. The
+  // host is the coordinate space: it is what the animation draws into.
   useEffect(() => {
     const stage = stageRef.current;
+    const host = hostRef.current;
     const pointer = pointerRef.current;
-    if (stage) pointer.attach(stage);
+    if (stage && host) pointer.attach(stage, host);
     return () => pointer.detach();
   }, [ready]);
 
@@ -300,7 +320,6 @@ export default function TalkRunner({ slug }: Props) {
         light={light}
         fading={fading}
         textHidden={textHidden}
-        cover={slide.animation?.cover ?? 1}
       >
         {slide.render()}
         <TalkChrome

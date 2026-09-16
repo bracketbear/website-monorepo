@@ -63,6 +63,8 @@ export abstract class BaseApplication<TContext = unknown>
   protected _isInitialized = false;
   protected _isRunning = false;
   protected resizeObserver: ResizeObserver | null = null;
+  /** The box the surface was last drawn at, shared by every resize path. */
+  private lastResize = { width: 0, height: 0 };
 
   constructor(options: ApplicationOptions = {}) {
     this.config = {
@@ -169,6 +171,10 @@ export abstract class BaseApplication<TContext = unknown>
     const rect = (this.container || container).getBoundingClientRect();
     this.config.width = rect.width || this.config.width;
     this.config.height = rect.height || this.config.height;
+    this.lastResize = {
+      width: this.config.width!,
+      height: this.config.height!,
+    };
 
     // Create the rendering context
     this.context = await this.createContext(this.config);
@@ -361,9 +367,6 @@ export abstract class BaseApplication<TContext = unknown>
   protected setupResizeObserver(): void {
     if (!this.container) return;
 
-    let currentWidth = 0;
-    let currentHeight = 0;
-
     this.resizeObserver = new ResizeObserver(() => {
       if (!this.container) return;
 
@@ -371,21 +374,40 @@ export abstract class BaseApplication<TContext = unknown>
       clearTimeout((this.resizeObserver as any)?.timeout);
       (this.resizeObserver as any).timeout = setTimeout(() => {
         const rect = this.container!.getBoundingClientRect();
-        const newWidth = rect.width;
-        const newHeight = rect.height;
 
         // Only resize if dimensions changed significantly
         if (
-          Math.abs(newWidth - currentWidth) > 10 ||
-          Math.abs(newHeight - currentHeight) > 10
+          Math.abs(rect.width - this.lastResize.width) > 10 ||
+          Math.abs(rect.height - this.lastResize.height) > 10
         ) {
-          currentWidth = newWidth;
-          currentHeight = newHeight;
-          this.handleResize(newWidth, newHeight);
+          this.resizeSurface(rect.width, rect.height);
         }
       }, 100);
     });
 
     this.resizeObserver.observe(this.container);
+  }
+
+  /**
+   * Draw at the container's current box, now, without waiting for the
+   * observer's debounce. Callers that resize the container and then mount an
+   * animation need this in between: animations bake their layout from the
+   * surface they are handed at init, so one mounted against the old box
+   * leaves the new one partly unpainted.
+   */
+  public resizeToContainer(): void {
+    if (!this.container || !this._isInitialized) return;
+    const rect = this.container.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    this.resizeSurface(rect.width, rect.height);
+  }
+
+  /** The one place the surface size changes, so every path shares a baseline. */
+  private resizeSurface(width: number, height: number): void {
+    if (width === this.lastResize.width && height === this.lastResize.height) {
+      return;
+    }
+    this.lastResize = { width, height };
+    this.handleResize(width, height);
   }
 }

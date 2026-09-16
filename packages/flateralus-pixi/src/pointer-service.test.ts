@@ -90,3 +90,42 @@ describe('PointerService', () => {
     second.remove();
   });
 });
+
+describe('PointerService with a separate coordinate space', () => {
+  it('reports positions in the space element, not the listener', () => {
+    // The talk stage listens on the 1920x1080 slide box, but the animation
+    // draws into a host bled out around it; the cursor has to arrive in the
+    // host's coordinates or the scene reads it in the wrong corner.
+    const listener = document.createElement('div');
+    listener.getBoundingClientRect = () =>
+      ({ left: 0, top: 0, width: 1920, height: 1080 }) as DOMRect;
+    const space = document.createElement('div');
+    space.getBoundingClientRect = () =>
+      ({ left: -768, top: -432, width: 3456, height: 1944 }) as DOMRect;
+    document.body.appendChild(listener);
+
+    const svc = new PointerService();
+    svc.attach(listener, space);
+    listener.dispatchEvent(
+      new MouseEvent('pointermove', {
+        clientX: 960,
+        clientY: 540,
+        bubbles: true,
+      })
+    );
+    listener.dispatchEvent(
+      new MouseEvent('pointerdown', {
+        clientX: 960,
+        clientY: 540,
+        bubbles: true,
+      })
+    );
+
+    // The center of the stage is the center of the bled host too.
+    expect(svc.mouse).toEqual({ x: 1728, y: 972, active: true });
+    expect(svc.clicks).toEqual([{ x: 1728, y: 972 }]);
+
+    svc.detach();
+    listener.remove();
+  });
+});
