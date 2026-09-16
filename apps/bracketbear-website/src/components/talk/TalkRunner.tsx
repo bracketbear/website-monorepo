@@ -4,7 +4,11 @@ import {
   PointerService,
   type PixiAnimation,
 } from '@bracketbear/flateralus-pixi';
-import { applyTheme, type AnimationManifest } from '@bracketbear/flateralus';
+import {
+  PAL,
+  applyTheme,
+  type AnimationManifest,
+} from '@bracketbear/flateralus';
 import { REGISTRY } from '../lab/registry';
 import { findTalk } from '../../talks';
 import { indexFromParam, next, prev, clampIndex } from '../../talks/talk-model';
@@ -69,6 +73,9 @@ export default function TalkRunner({ slug }: Props) {
     if (!force && (want?.id ?? null) === mountedIdRef.current) return;
 
     pointerRef.current.clearClicks();
+    // Every slide starts from the brand theme; a slide may override roles.
+    applyTheme('sunset');
+    if (want?.palette) Object.assign(PAL, want.palette);
     if (!want) {
       app.setAnimation(null);
       animRef.current = null;

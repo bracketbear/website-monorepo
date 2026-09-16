@@ -1,9 +1,16 @@
 import type { ReactNode } from 'react';
+import type { PaletteColors } from '@bracketbear/flateralus';
 
 /** A reference to a lab-registered animation, by id, plus optional controls. */
 export interface SlideAnimation {
   id: string;
   controls?: Record<string, unknown>;
+  /**
+   * Palette roles to override for this slide only, on top of the sunset
+   * theme. Animations read PAL live, so the override holds while the
+   * slide is up and the next slide restores the brand.
+   */
+  palette?: Partial<PaletteColors>;
 }
 
 export interface Slide {

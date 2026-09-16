@@ -66,7 +66,11 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
     },
     {
       id: 'beyond',
-      animation: { id: 'rd-vat' },
+      animation: {
+        id: 'rd-vat',
+        // Slower reaction, seeded from noise rather than the mark.
+        controls: { seedTex: 1, speed: 5 },
+      },
       render: () => (
         <SlideBig
           head="GO BEYOND EXPECTATION."
@@ -78,7 +82,17 @@ export const EVERYTHING_IS_AN_EXPERIENCE: Talk = {
     },
     {
       id: 'experiential',
-      animation: { id: 'jelly-tank' },
+      animation: {
+        id: 'jelly-tank',
+        // Neon jelly over a city at night: violet bells, cyan highlights,
+        // lavender glow, near-black navy water.
+        palette: {
+          ink: 0x0a0618,
+          bright: 0x9b3dff,
+          sun: 0x00e5ff,
+          cream: 0xe8d5ff,
+        },
+      },
       render: () => (
         <SlideBig
           head="THEN, EXPERIENTIAL TECHNOLOGY."
