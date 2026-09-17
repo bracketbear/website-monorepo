@@ -17,6 +17,7 @@ import LabNav from './LabNav';
 import LabStage from './LabStage';
 import LabInspector from './LabInspector';
 import LabPerf from './LabPerf';
+import { buildSettingsFile, downloadSettingsFile } from './settings-export';
 
 /** Animations bake layout at init, so a resize rebuilds rather than reflows. */
 const RESIZE_DEBOUNCE_MS = 250;
@@ -227,6 +228,19 @@ export default function AnimationLab() {
     mount(getManifestDefaultControlValues(manifest) as Record<string, unknown>);
   }, [manifest, mount]);
 
+  /** Snapshot the dialled-in look so it can be pasted back as defaults. */
+  const handleDownload = useCallback(() => {
+    if (!manifest) return;
+    downloadSettingsFile(
+      buildSettingsFile({
+        animationId: activeId,
+        theme,
+        manifest,
+        values: valuesRef.current,
+      })
+    );
+  }, [manifest, activeId, theme]);
+
   const active = REGISTRY.find((e) => e.id === activeId) ?? null;
 
   return (
@@ -241,6 +255,7 @@ export default function AnimationLab() {
         onView={setInContext}
         onRandomize={handleRandomize}
         onReset={handleReset}
+        onDownload={handleDownload}
       />
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         <LabNav activeId={activeId} onSelect={setActiveId} />

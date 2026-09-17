@@ -14,6 +14,7 @@ interface Props {
   onView: (inContext: boolean) => void;
   onRandomize: () => void;
   onReset: () => void;
+  onDownload: () => void;
 }
 
 function segStyle(active: boolean): React.CSSProperties {
@@ -51,6 +52,7 @@ export default function LabHeader({
   onView,
   onRandomize,
   onReset,
+  onDownload,
 }: Props) {
   const status = ready
     ? `${count} animations registered · ${section.toUpperCase()} section`
@@ -226,6 +228,20 @@ export default function LabHeader({
           }}
         >
           Reset
+        </button>
+        <button
+          type="button"
+          className="lab-download"
+          title="Download the current settings as JSON"
+          onClick={onDownload}
+          style={{
+            ...buttonBase,
+            background: 'transparent',
+            color: '#d8ff3d',
+            border: '1px solid rgba(216,255,61,0.45)',
+          }}
+        >
+          Download
         </button>
       </div>
     </header>
