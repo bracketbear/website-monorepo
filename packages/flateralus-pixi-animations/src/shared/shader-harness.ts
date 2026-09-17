@@ -106,7 +106,7 @@ export function setColor(
   gl.uniform3f(loc, c[0], c[1], c[2]);
 }
 
-function compile(
+export function compile(
   gl: WebGL2RenderingContext,
   type: number,
   src: string
