@@ -28,6 +28,7 @@ import {
   createPortalMarkAnimation,
   createRdVatAnimation,
   createRustMachineAnimation,
+  createSandboxAnimation,
   createScanTerrainAnimation,
   createSchematicLensAnimation,
   createSdfForgeAnimation,
@@ -468,6 +469,18 @@ export const REGISTRY: LabEntry[] = [
       'A water surface integrated with the 2D wave equation, with caustics computed rather than painted: the display pass measures the Jacobian of the refraction map, so the floor brightens where rays converge. Pool toys ride the result.',
     create: (initialControls) =>
       createCausticsPoolAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'sandbox',
+    section: 'toys',
+    name: 'Sandbox',
+    tag: 'glsl sim',
+    blurb:
+      'A box of sand under a low sun, and it keeps every grain. What the finger pushes aside piles up as a berm and slumps to the angle of repose; what the bucket stamps stands while it is damp and crumbles as it dries; the wind carries sand in hops, so ripples grow on their own at the wavelength the hop length says. Shadows are marched across that one surface toward the sun, the beach ball rolls down whatever slope it is on and cuts a rut doing it, and turned sand is dark because it is damp. Dig far enough and you reach the bottom of the box.',
+    create: (initialControls) =>
+      createSandboxAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

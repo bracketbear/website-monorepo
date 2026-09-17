@@ -3,6 +3,7 @@ import { createManifest } from '@bracketbear/flateralus';
 import type { ManifestToControlValues } from '@bracketbear/flateralus';
 import { PixiAnimation, rand } from '@bracketbear/flateralus-pixi';
 import { logoMask, VERT } from '../shared/shader-harness';
+import { identity3, mul3, axisAngle3, ortho3 } from '../shared/mat3';
 
 const MANIFEST = createManifest({
   id: 'caustics-pool',
@@ -843,55 +844,6 @@ function h2f(h: number): number {
   return s * (1 + m / 1024) * Math.pow(2, e - 15);
 }
 
-// Column-major mat3 helpers for the rolling ball.
-
-function mul3(A: number[], B: number[]): number[] {
-  const C = new Array<number>(9);
-  for (let c = 0; c < 3; c++)
-    for (let r = 0; r < 3; r++) {
-      let s2 = 0;
-      for (let k = 0; k < 3; k++) s2 += A[k * 3 + r] * B[c * 3 + k];
-      C[c * 3 + r] = s2;
-    }
-  return C;
-}
-
-function axisAngle3(x: number, y: number, z: number, th: number): number[] {
-  const c = Math.cos(th),
-    s3 = Math.sin(th),
-    t = 1 - c;
-  return [
-    c + t * x * x,
-    t * x * y + s3 * z,
-    t * x * z - s3 * y,
-    t * x * y - s3 * z,
-    c + t * y * y,
-    t * y * z + s3 * x,
-    t * x * z + s3 * y,
-    t * y * z - s3 * x,
-    c + t * z * z,
-  ];
-}
-
-/** Re-orthonormalize in place — repeated incremental rotations drift. */
-function ortho3(M: number[]): void {
-  let l = Math.hypot(M[0], M[1], M[2]);
-  M[0] /= l;
-  M[1] /= l;
-  M[2] /= l;
-  const d = M[0] * M[3] + M[1] * M[4] + M[2] * M[5];
-  M[3] -= d * M[0];
-  M[4] -= d * M[1];
-  M[5] -= d * M[2];
-  l = Math.hypot(M[3], M[4], M[5]);
-  M[3] /= l;
-  M[4] /= l;
-  M[5] /= l;
-  M[6] = M[1] * M[5] - M[2] * M[4];
-  M[7] = M[2] * M[3] - M[0] * M[5];
-  M[8] = M[0] * M[4] - M[1] * M[3];
-}
-
 const STEP_UNIFORMS = ['uH', 'uC2', 'uDamp', 'uWind', 'uTime', 'uSim'] as const;
 const SPLAT_UNIFORMS = ['uC', 'uAmp', 'uRad', 'uSim'] as const;
 const DISP_UNIFORMS = [
@@ -954,10 +906,6 @@ interface Toy {
   hit: number;
   /** Column-major body-to-world orientation; only the beach ball rolls. */
   M: number[];
-}
-
-function identity3(): number[] {
-  return [1, 0, 0, 0, 1, 0, 0, 0, 1];
 }
 
 /** Fonts the pool-floor lockup needs before it can be rasterized. */

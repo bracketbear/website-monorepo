@@ -32,6 +32,7 @@ export * from './portal-mark';
 export * from './rd-vat';
 export * from './retro-grid';
 export * from './rust-machine';
+export * from './sandbox';
 export * from './scan-terrain';
 export * from './schematic-lens';
 export * from './sdf-forge';

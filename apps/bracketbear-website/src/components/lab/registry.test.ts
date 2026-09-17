@@ -39,6 +39,7 @@ const SELECTED = [
   'interference-field',
   'caustics-pool',
   'erosion-table',
+  'sandbox',
   'chladni-plate',
   'iron-bloom',
   'four-way-stop',
