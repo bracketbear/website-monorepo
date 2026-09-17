@@ -278,6 +278,21 @@ debug panel, 0 to 2. Tyre tracks are recorded per metre travelled instead
 of per frame, so the six-thousand-segment cap holds about a minute of the
 corner instead of five seconds.
 
+**A clear cannot empty a box the far side has filled.** The spec's measure
+said a late bus "clears within fifteen seconds of a clear command". It
+cannot: the bus is stopped because the exit lane ahead of it is full, and no
+gesture moves a queue with nowhere to go. Measured against a real 29-second
+far-side red, the box emptied about ten seconds after the red ended, with
+the cop holding the lines the whole time. The spec's sentence was amended to
+say that; the code was not bent to fake it.
+
+**A forced gap is drawn as a forced gap.** When a ring of stopped drivers
+has to be broken, the one who has waited longest is let through the body
+blocking it, and for a second or two two bodies overlap on screen. It is rare
+(one and a half seconds in ten minutes at default demand, more under
+adversarial waving) and it is the one place the core lets a body through a
+body. Left visible rather than hidden.
+
 ## Lichtenberg
 
 Worth building purely on the gap between the honest version and the version

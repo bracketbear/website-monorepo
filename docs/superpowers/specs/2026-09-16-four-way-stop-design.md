@@ -195,8 +195,16 @@ about thirty. The IDM's shape survives compression — the waves still travel
 backward, the jams still appear from nothing — because only its constants
 move. The measure: with the cop absent and default demand, no approach's
 longest wait exceeds twenty seconds and no approach starves; with a bus
-waved late, the box gridlocks and clears within fifteen seconds of a clear
-command.
+waved late, the box gridlocks, and once the far side reopens it clears
+within fifteen seconds while the cop holds the lines.
+
+**Amended after building.** The first draft of that last clause said "within
+fifteen seconds of a clear command". Measured, a clear cannot do that: the
+bus is parked because the exit lane ahead of it is physically full, and no
+gesture moves a queue that has nowhere to go. What a clear does is hold every
+line so that the moment the far side moves, the box drains rather than
+refills — measured at about ten seconds after the light down the block
+changes. The measure now says what the corner can honestly deliver.
 
 ## Files
 
