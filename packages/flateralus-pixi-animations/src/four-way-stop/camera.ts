@@ -1,5 +1,5 @@
 /**
- * A pinhole camera on the south-east corner mast, looking down into the
+ * A pinhole camera on a tower south of the corner, looking down into the
  * crossing with the north approach receding up the frame. One projection
  * for everything: road, vehicles, lights, and the same lights mirrored
  * through the road plane, which is what a wet street does to them.
@@ -45,9 +45,9 @@ const norm = (a: V3): V3 => {
  * north approach climbs the middle of the frame and the east approach
  * climbs its right side. A mast planted at the curb sits inside the south
  * queue's own length, so a car passing the mast's latitude balloons; this
- * is pulled back enough that a queue out to about ten cars stays in front
- * of the lens at a sane size, which is as far as the corner realistically
- * fills. A portrait frame gets a taller field of view, so both queues
+ * is pulled back enough that a seven-car queue (the longest a stress run
+ * holding one approach for a minute built) stays in front of the lens at
+ * a sane size. A portrait frame gets a taller field of view, so both queues
  * still reach the edges.
  */
 export function makeCamera(aspect: number): Camera {

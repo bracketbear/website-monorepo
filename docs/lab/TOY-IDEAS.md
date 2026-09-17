@@ -242,6 +242,42 @@ computing a rain-dependent life of 25 to 75; at low rain a track would be
 culled at 25 while still rendering as if it had 50 left, so it popped instead
 of fading. Each track now carries the life it was drawn with.
 
+**The fix wave found that the bodies were ghosts.** The final review parked
+a car with its body over a conflict point and a granted car from the
+crossing street drove through it at 8 m/s without braking, because "on the
+point" was judged by the front bumper, and a wave granted every car on the
+street, sixty metres up included, with nothing to take it back when the
+hand changed. With the bodies made solid (a driver looks along its own
+route for any body its rectangle would meet, and a granted driver still on
+the approach does the same from the line) the corner showed what the point
+model had been hiding: four left-turners can each stop against the next
+one's body around the centre, and nothing in a world without a reverse gear
+can move them. That is the honest gridlock, and the spec says it clears.
+Two rules do it. A driver at the line does not enter behind a body that is
+already stopped inside the box (a body beyond the seam is a queue to join,
+which is how a late bus still parks across the crossing), and a ring of
+drivers each stopped against the next is broken, once patience is out or
+the cop is clearing, by the one who has been there longest forcing past,
+which is the toy's stand-in for someone backing up. Patience latches, too:
+a driver released from a courtesy used to creep forward, reset its clock,
+and yield again, a few centimetres every four seconds. A cop who waves
+every approach in turn every three seconds for five minutes at heavy
+demand now leaves a box a clear empties in one to eight seconds on ten
+seeds, and bodies overlap only inside a forced ring pass. Buses also had to
+lie across the chord of their turn rather than along the front's tangent,
+which had been putting a turning bus's tail across the far side of the box.
+
+The far side got a light. Each exit lane backs up on its own for fifteen to
+thirty seconds about once every two and a half minutes (a hashed third of
+fifty-second cells, per exit, off the simulation clock), so a bus waved
+late can meet a backed-up far side without a test hook. At that rate, with
+the cop absent and default demand, the measure still holds: no wait over
+twenty seconds, every approach served, and nobody takes more than twenty
+seconds from stopping at the line to clearing the box. `Far Side` is on the
+debug panel, 0 to 2. Tyre tracks are recorded per metre travelled instead
+of per frame, so the six-thousand-segment cap holds about a minute of the
+corner instead of five seconds.
+
 ## Lichtenberg
 
 Worth building purely on the gap between the honest version and the version
