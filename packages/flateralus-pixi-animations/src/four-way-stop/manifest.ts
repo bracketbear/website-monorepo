@@ -63,6 +63,16 @@ export const MANIFEST = createManifest({
       debug: true,
     },
     {
+      name: 'farSide',
+      type: 'number',
+      label: 'Far Side',
+      min: 0,
+      max: 2,
+      step: 0.1,
+      defaultValue: 1,
+      debug: true,
+    },
+    {
       name: 'rain',
       type: 'number',
       label: 'Rain',

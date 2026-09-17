@@ -61,6 +61,7 @@ export class FourWayStopAnimation extends PixiAnimation<typeof MANIFEST> {
       headwayScale: Number(c.headway),
       busEvery: c.bus ? DEFAULT_PARAMS.busEvery : 0,
       bikeShare: c.bikes ? DEFAULT_PARAMS.bikeShare : 0,
+      farSide: Number(c.farSide),
     };
   }
 
