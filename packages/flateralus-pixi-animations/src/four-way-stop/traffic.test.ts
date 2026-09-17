@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { L_APPROACH, L_EXIT } from './geometry';
+import { L_APPROACH, L_EXIT, PATHS, conflictBetween } from './geometry';
 import {
   DEFAULT_PARAMS,
   KINDS,
@@ -7,13 +7,17 @@ import {
   addVehicle,
   step,
   vehiclesOn,
-  poseOf,
+  bodyPoseOf,
+  pathOf,
+  boxS,
   isGridlocked,
   setCop,
   occupiesBox,
   demandAt,
+  farSideBlocked,
   type TrafficParams,
   type TrafficState,
+  type Vehicle,
 } from './traffic';
 
 function params(over: Partial<TrafficParams> = {}): TrafficParams {
@@ -34,6 +38,60 @@ function laneGaps(S: TrafficState, from: 0 | 1 | 2 | 3): number[] {
   for (let i = 1; i < vs.length; i++)
     gaps.push(vs[i - 1].s - KINDS[vs[i - 1].kind].len - vs[i].s);
   return gaps;
+}
+
+/**
+ * Whether two bodies overlap, as oriented rectangles from the pose (front
+ * bumper, unit heading) and the kind's length and width. Separating-axis
+ * test on the four edge normals; a hair of tolerance so bodies packed to
+ * the jam gap and float noise do not count.
+ */
+function bodiesOverlap(a: Vehicle, b: Vehicle, tol = 0.05): boolean {
+  const rect = (v: Vehicle) => {
+    const q = bodyPoseOf(v);
+    const k = KINDS[v.kind];
+    const cx = q.x - (q.hx * k.len) / 2;
+    const cy = q.y - (q.hy * k.len) / 2;
+    return { cx, cy, hx: q.hx, hy: q.hy, hl: k.len / 2, hw: k.width / 2 };
+  };
+  const A = rect(a);
+  const B = rect(b);
+  const axes: [number, number][] = [
+    [A.hx, A.hy],
+    [-A.hy, A.hx],
+    [B.hx, B.hy],
+    [-B.hy, B.hx],
+  ];
+  const dx = B.cx - A.cx;
+  const dy = B.cy - A.cy;
+  for (const [ax, ay] of axes) {
+    const ra =
+      A.hl * Math.abs(ax * A.hx + ay * A.hy) +
+      A.hw * Math.abs(-ax * A.hy + ay * A.hx);
+    const rb =
+      B.hl * Math.abs(ax * B.hx + ay * B.hy) +
+      B.hw * Math.abs(-ax * B.hy + ay * B.hx);
+    if (Math.abs(dx * ax + dy * ay) > ra + rb - tol) return false;
+  }
+  return true;
+}
+
+/**
+ * Pairs of bodies in the box that overlap right now, not counting a pair
+ * where one is forcing past the other to break a ring (`Vehicle.forcing`),
+ * which is the core's stand-in for backing out of a gridlock.
+ */
+function overlapsInBox(S: TrafficState): number {
+  const inBox = S.vehicles.filter(occupiesBox);
+  let n = 0;
+  for (let i = 0; i < inBox.length; i++)
+    for (let j = i + 1; j < inBox.length; j++) {
+      const a = inBox[i];
+      const b = inBox[j];
+      if (a.forcing.includes(b.id) || b.forcing.includes(a.id)) continue;
+      if (bodiesOverlap(a, b)) n++;
+    }
+  return n;
 }
 
 describe('the approach lane', () => {
@@ -160,6 +218,10 @@ describe('the crossing', () => {
     const served = [0, 0, 0, 0];
     const worst = [0, 0, 0, 0];
     const seen = new Set<number>();
+    // Clock when each vehicle first stopped at its line, and the longest
+    // anyone took from that stop to having its whole body out of the box.
+    const stoppedAt = new Map<number, number>();
+    let worstStopToExit = 0;
     for (let t = 0; t < 180; t += p.dt) {
       step(S, p);
       for (const v of S.vehicles) {
@@ -168,12 +230,17 @@ describe('the crossing', () => {
           seen.add(v.id);
           served[v.from]++;
         }
+        if (v.stopped && !stoppedAt.has(v.id)) stoppedAt.set(v.id, S.clock);
+        const t0 = stoppedAt.get(v.id);
+        if (t0 !== undefined && (v.phase !== 'exit' || occupiesBox(v)))
+          worstStopToExit = Math.max(worstStopToExit, S.clock - t0);
       }
     }
     for (const a of [0, 1, 2, 3]) {
       expect(served[a]).toBeGreaterThan(8);
       expect(worst[a]).toBeLessThan(20);
     }
+    expect(worstStopToExit).toBeLessThan(20);
   });
 
   it('never overlaps two bodies at a conflict point', () => {
@@ -182,16 +249,7 @@ describe('the crossing', () => {
     let crashes = 0;
     for (let t = 0; t < 180; t += p.dt) {
       step(S, p);
-      const inBox = S.vehicles.filter((v) => v.phase === 'box');
-      for (let i = 0; i < inBox.length; i++)
-        for (let j = i + 1; j < inBox.length; j++) {
-          const a = inBox[i];
-          const b = inBox[j];
-          const pa = poseOf(a);
-          const pb = poseOf(b);
-          // Centres closer than half a car: bodies overlap.
-          if (Math.hypot(pa.x - pb.x, pa.y - pb.y) < 1.6) crashes++;
-        }
+      crashes += overlapsInBox(S);
       for (const g of laneGaps(S, 0)) if (g < -0.05) crashes++;
     }
     expect(crashes).toBe(0);
@@ -239,16 +297,24 @@ describe('the cop', () => {
     const o = addVehicle(S, 2, 'straight', 'car', L_APPROACH - 0.2, 0);
     o.stopped = true;
     o.arrivedAt = 0.1;
+    const c = conflictBetween(pathOf(l), pathOf(o))!;
     let lEnter = -1;
     let oEnter = -1;
+    let lAtPoint = -1;
+    let oAtPoint = -1;
     for (let t = 0; t < 15; t += p.dt) {
       step(S, p);
       if (lEnter < 0 && l.phase !== 'approach') lEnter = t;
       if (oEnter < 0 && o.phase !== 'approach') oEnter = t;
+      if (lAtPoint < 0 && boxS(l) >= c.sa) lAtPoint = t;
+      if (oAtPoint < 0 && boxS(o) >= c.sb) oAtPoint = t;
     }
     expect(l.pittsburghLeft).toBe(true);
     expect(lEnter).toBeGreaterThan(0);
     expect(lEnter).toBeLessThanOrEqual(oEnter);
+    // It took the crossing: the left reached the conflict point first.
+    expect(lAtPoint).toBeGreaterThan(0);
+    expect(lAtPoint).toBeLessThan(oAtPoint);
   });
 
   it('a bus waved through late gridlocks the box, and a clear resolves it', () => {
@@ -274,16 +340,210 @@ describe('the cop', () => {
     expect(lockedAt).toBeGreaterThan(0);
     expect(occupiesBox(bus)).toBe(true);
     expect(e.phase).toBe('approach');
-    // Now the far side drains and the cop clears the box.
-    const open = params();
+    // A clear is not magic: with the far side still backed up, five
+    // seconds of clearing moves nothing, because the bus is physically
+    // stuck behind the queue.
     setCop(S, { present: true, waved: null, clearing: true });
+    run(S, p, 5);
+    expect(occupiesBox(bus)).toBe(true);
+    expect(S.cop.clearing).toBe(true);
+    expect(e.phase).toBe('approach');
+    // Now the far side drains. The clear holds every line while the box
+    // empties, then ends itself.
+    const open = params({ farSide: 0 });
     let clearedAt = -1;
+    let enteredDuringClear = false;
     for (let t = 0; t < 15; t += open.dt) {
       step(S, open);
+      if (S.cop.clearing && e.phase !== 'approach') enteredDuringClear = true;
       if (clearedAt < 0 && !S.vehicles.some(occupiesBox)) clearedAt = t;
     }
     expect(clearedAt).toBeGreaterThan(0);
     expect(S.cop.clearing).toBe(false);
+    expect(enteredDuringClear).toBe(false);
+  });
+});
+
+describe('the crossing, by the body', () => {
+  it('two crossing drivers stopped at their lines are not both granted at once', () => {
+    // Probe A. Both at rest at the line; the later one must read the
+    // earlier one's acceleration toward the point, not "twenty seconds
+    // away because it is stationary".
+    const S = createTraffic(20);
+    const p = params();
+    const n = addVehicle(S, 0, 'straight', 'car', L_APPROACH - 0.2, 0);
+    n.stopped = true;
+    n.arrivedAt = 0;
+    const e = addVehicle(S, 1, 'straight', 'car', L_APPROACH - 0.2, 0);
+    e.stopped = true;
+    e.arrivedAt = 1;
+    let gN = -1;
+    let gE = -1;
+    let overlaps = 0;
+    for (let i = 0; i < 600; i++) {
+      step(S, p);
+      if (gN < 0 && n.granted) gN = i;
+      if (gE < 0 && e.granted) gE = i;
+      overlaps += overlapsInBox(S);
+    }
+    expect(gN).toBeGreaterThanOrEqual(0);
+    expect(gE).toBeGreaterThan(gN + 60);
+    expect(gE).toBeLessThan(600);
+    expect(overlaps).toBe(0);
+  });
+
+  it('a body stopped over a conflict point stops the crossing car', () => {
+    // Probe F. The blocker's front is past the point but its body still
+    // covers it; the crossing car must not drive through it.
+    const S = createTraffic(21);
+    const p = params();
+    const c = conflictBetween(PATHS[0].straight, PATHS[1].straight)!;
+    const o = addVehicle(S, 1, 'straight', 'car', 0, 0);
+    o.phase = 'box';
+    o.s = c.sb + 1.5;
+    o.granted = true;
+    o.enteredAt = 0;
+    const v = addVehicle(S, 0, 'straight', 'car', L_APPROACH - 8, 8);
+    v.granted = true;
+    let maxFront = -Infinity;
+    let overlaps = 0;
+    for (let i = 0; i < 300; i++) {
+      o.s = c.sb + 1.5; // pinned: it is stuck
+      o.v = 0;
+      step(S, p);
+      maxFront = Math.max(maxFront, boxS(v));
+      overlaps += overlapsInBox(S);
+    }
+    expect(v.phase).toBe('box');
+    expect(maxFront).toBeLessThan(c.sa - 0.5);
+    expect(overlaps).toBe(0);
+  });
+});
+
+describe('the cop, by the hand', () => {
+  it('a car granted during a brief wave stops at the line once the approach is held', () => {
+    // Probe C. A wave reaches the cars near the line, not the whole
+    // street; when the hand changes, whoever is still short of the line
+    // takes the new gesture.
+    const S = createTraffic(22);
+    const p = params();
+    setCop(S, { present: true, waved: 0 });
+    const far = addVehicle(S, 0, 'straight', 'car', 10, 8);
+    step(S, p);
+    setCop(S, { waved: null, held: [true, false, false, false] });
+    run(S, p, 20);
+    expect(far.phase).toBe('approach');
+    expect(far.granted).toBe(false);
+    expect(far.waved).toBe(false);
+    expect(far.stopped).toBe(true);
+    expect(far.s).toBeLessThanOrEqual(L_APPROACH + 0.01);
+    // The cop leaves; the rule takes over and it crosses on its own.
+    setCop(S, { present: false, held: [false, false, false, false] });
+    run(S, p, 10);
+    expect(far.phase).not.toBe('approach');
+  });
+
+  it('waves rotated for minutes seize nothing a clear cannot empty in fifteen seconds', () => {
+    // Probe D. A cop who waves each approach in turn every three seconds
+    // at heavy demand, for five minutes, then clears the box. The spec:
+    // the box "clears within fifteen seconds of a clear command", and
+    // bodies never overlap on the way except where a ring is being
+    // forced, the one place the core lets a body through another.
+    for (const seed of [1, 2, 3, 4, 5]) {
+      const p = params({ demand: 0.35, farSide: 0 });
+      const S = createTraffic(seed);
+      let overlaps = 0;
+      for (let i = 0; i < 60 * 300; i++) {
+        const a = (Math.floor(i / 180) % 4) as 0 | 1 | 2 | 3;
+        setCop(S, {
+          present: true,
+          waved: a,
+          held: [false, false, false, false],
+        });
+        step(S, p);
+        overlaps += overlapsInBox(S);
+      }
+      setCop(S, { present: true, waved: null, clearing: true });
+      let clearedAt = -1;
+      for (let i = 0; i < 60 * 30; i++) {
+        step(S, p);
+        overlaps += overlapsInBox(S);
+        if (clearedAt < 0 && !S.cop.clearing) clearedAt = (i + 1) / 60;
+      }
+      expect(clearedAt, `seed ${seed}: clear never ended`).toBeGreaterThan(0);
+      expect(
+        clearedAt,
+        `seed ${seed}: cleared after ${clearedAt}s`
+      ).toBeLessThanOrEqual(15);
+      expect(overlaps, `seed ${seed}: bodies overlapped`).toBe(0);
+    }
+  });
+});
+
+describe('the far side', () => {
+  /** Episodes (start, length) when exit `dest` is backed up over `T` seconds of clock. */
+  function episodes(dest: 0 | 1 | 2 | 3, p: TrafficParams, T: number) {
+    const S = createTraffic(1);
+    const out: number[] = [];
+    let on = false;
+    let start = 0;
+    for (let t = 0; t <= T; t += 0.1) {
+      S.clock = t;
+      const b = farSideBlocked(S, dest, p);
+      if (b && !on) start = t;
+      if (!b && on) out.push(t - start);
+      on = b;
+    }
+    return out;
+  }
+
+  it('each exit backs up for a while every few minutes, and not at all when turned off', () => {
+    const p = params();
+    for (const dest of [0, 1, 2, 3] as const) {
+      const eps = episodes(dest, p, 1800);
+      // Once every two to four minutes, for ten to forty seconds.
+      expect(
+        eps.length,
+        `exit ${dest}: ${eps.length} episodes`
+      ).toBeGreaterThanOrEqual(6);
+      expect(
+        eps.length,
+        `exit ${dest}: ${eps.length} episodes`
+      ).toBeLessThanOrEqual(16);
+      for (const d of eps) expect(d).toBeGreaterThan(8);
+      for (const d of eps) expect(d).toBeLessThan(45);
+      expect(episodes(dest, params({ farSide: 0 }), 1800)).toEqual([]);
+    }
+    // The exits do not all block together.
+    const S = createTraffic(1);
+    let allFour = 0;
+    for (let t = 0; t <= 1800; t += 0.1) {
+      S.clock = t;
+      if ([0, 1, 2, 3].every((d) => farSideBlocked(S, d as 0 | 1 | 2 | 3, p)))
+        allFour++;
+    }
+    expect(allFour).toBe(0);
+  });
+
+  it('a backed-up far side walls the exit lane and the queue reaches the box', () => {
+    const S = createTraffic(23);
+    const p = params({ farSide: 1 });
+    // Find a moment exit 2 is blocked and park the clock there.
+    let t = 0;
+    while (!farSideBlocked({ ...S, clock: t }, 2, p) && t < 3600) t += 0.5;
+    expect(t).toBeLessThan(3600);
+    S.clock = t;
+    const front = addVehicle(S, 0, 'straight', 'car', 0, 8);
+    front.phase = 'exit';
+    front.s = 10;
+    const q = { ...p, dt: p.dt };
+    for (let i = 0; i < 600; i++) {
+      S.clock = t; // hold the light red
+      step(S, q);
+    }
+    expect(front.v).toBeLessThan(0.1);
+    expect(front.s).toBeLessThan(L_EXIT - 4);
+    expect(front.s).toBeGreaterThan(L_EXIT - 10);
   });
 });
 

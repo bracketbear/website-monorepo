@@ -94,6 +94,16 @@ export const KINDS: Record<Kind, KindParams> = {
 
 /** Hardest braking the model may produce, m/s^2. An emergency stop. */
 export const B_MAX = 9;
+/** A wave reaches the drivers this close to the line, m; the rest keep coming. */
+export const WAVE_REACH = 12;
+/** Closer than this to the line, a waved driver is committed and goes, m. */
+export const WAVE_COMMIT = 3;
+/** How far ahead a driver in or entering the box looks for bodies, m. */
+export const SWEEP_HORIZON = 24;
+/** Sampling of that look, m. */
+export const SWEEP_STEP = 0.25;
+/** Clearance kept around a body when sweeping, m. */
+export const SWEEP_CLEARANCE = 0.2;
 
 export type Phase = 'approach' | 'box' | 'exit';
 
@@ -125,6 +135,17 @@ export interface Vehicle {
   enteredAt: number;
   /** Seconds stopped inside the box. */
   boxWait: number;
+  /**
+   * Patience in the box has run out: `boxWait` passed `boxTau` once. It
+   * stays out for the rest of this crossing, so a driver released from a
+   * courtesy does not creep forward, reset the clock and yield again.
+   */
+  impatient: boolean;
+  /**
+   * Ids of the bodies this driver is forcing past to break a ring (see
+   * `leaderOf`); emptied as each is left behind.
+   */
+  forcing: number[];
   /** Index into the scene's body-colour palette. */
   color: number;
 }
@@ -160,6 +181,11 @@ export interface TrafficParams {
   lineIsWall: boolean;
   /** Test hook: the far end of each exit lane is blocked (the far side is backed up). */
   exitBlocked: [boolean, boolean, boolean, boolean];
+  /**
+   * How often the far side of an exit backs up on its own (`farSideBlocked`):
+   * 1 is the measured default, 0 never, 2 twice as often.
+   */
+  farSide: number;
 }
 
 /**
@@ -179,6 +205,7 @@ export const DEFAULT_PARAMS: TrafficParams = {
   headwayScale: 1,
   lineIsWall: false,
   exitBlocked: [false, false, false, false],
+  farSide: 1,
 };
 
 export interface TrafficEvent {
@@ -261,6 +288,8 @@ export function addVehicle(
     pittsburghLeft: false,
     enteredAt: Infinity,
     boxWait: 0,
+    impatient: false,
+    forcing: [],
     color: Math.floor(S.rng() * 8),
   };
   S.vehicles.push(veh);
@@ -309,6 +338,98 @@ export function poseOf(v: Vehicle): Pose {
   return exitPose(destination(v.from, v.turn), v.s);
 }
 
+/** Front-bumper pose `sBox` metres along a vehicle's whole route, measured as `boxS`. */
+function poseAlong(v: Vehicle, sBox: number): Pose {
+  if (sBox < 0) return approachPose(v.from, L_APPROACH + sBox);
+  const path = pathOf(v);
+  if (sBox <= path.len) return pathPose(path, sBox);
+  return exitPose(destination(v.from, v.turn), sBox - path.len);
+}
+
+/**
+ * The body's pose with its front `sBox` along the route: the front bumper
+ * with the heading of the body's own axis, which runs from where its tail
+ * is on the route to its front. On a straight that is the lane heading;
+ * in a bend the rear tracks inside the curve, so a bus in a left turn
+ * lies across the chord of its arc rather than along a tangent that would
+ * put its tail across the far side of the box.
+ */
+function bodyPoseAlong(v: Vehicle, sBox: number): Pose {
+  const front = poseAlong(v, sBox);
+  const tail = poseAlong(v, sBox - KINDS[v.kind].len);
+  const dx = front.x - tail.x;
+  const dy = front.y - tail.y;
+  const m = Math.hypot(dx, dy);
+  if (m < 1e-6) return front;
+  return { x: front.x, y: front.y, hx: dx / m, hy: dy / m };
+}
+
+/** The body's pose now: front bumper and body-axis heading. The scene draws this. */
+export function bodyPoseOf(v: Vehicle): Pose {
+  return bodyPoseAlong(v, boxS(v));
+}
+
+/** A body: a rectangle back from the front bumper along the body's axis. */
+interface Body {
+  cx: number;
+  cy: number;
+  hx: number;
+  hy: number;
+  hl: number;
+  hw: number;
+}
+
+function bodyAt(k: KindParams, q: Pose): Body {
+  return {
+    cx: q.x - (q.hx * k.len) / 2,
+    cy: q.y - (q.hy * k.len) / 2,
+    hx: q.hx,
+    hy: q.hy,
+    hl: k.len / 2,
+    hw: k.width / 2,
+  };
+}
+
+/** Separating-axis test on two rectangles, each grown by `margin`. */
+function bodiesTouch(a: Body, b: Body, margin: number): boolean {
+  const dx = b.cx - a.cx;
+  const dy = b.cy - a.cy;
+  const axes = [a.hx, a.hy, -a.hy, a.hx, b.hx, b.hy, -b.hy, b.hx];
+  for (let i = 0; i < 8; i += 2) {
+    const ax = axes[i];
+    const ay = axes[i + 1];
+    const ra =
+      a.hl * Math.abs(ax * a.hx + ay * a.hy) +
+      a.hw * Math.abs(-ax * a.hy + ay * a.hx);
+    const rb =
+      b.hl * Math.abs(ax * b.hx + ay * b.hy) +
+      b.hw * Math.abs(-ax * b.hy + ay * b.hx);
+    if (Math.abs(dx * ax + dy * ay) > ra + rb + 2 * margin) return false;
+  }
+  return true;
+}
+
+/**
+ * How far `v` can drive along its route from `ms` before its body meets
+ * `o`'s, held still: the physical gap between them, in metres, or
+ * Infinity within the horizon. On a square crossing this is the body on
+ * the conflict point, a metre either side; where two paths run together
+ * for a stretch, it is the tail that would sweep into a body short of the
+ * point, which a point cannot see.
+ */
+export function sweepGap(v: Vehicle, ms: number, o: Vehicle): number {
+  const kv = KINDS[v.kind];
+  const ko = KINDS[o.kind];
+  const ob = bodyAt(ko, bodyPoseOf(o));
+  const q0 = poseOf(v);
+  if (Math.hypot(q0.x - ob.cx, q0.y - ob.cy) > SWEEP_HORIZON + kv.len + ko.len)
+    return Infinity;
+  for (let d = 0; d <= SWEEP_HORIZON; d += SWEEP_STEP)
+    if (bodiesTouch(bodyAt(kv, bodyPoseAlong(v, ms + d)), ob, SWEEP_CLEARANCE))
+      return d;
+  return Infinity;
+}
+
 export function vehiclesOn(S: TrafficState, from: Approach): Vehicle[] {
   return S.vehicles.filter((v) => v.from === from);
 }
@@ -341,6 +462,20 @@ interface Leader {
   dv: number;
 }
 
+/**
+ * Seconds for a vehicle of kind `k` now at speed `u` to cover `d` metres,
+ * accelerating at its comfortable rate and capped at its desired speed. A
+ * stationary vehicle is not twenty seconds away from a point seven metres
+ * off; it is two and a half.
+ */
+export function timeToCover(d: number, u: number, k: KindParams): number {
+  if (d <= 0) return 0;
+  const u0 = Math.min(u, k.v0);
+  const dToV0 = (k.v0 * k.v0 - u0 * u0) / (2 * k.a);
+  if (d <= dToV0) return (Math.sqrt(u0 * u0 + 2 * k.a * d) - u0) / k.a;
+  return (k.v0 - u0) / k.a + (d - dToV0) / k.v0;
+}
+
 function closer(a: Leader | null, gap: number, dv: number): Leader {
   if (!a || gap < a.gap) return { gap, dv };
   return a;
@@ -365,7 +500,7 @@ export function gapAccepted(
   const mine = pathOf(v);
   for (const o of S.vehicles) {
     if (o === v || o.from === v.from) continue;
-    if (o.phase === 'exit' && o.s >= KINDS[o.kind].len) continue;
+    if (o.phase === 'exit' && !occupiesBox(o)) continue;
     if (o.phase === 'approach' && !o.granted) continue;
     const c = conflictBetween(mine, pathOf(o));
     if (!c) continue;
@@ -377,12 +512,13 @@ export function gapAccepted(
       // if the tail is gone before I can get there from rest; a stopped
       // vehicle on the point never clears.
       const tClear = (c.sb + len + 1 - so) / Math.max(o.v, 0.3);
-      const tArrive = Math.sqrt((2 * Math.max(c.sa, 0.5)) / KINDS[v.kind].a);
+      const tArrive = timeToCover(Math.max(c.sa, 0.5), v.v, KINDS[v.kind]);
       if (tClear >= tArrive) return false;
       continue;
     }
-    // Approaching: it must not reach the point inside my critical gap.
-    if ((c.sb - so) / Math.max(o.v, 0.3) < tc) return false;
+    // Approaching: it must not reach the point inside my critical gap,
+    // judged by how it would drive there, not by the speed it has now.
+    if (timeToCover(c.sb - so, o.v, KINDS[o.kind]) < tc) return false;
   }
   return true;
 }
@@ -431,31 +567,63 @@ export function hasPriority(
   return true;
 }
 
+const NOBODY: ReadonlySet<Vehicle> = new Set();
+
+interface Constraints {
+  L: Leader | null;
+  /** The stopped body this vehicle is itself stopped against, if any. */
+  blocker: Vehicle | null;
+}
+
 /**
- * What a vehicle is following, as the nearest constraint ahead of it.
+ * What a vehicle is following, as the nearest constraint ahead of it, and
+ * which body it is stopped against.
  *
  * Approach: the vehicle ahead on the lane, and the stop line as a stopped
- * leader unless granted. Box: the vehicle ahead on the same path, a vehicle
- * heading for the same exit lane followed by remaining distance (a merge is
- * car-following, not a crossing), anything physically on a conflict point
- * ahead of me — resolved by entry order when we are both on it, so a
- * mutual standoff does not freeze us both — and — unless my patience in the
+ * leader unless granted — parked one jam gap (`s0`) past the line, so the
+ * IDM's equilibrium lands the bumper on the line itself. A granted driver
+ * still on the approach reads the box's constraints too, from where it
+ * stands, so a body just past the line is a leader before the line, and a
+ * body stopped inside the box on its route keeps it at the line rather
+ * than in the box (do not block the box).
+ *
+ * Box: the vehicle ahead on the same path; a vehicle heading for the same
+ * exit lane, followed by remaining distance (a merge is car-following, not
+ * a crossing); any body my own body would meet along my route, at the
+ * distance it would meet it (`sweepGap`); and — unless my patience in the
  * box has run out — anyone who entered before me and has not yet cleared a
- * conflict point I am heading for. Exit: the vehicle ahead on the exit
- * lane, and the test hook's wall at its end.
+ * conflict point I am heading for.
+ *
+ * Exit: the vehicle ahead on the exit lane, and the wall at its end when
+ * the far side is backed up.
  *
  * Physical occupancy always counts. That is how a forced gap reaches the
- * crossing car: the forcer is simply there, on the point, and the IDM does
- * the rest.
+ * crossing car: the forcer is simply there, in the way, and the IDM does
+ * the rest. `ignore` is the set of bodies the ring valve in `leaderOf`
+ * lets a driver force past.
  */
-function leaderOf(
+function constraints(
   v: Vehicle,
   S: TrafficState,
-  p: TrafficParams
-): Leader | null {
+  p: TrafficParams,
+  ignore: ReadonlySet<Vehicle> = NOBODY
+): Constraints {
   let L: Leader | null = null;
+  let blocker: Vehicle | null = null;
+  let blockerGap = Infinity;
   const len = (o: Vehicle) => KINDS[o.kind].len;
   const dest = destination(v.from, v.turn);
+  const stoppedAgainst = (o: Vehicle, gap: number) => {
+    if (
+      v.v < 0.15 &&
+      o.v < 0.15 &&
+      gap < blockerGap &&
+      gap < KINDS[v.kind].s0 + 0.6
+    ) {
+      blocker = o;
+      blockerGap = gap;
+    }
+  };
   if (v.phase === 'approach') {
     for (const o of S.vehicles) {
       if (o === v || o.from !== v.from) continue;
@@ -467,19 +635,36 @@ function leaderOf(
     // The line is a stopped leader one jam gap beyond the line itself, so
     // the IDM's equilibrium lands the bumper on the line; the clamp in
     // `step` catches overshoot.
-    if (!v.granted || p.lineIsWall)
+    if (!v.granted || p.lineIsWall) {
       L = closer(L, L_APPROACH + KINDS[v.kind].s0 - v.s, v.v);
-    return L;
+      return { L, blocker };
+    }
   }
   const mine = pathOf(v);
   const ms = boxS(v);
-  if (v.phase === 'box') {
-    const yielding = v.boxWait < p.boxTau && !S.cop.clearing;
+  if (v.phase !== 'exit') {
+    const yielding = !v.impatient && !S.cop.clearing;
     for (const o of S.vehicles) {
-      if (o === v) continue;
-      if (o.from === v.from && o.turn === v.turn) {
+      if (o === v || ignore.has(o)) continue;
+      if (o.from === v.from) {
+        // Same lane, handled above. Same path: the vehicle ahead. Another
+        // path from the same entry: a body that diverged ahead of me is
+        // still a body, and a turning car's rear corner swings through
+        // the lane it is leaving.
+        if (v.phase !== 'box' || o.phase === 'approach') continue;
         const os = boxS(o);
-        if (os > ms) L = closer(L, os - len(o) - ms, v.v - o.v);
+        if (o.turn === v.turn) {
+          if (os > ms) {
+            L = closer(L, os - len(o) - ms, v.v - o.v);
+            stoppedAgainst(o, os - len(o) - ms);
+          }
+          continue;
+        }
+        const hit = sweepGap(v, ms, o);
+        if (hit < Infinity) {
+          L = closer(L, hit, v.v - o.v);
+          stoppedAgainst(o, hit);
+        }
         continue;
       }
       // A merge is car-following, not a crossing: two paths into one exit
@@ -492,41 +677,53 @@ function leaderOf(
         } else if (o.phase === 'box') {
           const remO = pathOf(o).len - boxS(o);
           const remMe = mine.len - ms;
-          if (remO < remMe || (remO === remMe && o.id < v.id))
+          if (remO < remMe || (remO === remMe && o.id < v.id)) {
             L = closer(L, remMe - remO - len(o), v.v - o.v);
+            stoppedAgainst(o, remMe - remO - len(o));
+          }
         }
         continue;
       }
       // An exit-phase vehicle still counts until its tail clears the seam.
       if (
-        (o.phase === 'exit' && o.s >= len(o)) ||
+        (o.phase === 'exit' && !occupiesBox(o)) ||
         (o.phase === 'approach' && !o.granted)
       )
         continue;
       const c = conflictBetween(mine, pathOf(o));
-      if (!c || c.sa <= ms) continue;
-      const os = boxS(o);
-      const onIt = os > c.sb - len(o) - 1 && os < c.sb + 1;
-      if (onIt) {
-        // If we are both on the point, a failed forced gap must not freeze
-        // us both: the earlier entrant carries on and the later one waits.
-        const meOn = ms > c.sa - len(v) - 1 && ms < c.sa + 1;
-        const iLead =
-          meOn &&
-          (v.enteredAt < o.enteredAt ||
-            (v.enteredAt === o.enteredAt && v.id < o.id));
-        if (!iLead) {
-          L = closer(L, c.sa - ms - 1, v.v);
+      if (!c) continue;
+      // Physical occupancy: their body, wherever my route would meet it.
+      const hit = sweepGap(v, ms, o);
+      if (hit < Infinity) {
+        // Do not block the box: a driver still at the line who would have
+        // to stop inside the box behind a body that is itself stopped
+        // waits at the line instead. A body beyond the seam is a queue to
+        // join, and joining it late is the honest gridlock.
+        if (
+          v.phase === 'approach' &&
+          o.v < 0.5 &&
+          ms + hit >= 0 &&
+          ms + hit < mine.len
+        ) {
+          L = closer(L, L_APPROACH + KINDS[v.kind].s0 - v.s, v.v);
+          stoppedAgainst(o, hit);
           continue;
         }
+        const qo = poseOf(o);
+        const qv = poseOf(v);
+        L = closer(L, hit, v.v - o.v * (qo.hx * qv.hx + qo.hy * qv.hy));
+        stoppedAgainst(o, hit);
+        continue;
       }
+      if (c.sa <= ms) continue;
+      const os = boxS(o);
       if (yielding && o.enteredAt < v.enteredAt && os < c.sb) {
         const tClear = (c.sb + len(o) - os) / Math.max(o.v, 1);
         const tMine = (c.sa - ms) / Math.max(v.v, 1);
         if (tMine < tClear + 0.5) L = closer(L, c.sa - ms - 1.5, v.v);
       }
     }
-    return L;
+    return { L, blocker };
   }
   // exit
   for (const o of S.vehicles) {
@@ -534,7 +731,70 @@ function leaderOf(
     if (destination(o.from, o.turn) !== dest || o.s <= v.s) continue;
     L = closer(L, o.s - len(o) - v.s, v.v - o.v);
   }
-  if (p.exitBlocked[dest]) L = closer(L, L_EXIT - 4 - v.s, v.v);
+  if (p.exitBlocked[dest] || farSideBlocked(S, dest, p))
+    L = closer(L, L_EXIT - 4 - v.s, v.v);
+  return { L, blocker };
+}
+
+/** Longest in the box first; ties by id. */
+function earlier(a: Vehicle, b: Vehicle): boolean {
+  return (
+    a.enteredAt < b.enteredAt || (a.enteredAt === b.enteredAt && a.id < b.id)
+  );
+}
+
+/** The bodies a driver is currently forcing past, as vehicles. */
+function forcingSet(v: Vehicle, S: TrafficState): Set<Vehicle> {
+  const out = new Set<Vehicle>();
+  if (v.forcing.length === 0) return out;
+  for (const o of S.vehicles) if (v.forcing.includes(o.id)) out.add(o);
+  return out;
+}
+
+/**
+ * The nearest constraint ahead of a vehicle, with the ring valve.
+ *
+ * Bodies are solid and nobody reverses, so a ring — each driver stopped
+ * against the next one's body, round to the first — would hold forever.
+ * It is the box's honest failure, and the spec says it clears: once a
+ * driver in a ring has waited out `boxTau` (`impatient`), or the cop is clearing, the
+ * one who has been in the box longest forces past the bodies in its way,
+ * which is the toy's stand-in for someone backing up. The forcing sticks
+ * until each body is behind it, so it does not creep in four-second
+ * steps. A chain that ends at the far side (a bus parked behind a
+ * backed-up exit) is not a ring and is never forced: that gridlock waits
+ * for the far side to drain.
+ */
+function leaderOf(
+  v: Vehicle,
+  S: TrafficState,
+  p: TrafficParams
+): Leader | null {
+  const ignore = forcingSet(v, S);
+  if (ignore.size) {
+    // Done with the ones whose body my route no longer meets (a bus's
+    // tail is still passing when its front is out on the exit lane).
+    const ms = boxS(v);
+    for (const o of ignore)
+      if (sweepGap(v, ms, o) === Infinity) ignore.delete(o);
+    v.forcing = [...ignore].map((o) => o.id);
+  }
+  let { L, blocker } = constraints(v, S, p, ignore);
+  if (v.phase !== 'box') return L;
+  if (!v.impatient && !S.cop.clearing) return L;
+  for (let guard = 0; blocker && guard < 4; guard++) {
+    const ring: Vehicle[] = [v];
+    let cur: Vehicle | null = blocker;
+    while (cur && cur !== v && ring.length < 8 && !ring.includes(cur)) {
+      ring.push(cur);
+      cur = constraints(cur, S, p, forcingSet(cur, S)).blocker;
+    }
+    if (cur !== v) return L;
+    for (const o of ring) if (o !== v && earlier(o, v)) return L;
+    ignore.add(blocker);
+    v.forcing.push(blocker.id);
+    ({ L, blocker } = constraints(v, S, p, ignore));
+  }
   return L;
 }
 
@@ -553,10 +813,34 @@ function grant(S: TrafficState, p: TrafficParams): void {
   if (p.lineIsWall) return;
   for (const a of APPROACHES) {
     const mode = lineMode(S, a);
+    if (mode !== 'wave') {
+      // The hand has changed. Whoever the wave reached but who is still
+      // short of the line takes the new gesture: a hold is a wall again
+      // and a clear stops the feed. Within a few metres and rolling they
+      // are committed; standing still at the line, they are not.
+      for (const v of S.vehicles)
+        if (
+          v.from === a &&
+          v.phase === 'approach' &&
+          v.waved &&
+          (v.s < L_APPROACH - WAVE_COMMIT || v.v < 0.15)
+        ) {
+          v.granted = false;
+          v.waved = false;
+        }
+    }
     if (mode === 'wall') continue;
     if (mode === 'wave') {
+      // Every step, so the queue keeps flowing while the wave lasts; only
+      // the drivers within reach of the line, so a car sixty metres up
+      // the street is not committed by a gesture it has not reached.
       for (const v of S.vehicles)
-        if (v.from === a && v.phase === 'approach' && !v.granted) {
+        if (
+          v.from === a &&
+          v.phase === 'approach' &&
+          !v.granted &&
+          v.s > L_APPROACH - WAVE_REACH
+        ) {
           v.granted = true;
           v.waved = true;
           const q = poseOf(v);
@@ -630,16 +914,18 @@ function spawn(S: TrafficState, p: TrafficParams): void {
   S.busTimer[1] -= p.dt;
 }
 
+/** A hash of an integer to [0, 1). */
+function hash1(n: number): number {
+  const s = Math.sin(n * 127.1 + 311.7) * 43758.5453123;
+  return s - Math.floor(s);
+}
+
 /** Value noise on a line, for the demand clock. */
 function noise1(x: number): number {
   const i = Math.floor(x);
   const f = x - i;
   const u = f * f * (3 - 2 * f);
-  const h = (n: number) => {
-    const s = Math.sin(n * 127.1 + 311.7) * 43758.5453123;
-    return s - Math.floor(s);
-  };
-  return h(i) + (h(i + 1) - h(i)) * u;
+  return hash1(i) + (hash1(i + 1) - hash1(i)) * u;
 }
 
 /**
@@ -656,6 +942,39 @@ export function demandAt(
   const street = a % 2;
   const n = noise1(S.clock * 0.011 + street * 57.3);
   return p.demand * (0.15 + 0.85 * n);
+}
+
+/** The far side's clock is cut into cells this long, s. */
+const FAR_SIDE_CELL = 50;
+/** Share of cells that go red at `farSide` 1: one every two and a half minutes. */
+const FAR_SIDE_SHARE = 1 / 3;
+/** A red lasts between these, s. */
+const FAR_SIDE_RED_MIN = 15;
+const FAR_SIDE_RED_MAX = 30;
+
+/**
+ * Whether the far side of exit `dest` is backed up right now: a light
+ * down the street that nobody can see. Each exit's clock is cut into
+ * cells; a hashed third of them (at `farSide` 1) hold a red of fifteen
+ * to thirty seconds at a hashed offset, so every exit backs up about
+ * once every two or three minutes for a stretch that can reach the box.
+ * The same hash as the demand noise, on its own track per exit. Driven
+ * by the simulation clock, never wall time; `farSide` 0 turns it off.
+ */
+export function farSideBlocked(
+  S: TrafficState,
+  dest: Approach,
+  p: TrafficParams
+): boolean {
+  if (p.farSide <= 0) return false;
+  const cell = Math.floor(S.clock / FAR_SIDE_CELL);
+  const base = cell * 3 + dest * 1013;
+  if (hash1(base) >= FAR_SIDE_SHARE * p.farSide) return false;
+  const red =
+    FAR_SIDE_RED_MIN + (FAR_SIDE_RED_MAX - FAR_SIDE_RED_MIN) * hash1(base + 1);
+  const start = (FAR_SIDE_CELL - red) * hash1(base + 2);
+  const t = S.clock - cell * FAR_SIDE_CELL;
+  return t >= start && t < start + red;
 }
 
 /**
@@ -699,7 +1018,9 @@ export function step(S: TrafficState, p: TrafficParams): void {
           v.arrivedAt = Math.min(v.arrivedAt, S.clock);
           v.wait += p.dt;
         }
-      } else if (v.s >= L_APPROACH) {
+      } else if (v.s > L_APPROACH) {
+        // Past the line, not on it: a granted driver standing on the line
+        // is still reading the box from the line.
         v.phase = 'box';
         v.s -= L_APPROACH;
         v.enteredAt = S.clock;
@@ -713,8 +1034,10 @@ export function step(S: TrafficState, p: TrafficParams): void {
       }
     }
     if (occupiesBox(v)) {
-      if (v.v < 0.15) v.boxWait += p.dt;
-      else v.boxWait = 0;
+      if (v.v < 0.15) {
+        v.boxWait += p.dt;
+        if (v.boxWait > p.boxTau) v.impatient = true;
+      } else v.boxWait = 0;
     }
   });
   S.vehicles = S.vehicles.filter((v) => !(v.phase === 'exit' && v.s > L_EXIT));

@@ -10,7 +10,13 @@ import {
   type Approach,
 } from './geometry';
 import { type Camera, project, projectMirror, cameraPos } from './camera';
-import { KINDS, poseOf, type TrafficState, type Vehicle } from './traffic';
+import {
+  KINDS,
+  bodyPoseOf,
+  poseOf,
+  type TrafficState,
+  type Vehicle,
+} from './traffic';
 import type { Tint } from './manifest';
 
 /**
@@ -49,8 +55,11 @@ export class Scene {
   }[] = [];
   /** Skid marks, kept for the session. */
   private skids: { x: number; y: number; hx: number; hy: number }[] = [];
+  /** Where each vehicle's last recorded track segment ended. */
   private lastPose = new Map<number, { x: number; y: number }>();
   private time = 0;
+  /** Metres a vehicle travels between recorded track segments. */
+  private static readonly TRACK_STEP = 1;
   private static readonly BODY = [
     0x2c3140, 0x4a2f2a, 0x1f3a4a, 0x3a3a3a, 0x5a4a30, 0x2a4a3a, 0x50505a,
     0x3a2a4a,
@@ -361,8 +370,11 @@ export class Scene {
   }
 
   /**
-   * Wheel tracks: two lines per vehicle per frame, at ±0.4 of its width,
-   * that the rain refills over about a minute. Skids come from the core's
+   * Wheel tracks: two lines per vehicle per metre travelled, at ±0.4 of
+   * its width, that the rain refills over about a minute. Recorded per
+   * metre since the last recorded pose, not per frame, so the cap holds
+   * about a minute of the corner and a track lives out its `life`
+   * instead of being culled at five seconds. Skids come from the core's
    * events and stay.
    */
   private recordHistory(S: TrafficState, dt: number, rain: number): void {
@@ -370,7 +382,11 @@ export class Scene {
     for (const v of S.vehicles) {
       const q = poseOf(v);
       const last = this.lastPose.get(v.id);
-      if (last && v.v > 0.5) {
+      if (!last) {
+        this.lastPose.set(v.id, { x: q.x, y: q.y });
+        continue;
+      }
+      if (Math.hypot(q.x - last.x, q.y - last.y) >= Scene.TRACK_STEP) {
         const k = KINDS[v.kind];
         const rx = q.hy * k.width * 0.4;
         const ry = -q.hx * k.width * 0.4;
@@ -390,8 +406,8 @@ export class Scene {
           age: 0,
           life,
         });
+        this.lastPose.set(v.id, { x: q.x, y: q.y });
       }
-      this.lastPose.set(v.id, { x: q.x, y: q.y });
     }
     for (const id of [...this.lastPose.keys()])
       if (!S.vehicles.some((v) => v.id === id)) this.lastPose.delete(id);
@@ -450,7 +466,9 @@ export class Scene {
    */
   private drawVehicle(v: Vehicle, cam: Camera, tint: Tint, rain: number): void {
     const k = KINDS[v.kind];
-    const q = poseOf(v);
+    // The body's own axis, not the front's tangent: in a bend the rear
+    // tracks inside the curve, and the core's bodies are these.
+    const q = bodyPoseOf(v);
     const rx = q.hy;
     const ry = -q.hx;
     const corner = (ds: number, dw: number, z: number) =>
