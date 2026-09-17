@@ -60,7 +60,7 @@ was run.
 | ------------------------------------------ | ----------------- | ---------------------------------------------------------------------------------- |
 | [Erosion Table](#erosion-table)            | strong on 1, 2, 5 | **built** — shipped to the toys shelf                                              |
 | [Sandbox](#sandbox)                        | strong on 1, 2, 5 | **built** — spec in `docs/superpowers/specs/2026-09-15-sandbox-design.md`; fails 0 |
-| [Four-Way Stop](#four-way-stop)            | strong on 0, 2, 5 | **specced** — `docs/superpowers/specs/2026-09-16-four-way-stop-design.md`          |
+| [Four-Way Stop](#four-way-stop)            | strong on 0, 2, 5 | **built** — shipped to the toys shelf                                              |
 | [Lichtenberg](#lichtenberg)                | strong on 2, 4    | ready to spec                                                                      |
 | [Frost](#frost)                            | strong on 1, 2    | ready to spec                                                                      |
 | [Soap Film](#soap-film)                    | strong on 2, 4    | ready to spec                                                                      |
@@ -188,7 +188,7 @@ pool cannot: memory. A wake is gone in seconds; a track stays.
 - **Subject:** a sandbox at golden hour, with the box floor and the mark
   printed on it waiting under the sand.
 
-## Four-Way Stop — specced
+## Four-Way Stop — built
 
 The first _negotiate_ toy: two streams of cars want one crossing, and you are
 the cop. Car-following is the Intelligent Driver Model, so braking waves and
@@ -197,6 +197,50 @@ as their patience runs out, which is where the standoff comes from. Wet
 asphalt reflects every light by mirroring its geometry through the road
 plane. Chosen over two cats and one sunbeam, and one door and two crowds,
 because the cursor's job is unmistakable in the first second.
+
+### What it cost
+
+The named tension held without moving a traffic constant: compressed headway,
+patience and demand still produce backward-travelling braking waves and jams
+from nothing, because only the IDM's constants were compressed, not its
+shape. `demand` stayed at the 0.2 the design already lowered it to; nothing
+else in `DEFAULT_PARAMS` needed to move, and `traffic.test.ts` is still the
+arbiter that would have said so.
+
+**Four of the bugs the plan didn't see were about where a car actually is,
+not where its model says it is, and none of them showed up by looking.**
+The stop-line leader was modelled parked exactly at the line, so its bumper
+sat two metres short of it; the fix is a leader a jam gap past the line. A
+merge was modelled as a crossing, so two vehicles converging on the same
+exit lane each waited for the other to clear a point neither was
+approaching, and froze each other forever; following by remaining distance
+to the merge point instead of by crossing time fixed it. The bus's body
+straddles the twelve-metre box while its front is already out on the exit
+lane, so gridlock and crossing checks keyed on the front bumper missed it
+sitting in the way; they key on body occupancy now. And gap acceptance
+judged by the gap's length in metres refused tails that would be gone by the
+time a driver reached them, doubling every wait for no reason; judged in
+time instead, it matches what a driver would actually risk.
+
+**The camera fight was in "the picture," not in the traffic.** A mast close
+enough to the corner to match the spec's "corner mast" description sits
+inside the south and west approaches' own length, so a car passing the
+mast's latitude crosses behind the lens's near plane — not just "too big,"
+but a frame or two of the image tearing as depth goes through zero. Pulling
+the mast back and re-aiming north-east (so the north and east queues both
+climb into the frame instead of one sweeping past the lens, which is what a
+south-east-facing mast did to the east approach) fixes both the framing and
+the tear, but the fix is a real tower, not a streetlight: the doc comment now
+says so instead of pretending otherwise. A stress run holding one approach
+for a minute built a seven-car queue on the near lane with no glitch,
+which is the actual bound that mattered, not the theoretical one at the
+lane's full length.
+
+**Tyre tracks were fading against the wrong lifetime.** `drawHistory` faded
+every track against a fixed 75-frame span while `recordHistory` was already
+computing a rain-dependent life of 25 to 75; at low rain a track would be
+culled at 25 while still rendering as if it had 50 left, so it popped instead
+of fading. Each track now carries the life it was drawn with.
 
 ## Lichtenberg
 
