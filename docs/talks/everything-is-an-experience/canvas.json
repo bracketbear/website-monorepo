@@ -1,0 +1,211 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "title": "01 EVERYTHING IS AN EXPERIENCE.",
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S02UX.dc.html",
+      "title": "02 USER EXPERIENCE",
+      "x": 2040,
+      "y": 0,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S03Hospitality.dc.html",
+      "title": "03 TEN YEARS IN HOSPITALITY.",
+      "x": 4080,
+      "y": 0,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S04Beyond.dc.html",
+      "title": "04 GO BEYOND EXPECTATION.",
+      "x": 6120,
+      "y": 0,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S05Experiential.dc.html",
+      "title": "05 THEN, EXPERIENTIAL TECHNOLOGY.",
+      "x": 0,
+      "y": 1560,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S06TouchPoint.dc.html",
+      "title": "06 EVERYTHING IS PART OF THE EXPERIENCE.",
+      "x": 2040,
+      "y": 1560,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S07Business.dc.html",
+      "title": "07 A BUSINESS.",
+      "x": 4080,
+      "y": 1560,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S08Place.dc.html",
+      "title": "08 A PLACE.",
+      "x": 6120,
+      "y": 1560,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S09Person.dc.html",
+      "title": "09 A PERSON.",
+      "x": 0,
+      "y": 3120,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S10BadUX.dc.html",
+      "title": "10 BAD USER EXPERIENCE IS STILL AN EXPERIENCE.",
+      "x": 2040,
+      "y": 3120,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S11Habit.dc.html",
+      "title": "11 Embrace this moment. Remember.<br>We are eternal, all this p",
+      "x": 4080,
+      "y": 3120,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S12Impression.dc.html",
+      "title": "12 LEAVE A GREAT IMPRESSION.",
+      "x": 6120,
+      "y": 3120,
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "file": "S13Thanks.dc.html",
+      "title": "13 THANKS, FIRESIDE.",
+      "x": 0,
+      "y": 4680,
+      "w": 1920,
+      "h": 1080
+    }
+  ],
+  "annotations": [
+    {
+      "id": "read-me",
+      "x": 0,
+      "y": -400,
+      "w": 1920,
+      "text": "EVERYTHING IS AN EXPERIENCE · Fireside · ~10 min · 13 slides\n\nThe note under each slide is a speaker beat, not a script. The voice profile only covers short-form, so the beats are prompts in your register and the narration is yours.\n\nSlide 04 carries your roles (server, bartender, FOH manager). Add the venue names in the beat if you want them on the slide.\n\nNine slides carry a Flateralus still (Caustics Pool, Contour Hood, Block Party, RD Vat, Jelly Tank, Portal Mark, Rust Machine, All Eyes, Silhouette Flock). In the live runner those play for real."
+    },
+    {
+      "id": "beats-01",
+      "x": 0,
+      "y": 1128,
+      "w": 1920,
+      "text": "Title stays up while folks settle. Say hi, say what you do at Bracket Bear in one sentence, and that this talk is ten minutes."
+    },
+    {
+      "id": "beats-02",
+      "x": 2040,
+      "y": 1128,
+      "w": 1920,
+      "text": "Ask the room what they picture when they hear 'user experience.' A website, a wireframe, a Figma file. That's where I started too, with this book. Thought's fine, thinking is encouraged. The part that stuck is the feeling: you shouldn't have to fight the thing in front of you."
+    },
+    {
+      "id": "beats-03",
+      "x": 4080,
+      "y": 1128,
+      "w": 1920,
+      "text": "Hold this one. Name the places. One story from a shift. Nobody there said 'user experience' and everybody was doing it. What the guest saw versus what the kitchen saw."
+    },
+    {
+      "id": "beats-04",
+      "x": 6120,
+      "y": 1128,
+      "w": 1920,
+      "text": "Your words from the Will Guidara post, May 2024. Two equivalent services: the differentiator is how personal the experience is. One example of a small thing that got somebody to come back."
+    },
+    {
+      "id": "beats-05",
+      "x": 0,
+      "y": 2688,
+      "w": 1920,
+      "text": "Hold this one too. On site, production hardware, the moment it all syncs. The experience isn't the screen. It's the room, the sound, the timing, the person standing next to you."
+    },
+    {
+      "id": "beats-06",
+      "x": 2040,
+      "y": 2688,
+      "w": 1920,
+      "text": "The turn. Same rule, everywhere. Somebody on the other end experiences every one of those. Krug's rule never said 'web pages' out loud."
+    },
+    {
+      "id": "beats-07",
+      "x": 4080,
+      "y": 2688,
+      "w": 1920,
+      "text": "Bracket Bear. The tagline is 'Welcome to Bracket Bear' and the invoice got design time for the same reason the site did. Say what the invoice looks like and what it took."
+    },
+    {
+      "id": "beats-08",
+      "x": 6120,
+      "y": 2688,
+      "w": 1920,
+      "text": "Both stories were about a room. The restaurant floor, the install site. A meetup venue is one too. Fireside has been looking for a room with a big LED wall for a reason."
+    },
+    {
+      "id": "beats-09",
+      "x": 0,
+      "y": 4248,
+      "w": 1920,
+      "text": "How you show up at Fireside is an experience somebody else is having. I'm not saying I'm good at it. I'm saying I think about it."
+    },
+    {
+      "id": "beats-10",
+      "x": 2040,
+      "y": 4248,
+      "w": 1920,
+      "text": "The reframe. Back to the host stand: nobody designed the twenty-minute wait, and every guest felt it. Same with the invoice nobody proofread and the Slack message sent at 11pm. It gets felt either way."
+    },
+    {
+      "id": "beats-11",
+      "x": 4080,
+      "y": 4248,
+      "w": 1920,
+      "text": "The lyric is the slide. Say the habit over it: ten years behind a bar taught you to stand where the guest stands, and you still do it on every install."
+    },
+    {
+      "id": "beats-12",
+      "x": 6120,
+      "y": 4248,
+      "w": 1920,
+      "text": "The ask. If you want the 'better than yesterday' line, say it here, out loud."
+    },
+    {
+      "id": "beats-13",
+      "x": 0,
+      "y": 5808,
+      "w": 1920,
+      "text": "Thank Terence and the Fireside crew out loud, by name. Then stop. Q&A if there's time."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

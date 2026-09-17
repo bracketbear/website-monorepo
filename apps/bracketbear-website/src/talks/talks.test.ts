@@ -25,7 +25,7 @@ describe('talks', () => {
     }
   });
 
-  it('puts an animation on exactly the ten storyboard slides', () => {
+  it('puts an animation on exactly the eleven storyboard slides', () => {
     const talk = findTalk('everything-is-an-experience')!;
     const withAnim = talk.slides.filter((s) => s.animation).map((s) => s.id);
     expect(withAnim).toEqual([
