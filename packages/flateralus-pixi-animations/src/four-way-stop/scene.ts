@@ -42,6 +42,10 @@ export class Scene {
     x2: number;
     y2: number;
     age: number;
+    /** The rain-derived lifetime this track was recorded with, so it fades
+     * out over its own span rather than a span that no longer matches the
+     * current rain. */
+    life: number;
   }[] = [];
   /** Skid marks, kept for the session. */
   private skids: { x: number; y: number; hx: number; hy: number }[] = [];
@@ -362,6 +366,7 @@ export class Scene {
    * events and stay.
    */
   private recordHistory(S: TrafficState, dt: number, rain: number): void {
+    const life = 25 + 50 * rain;
     for (const v of S.vehicles) {
       const q = poseOf(v);
       const last = this.lastPose.get(v.id);
@@ -375,6 +380,7 @@ export class Scene {
           x2: q.x + rx,
           y2: q.y + ry,
           age: 0,
+          life,
         });
         this.tracks.push({
           x1: last.x - rx,
@@ -382,15 +388,15 @@ export class Scene {
           x2: q.x - rx,
           y2: q.y - ry,
           age: 0,
+          life,
         });
       }
       this.lastPose.set(v.id, { x: q.x, y: q.y });
     }
     for (const id of [...this.lastPose.keys()])
       if (!S.vehicles.some((v) => v.id === id)) this.lastPose.delete(id);
-    const life = 25 + 50 * rain;
     for (const t of this.tracks) t.age += dt;
-    this.tracks = this.tracks.filter((t) => t.age < life);
+    this.tracks = this.tracks.filter((t) => t.age < t.life);
     if (this.tracks.length > 6000)
       this.tracks.splice(0, this.tracks.length - 6000);
     for (const e of S.events)
@@ -413,7 +419,7 @@ export class Scene {
         .lineTo(x2, y2)
         .stroke({
           color: 0x07080c,
-          alpha: 0.3 * (1 - t.age / 75),
+          alpha: 0.3 * (1 - t.age / t.life),
           width: Math.max(1, 14 / a.depth),
         });
     }

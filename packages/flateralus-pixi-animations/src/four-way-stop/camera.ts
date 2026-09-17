@@ -39,17 +39,24 @@ const norm = (a: V3): V3 => {
 };
 
 /**
- * The mast: 7 m up on the south-east corner, aimed a little north of the
- * box centre so the frame holds the north queue. A portrait frame gets a
- * taller field of view, so the queue still reaches the top.
+ * A tower south of the corner, high enough and far enough back that the
+ * north and the east queues both climb into the frame instead of one of
+ * them sweeping past the lens: aimed north-east, across the box, so the
+ * north approach climbs the middle of the frame and the east approach
+ * climbs its right side. A mast planted at the curb sits inside the south
+ * queue's own length, so a car passing the mast's latitude balloons; this
+ * is pulled back enough that a queue out to about ten cars stays in front
+ * of the lens at a sane size, which is as far as the corner realistically
+ * fills. A portrait frame gets a taller field of view, so both queues
+ * still reach the edges.
  */
 export function makeCamera(aspect: number): Camera {
-  const pos: V3 = [11.5, -12.5, 7.2];
-  const target: V3 = [-1.5, 6, 0];
+  const pos: V3 = [-8, -46, 40];
+  const target: V3 = [4, -4, 0.5];
   const f = norm(sub(target, pos));
   const r = norm(cross(f, [0, 0, 1]));
   const u = cross(r, f);
-  const fovY = aspect < 1 ? 1.15 : 0.85;
+  const fovY = aspect < 1 ? 1.1 : 0.85;
   return { pos, f, r, u, tanH: Math.tan(fovY / 2), aspect };
 }
 
