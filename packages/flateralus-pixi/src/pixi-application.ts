@@ -1,6 +1,7 @@
 import { Application as PixiApp } from 'pixi.js';
 import {
   BaseApplication,
+  type Animation,
   type ApplicationConfig,
   type StageControlValues,
   type StageControlsManifest,
@@ -33,6 +34,25 @@ export class PixiApplication extends BaseApplication<PixiApp> {
   }
 
   /**
+   * Set the animation, and hand the ticker whatever frame cap it asks for.
+   */
+  public setAnimation(animation: Animation<any, PixiApp> | null): void {
+    super.setAnimation(animation);
+    this.applyFrameCap();
+  }
+
+  /**
+   * The ticker runs at the display's native rate unless the animation
+   * declares a `maxFPS`. Applied both when the animation is set and when the
+   * loop starts, because either can happen first.
+   */
+  private applyFrameCap(): void {
+    if (!this.pixiApp) return;
+    const anim = this.animation as { maxFPS?: number } | null;
+    this.pixiApp.ticker.maxFPS = anim?.maxFPS ?? 0;
+  }
+
+  /**
    * Start the PIXI render loop
    */
   protected startRenderLoop(): void {
@@ -40,6 +60,7 @@ export class PixiApplication extends BaseApplication<PixiApp> {
 
     // PIXI handles its own render loop through the ticker
     this.pixiApp.ticker.add(this.updateAnimation, this);
+    this.applyFrameCap();
     this.pixiApp.ticker.start();
 
     // A hidden tab reports frame intervals in seconds. Without telling the

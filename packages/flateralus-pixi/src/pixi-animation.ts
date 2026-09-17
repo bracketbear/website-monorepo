@@ -30,6 +30,23 @@ export abstract class PixiAnimation<
    */
   readonly dpr?: number;
 
+  /**
+   * Optional cap on the render loop, in frames per second. Undefined or 0
+   * means the display's native rate.
+   *
+   * For a scene that costs more than one 120 Hz slot but less than two, a
+   * steady 60 reads smoother than an uneven 90: without the cap each frame
+   * lands on whichever vsync it happens to make, and the cadence alternates
+   * between one slot and two. The host reads this when the animation is set.
+   *
+   * Under a cap the quality controller can only ratchet down, never back
+   * up: it climbs when the frame interval sits well under budget, and a
+   * capped loop never reports an interval shorter than the cap. Pick the
+   * cap for the machine class the scene is tuned on and treat a drop as
+   * permanent for that session.
+   */
+  readonly maxFPS?: number;
+
   private pointerService: PointerService | null = null;
 
   /** Give the animation access to shared host-relative pointer state. */
