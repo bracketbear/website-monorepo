@@ -39,6 +39,7 @@ import {
   createSignalAlignmentAnimation,
   createSilhouetteFlockAnimation,
   createSlimeMoldAnimation,
+  createSlowBurnAnimation,
   createStreetPulseAnimation,
   createSunArcAnimation,
   createVisionaryEyeAnimation,
@@ -556,6 +557,18 @@ export const REGISTRY: LabEntry[] = [
       'A heading that freezes onto a cold pane. The letters hold water vapour; ice starts at scattered sites on their edges, and a tip that reaches further into the vapour collects faster and leaves its neighbours starved. That is the Mullins–Sekerka instability, and it is the only reason there are feathers. They run to depletion in a second or two, then a slow feed of humidity fills the letter in behind them. Ice that froze fast froze dense, so the feathers stay visible as ridges in the finished letter. The cursor is a warm fingertip: drag to melt a line, click for a palm, and watch the patch refreeze from different vapour into a different grain.',
     create: (initialControls) =>
       createFrostLineAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'slow-burn',
+    section: 'type',
+    name: 'Slow Burn',
+    tag: 'glsl sim',
+    blurb:
+      'A proclamation printed on a sheet of paper, and then the sheet lit. Fuel burns where it is hot and burning makes heat, so the fire is a front: about 60 cells a second and white-hot through the ink-heavy type, half that and a dull red across bare paper, which is how it gets over a word space without the whole block going up at once. Colour is the temperature run through a Planck curve. Behind the front the char oxidises to ash as embers, which glow hotter under a moving cursor and are spent sooner. Click to light it anywhere. When it has burned out, a fresh sheet is fitted.',
+    create: (initialControls) =>
+      createSlowBurnAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

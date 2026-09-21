@@ -43,6 +43,7 @@ export * from './shatter-glass';
 export * from './signal-alignment';
 export * from './silhouette-flock';
 export * from './slime-mold';
+export * from './slow-burn';
 export * from './street-pulse';
 export * from './sun-arc';
 export * from './utils';
