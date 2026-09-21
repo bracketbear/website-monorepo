@@ -9,7 +9,8 @@ export type SectionKey =
   | 'values'
   | 'about'
   | 'cta'
-  | 'toys';
+  | 'toys'
+  | 'type';
 
 export const SECTIONS: { key: SectionKey; label: string }[] = [
   { key: 'hero', label: '01 · Hero' },
@@ -21,6 +22,7 @@ export const SECTIONS: { key: SectionKey; label: string }[] = [
   { key: 'about', label: '07 · About' },
   { key: 'cta', label: '08 · Contact' },
   { key: 'toys', label: '09 · Toys' },
+  { key: 'type', label: '10 · Type' },
 ];
 
 /**
@@ -34,6 +36,7 @@ export function sectionBackground(key: SectionKey): string {
     case 'statement':
     case 'about':
     case 'toys':
+    case 'type':
       return hx(PAL.ink);
     case 'intro':
     case 'values':
@@ -47,5 +50,7 @@ export function sectionBackground(key: SectionKey): string {
 
 /** Sections whose ground is dark, so stage chrome flips to cream. */
 export function isDarkSection(key: SectionKey): boolean {
-  return key === 'about' || key === 'statement' || key === 'toys';
+  return (
+    key === 'about' || key === 'statement' || key === 'toys' || key === 'type'
+  );
 }
