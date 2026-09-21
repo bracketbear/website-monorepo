@@ -54,6 +54,12 @@ export const PRE = `#version 300 es
       for (int i = 0; i < 4; i++) { v += a * vnoise(p); p = p * 2.03 + vec2(17.0, 9.2); a *= 0.5; }
       return v;
     }
+    // Themes reassign roles and do not rename them: 'ink' is the value that
+    // contrasts with the canvas, so it is dark under most themes and light
+    // under the two whose canvas is dark. An effect that needs a dark ground
+    // or a dark mark, whatever the theme, asks for it by what it is.
+    float luma(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
+    vec3 themeDark() { return luma(uInk) < luma(uOrange) ? uInk : uOrange; }
     float maskA(vec2 uv) {
       if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) return 0.0;
       return texture(uTex, uv).a;

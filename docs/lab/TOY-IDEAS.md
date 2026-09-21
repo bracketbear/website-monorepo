@@ -62,9 +62,9 @@ was run.
 | [Sandbox](#sandbox)                        | strong on 1, 2, 5 | **built** — spec in `docs/superpowers/specs/2026-09-15-sandbox-design.md`; fails 0 |
 | [Four-Way Stop](#four-way-stop)            | strong on 0, 2, 5 | **built** — shipped to the toys shelf                                              |
 | [Lichtenberg](#lichtenberg)                | strong on 2, 4    | ready to spec                                                                      |
-| [Frost](#frost)                            | strong on 1, 2    | ready to spec                                                                      |
+| [Frost](#frost)                            | strong on 1, 2    | **subject lent** to the type shelf as `frost-line`; a toy must pass 0 against it   |
 | [Soap Film](#soap-film)                    | strong on 2, 4    | ready to spec                                                                      |
-| [Ember](#ember)                            | strong on 2, 4    | ready to spec                                                                      |
+| [Ember](#ember)                            | strong on 2, 4    | **subject lent** to the type shelf as `slow-burn`; a toy must pass 0 against it    |
 | [Light Garden](#light-garden)              | strong on 1, 5    | ready to spec                                                                      |
 | [Chladni Plate](#chladni-plate--abandoned) | fails 1, 2, 3     | **abandoned** — see post-mortem                                                    |
 
@@ -311,6 +311,16 @@ everyone ships.
 
 ## Frost
 
+**Subject lent.** The physics here shipped as `frost-line` on the type shelf
+(`docs/superpowers/specs/2026-09-21-type-effects-design.md`), where the copy
+supplied the subject this entry lacked. What that build found out, so a toy
+does not find it out again: the humidity feed has to go into the _vapour_, not
+onto the ice (fed to receptive cells it fattens every arm into a sector plate);
+sparse nucleation is what makes feathers, because a full edge fingers too and
+comes out as fur; and a melted patch must lose most of its water or it
+flash-freezes back as a slab. A Frost _toy_ now has to be a different animal
+from a frosted heading — question 0, with `frost-line` as the named sibling.
+
 - **State:** vapour concentration field plus a frozen mask.
 - **Measured:** the feather shape. Mullins–Sekerka instability — tips reach
   further into the vapour, eat more, and run away. The branching is instability,
@@ -331,6 +341,16 @@ everyone ships.
   — the Newton black film), then it ruptures and a new bubble is blown.
 
 ## Ember
+
+**Subject lent.** The physics here shipped as `slow-burn` on the type shelf
+(`docs/superpowers/specs/2026-09-21-type-effects-design.md`), with the
+letterforms as the fuel and the buoyant velocity field dropped for an upward
+bias in the heat transport. What that build found out: a reaction front near
+extinction does not slow toward zero, it holds a minimum speed and then dies —
+so "paper at a quarter of the type's speed" does not exist in this chemistry,
+and the contrast between the two has to be carried by temperature. An Ember
+_toy_ now has to be a different animal from a burning heading — question 0,
+with `slow-burn` as the named sibling.
 
 - **State:** fuel, temperature and a buoyant velocity field, coupled.
 - **Measured:** the colour. Blackbody radiation from the temperature field

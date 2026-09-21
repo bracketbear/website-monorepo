@@ -198,7 +198,7 @@ const DISP_FRAG =
         float inside = smoothstep(0.004, -0.004, sd);
 
         bool amber = uStage > 0.5;
-        vec3 ground = amber ? uInk : uOrange;
+        vec3 ground = amber ? themeDark() : uOrange;
         ground *= 0.95 + 0.05 * fbm(uvS * 3.0);
 
         // The plate, and the slab's contact shadow on it, which leans with
@@ -237,7 +237,7 @@ const DISP_FRAG =
         // Thin at the rim, so the ground shows through it there.
         float thick = mix(0.55, 0.9, edge);
         vec3 gel = mix(ground, body, thick * (amber ? 0.9 : 0.72));
-        vec3 ink = amber ? uCream : uInk;
+        vec3 ink = amber ? uCream : themeDark();
         gel = mix(gel, ink * (0.9 + 0.1 * lamb), type * 0.96);
         gel += spec * (amber ? vec3(1.0, 0.93, 0.8) : vec3(1.0)) * 0.85;
         // Meniscus: a bright line just inside the outline.

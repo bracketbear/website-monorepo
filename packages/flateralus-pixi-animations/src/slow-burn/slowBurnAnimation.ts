@@ -215,7 +215,7 @@ const DISP_FRAG =
         // The sheet, slid down by uSlide.x while it is being fitted.
         vec2 ps = p - vec2(0.0, uSlide.x);
         vec2 sv = ps / uRes;
-        vec3 under = uInk * (0.92 + 0.08 * fbm(uvS * 3.0));
+        vec3 under = themeDark() * (0.92 + 0.08 * fbm(uvS * 3.0));
         if (sv.y < 0.0 || sv.y > 1.0) { fragColor = vec4(finish(under, uvS, p), 1.0); return; }
 
         vec2 g = vec2(sv.x, 1.0 - sv.y);
@@ -244,7 +244,7 @@ const DISP_FRAG =
         // Type: ink until it burns, then char, then whatever the embers leave.
         vec3 charC = vec3(0.035, 0.03, 0.03) * (0.7 + 0.6 * fibre);
         vec3 ashC = uCream * vec3(0.8, 0.79, 0.78) * (0.8 + 0.3 * fibre);
-        vec3 type = mix(uInk, charC, burnt);
+        vec3 type = mix(themeDark(), charC, burnt);
         // Unfanned embers leave charcoal; a fanned stroke burns down to pale ash.
         type = mix(type, ashC, smoothstep(0.5, 0.95, ash));
         vec3 col = mix(sheet, type, m);

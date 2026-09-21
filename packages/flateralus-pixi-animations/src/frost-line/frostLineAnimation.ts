@@ -236,7 +236,7 @@ const DISP_FRAG =
         vec2 uvS = vec2(vUV.x, 1.0 - vUV.y);
         vec2 p = uvS * uRes;
         bool inkStage = uStage > 0.5;
-        vec3 ground = inkStage ? uInk : uOrange;
+        vec3 ground = inkStage ? themeDark() : uOrange;
         ground *= 0.94 + 0.06 * fbm(uvS * 3.0);
 
         vec2 luv = (p - uRect.xy) / uRect.zw;

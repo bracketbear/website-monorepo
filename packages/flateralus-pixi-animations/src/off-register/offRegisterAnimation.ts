@@ -211,12 +211,15 @@ const FRAG =
         if (uStage > 0.5) {
           // Ink on paper subtracts: overprint is a multiply.
           col = uCream * (0.965 + 0.035 * fbm(p * 0.012));
-          col *= mix(vec3(1.0), uSun, sun);
-          col *= mix(vec3(1.0), uOrange, org);
-          col = mix(col, uInk, key);
+          // Through inks that are translucent, not perfect filters: two
+          // complementary inks then overprint to a third colour, where a
+          // pure multiply takes them to black and the dots with them.
+          col *= mix(vec3(1.0), mix(uSun, vec3(1.0), 0.2), sun);
+          col *= mix(vec3(1.0), mix(uOrange, vec3(1.0), 0.2), org);
+          col = mix(col, themeDark(), key);
         } else {
           // Opaque inks on dark stock: the later pass covers the earlier.
-          col = uInk * (0.94 + 0.06 * fbm(p * 0.012));
+          col = themeDark() * (0.94 + 0.06 * fbm(p * 0.012));
           col = mix(col, uSun, sun);
           col = mix(col, uOrange, org * 0.9);
           col = mix(col, uCream, key);

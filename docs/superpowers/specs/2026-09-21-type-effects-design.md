@@ -94,9 +94,14 @@ and 1.44 s** — one after another, each overshooting once or twice
 (ζ = 0.35, 0.28, 0.23). Angular motion uses the same constants scaled by a
 moment of inertia proportional to mass.
 
-**Plates.** Sun screened at 75°, orange screened at 45°, a solid cream key on
-top, over ink. The screens print the type as a tint: dot radius follows a
-low-passed mask so edges break into dots rather than aliasing.
+**Plates.** Two halftone screens — orange at 45°, sun at 45° plus a `skew` of
+5° — and an ink keyline on top. The screens print the type as a tint: dot
+radius follows a low-passed mask so edges break into dots rather than
+aliasing. _As built, not as first specified:_ the first cut had a solid key
+over 45°/75° screens, and it read as a drop shadow — the solid key hid the
+plates, and 30° of separation makes a moiré too fine to see at heading size.
+A keyline shows the plates, and screens a few degrees apart beat at the size
+of a letter.
 
 **Rest pose.** Not zero. With perfect register the colour plates hide under
 the key and the effect has no resting face. The `register` control sets the
@@ -106,9 +111,12 @@ rest offset, default ~3 px of deliberate riso fringe; 0 is available.
 actual angles. When a knock rotates a plate the beat bands sweep across the
 letters at the frequency the angle difference dictates. Nothing draws them.
 
-**Input.** The pointer grabs the nearest plate (by fringe under the cursor)
-with a spring to the pointer, so releasing hands over velocity. A click
-knocks all three with random linear and angular impulses.
+**Input.** The pointer is a hand on the whole stack: a viscous coupling toward
+its velocity, folded into the same force as the spring so the held position
+carries no mass-dependent bias. Mass does not change how far a plate is pulled
+(a steady drag holds every plate at grip·v/K); it changes _when_ — the light
+plate answers first and the heavy one lags, so the stack is pulled apart in
+time. A click knocks all three with random linear and angular impulses.
 
 **Rest.** When every plate's kinetic + potential energy is under ε and the
 palette, controls and stage size are unchanged since the last draw,
@@ -127,11 +135,19 @@ The heading set in a slab of amber gel, dropped onto a plate.
 **Rubric.** Subject: a jelly on a plate. Legible at once. Measured: strain.
 Loop: a poke at one letter reaches the others.
 
-**State.** `PingPong`, RGBA16F: `xy` displacement `u`, `zw` velocity `v`. The
-slab is a rounded rectangle around the type block.
+**State.** `PingPong`, RGBA**32**F: `xy` displacement `u`, `zw` velocity `v`.
+The slab is a rounded rectangle around the type block.
 
-    v += (c² ∇²u − ω₀² u − γ v) dt      u += v dt
+    v += (c² ∇²u − ω₀² u − γ v + ν ∇²v) dt      u += v dt
 
+Two things the build added. Kelvin–Voigt viscosity `ν∇²v`, which takes the
+grid-scale ringing out in a few steps and leaves the sway alone — without it
+a drop leaves the slab striped with two-cell compression modes. And 32-bit
+state: with half floats the per-step increment (~10⁻³) is rounded by ten
+percent against a velocity near 0.2, and because the rounding depends only on
+the value, a state uniform along a row is striped along it. The CPU mirror,
+in Float32, cannot see this; the screen can. `PingPong` now takes
+`fullPrecision` for any integrator.
 Symplectic Euler at a fixed 1/480 s, at most 12 steps a frame. Bottom row
 pinned (`u = 0`) — it sits on the plate — and the other edges free. Grid is
 ~5760 cells from the block aspect (96×60 at 1.6). A displacement field is
@@ -166,34 +182,53 @@ The heading freezes onto a cold pane.
 **Rubric.** Subject: a frosted window. Legible at once; a fingertip melting it
 needs no explanation. Measured: the feather shape.
 
-**State.** `PingPong`, RGBA16F at ~164k cells (512×320 at 1.6): `x` ice,
-`y` vapour, `z` boundary mass, `w` freeze age. The glyph interior is the cold
-region; outside it nothing attaches.
+**State.** `PingPong`, RGBA32F at ~70k cells: `x` ice, `y` water (−1 outside
+the letter, so the sim carries its own mask), `z` freeze age, `w` warmth.
+Fewer cells than first specified, because a cell is then about three pixels
+and a feather a few dozen cells long is long enough on screen to be seen as
+one. There is no separate boundary-mass channel: a receptive cell simply
+keeps what reaches it.
 
 **Model.** Reiter-style: vapour diffuses through unfrozen cells; a cell next
-to ice collects boundary mass and freezes past a threshold; frozen cells
-consume their vapour. Tips reach further into the vapour, collect faster and
-run away, and starve their neighbours — Mullins–Sekerka from depletion, not a
-drawn branch. Six-fold anisotropy enters through the attachment weight.
+to ice keeps what reaches it and freezes past a threshold. Tips reach further
+into the vapour, collect faster and run away, and starve their neighbours —
+Mullins–Sekerka from depletion, not a drawn branch. Six-fold habit comes from
+the hex lattice (offset rows) rather than from a term. Diffusion is written as
+pairwise flux so water is conserved exactly, and the tests audit it.
 
-**Seeding.** Sparse. Nucleate every edge cell and the result is a uniform
-rind growing inward, with no competition and no feathers. Seeds are hashed
-onto the glyph edge at about one per 12 cells of perimeter.
+**Seeding.** Sparse: one site per ~36 cells of edge. Nucleate every edge cell
+and the front fingers too — a flat front is unstable — but into a short even
+fur, every strand starving the next before any gets anywhere; measured, none
+of its ice gets further than eight cells in. Scattered sites have room to
+become feathers that run to the middle of the stroke, and the test asserts
+that share of deep ice rather than a perimeter ratio, which turned out not to
+separate the two.
 
 **Tension — the one that matters.** Feathers need starvation, and starved
 feathers leave gaps; legibility needs the letter filled. One vapour density
 cannot serve both. Two stages:
 
 1. **Feather**, ~2–3 s: closed vapour budget, fast dendrites to depletion.
-2. **Sinter**, to ~6 s: a small uniform humidity feed thickens what exists
-   until **≥ 88 %** of the glyph area is ice.
+2. **Sinter**, to ~6 s: a small uniform humidity feed brings the fill to
+   **≥ 88 %** of the glyph area.
+
+The feed goes into the _vapour_, everywhere, and not onto the ice. Fed to
+receptive cells — Reiter's own γ — it thickens every arm from the first step
+and the crystals come out as fat sector plates. Fed to the vapour it is
+negligible while the letter is rich, so growth stays diffusion-limited and
+dendritic, and only takes over after depletion, when it pools in the gaps and
+deposits evenly on whatever is nearest. One model, two regimes, no switch.
 
 The display shades by age and thickness, so the feather skeleton stays
 visible as bright ridges inside a letter that now reads solid.
 
-**Input.** A warm fingertip, stamped along the drag path. Melting conserves
-mass: ice returns to vapour in place, so the patch refreezes — differently,
-because the vapour field it refreezes from is not the one it grew from. A
+**Input.** A warm fingertip, stamped along the drag path. Melting returns ice
+to vapour in place, but most of the meltwater leaves — off the glass, into the
+room — so the patch is left fogged at the letter's starting density. It has to
+be: kept in place, every melted cell holds a full cell's worth of water and
+the patch flash-freezes back from its rim as a featureless slab. Fogged, it
+regrows the way the letter grew, as a second generation of smaller feathers.
+The water that left is booked, so the conservation audit still closes. A
 click is a palm: a larger melt.
 
 **Arrival.** The growth is the arrival; no pre-roll except under reduced
@@ -214,8 +249,8 @@ History: total — burned is burned.
 **Ground.** Ink type on cream paper, so the copy reads _before_ anything
 happens, and char on scorched paper reads after.
 
-**State.** `PingPong`, RGBA16F at ~92k cells (384×240): `x` fuel, `y`
-temperature, `z` peak temperature seen (scorch), `w` char.
+**State.** `PingPong`, RGBA32F at ~92k cells: `x` fuel, `y` temperature,
+`z` peak temperature seen (scorch), `w` char.
 
     rate = A · fuel · smoothstep(T_ign, T_ign + δ, T)
     dT   = D ∇²T + upward bias + Q · rate − cooling · T
@@ -229,23 +264,38 @@ without a second solver.
 jump a ~16-cell gap; raise `D` or `Q` until it does and the whole block
 flashes over at once, with no walking front. So the paper is fuel too — thin
 (0.15 against the letters' 1.0), enough to carry a slow cool smoulder across
-gaps and scorch as it goes, never enough to flame. Two media, two speeds:
-**~55 cells/s** in type, about a quarter of that in paper.
+gaps and scorch as it goes, never enough to flame.
+
+_Measured, the contrast is in temperature more than speed._ A
+reaction–diffusion front near extinction does not slow toward zero: it holds
+a minimum speed and then goes out. On this chemistry the paper runs at 32
+cells/s with `T_IGN = 0.08`, 27 at 0.09, and is dead at 0.10; "a quarter of
+the type's speed" does not exist. So type runs at **~60 cells/s** and pins the
+temperature at the cap; paper runs at **~32** and peaks near 0.27 — a dull
+red crawl beside a white-hot one.
 
 Targets, asserted in the mirror: a front crosses a 16-cell paper gap between
-two fuel bars; with paper fuel zeroed it stalls (the test that proves the
-reason); first-to-last letter ignition ≥ 3 s; default phrase burns out in
-6–14 s.
+two fuel bars, slower than it crosses type; with paper fuel zeroed it stalls
+(the test that proves the reason); first-to-last letter ignition ≥ 3 s;
+default phrase burns out in 6–14 s of sim time. A `pace` control (default
+0.55) scales sim time, because at the sim's own rate a phrase goes in about
+four seconds and reads as a flash.
 
 **Colour.** Temperature through a Planck-locus fit, 600–1900 K, intensity as
 `T⁴`, tone-mapped. Flame, ember and the dull red before black are one curve.
 
 **Remains.** Char, scorch from the peak channel, and embers: a second, slower
-oxidation of char that glows and cools.
+oxidation of char to ash that gives back heat. The heat per unit of char has
+to be several times what a balance against room cooling alone suggests,
+because a glowing stroke loses most of its heat sideways into the cold burned
+sheet around it. Moving air multiplies the ember rate, so a fanned stroke
+glows hotter and is ash sooner — and ends visibly paler: measured on screen,
+fanned strokes finish 27 % brighter than unfanned ones.
 
 **Input.** A click ignites at the click point — on a letter, or on bare paper,
-which smoulders its way to one. The pointer fans: moving air raises the ember
-reaction rate under it. Clicking char does nothing.
+which smoulders its way to one. The pointer fans: moving air (a still cursor
+fans nothing) raises the ember reaction rate under it. Clicking char does
+nothing.
 
 **Opening state.** Auto-ignites ~0.8 s after load (`autoIgnite`), so the lab
 opens on it burning rather than on a sheet of paper. After burn-out and a
@@ -273,6 +323,12 @@ under vitest:
 Then on screen: the headless probe loop, and every stage and palette in the
 lab with the effect running. A palette that kills the computed thing is a bug.
 
+**Measured at 1600×1400 on an M1 Max, GPU time per frame by timer query:**
+Off Register 0.82 ms busy / 0.00 at rest; Aspic 1.11 / 0.00; Frost Line
+1.90 / 0.00; Slow Burn 1.37 while burning (a proclamation, so it is always
+burning or being refitted). The three arrivals issue no draw calls at all
+once they have settled — counted, not inferred.
+
 ## Build order
 
 Off Register, Aspic, Frost Line, Slow Burn — cheapest to heaviest, each landed
@@ -298,6 +354,12 @@ control and the sleep-at-rest pattern that Aspic reuses.
   a real heading is its own decision, with its own intersection-observer
   trigger and its own look at cost on a phone.
 - Reduced-motion handling for the existing 38 animations.
+- Themes with a light canvas. Every theme reassigns the palette's _roles_, so
+  under Miami '84 and JNCO Rave `ink` is near-white and `orange` is the dark.
+  The four effects pick their dark by luminance (`themeDark()` in the shared
+  prelude) rather than by role, which is what keeps frost on a dark pane and
+  ink on cream paper under every theme. The other shader effects still read
+  roles literally; whether they should is a separate question.
 - Fonts other than Anton. `phraseMask` is Anton-only and stays that way here.
 - The Frost and Ember _toys_. They remain open in `TOY-IDEAS.md`, and now
   have to pass question 0 against these two.
