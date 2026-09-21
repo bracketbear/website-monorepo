@@ -14,6 +14,7 @@ export * from './energy-body';
 export * from './erosion-table';
 export * from './foil-statement';
 export * from './four-way-stop';
+export * from './frost-line';
 export * from './goo-lamp';
 export * from './halftone-tide';
 export * from './heat-haze';

@@ -39,21 +39,30 @@ export function alphaToGrid(
   return out;
 }
 
-/** Rasterize `mask` letterboxed into a gw×gh grid. Needs a real canvas. */
+/**
+ * Rasterize `mask` letterboxed into a gw×gh grid. Needs a real canvas.
+ *
+ * `xOversample` rasterizes that many columns per cell, keeping the mask
+ * where it would have been: a caller with a staggered lattice asks for 2 and
+ * picks each row's samples from where that row's cells actually sit. The
+ * grid it gets back is `gw * xOversample` wide.
+ */
 export function maskToGrid(
   mask: HTMLCanvasElement,
   gw: number,
   gh: number,
-  scale: number
+  scale: number,
+  xOversample = 1
 ): Float32Array {
+  const cw = gw * xOversample;
   const cv = document.createElement('canvas');
-  cv.width = gw;
+  cv.width = cw;
   cv.height = gh;
   const g = cv.getContext('2d', { willReadFrequently: true })!;
   const [x, y, w, h] = letterbox(mask.width, mask.height, gw, gh, scale);
   g.imageSmoothingQuality = 'high';
-  g.drawImage(mask, x, y, w, h);
-  return alphaToGrid(g.getImageData(0, 0, gw, gh).data, gw, gh);
+  g.drawImage(mask, x * xOversample, y, w * xOversample, h);
+  return alphaToGrid(g.getImageData(0, 0, cw, gh).data, cw, gh);
 }
 
 /**

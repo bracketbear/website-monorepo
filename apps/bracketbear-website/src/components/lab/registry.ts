@@ -14,6 +14,7 @@ import {
   createErosionTableAnimation,
   createFoilStatementAnimation,
   createFourWayStopAnimation,
+  createFrostLineAnimation,
   createGooLampAnimation,
   createHalftoneTideAnimation,
   createHeatHazeAnimation,
@@ -543,6 +544,18 @@ export const REGISTRY: LabEntry[] = [
       'A heading set in a slab of gel and dropped on a plate. The slab is a small grid of displacements under linear elasticity, with its base pinned, so it lands, sways from the top at about 3 Hz, and is still again in a little over a second. Compression travels faster than shear: poke the first letter and a pressure pulse reaches the last one a quarter of a second later, ahead of the wobble. The highlight and the density of the gel are read off the strain. Drag a finger through it; click to flick it. At rest it stops drawing.',
     create: (initialControls) =>
       createAspicAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'frost-line',
+    section: 'type',
+    name: 'Frost Line',
+    tag: 'glsl sim',
+    blurb:
+      'A heading that freezes onto a cold pane. The letters hold water vapour; ice starts at scattered sites on their edges, and a tip that reaches further into the vapour collects faster and leaves its neighbours starved. That is the Mullins–Sekerka instability, and it is the only reason there are feathers. They run to depletion in a second or two, then a slow feed of humidity fills the letter in behind them. Ice that froze fast froze dense, so the feathers stay visible as ridges in the finished letter. The cursor is a warm fingertip: drag to melt a line, click for a palm, and watch the patch refreeze from different vapour into a different grain.',
+    create: (initialControls) =>
+      createFrostLineAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

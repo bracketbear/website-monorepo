@@ -27,19 +27,27 @@ export const SPS = 120;
 /** Diffusion weight: a pair of vapour cells exchanges ALPHA/12 of their difference. */
 export const ALPHA = 1;
 /** Vapour in the letter to begin with, as a fraction of what a cell needs to freeze. */
-export const RHO = 0.5;
+export const RHO = 0.35;
 /** Water a cell must hold to freeze. */
 export const THETA = 1;
 /**
- * Humidity reaching each receptive cell per step: the sinter. Feathers alone
- * stop at depletion with about RHO of the letter frozen, which is a feather
- * and not a heading. This slow feed thickens what grew until the letter reads
- * solid, a layer every 1/GAMMA steps. Measured on a 28-cell stroke: 0.64 of
- * the letter frozen at 2.5 s, 0.95 at 6 s.
+ * Humidity reaching every unfrozen cell of the pane per step, as vapour: the
+ * sinter. Feathers alone stop at depletion with about a third of the letter
+ * frozen, which is a feather and not a heading.
+ *
+ * It is fed to the vapour and not straight onto the ice, and that matters.
+ * Deposited on receptive cells (Reiter's γ) it thickens every arm from the
+ * first step and the crystals come out as fat sector plates. Fed to the
+ * vapour it is negligible while the letter is rich — growth stays
+ * diffusion-limited and dendritic — and only takes over after depletion,
+ * when it pools in the enclosed gaps and deposits evenly on whatever is
+ * nearest. One model, two regimes, no switch.
+ *
+ * Measured on a 56-cell stroke: 0.55 of the letter frozen at 2.5 s, 0.9 at 6 s.
  */
-export const GAMMA = 0.004;
+export const GAMMA = 0.002;
 /** About one nucleation site per this many cells of the letter's edge. */
-export const SEED_EVERY = 12;
+export const SEED_EVERY = 36;
 /** Warmth left by a fingertip decays by this per step; ice cannot form above 0.1. */
 export const WARM_DECAY = 0.985;
 
@@ -178,10 +186,9 @@ export function stepFrost(f: Frost): void {
           w += a * (water[m] - water[k]);
         }
       }
-      if (rec[k]) {
-        w += f.gamma;
-        f.fed += f.gamma;
-      }
+      // Humidity reaches the whole pane, as vapour.
+      w += f.gamma;
+      f.fed += f.gamma;
       next[k] = w;
     }
   }
@@ -197,7 +204,19 @@ export function stepFrost(f: Frost): void {
   }
 }
 
-/** A warm fingertip. The ice goes back to vapour where it lies. */
+/**
+ * A warm fingertip. The ice melts, and most of the meltwater is gone — off
+ * the glass and into the room — leaving the patch fogged at RHO like the
+ * letter was to begin with. What left is booked against `fed`, so the audit
+ * still closes.
+ *
+ * Keeping all of it in place was the first version, and it is wrong in a way
+ * only the picture shows: every melted cell holds a full THETA, so when the
+ * warmth fades the patch does not regrow, it flash-freezes inward from its
+ * rim at a cell a step and comes back as a featureless slab. Fogged at RHO
+ * it has to grow back the way the letter grew, from the rim of the patch,
+ * as a second generation of smaller feathers.
+ */
 export function melt(f: Frost, ci: number, cj: number, r: number): void {
   const { gw, gh } = f;
   for (
@@ -216,6 +235,10 @@ export function melt(f: Frost, ci: number, cj: number, r: number): void {
       f.ice[k] = 0;
       f.age[k] = 0;
       f.warm[k] = 1;
+      if (f.water[k] > RHO) {
+        f.fed -= f.water[k] - RHO;
+        f.water[k] = RHO;
+      }
     }
   }
 }
