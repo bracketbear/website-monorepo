@@ -1,3 +1,4 @@
+export * from './aspic';
 export * from './atomic-age';
 export * from './blob';
 export * from './block-party';

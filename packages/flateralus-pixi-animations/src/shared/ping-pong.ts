@@ -14,6 +14,16 @@ export interface PingPongOptions {
   dispFrag: string;
   simUniforms: readonly string[];
   dispUniforms: readonly string[];
+  /**
+   * Store the state as 32-bit floats instead of 16. Half floats carry ten
+   * bits of mantissa, which is plenty for a field that is redrawn from
+   * scratch each step and not enough for an integrator: when the per-step
+   * increment is a thousandth of the value it is added to, it is rounded by
+   * ten percent every step, and because the rounding depends only on the
+   * value, a state that is uniform along a row is striped along that row.
+   * Falls back to half where float textures cannot be filtered.
+   */
+  fullPrecision?: boolean;
 }
 
 type Locs = Record<string, WebGLUniformLocation | null>;
@@ -60,6 +70,8 @@ export class PingPong {
   private state: (WebGLTexture | null)[] = [null, null];
   private fbo: (WebGLFramebuffer | null)[] = [null, null];
   private cur = 0;
+  /** Sized internal format of the state pair. */
+  private format: number = 0;
 
   /** Simulation grid size, set by initState. */
   sw = 0;
@@ -93,6 +105,10 @@ export class PingPong {
     if (!simProg || !dispProg) return null;
 
     const pp = new PingPong(canvas, gl, simProg, dispProg);
+    pp.format =
+      o.fullPrecision && gl.getExtension('OES_texture_float_linear')
+        ? gl.RGBA32F
+        : gl.RGBA16F;
     gl.useProgram(simProg);
     for (const n of ['uState', ...o.simUniforms]) {
       pp.simL[n] = gl.getUniformLocation(simProg, n);
@@ -104,9 +120,17 @@ export class PingPong {
     return pp;
   }
 
-  /** Allocate the pair and seed the first texture. */
+  /**
+   * Allocate the pair and seed the first texture. Safe to call again with a
+   * different size: the previous pair is released first.
+   */
   initState(sw: number, sh: number, data: Float32Array | null): void {
     const gl = this.gl;
+    for (let i = 0; i < 2; i++) {
+      if (this.state[i]) gl.deleteTexture(this.state[i]);
+      if (this.fbo[i]) gl.deleteFramebuffer(this.fbo[i]);
+    }
+    this.cur = 0;
     this.sw = sw;
     this.sh = sh;
     for (let i = 0; i < 2; i++) {
@@ -115,7 +139,7 @@ export class PingPong {
       gl.texImage2D(
         gl.TEXTURE_2D,
         0,
-        gl.RGBA16F,
+        this.format,
         sw,
         sh,
         0,
@@ -150,7 +174,7 @@ export class PingPong {
       gl.texImage2D(
         gl.TEXTURE_2D,
         0,
-        gl.RGBA16F,
+        this.format,
         this.sw,
         this.sh,
         0,

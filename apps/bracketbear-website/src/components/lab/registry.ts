@@ -1,6 +1,7 @@
 import type { PixiAnimation } from '@bracketbear/flateralus-pixi';
 import type { AnimationManifest } from '@bracketbear/flateralus';
 import {
+  createAspicAnimation,
   createAtomicAgeAnimation,
   createBlockPartyAnimation,
   createCausticsPoolAnimation,
@@ -530,6 +531,18 @@ export const REGISTRY: LabEntry[] = [
       'A heading printed in three passes that have not quite lined up: two halftone plates and an ink keyline, each one a mass on a spring. They start apart and land one after another, the heaviest last. The moiré between the colour plates is the overprint of two dot screens set five degrees apart, so its bands are the size of a letter and sweep across the letters when a knock turns a plate. Drag across the stack and the light plate moves first; click to knock all three. At rest it stops drawing. Type your own line into Phrase.',
     create: (initialControls) =>
       createOffRegisterAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'aspic',
+    section: 'type',
+    name: 'Aspic',
+    tag: 'glsl sim',
+    blurb:
+      'A heading set in a slab of gel and dropped on a plate. The slab is a small grid of displacements under linear elasticity, with its base pinned, so it lands, sways from the top at about 3 Hz, and is still again in a little over a second. Compression travels faster than shear: poke the first letter and a pressure pulse reaches the last one a quarter of a second later, ahead of the wobble. The highlight and the density of the gel are read off the strain. Drag a finger through it; click to flick it. At rest it stops drawing.',
+    create: (initialControls) =>
+      createAspicAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

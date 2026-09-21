@@ -8,7 +8,8 @@
  * The model is linear elasticity (Navier–Cauchy) with a restoring spring and
  * viscous damping, in per-step units:
  *
- *   a = CS2·∇²u + (CP2 − CS2)·∇(∇·u) − W2·u − G·v      v += a      u += v
+ *   a = CS2·∇²u + (CP2 − CS2)·∇(∇·u) − W2·u − G·v + NU·∇²v
+ *   v += a      u += v
  *
  * Two wave speeds, because a gel has two: compression runs ahead at CP and
  * the visible wobble follows as shear at CS. The spring is what brings the
@@ -35,6 +36,14 @@ export const CS2 = 0.16;
 export const W2 = (18.2 / SPS) ** 2;
 /** γ/SPS with γ = 6.5 s⁻¹: amplitude decays as e^(−γt/2), 2 % at 1.2 s. */
 export const G = 6.5 / SPS;
+/**
+ * Kelvin–Voigt viscosity, per step. Damping that grows with the square of
+ * the wavenumber: it takes the grid-scale ringing out in a few steps and
+ * barely touches the slab-sized sway, which is how a gel behaves and why it
+ * jiggles rather than buzzes. Without it a drop leaves the slab striped with
+ * two-cell compression modes that G alone takes a second to clear.
+ */
+export const NU = 0.06;
 /** Seconds after the last input by which motion is under a part in 10³. */
 export const SLEEP_AFTER = (2 * Math.log(1e3)) / 6.5;
 
@@ -91,10 +100,21 @@ export function stepGel(g: Gel): void {
       const uxy_x = (ux[a] - ux[b] - ux[e] + ux[f]) * 0.25;
       const uxy_y = (uy[a] - uy[b] - uy[e] + uy[f]) * 0.25;
 
+      const lvx = vx[l] + vx[r] + vx[d] + vx[u] - 4 * vx[c];
+      const lvy = vy[l] + vy[r] + vy[d] + vy[u] - 4 * vy[c];
+
       const ax =
-        CS2 * (uxx_x + uyy_x) + K * (uxx_x + uxy_y) - W2 * ux[c] - G * vx[c];
+        CS2 * (uxx_x + uyy_x) +
+        K * (uxx_x + uxy_y) -
+        W2 * ux[c] -
+        G * vx[c] +
+        NU * lvx;
       const ay =
-        CS2 * (uxx_y + uyy_y) + K * (uxy_x + uyy_y) - W2 * uy[c] - G * vy[c];
+        CS2 * (uxx_y + uyy_y) +
+        K * (uxy_x + uyy_y) -
+        W2 * uy[c] -
+        G * vy[c] +
+        NU * lvy;
       nx[c] = vx[c] + ax;
       ny[c] = vy[c] + ay;
     }
@@ -145,7 +165,10 @@ export function poke(
 export function drop(g: Gel, v: number, lean = 0.6): void {
   const { gw, gh } = g;
   for (let j = 1; j < gh; j++) {
-    const h = j / (gh - 1);
+    // Smoothstep in height: no kink at the pinned base or the free top, so
+    // the landing excites the sway and not every plane mode above it.
+    const t = j / (gh - 1);
+    const h = t * t * (3 - 2 * t);
     for (let i = 0; i < gw; i++) {
       g.vy[i + j * gw] -= v * h;
       g.vx[i + j * gw] += v * lean * h;

@@ -81,6 +81,26 @@ describe('aspic gel', () => {
     expect(settledAt).toBeLessThanOrEqual(1.4);
   });
 
+  it('rings down its grid-scale modes long before its sway', () => {
+    // A two-cell checker in velocity is the worst stripe the grid can hold.
+    const g = makeGel(GW, GH);
+    for (let j = 1; j < GH; j++) {
+      for (let i = 0; i < GW; i++) g.vy[at(i, j)] = j % 2 ? 0.02 : -0.02;
+    }
+    const e0 = gelEnergy(g);
+    run(g, 0.1);
+    expect(gelEnergy(g) / e0).toBeLessThan(1e-3);
+
+    // The sway, over the same tenth of a second, has barely started to fade.
+    const s = makeGel(GW, GH);
+    for (let j = 1; j < GH; j++) {
+      for (let i = 0; i < GW; i++) s.vx[at(i, j)] = 0.02 * (j / GH);
+    }
+    const s0 = gelEnergy(s);
+    run(s, 0.1);
+    expect(gelEnergy(s) / s0).toBeGreaterThan(0.3);
+  });
+
   it('carries a poke across the slab in about a third of a second', () => {
     const g = makeGel(GW, GH);
     poke(g, 6, 30, 4, 0.3, 0);
