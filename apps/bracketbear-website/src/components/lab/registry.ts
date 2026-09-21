@@ -24,6 +24,7 @@ import {
   createKaleidoAnimation,
   createLedMatrixAnimation,
   createLogoResolveAnimation,
+  createOffRegisterAnimation,
   createPixelSunriseAnimation,
   createPortalMarkAnimation,
   createRdVatAnimation,
@@ -517,6 +518,18 @@ export const REGISTRY: LabEntry[] = [
       'A Pittsburgh corner at night in the rain, no light, a cop in the middle. Two streams of cars want the same crossing. Every car follows the Intelligent Driver Model, so braking waves run backward up a queue and jams appear from nothing, and drivers at the line take gaps by a critical gap that shrinks the longer they wait: a driver who has waited long enough forces one, and the crossing car brakes, and that runs back up the other queue. Wet asphalt is a mirror, so every light is reflected by mirroring its geometry through the road. Hover an approach to hold it, click to wave it through, click the box to clear it. Leave, and the four-way-stop rule runs the corner on its own.',
     create: (initialControls) =>
       createFourWayStopAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'off-register',
+    section: 'type',
+    name: 'Off Register',
+    tag: 'glsl shader',
+    blurb:
+      'A heading printed in three passes that have not quite lined up: two halftone plates and an ink keyline, each one a mass on a spring. They start apart and land one after another, the heaviest last. The moiré between the colour plates is the overprint of two dot screens set five degrees apart, so its bands are the size of a letter and sweep across the letters when a knock turns a plate. Drag across the stack and the light plate moves first; click to knock all three. At rest it stops drawing. Type your own line into Phrase.',
+    create: (initialControls) =>
+      createOffRegisterAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

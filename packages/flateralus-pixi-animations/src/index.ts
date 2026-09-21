@@ -25,6 +25,7 @@ export * from './kaleido';
 export * from './led-matrix';
 export * from './logo-particle-sphere';
 export * from './logo-resolve';
+export * from './off-register';
 export * from './particle-sphere';
 export * from './particle-wave';
 export * from './pixel-sunrise';

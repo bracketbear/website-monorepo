@@ -290,6 +290,18 @@ export function headlineMask(): HTMLCanvasElement | null {
 
 const phraseCache = new Map<string, HTMLCanvasElement>();
 
+/** The type size each phrase canvas was set at, in its own pixels. */
+const phraseSize = new WeakMap<HTMLCanvasElement, number>();
+
+/**
+ * One em of a phrase mask, in the mask's own pixels — for effects that size
+ * something against the type (a halftone pitch, a stroke width) rather than
+ * against the block. Zero for a canvas `phraseMask` did not make.
+ */
+export function phraseEm(mask: HTMLCanvasElement): number {
+  return phraseSize.get(mask) ?? 0;
+}
+
 /**
  * Break `words` into `n` lines, balancing measured width across the lines.
  *
@@ -385,6 +397,7 @@ function buildPhrase(text: string, targetAspect: number): HTMLCanvasElement {
     // 0.72 em is Anton's cap height; it centres the caps in the line box.
     g.fillText(l, W / 2, pad + size * (LEADING * i + 0.72));
   });
+  phraseSize.set(cv, size);
   return cv;
 }
 
