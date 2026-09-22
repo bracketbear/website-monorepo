@@ -45,8 +45,8 @@ is the subject they were missing.
 
 **Rejected siblings.** "Heat-haze with springs" — Aspic is only worth building
 if the gel is a _body_, with a pinned base and waves that carry a poke from
-one letter to the next; a displacement field that merely wobbles in place is
-the haze again. "The pool with type on the floor" — type under a ripple tank
+one end of a letter to the other; a displacement field that merely wobbles in
+place is the haze again. "The pool with type on the floor" — type under a ripple tank
 is `caustics-pool`'s anatomy and was not considered further.
 
 ## The shelf
@@ -60,7 +60,11 @@ Shared by all four:
 - **`phrase`** — `text` control, `maxLength: 64`, set through `phraseMask`.
   A change re-seeds the effect, which replays the arrival. `phraseMask`
   returns null until Anton loads; every effect keeps asking rather than
-  caching the null, as `ink-dissolve` does.
+  caching the null, as `ink-dissolve` does. The rasterizer now measures the
+  face's cap height instead of assuming 0.72 em — Anton's caps are taller,
+  and the first line was losing its top — and records each canvas's size,
+  baselines and line extents (`phraseMetricsOf`) for effects that need to
+  know where the type stands.
 - **`textScale`**, **`grain`**, and (where the effect has two grounds)
   **`stage`**, matching the existing shader effects.
 - **Reduced motion.** The framework has none today. These four ship with it:
@@ -130,40 +134,45 @@ the type, and the key plate guarantees the letterform whatever the screens do.
 
 ## Aspic
 
-The heading set in a slab of amber gel, dropped onto a plate.
+The heading turned out of a jelly mould: every letter its own body of gel,
+standing on a plate.
 
-**Rubric.** Subject: a jelly on a plate. Legible at once. Measured: strain.
-Loop: a poke at one letter reaches the others.
+**Rubric.** Subject: jellies on a plate. Legible at once. Measured: strain.
+Loop: a poke at one end of a letter reaches the other end; a poke at one
+letter does not reach the next.
 
-**State.** `PingPong`, RGBA**32**F: `xy` displacement `u`, `zw` velocity `v`.
-The slab is a rounded rectangle around the type block.
+**State.** `PingPong`, RGBA**32**F: `xy` displacement `u`, `zw` velocity `v`,
+on a grid 200 cells across the type block plus a margin. A second texture
+carries the domain: each letterform grown by five cells is a _hull_, and the
+hull cells within a row and a half of the line's baseline (or below it, in
+the margin) are _pinned_. Outside the hulls is air.
 
     v += (c² ∇²u − ω₀² u − γ v + ν ∇²v) dt      u += v dt
 
-Two things the build added. Kelvin–Voigt viscosity `ν∇²v`, which takes the
-grid-scale ringing out in a few steps and leaves the sway alone — without it
-a drop leaves the slab striped with two-cell compression modes. And 32-bit
-state: with half floats the per-step increment (~10⁻³) is rounded by ten
-percent against a velocity near 0.2, and because the rounding depends only on
-the value, a state uniform along a row is striped along it. The CPU mirror,
-in Float32, cannot see this; the screen can. `PingPong` now takes
-`fullPrecision` for any integrator.
-Symplectic Euler at a fixed 1/480 s, at most 12 steps a frame. Bottom row
-pinned (`u = 0`) — it sits on the plate — and the other edges free. Grid is
-~5760 cells from the block aspect (96×60 at 1.6). A displacement field is
-smooth, so linear filtering carries it to screen resolution.
+A neighbour outside the hull reads as the cell itself — zero traction to
+first order, a free edge — so each letter is its own elastic body and two
+that do not touch cannot feel each other; the mirror asserts a poke crosses a
+letter and arrives at the next as exactly zero. The margin exists so a lean
+carries the silhouette into cells that hold displacement: the display reads
+the letter at the material point under each pixel, `m = sp − u(sp)`, and a
+pixel just outside the undeformed letter needs a `u` to read.
 
-Numbers: `c = 0.57` cells/step, under the 0.707 CFL limit, is 274 cells/s —
-a poke crosses the block in **0.35 s**. `γ = 6.5 s⁻¹` takes amplitude to 2 %
-in **1.2 s**. `ω₀` is tuned so the fundamental sway lands near **3 Hz**
-(the slab's own shear mode, `c/4H ≈ 1.1 Hz`, adds in quadrature).
+_First built as one slab with the type inside it_, which was the spec's
+original shape. It read as a tray. The letters as the bodies are the
+different animal: the material is the type. Kelvin–Voigt viscosity `ν∇²v`
+takes the grid-scale ringing out and leaves the sway alone; 32-bit state
+because half floats stripe an integrator (see `PingPong.fullPrecision`).
 
-**Arrival.** The slab starts displaced upward with downward velocity and
-lands. Because the base is pinned, the top sways most — which is the look.
+**Arrival.** Each letter drops onto its own line's plate: every free cell
+starts moving down in proportion to its height above its foot, with a lean.
+Because the foot is pinned, the top sways most — which is the look.
 
-**Display.** Mask sampled at `luv − u`. The slab body is shaded from `∇·u`:
-compression raises optical density and drives a surface bulge whose gradient
-gives the specular highlight. One field, every visible thing derived from it.
+**Display.** The letter's cross-section (a chamfer distance to its edge,
+baked into the domain texture) raises a dome; the strain `∇·u` bulges it and
+sets the gel's density; one key light gives lambert and specular off that
+surface. A plate under each line, and each letter's own squashed silhouette
+as a contact shadow that leans with the top of the line. Same field, every
+visible thing derived from it.
 
 **Input.** The pointer is a finger with a radius: inside it, `v` is dragged
 toward pointer velocity, stamped along the path. A click is a flick impulse.

@@ -542,7 +542,7 @@ export const REGISTRY: LabEntry[] = [
     name: 'Aspic',
     tag: 'glsl sim',
     blurb:
-      'A heading set in a slab of gel and dropped on a plate. The slab is a small grid of displacements under linear elasticity, with its base pinned, so it lands, sways from the top at about 3 Hz, and is still again in a little over a second. Compression travels faster than shear: poke the first letter and a pressure pulse reaches the last one a quarter of a second later, ahead of the wobble. The highlight and the density of the gel are read off the strain. Drag a finger through it; click to flick it. At rest it stops drawing.',
+      'The heading turned out of a jelly mould. Every letter is its own body of gel under linear elasticity, standing on its plate along its foot with its other edges free: it drops, sways from the base at about 3 Hz, and is still again in a little over a second. Compression travels faster than shear, so a pressure pulse crosses a letter ahead of its wobble, and letters that do not touch cannot feel each other. The highlight and the density of the gel are read off the strain. Drag a finger through a letter; click to flick it. At rest it stops drawing.',
     create: (initialControls) =>
       createAspicAnimation(
         initialControls as never

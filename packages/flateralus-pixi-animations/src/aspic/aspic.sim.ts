@@ -1,5 +1,5 @@
 /**
- * A slab of gel, as a small grid of displacements.
+ * Letters set in gel, as a small grid of displacements.
  *
  * Pure arithmetic — no DOM, no GL. The sim shader in aspicAnimation.ts is a
  * port of `stepGel` and interpolates the constants below, so what is tested
@@ -13,11 +13,17 @@
  *
  * Two wave speeds, because a gel has two: compression runs ahead at CP and
  * the visible wobble follows as shear at CS. The spring is what brings the
- * type back to where it was set; without it the slab would come to rest
+ * type back to where it was set; without it a letter would come to rest
  * wherever the last poke left it.
  *
- * Displacement is in grid cells. Row 0 is the bottom of the slab and is
- * pinned — it sits on the plate — and the other three edges are free.
+ * The gel is the type. Each letterform, grown by a small margin, is its own
+ * elastic body — the `hull` — and its edge is free: a neighbour outside the
+ * hull is taken to be the cell itself, which is zero traction to first
+ * order. Two letters that do not touch cannot feel each other. A body is
+ * held to the plate along its `pinned` cells, the foot of the letter, and
+ * sways from there.
+ *
+ * Displacement is in grid cells. Row 0 is the bottom of the grid.
  */
 
 /** Steps per second. */
@@ -54,13 +60,32 @@ export interface Gel {
   uy: Float32Array;
   vx: Float32Array;
   vy: Float32Array;
+  /** 1 where there is gel. */
+  hull: Uint8Array;
+  /** 1 where the gel is held to the plate. */
+  pinned: Uint8Array;
   /** Scratch for the step, so reads never see this step's writes. */
   nx: Float32Array;
   ny: Float32Array;
 }
 
-export function makeGel(gw: number, gh: number): Gel {
+/**
+ * A gel on a grid. With no hull the whole grid is one slab pinned along its
+ * bottom row, which is what the wave and settle tests measure on.
+ */
+export function makeGel(
+  gw: number,
+  gh: number,
+  body?: { hull: Uint8Array; pinned: Uint8Array }
+): Gel {
   const n = gw * gh;
+  let hull = body?.hull;
+  let pinned = body?.pinned;
+  if (!hull || !pinned) {
+    hull = new Uint8Array(n).fill(1);
+    pinned = new Uint8Array(n);
+    for (let i = 0; i < gw; i++) pinned[i] = 1;
+  }
   return {
     gw,
     gh,
@@ -68,38 +93,87 @@ export function makeGel(gw: number, gh: number): Gel {
     uy: new Float32Array(n),
     vx: new Float32Array(n),
     vy: new Float32Array(n),
+    hull,
+    pinned,
     nx: new Float32Array(n),
     ny: new Float32Array(n),
   };
 }
 
-export function stepGel(g: Gel): void {
-  const { gw, gh, ux, uy, vx, vy, nx, ny } = g;
-  const K = CP2 - CS2;
-  for (let j = 1; j < gh; j++) {
-    const jm = j - 1;
-    const jp = Math.min(gh - 1, j + 1);
+/**
+ * The bodies a phrase makes. Every letter grown by `margin` cells is a hull,
+ * so a lean carries the silhouette into cells that hold displacement; and
+ * every hull cell within `foot` rows above a baseline (or below it, in the
+ * margin) is pinned — the letter stands on its plate along its foot, and a
+ * round-bottomed letter stands on the margin's flat skirt like a jelly
+ * turned out of a mould.
+ */
+export function bodiesOf(
+  letters: Float32Array,
+  gw: number,
+  gh: number,
+  margin: number,
+  baselineRows: number[],
+  foot: number
+): { hull: Uint8Array; pinned: Uint8Array } {
+  const n = gw * gh;
+  const hull = new Uint8Array(n);
+  const pinned = new Uint8Array(n);
+  const R = Math.ceil(margin);
+  for (let j = 0; j < gh; j++) {
     for (let i = 0; i < gw; i++) {
-      const im = Math.max(0, i - 1);
-      const ip = Math.min(gw - 1, i + 1);
+      if (letters[i + j * gw] < 0.5) continue;
+      for (let dj = -R; dj <= R; dj++) {
+        for (let di = -R; di <= R; di++) {
+          if (di * di + dj * dj > margin * margin) continue;
+          const x = i + di;
+          const y = j + dj;
+          if (x >= 0 && y >= 0 && x < gw && y < gh) hull[x + y * gw] = 1;
+        }
+      }
+    }
+  }
+  for (const b of baselineRows) {
+    const lo = Math.max(0, Math.floor(b - margin));
+    const hi = Math.min(gh - 1, Math.ceil(b + foot));
+    for (let j = lo; j <= hi; j++) {
+      for (let i = 0; i < gw; i++) {
+        if (hull[i + j * gw]) pinned[i + j * gw] = 1;
+      }
+    }
+  }
+  return { hull, pinned };
+}
+
+export function stepGel(g: Gel): void {
+  const { gw, gh, ux, uy, vx, vy, nx, ny, hull, pinned } = g;
+  const K = CP2 - CS2;
+  // A neighbour outside the gel reads as the cell itself: a free edge.
+  const at = (c: number, x: number, y: number) => {
+    if (x < 0 || y < 0 || x >= gw || y >= gh) return c;
+    const k = x + y * gw;
+    return hull[k] ? k : c;
+  };
+  for (let j = 0; j < gh; j++) {
+    for (let i = 0; i < gw; i++) {
       const c = i + j * gw;
-      const l = im + j * gw;
-      const r = ip + j * gw;
-      const d = i + jm * gw;
-      const u = i + jp * gw;
+      if (!hull[c] || pinned[c]) continue;
+      const l = at(c, i - 1, j);
+      const r = at(c, i + 1, j);
+      const d = at(c, i, j - 1);
+      const u = at(c, i, j + 1);
+      const a = at(c, i + 1, j + 1);
+      const b = at(c, i - 1, j + 1);
+      const e = at(c, i + 1, j - 1);
+      const f = at(c, i - 1, j - 1);
 
       const uxx_x = ux[l] + ux[r] - 2 * ux[c];
       const uyy_x = ux[d] + ux[u] - 2 * ux[c];
       const uxx_y = uy[l] + uy[r] - 2 * uy[c];
       const uyy_y = uy[d] + uy[u] - 2 * uy[c];
       // Mixed derivative: the four corners, over four.
-      const a = ip + jp * gw;
-      const b = im + jp * gw;
-      const e = ip + jm * gw;
-      const f = im + jm * gw;
       const uxy_x = (ux[a] - ux[b] - ux[e] + ux[f]) * 0.25;
       const uxy_y = (uy[a] - uy[b] - uy[e] + uy[f]) * 0.25;
-
       const lvx = vx[l] + vx[r] + vx[d] + vx[u] - 4 * vx[c];
       const lvy = vy[l] + vy[r] + vy[d] + vy[u] - 4 * vy[c];
 
@@ -119,14 +193,12 @@ export function stepGel(g: Gel): void {
       ny[c] = vy[c] + ay;
     }
   }
-  for (let j = 1; j < gh; j++) {
-    for (let i = 0; i < gw; i++) {
-      const c = i + j * gw;
-      vx[c] = nx[c];
-      vy[c] = ny[c];
-      ux[c] += vx[c];
-      uy[c] += vy[c];
-    }
+  for (let c = 0; c < gw * gh; c++) {
+    if (!hull[c] || pinned[c]) continue;
+    vx[c] = nx[c];
+    vy[c] = ny[c];
+    ux[c] += vx[c];
+    uy[c] += vy[c];
   }
 }
 
@@ -159,44 +231,90 @@ export function poke(
 }
 
 /**
- * The arrival: the slab lands. Everything above the base is moving down, the
- * top fastest, with a little lean so it does not land dead square.
+ * The arrival: the gel lands. Every free cell is moving down, faster the
+ * higher it stands above its plate, with a little lean so nothing lands
+ * dead square. `height` is how far above its foot a cell is, 0..1, so a
+ * letter on the second line drops onto its own plate and not the floor.
  */
-export function drop(g: Gel, v: number, lean = 0.6): void {
-  const { gw, gh } = g;
-  for (let j = 1; j < gh; j++) {
-    // Smoothstep in height: no kink at the pinned base or the free top, so
-    // the landing excites the sway and not every plane mode above it.
-    const t = j / (gh - 1);
+export function drop(
+  g: Gel,
+  v: number,
+  height: (k: number) => number,
+  lean = 0.6
+): void {
+  for (let k = 0; k < g.gw * g.gh; k++) {
+    if (!g.hull[k] || g.pinned[k]) continue;
+    // Smoothstep in height: no kink at the foot or the top.
+    const t = Math.min(1, Math.max(0, height(k)));
     const h = t * t * (3 - 2 * t);
-    for (let i = 0; i < gw; i++) {
-      g.vy[i + j * gw] -= v * h;
-      g.vx[i + j * gw] += v * lean * h;
-    }
+    g.vy[k] -= v * h;
+    g.vx[k] += v * lean * h;
   }
 }
 
 /** Kinetic, spring and elastic energy, summed over the slab. */
 export function gelEnergy(g: Gel): number {
-  const { gw, gh, ux, uy, vx, vy } = g;
+  const { gw, gh, ux, uy, vx, vy, hull } = g;
   let e = 0;
   for (let j = 0; j < gh; j++) {
     for (let i = 0; i < gw; i++) {
       const c = i + j * gw;
+      if (!hull[c]) continue;
       e += 0.5 * (vx[c] * vx[c] + vy[c] * vy[c]);
       e += 0.5 * W2 * (ux[c] * ux[c] + uy[c] * uy[c]);
-      if (i + 1 < gw && j + 1 < gh) {
-        const r = c + 1;
-        const u = c + gw;
-        const dxx = ux[r] - ux[c];
-        const dxy = ux[u] - ux[c];
-        const dyx = uy[r] - uy[c];
-        const dyy = uy[u] - uy[c];
-        e += 0.5 * CS2 * (dxx * dxx + dxy * dxy + dyx * dyx + dyy * dyy);
-        const div = dxx + dyy;
-        e += 0.5 * (CP2 - CS2) * div * div;
-      }
+      const r = i + 1 < gw && hull[c + 1] ? c + 1 : c;
+      const u = j + 1 < gh && hull[c + gw] ? c + gw : c;
+      const dxx = ux[r] - ux[c];
+      const dxy = ux[u] - ux[c];
+      const dyx = uy[r] - uy[c];
+      const dyy = uy[u] - uy[c];
+      e += 0.5 * CS2 * (dxx * dxx + dxy * dxy + dyx * dyx + dyy * dyy);
+      const div = dxx + dyy;
+      e += 0.5 * (CP2 - CS2) * div * div;
     }
   }
   return e;
+}
+
+/**
+ * Distance from each letter cell to the nearest air cell, in cells, capped
+ * at `cap`: a chamfer pass down and up the grid. This is the letter's
+ * cross-section — how far under the surface a point of the stroke is — and
+ * the display raises the gel's dome on it.
+ */
+export function insideDistance(
+  letters: Float32Array,
+  gw: number,
+  gh: number,
+  cap: number
+): Float32Array {
+  const d = new Float32Array(gw * gh);
+  for (let k = 0; k < gw * gh; k++) d[k] = letters[k] >= 0.5 ? cap : 0;
+  const relax = (k: number, n: number, w: number) => {
+    if (n >= 0 && n < gw * gh && d[n] + w < d[k]) d[k] = d[n] + w;
+  };
+  const D = Math.SQRT2;
+  for (let j = 0; j < gh; j++) {
+    for (let i = 0; i < gw; i++) {
+      const k = i + j * gw;
+      if (!d[k]) continue;
+      if (i > 0) relax(k, k - 1, 1);
+      if (j > 0) relax(k, k - gw, 1);
+      if (i > 0 && j > 0) relax(k, k - gw - 1, D);
+      if (i < gw - 1 && j > 0) relax(k, k - gw + 1, D);
+      if (i === 0 || j === 0) d[k] = Math.min(d[k], 1);
+    }
+  }
+  for (let j = gh - 1; j >= 0; j--) {
+    for (let i = gw - 1; i >= 0; i--) {
+      const k = i + j * gw;
+      if (!d[k]) continue;
+      if (i < gw - 1) relax(k, k + 1, 1);
+      if (j < gh - 1) relax(k, k + gw, 1);
+      if (i < gw - 1 && j < gh - 1) relax(k, k + gw + 1, D);
+      if (i > 0 && j < gh - 1) relax(k, k + gw - 1, D);
+      if (i === gw - 1 || j === gh - 1) d[k] = Math.min(d[k], 1);
+    }
+  }
+  return d;
 }
