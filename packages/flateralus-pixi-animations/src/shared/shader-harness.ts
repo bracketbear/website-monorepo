@@ -296,16 +296,32 @@ export function headlineMask(): HTMLCanvasElement | null {
 
 const phraseCache = new Map<string, HTMLCanvasElement>();
 
-/** The type size each phrase canvas was set at, in its own pixels. */
-const phraseSize = new WeakMap<HTMLCanvasElement, number>();
+/** How a phrase canvas was set, in its own pixels. */
+export interface PhraseMetrics {
+  /** Type size. */
+  size: number;
+  /** Cap height, measured from the face rather than assumed. */
+  capHeight: number;
+  /** Baseline y of each line, top to bottom. */
+  baselines: number[];
+  /** Left and right extent of each line's ink. */
+  extents: [number, number][];
+}
+
+const phraseMetrics = new WeakMap<HTMLCanvasElement, PhraseMetrics>();
 
 /**
- * One em of a phrase mask, in the mask's own pixels — for effects that size
- * something against the type (a halftone pitch, a stroke width) rather than
- * against the block. Zero for a canvas `phraseMask` did not make.
+ * How a phrase mask was set — for effects that size something against the
+ * type (a halftone pitch) or need to know where its baselines are (a jelly
+ * on a plate). Null for a canvas `phraseMask` did not make.
  */
+export function phraseMetricsOf(mask: HTMLCanvasElement): PhraseMetrics | null {
+  return phraseMetrics.get(mask) ?? null;
+}
+
+/** One em of a phrase mask, in the mask's own pixels; zero if not a phrase. */
 export function phraseEm(mask: HTMLCanvasElement): number {
-  return phraseSize.get(mask) ?? 0;
+  return phraseMetrics.get(mask)?.size ?? 0;
 }
 
 /**
@@ -385,6 +401,17 @@ function buildPhrase(text: string, targetAspect: number): HTMLCanvasElement {
   g.font = '100px Anton';
   const em = (t: string) => g.measureText(t).width / 100;
   const lines = planPhraseLines(text, em, targetAspect);
+  // Anton's caps stand taller than the 0.72 em a guess would give them, and
+  // a round letter overshoots its cap line besides. Measure the tallest
+  // line's actual ink rather than assume, or the first line loses its top.
+  const capHeight =
+    Math.max(
+      ...lines.map((l) => g.measureText(l).actualBoundingBoxAscent || 0)
+    ) / 100;
+  const descent =
+    Math.max(
+      ...lines.map((l) => g.measureText(l).actualBoundingBoxDescent || 0)
+    ) / 100;
 
   // Rasterize wide enough that the letterforms survive the dye grid, then
   // let the caller letterbox it. 1600px across is ~1.5 dye texels per source
@@ -393,17 +420,24 @@ function buildPhrase(text: string, targetAspect: number): HTMLCanvasElement {
   const pad = Math.round(W * 0.03);
   const size = Math.round((W - pad * 2) / Math.max(...lines.map(em)));
   cv.width = W;
-  cv.height = Math.round(size * LEADING * lines.length + pad * 2);
+  cv.height = Math.round(
+    size * (capHeight + LEADING * (lines.length - 1) + descent) + pad * 2
+  );
   // Resizing the canvas resets the context, so restate everything.
   g.font = `${size}px Anton`;
   g.fillStyle = '#fff';
   g.textAlign = 'center';
   g.textBaseline = 'alphabetic';
+  const baselines: number[] = [];
+  const extents: [number, number][] = [];
   lines.forEach((l, i) => {
-    // 0.72 em is Anton's cap height; it centres the caps in the line box.
-    g.fillText(l, W / 2, pad + size * (LEADING * i + 0.72));
+    const y = pad + size * (capHeight + LEADING * i);
+    g.fillText(l, W / 2, y);
+    baselines.push(y);
+    const w = g.measureText(l).width;
+    extents.push([(W - w) / 2, (W + w) / 2]);
   });
-  phraseSize.set(cv, size);
+  phraseMetrics.set(cv, { size, capHeight, baselines, extents });
   return cv;
 }
 
