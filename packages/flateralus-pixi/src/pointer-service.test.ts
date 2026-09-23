@@ -27,8 +27,9 @@ describe('PointerService', () => {
   });
 
   it('starts inactive at the origin', () => {
-    expect(svc.mouse).toEqual({ x: 0, y: 0, active: false });
+    expect(svc.mouse).toEqual({ x: 0, y: 0, active: false, down: false });
     expect(svc.clicks).toHaveLength(0);
+    expect(svc.releases).toHaveLength(0);
   });
 
   it('records pointer position relative to the host', () => {
@@ -88,5 +89,33 @@ describe('PointerService', () => {
     );
     expect(svc.mouse.active).toBe(false);
     second.remove();
+  });
+
+  it('holds down from pointerdown to pointerup and queues the release', () => {
+    host.dispatchEvent(
+      new MouseEvent('pointerdown', { clientX: 30, clientY: 40, bubbles: true })
+    );
+    expect(svc.mouse.down).toBe(true);
+    host.dispatchEvent(
+      new MouseEvent('pointerup', { clientX: 50, clientY: 60, bubbles: true })
+    );
+    expect(svc.mouse.down).toBe(false);
+    expect(svc.releases).toEqual([{ x: 40, y: 40 }]);
+  });
+
+  it('cancels a hold on pointerleave without a release', () => {
+    host.dispatchEvent(
+      new MouseEvent('pointerdown', { clientX: 30, clientY: 40, bubbles: true })
+    );
+    host.dispatchEvent(new MouseEvent('pointerleave', { bubbles: true }));
+    expect(svc.mouse.down).toBe(false);
+    expect(svc.releases).toHaveLength(0);
+  });
+
+  it('ignores a pointerup with no hold', () => {
+    host.dispatchEvent(
+      new MouseEvent('pointerup', { clientX: 50, clientY: 60, bubbles: true })
+    );
+    expect(svc.releases).toHaveLength(0);
   });
 });
