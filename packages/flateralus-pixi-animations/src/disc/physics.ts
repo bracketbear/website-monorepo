@@ -217,27 +217,29 @@ export function totalMass(D: Disc): number {
   return m;
 }
 
-/** Relative m = 2 Fourier amplitude of Σ around ring i: the wake's signature. */
-export function wakeM2(D: Disc, i: number): number {
-  let c = 0;
+/**
+ * RMS relative perturbation of Σ around ring i: the wake's contrast. Not
+ * a Fourier mode — at one ring the wake is a single peak about H wide,
+ * whose low-m coefficients carry only a few percent of it.
+ */
+export function wakeRms(D: Disc, i: number): number {
+  const mean = ringMean(D, i);
+  if (mean <= 0) return 0;
   let s = 0;
-  let m = 0;
   for (let j = 0; j < D.nphi; j++) {
-    const phi = (j + 0.5) * D.dphi;
-    const v = D.sig[i * D.nphi + j];
-    c += v * Math.cos(2 * phi);
-    s += v * Math.sin(2 * phi);
-    m += v;
+    const d = D.sig[i * D.nphi + j] / mean - 1;
+    s += d * d;
   }
-  return Math.hypot(c, s) / Math.max(m, 1e-30);
+  return Math.sqrt(s / D.nphi);
 }
 
-/** Mean wake amplitude two scale heights inside and outside r_p. */
+/** Mean wake contrast two scale heights inside and outside r_p. */
 export function wakeAmplitude(D: Disc, rp: number, h: number): number {
   const H = h * rp;
   return (
     0.5 *
-    (wakeM2(D, ringIndex(D, rp - 2 * H)) + wakeM2(D, ringIndex(D, rp + 2 * H)))
+    (wakeRms(D, ringIndex(D, rp - 2 * H)) +
+      wakeRms(D, ringIndex(D, rp + 2 * H)))
   );
 }
 
