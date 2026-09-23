@@ -4,8 +4,7 @@ A protoplanetary disc seen from above its pole: a young star, a disc of gas
 and dust from an inner cavity out to a soft edge, and one planet already in
 it trailing a spiral wake. You throw seeds. Small ones raise a wake and eat;
 one that eats past the gap-opening mass clears a dark annulus in front of
-you. The disc drains into the star over minutes and the planets keep what
-they took.
+you. The planets keep what they took, and the disc is what is left.
 
 The first _feed_ toy on the shelf, after the rule in
 [`docs/lab/TOY-IDEAS.md`](../../lab/TOY-IDEAS.md) that a new toy carries the
@@ -40,7 +39,7 @@ inside.
 3. **Consequences that travel.** A seed's wake is a spiral that wraps the
    whole disc; a gap changes what every later seed can eat.
 4. **Parts that play alone.** The seeded planet migrates, eats and carves
-   without anyone there; the disc drains into the star on its own clock.
+   without anyone there.
 5. **Differing parts.** Seeds of different mass are different objects: a
    wake-maker, a gap-opener, one that falls into the star.
 6. **Honest material.** Colour is the disc's temperature through a Planck
@@ -74,8 +73,9 @@ cavity, the outer edge is outflow.
 
 One `PingPong` at `fullPrecision` (the half-float integrator stripes are
 already documented). RGBA per cell: surface density `Σ`, radial velocity
-`v_r`, azimuthal velocity `v_φ` (full, not the deviation), and a spare
-channel reserved for dust in v2.
+`v_r`, azimuthal velocity `v_φ` (full, not the deviation), and the mass the
+accretion sink removed from the cell this frame, which is how the reduce
+knows what each planet ate.
 
 ### Equations
 
@@ -92,9 +92,15 @@ c_s = h · v_K(r),          h = H/r = 0.05  →  c_s ∝ r^−½
 
 `h` is the one constant that sets the pressure, the softening, the wake's
 pitch and the colour (§ Rendering). The initial `Σ ∝ r^−1`, normalised so the
-disc holds `discMass` of the star (default 0.02), tapered to zero over the
-last 10 % of radius, with the rotation curve corrected for the pressure
-gradient so the disc starts in equilibrium.
+disc holds `discMass` of the star (default 0.02), tapered to a floor over
+the last 10 % of radius and the first few cells, with the rotation curve
+solved from the _discrete_ pressure gradient the step uses, so the disc
+starts in equilibrium to round-off rather than to the analytic
+approximation.
+
+The viscosity is not the disc's clock. `t_ν = 1/(α h² Ω) ≈ 1.3×10⁵` time
+units at `r = 1` — a day of wall clock — so at this `α` the disc does not
+drain visibly. What consumes it is the planets (tension 4).
 
 ### Step — orbital advection
 
@@ -103,23 +109,33 @@ whole velocity field would either smear a 4-cell arm into nothing or need a
 step too small to afford. The real codes solve this with **orbital
 advection** (Masset 2000, FARGO), and so does this one. Each substep:
 
-1. **Orbital shift.** Every ring is shifted by exactly `Ω_K(r)·dt` in φ — a
-   fractional texel offset, bilinear. Exact for the Keplerian part, no
-   diffusion.
-2. **Residual advection.** `(v_r, v_φ − v_K)` is order `c_s`; advect Σ and
-   v by it semi-Lagrangian with a MacCormack correction, so an arm survives
-   a wrap.
-3. **Sources.** Pressure gradient, star and planet gravity, centrifugal and
+1. **Sources.** Pressure gradient, star and planet gravity, centrifugal and
    Coriolis terms in polar form:
    `a_r = v_φ²/r − 1/r² − (1/Σ)∂P/∂r − ∂Φ_p/∂r`,
    `a_φ = −v_r v_φ/r − (1/(Σ r))∂P/∂φ − (1/r)∂Φ_p/∂φ`.
    **Semi-implicit Euler**: update `v_φ`, then `v_r` with the new `v_φ`.
    Forward Euler on an epicycle at the inner edge grows about 1 % a step
    and e-folds in two seconds; semi-implicit is stable for `ω·dt < 2`.
-4. **Viscosity.** `ν∇²v`, explicit; the diffusive CFL is loose at this `α`.
-5. **Accretion sink.** Inside `0.5 r_H` of each planet
-   (`r_H = r_p (q/3)^⅓`, Kley's prescription) Σ is removed at rate
-   `1/τ_acc`. What is removed is what the planet gains (§ The planets).
+   Viscosity `ν∇²v` is folded in, explicit; the diffusive CFL is loose at
+   this `α`.
+2. **Accretion sink**, in the same pass. Inside `max(0.5 r_H, 1.5 cells)` of
+   each planet (`r_H = r_p (q/3)^⅓`, Kley's prescription; the floor because
+   a fresh seed's half-Hill radius is 0.008, under one cell, and a sink the
+   grid cannot see never feeds) Σ is removed at rate `1/τ_acc`. What is
+   removed is written to the fourth channel and is what the planet gains
+   (§ The planets).
+3. **Azimuthal transport with orbital shift.** Every ring is shifted by the
+   integer number of cells nearest `Ω_K(r)·dt/Δφ` — an exact permutation,
+   no diffusion — and the remainder (under half a cell) plus the real
+   deviation `v_φ − v_K` is the residual, order `c_s`, which transports Σ,
+   `Σ v_r` and `Σ r v_φ` in **flux form** with van Leer slope-limited
+   upwind faces. Flux form because the mass test (§ Tests, 5) is only
+   honest if the scheme conserves by construction; semi-Lagrangian does
+   not. This is FARGO's scheme (Masset 2000).
+4. **Radial transport.** The same van Leer flux form in `ln r`, with cell
+   areas `½(r²_{i+½} − r²_{i−½})Δφ` so mass is conserved on the
+   non-uniform cells. Domain faces are outflow: flux leaves with the upwind
+   value, nothing enters.
 
 Fixed `dt = 0.02` with a capped accumulator (max 4 substeps a frame). Wall
 clock runs at 1.57 units/s, so the orbit at `r = 1` takes **4 s**, the
@@ -142,9 +158,10 @@ on a 98k-cell grid. A `speed` control scales the rate.
 ### Named tensions
 
 1. **Sharp arms against a cheap step.** Arm width is `H = 0.05`, four cells
-   at `Δr/r = 0.0123`. Semi-Lagrangian diffusion eats a four-cell feature over
-   a few wraps; MacCormack buys about one order. If the arms wash out inside
-   two orbits, the fix is the grid (768 × 256), not a constant.
+   at `Δr/r = 0.0123`. Second-order upwind still diffuses a four-cell
+   feature over a few wraps; the exact orbital shift is what keeps most of
+   it. If the arms wash out inside two orbits, the fix is the grid
+   (768 × 256), not a constant.
 2. **Toomre.** With `Σ ∝ r⁻¹` and 2 % of the star in the disc, `Σ(1) ≈
 1.8×10⁻³`, so `Q = c_s κ / (π G Σ) ≈ 9` at `r = 1`. The disc would not
    fragment even with self-gravity on, which is why self-gravity is off in
@@ -154,11 +171,19 @@ on a 98k-cell grid. A `speed` control scales the rate.
 3. **Feeding against history.** Every gap is disc the star never gets, and a
    stage full of gaps dies fast. Accepted as the ending rather than damped:
    the disc is consumed, and `reseed` runs the collapse again.
+4. **A visible drain against a reachable gap.** Both hang on `α`. A drain
+   you could watch (ten minutes) needs `α ≈ 0.4`, which puts the viscous
+   gap threshold `40 α h²` at `q ≈ 0.04` — forty Jupiters — so nothing you
+   could throw would ever open one. Gaps win. The drain is not the story;
+   the star's brightness is its accretion flux and will read nearly
+   constant, flaring only when a planet falls in.
 
 ## The planets
 
 On the CPU, up to 8: position, velocity, `q`, age. Integrated at the same
-`dt` by semi-implicit Euler in the star's potential plus each other's. Passed
+`dt` by kick-drift-kick leapfrog in the star's potential plus each other's —
+second order and symplectic, so the energy oscillates within `(ω dt)²/8`
+and does not drift. Passed
 to the step shader as uniform arrays (position, `q`, `ε`) — the **write**
 direction: the planet is a potential the gas feels.
 
@@ -281,9 +306,12 @@ Every real erosion bug was found by arithmetic. These are the disc's, on a
 3. **Wake exists, right sign.** A `q = 10⁻⁴` planet produces an `m = 2`
    perturbation trailing outside and leading inside its orbit, amplitude
    scaling with `q`.
-4. **Gap threshold is real.** `q = 10⁻⁴` opens no gap in 30 orbits;
-   `q = 10⁻³` drops Σ at `r_p` below 30 % of initial. Both against a `q = 0`
-   control so the viscous drain is not misread as a gap.
+4. **Gap threshold is real.** With the sink off, so only gravity can clear
+   anything: `q = 10⁻⁴` keeps the azimuthal mean of Σ at `r_p` above 85 %
+   of a `q = 0` control after 60 orbits; `q = 10⁻³` takes it below 60 %.
+   The control is what separates a torque-opened gap from anything the
+   scheme does on its own. If either lands on the wrong side, the claim
+   under test is the spec's threshold, not the tolerance.
 5. **Mass is conserved.** Σ lost from the grid equals mass gained by planets,
    star and the outer boundary, to float precision.
 6. **Migration sign.** The reduce's torque on a low-mass planet is negative.
@@ -297,5 +325,6 @@ with the headless Metal timer loop, not the lab readout.
 ## Out of scope for v1
 
 Self-gravity (Toomre margin above). Dust as a second phase trapped in
-pressure bumps — the spare channel is for it. Moons, planet rings, tilt,
-sound.
+pressure bumps. The indirect term (the star's own acceleration from the
+planets) — small at these `q`, and noted so it is not mistaken for a bug in
+the planet's precession. Moons, planet rings, tilt, sound.
