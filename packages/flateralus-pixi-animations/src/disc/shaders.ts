@@ -287,7 +287,9 @@ export const DISPLAY_FS = `#version 300 es
     void main() {
       G = textureSize(uState, 0);
       vec3 ground = luma(uInk) < luma(uOrange) ? uInk : uOrange;
-      vec2 p = (vUV - 0.5) * vec2(uRes.x / uRes.y, 1.0) * 2.0 * uView;
+      // The disc fills the shorter screen dimension, as toDisc() assumes.
+      vec2 asp = uRes.x >= uRes.y ? vec2(uRes.x / uRes.y, 1.0) : vec2(1.0, uRes.y / uRes.x);
+      vec2 p = (vUV - 0.5) * asp * 2.0 * uView;
       float r = length(p);
       float phi = atan(p.y, p.x);
       if (phi < 0.0) phi += TAU;
