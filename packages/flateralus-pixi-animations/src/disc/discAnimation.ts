@@ -218,7 +218,10 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
         eaten += rows[o + 2];
       }
       const pl = this.planets[k];
-      if (Number.isFinite(ax) && Number.isFinite(ay)) {
+      // A force held fixed across the pre-roll's 400 substeps is four time
+      // units of one vector, and it pumps the orbit until the planet
+      // escapes. The planet feels the disc once the frame is honest.
+      if (this.preroll === 0 && Number.isFinite(ax) && Number.isFinite(ay)) {
         pl.ax = ax;
         pl.ay = ay;
       }

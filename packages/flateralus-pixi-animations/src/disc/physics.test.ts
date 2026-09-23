@@ -26,8 +26,10 @@ import {
 const NR = 48;
 const NPHI = 96;
 
-// The mirror is four times coarser than production, so 0.02 here is the
-// same acoustic Courant number production has at STEP.
+// The mirror is four times coarser than production, so 0.02 here is an
+// acoustic Courant number of about 0.3 at the inner rings — safe, and half
+// the steps of STEP. The production-grid test in physics.sim.test.ts is what
+// guards stability at the size the toy runs.
 function params(over: Partial<DiscParams> = {}): DiscParams {
   return { ...DEFAULT_PARAMS, dt: 0.02, ...over };
 }
