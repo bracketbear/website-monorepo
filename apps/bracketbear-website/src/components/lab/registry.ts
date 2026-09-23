@@ -9,6 +9,7 @@ import {
   createContourHoodAnimation,
   createContourPghAnimation,
   createCrtPhosphorAnimation,
+  createDiscAnimation,
   createDmtTunnelAnimation,
   createEnergyBodyAnimation,
   createErosionTableAnimation,
@@ -521,6 +522,18 @@ export const REGISTRY: LabEntry[] = [
       'A Pittsburgh corner at night in the rain, no light, a cop in the middle. Two streams of cars want the same crossing. Every car follows the Intelligent Driver Model, so braking waves run backward up a queue and jams appear from nothing, and drivers at the line take gaps by a critical gap that shrinks the longer they wait: a driver who has waited long enough forces one, and the crossing car brakes, and that runs back up the other queue. Wet asphalt is a mirror, so every light is reflected by mirroring its geometry through the road. Hover an approach to hold it, click to wave it through, click the box to clear it. Leave, and the four-way-stop rule runs the corner on its own.',
     create: (initialControls) =>
       createFourWayStopAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'disc',
+    section: 'toys',
+    name: 'Disc',
+    tag: 'glsl sim',
+    blurb:
+      'A protoplanetary disc from above its pole. The gas runs on a log-polar grid with orbital advection, so the supersonic rotation is an exact shift and only what deviates from it is transported; a planet raises a two-armed wake because the gas answers its gravity at the Lindblad resonances, and a gap opens only when the planet passes the real thermal and viscous thresholds. The wake pulls the planet inward and the sink feeds it. Colour is the disc’s temperature through a Planck curve. Press, drag and release to throw a seed; click for a circular orbit. Feed one far enough and it clears an annulus.',
+    create: (initialControls) =>
+      createDiscAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

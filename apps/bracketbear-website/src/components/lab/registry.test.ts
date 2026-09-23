@@ -43,6 +43,12 @@ const SELECTED = [
   'chladni-plate',
   'iron-bloom',
   'four-way-stop',
+  'disc',
+  // Type shelf
+  'off-register',
+  'aspic',
+  'frost-line',
+  'slow-burn',
 ];
 
 /**
