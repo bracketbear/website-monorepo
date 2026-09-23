@@ -101,6 +101,24 @@ export function sigmaProfile(r: number, sigma0: number): number {
 }
 
 /**
+ * The radial-gradient stencil shared by the opening state and the step:
+ * central in the interior, one-sided at the two edges. Takes the three
+ * neighbouring values so callers on a hot loop pay no closure.
+ */
+export function gradRStencil(
+  Pm: number,
+  P0: number,
+  Pp: number,
+  r: Float32Array,
+  i: number,
+  nr: number
+): number {
+  if (i === 0) return (Pp - P0) / (r[1] - r[0]);
+  if (i === nr - 1) return (P0 - Pm) / (r[i] - r[i - 1]);
+  return (Pp - Pm) / (r[i + 1] - r[i - 1]);
+}
+
+/**
  * Radial gradient of a ring quantity with the stencil the step uses:
  * central in the interior, one-sided at the two edges. `get(i)` must
  * clamp i itself where it is asked beyond the grid.
@@ -111,9 +129,7 @@ export function gradR(
   i: number,
   nr: number
 ): number {
-  if (i === 0) return (get(1) - get(0)) / (r[1] - r[0]);
-  if (i === nr - 1) return (get(i) - get(i - 1)) / (r[i] - r[i - 1]);
-  return (get(i + 1) - get(i - 1)) / (r[i + 1] - r[i - 1]);
+  return gradRStencil(get(i - 1), get(i), get(i + 1), r, i, nr);
 }
 
 export function createDisc(nr: number, nphi: number, p: DiscParams): Disc {
@@ -311,10 +327,7 @@ export function sourcePass(
       const P0 = c2 * sig[k];
       const Pp = c2p * sig[at(i + 1, j)];
       const Pm = c2m * sig[at(i - 1, j)];
-      let dPdr: number;
-      if (i === 0) dPdr = (Pp - P0) / (r[1] - r[0]);
-      else if (i === nr - 1) dPdr = (P0 - Pm) / (r[i] - r[i - 1]);
-      else dPdr = (Pp - Pm) / (r[i + 1] - r[i - 1]);
+      const dPdr = gradRStencil(Pm, P0, Pp, r, i, nr);
       const dPdphi =
         (c2 * (sig[at(i, j + 1)] - sig[at(i, j - 1)])) / (2 * dphi);
 
