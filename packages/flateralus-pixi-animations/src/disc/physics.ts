@@ -385,3 +385,204 @@ export function sourcePass(
   }
   swap(D);
 }
+
+/** Van Leer's harmonic-mean slope limiter: monotone, second order. */
+export function vanLeer(am: number, a0: number, ap: number): number {
+  const d1 = a0 - am;
+  const d2 = ap - a0;
+  const pr = d1 * d2;
+  return pr > 0 ? (2 * pr) / (d1 + d2) : 0;
+}
+
+/** Upwind face value: the donor cell's value, extrapolated by its slope. */
+export function faceValue(
+  aL: number,
+  sL: number,
+  aR: number,
+  sR: number,
+  c: number
+): number {
+  return c > 0 ? aL + 0.5 * sL * (1 - c) : aR - 0.5 * sR * (1 + c);
+}
+
+const clampC = (c: number) => Math.max(-0.9, Math.min(0.9, c));
+
+/**
+ * Azimuthal transport with orbital advection (Masset 2000). Each ring is
+ * shifted by the nearest whole number of cells to Ω dt / Δφ — an exact
+ * permutation — and the remainder, plus the real deviation from Keplerian,
+ * transports Σ, Σ v_r and Σ r v_φ in flux form. Same as `uPass == 1`.
+ */
+export function phiPass(D: Disc, p: DiscParams): void {
+  const { nr, nphi, dphi, r, sig, vr, vp, eat } = D;
+  const dt = p.dt;
+  const q0 = new Float64Array(nphi);
+  const q1 = new Float64Array(nphi);
+  const q2 = new Float64Array(nphi);
+  const u = new Float64Array(nphi);
+  const F0 = new Float64Array(nphi);
+  const F1 = new Float64Array(nphi);
+  const F2 = new Float64Array(nphi);
+  for (let i = 0; i < nr; i++) {
+    const ri = r[i];
+    const base = i * nphi;
+    const om = Math.pow(ri, -1.5);
+    const n = Math.round((om * dt) / dphi);
+    const kres = (n * dphi * ri) / dt;
+    const dx = ri * dphi;
+    for (let j = 0; j < nphi; j++) {
+      const k = base + j;
+      q0[j] = sig[k];
+      q1[j] = sig[k] * vr[k];
+      q2[j] = sig[k] * ri * vp[k];
+      u[j] = vp[k] - kres;
+    }
+    // Flux through the face between j and j+1.
+    for (let j = 0; j < nphi; j++) {
+      const jm = (j + nphi - 1) % nphi;
+      const jp = (j + 1) % nphi;
+      const jpp = (j + 2) % nphi;
+      const c = clampC((0.5 * (u[j] + u[jp]) * dt) / dx);
+      F0[j] =
+        c *
+        faceValue(
+          q0[j],
+          vanLeer(q0[jm], q0[j], q0[jp]),
+          q0[jp],
+          vanLeer(q0[j], q0[jp], q0[jpp]),
+          c
+        );
+      F1[j] =
+        c *
+        faceValue(
+          q1[j],
+          vanLeer(q1[jm], q1[j], q1[jp]),
+          q1[jp],
+          vanLeer(q1[j], q1[jp], q1[jpp]),
+          c
+        );
+      F2[j] =
+        c *
+        faceValue(
+          q2[j],
+          vanLeer(q2[jm], q2[j], q2[jp]),
+          q2[jp],
+          vanLeer(q2[j], q2[jp], q2[jpp]),
+          c
+        );
+    }
+    for (let j = 0; j < nphi; j++) {
+      const jm = (j + nphi - 1) % nphi;
+      const n0 = q0[j] - (F0[j] - F0[jm]);
+      const n1 = q1[j] - (F1[j] - F1[jm]);
+      const n2 = q2[j] - (F2[j] - F2[jm]);
+      const dst = base + ((j + n) % nphi);
+      const sg = Math.max(D.floor, n0);
+      D.sig2[dst] = sg;
+      D.vr2[dst] = n1 / sg;
+      D.vp2[dst] = n2 / (sg * ri);
+      D.eat2[dst] = eat[base + j];
+    }
+  }
+  swap(D);
+}
+
+/**
+ * Radial transport in flux form on the non-uniform cells, with mass fluxes
+ * through faces of radius r_f so the area weighting is exact. Domain faces
+ * are outflow: flux leaves with the upwind value, nothing enters. Same as
+ * `uPass == 2`.
+ */
+export function rPass(D: Disc, p: DiscParams): void {
+  const { nr, nphi, dphi, r, rf, area, sig, vr, vp, eat } = D;
+  const dt = p.dt;
+  const q0 = new Float64Array(nr);
+  const q1 = new Float64Array(nr);
+  const q2 = new Float64Array(nr);
+  const F0 = new Float64Array(nr + 1);
+  const F1 = new Float64Array(nr + 1);
+  const F2 = new Float64Array(nr + 1);
+  const dr = (i: number) => rf[i + 1] - rf[i];
+  const cl = (i: number) => Math.max(0, Math.min(nr - 1, i));
+  for (let j = 0; j < nphi; j++) {
+    for (let i = 0; i < nr; i++) {
+      const k = i * nphi + j;
+      q0[i] = sig[k];
+      q1[i] = sig[k] * vr[k];
+      q2[i] = sig[k] * r[i] * vp[k];
+    }
+    const Q0 = (i: number) => q0[cl(i)];
+    const Q1 = (i: number) => q1[cl(i)];
+    const Q2 = (i: number) => q2[cl(i)];
+    for (let f = 0; f <= nr; f++) {
+      let w: number;
+      let a0: number;
+      let a1: number;
+      let a2: number;
+      if (f === 0) {
+        w = Math.min(vr[j], 0);
+        a0 = q0[0];
+        a1 = q1[0];
+        a2 = q2[0];
+      } else if (f === nr) {
+        w = Math.max(vr[(nr - 1) * nphi + j], 0);
+        a0 = q0[nr - 1];
+        a1 = q1[nr - 1];
+        a2 = q2[nr - 1];
+      } else {
+        w = 0.5 * (vr[(f - 1) * nphi + j] + vr[f * nphi + j]);
+        const c = clampC((w * dt) / (w > 0 ? dr(f - 1) : dr(f)));
+        a0 = faceValue(
+          Q0(f - 1),
+          vanLeer(Q0(f - 2), Q0(f - 1), Q0(f)),
+          Q0(f),
+          vanLeer(Q0(f - 1), Q0(f), Q0(f + 1)),
+          c
+        );
+        a1 = faceValue(
+          Q1(f - 1),
+          vanLeer(Q1(f - 2), Q1(f - 1), Q1(f)),
+          Q1(f),
+          vanLeer(Q1(f - 1), Q1(f), Q1(f + 1)),
+          c
+        );
+        a2 = faceValue(
+          Q2(f - 1),
+          vanLeer(Q2(f - 2), Q2(f - 1), Q2(f)),
+          Q2(f),
+          vanLeer(Q2(f - 1), Q2(f), Q2(f + 1)),
+          c
+        );
+      }
+      const g = w * dt * rf[f] * dphi;
+      F0[f] = g * a0;
+      F1[f] = g * a1;
+      F2[f] = g * a2;
+    }
+    D.outflow += -F0[0] + F0[nr];
+    for (let i = 0; i < nr; i++) {
+      const k = i * nphi + j;
+      const n0 = q0[i] - (F0[i + 1] - F0[i]) / area[i];
+      const n1 = q1[i] - (F1[i + 1] - F1[i]) / area[i];
+      const n2 = q2[i] - (F2[i + 1] - F2[i]) / area[i];
+      const sg = Math.max(D.floor, n0);
+      D.sig2[k] = sg;
+      D.vr2[k] = n1 / sg;
+      D.vp2[k] = n2 / (sg * r[i]);
+      D.eat2[k] = eat[k];
+    }
+  }
+  swap(D);
+}
+
+/** One substep: sources and sink, azimuthal transport, radial transport. */
+export function step(
+  D: Disc,
+  p: DiscParams,
+  planets: readonly Planet[],
+  clearEat: boolean
+): void {
+  sourcePass(D, p, planets, clearEat);
+  phiPass(D, p);
+  rPass(D, p);
+}

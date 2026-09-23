@@ -9,6 +9,8 @@ import {
   totalMass,
   isHealthy,
   sourcePass,
+  step,
+  phiPass,
   hillRadius,
   type DiscParams,
   type Planet,
@@ -25,6 +27,31 @@ function planet(x: number, y: number, q: number): Planet {
   const r = Math.hypot(x, y);
   const vK = 1 / Math.sqrt(r);
   return { x, y, vx: (-y / r) * vK, vy: (x / r) * vK, q, age: 0, ax: 0, ay: 0 };
+}
+
+/** Run n steps, clearing the eat channel each step and totalling it. */
+function run(
+  D: ReturnType<typeof createDisc>,
+  p: DiscParams,
+  planets: Planet[],
+  n: number
+): number {
+  let eaten = 0;
+  for (let s = 0; s < n; s++) {
+    step(D, p, planets, true);
+    for (let i = 0; i < D.nr; i++) {
+      let row = 0;
+      for (let j = 0; j < D.nphi; j++) row += D.eat[i * D.nphi + j];
+      eaten += row * D.area[i];
+    }
+  }
+  return eaten;
+}
+
+const ORBIT = Math.round((2 * Math.PI) / DEFAULT_PARAMS.dt);
+
+function phiPassOnly(D: ReturnType<typeof createDisc>, p: DiscParams) {
+  phiPass(D, p);
 }
 
 describe('the opening disc', () => {
@@ -145,5 +172,62 @@ describe('the source pass', () => {
     const iOut = ringIndex(D, 1.1);
     expect(D.vr[iIn * NPHI + 0]).toBeGreaterThan(0);
     expect(D.vr[iOut * NPHI + 0]).toBeLessThan(0);
+  });
+});
+
+describe('transport', () => {
+  it('holds the equilibrium disc for three orbits', () => {
+    const p = params();
+    const D = createDisc(NR, NPHI, p);
+    const sig0 = Float32Array.from(D.sig);
+    run(D, p, [], 3 * ORBIT);
+    expect(isHealthy(D)).toBe(true);
+    const a = ringIndex(D, 0.4);
+    const b = ringIndex(D, 1.6);
+    for (let i = a; i <= b; i++)
+      for (let j = 0; j < NPHI; j++) {
+        const k = i * NPHI + j;
+        expect(Math.abs(D.sig[k] - sig0[k]) / sig0[k]).toBeLessThan(0.01);
+        expect(Math.abs(D.vr[k])).toBeLessThan(2e-3);
+      }
+  });
+
+  it('conserves mass across transport, the sink and the open edges', () => {
+    const p = params();
+    const D = createDisc(NR, NPHI, p);
+    const before = totalMass(D);
+    const eaten = run(D, p, [planet(1.0, 0, 1e-4)], 300);
+    const after = totalMass(D) + eaten + D.outflow;
+    // Σ is float32 and the floor may add mass only where Σ is already at
+    // 1e-4 of the disc; 1e-4 relative is the honest bound, not 1e-7.
+    expect(Math.abs(after - before) / before).toBeLessThan(1e-4);
+    expect(eaten).toBeGreaterThan(0);
+  });
+
+  it('shifts each ring by the nearest whole number of cells', () => {
+    const p = params();
+    const D = createDisc(NR, NPHI, p);
+    // Paint one cell of extra Σ on the r = 1 ring and step once with no
+    // sources: the blob moves by round(Ω dt / Δφ) cells and nothing else.
+    const i = ringIndex(D, 1.0);
+    D.sig[i * NPHI + 10] *= 1.5;
+    const om = Math.pow(D.r[i], -1.5);
+    const n = Math.round((om * p.dt) / D.dphi);
+    phiPassOnly(D, p);
+    let at = 0;
+    let best = 0;
+    for (let j = 0; j < NPHI; j++)
+      if (D.sig[i * NPHI + j] > best) {
+        best = D.sig[i * NPHI + j];
+        at = j;
+      }
+    expect(at).toBe((10 + n) % NPHI);
+  });
+
+  it('stays finite at the control extremes', () => {
+    const p = params({ h: 0.03, alpha: 1e-2, discMass: 0.05, accRate: 0.2 });
+    const D = createDisc(NR, NPHI, p);
+    run(D, p, [planet(0.7, 0, 5e-4), planet(-1.3, 0, 1e-3)], 2 * ORBIT);
+    expect(isHealthy(D)).toBe(true);
   });
 });
