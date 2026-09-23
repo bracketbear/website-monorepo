@@ -21,15 +21,22 @@ should stop retrying.
 ## When to own the plumbing instead
 
 `PingPong` keeps the live framebuffer private. You must own the ping-pong
-yourself if you need to either:
+yourself if you need to **blend extra passes onto the live texture between
+steps** (a splat pass that adds disturbances).
 
-- **blend extra passes onto the live texture between steps** (a splat pass that
-  adds disturbances), or
-- **read the field back on the CPU** (objects sampling the state).
+For **reading the field back on the CPU**, `PingPong` now has a reduction
+pass: pass `reduceFrag` (a shader that reads `uState` and writes a small
+float target — one fragment per object, or per column) and call
+`pp.reduce(w, h, setUniforms)` once a frame for the `Float32Array`. It
+probes the readback format once and returns null where the driver refuses,
+so keep a path where the objects still run without it. `aspic` sums the
+force on each plate this way; do not read the whole field back when a
+shader can reduce it first.
 
-`caustics-pool` needs both, so it runs three programs — step, splat, display —
-and owns `hTex[2]` / `hFb[2]` directly. That is the reason for the divergence;
-do not "simplify" it back onto `PingPong`.
+`caustics-pool` predates this and needs the splat pass too, so it runs three
+programs — step, splat, display — and owns `hTex[2]` / `hFb[2]` directly.
+That is the reason for the divergence; do not "simplify" it back onto
+`PingPong`.
 
 ## The three-program shape
 
@@ -101,6 +108,36 @@ converts. Always keep a path where the probe fails and the scene still works.
 Measured cost: 3 objects × one 3×3 read per frame held a steady 60fps in Chrome
 at the lab's ~640×1030 canvas. Do not pre-optimize it away — it is the loop
 closure.
+
+## An index in a texture is fetched, never filtered
+
+A domain texture that carries _which body_ a cell belongs to (a plate index,
+a region id) must be read with `texelFetch`, or with `NEAREST` — bilinear
+filtering between index 0 and index 1 yields a value that names neither,
+and the display then accepts one body's ink as another's. This shows up
+exactly where bodies touch, which is where it matters. Continuous fields in
+the same texture (a distance, a height) can still be filtered; only the
+integer channel needs the fetch.
+
+Anton sets lines _touching_: the row on a baseline holds the foot of one
+line and the top of the next. Any row-only rule for which line a cell is on
+fails there; `aspic` assigns ink by the cap band it is in and margin cells
+by their nearest ink.
+
+## Keep a rigid body's motion out of the field it carries
+
+When objects (plates, carts) carry a piece of the field, store the field
+_relative_ to the object's pose: the carried cells hold zero and the
+object's per-step change in rate enters the free cells as a fictitious
+force. A rigid pose is a linear field, so a second-difference stencil
+cannot tell, and the plumbing is unchanged. Two things go wrong otherwise.
+The display reads the field at the pixel and inverts to first order, so a
+body that slides further than its margin runs off the field and is sheared
+off at the hull. And where two objects' cells meet, bilinear sampling blends
+two poses into a displacement neither body has — fragments the size of the
+difference between the poses, exactly when one of them was just kicked.
+`aspic` had both; the pose is now undone analytically in the display and
+the field holds only the elastic residual.
 
 ## Deriving the display
 

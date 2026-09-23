@@ -24,6 +24,13 @@ export interface PingPongOptions {
    * Falls back to half where float textures cannot be filtered.
    */
   fullPrecision?: boolean;
+  /**
+   * A reduction pass: a fragment shader that reads the live state and
+   * writes a small float target which `reduce` hands back to the CPU. This
+   * is how objects on the CPU feel the field.
+   */
+  reduceFrag?: string;
+  reduceUniforms?: readonly string[];
 }
 
 type Locs = Record<string, WebGLUniformLocation | null>;
@@ -73,6 +80,16 @@ export class PingPong {
   /** Sized internal format of the state pair. */
   private format: number = 0;
 
+  private reduceProg: WebGLProgram | null = null;
+  private reduceL: Locs = {};
+  private reduceTx: WebGLTexture | null = null;
+  private reduceFbo: WebGLFramebuffer | null = null;
+  private reduceW = 0;
+  private reduceH = 0;
+  private reduceBuf: Float32Array | null = null;
+  /** Whether the driver hands float pixels back; probed on the first read. */
+  private readable: boolean | null = null;
+
   /** Simulation grid size, set by initState. */
   sw = 0;
   sh = 0;
@@ -116,6 +133,15 @@ export class PingPong {
     gl.useProgram(dispProg);
     for (const n of ['uState', ...o.dispUniforms]) {
       pp.dispL[n] = gl.getUniformLocation(dispProg, n);
+    }
+    if (o.reduceFrag) {
+      const prog = program(gl, o.reduceFrag, 'reduce');
+      if (!prog) return null;
+      pp.reduceProg = prog;
+      gl.useProgram(prog);
+      for (const n of ['uState', ...(o.reduceUniforms ?? [])]) {
+        pp.reduceL[n] = gl.getUniformLocation(prog, n);
+      }
     }
     return pp;
   }
@@ -217,6 +243,78 @@ export class PingPong {
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
+  /**
+   * Run the reduction pass over the live state into a w×h float target and
+   * read it back: w*h RGBA floats, row-major from the bottom. The buffer is
+   * reused between calls. Null where there is no reduction pass or the
+   * driver will not hand float pixels back — the caller degrades and the
+   * scene still runs.
+   */
+  reduce(
+    w: number,
+    h: number,
+    setUniforms?: (gl: WebGL2RenderingContext, locs: Locs) => void
+  ): Float32Array | null {
+    const gl = this.gl;
+    if (!this.reduceProg || this.readable === false) return null;
+    if (!this.reduceTx || this.reduceW !== w || this.reduceH !== h) {
+      if (this.reduceTx) gl.deleteTexture(this.reduceTx);
+      if (this.reduceFbo) gl.deleteFramebuffer(this.reduceFbo);
+      const tx = gl.createTexture()!;
+      gl.bindTexture(gl.TEXTURE_2D, tx);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA32F,
+        w,
+        h,
+        0,
+        gl.RGBA,
+        gl.FLOAT,
+        null
+      );
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      const fb = gl.createFramebuffer()!;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+      gl.framebufferTexture2D(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        gl.TEXTURE_2D,
+        tx,
+        0
+      );
+      this.reduceTx = tx;
+      this.reduceFbo = fb;
+      this.reduceW = w;
+      this.reduceH = h;
+      this.reduceBuf = new Float32Array(w * h * 4);
+      // The attachment changed, so what can be read from it may have too.
+      this.readable = null;
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.reduceFbo);
+    gl.viewport(0, 0, w, h);
+    gl.useProgram(this.reduceProg);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.state[this.cur]);
+    gl.uniform1i(this.reduceL.uState!, 0);
+    setUniforms?.(gl, this.reduceL);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    try {
+      if (this.readable === null) {
+        this.readable =
+          gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_FORMAT) === gl.RGBA &&
+          gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_TYPE) === gl.FLOAT;
+        if (!this.readable) return null;
+      }
+      gl.readPixels(0, 0, w, h, gl.RGBA, gl.FLOAT, this.reduceBuf!);
+      return this.reduceBuf;
+    } catch {
+      this.readable = false;
+      return null;
+    }
+  }
+
   /** Delete every GL object this owns and drop the context. */
   destroy(): void {
     const gl = this.gl;
@@ -224,6 +322,12 @@ export class PingPong {
       if (this.state[i]) gl.deleteTexture(this.state[i]);
       if (this.fbo[i]) gl.deleteFramebuffer(this.fbo[i]);
     }
+    if (this.reduceTx) gl.deleteTexture(this.reduceTx);
+    if (this.reduceFbo) gl.deleteFramebuffer(this.reduceFbo);
+    if (this.reduceProg) gl.deleteProgram(this.reduceProg);
+    this.reduceTx = null;
+    this.reduceFbo = null;
+    this.reduceProg = null;
     gl.deleteProgram(this.simProg);
     gl.deleteProgram(this.dispProg);
     gl.getExtension('WEBGL_lose_context')?.loseContext();

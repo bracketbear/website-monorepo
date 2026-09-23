@@ -31,7 +31,7 @@ let sdfInfo: SdfInfo | null = null;
  * Two-pass chamfer distance transform. Returns distance in pixels from each
  * cell to the nearest set cell, or to the nearest clear cell when inverted.
  */
-function distanceTransform(
+export function distanceTransform(
   bin: Uint8Array,
   W: number,
   H: number,

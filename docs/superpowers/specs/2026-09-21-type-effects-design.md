@@ -139,7 +139,9 @@ standing on a plate.
 
 **Rubric.** Subject: jellies on a plate. Legible at once. Measured: strain.
 Loop: a poke at one end of a letter reaches the other end; a poke at one
-letter does not reach the next.
+letter does not reach the next through the gel — it reaches it through the
+plate, later and smaller, because the plate is a body that the gel pushes
+and that pushes the gel back.
 
 **State.** `PingPong`, RGBA**32**F: `xy` displacement `u`, `zw` velocity `v`,
 on a grid 200 cells across the type block plus a margin. A second texture
@@ -149,13 +151,50 @@ the margin) are _pinned_. Outside the hulls is air.
 
     v += (c² ∇²u − ω₀² u − γ v + ν ∇²v) dt      u += v dt
 
-A neighbour outside the hull reads as the cell itself — zero traction to
-first order, a free edge — so each letter is its own elastic body and two
-that do not touch cannot feel each other; the mirror asserts a poke crosses a
-letter and arrives at the next as exactly zero. The margin exists so a lean
-carries the silhouette into cells that hold displacement: the display reads
-the letter at the material point under each pixel, `m = sp − u(sp)`, and a
-pixel just outside the undeformed letter needs a `u` to read.
+A neighbour outside the hull, or on another plate, reads as the cell itself
+— zero traction to first order, a free edge — so each letter is its own
+elastic body and two that do not touch cannot feel each other through the
+gel; the mirror asserts a poke crosses a letter and arrives at the next as
+exactly zero with the plate nailed down. The margin exists so a lean carries
+the silhouette into cells that hold displacement: the display reads the
+letter at the material point under each pixel, `m = sp − u(sp)`, and a pixel
+just outside the undeformed letter needs a `u` to read.
+
+**Subject and flavour.** A `subject` select puts either the phrase or the
+mark on the plate: the mark is one jelly on one plate, standing on its
+bottom edge with the whole of its height for a cap, and lands as its two
+halves, which is what the column gap between them makes of it. The fall is
+capped at sixty cells so a subject whose cap is its whole height does not
+arrive at a speed that throws its plate. A `flavour` select colours the gel
+— amber and clear are made of the palette and follow the theme; strawberry,
+lime, lemon, grape and blue raspberry are what the packet says — and is
+decoupled from `stage`, which now only picks the ground.
+
+**The plate.** Anton sets lines touching, so the hull margins of two lines
+overlap and a row on a baseline holds the foot of one line and the top of
+the next; the domain's alpha carries which plate each cell stands on (ink
+by the cap band it is in, margin by its nearest ink), and that index is
+what makes the free edge between lines. Each plate is a rigid body on a
+soft mat — slide, dip and tilt, with a mass of three gel cells per cell it
+carries — and the spring `ω₀²(u − p)` is now relative to the plate's pose
+`p` at the cell: physically it is the jelly's contact with the plate under
+its whole face, so its far end is on the plate and it pulls the plate back.
+The field is kept _relative to each cell's own plate_: pinned cells are
+zero, and what a plate gains in rate each step enters its free cells as the
+fictitious force of a moving frame (a rigid pose is a linear field, so the
+stencil cannot tell). This is what keeps the field small and continuous
+across the seam between two lines — a field that held each plate's absolute
+motion would, when the display samples it between cells, blend two poses
+into a displacement neither body has, and that showed up as fragments the
+size of the difference between the poses right after a thump. A reduction
+pass (`PingPong.reduce`, one column per fragment, one row per plate) sums
+the traction at the feet and the spring's reaction over the free cells, and
+the CPU reads it back once a frame, holds it over that frame's steps and
+integrates the plates. Without a readable float target the plates still take
+the landings and spring home; they just cannot be pushed. Energy of gel plus
+plates is non-increasing in the mirror. Plate mass sets the character: at
+three, the sway on a loose plate runs within 15 % of its nailed pitch; the
+`plate` control scales it.
 
 _First built as one slab with the type inside it_, which was the spec's
 original shape. It read as a tray. The letters as the bodies are the
@@ -163,16 +202,44 @@ different animal: the material is the type. Kelvin–Voigt viscosity `ν∇²v`
 takes the grid-scale ringing out and leaves the sway alone; 32-bit state
 because half floats stripe an integrator (see `PingPong.fullPrecision`).
 
-**Arrival.** Each letter drops onto its own line's plate: every free cell
-starts moving down in proportion to its height above its foot, with a lean.
-Because the foot is pinned, the top sways most — which is the look.
+**Arrival.** The letters land one at a time, 55 ms apart, left to right and
+line by line, each falling for a quarter second from nine tenths of a cap
+height, its shadow darkening as it comes. The letters are found as runs of
+ink columns on the mask at its own resolution (Anton sets them closer than a
+cell) and mapped back to cells; at the landing step every free cell of the
+run starts moving down in proportion to its height above its foot, with a
+lean, and the momentum the pinned foot absorbed — the difference between the
+impact speed and what the gel keeps — goes into the plate as an impulse. So
+each landing thumps the plate, and the letters already standing shiver;
+twelve landings in a row rock the line. The fall itself is kinematic and
+drawn by the display from the step counter; the sim takes over at contact.
+A letter on its way down is drawn in front of one that has landed.
 
-**Display.** The letter's cross-section (a chamfer distance to its edge,
-baked into the domain texture) raises a dome; the strain `∇·u` bulges it and
-sets the gel's density; one key light gives lambert and specular off that
-surface. A plate under each line, and each letter's own squashed silhouette
-as a contact shadow that leans with the top of the line. Same field, every
-visible thing derived from it.
+**Display.** A raymarch of a tableau, in framebuffer px: every line stands
+on its own oval platter on one table, the last line in front and each
+earlier one a platter further back, seen from 16° above through a 28° lens
+at a distance where one world px is one screen px at the target. A jelly
+is its line's ink extruded to 0.16 of a cap with edges rounded to 0.3 of
+that depth. The ink is a 16-bit SDF built at seed, one layer per line,
+stacked in one texture and padded with air: lines can be set touching, and
+a pixel on the shared row goes to the line whose settled ink is nearer, or
+to neither when both are within a couple of pixels — the lines stand on
+different platters and have no business touching in depth. The point being
+tested has the plate's pose undone as a rigid transform, then the elastic
+residual read from the field: the same first-order material point as the 2D
+version, inside a march, and one that never carries a letter past the hull
+its field lives in. A ray refracts in, runs to where it comes out, and what
+it sees behind (platter, table, the sunset at the horizon) is absorbed over
+that length toward the flavour's deep colour, with a little extinction the
+same in every channel; thin edges pale, thick strokes deep. Strain still
+sets density; one key light, Fresnel, a soft shadow marched toward the
+light. The pointer is unprojected onto the plane of the line whose band it
+crosses. The march steps 0.7 of the distance (a displaced field's gradient
+runs to one plus the strain), a ray that stalls within a couple of pixels
+of a surface counts as having hit it (a letter's top, skimmed from a little
+above, is where that happens), and silhouettes are softened from the ray's
+closest approach, taken only from exact distances and never during the
+arrival.
 
 **Input.** The pointer is a finger with a radius: inside it, `v` is dragged
 toward pointer velocity, stamped along the path. A click is a flick impulse.
@@ -321,8 +388,14 @@ under vitest:
 
 - **Off Register** — energy is non-increasing with no input; settle times
   match `8m/c` within 10 %; a knocked plate returns to its rest pose.
-- **Aspic** — stable at the fixed step for 10⁴ steps; energy decays; 2 %
-  settle ≤ 1.4 s; fundamental in 2.5–3.5 Hz; pinned row stays zero.
+- **Aspic** — stable at the fixed step for 10⁴ steps, with the plate loose
+  too; energy of gel plus plates decays; 2 % settle ≤ 1.4 s nailed; fundamental
+  in 2.5–3.5 Hz nailed and 2.5–4.5 Hz loose; pinned row stays zero when nailed
+  and sits exactly at the plate's pose when loose; a poke crosses to the next
+  letter through the plate within 0.1 s at under three quarters of its
+  amplitude and not at all with the plate nailed; a landing on one bar dips
+  and tilts the plate and moves the other bar within 0.1 s; the plate comes
+  home; two lines set tighter than the margin stay separate bodies.
 - **Frost Line** — ice + vapour + boundary mass conserved in stage one; no
   ice where mask < 0.5; glyph fill ≥ 0.88 by 6 s; sparse seeding yields a
   higher perimeter-to-area ratio than dense seeding (feathers, not a rind).
@@ -333,7 +406,9 @@ Then on screen: the headless probe loop, and every stage and palette in the
 lab with the effect running. A palette that kills the computed thing is a bug.
 
 **Measured at 1600×1400 on an M1 Max, GPU time per frame by timer query:**
-Off Register 0.82 ms busy / 0.00 at rest; Aspic 1.11 / 0.00; Frost Line
+Off Register 0.82 ms busy / 0.00 at rest; Aspic 4.56 / 0.00 (1.11 as a 2D dome, 1.86 with
+the plate's reduction pass, 4.56 raymarched with a layer of SDF per line; the
+readback is a sync point, not GPU time); Frost Line
 1.90 / 0.00; Slow Burn 1.37 while burning (a proclamation, so it is always
 burning or being refitted). The three arrivals issue no draw calls at all
 once they have settled — counted, not inferred.
