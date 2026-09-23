@@ -755,3 +755,59 @@ export function settle(planets: Planet[], h: number): DiscEvent[] {
   }
   return events;
 }
+
+// ---- what the disc hands back: the CPU twins of the reduce pass
+
+/** Acceleration of a planet from the gas, softened as the gas is. */
+export function discForce(D: Disc, pl: Planet, h: number): [number, number] {
+  const e = softening(pl, h);
+  const e2 = e * e;
+  let ax = 0;
+  let ay = 0;
+  for (let i = 0; i < D.nr; i++) {
+    const A = D.area[i];
+    const ri = D.r[i];
+    for (let j = 0; j < D.nphi; j++) {
+      const phi = (j + 0.5) * D.dphi;
+      const dx = ri * Math.cos(phi) - pl.x;
+      const dy = ri * Math.sin(phi) - pl.y;
+      const d2 = dx * dx + dy * dy + e2;
+      const inv = (D.sig[i * D.nphi + j] * A) / (d2 * Math.sqrt(d2));
+      ax += dx * inv;
+      ay += dy * inv;
+    }
+  }
+  return [ax, ay];
+}
+
+/** The eat channel, summed within the sink plus two cells of slop. */
+export function eatenBy(D: Disc, pl: Planet, p: DiscParams): number {
+  let m = 0;
+  for (let i = 0; i < D.nr; i++) {
+    const ri = D.r[i];
+    const rs =
+      Math.max(0.5 * hillRadius(pl), p.sinkFloorCells * ri * D.dphi) +
+      2 * ri * D.dphi;
+    for (let j = 0; j < D.nphi; j++) {
+      const phi = (j + 0.5) * D.dphi;
+      const dx = ri * Math.cos(phi) - pl.x;
+      const dy = ri * Math.sin(phi) - pl.y;
+      if (dx * dx + dy * dy < rs * rs) m += D.eat[i * D.nphi + j] * D.area[i];
+    }
+  }
+  return m;
+}
+
+/** Mass per unit time through the cavity edge; negative is inward. */
+export function innerFlux(D: Disc): number {
+  let f = 0;
+  for (let j = 0; j < D.nphi; j++)
+    f += D.sig[j] * Math.min(D.vr[j], 0) * D.rf[0] * D.dphi;
+  return f;
+}
+
+/** Component of an acceleration along the planet's prograde direction. */
+export function tangentialForce(pl: Planet, ax: number, ay: number): number {
+  const r = Math.hypot(pl.x, pl.y);
+  return (-pl.y * ax + pl.x * ay) / r;
+}
