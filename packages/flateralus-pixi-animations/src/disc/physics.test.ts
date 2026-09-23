@@ -67,15 +67,34 @@ describe('the opening disc', () => {
 });
 
 describe('the source pass', () => {
-  it('leaves the equilibrium disc where it is', () => {
-    const p = params();
+  it('leaves the equilibrium disc where it is, without viscosity', () => {
+    // No ν: the only forces are the ones the opening state was solved
+    // against, so any drift is a stencil that does not match createDisc.
+    const p = params({ alpha: 0 });
     const D = createDisc(NR, NPHI, p);
     const vp0 = Float32Array.from(D.vp);
     for (let s = 0; s < 50; s++) sourcePass(D, p, [], true);
     for (let k = 0; k < D.sig.length; k++) {
-      expect(Math.abs(D.vr[k])).toBeLessThan(1e-4);
-      expect(Math.abs(D.vp[k] - vp0[k])).toBeLessThan(1e-4);
+      expect(Math.abs(D.vr[k])).toBeLessThan(1e-6);
+      expect(Math.abs(D.vp[k] - vp0[k])).toBeLessThan(1e-6);
     }
+  });
+
+  it('viscosity only stirs the edges', () => {
+    // With ν on, the clamped edge rings see a one-sided Laplacian of a
+    // curved v_φ and drift; the body of the disc must not.
+    const p = params();
+    const D = createDisc(NR, NPHI, p);
+    const vp0 = Float32Array.from(D.vp);
+    for (let s = 0; s < 50; s++) sourcePass(D, p, [], true);
+    const a = ringIndex(D, 0.4);
+    const b = ringIndex(D, 1.6);
+    for (let i = a; i <= b; i++)
+      for (let j = 0; j < NPHI; j++) {
+        const k = i * NPHI + j;
+        expect(Math.abs(D.vr[k])).toBeLessThan(1e-4);
+        expect(Math.abs(D.vp[k] - vp0[k])).toBeLessThan(1e-4);
+      }
   });
 
   it('removes gas inside the sink and records exactly what it removed', () => {
