@@ -61,6 +61,7 @@ was run.
 | [Erosion Table](#erosion-table)            | strong on 1, 2, 5 | **built** — shipped to the toys shelf                                              |
 | [Sandbox](#sandbox)                        | strong on 1, 2, 5 | **built** — spec in `docs/superpowers/specs/2026-09-15-sandbox-design.md`; fails 0 |
 | [Four-Way Stop](#four-way-stop)            | strong on 0, 2, 5 | **built** — shipped to the toys shelf                                              |
+| [Disc](#disc)                              | strong on 0, 4, 5 | **specced** — `docs/superpowers/specs/2026-09-23-disc-design.md`                   |
 | [Lichtenberg](#lichtenberg)                | strong on 2, 4    | ready to spec                                                                      |
 | [Frost](#frost)                            | strong on 1, 2    | **subject lent** to the type shelf as `frost-line`; a toy must pass 0 against it   |
 | [Soap Film](#soap-film)                    | strong on 2, 4    | ready to spec                                                                      |
@@ -292,6 +293,27 @@ blocking it, and for a second or two two bodies overlap on screen. It is rare
 (one and a half seconds in ten minutes at default demand, more under
 adversarial waving) and it is the one place the core lets a body through a
 body. Left visible rather than hidden.
+
+## Disc — specced
+
+The first _feed_ toy. A protoplanetary disc from above the pole; you throw
+seeds, they raise wakes and eat, and one fed past the gap-opening mass clears
+an annulus. Chosen over a gravitational lens (the caustics Jacobian on a
+deflection map — _fling_, which is poke with a longer reach) and tides with
+the cursor as a moon (_drag_ on a wave field on a sphere — the pool again)
+because feeding until the disc changes regime is a verb nothing else has.
+
+- **State:** surface density and velocity on a log-polar grid, orbital
+  advection (FARGO) so the supersonic Keplerian part is an exact shift and
+  only the residual is advected.
+- **Measured:** the spiral wake as the gas's Lindblad response, and a gap
+  that opens only past the real thermal and viscous thresholds.
+- **Loop closure:** the planet is a potential the gas feels; the wake's
+  torque migrates the planet and the accretion sink feeds it.
+- **Rejected sibling:** the rubber-sheet gravity well — the pool with a dent.
+- **Named tensions:** sharp arms vs cheap step (four cells per scale height);
+  Toomre `Q ≈ 9`, so self-gravity is off; feeding consumes the disc, which
+  is the ending.
 
 ## Lichtenberg
 
