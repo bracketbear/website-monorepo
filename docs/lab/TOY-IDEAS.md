@@ -61,7 +61,7 @@ was run.
 | [Erosion Table](#erosion-table)            | strong on 1, 2, 5 | **built** — shipped to the toys shelf                                              |
 | [Sandbox](#sandbox)                        | strong on 1, 2, 5 | **built** — spec in `docs/superpowers/specs/2026-09-15-sandbox-design.md`; fails 0 |
 | [Four-Way Stop](#four-way-stop)            | strong on 0, 2, 5 | **built** — shipped to the toys shelf                                              |
-| [Disc](#disc)                              | strong on 0, 4, 5 | **specced** — `docs/superpowers/specs/2026-09-23-disc-design.md`                   |
+| [Disc](#disc)                              | strong on 0, 4, 5 | **built** — shipped to the toys shelf                                              |
 | [Lichtenberg](#lichtenberg)                | strong on 2, 4    | ready to spec                                                                      |
 | [Frost](#frost)                            | strong on 1, 2    | **subject lent** to the type shelf as `frost-line`; a toy must pass 0 against it   |
 | [Soap Film](#soap-film)                    | strong on 2, 4    | ready to spec                                                                      |
@@ -294,7 +294,7 @@ blocking it, and for a second or two two bodies overlap on screen. It is rare
 adversarial waving) and it is the one place the core lets a body through a
 body. Left visible rather than hidden.
 
-## Disc — specced
+## Disc — built
 
 The first _feed_ toy. A protoplanetary disc from above the pole; you throw
 seeds, they raise wakes and eat, and one fed past the gap-opening mass clears
@@ -314,6 +314,146 @@ because feeding until the disc changes regime is a verb nothing else has.
 - **Named tensions:** sharp arms vs cheap step (four cells per scale height);
   Toomre `Q ≈ 9`, so self-gravity is off; feeding consumes the disc, which
   is the ending.
+
+### What it cost
+
+The gas held. The disc starts in equilibrium to round-off, the scheme
+conserves mass by construction, and the exact orbital shift keeps a
+four-cell arm through far more wraps than the named tension feared. The loop
+did not hold in the default the toy loads with, and the reason is not in the
+physics. What follows is what was not obvious in advance.
+
+**The default planet is gone within a second of load, and its arms hide
+that.** The disc's pull on each planet is read back once a frame and applied
+on every substep until the next read. At 2.6 substeps a frame that is
+harmless. The pre-roll runs just over 400 substeps a frame, four time units,
+so one frame's force vector, measured at one point on the orbit, is held
+fixed through more than half an orbit, and that pumps the orbit instead of
+perturbing it. Traced off the planet uniform in the running lab, the seeded
+planet climbs from r = 1.10 through 1.17, 1.28, 1.40, 1.51, 1.66, 1.84 and
+2.11 on successive pre-roll frames and is past the r = 2.2 escape radius by
+the fourteenth, about a second of wall clock, before the pre-roll has
+finished. The force itself is sane: about 8.5 × 10⁻³, 1 % of the star's pull
+at that radius, so the reduce's area weighting is not at fault. The mirror,
+given a force of that size refreshed on the same cadence, follows the
+browser's trace to within a few hundredths of a radius frame by frame and
+loses the planet on the same frame; given it at six substeps a frame, it
+drifts the planet inward from 1.100 to 1.092 over 200 frames, which is the
+migration the spec asked for. The pre-roll lays the planet's wake down
+before the planet leaves, so what loads is a disc with spiral arms and
+nothing making them. No test runs bodies at the pre-roll's cadence, and on
+screen the arms read as a wake, so it went unseen until the uniform was
+tapped. It is not fixed on this branch. Holding the disc force at zero until
+the pre-roll ends is the obvious change, and is the spec's "real drivers
+only" taken literally. Until then the tensions that need the default planet
+(a maintained wake, visible migration, a planet fed to a gap) cannot be
+judged in the toy.
+
+**The step that was stable on the mirror was not stable on the grid.** The
+spec's `dt = 0.02` was chosen by the orbital clock and checked on the
+128 × 64 mirror, which held. On the production grid the disc rendered black:
+the gas went NaN between steps 200 and 300. The acoustic Courant number
+`c_s dt √(1/Δx² + 1/Δy²)` at the inner rings is 0.99 at that step on
+512 × 192 and 0.25 on the mirror, whose cells are four times wider, so no
+mirror test could have seen it. Running the mirror at production size found
+it, and at `dt = 0.01` the same run stayed healthy for 1,200 steps. The step
+is now 0.01, with up to six substeps a frame and a pre-roll of 6,280 steps
+for the same ten orbits. The mirror suites keep `dt = 0.02` on the coarse
+grid so the suite did not double in length; the Courant number there is
+about 0.25, half of production's at the new step, so the coarse suites are
+not at production's margin. One sim test now runs the mirror at 512 × 192 for
+1,200 steps and asks that it stays healthy and keeps 98 % of its mass. A
+stability limit goes with the cell size, so a mirror has to be run once at
+the size the toy runs, and now it is.
+
+**The wake needed a different measure before the physics could be judged.**
+The spec measured it as the `m = 2` Fourier component along a ring. At one
+ring a planet's wake is a single peak about H wide, whose `m = 2`
+coefficient is about 2 % of its contrast (0.0015 for q = 10⁻⁴), and a
+heavier planet steepens the peak, so the coefficient came out smaller for
+the heavier planet (0.87 of the lighter's) while the wake plainly grew. The
+RMS of Σ/⟨Σ⟩ − 1 around the ring is the contrast itself: 0.0149 at
+q = 10⁻⁴, and 1.94 times its value at half the mass. The torque, −4.6 × 10⁻⁴,
+is the Type I order of magnitude. As on the erosion table, the measure had
+to be chosen as carefully as the model.
+
+**The equilibrium test was measuring two things.** It failed at
+|v*r| = 1.19 × 10⁻⁴ against a tolerance of 10⁻⁴. The opening rotation curve
+is solved without viscosity, and at the clamped edges ν∇²v*φ is one-sided
+and large, so the failure was viscosity at the edge, not the stencil. Split
+in two: with α = 0 every cell holds to 10⁻⁶ over 50 steps, which pins the
+source split, and at the default α the body of the disc (0.4 < r < 1.6)
+holds to 10⁻⁴.
+
+**The gap bar is a statement about the mirror's resolution.** With the sink
+off, q = 10⁻³ leaves the ring at 62.8 % of the q = 0 control after 60 orbits
+on the 128 × 64 mirror, and q = 10⁻⁴ leaves it at 98.9 %. The spec's bar was
+60 %. At two cells per Hill radius the mirror cannot carve deeper, and
+production resolves the Hill radius four times finer. The bar is 70 %, and
+the claim it tests, a third of the ring gone past the threshold against one
+percent below it, holds.
+
+**Feeding is slower than the spec's minute by an order of magnitude.** A
+seed clicked onto a circular orbit at r ≈ 1.2, with Accretion Rate at 0.1
+(three times the default), went from q = 1.05 × 10⁻⁵ to 3.30 × 10⁻⁵ in a
+minute and 4.58 × 10⁻⁵ in ninety seconds, close to linear at about
+4 × 10⁻⁷ a second, and stayed near r = 1.2 the whole time. At that rate the
+gap threshold, 3.8 × 10⁻⁴, is about a quarter of an hour away, and further
+at the default (not measured). The sink only takes gas within a cell and a
+half of a small planet, so raising the rate toward 0.06, which the plan
+offered as the fix, would not close the distance. Nothing was tuned. The
+spec's minute leaned on the default planet, which starts at half the
+threshold; with that planet gone, a seed is the only thing on the stage to
+feed.
+
+**The picture caught what the mirror had no way to see.** The display
+shader mapped screen to disc by the height while the throw and its preview
+mapped by the shorter side. They agree on a landscape screen; the lab stage
+is portrait, so a throw landed 1.6 times further out than the pointer. The
+shader now fills the shorter side, as the CPU assumed.
+
+**The drain the mirror showed does not show.** On the 128 × 64 mirror the
+inner ring fell from 1.05 to 0.58 over 1,200 steps, about 1 % of the disc
+leaving through the inner edge every 12 time units at either step. Twelve
+time units is eight seconds of wall clock, so if the production grid did the
+same the disc would hollow visibly within a minute. Read off the framebuffer
+over five minutes, the azimuthal mean of brightness at r = 0.35 went from
+208.3 to 208.6 on a 0–255 scale, further out nothing moved by more than a
+tenth (and that was brighter, where the arms are), and the
+brightness-weighted total moved 0.2 %. Brightness saturates with optical
+depth, so a small drain could hide in the inner rings, but not a halving.
+The spec's "does not drain visibly" stands on screen; the mirror's
+inner-edge flow is a coarse-grid effect or too slow at 512 × 192 to read.
+
+**The arms do not wash out.** Contrast around a ring (RMS over mean of
+brightness) went from 0.04 to 0.13 over three minutes at r = 1.5, and from
+0.05 to 0.24 at r = 1.7. The 768 × 256 grid the named tension held in
+reserve is not needed. With the planet gone these arms are the wake it left,
+winding tighter every orbit with nothing renewing it, and the orbital shift
+keeps them. Why the contrast grows in the outer disc rather than holding is
+not explained yet.
+
+**The frame costs about four and a half erosion tables.** Measured headless
+on Metal with a timer query around every draw, at a steady 60 fps, in the lab
+at 1600 × 1400 (a 1068 × 1344 stage): a substep's three passes cost 0.58,
+0.72 and 0.83 ms (sources, azimuthal, radial), and at 2.6 substeps a frame
+that is 5.6 ms; the reduce is 1.5 ms and the display 0.75 ms, 7.8 ms of GPU a
+frame in all. The erosion table on the same page and viewport costs 1.7 ms:
+eight passes at 342 × 431 of 0.10 ms each and a 0.87 ms display. The plan
+expected the disc well under it. Per cell the disc's passes cost eight to
+twelve times the erosion table's, which is the limiter, the three-case
+stencil and the planet loop, and halving the step doubled how many of them
+run. The reduce is the worst-spent time in the frame: 1,728 fragments each
+summing a 512-cell ring cost more than a 98,304-cell step pass, with most of
+the GPU idle, and it is the first place to look (sum pairs of rings, or
+reduce in two stages). The display is not the problem. The lab's own readout
+says 60 fps and 16.7 / 17.4 ms and shows none of this; its quality
+controller walked down to 0.30, which this toy does not read.
+
+**One test was red before the branch started.** The type shelf
+(`off-register`, `aspic`, `frost-line`, `slow-burn`) had been registered
+without being added to the registry test's `SELECTED` list. The four ids were
+added on this branch alongside `disc`.
 
 ## Lichtenberg
 

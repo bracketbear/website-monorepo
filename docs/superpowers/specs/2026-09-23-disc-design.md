@@ -142,18 +142,38 @@ clock runs at 1.57 units/s, so the orbit at `r = 1` takes **4 s**, the
 cavity edge 0.5 s, the outer edge 9 s; that is one to two substeps a frame
 on a 98k-cell grid. A `speed` control scales the rate.
 
+_As built, not as first specified:_ `dt = 0.01`, up to 6 substeps a frame,
+2.6 a frame at 60 fps. At 0.02 the acoustic Courant number
+`c_s dt √(1/Δx² + 1/Δy²)` at the inner rings of the 512 × 192 grid is 0.99,
+and the gas went NaN between steps 200 and 300. The 128 × 64 mirror, four
+times coarser, sat at 0.25, so no mirror test saw it; the mirror run at
+production size did. The step was set by the orbital clock and has to be
+checked against the sound speed at the finest cell.
+
 ### Measured, with numbers
 
 - **The wake.** A planet's gravity launches waves at its Lindblad
   resonances; they trail outside the orbit and lead inside, and wrap with a
   pitch set by `c_s/v_K = h`. Measured in the mirror as the `m = 2` Fourier
   component of Σ along φ at `r_p ± 2H`; amplitude scales with `q`.
+  _As built, not as first specified:_ measured as the RMS of `Σ/⟨Σ⟩ − 1`
+  around the ring. At one ring the wake is a single peak about `H` wide,
+  whose `m = 2` coefficient is about 2 % of its contrast (0.0015 at
+  `q = 10⁻⁴`) and shrinks as a heavier planet steepens the peak. RMS
+  contrast is 0.0149 at `q = 10⁻⁴`, and 1.94 times its value at half the
+  mass.
 - **The gap.** Opens when `q` passes both the thermal threshold
   `q > 3h³ = 3.8×10⁻⁴` and the viscous one `q > 40 ν/(r² Ω) ≈ 3×10⁻⁴`. A
   seed at `q = 10⁻⁵` (Earth-ish) makes a wake and no gap; fed to
   `~4×10⁻⁴` it clears one. With the disc at 2 % of the star, the seed has
   to eat a few percent of the disc to get there, and `τ_acc` is tuned so that
   takes about a minute.
+  _As built, not as first specified:_ it takes far longer. A seed on a
+  circular orbit at `r ≈ 1.2`, with `accretionRate` at 0.1, went from
+  `q = 1.05×10⁻⁵` to `3.30×10⁻⁵` in a minute, near-linear at about
+  `4×10⁻⁷` a second, which puts the threshold about a quarter of an hour
+  away. The sink only reaches gas within a cell and a half of a small
+  planet, so raising the rate does not buy the minute. Not tuned; recorded.
 
 ### Named tensions
 
@@ -235,6 +255,18 @@ orbit. Pre-roll: ten orbits at `r = 1` (about 3,100 substeps) at init before
 the first frame, real drivers only, no stamped spirals. Re-prime on resize
 and on any control change that rebuilds the grid.
 
+_As built, not as first specified:_ ten orbits are 6,280 substeps at the
+halved step, run 400 a frame over the first sixteen frames rather than
+before the first. A resize re-primes nothing: the grid is fixed at
+512 × 192 whatever the canvas, so a resize changes no state. And the default
+planet does not survive the pre-roll. The disc's force on it is read back
+once a frame and applied on every substep, so each pre-roll frame holds one
+force vector fixed for four time units, more than half an orbit; that pumps
+the orbit, and the planet crosses the `r > 2.2` escape radius within about
+fourteen frames. The disc loads with the wake the planet laid down and no
+planet. Holding the disc force at zero until the pre-roll ends is the fix;
+not made on the build branch.
+
 **Reduced motion.** Read at init via `shared/reduced-motion.ts`. Under it
 the wall-clock rate drops to 0.25× (16 s per orbit at `r = 1`); the throw
 still works. The disc slows rather than stops — a stopped disc is a picture.
@@ -300,27 +332,50 @@ Every real erosion bug was found by arithmetic. These are the disc's, on a
 1. **Equilibrium holds.** An unperturbed disc with the pressure-corrected
    rotation curve keeps Σ within 1 % over 20 orbits. If not, the source split
    is wrong, and no picture would say which term.
+   _As built, not as first specified:_ split in two. The opening rotation
+   curve is solved without viscosity, and at the clamped edges `ν∇²v_φ` is
+   one-sided and large, so one test was measuring both. With `α = 0` every
+   cell holds `|v_r|` and `|Δv_φ|` under 10⁻⁶ over 50 steps; at the default
+   `α` the body, `0.4 < r < 1.6`, holds `|v_r|` under 10⁻⁴.
 2. **Orbit drift.** A body on a circular orbit: energy drift under 10⁻⁴ per
    orbit at `dt = 0.02`; the preview ellipse matches the flown path to within
    a cell.
+   _As built, not as first specified:_ production steps at 0.01; the
+   mirror suites keep `dt = 0.02` on the 128 × 64 grid, where the
+   inner-ring acoustic Courant number is about 0.25, half of production's.
 3. **Wake exists, right sign.** A `q = 10⁻⁴` planet produces an `m = 2`
    perturbation trailing outside and leading inside its orbit, amplitude
    scaling with `q`.
+   _As built, not as first specified:_ amplitude is the RMS contrast
+   (above), and the scaling compares `q = 5×10⁻⁵` with `10⁻⁴`, both inside
+   the linear regime, for a ratio between 1.4 and 2.8.
 4. **Gap threshold is real.** With the sink off, so only gravity can clear
    anything: `q = 10⁻⁴` keeps the azimuthal mean of Σ at `r_p` above 85 %
    of a `q = 0` control after 60 orbits; `q = 10⁻³` takes it below 60 %.
    The control is what separates a torque-opened gap from anything the
    scheme does on its own. If either lands on the wrong side, the claim
    under test is the spec's threshold, not the tolerance.
+   _As built, not as first specified:_ the bar is 70 %. At two cells per
+   Hill radius the mirror leaves the ring at 62.8 % of the control after 60
+   orbits for `q = 10⁻³`, and at 98.9 % for `q = 10⁻⁴`; production resolves
+   `r_H` four times finer.
 5. **Mass is conserved.** Σ lost from the grid equals mass gained by planets,
    star and the outer boundary, to float precision.
 6. **Migration sign.** The reduce's torque on a low-mass planet is negative.
 7. **Stability.** No NaN over 200 orbits at defaults and at every control
    extreme.
+   _As built, not as first specified:_ plus one run at production size,
+   512 × 192 for 1,200 steps at the production step, healthy and keeping
+   98 % of its mass. It is the test that would have caught the Courant
+   number.
 
 The GPU step is kept numerically in line with the mirror as the erosion table's
 is. Per-frame cost (three substeps at 512 × 192 plus one reduce) is checked
 with the headless Metal timer loop, not the lab readout.
+_As built:_ 7.8 ms of GPU a frame at 60 fps in a 1068 × 1344 stage (5.6 ms
+of substeps, 1.5 ms of reduce, 0.75 ms of display) against 1.7 ms for the
+erosion table on the same page. The reduce's 1,728 fragments cost more than
+a whole step pass.
 
 ## Out of scope for v1
 
