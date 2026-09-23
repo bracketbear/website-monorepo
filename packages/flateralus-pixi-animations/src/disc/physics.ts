@@ -246,3 +246,129 @@ export function isHealthy(D: Disc): boolean {
   }
   return true;
 }
+
+// ---- the operator split
+
+export function swap(D: Disc): void {
+  [D.sig, D.sig2] = [D.sig2, D.sig];
+  [D.vr, D.vr2] = [D.vr2, D.vr];
+  [D.vp, D.vp2] = [D.vp2, D.vp];
+  [D.eat, D.eat2] = [D.eat2, D.eat];
+}
+
+export function hillRadius(pl: Planet): number {
+  return Math.hypot(pl.x, pl.y) * Math.cbrt(pl.q / 3);
+}
+
+/** Plummer softening at 0.6 H, the convention the gap thresholds assume. */
+export function softening(pl: Planet, h: number): number {
+  return 0.6 * h * Math.hypot(pl.x, pl.y);
+}
+
+/**
+ * Pressure gradient, star and planet gravity, centrifugal and Coriolis
+ * terms, viscosity, and the accretion sink. Semi-implicit Euler: v_φ
+ * first, then v_r with the new v_φ. Same stencils as `uPass == 0`.
+ */
+export function sourcePass(
+  D: Disc,
+  p: DiscParams,
+  planets: readonly Planet[],
+  clearEat: boolean
+): void {
+  const { nr, nphi, dlnr, dphi, r, sig, vr, vp, eat } = D;
+  const h = p.h;
+  const dt = p.dt;
+  const accK = 1 - Math.exp(-p.accRate * dt);
+  const at = (i: number, j: number) =>
+    Math.max(0, Math.min(nr - 1, i)) * nphi + (((j % nphi) + nphi) % nphi);
+  const np = planets.length;
+  const px = new Float64Array(np);
+  const py = new Float64Array(np);
+  const pq = new Float64Array(np);
+  const peps2 = new Float64Array(np);
+  const prs = new Float64Array(np);
+  for (let k = 0; k < np; k++) {
+    const pl = planets[k];
+    px[k] = pl.x;
+    py[k] = pl.y;
+    pq[k] = pl.q;
+    const e = softening(pl, h);
+    peps2[k] = e * e;
+    prs[k] = 0.5 * hillRadius(pl);
+  }
+
+  for (let i = 0; i < nr; i++) {
+    const ri = r[i];
+    const rinv = 1 / ri;
+    const c2 = cs2(ri, h);
+    const c2p = cs2(r[Math.min(nr - 1, i + 1)], h);
+    const c2m = cs2(r[Math.max(0, i - 1)], h);
+    const nu = p.alpha * h * h * Math.sqrt(ri);
+    for (let j = 0; j < nphi; j++) {
+      const k = i * nphi + j;
+      const s = Math.max(sig[k], D.floor);
+      const P0 = c2 * sig[k];
+      const Pp = c2p * sig[at(i + 1, j)];
+      const Pm = c2m * sig[at(i - 1, j)];
+      let dPdr: number;
+      if (i === 0) dPdr = (Pp - P0) / (r[1] - r[0]);
+      else if (i === nr - 1) dPdr = (P0 - Pm) / (r[i] - r[i - 1]);
+      else dPdr = (Pp - Pm) / (r[i + 1] - r[i - 1]);
+      const dPdphi =
+        (c2 * (sig[at(i, j + 1)] - sig[at(i, j - 1)])) / (2 * dphi);
+
+      const phi = (j + 0.5) * dphi;
+      const cp = Math.cos(phi);
+      const sp = Math.sin(phi);
+      const x = ri * cp;
+      const y = ri * sp;
+      let fx = 0;
+      let fy = 0;
+      let s1 = sig[k];
+      let removed = 0;
+      for (let m = 0; m < np; m++) {
+        const dx = x - px[m];
+        const dy = y - py[m];
+        const d2 = dx * dx + dy * dy;
+        const d2e = d2 + peps2[m];
+        const inv = pq[m] / (d2e * Math.sqrt(d2e));
+        fx -= dx * inv;
+        fy -= dy * inv;
+        const rs = Math.max(prs[m], p.sinkFloorCells * ri * dphi);
+        if (d2 < rs * rs) {
+          const rem = s1 * accK;
+          s1 -= rem;
+          removed += rem;
+        }
+      }
+      const arp = fx * cp + fy * sp;
+      const app = -fx * sp + fy * cp;
+
+      const vrC = vr[k];
+      const vpC = vp[k];
+      const lapVr =
+        ((vr[at(i + 1, j)] - 2 * vrC + vr[at(i - 1, j)]) / (dlnr * dlnr) +
+          (vr[at(i, j + 1)] - 2 * vrC + vr[at(i, j - 1)]) / (dphi * dphi)) *
+        rinv *
+        rinv;
+      const lapVp =
+        ((vp[at(i + 1, j)] - 2 * vpC + vp[at(i - 1, j)]) / (dlnr * dlnr) +
+          (vp[at(i, j + 1)] - 2 * vpC + vp[at(i, j - 1)]) / (dphi * dphi)) *
+        rinv *
+        rinv;
+
+      const vp1 =
+        vpC + dt * (-vrC * vpC * rinv - dPdphi / (s * ri) + app + nu * lapVp);
+      const vr1 =
+        vrC +
+        dt * (vp1 * vp1 * rinv - rinv * rinv - dPdr / s + arp + nu * lapVr);
+
+      D.sig2[k] = s1;
+      D.vr2[k] = vr1;
+      D.vp2[k] = vp1;
+      D.eat2[k] = clearEat ? removed : eat[k] + removed;
+    }
+  }
+  swap(D);
+}

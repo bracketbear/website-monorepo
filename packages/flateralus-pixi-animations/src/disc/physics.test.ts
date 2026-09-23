@@ -8,7 +8,10 @@ import {
   ringMean,
   totalMass,
   isHealthy,
+  sourcePass,
+  hillRadius,
   type DiscParams,
+  type Planet,
 } from './physics';
 
 const NR = 48;
@@ -16,6 +19,12 @@ const NPHI = 96;
 
 function params(over: Partial<DiscParams> = {}): DiscParams {
   return { ...DEFAULT_PARAMS, ...over };
+}
+
+function planet(x: number, y: number, q: number): Planet {
+  const r = Math.hypot(x, y);
+  const vK = 1 / Math.sqrt(r);
+  return { x, y, vx: (-y / r) * vK, vy: (x / r) * vK, q, age: 0, ax: 0, ay: 0 };
 }
 
 describe('the opening disc', () => {
@@ -54,5 +63,68 @@ describe('the opening disc', () => {
     expect(D.rf[NR]).toBeCloseTo(R_OUT, 9);
     expect(D.dlnr).toBeCloseTo(Math.log(R_OUT / R_IN) / NR, 12);
     expect(D.dphi).toBeCloseTo((2 * Math.PI) / NPHI, 12);
+  });
+});
+
+describe('the source pass', () => {
+  it('leaves the equilibrium disc where it is', () => {
+    const p = params();
+    const D = createDisc(NR, NPHI, p);
+    const vp0 = Float32Array.from(D.vp);
+    for (let s = 0; s < 50; s++) sourcePass(D, p, [], true);
+    for (let k = 0; k < D.sig.length; k++) {
+      expect(Math.abs(D.vr[k])).toBeLessThan(1e-4);
+      expect(Math.abs(D.vp[k] - vp0[k])).toBeLessThan(1e-4);
+    }
+  });
+
+  it('removes gas inside the sink and records exactly what it removed', () => {
+    const p = params({ accRate: 0.5 });
+    const D = createDisc(NR, NPHI, p);
+    const pl = planet(1.0, 0, 1e-3);
+    const before = totalMass(D);
+    sourcePass(D, p, [pl], true);
+    let eaten = 0;
+    for (let i = 0; i < NR; i++)
+      for (let j = 0; j < NPHI; j++) eaten += D.eat[i * NPHI + j] * D.area[i];
+    expect(eaten).toBeGreaterThan(0);
+    expect(Math.abs(before - totalMass(D) - eaten) / eaten).toBeLessThan(1e-5);
+  });
+
+  it('accumulates eaten mass across substeps until told to clear', () => {
+    const p = params({ accRate: 0.5 });
+    const D = createDisc(NR, NPHI, p);
+    const pl = planet(1.0, 0, 1e-3);
+    sourcePass(D, p, [pl], true);
+    const one = Float32Array.from(D.eat);
+    sourcePass(D, p, [pl], false);
+    let grew = false;
+    for (let k = 0; k < one.length; k++) {
+      expect(D.eat[k]).toBeGreaterThanOrEqual(one[k]);
+      if (D.eat[k] > one[k]) grew = true;
+    }
+    expect(grew).toBe(true);
+    sourcePass(D, p, [pl], true);
+    for (let k = 0; k < one.length; k++)
+      expect(D.eat[k]).toBeLessThanOrEqual(one[k] + 1e-12);
+  });
+
+  it('a sink is never smaller than the floor', () => {
+    const pl = planet(1.0, 0, 1e-5);
+    // Half a Hill radius at Earth mass is 0.007, under one production cell.
+    expect(0.5 * hillRadius(pl)).toBeLessThan(0.01);
+  });
+
+  it('pulls gas toward a planet', () => {
+    const p = params({ accRate: 0 });
+    const D = createDisc(NR, NPHI, p);
+    const pl = planet(1.0, 0, 1e-2);
+    sourcePass(D, p, [pl], true);
+    // Just inside the planet's radius, gas is pulled outward (toward it);
+    // just outside, inward.
+    const iIn = ringIndex(D, 0.9);
+    const iOut = ringIndex(D, 1.1);
+    expect(D.vr[iIn * NPHI + 0]).toBeGreaterThan(0);
+    expect(D.vr[iOut * NPHI + 0]).toBeLessThan(0);
   });
 });
