@@ -10,6 +10,7 @@ import {
   tangentialForce,
   ringIndex,
   ringMean,
+  totalMass,
   wakeAmplitude,
   peakPhi,
   isHealthy,
@@ -20,11 +21,13 @@ import {
 
 const NR = 64;
 const NPHI = 128;
-const ORBIT = Math.round((2 * Math.PI) / DEFAULT_PARAMS.dt);
+const ORBIT = Math.round((2 * Math.PI) / 0.02);
 const SLOW = 300_000;
 
+// The mirror is four times coarser than production, so 0.02 here is the
+// same acoustic Courant number production has at STEP.
 function params(over: Partial<DiscParams> = {}): DiscParams {
-  return { ...DEFAULT_PARAMS, ...over };
+  return { ...DEFAULT_PARAMS, dt: 0.02, ...over };
 }
 
 function planetAt(r: number, q: number): Planet {
@@ -121,4 +124,23 @@ describe('the disc pulls back', () => {
       for (let j = 0; j < D.nphi; j++) all += D.eat[i * D.nphi + j] * D.area[i];
     expect(eatenBy(D, pl, p)).toBeCloseTo(all, 12);
   });
+});
+
+describe('the production grid', () => {
+  it(
+    'holds at 512 × 192 for two orbits at the production step',
+    () => {
+      // The coarse mirror sits at a quarter of production's Courant number
+      // and could not see the inner rings go NaN at dt = 0.02. This is
+      // the one test that runs the mirror at the size the toy runs.
+      const p = { ...DEFAULT_PARAMS };
+      const D = createDisc(192, 512, p);
+      const pl = [planetAt(1.1, 2e-4)];
+      const m0 = totalMass(D);
+      evolve(D, p, pl, 1200);
+      expect(isHealthy(D)).toBe(true);
+      expect(totalMass(D) / m0).toBeGreaterThan(0.98);
+    },
+    SLOW
+  );
 });

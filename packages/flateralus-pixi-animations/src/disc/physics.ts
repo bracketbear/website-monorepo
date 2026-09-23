@@ -11,9 +11,14 @@
 
 export const R_IN = 0.25;
 export const R_OUT = 2.0;
-/** Fixed simulation step, and the most substeps a frame may take. */
-export const STEP = 0.02;
-export const MAX_STEPS_PER_FRAME = 4;
+/**
+ * Fixed simulation step, and the most substeps a frame may take. The
+ * acoustic Courant number at the inner rings of the production grid is
+ * 0.5 here; at 0.02 it was 0.99 and the gas went NaN in three hundred
+ * steps.
+ */
+export const STEP = 0.01;
+export const MAX_STEPS_PER_FRAME = 6;
 /** Wall-clock rate: the orbit at r = 1 takes 4 s. */
 export const UNITS_PER_SECOND = 1.57;
 export const MAX_PLANETS = 8;

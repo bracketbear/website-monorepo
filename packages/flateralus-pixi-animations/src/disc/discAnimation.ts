@@ -42,8 +42,8 @@ const NR = 192;
  * and settled. Real drivers only, no stamped spiral. The sink is off
  * during the pre-roll so nothing vanishes before the planet can be paid.
  */
-const PREROLL_STEPS = 3140;
-const PREROLL_PER_FRAME = 200;
+const PREROLL_STEPS = 6280;
+const PREROLL_PER_FRAME = 400;
 /** Disc radius that fills the shorter screen dimension. */
 const R_VIEW = 2.15;
 /** Drag scale: one view radius of drag is 1.5 v_K at r = 1. */

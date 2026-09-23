@@ -26,8 +26,10 @@ import {
 const NR = 48;
 const NPHI = 96;
 
+// The mirror is four times coarser than production, so 0.02 here is the
+// same acoustic Courant number production has at STEP.
 function params(over: Partial<DiscParams> = {}): DiscParams {
-  return { ...DEFAULT_PARAMS, ...over };
+  return { ...DEFAULT_PARAMS, dt: 0.02, ...over };
 }
 
 function planet(x: number, y: number, q: number): Planet {
@@ -55,7 +57,7 @@ function run(
   return eaten;
 }
 
-const ORBIT = Math.round((2 * Math.PI) / DEFAULT_PARAMS.dt);
+const ORBIT = Math.round((2 * Math.PI) / 0.02);
 
 function phiPassOnly(D: ReturnType<typeof createDisc>, p: DiscParams) {
   phiPass(D, p);
