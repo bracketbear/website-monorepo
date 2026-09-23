@@ -3,6 +3,7 @@ import {
   DEFAULT_PARAMS,
   R_IN,
   R_OUT,
+  R_ESCAPE,
   createDisc,
   ringIndex,
   ringMean,
@@ -12,6 +13,12 @@ import {
   step,
   phiPass,
   hillRadius,
+  stepBodies,
+  circularVelocity,
+  elementsOf,
+  orbitPath,
+  orbitEnergy,
+  settle,
   type DiscParams,
   type Planet,
 } from './physics';
@@ -229,5 +236,86 @@ describe('transport', () => {
     const D = createDisc(NR, NPHI, p);
     run(D, p, [planet(0.7, 0, 5e-4), planet(-1.3, 0, 1e-3)], 2 * ORBIT);
     expect(isHealthy(D)).toBe(true);
+  });
+});
+
+describe('planets', () => {
+  it('keeps a circular orbit for fifty orbits without drifting', () => {
+    const [vx, vy] = circularVelocity(1, 0);
+    const pl: Planet = { x: 1, y: 0, vx, vy, q: 1e-4, age: 0, ax: 0, ay: 0 };
+    const E0 = orbitEnergy(pl);
+    for (let s = 0; s < 50 * ORBIT; s++)
+      stepBodies([pl], DEFAULT_PARAMS.dt, 0.05);
+    expect(Math.abs(orbitEnergy(pl) - E0) / Math.abs(E0)).toBeLessThan(1e-4);
+    expect(Math.abs(Math.hypot(pl.x, pl.y) - 1)).toBeLessThan(2e-3);
+  });
+
+  it('describes a circular throw as e = 0, a = r', () => {
+    const [vx, vy] = circularVelocity(0.8, 0.6);
+    const el = elementsOf(0.8, 0.6, vx, vy);
+    expect(el.bound).toBe(true);
+    expect(el.e).toBeLessThan(1e-9);
+    expect(el.a).toBeCloseTo(1, 9);
+  });
+
+  it('draws the ellipse the body actually flies', () => {
+    // At periapsis r = 1 with v = 1.2: a = 1/(2 − 1.44) = 1.786, e = 0.44.
+    const el = elementsOf(1, 0, 0, 1.2);
+    expect(el.a).toBeCloseTo(1.7857, 3);
+    expect(el.e).toBeCloseTo(0.44, 3);
+    const path = orbitPath(el, 720);
+    const pl: Planet = {
+      x: 1,
+      y: 0,
+      vx: 0,
+      vy: 1.2,
+      q: 1e-5,
+      age: 0,
+      ax: 0,
+      ay: 0,
+    };
+    const T = 2 * Math.PI * Math.pow(el.a, 1.5);
+    const steps = Math.round(T / DEFAULT_PARAMS.dt);
+    for (let s = 0; s < steps; s++) {
+      stepBodies([pl], DEFAULT_PARAMS.dt, 0.05);
+      let best = Infinity;
+      for (let m = 0; m < path.length; m += 2)
+        best = Math.min(best, Math.hypot(path[m] - pl.x, path[m + 1] - pl.y));
+      expect(best).toBeLessThan(0.02);
+    }
+  });
+
+  it('calls an escape a hyperbola', () => {
+    const el = elementsOf(1, 0, 0, 1.6);
+    expect(el.bound).toBe(false);
+    expect(el.e).toBeGreaterThan(1);
+    const path = orbitPath(el, 200);
+    expect(path.length).toBeGreaterThan(0);
+    for (let m = 0; m < path.length; m += 2)
+      expect(Math.hypot(path[m], path[m + 1])).toBeLessThan(
+        1.5 * R_ESCAPE + 1e-9
+      );
+  });
+
+  it('merges two planets inside a Hill radius, conserving mass and momentum', () => {
+    const a = planet(1, 0, 1e-3);
+    const b: Planet = { ...planet(1, 0, 1e-3), x: 1.02, vx: 0.1 };
+    const list = [a, b];
+    const ev = settle(list, 0.05);
+    expect(list).toHaveLength(1);
+    expect(ev.map((e) => e.type)).toEqual(['merge']);
+    expect(list[0].q).toBeCloseTo(2e-3, 12);
+    expect(list[0].vx).toBeCloseTo(0.05, 9);
+  });
+
+  it('drops a planet into the star and lets one leave', () => {
+    const fell: Planet = { ...planet(1, 0, 3e-4), x: 0.2, y: 0 };
+    const left: Planet = { ...planet(1, 0, 3e-4), x: 2.5, y: 0 };
+    const stays = planet(1, 0, 3e-4);
+    const list = [fell, stays, left];
+    const ev = settle(list, 0.05);
+    expect(list).toEqual([stays]);
+    expect(ev.map((e) => e.type).sort()).toEqual(['escape', 'fell']);
+    expect(ev.find((e) => e.type === 'fell')?.q).toBe(3e-4);
   });
 });

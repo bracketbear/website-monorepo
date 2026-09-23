@@ -586,3 +586,172 @@ export function step(
   phiPass(D, p);
   rPass(D, p);
 }
+
+// ---- the planets
+
+/** Prograde circular velocity at (x, y). */
+export function circularVelocity(x: number, y: number): [number, number] {
+  const r = Math.hypot(x, y);
+  const vK = 1 / Math.sqrt(r);
+  return [(-y / r) * vK, (x / r) * vK];
+}
+
+function bodyAccel(
+  planets: readonly Planet[],
+  k: number,
+  h: number
+): [number, number] {
+  const a = planets[k];
+  const r = Math.hypot(a.x, a.y);
+  const r3 = r * r * r;
+  let ax = -a.x / r3 + a.ax;
+  let ay = -a.y / r3 + a.ay;
+  const e = softening(a, h);
+  const e2 = e * e;
+  for (let m = 0; m < planets.length; m++) {
+    if (m === k) continue;
+    const b = planets[m];
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const d2 = dx * dx + dy * dy + e2;
+    const inv = b.q / (d2 * Math.sqrt(d2));
+    ax += dx * inv;
+    ay += dy * inv;
+  }
+  return [ax, ay];
+}
+
+/**
+ * Kick-drift-kick leapfrog in the star's potential plus each other's, plus
+ * the disc force held on each planet from the last reduce. Symplectic, so
+ * the energy oscillates within (ω dt)²/8 and does not walk.
+ */
+export function stepBodies(planets: Planet[], dt: number, h: number): void {
+  const n = planets.length;
+  const acc: [number, number][] = [];
+  for (let k = 0; k < n; k++) acc.push(bodyAccel(planets, k, h));
+  for (let k = 0; k < n; k++) {
+    const p = planets[k];
+    p.vx += 0.5 * acc[k][0] * dt;
+    p.vy += 0.5 * acc[k][1] * dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+  }
+  for (let k = 0; k < n; k++) {
+    const [ax, ay] = bodyAccel(planets, k, h);
+    const p = planets[k];
+    p.vx += 0.5 * ax * dt;
+    p.vy += 0.5 * ay * dt;
+    p.age += dt;
+  }
+}
+
+export function orbitEnergy(pl: Planet): number {
+  return 0.5 * (pl.vx * pl.vx + pl.vy * pl.vy) - 1 / Math.hypot(pl.x, pl.y);
+}
+
+export interface Elements {
+  bound: boolean;
+  /** Semi-major axis; Infinity when unbound. */
+  a: number;
+  e: number;
+  /** Argument of periapsis. */
+  w: number;
+  /** Semi-latus rectum, L². */
+  p: number;
+  L: number;
+}
+
+/** Orbital elements of a throw, from its position and velocity. */
+export function elementsOf(
+  x: number,
+  y: number,
+  vx: number,
+  vy: number
+): Elements {
+  const r = Math.hypot(x, y);
+  const E = 0.5 * (vx * vx + vy * vy) - 1 / r;
+  const L = x * vy - y * vx;
+  // Eccentricity vector: (v × L ẑ)/μ − r̂, with μ = 1.
+  const ex = vy * L - x / r;
+  const ey = -vx * L - y / r;
+  const e = Math.hypot(ex, ey);
+  return {
+    bound: E < 0,
+    a: E < 0 ? -1 / (2 * E) : Infinity,
+    e,
+    w: Math.atan2(ey, ex),
+    p: L * L,
+    L,
+  };
+}
+
+/**
+ * The conic r(θ) = p / (1 + e cos(θ − w)), sampled as xy pairs. A bound
+ * orbit is the whole ellipse; an unbound one is the arc that stays inside
+ * 1.5 R_ESCAPE, which is as far as the stage shows.
+ */
+export function orbitPath(el: Elements, n: number): Float32Array {
+  const out: number[] = [];
+  const limit = 1.5 * R_ESCAPE;
+  let from = 0;
+  let to = 2 * Math.PI;
+  if (!el.bound) {
+    const tInf = Math.acos(-1 / el.e);
+    from = el.w - tInf;
+    to = el.w + tInf;
+  }
+  for (let m = 0; m <= n; m++) {
+    const th = from + ((to - from) * m) / n;
+    const den = 1 + el.e * Math.cos(th - el.w);
+    if (den <= 1e-6) continue;
+    const r = el.p / den;
+    if (r > limit) continue;
+    out.push(r * Math.cos(th), r * Math.sin(th));
+  }
+  return Float32Array.from(out);
+}
+
+export type DiscEvent =
+  | { type: 'merge'; q: number }
+  | { type: 'fell'; q: number }
+  | { type: 'escape'; q: number };
+
+/**
+ * Merge pairs inside the larger Hill radius, drop what has crossed the
+ * cavity into the star, forget what has left. Mutates the array.
+ */
+export function settle(planets: Planet[], h: number): DiscEvent[] {
+  void h;
+  const events: DiscEvent[] = [];
+  for (let a = 0; a < planets.length; a++) {
+    for (let b = a + 1; b < planets.length; b++) {
+      const A = planets[a];
+      const B = planets[b];
+      const d = Math.hypot(A.x - B.x, A.y - B.y);
+      if (d < Math.max(hillRadius(A), hillRadius(B))) {
+        const q = A.q + B.q;
+        A.x = (A.x * A.q + B.x * B.q) / q;
+        A.y = (A.y * A.q + B.y * B.q) / q;
+        A.vx = (A.vx * A.q + B.vx * B.q) / q;
+        A.vy = (A.vy * A.q + B.vy * B.q) / q;
+        A.age = Math.max(A.age, B.age);
+        A.q = q;
+        planets.splice(b, 1);
+        events.push({ type: 'merge', q });
+        b--;
+      }
+    }
+  }
+  for (let k = planets.length - 1; k >= 0; k--) {
+    const r = Math.hypot(planets[k].x, planets[k].y);
+    if (r < R_IN) {
+      events.push({ type: 'fell', q: planets[k].q });
+      planets.splice(k, 1);
+    } else if (r > R_ESCAPE) {
+      events.push({ type: 'escape', q: planets[k].q });
+      planets.splice(k, 1);
+    }
+  }
+  return events;
+}
