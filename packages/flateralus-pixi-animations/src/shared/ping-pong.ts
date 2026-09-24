@@ -94,6 +94,11 @@ export class PingPong {
   sw = 0;
   sh = 0;
 
+  /** The live state texture, for another program on this context to sample. */
+  get texture(): WebGLTexture | null {
+    return this.state[this.cur];
+  }
+
   private constructor(
     canvas: HTMLCanvasElement,
     gl: WebGL2RenderingContext,
