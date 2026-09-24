@@ -98,6 +98,11 @@ solved from the _discrete_ pressure gradient the step uses, so the disc
 starts in equilibrium to round-off rather than to the analytic
 approximation.
 
+_As built in the second pass:_ the inner taper is eased in ln Σ over
+`[0.25, 0.37]` by `e⁻³`, not to the floor over the first few cells, and
+both edges carry wave-damping zones. See "The edges" in
+[`2026-09-23-disc-dust-design.md`](2026-09-23-disc-dust-design.md).
+
 The viscosity is not the disc's clock. `t_ν = 1/(α h² Ω) ≈ 1.3×10⁵` time
 units at `r = 1` — a day of wall clock — so at this `α` the disc does not
 drain visibly. What consumes it is the planets (tension 4).
@@ -136,6 +141,10 @@ advection** (Masset 2000, FARGO), and so does this one. Each substep:
    areas `½(r²_{i+½} − r²_{i−½})Δφ` so mass is conserved on the
    non-uniform cells. Domain faces are outflow: flux leaves with the upwind
    value, nothing enters.
+   _As built in the second pass:_ inside `r = 0.32` and outside `1.8` the
+   gas is also relaxed toward the opening state on the edge's orbital
+   time, which adds or removes mass (`D.damped`); the outflow faces are
+   unchanged. See "The edges" in the dust spec.
 
 Fixed `dt = 0.02` with a capped accumulator (max 4 substeps a frame). Wall
 clock runs at 1.57 units/s, so the orbit at `r = 1` takes **4 s**, the

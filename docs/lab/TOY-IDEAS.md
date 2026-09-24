@@ -499,7 +499,13 @@ healthy through 8,000 steps, and the toy runs at 0.8 because the inner
 wake's tight rings between rim and lane are the best thing in the picture.
 Two production-size tests pin it: every ring within a third of a cell a step
 of Keplerian at the opening state, and the cavity edge still populated after
-800 steps under the giant.
+800 steps under the giant. Two things the zones change on purpose: the edges
+are now a standing source, so a planet past `r = 1.8` has its wake absorbed
+and its sink refilled by the zone, at about 0.014 a unit against a sink
+rate of 0.5; and the cavity edge holds `0.2 Σ₀` at ring 0, so the rim is a
+soft glow from 0.3 to 0.4 rather than a hard edge on black. The parent
+spec's "tapered to a floor" and "nothing enters" are no longer true and
+carry pointers.
 
 **Dust.** 65,536 grains in a float texture on the gas context, each
 `(ln r, φ, St, alive)`, stepped by a shader that samples the gas and adds the

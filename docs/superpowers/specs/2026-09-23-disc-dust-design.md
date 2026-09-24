@@ -92,7 +92,13 @@ tests on the production grid:
   outside). A wake arriving at an edge is absorbed rather than reflected or
   drained through it. The mass the zones add is accumulated in `D.damped`
   and enters the conservation test. The shader recomputes the opening
-  profile and its rotation curve where it needs them, from `uSigma0`.
+  profile and its rotation curve where it needs them, from `uSigma0`. Two
+  consequences: the zones are a standing source, so "the dust is consumed
+  with the disc" is no longer strictly true of the gas at the edges, and a
+  planet orbiting past 1.8 has its wake absorbed and its sink refilled at
+  about 0.014 a unit against a sink rate of 0.5, negligible but real; and
+  the cavity edge now holds `0.2 Σ₀` at ring 0, so it glows faintly
+  (optical depth about 0.1) rather than reading black.
 - **The inner taper eased in ln Σ**: `Σ = (Σ₀/r) · exp(−3(1 − s(r)))` with
   `s` the smoothstep over `[0.25, 0.37]`, instead of a smoothstep from the
   floor over 0.06. The old taper's first cell held a 25× jump; balancing
@@ -215,6 +221,10 @@ _As built:_ measured in headless Chromium on Metal with a timer query around
 every draw, 1068 × 1344 stage, 60 fps: gas substeps 4.1 ms (7.85 passes a
 frame at 0.52 each), reduce **0.93** (was 1.5), display 0.67, grain step
 0.77, grain draw 0.78; **7.26 ms** a frame against the built toy's 7.8.
+The chunked reduce's answer, read off the running toy after the pre-roll:
+the disc's pull on the giant at `r = 0.78` is `8.9×10⁻³`, on the seed at
+`1.46` `8.0×10⁻³`, finite and of the order the built toy measured
+(`8.5×10⁻³` for a `2×10⁻⁴` planet at 1.1).
 
 ## Architecture
 
