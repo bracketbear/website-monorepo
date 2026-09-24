@@ -165,22 +165,33 @@ describe('the drift', () => {
     expect(inLane(gs)).toBeGreaterThan(0.7);
   });
 
-  it("never exceeds the sound speed, even on the taper's steepest cells", () => {
+  it('clamps the drift to the sound speed where Σ sits at the floor', () => {
+    // The opening profile never exercises the clamp (its steepest cells
+    // ask for 2 % of c_s), so construct the case: two rings at the floor
+    // and a grain on the outer one, with the profile one cell further out.
+    // The unclamped drift is t_s c² Σ_profile / (floor · 2Δr), a thousand
+    // times the sound speed.
     const p = params();
     const D = createDisc(NR, NPHI, p);
-    // The second ring in from the cavity: Σ climbs by a factor of thirty
-    // over the two neighbouring cells, and the unclamped drift there is
-    // four times the sound speed.
-    const r = R_IN * Math.exp(1.5 * D.dlnr);
+    const i = ringIndex(D, 1.0);
+    for (let j = 0; j < NPHI; j++) {
+      D.sig[i * NPHI + j] = D.floor;
+      D.sig[(i - 1) * NPHI + j] = D.floor;
+    }
+    const r = D.r[i];
+    const cs = p.h / Math.sqrt(r);
+    const unclamped = driftRate(D, p, r, ST_MAX);
+    expect(Math.abs(unclamped)).toBeGreaterThan(10 * cs);
     const g = grain(r, 2.0, ST_MAX);
     const before = g[0];
     stepGrains(D, p, g);
-    const cs = p.h / Math.sqrt(r);
     const dlnr = Math.abs(g[0] - before);
-    // |v_r + Δv_r| / r · dt ≤ (|v_r| + c_s) / r · dt; v_r is ~0 here.
-    expect(dlnr).toBeLessThanOrEqual(((cs + 1e-3) / r) * p.dt);
+    // |v_r + Δv_r| / r · dt ≤ (|v_r| + c_s) / r · dt; v_r is 0 here.
+    expect(dlnr).toBeLessThanOrEqual(((cs + 1e-6) / r) * p.dt);
+    expect(dlnr).toBeGreaterThan(((0.5 * cs) / r) * p.dt);
     expect(Number.isFinite(g[0])).toBe(true);
     expect(Number.isFinite(g[1])).toBe(true);
+    expect(g[3]).toBe(1);
   });
 
   it('kills a grain that leaves the domain and never revives it', () => {
