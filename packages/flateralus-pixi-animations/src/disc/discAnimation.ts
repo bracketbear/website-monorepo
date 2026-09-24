@@ -52,6 +52,14 @@ const NR = 192;
  */
 const PREROLL_STEPS = 6280;
 const PREROLL_PER_FRAME = 400;
+/**
+ * Gas substeps per grain step. Grains integrate (ln r, φ), so a circular
+ * orbit is exact at any step and the step only has to keep a wake's v_r
+ * under a fraction of a cell: 0.08 units at the sound speed moves a grain
+ * half a percent of its radius. Live frames take one grain step for all
+ * their substeps; a grain step costs as much as a gas pass.
+ */
+const GRAIN_EVERY = 8;
 /** Disc radius that fills the shorter screen dimension. */
 const R_VIEW = 2.15;
 /** Drag scale: one view radius of drag is 1.5 v_K at r = 1. */
@@ -213,22 +221,25 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
       });
     }
     stepBodies(this.planets, p.dt, p.h);
-    if (this.grains) {
-      const gasTex = pp.texture;
-      this.grains.step((gl, L) => {
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, gasTex);
-        gl.uniform1i(L.uState!, 1);
-        this.setGrid(gl, L);
-        gl.uniform1f(L.uROut!, R_OUT);
-        gl.uniform1f(L.uH!, p.h);
-        gl.uniform1f(L.uDt!, p.dt);
-        gl.uniform1f(L.uFloor!, this.floor);
-      });
-    }
     for (const ev of settle(this.planets, p.h)) {
       if (ev.type === 'fell') this.flare += 4 * Math.cbrt(ev.q / 1e-4);
     }
+  }
+
+  /** Move every grain through dt of the gas as it stands now. */
+  private stepGrains(pp: PingPong, p: DiscParams, dt: number): void {
+    if (!this.grains) return;
+    const gasTex = pp.texture;
+    this.grains.step((gl, L) => {
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, gasTex);
+      gl.uniform1i(L.uState!, 1);
+      this.setGrid(gl, L);
+      gl.uniform1f(L.uROut!, R_OUT);
+      gl.uniform1f(L.uH!, p.h);
+      gl.uniform1f(L.uDt!, dt);
+      gl.uniform1f(L.uFloor!, this.floor);
+    });
   }
 
   /** The disc's answer for this frame: force on each planet, what it ate, the star's flux. */
@@ -414,24 +425,33 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
 
     // ---- the pre-roll, outside the accumulator so the cap cannot eat it
     let pre = PREROLL_PER_FRAME;
+    let sinceGrains = 0;
     while (this.preroll > 0 && pre-- > 0) {
       this.preroll--;
       this.doStep(pp, p, true, false);
+      if (++sinceGrains === GRAIN_EVERY) {
+        this.stepGrains(pp, p, GRAIN_EVERY * STEP);
+        sinceGrains = 0;
+      }
     }
+    if (sinceGrains > 0) this.stepGrains(pp, p, sinceGrains * STEP);
 
     // ---- fixed-step integration, capped so a stall cannot spiral
     const rate =
       UNITS_PER_SECOND * Number(controls.speed) * (this.reduced ? 0.25 : 1);
     this.acc = Math.min(this.acc + dt * rate, MAX_STEPS_PER_FRAME * STEP);
     let first = true;
-    let stepped = false;
+    let steps = 0;
     while (this.acc >= STEP) {
       this.acc -= STEP;
       this.doStep(pp, p, first, true);
       first = false;
-      stepped = true;
+      steps++;
     }
-    if (stepped) this.readBack(pp, p);
+    if (steps > 0) {
+      this.stepGrains(pp, p, steps * STEP);
+      this.readBack(pp, p);
+    }
     this.flare *= Math.exp(-dt / FLARE_TAU);
 
     // ---- display
