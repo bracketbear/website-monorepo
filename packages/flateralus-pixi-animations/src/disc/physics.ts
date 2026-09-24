@@ -22,8 +22,11 @@ export const MAX_STEPS_PER_FRAME = 6;
 /** Wall-clock rate: the orbit at r = 1 takes 4 s. */
 export const UNITS_PER_SECOND = 1.57;
 export const MAX_PLANETS = 8;
-/** A thrown seed, about the Earth against the Sun. */
-export const SEED_Q = 1e-5;
+/**
+ * A thrown seed: about thirty Earths against the Sun. Small enough to
+ * make a wake and no gap, big enough that the wake shows.
+ */
+export const SEED_Q = 1e-4;
 /** Past this a planet has left the scene. Inside R_IN it has fallen in. */
 export const R_ESCAPE = 2.2;
 
@@ -35,7 +38,10 @@ export interface DiscParams {
   alpha: number;
   /** Disc mass as a fraction of the star's. */
   discMass: number;
-  /** 1/τ_acc: the fraction of Σ inside a sink removed per unit time. */
+  /**
+   * 1/τ_acc: the fraction of Σ inside a sink removed per unit time. At 0.5
+   * the sink turns over in two units, a third of an orbit at r = 1.
+   */
   accRate: number;
   /** A sink is never smaller than this many cells, so a fresh seed eats. */
   sinkFloorCells: number;
@@ -46,8 +52,8 @@ export const DEFAULT_PARAMS: DiscParams = {
   h: 0.05,
   alpha: 3e-3,
   discMass: 0.02,
-  accRate: 0.03,
-  sinkFloorCells: 1.5,
+  accRate: 0.5,
+  sinkFloorCells: 2,
 };
 
 export interface Planet {

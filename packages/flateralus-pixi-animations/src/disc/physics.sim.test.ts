@@ -14,6 +14,8 @@ import {
   wakeAmplitude,
   peakPhi,
   isHealthy,
+  SEED_Q,
+  UNITS_PER_SECOND,
   type Disc,
   type DiscParams,
   type Planet,
@@ -142,6 +144,30 @@ describe('the production grid', () => {
       evolve(D, p, pl, 1200);
       expect(isHealthy(D)).toBe(true);
       expect(totalMass(D) / m0).toBeGreaterThan(0.98);
+    },
+    SLOW
+  );
+
+  it(
+    'feeds a seed on a circular orbit to the gap threshold in under two minutes',
+    () => {
+      // The sink is rate-limited well below what shear refills it with,
+      // so the rate is the lever; measured here at production cell size
+      // because the sink floor is in cells.
+      const p = { ...DEFAULT_PARAMS };
+      const D = createDisc(192, 512, p);
+      const pl = planetAt(1.2, SEED_Q);
+      let eaten = 0;
+      for (let s = 0; s < 200; s++) {
+        step(D, p, [pl], true);
+        eaten += eatenBy(D, pl, p);
+        stepBodies([pl], p.dt, p.h);
+      }
+      const perUnit = eaten / (200 * p.dt);
+      const seconds = (3.8e-4 - SEED_Q) / perUnit / UNITS_PER_SECOND;
+      expect(isHealthy(D)).toBe(true);
+      expect(perUnit).toBeGreaterThan(0);
+      expect(seconds).toBeLessThan(120);
     },
     SLOW
   );
