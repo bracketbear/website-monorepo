@@ -455,6 +455,93 @@ controller walked down to 0.30, which this toy does not read.
 without being added to the registry test's `SELECTED` list. The four ids were
 added on this branch alongside `disc`.
 
+### Second pass
+
+Spec in `docs/superpowers/specs/2026-09-23-disc-dust-design.md`. The gas had
+held; what had not was the distance between the physics and what a visitor
+saw. Four gaps, measured before anything was changed, and what closing them
+cost.
+
+**Feeding was a quarter of an hour, and the build note blamed the wrong
+thing.** On the production grid a fresh seed with the sink at 1.5 cells and
+`accretionRate` 0.1 ate `2.45 × 10⁻⁷` a time unit, sixteen minutes to the
+gap threshold. At 0.5 it ate `1.10 × 10⁻⁶`, at 2.0 `3.01 × 10⁻⁶`: the sink
+was rate-limited about five times below what shear refills it with, so the
+rate was the lever after all, just not at 0.06. Now 0.5, with the floor at 2
+cells and a seed thirty Earths instead of one. Measured live, a seed clicked
+onto a circular orbit at `r = 1.2` passed `3.8 × 10⁻⁴` 52 time units later,
+33 s of wall clock at 60 fps, and its lane followed. The seed the disc loads
+with does the same on its own about 35 s after load.
+
+**The display had no headroom.** `κ = 1.5/Σ₀` put the optical depth at 0.78
+at `r = 1` and 0.99 at `r = 0.3`, so a 1.5 % density contrast was a 0.5 %
+brightness contrast and every arm on screen was the shock-heating term.
+`κ = 0.5/Σ₀` with a gain of 1.6 on the emission; the rim still saturates.
+
+**A giant at load, and what it found at the cavity edge.** The opening
+state now has a `1.5 × 10⁻³` giant on a circular orbit that carves a lane
+during the pre-roll, and a seed further out. The first placement, `r = 0.6`,
+sent the gas NaN on step 461 of the production-size mirror, sink on or off;
+`r = 0.8` lasted to step 2383; both at ring 0. Instrumented, the mechanism
+was plain: the giant's inner wake reaches the cavity edge as a shock with
+radial velocities near the sound speed, its trough drains ring 0 from 0.2 to
+0.001 of `Σ₀` over 150 steps, and the moment Σ touches the floor the pressure
+gradient divided by the floor density multiplies the velocity by sixty in one
+step. The 2 × 10⁻⁴ planet the toy shipped with never excited it. Two changes:
+wave-damping zones at both edges (de Val-Borro et al. 2006), which relax the
+gas toward the opening state on the edge's orbital time with a parabolic ramp
+so a wake arriving there is absorbed rather than drained through the
+boundary, and an inner taper eased in ln Σ, because the old one, quadratic
+from the floor over 0.06, had put ring 0 at a residual Courant number of 4.3
+to balance a 25× jump across one cell. The mass the zones add is tracked and
+enters the conservation test. With both, the giant at 0.6 and at 0.8 is
+healthy through 8,000 steps, and the toy runs at 0.8 because the inner
+wake's tight rings between rim and lane are the best thing in the picture.
+Two production-size tests pin it: every ring within a third of a cell a step
+of Keplerian at the opening state, and the cavity edge still populated after
+800 steps under the giant.
+
+**Dust.** 65,536 grains in a float texture on the gas context, each
+`(ln r, φ, St, alive)`, stepped by a shader that samples the gas and adds the
+terminal-velocity drift `t_s ∇P / Σ`, drawn as additive points coloured by
+the disc's temperature. Stokes numbers log-uniform on `[0.02, 0.2]`. It does
+what it was for: the lane empties of grains inside a minute, biggest first,
+the grains pile into bright rings at the lane edges, and the disc visibly
+turns, faster inside than out. A CPU twin in `grains.ts` carries the tests;
+the "leaves the lane" test uses a constructed 80 % dip in a frozen gas,
+because the mirror's torque-carved gap at 30 orbits is too shallow and the
+background inward drift confounds a control, and because the gradient
+stencil spans a cell each way, wider than a 50 % dip's bottom.
+
+**What the frame costs now.** Headless Chromium on Metal, timer query
+around every draw, 1068 × 1344 stage, at 60 fps:
+
+| Pass                       | Built toy | Now      |
+| -------------------------- | --------- | -------- |
+| gas substeps (2.6 a frame) | 5.6 ms    | 4.1      |
+| reduce                     | 1.5       | 0.93     |
+| display                    | 0.75      | 0.67     |
+| grain step (1 a frame)     | —         | 0.77     |
+| grain draw (65,536 points) | —         | 0.78     |
+| **total**                  | **7.8**   | **7.26** |
+
+The reduce, chunked eight ways along each ring (13,824 fragments summing 64
+cells each), gave back 0.6 ms. A grain step costs as much as a gas pass, so
+it runs once per frame over the frame's substeps rather than per substep,
+which took the total from 9.0 ms to 7.3; grains integrate `(ln r, φ)`, so the
+orbit is exact at any step and only a wake's `v_r` bounds it. The gas passes
+themselves measured 0.52 ms each against the earlier 0.58–0.83; same
+machine, a different day.
+
+**Two things about measuring.** The Chrome tab the agent drives is hidden
+(`document.visibilityState` is `hidden`, zero animation frames a second, the
+lab readout says FPS 0), so the animation only advanced in bursts during a
+screenshot or a click, and an hour went to probes that never landed. The
+memory's headless playwright loop is the only honest way to watch this toy
+run. And the astro dev server does not watch files outside the app root, so
+a rebuild of the package's `dist` two directories up is never picked up
+until the server restarts.
+
 ## Lichtenberg
 
 Worth building purely on the gap between the honest version and the version

@@ -48,6 +48,12 @@ watched to the threshold on screen before the branch is finished. A
 thrown seed raises a wake the shock-heating term shows at once, so a throw
 announces itself. The eaten gas's momentum stays ignored.
 
+_As built:_ a seed clicked onto a circular orbit at `r = 1.2` passed the
+threshold 52 time units later, 33 s of wall clock at 60 fps, faster than the
+test's linear extrapolation because the sink radius outgrows the floor past
+`q ≈ 1.5×10⁻⁴`. The seed the disc loads with does the same on its own about
+35 s after load.
+
 ## Default state
 
 Two bodies, both circular:
@@ -62,6 +68,37 @@ during the pre-roll; it keeps deepening live, and the grains drain out of
 it during the first minute on screen, which is where most of the visible
 depth comes from. The giant's wake spans about 0.4–0.9 and the seed's
 1.0–1.7, so neither sits in the other's arms.
+
+_As built, not as first specified:_ the giant is at **`r = 0.8`** and the
+seed at **`1.5`**. At 0.6 the production-size mirror went NaN on step 461
+at the cavity edge, sink on or off; 0.8 lasted to step 2383. The cause was
+the boundary, not the placement (§ The edges), and with it fixed both
+placements are healthy through 8,000 steps; 0.8 stays because it leaves
+room for the inner wake's tight rings between rim and lane.
+
+## The edges
+
+_Added as built._ A giant's inner wake reaches the cavity edge as a shock
+with radial velocities near the sound speed. Its trough drains ring 0 from
+0.2 to 0.001 of `Σ₀` over about 150 steps, and when Σ touches the floor the
+pressure gradient over the floor density multiplies the velocity by sixty
+in one step. Two changes to `physics.ts` and the step shader, pinned by
+tests on the production grid:
+
+- **Wave-damping zones** (de Val-Borro et al. 2006): for `r < 0.32` and
+  `r > 1.8`, Σ, `v_r` and `v_φ` relax toward the opening ring profile at a
+  rate `ramp² / τ`, `ramp` linear from 0 at the zone's inner boundary to 1
+  at the edge, `τ` the orbital period at that edge (0.785 inside, 17.8
+  outside). A wake arriving at an edge is absorbed rather than reflected or
+  drained through it. The mass the zones add is accumulated in `D.damped`
+  and enters the conservation test. The shader recomputes the opening
+  profile and its rotation curve where it needs them, from `uSigma0`.
+- **The inner taper eased in ln Σ**: `Σ = (Σ₀/r) · exp(−3(1 − s(r)))` with
+  `s` the smoothstep over `[0.25, 0.37]`, instead of a smoothstep from the
+  floor over 0.06. The old taper's first cell held a 25× jump; balancing
+  that put ring 0 at 30 % above Keplerian, a residual Courant number of 4.3
+  at the production step, hidden while the ring stayed uniform. Every ring
+  now opens under 0.3.
 
 ## Headroom
 
@@ -133,6 +170,14 @@ points are added on top, and the points fragment multiplies by the same
 vignette weight so the corners do not fill with dust. The film grain stays
 on the disc only.
 
+_As built, not as first specified:_ grains step **once per live frame**
+with `dt` = that frame's substeps × `STEP`, and once every eight gas
+substeps during the pre-roll. A grain step costs 0.68 ms of GPU, as much as
+a gas pass, and per substep it put the frame at 9.0 ms; per frame it is
+0.77. Integrating `(ln r, φ)` makes the orbit exact at any step, so only a
+wake's `v_r` bounds it: 0.08 units at `c_s` moves a grain half a percent of
+its radius.
+
 ### Plumbing
 
 - `PingPong.texture`: a getter for the live state texture, so another
@@ -166,6 +211,11 @@ drawFrag, stepUniforms, drawUniforms })`. A ping-pong pair of `n`-texel
   Metal timer loop; if that loop cannot be run on this branch the number is
   reported as unmeasured, not guessed.
 
+_As built:_ measured in headless Chromium on Metal with a timer query around
+every draw, 1068 × 1344 stage, 60 fps: gas substeps 4.1 ms (7.85 passes a
+frame at 0.52 each), reduce **0.93** (was 1.5), display 0.67, grain step
+0.77, grain draw 0.78; **7.26 ms** a frame against the built toy's 7.8.
+
 ## Architecture
 
 | File                       | Change                                                                                                                 |
@@ -197,6 +247,16 @@ drawFrag, stepUniforms, drawUniforms })`. A ping-pong pair of `n`-texel
    `SEED_Q` seed at `r = 1.2` on a circular orbit, 200 steps: the eaten
    mass extrapolates linearly to under two minutes of wall clock to the
    thermal threshold. Slow; marked so.
+
+   _As built:_ test 2 uses a constructed lane, an 80 % Gaussian dip of width
+   `H` in a frozen gas, not a torque-carved one: the mirror's 30-orbit gap
+   is too shallow, the background inward drift confounds the control, and
+   the gradient stencil spans a cell each way, wider than a shallower dip's
+   bottom. Two tests were added on the production grid: every ring within a
+   residual Courant number of 0.3 at the opening state, and the cavity edge
+   keeping 30 % of its density after 800 steps under a `1.5×10⁻³` giant at
+   `r = 0.6`.
+
 4. **Mass is still conserved** with the sink at 2 cells and rate 0.5: the
    existing test 5 at the new defaults.
 5. **The mirror's existing suites pass unchanged** except where the
@@ -209,6 +269,11 @@ lane is clear of large grains inside a minute; a throw shows a wake and a
 growing dot, and the dot's mass passes `3.8×10⁻⁴` inside two minutes of
 being clicked onto a circular orbit at `r ≈ 1.2`; the frame's GPU cost
 stays under the built toy's 7.8 ms.
+
+_As built:_ all of it, in headless Chromium at 60 fps, with the clock and
+the planets' masses read off a temporary title probe. The Chrome tab the
+agent drives is hidden, so `requestAnimationFrame` never fires there and
+the animation only moved during screenshots and clicks.
 
 ## Out of scope
 
