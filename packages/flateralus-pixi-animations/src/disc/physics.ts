@@ -29,6 +29,32 @@ export const MAX_PLANETS = 8;
 export const SEED_Q = 1e-4;
 /** Past this a planet has left the scene. Inside R_IN it has fallen in. */
 export const R_ESCAPE = 2.2;
+/**
+ * Wave-damping zones (de Val-Borro et al. 2006): inside R_DAMP_IN and
+ * outside R_DAMP_OUT the gas relaxes toward the opening state on the
+ * orbital time at that edge, with a parabolic ramp, so a wake that
+ * reaches an edge is absorbed there rather than reflected or drained
+ * through it. Without them a giant's inner wake drains the cavity edge
+ * to the floor, and the pressure gradient over the floor density is
+ * unbounded.
+ */
+export const R_DAMP_IN = 0.32;
+export const R_DAMP_OUT = 1.8;
+export const TAU_DAMP_IN = 2 * Math.PI * Math.pow(R_IN, 1.5);
+export const TAU_DAMP_OUT = 2 * Math.PI * Math.pow(R_OUT, 1.5);
+
+/** Relaxation rate toward the opening state at radius r, per unit time. */
+export function dampRate(r: number): number {
+  if (r < R_DAMP_IN) {
+    const x = (R_DAMP_IN - r) / (R_DAMP_IN - R_IN);
+    return (x * x) / TAU_DAMP_IN;
+  }
+  if (r > R_DAMP_OUT) {
+    const x = (r - R_DAMP_OUT) / (R_OUT - R_DAMP_OUT);
+    return (x * x) / TAU_DAMP_OUT;
+  }
+  return 0;
+}
 
 export interface DiscParams {
   dt: number;
@@ -92,6 +118,11 @@ export interface Disc {
   floor: number;
   /** Mass that has left through the domain faces. */
   outflow: number;
+  /** The opening ring profile the damping zones relax toward. */
+  sig0: Float32Array;
+  vp0: Float32Array;
+  /** Mass the damping zones have added (negative: removed). */
+  damped: number;
 }
 
 /** Locally isothermal: c_s = h v_K, so c_s² = h²/r. */
@@ -104,9 +135,17 @@ function smooth01(t: number): number {
   return x * x * (3 - 2 * x);
 }
 
-/** Σ ∝ 1/r, eased in over the first 0.06 and out over the last 10 %. */
+/**
+ * Σ ∝ 1/r, eased out over the last 10 % and in over the first 0.12 — in
+ * ln Σ, by e⁻³, so the slope at the cavity edge is at most 37 per unit.
+ * The rotation curve balances the discrete pressure gradient, and a
+ * taper steep in ln Σ makes its rings super-Keplerian by more than the
+ * azimuthal pass can carry in a step: the old taper, quadratic from the
+ * floor over 0.06, put ring 0 at a residual Courant number of 4. Uniform
+ * rings hid it; the first giant's wake to reach them went NaN.
+ */
 export function sigmaProfile(r: number, sigma0: number): number {
-  const tin = smooth01((r - R_IN) / 0.06);
+  const tin = Math.exp(-3 * (1 - smooth01((r - R_IN) / 0.12)));
   const tout = 1 - smooth01((r - 0.9 * R_OUT) / (0.1 * R_OUT));
   return (sigma0 / r) * tin * tout;
 }
@@ -194,6 +233,9 @@ export function createDisc(nr: number, nphi: number, p: DiscParams): Disc {
     sigma0,
     floor,
     outflow: 0,
+    sig0: Float32Array.from(prof),
+    vp0: Float32Array.from(vpr),
+    damped: 0,
   };
   for (let i = 0; i < nr; i++)
     for (let j = 0; j < nphi; j++) {
@@ -305,10 +347,11 @@ export function sourcePass(
   planets: readonly Planet[],
   clearEat: boolean
 ): void {
-  const { nr, nphi, dlnr, dphi, r, sig, vr, vp, eat } = D;
+  const { nr, nphi, dlnr, dphi, r, sig, vr, vp, eat, sig0, vp0, area } = D;
   const h = p.h;
   const dt = p.dt;
   const accK = 1 - Math.exp(-p.accRate * dt);
+  let damped = 0;
   const at = (i: number, j: number) =>
     Math.max(0, Math.min(nr - 1, i)) * nphi + (((j % nphi) + nphi) % nphi);
   const np = planets.length;
@@ -334,6 +377,7 @@ export function sourcePass(
     const c2p = cs2(r[Math.min(nr - 1, i + 1)], h);
     const c2m = cs2(r[Math.max(0, i - 1)], h);
     const nu = p.alpha * h * h * Math.sqrt(ri);
+    const kd = dampRate(ri) * dt;
     for (let j = 0; j < nphi; j++) {
       const k = i * nphi + j;
       const s = Math.max(sig[k], D.floor);
@@ -386,16 +430,26 @@ export function sourcePass(
 
       const vp1 =
         vpC + dt * (-vrC * vpC * rinv - dPdphi / (s * ri) + app + nu * lapVp);
-      const vr1 =
+      let vr1 =
         vrC +
         dt * (vp1 * vp1 * rinv - rinv * rinv - dPdr / s + arp + nu * lapVr);
+      let vp2 = vp1;
+
+      if (kd > 0) {
+        const ds = (sig0[i] - s1) * kd;
+        s1 += ds;
+        damped += ds * area[i];
+        vr1 -= vr1 * kd;
+        vp2 += (vp0[i] - vp2) * kd;
+      }
 
       D.sig2[k] = s1;
       D.vr2[k] = vr1;
-      D.vp2[k] = vp1;
+      D.vp2[k] = vp2;
       D.eat2[k] = clearEat ? removed : eat[k] + removed;
     }
   }
+  D.damped += damped;
   swap(D);
 }
 

@@ -149,6 +149,25 @@ describe('the production grid', () => {
   );
 
   it(
+    'keeps the cavity edge populated under a giant at 0.6',
+    () => {
+      // A giant's inner wake reaches the cavity edge as a shock with
+      // radial velocities near the sound speed. Its trough drains ring 0
+      // until Σ touches the floor, and the pressure gradient over the
+      // floor density then blows the velocity up sixtyfold in a step:
+      // NaN by step 461 without the damping zones.
+      const p = { ...DEFAULT_PARAMS };
+      const D = createDisc(192, 512, p);
+      const s0 = ringMean(D, 0);
+      const pl = [planetAt(0.6, 1.5e-3)];
+      evolve(D, p, pl, 800);
+      expect(isHealthy(D)).toBe(true);
+      expect(ringMean(D, 0) / s0).toBeGreaterThan(0.3);
+    },
+    SLOW
+  );
+
+  it(
     'feeds a seed on a circular orbit to the gap threshold in under two minutes',
     () => {
       // The sink is rate-limited well below what shear refills it with,

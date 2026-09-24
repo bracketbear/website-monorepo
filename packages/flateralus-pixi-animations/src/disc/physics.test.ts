@@ -95,6 +95,24 @@ describe('the opening disc', () => {
       expect(D.sig[a * NPHI + j]).toBe(D.sig[a * NPHI]);
   });
 
+  it('keeps every ring within a third of a cell a step of Keplerian, at production size', () => {
+    // The rotation curve balances the discrete pressure gradient, so a
+    // taper that is steep in ln Σ makes its rings super-Keplerian, and
+    // the residual the azimuthal pass transports goes past its Courant
+    // clamp. Uniform rings hide that; the first strong wake to reach them
+    // does not. The cavity edge is where the cells are smallest.
+    const D = createDisc(192, 512, { ...DEFAULT_PARAMS });
+    let worst = 0;
+    for (let i = 0; i < D.nr; i++) {
+      const r = D.r[i];
+      const vK = 1 / Math.sqrt(r);
+      const c =
+        (Math.abs(D.vp[i * 512] - vK) * DEFAULT_PARAMS.dt) / (r * D.dphi);
+      worst = Math.max(worst, c);
+    }
+    expect(worst).toBeLessThan(0.3);
+  });
+
   it('spans the cavity to the edge with same-shaped cells', () => {
     const D = createDisc(NR, NPHI, params());
     expect(D.rf[0]).toBeCloseTo(R_IN, 9);
@@ -208,7 +226,7 @@ describe('transport', () => {
     const D = createDisc(NR, NPHI, p);
     const before = totalMass(D);
     const eaten = run(D, p, [planet(1.0, 0, 1e-4)], 300);
-    const after = totalMass(D) + eaten + D.outflow;
+    const after = totalMass(D) + eaten + D.outflow - D.damped;
     // Σ is float32 and the floor may add mass only where Σ is already at
     // 1e-4 of the disc; 1e-4 relative is the honest bound, not 1e-7.
     expect(Math.abs(after - before) / before).toBeLessThan(1e-4);

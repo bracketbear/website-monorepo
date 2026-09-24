@@ -1,4 +1,10 @@
-import { MAX_PLANETS } from './physics';
+import {
+  MAX_PLANETS,
+  R_DAMP_IN,
+  R_DAMP_OUT,
+  TAU_DAMP_IN,
+  TAU_DAMP_OUT,
+} from './physics';
 
 /**
  * Each ring is summed in chunks so the reduce has enough fragments to
@@ -44,11 +50,37 @@ export const STEP_FS = `#version 300 es
     out vec4 fragColor;
     ${GRID}
     uniform int uPass;
-    uniform float uDt, uH, uAlpha, uAccK, uSinkFloor, uFloor;
+    uniform float uDt, uH, uAlpha, uAccK, uSinkFloor, uFloor, uROut, uSigma0;
     uniform int uClearEat;
     uniform int uPlanetN;
     uniform vec4 uPlanet[${MAX_PLANETS}];
     float cs2At(int i) { return uH * uH / rAt(clamp(i, 0, G.y - 1)); }
+
+    // The opening state, recomputed where the damping zones need it:
+    // sigmaProfile() and the rotation curve createDisc() solves from the
+    // discrete pressure gradient.
+    float smooth01(float t) { float x = clamp(t, 0.0, 1.0); return x * x * (3.0 - 2.0 * x); }
+    float prof(int i) {
+      float r = rAt(clamp(i, 0, G.y - 1));
+      float tin = exp(-3.0 * (1.0 - smooth01((r - uRIn) / 0.12)));
+      float tout = 1.0 - smooth01((r - 0.9 * uROut) / (0.1 * uROut));
+      return max(uFloor, uSigma0 / r * tin * tout);
+    }
+    float vp0At(int i) {
+      float r = rAt(i);
+      float P0 = cs2At(i) * prof(i), Pp = cs2At(i + 1) * prof(i + 1), Pm = cs2At(i - 1) * prof(i - 1);
+      float dPdr;
+      if (i == 0) dPdr = (Pp - P0) / (rAt(1) - rAt(0));
+      else if (i == G.y - 1) dPdr = (P0 - Pm) / (rAt(i) - rAt(i - 1));
+      else dPdr = (Pp - Pm) / (rAt(i + 1) - rAt(i - 1));
+      return sqrt(max(0.0, r * (1.0 / (r * r) + dPdr / prof(i))));
+    }
+    // dampRate(): the wave-damping zones at each edge.
+    float dampRate(float r) {
+      if (r < ${R_DAMP_IN}) { float x = (${R_DAMP_IN} - r) / (${R_DAMP_IN} - uRIn); return x * x / ${TAU_DAMP_IN}; }
+      if (r > ${R_DAMP_OUT}) { float x = (r - ${R_DAMP_OUT}) / (uROut - ${R_DAMP_OUT}); return x * x / ${TAU_DAMP_OUT}; }
+      return 0.0;
+    }
 
     // sourcePass()
     vec4 sources(int i, int j) {
@@ -90,6 +122,12 @@ export const STEP_FS = `#version 300 es
       float lapVp = ((ip.z - 2.0 * c.z + im.z) / (uDlnr * uDlnr) + (jp.z - 2.0 * c.z + jm.z) / (uDphi * uDphi)) * rinv * rinv;
       float vp1 = c.z + uDt * (-c.y * c.z * rinv - dPdphi / (s * r) + app + nu * lapVp);
       float vr1 = c.y + uDt * (vp1 * vp1 * rinv - rinv * rinv - dPdr / s + arp + nu * lapVr);
+      float kd = dampRate(r) * uDt;
+      if (kd > 0.0) {
+        s1 += (prof(i) - s1) * kd;
+        vr1 -= vr1 * kd;
+        vp1 += (vp0At(i) - vp1) * kd;
+      }
       float eat = uClearEat == 1 ? removed : c.w + removed;
       return vec4(s1, vr1, vp1, eat);
     }
@@ -174,6 +212,8 @@ export const STEP_FS = `#version 300 es
 export const STEP_UNIFORMS = [
   'uState',
   'uPass',
+  'uROut',
+  'uSigma0',
   'uDt',
   'uH',
   'uAlpha',
@@ -249,6 +289,19 @@ export const REDUCE_UNIFORMS = [
   'uDphi',
 ] as const;
 
+/** Blackbody chromaticity, Helland's fit, valid 1000–40000 K. */
+const KELVIN = `
+    vec3 kelvin(float T) {
+      float t = clamp(T, 1000.0, 40000.0) / 100.0;
+      vec3 c;
+      c.r = t <= 66.0 ? 1.0 : clamp(1.2929 * pow(t - 60.0, -0.1332), 0.0, 1.0);
+      c.g = t <= 66.0 ? clamp(0.3901 * log(t) - 0.6318, 0.0, 1.0)
+                      : clamp(1.1298 * pow(t - 60.0, -0.0755), 0.0, 1.0);
+      c.b = t >= 66.0 ? 1.0 : (t <= 19.0 ? 0.0 : clamp(0.5432 * log(t - 10.0) - 1.1963, 0.0, 1.0));
+      return c;
+    }
+`;
+
 /**
  * Everything on screen is a projection of Σ and v. Colour is the disc's
  * temperature T = 3000 K · r^-½ through a Planck fit, brightened where the
@@ -284,16 +337,7 @@ export const DISPLAY_FS = `#version 300 es
       return mix(a, b, ti);
     }
 
-    // Blackbody chromaticity, Helland's fit, valid 1000–40000 K.
-    vec3 kelvin(float T) {
-      float t = clamp(T, 1000.0, 40000.0) / 100.0;
-      vec3 c;
-      c.r = t <= 66.0 ? 1.0 : clamp(1.2929 * pow(t - 60.0, -0.1332), 0.0, 1.0);
-      c.g = t <= 66.0 ? clamp(0.3901 * log(t) - 0.6318, 0.0, 1.0)
-                      : clamp(1.1298 * pow(t - 60.0, -0.0755), 0.0, 1.0);
-      c.b = t >= 66.0 ? 1.0 : (t <= 19.0 ? 0.0 : clamp(0.5432 * log(t - 10.0) - 1.1963, 0.0, 1.0));
-      return c;
-    }
+    ${KELVIN}
 
     void main() {
       G = textureSize(uState, 0);
@@ -363,3 +407,106 @@ export const DISP_UNIFORMS = [
   'uDlnr',
   'uDphi',
 ] as const;
+
+/**
+ * One grain per texel: (ln r, φ, St, alive). Samples the gas bilinearly
+ * with φ wrapped by hand, takes the gas velocity plus the terminal-velocity
+ * drift t_s ∇P / Σ clamped to c_s, and advances (ln r, φ) — the twin of
+ * stepGrain() in grains.ts. A grain past either edge is dead and stays so.
+ */
+export const GRAIN_STEP_FS = `#version 300 es
+    precision highp float;
+    precision highp int;
+    out vec4 fragColor;
+    uniform sampler2D uParticles;
+    uniform int uPW;
+    ${GRID}
+    uniform float uROut, uH, uDt, uFloor;
+    const float TAU = 6.28318530718;
+    vec4 gas(float lnr, float phi) {
+      float fi = (lnr - log(uRIn)) / uDlnr - 0.5;
+      float fj = phi / uDphi - 0.5;
+      int i0 = int(floor(fi)), j0 = int(floor(fj));
+      float ti = fi - float(i0), tj = fj - float(j0);
+      vec4 a = mix(S(i0, j0), S(i0, j0 + 1), tj);
+      vec4 b = mix(S(i0 + 1, j0), S(i0 + 1, j0 + 1), tj);
+      return mix(a, b, ti);
+    }
+    void main() {
+      G = textureSize(uState, 0);
+      vec4 g = texelFetch(uParticles, ivec2(gl_FragCoord.xy), 0);
+      if (g.w == 0.0) { fragColor = g; return; }
+      float lnr = g.x, phi = g.y, st = g.z;
+      float r = exp(lnr), om = pow(r, -1.5);
+      vec4 c = gas(lnr, phi);
+      float sig = max(c.x, uFloor);
+      float rp = exp(lnr + uDlnr), rm = exp(lnr - uDlnr);
+      float sp = max(gas(lnr + uDlnr, phi).x, uFloor);
+      float sm = max(gas(lnr - uDlnr, phi).x, uFloor);
+      float dPdr = (uH * uH / rp * sp - uH * uH / rm * sm) / (rp - rm);
+      float jp = gas(lnr, phi + uDphi).x, jm = gas(lnr, phi - uDphi).x;
+      float dPdphi = uH * uH / r * (jp - jm) / (2.0 * uDphi);
+      float ts = st / om;
+      vec2 dv = vec2(ts * dPdr / sig, ts * dPdphi / (sig * r));
+      float cs = uH / sqrt(r);
+      float m = length(dv);
+      if (m > cs) dv *= cs / m;
+      float lnr1 = lnr + (c.y + dv.x) / r * uDt;
+      float phi1 = phi + (c.z + dv.y) / r * uDt;
+      phi1 -= TAU * floor(phi1 / TAU);
+      float alive = (lnr1 < log(uRIn) || lnr1 > log(uROut)) ? 0.0 : 1.0;
+      fragColor = vec4(lnr1, phi1, st, alive);
+    }`;
+
+export const GRAIN_STEP_UNIFORMS = [
+  'uState',
+  'uRIn',
+  'uROut',
+  'uDlnr',
+  'uDphi',
+  'uH',
+  'uDt',
+  'uFloor',
+] as const;
+
+/**
+ * Each point fetches its grain by gl_VertexID and lands it with the
+ * display pass's mapping (the disc fills the shorter side). Dead grains
+ * go off-screen. Colour is the disc's temperature at the grain's radius.
+ */
+export const GRAIN_VERT = `#version 300 es
+    precision highp float;
+    precision highp int;
+    uniform sampler2D uParticles;
+    uniform int uPW;
+    uniform vec2 uRes;
+    uniform float uView, uSize;
+    out float vT;
+    out vec2 vNdc;
+    void main() {
+      ivec2 ij = ivec2(gl_VertexID % uPW, gl_VertexID / uPW);
+      vec4 g = texelFetch(uParticles, ij, 0);
+      float r = exp(g.x);
+      vec2 p = r * vec2(cos(g.y), sin(g.y));
+      vec2 asp = uRes.x >= uRes.y ? vec2(uRes.x / uRes.y, 1.0) : vec2(1.0, uRes.y / uRes.x);
+      vec2 uv = p / (2.0 * uView * asp) + 0.5;
+      vNdc = uv * 2.0 - 1.0;
+      gl_Position = vec4(g.w > 0.0 ? vNdc : vec2(-2.0), 0.0, 1.0);
+      gl_PointSize = uSize;
+      vT = 3000.0 * inversesqrt(r);
+    }`;
+
+export const GRAIN_FRAG = `#version 300 es
+    precision highp float;
+    in float vT;
+    in vec2 vNdc;
+    uniform float uDust;
+    out vec4 fragColor;
+    ${KELVIN}
+    void main() {
+      // The display's vignette, so the corners do not fill with dust.
+      float vig = 0.92 + 0.08 * smoothstep(1.7, 0.3, dot(vNdc, vNdc));
+      fragColor = vec4(kelvin(vT) * uDust * vig, 1.0);
+    }`;
+
+export const GRAIN_DRAW_UNIFORMS = ['uRes', 'uView', 'uSize', 'uDust'] as const;

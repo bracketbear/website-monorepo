@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import { PAL } from '@bracketbear/flateralus';
 import { PixiAnimation } from '@bracketbear/flateralus-pixi';
 import { PingPong } from '../shared/ping-pong';
+import { Particles } from '../shared/particles';
 import { setColor } from '../shared/shader-harness';
 import { prefersReducedMotion } from '../shared/reduced-motion';
 import { MANIFEST, type DiscControlValues } from './manifest';
@@ -9,6 +10,11 @@ import {
   STEP_FS,
   REDUCE_FS,
   DISPLAY_FS,
+  GRAIN_STEP_FS,
+  GRAIN_STEP_UNIFORMS,
+  GRAIN_VERT,
+  GRAIN_FRAG,
+  GRAIN_DRAW_UNIFORMS,
   STEP_UNIFORMS,
   REDUCE_UNIFORMS,
   DISP_UNIFORMS,
@@ -33,6 +39,7 @@ import {
   type DiscParams,
   type Planet,
 } from './physics';
+import { N_GRAINS, GRAIN_W, seedGrains, mulberry32 } from './grains';
 
 /** Production grid: 512 in φ, 192 in ln r. Cells are the same shape. */
 const NPHI = 512;
@@ -59,8 +66,8 @@ const FLARE_TAU = 6;
  * further out, on the far side so the two do not start aligned.
  */
 const GIANT_Q = 1.5e-3;
-const GIANT_R = 0.6;
-const SEED_R = 1.3;
+const GIANT_R = 0.8;
+const SEED_R = 1.5;
 const PREVIEW_POINTS = 240;
 
 interface Hold {
@@ -97,6 +104,7 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
   private flare = 0;
   private starFlux = 0;
   private planetBuf = new Float32Array(MAX_PLANETS * 4);
+  private grains: Particles | null = null;
 
   constructor(initialControls?: Partial<DiscControlValues>) {
     super(MANIFEST, initialControls);
@@ -124,7 +132,7 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
   }
 
   /** Build the opening disc from the mirror and hand it to the GPU. */
-  private seed(pp: PingPong, p: DiscParams): void {
+  private seed(pp: PingPong, p: DiscParams, collapse: number): void {
     const D = createDisc(NR, NPHI, p);
     const data = new Float32Array(NR * NPHI * 4);
     for (let k = 0; k < NR * NPHI; k++) {
@@ -148,6 +156,7 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
     this.acc = 0;
     this.preroll = PREROLL_STEPS;
     this.reduced = prefersReducedMotion();
+    this.grains?.init(seedGrains(N_GRAINS, mulberry32(1 + collapse)));
   }
 
   private packPlanets(forDisplay: boolean): number {
@@ -196,12 +205,27 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
         gl.uniform1f(L.uAccK!, accK);
         gl.uniform1f(L.uSinkFloor!, p.sinkFloorCells);
         gl.uniform1f(L.uFloor!, this.floor);
+        gl.uniform1f(L.uROut!, R_OUT);
+        gl.uniform1f(L.uSigma0!, this.sigma0);
         gl.uniform1i(L.uClearEat!, clearEat ? 1 : 0);
         gl.uniform1i(L.uPlanetN!, n);
         gl.uniform4fv(L.uPlanet!, this.planetBuf);
       });
     }
     stepBodies(this.planets, p.dt, p.h);
+    if (this.grains) {
+      const gasTex = pp.texture;
+      this.grains.step((gl, L) => {
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, gasTex);
+        gl.uniform1i(L.uState!, 1);
+        this.setGrid(gl, L);
+        gl.uniform1f(L.uROut!, R_OUT);
+        gl.uniform1f(L.uH!, p.h);
+        gl.uniform1f(L.uDt!, p.dt);
+        gl.uniform1f(L.uFloor!, this.floor);
+      });
+    }
     for (const ev of settle(this.planets, p.h)) {
       if (ev.type === 'fell') this.flare += 4 * Math.cbrt(ev.q / 1e-4);
     }
@@ -291,6 +315,14 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
         return;
       }
       this.pp = pp;
+      this.grains = Particles.create(pp.gl, N_GRAINS, {
+        stepFrag: GRAIN_STEP_FS,
+        drawVert: GRAIN_VERT,
+        drawFrag: GRAIN_FRAG,
+        stepUniforms: GRAIN_STEP_UNIFORMS,
+        drawUniforms: GRAIN_DRAW_UNIFORMS,
+        width: GRAIN_W,
+      });
     }
     const pp = this.pp;
     const p = this.paramsOf(controls);
@@ -301,7 +333,7 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
 
     const seedKey = `${controls.discMass}|${controls.aspect}|${controls.reseed}`;
     if (seedKey !== this.seedKey) {
-      this.seed(pp, p);
+      this.seed(pp, p, Number(controls.reseed));
       this.seedKey = seedKey;
     }
 
@@ -425,10 +457,18 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
       setColor(gl, L.uInk!, PAL.ink);
       setColor(gl, L.uOrange!, PAL.orange);
     });
+    this.grains?.draw(W, H, (gl, L) => {
+      gl.uniform2f(L.uRes!, W, H);
+      gl.uniform1f(L.uView!, R_VIEW);
+      gl.uniform1f(L.uSize!, dpr);
+      gl.uniform1f(L.uDust!, Number(controls.dust));
+    });
     this.texture?.source.update();
   }
 
   onDestroy(): void {
+    this.grains?.destroy();
+    this.grains = null;
     this.pp?.destroy();
     this.pp = null;
     this.failed = false;

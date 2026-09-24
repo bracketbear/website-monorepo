@@ -68,6 +68,16 @@ export const MANIFEST = createManifest({
       debug: true,
     },
     {
+      name: 'dust',
+      type: 'number',
+      label: 'Dust',
+      min: 0,
+      max: 1,
+      step: 0.05,
+      defaultValue: 0.6,
+      debug: true,
+    },
+    {
       name: 'reseed',
       type: 'select',
       label: 'Reseed',
