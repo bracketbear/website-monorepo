@@ -50,8 +50,16 @@ const R_VIEW = 2.15;
 const THROW_K = 1.5 / R_VIEW;
 /** Under this many pixels a press-and-release is a click: circular orbit. */
 const CLICK_PX = 6;
-/** Seconds for a fall-in flare to decay. */
-const FLARE_TAU = 1.5;
+/** Seconds for a fall-in flare to decay: long enough to read as an event. */
+const FLARE_TAU = 6;
+/**
+ * What is already in the disc when it loads: a giant that has carved a
+ * lane during the pre-roll, and a seed — the same object a throw makes —
+ * further out, on the far side so the two do not start aligned.
+ */
+const GIANT_Q = 1.5e-3;
+const GIANT_R = 0.6;
+const SEED_R = 1.3;
 const PREVIEW_POINTS = 240;
 
 interface Hold {
@@ -127,10 +135,12 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
     else pp.initState(NPHI, NR, data);
     this.sigma0 = D.sigma0;
     this.floor = D.floor;
-    // One planet already in it, at half the gap-opening mass: a strong
-    // wake with something left to finish.
-    const [vx, vy] = circularVelocity(1.1, 0);
-    this.planets = [{ x: 1.1, y: 0, vx, vy, q: 2e-4, age: 0, ax: 0, ay: 0 }];
+    const [gvx, gvy] = circularVelocity(GIANT_R, 0);
+    const [svx, svy] = circularVelocity(-SEED_R, 0);
+    this.planets = [
+      { x: GIANT_R, y: 0, vx: gvx, vy: gvy, q: GIANT_Q, age: 0, ax: 0, ay: 0 },
+      { x: -SEED_R, y: 0, vx: svx, vy: svy, q: SEED_Q, age: 0, ax: 0, ay: 0 },
+    ];
     this.hold = null;
     this.flare = 0;
     this.starFlux = 0;
@@ -400,7 +410,9 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
       gl.uniform1f(L.uTime!, this.time);
       gl.uniform1f(L.uGrain!, Number(controls.grain));
       gl.uniform1f(L.uROut!, R_OUT);
-      gl.uniform1f(L.uKappa!, 1.5 / this.sigma0);
+      // Optical depth 0.39 at r = 1: density contrast passes through nearly
+      // linearly, and the rim still saturates.
+      gl.uniform1f(L.uKappa!, 0.5 / this.sigma0);
       gl.uniform1f(L.uView!, R_VIEW);
       gl.uniform1f(L.uStarL!, starL);
       gl.uniform1i(L.uPlanetN!, n);

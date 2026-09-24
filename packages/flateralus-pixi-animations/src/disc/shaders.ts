@@ -308,7 +308,8 @@ export const DISPLAY_FS = `#version 300 es
         float tau = 1.0 - exp(-uKappa * c.x);
         float L = pow(T / T0, 4.0);
         L = L / (1.0 + L);
-        vec3 emit = kelvin(T) * L;
+        // 1.6 keeps the mid disc as bright as it was at the old opacity.
+        vec3 emit = kelvin(T) * L * 1.6;
         // The outer taper fades into the ground so there is no rim.
         float edge = smoothstep(uROut, uROut * 0.92, r);
         col = mix(ground, emit, tau * edge);
