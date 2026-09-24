@@ -1,7 +1,13 @@
 import { MAX_PLANETS } from './physics';
 
-/** Slots in the reduce target: one per planet, then the star's row. */
-export const REDUCE_W = MAX_PLANETS + 1;
+/**
+ * Each ring is summed in chunks so the reduce has enough fragments to
+ * fill the GPU: 1,728 fragments each summing 512 cells cost more than a
+ * whole step pass. Column k * REDUCE_CHUNKS + c is planet k, chunk c; the
+ * star's chunks follow the last planet slot.
+ */
+export const REDUCE_CHUNKS = 8;
+export const REDUCE_W = (MAX_PLANETS + 1) * REDUCE_CHUNKS;
 
 /**
  * Shared prelude: the log-polar grid, clamped-and-wrapped fetch, the van
@@ -183,9 +189,10 @@ export const STEP_UNIFORMS = [
 ] as const;
 
 /**
- * One row per ring, one column per planet slot plus the star. Column m <
- * uPlanetN: (ax, ay, eaten, 0) — discForce() and eatenBy() for that ring.
- * The last column: (innerFlux on row 0, mass, 0, 0). The CPU sums rows.
+ * One row per ring, REDUCE_CHUNKS columns per planet slot plus the star's.
+ * Planet slot m < uPlanetN: (ax, ay, eaten, 0) — discForce() and eatenBy()
+ * over that ring's chunk. The star's columns: (innerFlux on row 0, mass,
+ * 0, 0). The CPU sums rows and chunks.
  */
 export const REDUCE_FS = `#version 300 es
     precision highp float;
@@ -198,7 +205,11 @@ export const REDUCE_FS = `#version 300 es
     uniform vec4 uPlanet[${MAX_PLANETS}];
     void main() {
       G = textureSize(uState, 0);
-      int slot = int(gl_FragCoord.x);
+      int col = int(gl_FragCoord.x);
+      int slot = col / ${REDUCE_CHUNKS};
+      int chunk = col - slot * ${REDUCE_CHUNKS};
+      int span = G.x / ${REDUCE_CHUNKS};
+      int j0 = chunk * span, j1 = j0 + span;
       int i = int(gl_FragCoord.y);
       float r = rAt(i), A = areaAt(i);
       vec4 acc = vec4(0.0);
@@ -208,7 +219,7 @@ export const REDUCE_FS = `#version 300 es
         float eps2 = eps * eps;
         float rh = pl.w * pow(pl.z / 3.0, 1.0 / 3.0);
         float rs = max(0.5 * rh, uSinkFloor * r * uDphi) + 2.0 * r * uDphi;
-        for (int j = 0; j < G.x; j++) {
+        for (int j = j0; j < j1; j++) {
           vec4 c = S(i, j);
           float phi = (float(j) + 0.5) * uDphi;
           vec2 d = vec2(r * cos(phi), r * sin(phi)) - pl.xy;
@@ -218,7 +229,7 @@ export const REDUCE_FS = `#version 300 es
           if (d2 < rs * rs) acc.z += c.w * A;
         }
       } else if (slot == ${MAX_PLANETS}) {
-        for (int j = 0; j < G.x; j++) {
+        for (int j = j0; j < j1; j++) {
           vec4 c = S(i, j);
           acc.y += c.x * A;
           if (i == 0) acc.x += c.x * min(c.y, 0.0) * rfAt(0) * uDphi;

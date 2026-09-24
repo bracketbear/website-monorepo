@@ -13,6 +13,7 @@ import {
   REDUCE_UNIFORMS,
   DISP_UNIFORMS,
   REDUCE_W,
+  REDUCE_CHUNKS,
 } from './shaders';
 import {
   DEFAULT_PARAMS,
@@ -222,10 +223,12 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
       let ay = 0;
       let eaten = 0;
       for (let i = 0; i < NR; i++) {
-        const o = (i * REDUCE_W + k) * 4;
-        ax += rows[o];
-        ay += rows[o + 1];
-        eaten += rows[o + 2];
+        for (let c = 0; c < REDUCE_CHUNKS; c++) {
+          const o = (i * REDUCE_W + k * REDUCE_CHUNKS + c) * 4;
+          ax += rows[o];
+          ay += rows[o + 1];
+          eaten += rows[o + 2];
+        }
       }
       const pl = this.planets[k];
       // A force held fixed across the pre-roll's 400 substeps is four time
@@ -237,7 +240,9 @@ export class DiscAnimation extends PixiAnimation<typeof MANIFEST> {
       }
       if (Number.isFinite(eaten) && eaten > 0) pl.q += eaten;
     }
-    const flux = rows[(0 * REDUCE_W + MAX_PLANETS) * 4];
+    let flux = 0;
+    for (let c = 0; c < REDUCE_CHUNKS; c++)
+      flux += rows[(0 * REDUCE_W + MAX_PLANETS * REDUCE_CHUNKS + c) * 4];
     if (Number.isFinite(flux)) this.starFlux = -flux;
   }
 
