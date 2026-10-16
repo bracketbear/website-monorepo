@@ -111,7 +111,13 @@ a `PixiAnimation` built the way `street-pulse` is, sharing `scrim`,
 | `hold`  | number  | 3 s, 0–10      | pause at the end before looping          |
 | `loop`  | boolean | true           | false: trace once and hold forever       |
 | `glow`  | boolean | true           |                                          |
-| `fit`   | select  | `contain`      | `contain` / `cover`, see Framing         |
+| `fit`   | select  | `contain`      | `contain` / `cover`, see Framing; resets |
+| `scrim` | boolean | true           | the lab's ink wash; `/run` turns it off  |
+
+`route`, `fit` and `scrim` are `resetsAnimation`; the rest update in place.
+Changing `trace` mid-trace does not move the drawn prefix: progress is
+stored as a fraction of the route and advanced by `dt / trace`, not derived
+from elapsed time.
 
 ### Framing
 
@@ -151,10 +157,12 @@ thing that makes the piece feel live while the route holds.
 
 ### Reduced motion
 
-`initialControls.instant: true` (declared `editor: null`, not a lab control)
-skips boot and trace: first frame is the finished route. The `/run` island
-sets it from `matchMedia('(prefers-reduced-motion: reduce)')`. The lab never
-sets it.
+The animation reads `prefersReducedMotion()` from `shared/reduced-motion.ts`
+in `onInit`, the way `frost-line` does, and when it is set it skips boot and
+trace: the first frame is the finished route. A click still replays the
+trace, because the viewer asked for that motion. There is no control for
+this; the manifest schema has no notion of a hidden control, and the host
+has nothing to set.
 
 ### Labels
 
@@ -181,12 +189,15 @@ mounted `client:only="react"` where `run.astro` now has the `<img>`:
 true, backgroundAlpha: 0, antialias: true}})`, `init(host)`, `start()`,
   `applyTheme('sunset')`, registry lookup by id, `setPointerService`,
   `setAnimation`.
-- Controls: `{ route: 'kc-segd-2026', loop: false, fit: 'contain', instant }`.
-  On the page it traces once and holds; a click replays it.
+- Controls: `{ route: 'kc-segd-2026', loop: false, fit: 'contain', scrim:
+false }`. On the page it traces once and holds; a click replays it.
 - The host is an aspect-ratio box (`9 / 11`, matching the still) so nothing
-  shifts when the canvas arrives. Until the animation's first frame, and for
-  `<noscript>`, the box shows `public/run/map.png`. The still stays the OG
-  image.
+  shifts when the canvas arrives. The box holds `public/run/map.png` as plain
+  server-rendered HTML, so it is there before hydration and without
+  JavaScript; the island fades it out once the canvas has drawn a frame. The
+  still stays the OG image.
+- Captions "Marriott · start" and "Liberty Memorial · turn" sit under the
+  box as HTML.
 - Footer gains "Map data © OpenStreetMap contributors."
 
 ## Testing
@@ -201,9 +212,11 @@ Vitest, beside the existing package and lab tests:
 - `fitRoute`: for a 1200×1200 stage and this route, `contain` yields
   k ≈ 9.4 ± 0.2; `cover` yields k larger than `contain`; both keep the route
   bbox centred.
-- `route-trace`: with `instant`, the first update draws the full prefix;
-  without, the drawn arc length at t = boot + `trace`/2 is half the route's
-  length ± one segment; a click resets progress to 0.
+- `route-trace`: under reduced motion the state starts finished; otherwise
+  progress at t = boot + `trace`/2 is 0.5 and the prefix's arc length is half
+  the route's ± one segment; a click resets progress to 0; a `trace` change
+  mid-trace leaves progress where it is; `hold: 0` with `loop` restarts
+  without sticking; a route with repeated consecutive points produces no NaN.
 - `registry.test.ts` picks up the new id.
 - `astro build` passes and `/run/index.html` is emitted; the existing
   `talk-smoke.mjs` pattern is not extended — the island's mount is covered by
