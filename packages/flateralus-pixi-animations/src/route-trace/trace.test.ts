@@ -169,6 +169,18 @@ describe('phases', () => {
     expect(s.phase).toBe('trace');
     expect(s.progress).toBe(0);
   });
+
+  it('under reduced motion, never loops on its own, even when loop is on', () => {
+    const s = createTrace(true);
+    run(s, 20, { ...TM, loop: true });
+    expect(s.phase).toBe('hold');
+    expect(s.progress).toBe(1);
+    // A click is the viewer asking: trace once, then hold again.
+    restartTrace(s);
+    run(s, TM.trace + TM.hold + 5, { ...TM, loop: true });
+    expect(s.phase).toBe('hold');
+    expect(s.progress).toBe(1);
+  });
 });
 
 describe('baseAlpha', () => {

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { PixiApplication, PointerService } from '@bracketbear/flateralus-pixi';
 import { applyTheme } from '@bracketbear/flateralus';
 import { REGISTRY } from '../lab/registry';
+import { SizeGate } from './size-gate';
 
 const ID = 'route-trace';
 const RESIZE_DEBOUNCE_MS = 250;
@@ -46,9 +47,13 @@ export default function RunMap() {
       app.setAnimation(animation);
     };
 
+    // observe() reports the current size at once; the gate swallows that
+    // opening notification so only a real resize rebuilds the frame.
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const ro = new ResizeObserver(() => {
-      if (!box?.hasAttribute('data-live')) return;
+    const gate = new SizeGate();
+    const ro = new ResizeObserver((entries) => {
+      const r = entries[0]?.contentRect;
+      if (!r || !gate.changed(r.width, r.height)) return;
       clearTimeout(timer);
       timer = setTimeout(mount, RESIZE_DEBOUNCE_MS);
     });

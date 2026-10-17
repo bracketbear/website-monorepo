@@ -26,13 +26,18 @@ export interface TraceState {
   t: number;
   /** Drawn share of the route's arc length, 0..1. */
   progress: number;
+  /**
+   * The viewer asked for less motion: the route starts finished and never
+   * loops on its own. A click still traces once, because they asked.
+   */
+  reduced: boolean;
 }
 
 /** `instant` is the reduced-motion start: streets up, route finished. */
 export function createTrace(instant: boolean): TraceState {
   return instant
-    ? { phase: 'hold', t: 0, progress: 1 }
-    : { phase: 'boot', t: 0, progress: 0 };
+    ? { phase: 'hold', t: 0, progress: 1, reduced: true }
+    : { phase: 'boot', t: 0, progress: 0, reduced: false };
 }
 
 export function stepTrace(s: TraceState, dt: number, tm: Timing): void {
@@ -55,7 +60,7 @@ export function stepTrace(s: TraceState, dt: number, tm: Timing): void {
       return;
     case 'hold':
       s.t += dt;
-      if (tm.loop && s.t >= tm.hold) {
+      if (tm.loop && !s.reduced && s.t >= tm.hold) {
         s.phase = 'trace';
         s.t = 0;
         s.progress = 0;
