@@ -35,6 +35,7 @@ export * from './pixel-sunrise';
 export * from './portal-mark';
 export * from './rd-vat';
 export * from './retro-grid';
+export * from './route-trace';
 export * from './rust-machine';
 export * from './sandbox';
 export * from './scan-terrain';
