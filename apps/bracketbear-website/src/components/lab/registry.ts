@@ -31,6 +31,7 @@ import {
   createPixelSunriseAnimation,
   createPortalMarkAnimation,
   createRdVatAnimation,
+  createRouteTraceAnimation,
   createRustMachineAnimation,
   createSandboxAnimation,
   createScanTerrainAnimation,
@@ -354,6 +355,18 @@ export const REGISTRY: LabEntry[] = [
       'Baked OpenStreetMap road geometry lit by connectivity propagation, so traffic spreads through the network the way it actually would rather than along scripted paths.',
     create: (initialControls) =>
       createStreetPulseAnimation(
+        initialControls as never
+      ) as unknown as PixiAnimation<AnimationManifest>,
+  },
+  {
+    id: 'route-trace',
+    section: 'work',
+    name: 'Route Trace',
+    tag: 'osm data',
+    blurb:
+      'A real run on a real city: the Bracket Bear Run Club route from the Kansas City Marriott Downtown to the Liberty Memorial and back, drawn at a constant pace over baked OpenStreetMap streets. Click to run it again. Map data © OpenStreetMap contributors.',
+    create: (initialControls) =>
+      createRouteTraceAnimation(
         initialControls as never
       ) as unknown as PixiAnimation<AnimationManifest>,
   },

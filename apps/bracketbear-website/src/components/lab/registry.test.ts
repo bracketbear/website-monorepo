@@ -23,6 +23,7 @@ const SELECTED = [
   'visionary-eye',
   // Section 04 Work through 08 Contact
   'street-pulse',
+  'route-trace',
   'atomic-age',
   'energy-body',
   'block-party',
