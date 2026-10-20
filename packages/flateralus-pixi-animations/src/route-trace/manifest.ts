@@ -6,7 +6,7 @@ export const MANIFEST = createManifest({
   id: 'route-trace',
   name: 'Route Trace',
   description:
-    'A real run drawn on a real city. Downtown Kansas City from OpenStreetMap as the dot-matrix grid Night Traffic draws, and over it the Bracket Bear Run Club route from the Marriott Downtown to the Liberty Memorial and back, tracing itself at a constant pace, then holding. Click to run it again. Map data © OpenStreetMap contributors.',
+    'A real run drawn on a real city. Downtown Kansas City from OpenStreetMap as the dot-matrix grid Night Traffic draws, and over it the Bracket Bear Run Club route from the Marriott Downtown to the Liberty Memorial and back, choreographed on a 125 BPM grid: a red pin drops on the lobby, the streets grow out from it, the camera follows the runner out to the turn and pulls back to the whole route. Click to run it again. Map data © OpenStreetMap contributors.',
   controls: [
     {
       name: 'route',
@@ -18,13 +18,13 @@ export const MANIFEST = createManifest({
       resetsAnimation: true,
     },
     {
-      name: 'trace',
+      name: 'bpm',
       type: 'number',
-      label: 'Trace (s)',
-      min: 1,
-      max: 12,
-      step: 0.5,
-      defaultValue: 4,
+      label: 'Tempo (BPM)',
+      min: 80,
+      max: 160,
+      step: 1,
+      defaultValue: 125,
       debug: true,
     },
     {

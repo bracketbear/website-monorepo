@@ -364,7 +364,7 @@ export const REGISTRY: LabEntry[] = [
     name: 'Route Trace',
     tag: 'osm data',
     blurb:
-      'A real run on a real city: the Bracket Bear Run Club route from the Kansas City Marriott Downtown to the Liberty Memorial and back, drawn at a constant pace over baked OpenStreetMap streets. Click to run it again. Map data © OpenStreetMap contributors.',
+      'A real run on a real city: the Bracket Bear Run Club route from the Kansas City Marriott Downtown to the Liberty Memorial and back, over baked OpenStreetMap streets, on a 125 BPM grid: a red pin drops on the lobby, the camera follows the runner out and pulls back at the turn. Click to run it again. Map data © OpenStreetMap contributors.',
     create: (initialControls) =>
       createRouteTraceAnimation(
         initialControls as never

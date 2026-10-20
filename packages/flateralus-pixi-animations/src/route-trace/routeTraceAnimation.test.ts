@@ -20,10 +20,10 @@ describe('route-trace animation', () => {
     const app = fakeApp();
     a.init(app);
     const controls = a.getControlValues();
-    // scrim + base + water + green + line + heat
-    expect(rootOf(a).children.length).toBe(6);
+    // scrim + the world (the city and route, under the camera) + the pin
+    expect(rootOf(a).children.length).toBe(3);
     svc.clicks.push({ x: 600, y: 600 }, { x: 10, y: 10 });
-    for (let i = 0; i < 10; i++) a.onUpdate(app, controls, 1 / 60);
+    for (let i = 0; i < 900; i++) a.onUpdate(app, controls, 1 / 60);
     expect(svc.clicks).toHaveLength(0);
     a.onDestroy();
   });
@@ -32,7 +32,7 @@ describe('route-trace animation', () => {
     const a = createRouteTraceAnimation({ scrim: false });
     const app = fakeApp(900, 1100);
     a.init(app);
-    expect(rootOf(a).children.length).toBe(5);
+    expect(rootOf(a).children.length).toBe(2);
     a.onDestroy();
   });
 });
