@@ -22,12 +22,17 @@ END:STANDARD
 END:VTIMEZONE
 BEGIN:VEVENT
 UID:run-club-segd-2026-10-23@bracketbear.com
-DTSTAMP:20261015T200000Z
+DTSTAMP:20261020T150000Z
+SEQUENCE:1
 DTSTART;TZID=America/Chicago:20261023T070000
 DTEND;TZID=America/Chicago:20261023T080000
 SUMMARY:Bracket Bear Run Club — SEGD 2026
-LOCATION:Kansas City Marriott Downtown\, lobby
-DESCRIPTION:5.5K out to the Liberty Memorial and back. Every pace. Back before the first session. Meet in the lobby at 7:00. https://bracketbear.com/run
+LOCATION:Kansas City Marriott Downtown\, outside the lobby
+DESCRIPTION:5.5K out to the Liberty Memorial and back. Every pace. Back bef
+ ore the first session. Meet outside the lobby at 7:00. We'll grab coffee a
+ fter\, and one runner goes home with a free bag of freshly roasted Puff Co
+ ffee\, all the way from Portland\, Oregon. Route subject to change. https:
+ //bracketbear.com/run
 URL:https://bracketbear.com/run
 END:VEVENT
 END:VCALENDAR

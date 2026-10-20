@@ -137,6 +137,7 @@ html:has(.bb-run) {
   height: auto;
   fill: currentColor;
 }
+/* C1, the upright lockup, as the run club canvas draws it. */
 .run__mark-wordmark {
   font-family: var(--wordmark);
   font-size: 80px;
