@@ -38,10 +38,24 @@ fix that. Every ban below still stands except where those sections say otherwise
 
 ## Positioning
 
-Bracket Bear is **"the experiential software platform experts."** `[decision]`
+**Amended 2026-11-22.** Bracket Bear sells two things to experiential
+agencies, separately or as one package: `[decision]`
 
-A services company — not a project shop — that diagnoses and rebuilds the
-platform layer behind experiential work.
+- **Platforms.** The software layer behind installations: the CMS, the agent
+  on each exhibit machine, and the integrations with TouchDesigner, Unity,
+  Unreal and the rest. The proof is the three platforms Harrison has worked
+  on: Bridge (Downstream), Gumband (Deeplocal) and Hyperquake's (Bracket Bear).
+- **TD Brackets.** An open-source framework for TouchDesigner apps, and
+  Bracket Bear building apps on it for clients.
+
+The audience is agency teams first, and peers (creative technologists,
+TouchDesigner users, talk audiences) second. The site speaks as "we" and names
+Harrison as founder, and never states or implies a headcount. Full record:
+`docs/superpowers/specs/2026-11-22-bracketbear-site-v3-design.md`.
+
+The earlier headline, "the experiential software platform experts," described
+the Platforms offer alone and is retired. The thesis below still holds for
+that offer.
 
 **The core reframe is CMS → platform.** The thesis, which came out of
 Harrison's own LinkedIn writing: agencies are fighting their own platforms.

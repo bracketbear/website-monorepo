@@ -171,8 +171,8 @@ site does not ship until all of these are true:
 
 ## 11. Open, for the copy and plan stages
 
-1. Which name the site uses for Hyperquake's platform: "Hyperquake Experience
-   Platform" or another.
+1. ~~Which name the site uses for Hyperquake's platform.~~ Settled
+   2026-11-22: "Hyperquake's Experience Platform", which Harrison architected.
 2. Which two TD Brackets apps go public first as examples.
 3. The start date and founding year for Bracket Bear (the v2 hero said "EST.
    2024"; the job record says freelance work began 2023-04-01).
