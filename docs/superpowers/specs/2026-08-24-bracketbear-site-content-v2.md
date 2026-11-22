@@ -1,5 +1,7 @@
 # Bracket Bear Site — Content Design v2
 
+> **Superseded 2026-11-22** by `2026-11-22-bracketbear-site-v3-design.md`. Kept as a record; do not build from it.
+
 **Date:** 2026-08-24
 **Status:** Decisions locked via grilling session. Copy not yet drafted.
 **Supersedes:** `2026-05-03-bracketbear-website-content-design.md` — that spec's

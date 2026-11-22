@@ -1,5 +1,7 @@
 # Bracket Bear Site — Copy v2
 
+> **Superseded 2026-11-22** by `2026-11-22-bracketbear-site-v3-design.md`. Kept as a record; do not build from it.
+
 **Date:** 2026-08-24
 **Register:** brand (`docs/brand/BRAND.md`, as amended 2026-08-24)
 **Spec:** `2026-08-24-bracketbear-site-content-v2.md`
@@ -171,11 +173,12 @@ Every line below is the copy itself. Section numbers match the spec.
 **Body:**
 
 > Hyperquake opened a new line of business on a platform we built for them: a
-> CMS, a watchdog agent that **[BLOCKED — what does it watch, and what does it
-> > do when it finds something?]**, and an integration layer built on that
-> protocol. Point it at TouchDesigner, Unreal, or Unity and the connection gets
-> generated instead of hand-rolled. Their team spends its hours making the work
-> instead of wiring it together.
+> CMS, a watchdog agent that \*\*[BLOCKED — what does it watch, and what does it
+>
+> > do when it finds something?]\*\*, and an integration layer built on that
+> > protocol. Point it at TouchDesigner, Unreal, or Unity and the connection gets
+> > generated instead of hand-rolled. Their team spends its hours making the work
+> > instead of wiring it together.
 
 **No CTA in this beat.** The v1 button read `See it live →` and opened a
 `mailto:`. Nothing is viewable and visuals are not yet permitted; a button that

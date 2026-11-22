@@ -1,5 +1,7 @@
 # Bracket Bear Homepage Rebuild Implementation Plan
 
+> **Superseded 2026-11-22** by `../specs/2026-11-22-bracketbear-site-v3-design.md`. Kept as a record; do not build from it.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the live Bracket Bear homepage with the new content + structure defined in `docs/superpowers/specs/2026-05-03-bracketbear-website-content-design.md`, using the static draft at `apps/bracketbear-website/public/draft/index.html` as the visual source of truth.
