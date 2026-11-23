@@ -3,7 +3,7 @@
 **Date:** 2026-11-22
 **Spec:** `2026-11-22-bracketbear-site-v3-design.md`
 **Register:** brand (`docs/brand/BRAND.md`)
-**Status:** Front page drafted. Other pages not started.
+**Status:** Front page reviewed. `/platforms` drafted. Other pages not started.
 
 Written with `/bb-voice`, `/copywriting` and `/ogilvy`, then edited with
 `/copy-editing` and `/stop-slop`. Front page reviewed by Harrison 2026-11-22.
@@ -123,3 +123,89 @@ Headline alternatives:
   is "Hyperquake's Experience Platform" (spec §11, settled 2026-11-22).
 - **Stop-slop:** no em dashes, no adverbs, no "X, not Y" contrasts, no
   questions answered by the next line, no pull-quote closers.
+
+---
+
+## `/platforms`
+
+### 1. Header
+
+- **Label:** PLATFORMS
+- **Headline:** The CMS, the agents and the integrations behind your
+  installations, built as one platform.
+- **Lede:** An installation needs more than its app. Someone has to change the
+  content after opening, keep the app running on its machine, and find out
+  when it stops. We build the platform that does those jobs.
+
+### 2. What's in a platform
+
+**The CMS.** Your producers edit an exhibit's text, media, schedules and
+collections in a browser. A JSON manifest defines each exhibit's fields, so
+a new exhibit starts as a manifest.
+
+**The agent.** A program on each exhibit machine starts the app, restarts it
+when it crashes, syncs media with checksums, and reports CPU, memory and
+uptime back to the CMS.
+
+**The receivers.** Libraries for TouchDesigner, Unity, Unreal, Godot,
+Electron, Python and C++ that hand the app its content as it changes.
+
+### 3. Three platforms
+
+- **Headline:** Three platforms since 2020.
+- **Intro:** Our founder, Harrison Callahan, has worked on experience
+  platforms for six years. Each one carried an idea into the next.
+
+**Bridge** · Downstream · 2020–2022 · Lead front-end engineer
+
+> Downstream built Bridge so a new installation joined the platform through a
+> JSON manifest, which cut the hours it took to prototype a project. Harrison
+> led the front end, moving it to Vue 3, TypeScript and Vite over a Rust back
+> end.
+
+**Gumband** · Deeplocal · 2024–2025 · Full-stack engineer
+
+> Gumband was Deeplocal's CMS for experiential teams, built for reliability.
+> Harrison worked across the platform and prototyped a TouchDesigner
+> integration for building Gumband apps without code.
+
+**Hyperquake's Experience Platform** · Bracket Bear · 2025– · Architect
+
+> Harrison architected Hyperquake's Experience Platform: the CMS, the agent on
+> each exhibit machine, and receivers for seven runtimes. It brings both
+> earlier ideas together: exhibits defined by manifests, as in Bridge, and the
+> TouchDesigner integration first prototyped at Gumband.
+
+Images: Bridge and Gumband only from images the companies published (spec
+§6). Hyperquake screenshots with no client or exhibit data visible.
+
+### 4. What we build for you
+
+- **Headline:** A platform for your agency, or the part your setup is
+  missing.
+- **Body:** We build a full platform, or one piece of one: an agent for your
+  exhibit machines, a receiver for the runtime your team uses, or a CMS for
+  your producers. If the app runs on TouchDesigner, we can build that too, on
+  TD Brackets.
+- **Links:** Say hello → `mailto:hello@bracketbear.com` · See TD Brackets →
+  `/td-brackets`
+
+### Meta
+
+- **Title:** Platforms: the CMS, agents and integrations behind
+  installations | Bracket Bear
+- **Description:** Bracket Bear builds experience platforms for agencies: a
+  CMS for producers, an agent on each exhibit machine, and receivers for
+  TouchDesigner, Unity, Unreal, Godot, Electron, Python and C++.
+
+### Self-check
+
+- **Named nouns:** JSON manifest; CPU, memory, uptime; seven named runtimes;
+  Bridge, Downstream, Vue 3, Rust; Gumband, Deeplocal, TouchDesigner; TD
+  Brackets.
+- **Operator credit:** Downstream built Bridge and Deeplocal had Gumband;
+  Harrison's role is stated for each. Hyperquake's platform is "architected"
+  by Harrison, which leaves room for the other people who committed to it.
+- **Hyperquake:** what the platform is, with no client names, counts or
+  claims about Hyperquake's business.
+- **Stop-slop:** no em dashes, no adverbs, no "X, not Y".

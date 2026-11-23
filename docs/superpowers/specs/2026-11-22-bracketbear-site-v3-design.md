@@ -89,11 +89,11 @@ No long scroll of character sections.
 Told on one page, in order. Each gets the company, Harrison's role, the
 dates, one or two images and one sentence of outcome.
 
-| Platform                       | Company                   | Role                                                 | When                                     |
-| ------------------------------ | ------------------------- | ---------------------------------------------------- | ---------------------------------------- |
-| Bridge                         | Downstream (employee)     | Lead front-end engineer                              | 2020–2022                                |
-| Gumband                        | Deeplocal (employee)      | Full-stack software engineer                         | 2024–2025 (paused after company layoffs) |
-| Hyperquake Experience Platform | Bracket Bear (consulting) | Built the platform: CMS, machine agent, integrations | Current (start date to confirm)          |
+| Platform                       | Company                   | Role                                                       | When                                     |
+| ------------------------------ | ------------------------- | ---------------------------------------------------------- | ---------------------------------------- |
+| Bridge                         | Downstream (employee)     | Lead front-end engineer                                    | 2020–2022                                |
+| Gumband                        | Deeplocal (employee)      | Full-stack software engineer                               | 2024–2025 (paused after company layoffs) |
+| Hyperquake Experience Platform | Bracket Bear (consulting) | Architected the platform: CMS, machine agent, integrations | 2025– (Conflower began October 2025)     |
 
 Rules:
 
@@ -116,6 +116,10 @@ Rules:
   - Screenshots only with no client or exhibit data visible.
   - Before launch, Harrison checks the consulting agreement for a
     confidentiality or portfolio-use clause.
+
+**What `/platforms` sells** (settled 2026-11-23): a full platform, or one
+piece of one inside an agency's existing setup (an agent for its exhibit
+machines, a receiver for its runtime, or a CMS for its producers).
 
 No separate case-study pages at launch. They can follow.
 
