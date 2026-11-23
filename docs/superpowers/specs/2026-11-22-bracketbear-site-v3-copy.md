@@ -3,7 +3,7 @@
 **Date:** 2026-11-22
 **Spec:** `2026-11-22-bracketbear-site-v3-design.md`
 **Register:** brand (`docs/brand/BRAND.md`)
-**Status:** Front page reviewed. `/platforms` drafted. Other pages not started.
+**Status:** Front page and `/platforms` reviewed. `/td-brackets` drafted. Other pages not started.
 
 Written with `/bb-voice`, `/copywriting` and `/ogilvy`, then edited with
 `/copy-editing` and `/stop-slop`. Front page reviewed by Harrison 2026-11-22.
@@ -208,4 +208,100 @@ Images: Bridge and Gumband only from images the companies published (spec
   by Harrison, which leaves room for the other people who committed to it.
 - **Hyperquake:** what the platform is, with no client names, counts or
   claims about Hyperquake's business.
+- **Stop-slop:** no em dashes, no adverbs, no "X, not Y".
+
+---
+
+## `/td-brackets`
+
+### 1. Header
+
+- **Label:** TD BRACKETS
+- **Headline:** A framework for TouchDesigner apps you can test, review and
+  ship.
+- **Lede:** TD Brackets is an open-source framework for building
+  TouchDesigner apps. It gives each app the same layout, Python logic you can
+  test without opening TD, and a network you can read in a git diff. We use
+  it for client work, and it's free for yours.
+- **Buttons:** View on GitHub · Read the quickstart
+
+Headline alternative: "TouchDesigner apps with tests, a git history and a
+one-command check." More specific, less of a promise.
+
+### 2. What it does
+
+**Python you can test.** An app's logic lives in plain Python files with
+tests that run outside TouchDesigner. Portal Mark's TouchDesigner app runs 98
+of them in a tenth of a second.
+
+**A network you can review.** `tdb dump` writes the network out as text, so a
+pull request shows the expression that changed or the shader that went
+stale.
+
+**One command to check an app.** `tdb td smoke` opens the app headless,
+checks it and measures its frame rate at each output size the app declares.
+A git hook runs it before each push.
+
+**A new app in under a minute.** `tdb new` took `td_noise` from an empty
+folder to a passing smoke check in 27 seconds.
+
+### 3. Quickstart
+
+```
+tdb new demo
+cd demo
+tdb td smoke
+```
+
+(Install line to come with the release.)
+
+### 4. Built on TD Brackets
+
+- **Headline:** Built on TD Brackets.
+
+**Portal Mark.** Fourteen worlds inside the Bracket Bear mark, with audio
+reactivity, god rays and GPU particles, played from a Launchpad Pro.
+
+**Hyperquake's welcome wall.** A lobby wall [PLACEHOLDER: confirm it stands
+in a lobby] whose message, colors and
+background video producers change from Hyperquake's CMS.
+
+**Brick Your Face Off.** Breakout, with every brick a glass block holding one
+of Portal Mark's worlds: aurora, caustics, embers or signal.
+
+**Cyberpunk wall.** [PLACEHOLDER: one line on what it is]
+
+**Crystal effect.** [PLACEHOLDER: one line on what it is]
+
+**3D voxel matrix.** [PLACEHOLDER: one line on what it is]
+
+Each card is a short looping video, with a repo link once that repo is
+public.
+
+### 5. Hire us
+
+- **Headline:** Hire us to build your TouchDesigner app.
+- **Body:** We build installations on TD Brackets for agencies: the app, its
+  controls, and the checks that run before it ships. You get a project your
+  own team can open, test and change after we hand it over. [PLACEHOLDER:
+  confirm the hand-over is a commitment on every TD Brackets job] If the content
+  has to change after opening, we build the platform for that too.
+- **Links:** Say hello → `mailto:hello@bracketbear.com` · See platforms →
+  `/platforms`
+
+### Meta
+
+- **Title:** TD Brackets: an open-source framework for TouchDesigner apps |
+  Bracket Bear
+- **Description:** TD Brackets gives TouchDesigner apps tested Python logic,
+  a network you can review in git, and a one-command check. Open source, from
+  Bracket Bear.
+
+### Self-check
+
+- **Facts:** from the td-brackets README and `docs/lessons-learned.md` (98
+  tests in 0.1 s on td-portal; `td_noise` to a green smoke in 27 s; the
+  pre-push smoke) and the td-portal and td-breakout READMEs.
+- **Named nouns:** TouchDesigner, Python, git, `tdb`, Portal Mark, Launchpad
+  Pro, Hyperquake, Breakout.
 - **Stop-slop:** no em dashes, no adverbs, no "X, not Y".
