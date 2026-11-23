@@ -88,6 +88,34 @@ there. This is a factual accuracy rule, not a style preference.
 - Allowed: "built at," "shipped systems inside," "years across"
 - Never: "our clients include," "we partnered with"
 
+## Beliefs that guide decisions
+
+`[decision]` **Added 2026-11-23.** These shape what Bracket Bear writes and
+makes. None of them is stated on the site as a line.
+
+**Community is a center of gravity.** Bracket Bear puts time into the
+experiential industry and the cities it works in (the run club, talks, open
+source, the lab) because that is what the company is for. Work arriving
+through it is expected, and secondary. Community copy describes what Bracket
+Bear gives; it never reads as a sales funnel.
+
+**Not everyone will like us, and that is the point.** Agencies trying to
+appeal to every company end up stale, and the industry is too interesting for
+that. Bracket Bear accepts that some people won't like it, so the people who
+do like it will love it. In practice:
+
+- Copy takes positions and names its tastes.
+- When a draft has to choose between broad appeal and a clear opinion, it
+  takes the opinion.
+- The site never says "we're not for everyone" or anything like it. That line
+  is common, and announcing it is the performative contrarianism banned
+  below. The belief shows in the work.
+
+**Bracket Bear has its own creative vision**, published on Instagram, and
+intends to own creative direction for clients in time. Until there is client
+work behind it, the vision shows in the lab, the TD Brackets apps and
+Instagram, and the site does not sell it.
+
 ## Tagline
 
 **"Welcome to Bracket Bear."** `[decision]`

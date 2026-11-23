@@ -3,7 +3,7 @@
 **Date:** 2026-11-22
 **Spec:** `2026-11-22-bracketbear-site-v3-design.md`
 **Register:** brand (`docs/brand/BRAND.md`)
-**Status:** Front page and `/platforms` reviewed. `/td-brackets` drafted. Other pages not started.
+**Status:** Front page and `/platforms` reviewed. `/td-brackets` drafted with placeholders. `/about` and `/community` drafted. `/contact` not started.
 
 Written with `/bb-voice`, `/copywriting` and `/ogilvy`, then edited with
 `/copy-editing` and `/stop-slop`. Front page reviewed by Harrison 2026-11-22.
@@ -79,15 +79,17 @@ Headline alternatives:
   its content from Hyperquake's CMS.
 - **Button:** Tell us about your project → `/contact`
 
-### 4. Lab and talks
+### 4. Community
 
-- **Lab:** Simulations we build in the browser: a protoplanetary disc you
-  throw planets into, a Chladni plate, and a run traced over downtown Kansas
-  City. → Open the lab
-- **Talks:** Everything Is an Experience: the case for putting care into
-  everything a business or a personal brand puts out, from the invoices to
-  the software. It runs on creative technology, as a working example of a
-  presentation people remember. → See the talks
+- **Label:** COMMUNITY
+- **Headline:** Run with us, hear a talk, or build on TD Brackets.
+- **Run club:** The Bracket Bear Run Club ran the SEGD 2026 route through
+  downtown Kansas City, with coffee after. → See the route `/run`
+- **Talks:** Everything Is an Experience, on care in a business and the
+  creative technology that makes a talk memorable. → See the talks `/talks`
+- **Lab:** Simulations we build in the browser and leave open to play with.
+  → Open the lab `/lab`
+- **Link:** See the community → `/community`
 
 ### 5. Contact
 
@@ -304,4 +306,151 @@ public.
   pre-push smoke) and the td-portal and td-breakout READMEs.
 - **Named nouns:** TouchDesigner, Python, git, `tdb`, Portal Mark, Launchpad
   Pro, Hyperquake, Breakout.
+- **Stop-slop:** no em dashes, no adverbs, no "X, not Y".
+
+---
+
+## `/about`
+
+### 1. Header
+
+- **Label:** ABOUT
+- **Headline:** Bracket Bear is Harrison Callahan's studio for experiential
+  software.
+- **Lede:** Harrison started Bracket Bear in 2025, after building experience
+  platforms at Downstream and Deeplocal. The
+  studio builds platforms for experiential agencies and TouchDesigner apps on
+  TD Brackets. It's rooted in Pittsburgh and based in Portland.
+
+### 2. Founder
+
+- **Headline:** Harrison Callahan, founder
+- **Body:** Harrison has built websites and software since 2012, and software
+  for experiential work since 2020: the front end of Bridge at Downstream,
+  full-stack work on Gumband at Deeplocal, and Hyperquake's Experience Platform at
+  Bracket Bear. He gives a talk on care and creative technology, Everything
+  Is an Experience.
+- **Link:** Full work history → portfolio
+- **Image:** [PLACEHOLDER: a photo of Harrison, or none]
+
+### 3. How we work
+
+- **Headline:** How a project runs here
+- **Intro:** Welcome to Bracket Bear is how we treat a project, from the
+  first email to the invoice. The care that goes into the platform
+  architecture goes into the invoice we put our name on.
+
+**On platform work**
+
+**Guides your team can follow.** A release that changes how your producers
+work comes with an illustrated guide. We take the screenshots from a full
+run on a copy of your system before you touch the real one.
+
+**Changes checked against your real content.** Before a change to a live
+platform merges, we run it read-only against the content of every exhibit
+you have, so a change that would break one shows up first.
+
+**On TouchDesigner work**
+
+**Apps that pass their checks before they ship.** Every app we build on TD
+Brackets passes its smoke check before it leaves our hands: it opens, runs
+and reports its frame rate at each output size it declares.
+
+**On both**
+
+**Invoices you can check.** Each line on an invoice traces back to a meeting
+or a commit.
+
+### 4. Close
+
+- **Headline:** Come say hello.
+- **Button:** Say hello → `mailto:hello@bracketbear.com`
+
+### Meta
+
+- **Title:** About | Bracket Bear
+- **Description:** Bracket Bear is Harrison Callahan's studio for
+  experiential software: platforms for agencies, and TouchDesigner apps on
+  TD Brackets. Rooted in Pittsburgh, based in Portland.
+
+### Self-check
+
+- **Facts:** dates from `apps/cms/content/work/jobs/` (first job 2012,
+  Downstream 2020); the guide, the read-only audit and the invoices are from
+  the Honeywell and Hyperquake work recorded in the notes. The run club from
+  the route-trace spec.
+- **Dropped from the old page:** "Creative Technology Partner", the Magic
+  Wand Method, "artists who code, engineers who care", the three C's, and
+  "more than a decade building interactive installations" (the record shows
+  six years of experiential work).
+- **No headcount:** "we" throughout; Harrison is the only person named.
+- **Stop-slop:** no em dashes, no adverbs, no "X, not Y".
+
+---
+
+## `/community`
+
+### 1. Header
+
+- **Label:** COMMUNITY
+- **Headline:** Runs, talks and open source from Bracket Bear.
+- **Lede:** Bracket Bear puts time into the experiential industry and the
+  cities it works in, whether or not a project comes of it. You can run with
+  us, hear a talk, build on our code, or play with the lab.
+
+### 2. Run club
+
+- **Headline:** Bracket Bear Run Club
+- **Body:** At SEGD 2026 in Kansas City, the run club went from the Marriott
+  Downtown to the Liberty Memorial and back, with coffee after. All runners
+  are welcome at the next one.
+- **Link:** See the route → `/run`
+
+### 3. Talks
+
+- **Headline:** Everything Is an Experience
+- **Body:** The case for putting care into everything a business or a
+  personal brand puts out, from the invoices to the software. It runs on
+  creative technology, as a working example of a presentation people
+  remember.
+- **Link:** See the talks → `/talks`
+
+### 4. Open source
+
+- **Headline:** TD Brackets
+- **Body:** Our framework for TouchDesigner apps is free under the MIT
+  license. Use it for your own work, and send issues and pull requests.
+- **Links:** View on GitHub · See TD Brackets → `/td-brackets`
+
+### 5. The lab
+
+- **Headline:** The lab
+- **Body:** Simulations we build in the browser and leave open to play with:
+  a protoplanetary disc you throw planets into, a Chladni plate, and a run
+  traced over downtown Kansas City.
+- **Link:** Open the lab → `/lab`
+
+### 6. Instagram
+
+- **Body:** We post our own creative work on Instagram. [PLACEHOLDER: handle]
+- **Link:** Follow along → [PLACEHOLDER: URL]
+
+### 7. Close
+
+- **Headline:** Come say hello.
+- **Button:** Say hello → `mailto:hello@bracketbear.com`
+
+### Meta
+
+- **Title:** Community | Bracket Bear
+- **Description:** The Bracket Bear Run Club, talks, TD Brackets as open
+  source, and the lab.
+
+### Self-check
+
+- **Facts:** the run from the route-trace spec and `/run` (Marriott
+  Downtown to the Liberty Memorial, coffee after, all runners welcome).
+- **Beliefs** (`BRAND.md`): written as what Bracket Bear gives; no sales
+  push beyond the closing button; the "not for everyone" belief is not
+  stated.
 - **Stop-slop:** no em dashes, no adverbs, no "X, not Y".
