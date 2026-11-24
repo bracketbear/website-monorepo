@@ -3,7 +3,7 @@ import SiteLayout from '@/layouts/SiteLayout.astro';
 import { meta, notFound } from '@/content/site/not-found';
 ---
 
-<SiteLayout meta={meta} path="/404">
+<SiteLayout meta={meta} path="/404" noindex>
   <section class="section">
     <div class="section__inner">
       <h1 class="headline">{notFound.headline}</h1>

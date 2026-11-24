@@ -50,7 +50,11 @@ describe('netlify.toml redirects', () => {
 
   it('keeps the /draft/* 404 and the /run/* passthrough from holding', () => {
     const draft = redirects.find((r) => r.from === '/draft/*');
-    expect(draft).toMatchObject({ status: '404', force: 'true' });
+    expect(draft).toMatchObject({
+      to: '/404.html',
+      status: '404',
+      force: 'true',
+    });
     const run = redirects.find((r) => r.from === '/run/*');
     expect(run).toMatchObject({ to: '/run/:splat', status: '200' });
   });

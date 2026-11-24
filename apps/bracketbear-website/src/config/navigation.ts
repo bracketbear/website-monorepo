@@ -10,6 +10,13 @@ export const navItems: NavItem[] = [
   { name: 'Contact', href: '/contact' },
 ];
 
+/** A nav item is current on its own page and below it. Talks live under Community. */
+export function isCurrent(href: string, path: string): boolean {
+  const on = (base: string) => path === base || path.startsWith(base + '/');
+  if (href === '/community' && on('/talks')) return true;
+  return on(href);
+}
+
 export const navigationConfig: NavigationConfig = {
   items: navItems,
   branding: {

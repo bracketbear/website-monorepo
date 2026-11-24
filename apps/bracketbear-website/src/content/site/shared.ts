@@ -12,4 +12,6 @@ export const footer = {
   line: 'Rooted in Pittsburgh, based in Portland. Now booking.',
 };
 
+export const skipLink = 'Skip to content';
+
 export const bookend = "Welcome to Bracket Bear. We're happy you're here.";

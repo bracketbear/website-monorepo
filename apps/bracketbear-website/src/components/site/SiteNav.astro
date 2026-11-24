@@ -1,5 +1,5 @@
 ---
-import { navItems } from '@/config/navigation';
+import { isCurrent, navItems } from '@/config/navigation';
 
 interface Props {
   path: string;
@@ -36,7 +36,7 @@ const { path } = Astro.props;
             <a
               class="site-nav__link"
               href={item.href}
-              aria-current={item.href === path ? 'page' : undefined}
+              aria-current={isCurrent(item.href, path) ? 'page' : undefined}
             >
               {item.name}
             </a>

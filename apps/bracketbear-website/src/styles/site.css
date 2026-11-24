@@ -51,6 +51,26 @@ html:has(.bb-site) {
   display: block;
 }
 
+/* ---------- skip link ---------- */
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: 0;
+  z-index: 10;
+  padding: 0.6rem 1rem;
+  background: var(--orange);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: translateY(-120%);
+}
+.skip-link:focus {
+  transform: translateY(0.75rem);
+}
+
 /* ---------- nav ---------- */
 
 .site-nav {
@@ -404,6 +424,10 @@ body[data-live] .portal__stage {
 .ticker__diamond {
   color: var(--orange);
   margin-right: 1.5rem;
+}
+.ticker:hover .ticker__track,
+.ticker:focus-within .ticker__track {
+  animation-play-state: paused;
 }
 @keyframes ticker-scroll {
   to {

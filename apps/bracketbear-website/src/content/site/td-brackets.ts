@@ -48,6 +48,9 @@ export const quickstart: { headline: string; commands: string[] } = {
 
 export const appsHeadline = 'Built on TD Brackets.';
 
+/** The link label on an app that has a public repo. */
+export const repoLabel = 'View on GitHub';
+
 /** `video` and `repo` stay unset until a clip is captured or a repo is public. */
 export const apps: {
   name: string;

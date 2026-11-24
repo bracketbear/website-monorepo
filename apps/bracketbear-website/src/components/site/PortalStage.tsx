@@ -50,7 +50,7 @@ export default function PortalStage() {
     });
     if (state === 'none') return;
 
-    let cancelled = false;
+    let canceled = false;
     const app = new PixiApplication({
       config: { autoResize: true, backgroundAlpha: 0, antialias: true },
     });
@@ -81,7 +81,7 @@ export default function PortalStage() {
         console.error('portal stage boot', e);
         return;
       }
-      if (cancelled) {
+      if (canceled) {
         app.destroy();
         return;
       }
@@ -92,7 +92,7 @@ export default function PortalStage() {
       // Two frames: one for PIXI's first render, one for the browser to paint it.
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
-          if (cancelled) return;
+          if (canceled) return;
           document.body.setAttribute('data-live', '');
           ro.observe(host);
         })
@@ -100,7 +100,7 @@ export default function PortalStage() {
     })();
 
     return () => {
-      cancelled = true;
+      canceled = true;
       clearTimeout(timer);
       ro.disconnect();
       pointer.detach();

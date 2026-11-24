@@ -7,6 +7,7 @@ import {
   quickstart,
   appsHeadline,
   apps,
+  repoLabel,
   hire,
 } from '@/content/site/td-brackets';
 
@@ -75,7 +76,7 @@ const pieces = (text: string) => text.split('`');
             <p class="body-copy">{app.body}</p>
             {app.repo && (
               <a class="btn" href={app.repo}>
-                View on GitHub
+                {repoLabel}
               </a>
             )}
           </li>

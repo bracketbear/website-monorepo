@@ -1,12 +1,16 @@
 // Fails the launch when any built page still carries a [PLACEHOLDER marker.
 // Run after `npm run build`. Not part of check:ci: it is expected to fail
 // until the project notes' placeholders are filled in.
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
+if (!existsSync(dist)) {
+  console.error('dist not found: run npm run build first');
+  process.exit(1);
+}
 const MARKER = '[PLACEHOLDER';
 
 function* htmlFiles(dir) {

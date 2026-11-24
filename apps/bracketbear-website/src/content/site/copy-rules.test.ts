@@ -67,6 +67,11 @@ describe('site copy modules', () => {
     expect(findViolations(collectStrings(mod))).toEqual([]);
   });
 
+  it.each(modules)('%s has at most one exclamation point', (_path, mod) => {
+    const bangs = collectStrings(mod).join('').split('!').length - 1;
+    expect(bangs).toBeLessThanOrEqual(1);
+  });
+
   it('placeholders do not grow past the ones tracked in the project notes', () => {
     const all = modules.flatMap(([, mod]) => collectStrings(mod));
     expect(countPlaceholders(all)).toBeLessThanOrEqual(8);

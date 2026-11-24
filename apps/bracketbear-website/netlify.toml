@@ -40,7 +40,7 @@ status = 200
 # The homepage draft ships in public/ as the design reference; it is not a page
 [[redirects]]
 from = "/draft/*"
-to = "/index.html"
+to = "/404.html"
 status = 404
 force = true
 
