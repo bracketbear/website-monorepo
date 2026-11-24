@@ -8,7 +8,7 @@ const RULES: { rule: string; pattern: RegExp }[] = [
     pattern:
       /\b(behaviour|colour|favour|honour|organis|centre|cancelled|labelled|licence)\w*/i,
   },
-  { rule: 'headcount', pattern: /our team|our engineers|team of/i },
+  { rule: 'headcount', pattern: /\b(our team|our engineers|team of)\b/i },
 ];
 
 /** Walks any object, array or string and returns every string found. */
@@ -31,5 +31,8 @@ export function findViolations(strings: string[]): Violation[] {
 }
 
 export function countPlaceholders(strings: string[]): number {
-  return strings.filter((s) => s.includes('[PLACEHOLDER')).length;
+  return strings.reduce(
+    (total, s) => total + s.split('[PLACEHOLDER').length - 1,
+    0
+  );
 }

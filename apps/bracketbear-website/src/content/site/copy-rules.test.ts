@@ -24,8 +24,24 @@ describe('findViolations', () => {
     );
   });
 
+  it('does not flag "your team"', () => {
+    expect(findViolations(['what your team will change'])).toEqual([]);
+  });
+
+  it('flags emoji', () => {
+    expect(findViolations(['Hello 🔥']).map((v) => v.rule)).toEqual(['emoji']);
+  });
+
   it('passes clean copy', () => {
     expect(findViolations(['TouchDesigner apps you can test'])).toEqual([]);
+  });
+});
+
+describe('countPlaceholders', () => {
+  it('counts every occurrence, not every string', () => {
+    expect(countPlaceholders(['[PLACEHOLDER: a] and [PLACEHOLDER: b]'])).toBe(
+      2
+    );
   });
 });
 
