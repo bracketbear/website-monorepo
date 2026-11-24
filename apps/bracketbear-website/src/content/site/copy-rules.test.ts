@@ -72,3 +72,17 @@ describe('site copy modules', () => {
     expect(countPlaceholders(all)).toBeLessThanOrEqual(8);
   });
 });
+
+describe('platforms', () => {
+  it('are told in order, and never call Downstream or Deeplocal clients', async () => {
+    const { history } = await import('./platforms');
+    expect(history.platforms.map((p) => p.name)).toEqual([
+      'Bridge',
+      'Gumband',
+      "Hyperquake's Experience Platform",
+    ]);
+    for (const p of history.platforms) {
+      expect(p.body).not.toMatch(/\bclients?\b/i);
+    }
+  });
+});

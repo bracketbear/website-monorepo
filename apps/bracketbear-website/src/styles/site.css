@@ -458,3 +458,61 @@ body[data-live] .portal__stage {
   font-size: clamp(1.1rem, 2.4vw, 1.6rem);
   color: var(--cream);
 }
+
+/* ============================================================
+   /platforms
+   ============================================================ */
+
+.platforms-parts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+@media (min-width: 900px) {
+  .platforms-parts {
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+}
+.platforms-part__name {
+  margin: 0 0 0.75rem;
+  font-family: var(--wordmark);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  line-height: 1.1;
+  color: var(--cream);
+}
+
+.platforms-history {
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hairline);
+}
+.platforms-row {
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.platforms-row__name {
+  margin: 0 0 0.4rem;
+  font-family: var(--wordmark);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  line-height: 1.1;
+  color: var(--cream);
+  overflow-wrap: anywhere;
+}
+.platforms-row__meta {
+  margin: 0 0 0.9rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+  color: var(--orange);
+}
+.platforms-row__image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-top: 1rem;
+}
