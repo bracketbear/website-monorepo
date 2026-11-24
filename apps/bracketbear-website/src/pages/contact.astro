@@ -1,0 +1,45 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { ContactForm } from '@/components/ContactForm';
+import { meta, header, form, other } from '@/content/site/contact';
+import { CONTACT_EMAIL, MAILTO } from '@/content/site/shared';
+
+const [noscriptBefore, noscriptAfter] = form.noscript.split(CONTACT_EMAIL);
+---
+
+<SiteLayout meta={meta} path="/contact">
+  <section class="section">
+    <div class="section__inner">
+      <p class="label">{header.label}</p>
+      <h1 class="headline">{header.headline}</h1>
+      <p class="lede">{header.body}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__inner">
+      <ContactForm client:load />
+      <noscript>
+        <p class="body-copy">
+          {noscriptBefore}<a href={MAILTO}>{CONTACT_EMAIL}</a>{noscriptAfter}
+        </p>
+      </noscript>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__inner">
+      <ul class="link-rows">
+        <li>
+          <a class="link-row" href={other.email.href}>{other.email.label}</a>
+        </li>
+        <li>
+          <a class="link-row" href={other.linkedin.href}>
+            {other.linkedin.label}
+          </a>
+        </li>
+      </ul>
+      <p class="body-copy">{other.line}</p>
+    </div>
+  </section>
+</SiteLayout>

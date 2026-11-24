@@ -1,0 +1,101 @@
+@import '@fontsource/anton/400.css';
+@import '@fontsource/archivo-black/400.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+
+/* ============================================================
+   talk.css — Talk runner shell. Scoped under .bb-talk.
+   ============================================================ */
+
+.bb-talk {
+  --orange: #ff5f1f;
+  --cream: #fff3e3;
+  --ink: #110a08;
+  --cyan: #7df9ff;
+  --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* Letterboxed 16:9 stage. cqw units in the slide layouts resolve here. */
+.bb-talk-stage {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  container-type: size;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+.bb-talk-fade {
+  transition: opacity 0.2s ease;
+}
+
+.bb-talk-notes {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: rgba(17, 10, 8, 0.94);
+  border-top: 1px solid rgba(255, 243, 227, 0.14);
+  padding: 1rem 1.5rem 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  align-items: start;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--cream);
+}
+
+.bb-talk-notes .clock {
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--orange);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Bottom-center toggle that hides the slide text. Also on the T key. */
+.bb-talk-toggle {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  z-index: 11;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 243, 227, 0.55);
+  background: rgba(17, 10, 8, 0.55);
+  border: 1px solid rgba(255, 243, 227, 0.18);
+  padding: 0.55rem 0.9rem 0.5rem;
+  cursor: pointer;
+  opacity: 0.35;
+  transition:
+    opacity 0.2s ease,
+    color 0.2s ease;
+}
+.bb-talk-toggle:hover,
+.bb-talk-toggle:focus-visible {
+  opacity: 1;
+  color: var(--cream);
+  outline: none;
+}

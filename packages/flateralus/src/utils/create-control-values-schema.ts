@@ -34,10 +34,16 @@ function controlToZodSchema(control: Mutable<Control>): ZodTypeAny {
       // Now options is mutable
       const options = control.options;
       return z
-        .string()
+        .union([z.string(), z.number()])
         .refine((val) => options.some((opt) => opt.value === val), {
           message: `Value must be one of: ${options.map((o) => o.value).join(', ')}`,
         });
+    }
+    case 'text': {
+      let schema = z.string();
+      if (typeof control.maxLength === 'number')
+        schema = schema.max(control.maxLength);
+      return schema;
     }
     case 'group': {
       // For group controls, we need to validate against the items definition

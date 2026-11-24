@@ -5,6 +5,17 @@ command = "npm run build"
 [build.environment]
 NODE_VERSION = "18"
 
+# The v2 /services page is retired; send it to the front page
+[[redirects]]
+from = "/services"
+to = "/"
+status = 301
+
+[[redirects]]
+from = "/services/"
+to = "/"
+status = 301
+
 # Exclude static files from SPA redirect
 [[redirects]]
 from = "/robots.txt"
@@ -26,11 +37,20 @@ from = "/favicon.svg"
 to = "/favicon.svg"
 status = 200
 
-# Catch-all for SPA routing
+# The homepage draft ships in public/ as the design reference; it is not a page
 [[redirects]]
-from = "/*"
-to = "/index.html"
+from = "/draft/*"
+to = "/404.html"
+status = 404
+force = true
+
+# The run page's static assets: the baked map, the calendar file, the OG image
+[[redirects]]
+from = "/run/*"
+to = "/run/:splat"
 status = 200
+
+# No /* catch-all: unknown paths get the static 404.html Astro builds
 
 [[headers]]
 for = "/*"

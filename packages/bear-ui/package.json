@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@bracketbear/bear-ui-tailwind": "file:../bear-ui-tailwind",
-    "zod": "^3.25.76"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",

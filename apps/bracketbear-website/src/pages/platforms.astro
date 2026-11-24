@@ -1,0 +1,73 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { meta, header, parts, history, offer } from '@/content/site/platforms';
+---
+
+<SiteLayout meta={meta} path="/platforms">
+  <section class="section">
+    <div class="section__inner">
+      <p class="label">{header.label}</p>
+      <h1 class="headline">{header.headline}</h1>
+      <p class="lede">{header.body}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="platforms-parts">
+      {
+        parts.map((part) => (
+          <div class="platforms-part">
+            <h2 class="platforms-part__name">{part.headline}</h2>
+            <p class="body-copy">{part.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__inner">
+      <h2 class="headline">{history.headline}</h2>
+      <p class="lede">{history.intro}</p>
+    </div>
+    <ul class="platforms-history">
+      {
+        history.platforms.map((platform) => (
+          <li class="platforms-row">
+            <h3 class="platforms-row__name">{platform.name}</h3>
+            <p class="platforms-row__meta">
+              {platform.company} · {platform.role} · {platform.years}
+            </p>
+            <p class="body-copy">{platform.body}</p>
+            {platform.image && (
+              <img
+                class="platforms-row__image"
+                src={platform.image.src}
+                alt={platform.image.alt}
+                loading="lazy"
+              />
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="section">
+    <div class="section__inner">
+      <h2 class="headline">{offer.headline}</h2>
+      <p class="body-copy">{offer.body}</p>
+      <ul class="link-rows">
+        {
+          offer.links!.map((link) => (
+            <li>
+              <a class="link-row" href={link.href}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</SiteLayout>

@@ -1,0 +1,32 @@
+[
+  {
+    "judge": "judge1",
+    "shape": "short reaction",
+    "tell": "'Congrats on the promotion \u2014 you earned it.' is generic filler with no voice markers at all \u2014 no 'y'all', 'folks', exclamation-stacking, or personal anecdote anywhere in his real posts, even short ones."
+  },
+  {
+    "judge": "judge1",
+    "shape": "hot take",
+    "tell": "'Most experiential agencies are sitting on a platform problem, and nobody wants to admit it.' is a textbook LinkedIn-thought-leader hook \u2014 too rhetorically tight and depersonalized versus his rambling, anecdote-first voice."
+  },
+  {
+    "judge": "judge2",
+    "shape": "short reaction",
+    "tell": "Generic 'you earned it' with no named person, company, or concrete detail \u2014 every reference post, even short ones like REF6, anchors itself in a specific fact."
+  },
+  {
+    "judge": "judge2",
+    "shape": "hot take",
+    "tell": "Copies REF7's rhetorical skeleton almost beat-for-beat (claim \u2192 'Why?' \u2192 'Because...' \u2192 reframe \u2192 half-joking business idea \u2192 single emoji), reading like template reuse rather than organic variation."
+  },
+  {
+    "judge": "judge3",
+    "shape": "short reaction",
+    "tell": "generic and flat \u2014 'you earned it. \ud83c\udf89' has none of his signature markers ('folks', 'y'all', 'freaking', stacked emoji, personal detail)"
+  },
+  {
+    "judge": "judge3",
+    "shape": "hot take",
+    "tell": "the crafted aphorism 'That's backwards.' and clipped 'Half joking. Mostly not.' read as polished thought-leader rhythm \u2014 missing the 'folks'/exclamation-heavy warmth of his genuinely similar hybrid-work post"
+  }
+]

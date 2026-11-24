@@ -1,0 +1,83 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import CloseBlock from '@/components/site/CloseBlock.astro';
+import {
+  meta,
+  header,
+  founder,
+  portfolio,
+  howWeWork,
+} from '@/content/site/about';
+
+const groups: { label: string; items: typeof howWeWork.items }[] = [];
+for (const item of howWeWork.items) {
+  const last = groups[groups.length - 1];
+  if (last && last.label === item.label) last.items.push(item);
+  else groups.push({ label: item.label ?? '', items: [item] });
+}
+---
+
+<SiteLayout meta={meta} path="/about">
+  <section class="section">
+    <div class="section__inner">
+      <p class="label">{header.label}</p>
+      <h1 class="headline">{header.headline}</h1>
+      <p class="lede">{header.body}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="about-founder">
+      <div class="about-founder__text">
+        <h2 class="headline">{founder.headline}</h2>
+        {founder.body.map((p) => <p class="body-copy">{p}</p>)}
+        <ul class="link-rows">
+          <li>
+            <a class="link-row" href={portfolio.href}>{portfolio.label}</a>
+          </li>
+        </ul>
+      </div>
+      {
+        founder.photo.src ? (
+          <img
+            class="about-photo"
+            src={founder.photo.src}
+            alt={founder.photo.alt}
+          />
+        ) : (
+          <div
+            class="about-photo"
+            aria-hidden="true"
+            data-placeholder={founder.photo.alt}
+          />
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__inner">
+      <h2 class="headline">{howWeWork.headline}</h2>
+      <p class="lede">{howWeWork.intro}</p>
+    </div>
+    <div class="about-groups">
+      {
+        groups.map((group) => (
+          <div class="about-group">
+            <p class="label">{group.label}</p>
+            <ul class="about-items">
+              {group.items.map((item) => (
+                <li class="about-item">
+                  <h3 class="about-item__name">{item.headline}</h3>
+                  <p class="body-copy">{item.body}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <CloseBlock />
+</SiteLayout>

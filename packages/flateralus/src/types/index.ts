@@ -1,3 +1,4 @@
+import type { FrameStats } from '../perf/frame-monitor';
 import type { DeepReadonly, ObjectKeys, ObjectValues } from '@bracketbear/core';
 import { z } from 'zod';
 import type {
@@ -37,6 +38,7 @@ export const CONTROL_TYPES_TO_VALUE_TYPE = {
   boolean: 'boolean',
   color: 'string',
   select: 'string',
+  text: 'string',
   group: 'array',
 } as const;
 export const CONTROL_TYPES = Object.keys(
@@ -95,11 +97,11 @@ export interface BooleanControlValue extends ControlValue<boolean> {
   };
 }
 
-export interface SelectControlValue extends ControlValue<string> {
+export interface SelectControlValue extends ControlValue<string | number> {
   type: 'select';
-  value: string;
+  value: string | number;
   metadata?: {
-    options?: string[];
+    options?: (string | number)[];
   };
 }
 
@@ -128,7 +130,8 @@ type ControlTypeToValueTypeMap = {
   number: number;
   boolean: boolean;
   color: string;
-  select: string;
+  select: string | number;
+  text: string;
   group: AnyControlValue[];
 };
 
@@ -175,6 +178,23 @@ export interface Animation<
 
   /** Update the animation (called each frame) */
   update(): void;
+
+  /**
+   * Frame statistics for this animation, and the quality it is rendering at.
+   * Optional so an implementation outside BaseAnimation is not forced to
+   * carry a monitor it does not want.
+   */
+  getFrameStats?(): FrameStats;
+  getQuality?(): number;
+  getQualityMode?(): 'auto' | 'fixed';
+  setQualityMode?(mode: 'auto' | 'fixed', quality?: number): void;
+  getResolvedLevers?(): Record<string, number>;
+
+  /**
+   * Tell the frame monitor that the next interval is meaningless, because
+   * the tab was hidden or the animation was remounted.
+   */
+  notifyDiscontinuity?(): void;
 
   /** Reset the animation to default or specified control values */
   reset(controls?: Partial<TControlValues>): void;

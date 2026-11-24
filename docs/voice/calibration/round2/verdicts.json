@@ -1,0 +1,278 @@
+{
+  "judge1": [
+    {
+      "id": 1,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "the tagging cascade ('resisssstingggg...' then a list of names) and the closing joke about moving 'Bracket Bear HQ into this really cool space' mirror the exact name-tagging and self-referential humor pattern from REF 12."
+    },
+    {
+      "id": 2,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "'building its war chest for some time now' and 'explore what opportunities funding could provide' — zero emoji, no 'folks'/'y'all', none of his usual self-aware humor when talking about money (compare REF 4's 'it's not all about the Benjamins')."
+    },
+    {
+      "id": 3,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "terse teaser format with the '#bracketbear2026' signature hashtag, matching the short hype-drop style of REF 6 ('I was today years old...')."
+    },
+    {
+      "id": 4,
+      "verdict": "fake",
+      "confidence": 2,
+      "tell": "'Congrats on the promotion — you earned it.' is generic filler with no voice markers at all — no 'y'all', 'folks', exclamation-stacking, or personal anecdote anywhere in his real posts, even short ones."
+    },
+    {
+      "id": 5,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'Let's gooooooooooo!!!🔥' is the same word-elongation-plus-fire-emoji hype seen in REF 5's 'HERE WE GOOOOOOOOOOO!!!', plus the very-local 'PDX carpet' in-joke."
+    },
+    {
+      "id": 6,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "'Using an AI agent like ChatGPT develop time saving scripts is the way to go. 💯' is a garbled, generic-marketing sentence — missing the personal narrative/stakes he always attaches to AI-tool posts (compare REF 1's 'this is also terrifying')."
+    },
+    {
+      "id": 7,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "'Most experiential agencies are sitting on a platform problem, and nobody wants to admit it.' is a textbook LinkedIn-thought-leader hook — too rhetorically tight and depersonalized versus his rambling, anecdote-first voice."
+    },
+    {
+      "id": 8,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "'Hit me up or drop a comment. Let's chat!' is a plain, low-key direct ask consistent with his casual networking posts."
+    },
+    {
+      "id": 9,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "'TODAY! 🔥🔥🔥' triple-emoji burst matches the exact excitement pattern of REF 5's 'PITTSBURGH MORE OFTEN!!! 🔥🔥🔥'."
+    },
+    {
+      "id": 10,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "'It's an important day for all of us to recognize and highlight the impact...' is generic boilerplate with no first-person voice, no emoji flourish, no 'folks/y'all/freaking' — unlike every genuine post, which centers his own story."
+    },
+    {
+      "id": 11,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'🖤💛🖤' (Steelers colors) plus 'yinz' directly continues the REF 4/REF 5 layoff-to-new-job narrative and sign-off style."
+    },
+    {
+      "id": 12,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "the ultra-specific, slightly absurd detail 'five year old, 10-inch iPad' plus 'The future's here, folks. We did it! 🙌' matches his habit of pairing hyper-specific gear detail with hype (REF 8's tutorial link, REF 12's carpet-shop musings)."
+    },
+    {
+      "id": 13,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'not gonna lie, it made me a little jealous' plus the closing '🤘' matches the nostalgic-Pittsburgh, single-emoji-sign-off pattern of REF 3 and REF 11."
+    },
+    {
+      "id": 14,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'cool 💩 your coworkers make' echoes REF 6's exact joke premise (can't brag about cool work stuff) with the same playful, slightly crude emoji humor."
+    },
+    {
+      "id": 15,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "the clean ✅ checklist and phrase 'non-judgemental partner' read as tidy and formal — missing every one of his verbal tics ('y'all', 'folks', 'freaking', 'gosh darn') present in every other genuine AI-enthusiasm post."
+    }
+  ],
+  "judge2": [
+    {
+      "id": 1,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "Reuses the exact same idiosyncratic name formatting 'Scott Simpson,CTS-D/CTS-I' (comma, no space) seen in REF13, plus playful spelling 'resisssstingggg' and 'MY GOODNESS Y'ALL' matching his hype voice."
+    },
+    {
+      "id": 2,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "'developing new lines of business it could be beneficial for us to explore what opportunities funding could provide' is stilted corporate phrasing with zero emoji or exclamation — even his serious/ask posts (REF15) keep personal warmth and casual openers."
+    },
+    {
+      "id": 3,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "Short cryptic teaser with '#bracketbear2026' matches his established hype-teaser pattern seen in REF12/REF14."
+    },
+    {
+      "id": 4,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "Generic 'you earned it' with no named person, company, or concrete detail — every reference post, even short ones like REF6, anchors itself in a specific fact."
+    },
+    {
+      "id": 5,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'Gotta take a pic of the PDX carpet' is a hyper-specific Portland-local in-joke, and 'Let's gooooooooooo!!!🔥' echoes 'HERE WE GOOOOOOOOOOO!!!' from REF5."
+    },
+    {
+      "id": 6,
+      "verdict": "fake",
+      "confidence": 2,
+      "tell": "'the experience leaves a lot to be desired' is flat, generic complaint language lacking his usual 'freaking'/self-deprecating color found in REF1 and REF2's AI posts."
+    },
+    {
+      "id": 7,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "Copies REF7's rhetorical skeleton almost beat-for-beat (claim → 'Why?' → 'Because...' → reframe → half-joking business idea → single emoji), reading like template reuse rather than organic variation."
+    },
+    {
+      "id": 8,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "'Hey PDX network' ask format and TouchDesigner reference match his established local-network-favor pattern (REF9's SXSW ask, REF8's TouchDesigner posts)."
+    },
+    {
+      "id": 9,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'why not scan my entire project when you've got access to it?!?' uses the exact '?!?' punctuation seen in REF3 ('How freaking cool is that?!?'), and 'stoked' matches REF10."
+    },
+    {
+      "id": 10,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "Zero emoji and no personal anecdote — unusual since nearly every reference post, even serious ones like REF15, uses emoji and ties the topic to his own experience."
+    },
+    {
+      "id": 11,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'yinz' Pittsburgh slang plus the layoff-to-hope narrative arc mirrors REF4 and REF12 exactly, and 'Big news soon' matches the teaser pattern in item 3."
+    },
+    {
+      "id": 12,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "Specific stacked tech detail ('Arc Browser tab', 'five year old, 10-inch iPad') plus 'The future's here, folks. We did it! 🙌' matches his concrete-detail, folks-addressing enthusiasm."
+    },
+    {
+      "id": 13,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'a wall of 3D printers still running at 9pm on a Tuesday' is the kind of sensory-specific, wistfully personal detail seen in REF10/REF13; ending '🤘' matches his sign-off style."
+    },
+    {
+      "id": 14,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'Do y'all know how hard it is to keep my mouth shut' plus censored 'cool 💩' matches his comedic self-censoring humor and Deeplocal pride seen in REF6 and REF11."
+    },
+    {
+      "id": 15,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "Uses generic ✅ checkmark bullets, unlike his habit of topical/emotional emoji bullets (💰🎨🫣 in REF4, ✏️⚙️🔧 in REF5) — reads as a cleaner AI-listicle structure."
+    }
+  ],
+  "judge3": [
+    {
+      "id": 1,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "the playful elongated spelling 'resisssstingggg' and the specific named tag list mirror his habit of drawing out words for comedic emphasis (like 'GOOOOOOOOOOO' in the reference posts) and tagging real community members by name"
+    },
+    {
+      "id": 2,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "'explore what opportunities funding could provide our small company' is stiff, formal business-speak with zero emoji or exclamation points — every reference post, even serious ones, carries at least some emoji or exclamation energy"
+    },
+    {
+      "id": 3,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "the terse teaser-plus-hashtag format ('more very soon. #bracketbear2026') matches his short cryptic-hype style seen in the one-liner 'I was today years old...' post"
+    },
+    {
+      "id": 4,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "generic and flat — 'you earned it. 🎉' has none of his signature markers ('folks', 'y'all', 'freaking', stacked emoji, personal detail)"
+    },
+    {
+      "id": 5,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'y'all' plus the elongated 'Let's gooooooooooo!!!🔥' directly echoes 'HERE WE GOOOOOOOOOOO!!!' from the reference posts, and the PDX-carpet detail is a very specific local-insider touch"
+    },
+    {
+      "id": 6,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "'👇 Check this video out for inspiration' reproduces his exact pattern of appending a video/tutorial link with a pointing emoji, as seen with the TouchDesigner tutorial post"
+    },
+    {
+      "id": 7,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "the crafted aphorism 'That's backwards.' and clipped 'Half joking. Mostly not.' read as polished thought-leader rhythm — missing the 'folks'/exclamation-heavy warmth of his genuinely similar hybrid-work post"
+    },
+    {
+      "id": 8,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "'Hit me up or drop a comment. Let's chat!' matches his casual, direct networking-ask voice and Portland-community framing"
+    },
+    {
+      "id": 9,
+      "verdict": "real",
+      "confidence": 4,
+      "tell": "'TODAY! 🔥🔥🔥' and the closing engagement question ('What new feature are you looking forward to using?') mirror his enthusiastic AI-tool-announcement pattern from the ChatGPT posts"
+    },
+    {
+      "id": 10,
+      "verdict": "fake",
+      "confidence": 4,
+      "tell": "totally generic boilerplate with no 'folks', 'y'all', emoji, or personal anecdote — every real reference post personalizes even serious topics (e.g., the wildfire post offers his own connections)"
+    },
+    {
+      "id": 11,
+      "verdict": "real",
+      "confidence": 5,
+      "tell": "'yinz' and '🖤💛🖤' (Steelers colors) are exact signature markers from the reference posts, and it directly callbacks the layoff story told in the Fireside award post"
+    },
+    {
+      "id": 12,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "the hyper-specific, slightly absurd detail ('five year old, 10-inch iPad') and the closing 'folks. We did it! 🙌' match his habit of grounding excitement in oddly specific personal minutiae"
+    },
+    {
+      "id": 13,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "the wistful Pittsburgh nostalgia capped with '🤘' mirrors the exact sign-off emoji used in his 'Cool space, cooler people' style reference posts about Pittsburgh/Deeplocal"
+    },
+    {
+      "id": 14,
+      "verdict": "real",
+      "confidence": 3,
+      "tell": "using '💩' as a playful word substitute and '😤' fits his irreverent emoji-as-language humor seen throughout the references"
+    },
+    {
+      "id": 15,
+      "verdict": "fake",
+      "confidence": 3,
+      "tell": "the '✅' checkmark bullet list is a templated format never used in the references (he favors idiosyncratic emoji like 💰🎨🫣 as bullets), and the content reads like a generic AI 'lessons I learned' recap"
+    }
+  ]
+}

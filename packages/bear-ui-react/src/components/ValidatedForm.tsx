@@ -5,7 +5,9 @@ import { z } from 'zod';
  * Props for the ValidatedForm component.
  * @template TSchema - The Zod schema type for the form.
  */
-export interface ValidatedFormProps<TSchema extends z.ZodTypeAny> {
+export interface ValidatedFormProps<
+  TSchema extends z.ZodType<Record<string, any>>,
+> {
   schema: TSchema;
   onSubmit: (values: z.infer<TSchema>) => Promise<void> | void;
   children: (props: {
@@ -29,7 +31,7 @@ export interface ValidatedFormProps<TSchema extends z.ZodTypeAny> {
   className?: string;
 }
 
-export function ValidatedForm<TSchema extends z.ZodTypeAny>({
+export function ValidatedForm<TSchema extends z.ZodType<Record<string, any>>>({
   schema,
   onSubmit,
   children,
@@ -81,14 +83,15 @@ export function ValidatedForm<TSchema extends z.ZodTypeAny>({
 
     // Validate the updated values
     const result = schema.safeParse(updatedValues);
-    if (
-      !result.success &&
-      result.error.formErrors.fieldErrors[name as keyof Values]
-    ) {
+    const fieldErrors = result.success
+      ? undefined
+      : (z.flattenError(result.error).fieldErrors as Partial<
+          Record<keyof Values, string[]>
+        >);
+    if (fieldErrors?.[name as keyof Values]) {
       setErrors((prev) => ({
         ...prev,
-        [name]:
-          result.error.formErrors.fieldErrors[name as keyof Values]?.[0] || '',
+        [name]: fieldErrors[name as keyof Values]?.[0] || '',
       }));
     } else {
       setErrors((prev) => ({ ...prev, [name]: '' }));
@@ -102,7 +105,7 @@ export function ValidatedForm<TSchema extends z.ZodTypeAny>({
     setIsSubmitting(true);
     const result = schema.safeParse(values);
     if (!result.success) {
-      const fieldErrors = result.error.formErrors.fieldErrors;
+      const fieldErrors = z.flattenError(result.error).fieldErrors;
       setErrors(
         Object.fromEntries(
           Object.entries(fieldErrors).map(([k, v]) => [k, v?.[0] || ''])

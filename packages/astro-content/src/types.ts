@@ -1,3 +1,4 @@
+import type { z } from 'zod';
 import type {
   workCompanySchema,
   workJobSchema,
@@ -11,15 +12,15 @@ import type {
 } from '@bracketbear/schemas';
 
 // Export the raw schema types (inferred from Zod schemas)
-export type WorkCompany = typeof workCompanySchema._type;
-export type WorkJob = typeof workJobSchema._type;
-export type WorkSkill = typeof workSkillSchema._type;
-export type WorkSkillCategory = typeof workSkillCategorySchema._type;
-export type WorkProjectCategory = typeof workProjectCategorySchema._type;
-export type WorkProject = typeof workProjectSchema._type;
-export type Blog = typeof blogSchema._type;
-export type Page = typeof pageSchema._type;
-export type Service = typeof serviceSchema._type;
+export type WorkCompany = z.infer<typeof workCompanySchema>;
+export type WorkJob = z.infer<typeof workJobSchema>;
+export type WorkSkill = z.infer<typeof workSkillSchema>;
+export type WorkSkillCategory = z.infer<typeof workSkillCategorySchema>;
+export type WorkProjectCategory = z.infer<typeof workProjectCategorySchema>;
+export type WorkProject = z.infer<typeof workProjectSchema>;
+export type Blog = z.infer<typeof blogSchema>;
+export type Page = z.infer<typeof pageSchema>;
+export type Service = z.infer<typeof serviceSchema>;
 
 // Note: CollectionEntry types are Astro-specific and should be defined
 // in Astro applications that use this package, not in the package itself.

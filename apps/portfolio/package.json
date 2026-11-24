@@ -15,7 +15,7 @@
     "sync": "npx astro sync"
   },
   "dependencies": {
-    "@astrojs/react": "^4.3.0",
+    "@astrojs/react": "^6.0.2",
     "@bracketbear/astro-content": "file:../../packages/astro-content",
     "@bracketbear/bear-ui-react": "file:../../packages/bear-ui-react",
     "@bracketbear/core": "file:../../packages/core",
@@ -25,7 +25,7 @@
     "@bracketbear/flateralus-pixi": "file:../../packages/flateralus-pixi",
     "@bracketbear/flateralus-pixi-animations": "file:../../packages/flateralus-pixi-animations",
     "@bracketbear/flateralus-react": "file:../../packages/flateralus-react",
-    "astro": "^5.10.1",
+    "astro": "^7.1.6",
     "marked": "^16.1.1",
     "pixi.js": "^8.11.0",
     "react": "^19.0.0",

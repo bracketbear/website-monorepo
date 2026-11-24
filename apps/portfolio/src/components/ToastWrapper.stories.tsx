@@ -5,44 +5,28 @@ import { useToast } from '@bracketbear/bear-ui-react';
 
 // Component that demonstrates toast functionality
 function ToastDemo() {
-  const { toast } = useToast();
+  const { showToast } = useToast();
 
   const showSuccessToast = () => {
-    toast({
-      title: 'Success!',
-      description: 'Your action was completed successfully.',
-      type: 'success',
-    });
+    showToast('Your action was completed successfully.', { type: 'success' });
   };
 
   const showErrorToast = () => {
-    toast({
-      title: 'Error',
-      description: 'Something went wrong. Please try again.',
-      type: 'error',
-    });
+    showToast('Something went wrong. Please try again.', { type: 'error' });
   };
 
   const showWarningToast = () => {
-    toast({
-      title: 'Warning',
-      description: 'Please review your input before proceeding.',
+    showToast('Please review your input before proceeding.', {
       type: 'warning',
     });
   };
 
   const showInfoToast = () => {
-    toast({
-      title: 'Information',
-      description: 'Here is some useful information for you.',
-      type: 'info',
-    });
+    showToast('Here is some useful information for you.', { type: 'info' });
   };
 
   const showCustomToast = () => {
-    toast({
-      title: 'Custom Toast',
-      description: 'This is a custom toast with a longer duration.',
+    showToast('This is a custom toast with a longer duration.', {
       duration: 5000,
     });
   };
@@ -54,7 +38,7 @@ function ToastDemo() {
         <Button onClick={showSuccessToast} variant="primary">
           Success Toast
         </Button>
-        <Button onClick={showErrorToast} variant="danger">
+        <Button onClick={showErrorToast} variant="error">
           Error Toast
         </Button>
         <Button onClick={showWarningToast} variant="secondary">
@@ -116,24 +100,15 @@ export const WithCustomContent: Story = {
 export const MultipleToasts: Story = {
   render: () => {
     function MultipleToastDemo() {
-      const { toast } = useToast();
+      const { showToast } = useToast();
 
       const showMultipleToasts = () => {
-        toast({
-          title: 'First Toast',
-          description: 'This is the first toast.',
-        });
+        showToast('This is the first toast.');
         setTimeout(() => {
-          toast({
-            title: 'Second Toast',
-            description: 'This is the second toast.',
-          });
+          showToast('This is the second toast.');
         }, 500);
         setTimeout(() => {
-          toast({
-            title: 'Third Toast',
-            description: 'This is the third toast.',
-          });
+          showToast('This is the third toast.');
         }, 1000);
       };
 

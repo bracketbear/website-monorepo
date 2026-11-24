@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import { z } from 'zod';
 
 import { contentPath, workPath } from './utils';
 import {
@@ -20,6 +21,7 @@ import {
   portfolioProjectsPageSchema,
   portfolioProjectPageSchema,
   sourceCodePageSchema,
+  makePageSchema,
 } from '@bracketbear/schemas';
 
 /**
@@ -120,41 +122,181 @@ export const siteSpecificCollections = {
     base: join(contentPath, 'sites/portfolio/contact-methods'),
     schema: contactMethodSchema,
   },
-  // TODO: Add Bracket Bear collections when Bracket Bear site is implemented
-  // bracketBearAboutPage: {
-  //   base: join(contentPath, 'sites/bracketbear'),
-  //   schema: bracketBearAboutPageSchema,
-  // },
-  // bracketbearIndexPage: {
-  //   base: join(contentPath, 'sites/bracketbear'),
-  //   schema: indexPageSchema,
-  // },
-  // bracketbearContactPage: {
-  //   base: join(contentPath, 'sites/bracketbear'),
-  //   schema: makePageSchema({
-  //     phone: z.string().optional(),
-  //     address: z.string().optional(),
-  //     contactFormId: z.string().optional(),
-  //     officeHours: z.string().optional(),
-  //   }),
-  // },
-  // bracketbearAboutPage: {
-  //   base: join(contentPath, 'sites/bracketbear'),
-  //   schema: makePageSchema({
-  //     teamMembers: z
-  //       .array(
-  //         z.object({
-  //           name: z.string(),
-  //           role: z.string(),
-  //           bio: z.string().optional(),
-  //           image: z.string().optional(),
-  //         })
-  //       )
-  //       .optional(),
-  //     companyValues: z.array(z.string()).optional(),
-  //     foundedYear: z.number().optional(),
-  //   }),
-  // },
+  // Bracket Bear site singletons
+  bracketbearIndexPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: makePageSchema(
+      {
+        statusTicker: z.object({
+          beats: z.array(z.string()),
+        }),
+        hero: z.object({
+          kicker: z.string(),
+          eyebrow: z.string(),
+          punchLine1: z.string(),
+          lede: z.string(),
+          ctaPrimary: z.object({
+            label: z.string(),
+            href: z.string(),
+          }),
+          ctaGhost: z.object({
+            label: z.string(),
+            href: z.string(),
+          }),
+        }),
+        intro: z.object({
+          aside: z.string(),
+          leadBlock: z.string(),
+          closingLine: z.string(),
+        }),
+        offerings: z.object({
+          eyebrow: z.string(),
+          title: z.string(),
+          meta: z.string(),
+          items: z.array(
+            z.object({
+              number: z.string(),
+              title: z.string(),
+              body: z.string(),
+              tag: z.string(),
+            })
+          ),
+          platformLayers: z.object({
+            eyebrow: z.string(),
+            items: z.array(
+              z.object({
+                title: z.string(),
+                body: z.string(),
+              })
+            ),
+          }),
+        }),
+        receipts: z.object({
+          eyebrow: z.string(),
+          title: z.string(),
+          meta: z.string(),
+          pullQuoteStamp: z.string(),
+          pullQuoteBody: z.string(),
+          demoBody: z.string(),
+          demoCtaLabel: z.string(),
+          demoCtaHref: z.string(),
+          operatorCredit: z.object({
+            eyebrow: z.string(),
+            body: z.string(),
+          }),
+          hyperquake: z.object({
+            eyebrow: z.string(),
+            body: z.string(),
+          }),
+        }),
+        commitments: z.object({
+          eyebrow: z.string(),
+          title: z.string(),
+          meta: z.string(),
+          items: z.array(
+            z.object({
+              tag: z.string(),
+              title: z.string(),
+              body: z.string(),
+            })
+          ),
+        }),
+        manifesto: z.object({
+          banner: z.string(),
+          lines: z.array(z.string()),
+        }),
+        closingCta: z.object({
+          eyebrow: z.string(),
+          title: z.string(),
+          body: z.string(),
+          contactLines: z.array(z.string()),
+          ctaLabel: z.string(),
+          ctaHref: z.string(),
+          bookendLine1: z.string(),
+          bookendLine2: z.string(),
+        }),
+      },
+      { showCta: false }
+    ),
+    pattern: 'index-page.json',
+  },
+  bracketbearAboutPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: makePageSchema({
+      hero: z.object({
+        title: z.string(),
+        subtitle: z.string(),
+      }),
+      ourStory: z.object({
+        title: z.string(),
+        content: z.string(),
+      }),
+      philosophy: z.object({
+        title: z.string(),
+        subtitle: z.string(),
+        content: z.string(),
+      }),
+      coreValues: z.object({
+        title: z.string(),
+        subtitle: z.string(),
+        values: z.array(
+          z.object({
+            title: z.string(),
+            description: z.string(),
+          })
+        ),
+      }),
+      whoWeAre: z.object({
+        title: z.string(),
+        content: z.string(),
+      }),
+    }),
+    pattern: 'about-page.json',
+  },
+  bracketbearServicesPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: makePageSchema({
+      hero: z.object({
+        title: z.string(),
+        subtitle: z.string(),
+      }),
+      intro: z.object({
+        title: z.string(),
+        content: z.string(),
+      }),
+      serviceModes: z.array(
+        z.object({
+          title: z.string(),
+          description: z.string(),
+        })
+      ),
+    }),
+    pattern: 'services-page.json',
+  },
+  bracketbearContactPage: {
+    base: join(contentPath, 'sites/bracketbear'),
+    schema: makePageSchema(
+      {
+        hero: z.object({
+          title: z.string(),
+          subtitle: z.string(),
+        }),
+        introduction: z.string(),
+        contactMethods: z.array(z.string()),
+        contactForm: z.object({
+          title: z.string(),
+          description: z.string(),
+        }),
+      },
+      { showCta: false }
+    ),
+    pattern: 'contact-page.json',
+  },
+  // Bracket Bear site collections
+  bracketbearContactMethods: {
+    base: join(contentPath, 'sites/bracketbear/contact-methods'),
+    schema: contactMethodSchema,
+  },
 };
 
 /**

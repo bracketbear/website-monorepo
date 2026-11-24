@@ -1,0 +1,43 @@
+---
+import '@/styles/site.css';
+import type { Meta } from '@/content/site/types';
+import { skipLink } from '@/content/site/shared';
+import SiteNav from '@/components/site/SiteNav.astro';
+import SiteFooter from '@/components/site/SiteFooter.astro';
+
+interface Props {
+  meta: Meta;
+  path: string;
+  bodyClass?: string;
+  noindex?: boolean;
+}
+
+const { meta, path, bodyClass, noindex } = Astro.props;
+const url = `https://bracketbear.com${path}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{meta.title}</title>
+    <meta name="description" content={meta.description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {noindex && <meta name="robots" content="noindex" />}
+    {!noindex && <link rel="canonical" href={url} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={meta.title} />
+    <meta property="og:description" content={meta.description} />
+    {!noindex && <meta property="og:url" content={url} />}
+    <meta name="theme-color" content="#110a08" />
+  </head>
+  <body class:list={['bb-site', bodyClass]}>
+    <a class="skip-link" href="#main">{skipLink}</a>
+    <SiteNav path={path} />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

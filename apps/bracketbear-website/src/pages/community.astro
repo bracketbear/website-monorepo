@@ -1,0 +1,68 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import CloseBlock from '@/components/site/CloseBlock.astro';
+import {
+  meta,
+  header,
+  run,
+  talks,
+  openSource,
+  lab,
+  instagram,
+} from '@/content/site/community';
+
+const blocks = [run, talks, openSource, lab];
+---
+
+<SiteLayout meta={meta} path="/community">
+  <section class="section">
+    <div class="section__inner">
+      <p class="label">{header.label}</p>
+      <h1 class="headline">{header.headline}</h1>
+      <p class="lede">{header.body}</p>
+    </div>
+  </section>
+
+  {
+    blocks.map((block) => (
+      <section class="section">
+        <div class="section__inner">
+          <h2 class="headline">{block.headline}</h2>
+          <p class="body-copy">{block.body}</p>
+          <ul class="link-rows">
+            {block.links!.map((link) => (
+              <li>
+                <a class="link-row" href={link.href}>
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section">
+    <div class="section__inner">
+      <p class="body-copy">{instagram.body}</p>
+      {
+        instagram.link.href.startsWith('[PLACEHOLDER') ? (
+          <p class="community-pending">
+            {instagram.link.label}: {instagram.link.href}
+          </p>
+        ) : (
+          <ul class="link-rows">
+            <li>
+              <a class="link-row" href={instagram.link.href}>
+                {instagram.link.label}
+              </a>
+            </li>
+          </ul>
+        )
+      }
+    </div>
+  </section>
+
+  <CloseBlock />
+</SiteLayout>

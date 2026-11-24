@@ -1,0 +1,48 @@
+{
+  "title": "About Bracket Bear",
+  "subtitle": "Creative Technology Partner",
+  "metaDescription": "Learn about Bracket Bear's story, philosophy, and values. Founded by Harrison Callahan to bring hospitality to experience agencies.",
+  "canonicalUrl": "https://bracketbear.com/about",
+  "ogImage": "bracketbear-about.jpg",
+  "noIndex": false,
+  "hero": {
+    "title": "About Bracket Bear",
+    "subtitle": "We believe experience agencies deserve to be treated with the same care they give their audiences."
+  },
+  "ourStory": {
+    "title": "Our Story",
+    "content": "Bracket Bear was founded by Harrison Callahan after more than a decade building interactive installations, brand experiences, and creative tools for award-winning studios like Downstream and Deeplocal.\nHe saw a simple truth: the people crafting wonder for others rarely receive that same hospitality themselves.\nSo he built a new kind of partner — one that leads with care, listens deeply, and helps experiential agencies do their best work in the world."
+  },
+  "philosophy": {
+    "title": "Our Philosophy: The Magic Wand Method",
+    "subtitle": "Every collaboration begins with a question:",
+    "content": "\"If you could wave a magic wand and fix one thing keeping your agency from reaching its potential, what would it be?\"\n\nThat question unlocks our work.\nIt invites curiosity, honesty, and a shared vision of what better looks like.\nSometimes the answer is a process bottleneck. Sometimes it's technical uncertainty.\nWhatever it is, we design around it — removing friction so creativity can flow."
+  },
+  "coreValues": {
+    "title": "Our Core Values: The Three C's",
+    "subtitle": "The principles that guide everything we do:",
+    "values": [
+      {
+        "title": "Community",
+        "description": "Bracket Bear was founded to be a platform for greater good. We use it to elevate our local communities, social causes, and the experiential tech industry as a whole."
+      },
+      {
+        "title": "Collaboration",
+        "description": "We believe the sum of our collective ideas is greater than its parts. We build strong partnerships and do everything we can to help them succeed."
+      },
+      {
+        "title": "Consistency",
+        "description": "We sweat the details. When you choose Bracket Bear, you get quality craft paired with clear, thoughtful communication every time."
+      }
+    ]
+  },
+  "whoWeAre": {
+    "title": "Who We Are",
+    "content": "We're artists who code, engineers who care, and partners who lead with hospitality.\nOur team brings the same curiosity and precision to every project — whether we're guiding a pitch, building a prototype, or installing an interactive space.\nBecause care and craft belong in every step."
+  },
+  "contactCTA": {
+    "text": "Let's bring some hospitality to your next experience.",
+    "buttonText": "Explore how we work",
+    "buttonLink": "/services"
+  }
+}

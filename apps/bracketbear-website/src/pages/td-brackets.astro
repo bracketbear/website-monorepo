@@ -1,0 +1,105 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import {
+  meta,
+  header,
+  features,
+  quickstart,
+  appsHeadline,
+  apps,
+  repoLabel,
+  hire,
+} from '@/content/site/td-brackets';
+
+// Odd-indexed pieces of a backtick split are code.
+const pieces = (text: string) => text.split('`');
+---
+
+<SiteLayout meta={meta} path="/td-brackets">
+  <section class="section">
+    <div class="section__inner">
+      <p class="label">{header.label}</p>
+      <h1 class="headline">{header.headline}</h1>
+      <p class="lede">{header.body}</p>
+      <a class="btn btn--primary" href={header.links![0].href}
+        >{header.links![0].label}</a
+      >
+      <p class="tdb-secondary">
+        <a class="btn" href={header.links![1].href}>{header.links![1].label}</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="tdb-features">
+      {
+        features.map((feature) => (
+          <div class="tdb-feature">
+            <h2 class="platforms-part__name">{feature.headline}</h2>
+            <p class="body-copy">
+              {pieces(feature.body as string).map((piece, i) =>
+                i % 2 === 1 ? <code class="tdb-inline">{piece}</code> : piece
+              )}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section" id="quickstart">
+    <div class="section__inner">
+      <h2 class="headline">{quickstart.headline}</h2>
+      <pre class="tdb-code"><code>{quickstart.commands.join('\n')}</code></pre>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__inner">
+      <h2 class="headline">{appsHeadline}</h2>
+    </div>
+    <ul class="tdb-apps">
+      {
+        apps.map((app) => (
+          <li class="tdb-app">
+            {app.video && (
+              <video
+                class="tdb-app__video"
+                src={app.video}
+                autoplay
+                muted
+                loop
+                playsinline
+              />
+            )}
+            <h3 class="platforms-row__name">{app.name}</h3>
+            <p class="body-copy">{app.body}</p>
+            {app.repo && (
+              <a class="btn" href={app.repo}>
+                {repoLabel}
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="section">
+    <div class="section__inner">
+      <h2 class="headline">{hire.headline}</h2>
+      <p class="body-copy">{hire.body}</p>
+      <ul class="link-rows">
+        {
+          hire.links!.map((link) => (
+            <li>
+              <a class="link-row" href={link.href}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</SiteLayout>

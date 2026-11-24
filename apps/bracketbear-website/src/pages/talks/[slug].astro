@@ -1,0 +1,40 @@
+---
+// A talk is a full-viewport presentation surface, so it deliberately skips
+// Layout.astro: no site nav, no footer, no pointer effects competing with
+// the stage cursor. Same shape as lab.astro.
+import TalkRunner from '@/components/talk/TalkRunner';
+import { TALKS } from '@/talks';
+import '@/styles/talk.css';
+
+export function getStaticPaths() {
+  return TALKS.map((t) => ({
+    params: { slug: t.slug },
+    props: { title: t.title },
+  }));
+}
+
+const { slug } = Astro.params;
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title} — Bracket Bear</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #110a08;
+      }
+    </style>
+  </head>
+  <body>
+    <TalkRunner client:only="react" slug={slug} />
+  </body>
+</html>

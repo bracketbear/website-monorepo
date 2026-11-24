@@ -1,0 +1,57 @@
+[
+  {
+    "judge": "judge1",
+    "shape": "hot take",
+    "tell": "Polished essay cadence ending in an aphorism ('It's building a team you don't have to babysit') with no slang, no emoji, no first-person anecdote \u2014 the isolated 'Why?' mimics his structure but the voice underneath is generic LinkedIn-thinkfluencer, not his."
+  },
+  {
+    "judge": "judge1",
+    "shape": "short reaction",
+    "tell": "Every real post names actual, specific local people/businesses (Bryant Place, Terence Brasch, Deeplocal) \u2014 'Alex Chen and the Lightwell crew' reads like placeholder-generic AI stand-in names rather than a real Portland connection."
+  },
+  {
+    "judge": "judge1",
+    "shape": "community spotlight",
+    "tell": "Invented-sounding business name 'Rose City Machine Co.' with tidy full names 'Dave Kessler and his partner Mia Torres,' plus a flat generic closer ('I think what they're building is cool') that lacks his usual punchy sign-off."
+  },
+  {
+    "judge": "judge2",
+    "shape": "hot take",
+    "tell": "Ends on a polished LinkedIn-guru aphorism \u2014 'Maybe the real skill in 2026 isn't prompting. It's building a team you don't have to babysit.' \u2014 abstract thought-leadership with no first-person story, unlike his hands-on AI posts (refs 1, 13, 14) which are always grounded in his own specific experience."
+  },
+  {
+    "judge": "judge2",
+    "shape": "short reaction",
+    "tell": "'Alex Chen and the Lightwell crew' reads like generic placeholder names \u2014 his real posts name specific, verifiable, often credentialed people (e.g. 'Scott Simpson,CTS-D/CTS-I')."
+  },
+  {
+    "judge": "judge2",
+    "shape": "community spotlight",
+    "tell": "'Dave Kessler and his partner Mia Torres' feel like generic invented names, and the closer 'I think what they're building is cool' is flat compared to his signature superlative enthusiasm (contrast the CETI post's 'MY GOODNESS Y'ALL!!!')."
+  },
+  {
+    "judge": "judge2",
+    "shape": "network ask",
+    "tell": "A direct ask to his network missing his near-constant 'folks'/'y'all' address, and 'Nothing corporate \u2014 just power and some open floor' reads flatter and more generic than his asks (contrast ref 9's 'Folks... It would be rad if...')."
+  },
+  {
+    "judge": "judge3",
+    "shape": "hot take",
+    "tell": "Mimics his 'I think it's less about X and more about Y. Why?' rhetorical structure from ref post 7, but it's stripped of any 'folks', 'freaking', or exclamation-point energy \u2014 reads as smoothed-out AI thought-leadership ('the bottleneck stops being output') rather than his voice."
+  },
+  {
+    "judge": "judge3",
+    "shape": "short reaction",
+    "tell": "'Alex Chen' and 'the Lightwell crew' are generic placeholder-feeling names \u2014 his real posts name specific, verifiable people with full titles (Scott Simpson,CTS-D/CTS-I, Bryant Place), not vague 'buddy X and the Y crew' phrasing."
+  },
+  {
+    "judge": "judge3",
+    "shape": "community spotlight",
+    "tell": "'Dave Kessler and his partner Mia Torres' feels like invented filler names, and the closing line 'I think what they're building is cool' is flat and generic \u2014 his real posts end with a punchier personal hook, not a bland compliment."
+  },
+  {
+    "judge": "judge3",
+    "shape": "network ask",
+    "tell": "Compared to his real, detail-rich venue-hunting riff in ref post 12 ('a big ol' LED wall... maybe called a Big Wall... NW 16th & Johnson'), this version is generically phrased ('Nothing corporate \u2014 just power and some open floor') and missing his quirky specificity."
+  }
+]

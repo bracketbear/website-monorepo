@@ -1,24 +1,125 @@
 ---
-import { BracketBearLogo } from '@bracketbear/bear-ui-react';
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PortalStage from '@/components/site/PortalStage';
+import { bookend } from '@/content/site/shared';
+import {
+  meta,
+  ticker,
+  hero,
+  doors,
+  both,
+  community,
+  contact,
+} from '@/content/site/home';
+
+const communityItems = (community.body as string[]).map((text, i) => ({
+  text,
+  link: community.links![i],
+}));
+const communityLink = community.links![communityItems.length];
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Bracket Bear - Coming Soon</title>
-    <style is:global>
-      @import '@bracketbear/bear-ui-tailwind/styles/bracketbear.tailwind.css';
-      @source '../../../../node_modules/@bracketbear/core/dist';
-    </style>
-  </head>
-  <body class="bg-brand-dark flex min-h-screen items-center justify-center">
-    <div class="text-center">
-      <div class="mb-8">
-        <BracketBearLogo className="text-brand-orange mx-auto h-48 w-48" />
-      </div>
+<SiteLayout meta={meta} path="/">
+  <section class="portal home-hero">
+    <PortalStage client:only="react" />
+    <div class="home-hero__copy">
+      <p class="label">{hero.eyebrow}</p>
+      <h1 class="headline home-hero__headline">{hero.headline}</h1>
+      <p class="lede">{hero.lede}</p>
+      <a class="btn btn--primary" href={hero.button.href}>{hero.button.label}</a
+      >
     </div>
-  </body>
-</html>
+  </section>
+
+  <div class="ticker">
+    <div class="ticker__track">
+      {
+        [0, 1].map((copy) => (
+          <ul
+            class="ticker__list"
+            aria-hidden={copy === 1 ? 'true' : undefined}
+          >
+            {ticker.map((beat) => (
+              <li class="ticker__beat">
+                <span class="ticker__diamond" aria-hidden="true">
+                  &#9670;
+                </span>
+                {beat}
+              </li>
+            ))}
+          </ul>
+        ))
+      }
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="home-doors">
+      {
+        doors.map((door) => (
+          <div class="home-door">
+            <p class="label">{door.label}</p>
+            <h2 class="headline home-door__headline">{door.headline}</h2>
+            <p class="body-copy">{door.body}</p>
+            <ul class="link-rows">
+              {door.links!.map((link) => (
+                <li>
+                  <a class="link-row" href={link.href}>
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__inner">
+      <p class="label">{both.label}</p>
+      <h2 class="headline">{both.headline}</h2>
+      <p class="body-copy">{both.body}</p>
+      <a class="btn btn--primary" href={both.links![0].href}
+        >{both.links![0].label}</a
+      >
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__inner">
+      <p class="label">{community.label}</p>
+      <h2 class="headline">{community.headline}</h2>
+      <ul class="link-rows home-community">
+        {
+          communityItems.map((item) => (
+            <li class="home-community__item">
+              <p class="body-copy">{item.text}</p>
+              <a class="link-row" href={item.link.href}>
+                {item.link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="link-rows home-community__more">
+        <li>
+          <a class="link-row" href={communityLink.href}>
+            {communityLink.label}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="close">
+    <h2 class="headline">{contact.headline}</h2>
+    <p class="body-copy">{contact.body}</p>
+    <a class="btn btn--primary" href={contact.button.href}
+      >{contact.button.label}</a
+    >
+  </section>
+
+  <p class="home-bookend">{bookend}</p>
+</SiteLayout>

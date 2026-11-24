@@ -1,0 +1,15 @@
+{
+  "purpose": "Files held out of the VOICE.md close read and citations so calibration judges see unseen material. Do not quote these in VOICE.md.",
+  "holdout": [
+    "2023-11-30--openais-chatgpt-turns-1-today-this.md",
+    "2023-12-04--github-copilot-has-always-felt-a.md",
+    "2024-10-02--thirtythousand-feet-in-the-sky-on.md",
+    "2024-12-15--hey-design-network-have-you-thought.md",
+    "2025-02-07--do-yall-know-how-hard-it.md",
+    "2025-03-08--for-international-womens-day-id-like.md",
+    "2026-01-10--first-bracket-bear-install-yall-gotta.md",
+    "2026-03-13--one-year-ago-today-my-team.md",
+    "2026-07-24--hey-network-do-you-or-someone.md",
+    "2026-08-01--portland-experiential-technology-pros-how-the.md"
+  ]
+}

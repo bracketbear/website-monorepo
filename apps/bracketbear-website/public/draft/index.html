@@ -1,0 +1,2936 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#FF5F1F" />
+    <title>Bracket Bear — Draft</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Space+Grotesk:wght@300..700&family=Plus+Jakarta+Sans:wght@300..700&family=Manrope:wght@300..700&family=DM+Sans:wght@300..700&family=Inter+Tight:wght@300..700&family=Familjen+Grotesk:wght@400..700&family=Fraunces:opsz,wght@9..144,300..700&family=Caveat:wght@500;700&family=JetBrains+Mono:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500;700&family=Space+Mono:wght@400;700&family=Fira+Code:wght@400;500;700&family=DM+Mono:wght@400;500&family=Roboto+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Pixi v7 + pixi-filters v5 for the hero heartbeat stage -->
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pixi-filters@5.3.0/dist/browser/pixi-filters.js"></script>
+
+    <style>
+      :root {
+        /* Sunset / silhouette palette — DKC silhouette levels feel.
+           Orange dominates. Ink is the high-contrast text color.       */
+        --orange: #ff5f1f;          /* canvas / dominant */
+        --orange-bright: #ff7a33;   /* highlights */
+        --orange-deep: #d8420c;     /* shadowed band */
+        --orange-rust: #a82a07;     /* dusk */
+        --sun: #ffc24a;             /* the "sun" rim */
+        --cream: #fff3e3;           /* paper highlights */
+
+        --ink: #110a08;             /* near-black, warm — silhouette color */
+        --ink-2: #1c130e;           /* slightly lifted ink */
+        --ink-soft: #2a1d14;        /* ink-on-orange muted */
+        --ink-dim: #4a3326;         /* tertiary text on orange */
+
+        --cyan: #7df9ff;            /* tape damage — VERY sparingly */
+        --acid: #d8ff3d;
+
+        --rail: clamp(1rem, 4vw, 3rem);
+        --max: 84rem;
+
+        --display: "Anton", "Helvetica Neue", sans-serif;
+        --wordmark: "Archivo Black", "Helvetica Neue", sans-serif;
+        --body:
+          "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont,
+          sans-serif;
+        --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+        --ease-out: cubic-bezier(0.2, 0.7, 0.1, 1);
+        --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+        --duration-absorb: 0.42s;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--orange);
+        color: var(--ink);
+        font-family: var(--body);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        position: relative;
+        min-height: 100vh;
+        overflow-x: clip;
+        cursor: none;
+        background:
+          radial-gradient(
+            ellipse 80% 60% at 50% 22%,
+            var(--sun) 0%,
+            var(--orange-bright) 30%,
+            var(--orange) 55%,
+            transparent 100%
+          ),
+          var(--orange);
+      }
+
+      /* Subtle grain — far less aggressive against orange */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 200;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/></svg>");
+        mix-blend-mode: multiply;
+        opacity: 0.55;
+      }
+      /* Soft vignette toward bottom */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 199;
+        background: radial-gradient(
+          ellipse at 50% 100%,
+          transparent 50%,
+          rgba(17, 10, 8, 0.35) 100%
+        );
+      }
+
+      /* ============== CURSOR — blob + pixel hand on hover ============== */
+      .cursor {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 26px;
+        height: 26px;
+        background: var(--ink);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9998;
+        transform: translate3d(-50%, -50%, 0) scale(1);
+        transform-origin: 50% 50%;
+        transition: opacity 0.2s var(--ease-out), background 0.2s var(--ease-out);
+        will-change: transform;
+        filter: blur(0.4px);
+      }
+      /* Flip blob to orange over any dark-fill region — either a section
+         tagged with [data-cursor-light] or any inline .highlight stamp. */
+      body:has([data-cursor-light]:hover, .highlight:hover) .cursor {
+        background: var(--orange-bright);
+      }
+
+      .cursor-hand {
+        /* Outer: positioned by JS at the mouse point, zero-sized anchor */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+        z-index: 9999;
+        will-change: transform;
+      }
+      .cursor-hand__inner {
+        /* Inner: hot-point offset + bouncy scale-in. Fingertip at SVG (4.5, 0.5)
+           → at 3x display scale, hot-point is (13.5px, 1.5px) from top-left. */
+        width: 39px;
+        height: 42px;
+        transform: translate(-13.5px, -1.5px) scale(0.6) rotate(-8deg);
+        transform-origin: 13.5px 1.5px;
+        opacity: 0;
+        transition:
+          transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+          opacity 0.18s var(--ease-out);
+        filter: drop-shadow(0 3px 0 rgba(17, 10, 8, 0.22));
+      }
+      .cursor-hand.is-on .cursor-hand__inner {
+        opacity: 1;
+        transform: translate(-13.5px, -1.5px) scale(1) rotate(0deg);
+      }
+      .cursor-hand svg {
+        width: 100%;
+        height: 100%;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        display: block;
+      }
+      .cursor-hand.is-press .cursor-hand__inner {
+        transform: translate(-13.5px, -1.5px) scale(0.88) rotate(-3deg);
+      }
+
+      @media (hover: none) {
+        body {
+          cursor: auto;
+        }
+        .cursor,
+        .cursor-hand {
+          display: none;
+        }
+      }
+
+      /* Selection */
+      ::selection {
+        background: var(--ink);
+        color: var(--orange);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      img,
+      svg,
+      canvas {
+        display: block;
+        max-width: 100%;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        background: none;
+        border: 0;
+        cursor: none;
+      }
+
+      .container {
+        width: 100%;
+        max-width: var(--max);
+        margin-inline: auto;
+        padding-inline: var(--rail);
+      }
+
+      .label {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+      }
+      .label--ink {
+        color: var(--ink);
+      }
+
+      /* Highlight — the brand's signature inline emphasis: bright orange
+         text on an ink stamp. Doubles as a chunky marker stroke. Pair with
+         box-decoration-break: clone so a wrapped run paints one padded box
+         per line (real-marker behavior) instead of a single bridging box.
+         The cursor flips to orange over any .highlight automatically (see
+         the body:has() rule near .cursor) so the blob stays visible. */
+      .highlight {
+        background: var(--ink);
+        color: var(--orange-bright);
+        padding: 0.1em 0.28em;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+      }
+
+      /* ============== NAV ============== */
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        backdrop-filter: blur(14px) saturate(140%);
+        -webkit-backdrop-filter: blur(14px) saturate(140%);
+        background: color-mix(in srgb, var(--orange) 80%, transparent);
+        border-bottom: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+      }
+      .nav,
+      .nav a {
+        cursor: none;
+      }
+      .nav__inner {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 2rem;
+        padding-block: 0.9rem;
+      }
+
+      /* WORDMARK — Archivo Black + actual [BB] logo mark.
+         Mark sized to match cap-height of the text for optical balance.
+         Wordmark sits on baseline; mark anchored to cap-line via flex align. */
+      .wordmark {
+        font-family: var(--wordmark);
+        font-size: 1.15rem;
+        letter-spacing: 0.015em;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: var(--ink);
+        line-height: 1;
+      }
+      .wordmark__mark {
+        display: block;
+        /* Logo viewBox is 400.89 × 249.73 (~1.605:1). Sized so the mark
+           reads at roughly cap-height of the wordmark text. */
+        width: 33px;
+        height: 20.5px;
+        color: var(--ink);
+        flex-shrink: 0;
+        /* Lift slightly so the mark's optical center sits on the cap line */
+        margin-top: -1px;
+      }
+      .wordmark__mark svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .nav__links {
+        display: flex;
+        gap: 2.2rem;
+        justify-self: end;
+        margin-right: 2rem;
+      }
+      .nav__links a {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        position: relative;
+        padding-block: 0.35rem;
+        transition: color 0.3s var(--ease-out);
+      }
+      .nav__links a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 2px;
+        background: var(--ink);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s var(--ease-out);
+      }
+      .nav__links a:hover {
+        color: var(--ink);
+      }
+      .nav__links a:hover::after {
+        transform: scaleX(1);
+      }
+
+      /* ============== ABSORB BUTTONS ============== */
+      /* The ink fill is delivered by ::before — a blob that grows from the
+         cursor entry point with bouncy overshoot, then recedes toward the
+         exit point on leave. The element bg stays in its default color. */
+      .btn,
+      .pill,
+      .ticket,
+      .offer {
+        --fx: 50%;
+        --fy: 50%;
+        --fr: 0;
+      }
+      .btn::before,
+      .pill::before,
+      .ticket::before,
+      .offer::before {
+        content: "";
+        position: absolute;
+        left: var(--fx);
+        top: var(--fy);
+        width: 6px;
+        height: 6px;
+        background: var(--ink);
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(var(--fr));
+        transform-origin: 50% 50%;
+        pointer-events: none;
+        z-index: 0;
+        transition:
+          transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+          left 0.45s var(--ease-out),
+          top 0.45s var(--ease-out);
+        will-change: transform;
+      }
+      /* Leave state: shrink cleanly from the pointer's exit point — no
+         overshoot. The bouncy curve only fires on entry (absorb); on leave,
+         use a plain ease-out and snap the anchor instantly so the recede
+         originates exactly where the cursor left. */
+      .btn:not(.is-absorbed)::before,
+      .pill:not(.is-absorbed)::before,
+      .ticket:not(.is-absorbed)::before,
+      .offer:not(.is-absorbed)::before {
+        transition:
+          transform 0.35s var(--ease-out),
+          left 0s,
+          top 0s;
+      }
+
+      .btn,
+      .pill,
+      .ticket {
+        --bg: var(--cream);
+        --fg: var(--ink);
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+        font-family: var(--mono);
+        font-weight: 700;
+        cursor: none;
+        background: var(--bg);
+        color: var(--fg);
+        transition:
+          color var(--duration-absorb) var(--ease-out),
+          box-shadow var(--duration-absorb) var(--ease-out),
+          transform 0.25s var(--ease-out);
+        will-change: color, transform;
+        border: 0;
+      }
+      /* Keep button content above the fill */
+      .btn > *,
+      .pill > *,
+      .ticket > * {
+        position: relative;
+        z-index: 1;
+      }
+      .btn.is-absorbed,
+      .pill.is-absorbed,
+      .ticket.is-absorbed {
+        --fg: var(--orange-bright);
+        box-shadow: 0 14px 36px -12px rgba(17, 10, 8, 0.55);
+        /* --fr is set by JS based on element size + entry point */
+      }
+
+      .btn--primary {
+        padding: 1.05rem 1.5rem;
+        font-size: 0.84rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 14px) 0,
+          100% 14px,
+          100% 100%,
+          14px 100%,
+          0 calc(100% - 14px)
+        );
+      }
+      .btn--primary::after {
+        content: "→";
+        font-size: 1rem;
+        transition: transform 0.3s var(--ease-out);
+      }
+      .btn--primary:hover::after {
+        transform: translateX(4px);
+      }
+
+      .btn--ghost {
+        --bg: transparent;
+        background: var(--bg);
+        color: var(--ink);
+        border: 2.5px solid var(--ink);
+        padding: 1.05rem 1.4rem;
+        font-size: 0.84rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .btn--ghost.is-absorbed {
+        color: var(--orange-bright);
+      }
+
+      .pill {
+        padding: 0.55rem 0.95rem;
+        font-size: 0.76rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border-radius: 999px;
+      }
+      .pill__dot {
+        width: 6px;
+        height: 6px;
+        background: currentColor;
+        border-radius: 50%;
+      }
+
+      /* ============== STATUS BAR ============== */
+      .status {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        z-index: 99;
+        border-bottom: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+        background: color-mix(in srgb, var(--orange-bright) 70%, transparent);
+        backdrop-filter: blur(8px);
+      }
+      .status__row {
+        display: grid;
+        grid-template-columns: 9rem 1fr;
+        align-items: center;
+        gap: 1.5rem;
+        padding-block: 0.9rem 0.5rem;
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        line-height: 1;
+        font-weight: 500;
+      }
+      .status__live {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        color: var(--ink);
+        font-weight: 800;
+      }
+      .status__live::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        background: var(--acid);
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--acid) 35%, transparent);
+        animation: pulse 1.6s ease-in-out infinite;
+        flex-shrink: 0;
+      }
+      .status__version {
+        text-align: right;
+        color: var(--ink-soft);
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+      .ticker {
+        overflow: hidden;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+      }
+      .ticker__track {
+        display: inline-flex;
+        gap: 3rem;
+        animation: scroll 38s linear infinite;
+        align-items: center;
+      }
+      .ticker span {
+        display: inline-flex;
+        align-items: center;
+      }
+      .ticker span::before {
+        content: "◆";
+        color: var(--ink);
+        margin-right: 0.6rem;
+        font-size: 0.8em;
+      }
+      @keyframes scroll {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* ============== HERO ============== */
+      .hero {
+        padding-top: calc(56px + 32px);
+        position: relative;
+        min-height: 100vh;
+        display: grid;
+      }
+      .hero__inner {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 3.5rem;
+        padding-block: 4rem 6rem;
+        align-items: center;
+      }
+      @media (max-width: 900px) {
+        .hero__inner {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+      }
+
+      .hero__kicker {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        margin-bottom: 1.6rem;
+      }
+
+      /* ANTON HEADLINES — the workhorse display face */
+      .head {
+        font-family: var(--display);
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: -0.005em;
+        line-height: 0.86;
+        color: var(--ink);
+      }
+
+      /* Two-tier headline: a subordinate eyebrow line ("THE AGENCY for")
+         capped at ~37% the size of the punchline ("EXPERIENCE / AGENCIES.")
+         underneath. Editorial-deck hierarchy — kicker over feature head.
+         The orange-on-ink "for" lozenge stays the only ornament, but it's
+         now an inline stamp inside the eyebrow rather than its own line. */
+      .hero__title {
+        position: relative;
+        line-height: 1;
+      }
+      .hero__eyebrow {
+        display: inline-block;
+        font-size: clamp(1.5rem, 3.7vw, 2.85rem);
+        line-height: 1;
+        margin-bottom: 0.22em;
+      }
+      .hero__punch {
+        display: block;
+        font-size: clamp(3.2rem, 9.4vw, 7.8rem);
+        /* 0.92, not 0.86 — at this scale Anton's caps were crashing into
+           the previous line's baseline. Still tight, no longer touching. */
+        line-height: 0.92;
+      }
+      /* Keep the brackets glued to their word so a wrap can never strand
+         a closing bracket on its own line. */
+      .hero__title .bracketed {
+        white-space: nowrap;
+      }
+      /* The brand IS brackets — [BB] is literally what the wordmark is.
+         Extending the bracket motif into the headline ties the type
+         system to the logo and makes the wordplay (AGENCY ↔ AGENCIES)
+         legible: the words BB lays claim to are the bracketed ones.
+         Brackets in Archivo Black (the wordmark face) — the only place
+         we touch the wordmark font outside the wordmark itself. */
+      .hero__title .bracket {
+        font-family: var(--wordmark);
+        font-weight: 900;
+        font-size: 1.05em;
+        line-height: 1;
+        color: var(--ink);
+        display: inline-block;
+        vertical-align: -0.05em;
+      }
+      .hero__title .bracket--open {
+        margin-right: 0.04em;
+      }
+      .hero__title .bracket--close {
+        margin-left: 0.04em;
+      }
+
+      .hero__lede {
+        margin-top: 1.8rem;
+        font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+        line-height: 1.5;
+        color: var(--ink-soft);
+        max-width: 38ch;
+        font-weight: 400;
+      }
+      .hero__lede strong {
+        font-weight: 600;
+        color: var(--ink);
+      }
+
+      .hero__cta {
+        margin-top: 2.4rem;
+        display: flex;
+        gap: 0.8rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      /* Hero stage — frameless. The vasculature bleeds past the grid cell;
+         only the crosshair labels and the canvas live here. */
+      .stage {
+        position: relative;
+        aspect-ratio: 1 / 1.1;
+        background: transparent;
+        overflow: visible;
+        isolation: isolate;
+      }
+      /* Field extends 50% past the stage box on all sides — fireflies and
+         the alt-dim plane have plenty of space to drift, but the animation
+         stays anchored around its container, not bleeding into the text. */
+      .stage__field {
+        position: absolute;
+        inset: -50%;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .stage canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .stage__crosshair {
+        z-index: 4;
+      }
+      .stage__crosshair {
+        position: absolute;
+        z-index: 4;
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.18em;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        pointer-events: none;
+        font-weight: 500;
+      }
+      .stage__crosshair--tl {
+        top: 0.9rem;
+        left: 0.9rem;
+      }
+      .stage__crosshair--tr {
+        top: 0.9rem;
+        right: 0.9rem;
+        text-align: right;
+      }
+      .stage__crosshair--bl {
+        bottom: 0.9rem;
+        left: 0.9rem;
+      }
+      .stage__crosshair--br {
+        bottom: 0.9rem;
+        right: 0.9rem;
+        text-align: right;
+      }
+      .stage__crosshair span {
+        display: block;
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      /* ============== INTRO / MAGIC WAND ============== */
+      .intro {
+        padding-block: 8rem 7rem;
+        border-top: 2px solid var(--ink);
+        position: relative;
+        background: var(--orange-bright);
+      }
+      .intro__grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 4rem;
+        align-items: start;
+      }
+      @media (max-width: 900px) {
+        .intro__grid {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+      }
+      .intro__quote {
+        font-family: var(--display);
+        font-size: clamp(2.4rem, 5.6vw, 5rem);
+        line-height: 0.95;
+        letter-spacing: -0.005em;
+        text-transform: uppercase;
+        color: var(--ink);
+        position: relative;
+      }
+      .intro__quote::before {
+        content: "“";
+        position: absolute;
+        left: -0.34em;
+        top: -0.18em;
+        font-size: 1.4em;
+        color: var(--ink);
+        font-family: serif;
+        font-weight: 900;
+        line-height: 1;
+      }
+      /* Inline highlight stamps: a vertical-clip linear-gradient stands in
+         for a flat background. Anton's natural ascent+descent (~148% of
+         font-size) makes a solid inline `background` paint a box much
+         taller than the parent's tight line-height, bleeding into the
+         lines above and below. The gradient clips the paint to roughly
+         cap-top → just past baseline (~12%–84% of content area), so the
+         stamp fits inside the line-box without losing wrap-friendly
+         inline behavior. */
+      .intro__quote .accent {
+        background: linear-gradient(
+          to bottom,
+          transparent 12%,
+          var(--ink) 12%,
+          var(--ink) 84%,
+          transparent 84%
+        );
+        color: var(--orange-bright);
+        padding: 0 0.15em;
+      }
+      .intro__sig {
+        margin-top: 2rem;
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+      }
+      .intro__sig::before {
+        content: "";
+        width: 24px;
+        height: 2px;
+        background: var(--ink);
+      }
+
+      .marg {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        line-height: 1.7;
+        font-weight: 500;
+      }
+      .marg .key {
+        color: var(--ink);
+        font-weight: 700;
+      }
+      .marg p + p {
+        margin-top: 1rem;
+      }
+
+      /* ============== SECTION ============== */
+      .sec {
+        padding-block: 7rem;
+        border-top: 2px solid var(--ink);
+        position: relative;
+      }
+      .sec--orange {
+        background: var(--orange);
+      }
+      .sec--bright {
+        background: var(--orange-bright);
+      }
+      .sec__head {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: end;
+        gap: 2rem;
+        margin-bottom: 4rem;
+      }
+      .sec__num {
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        color: var(--ink);
+        letter-spacing: 0.22em;
+        margin-bottom: 1.2rem;
+        font-weight: 700;
+      }
+      .sec__title {
+        font-family: var(--display);
+        font-size: clamp(2.6rem, 7vw, 6rem);
+        line-height: 0.88;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+      .sec__title .accent {
+        background: linear-gradient(
+          to bottom,
+          transparent 12%,
+          var(--ink) 12%,
+          var(--ink) 84%,
+          transparent 84%
+        );
+        color: var(--orange-bright);
+        padding: 0 0.12em;
+      }
+      .sec__meta {
+        font-family: var(--mono);
+        font-size: 0.74rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        text-align: right;
+        line-height: 1.7;
+        font-weight: 500;
+      }
+      .sec__meta .v {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      /* ============== OFFERINGS ============== */
+      .offers {
+        border-top: 2px solid var(--ink);
+      }
+      .offer {
+        display: grid;
+        grid-template-columns: 5rem 18rem 1fr 12rem;
+        gap: 2.5rem;
+        padding-block: 3rem;
+        border-bottom: 2px solid var(--ink);
+        align-items: start;
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        cursor: none;
+      }
+      /* Keep offer content above the fill blob */
+      .offer > * {
+        position: relative;
+        z-index: 1;
+      }
+      .offer.is-absorbed {
+        /* --fr is set by JS based on element size + entry point */
+      }
+      .offer.is-absorbed .offer__num,
+      .offer.is-absorbed .offer__title,
+      .offer.is-absorbed .offer__body,
+      .offer.is-absorbed .offer__tag,
+      .offer.is-absorbed .offer__arrow {
+        color: var(--orange-bright);
+      }
+      .offer.is-absorbed .offer__body strong {
+        color: var(--cream);
+      }
+      .offer.is-absorbed .offer__arrow {
+        transform: translateX(8px);
+      }
+      @media (max-width: 900px) {
+        .offer {
+          grid-template-columns: 1fr;
+          gap: 0.75rem;
+          padding-block: 2.4rem;
+        }
+      }
+      .offer__num {
+        font-family: var(--mono);
+        font-size: 0.84rem;
+        color: var(--ink);
+        letter-spacing: 0.2em;
+        font-weight: 700;
+        transition: color 0.3s var(--ease-out);
+      }
+      .offer__title {
+        font-family: var(--display);
+        font-size: clamp(1.8rem, 3vw, 2.6rem);
+        line-height: 0.95;
+        letter-spacing: -0.005em;
+        text-transform: uppercase;
+        color: var(--ink);
+        transition: color 0.3s var(--ease-out);
+      }
+      .offer__body {
+        font-size: 1.05rem;
+        line-height: 1.5;
+        color: var(--ink-soft);
+        max-width: 50ch;
+        transition: color 0.3s var(--ease-out);
+      }
+      .offer__body strong {
+        color: var(--ink);
+        font-weight: 600;
+        transition: color 0.3s var(--ease-out);
+      }
+      .offer__tag {
+        font-family: var(--mono);
+        font-size: 0.74rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        text-align: right;
+        line-height: 1.7;
+        font-weight: 500;
+        transition: color 0.3s var(--ease-out);
+      }
+      .offer__arrow {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-family: var(--mono);
+        font-size: 1.6rem;
+        color: var(--ink);
+        transition:
+          transform 0.4s var(--ease-out),
+          color 0.3s var(--ease-out);
+      }
+
+      /* ============== VALUES ============== */
+      .values {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0;
+        border-top: 2px solid var(--ink);
+      }
+      @media (max-width: 760px) {
+        .values {
+          grid-template-columns: 1fr;
+        }
+      }
+      .value {
+        padding: 2.6rem 2rem 2.6rem 0;
+        border-bottom: 2px solid var(--ink);
+        position: relative;
+      }
+      .value:nth-child(odd) {
+        border-right: 2px solid var(--ink);
+        padding-right: 3rem;
+      }
+      .value:nth-child(even) {
+        padding-left: 3rem;
+      }
+      @media (max-width: 760px) {
+        .value:nth-child(odd) {
+          border-right: 0;
+          padding-right: 0;
+        }
+        .value:nth-child(even) {
+          padding-left: 0;
+        }
+      }
+      .value__tag {
+        font-family: var(--mono);
+        font-size: 0.74rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--ink);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-weight: 700;
+      }
+      .value__tag::before {
+        content: "◆";
+        font-size: 0.6rem;
+      }
+      .value__title {
+        font-family: var(--display);
+        font-size: clamp(2rem, 3.4vw, 2.8rem);
+        line-height: 0.92;
+        text-transform: uppercase;
+        color: var(--ink);
+        margin-bottom: 1rem;
+      }
+      .value__body {
+        font-size: 1.05rem;
+        line-height: 1.5;
+        color: var(--ink-soft);
+        max-width: 42ch;
+      }
+      .value__body strong {
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      /* ============== MANIFESTO — INVERTED BAND ============== */
+      .manifesto {
+        padding-block: 9rem;
+        border-top: 2px solid var(--ink);
+        position: relative;
+        overflow: hidden;
+        background: var(--ink);
+        color: var(--cream);
+      }
+      .manifesto__decor {
+        position: absolute;
+        right: -8vw;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 80vw;
+        max-width: 1400px;
+        color: transparent;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.9;
+      }
+      .manifesto__decor svg {
+        width: 100%;
+        height: auto;
+        fill: none;
+        stroke: var(--orange-deep);
+        stroke-width: 2;
+      }
+      .manifesto__decor svg path {
+        fill: none;
+        stroke: var(--orange-deep);
+        stroke-width: 2;
+      }
+      @media (max-width: 760px) {
+        .manifesto__decor {
+          right: -20vw;
+          width: 140vw;
+          opacity: 0.55;
+        }
+      }
+      .manifesto__inner {
+        position: relative;
+        z-index: 2;
+        max-width: 60rem;
+      }
+      .manifesto__lines {
+        font-family: var(--display);
+        font-size: clamp(2.2rem, 5.2vw, 4.6rem);
+        line-height: 1.05;
+        text-transform: uppercase;
+        color: var(--cream);
+      }
+      .manifesto__lines p {
+        padding-block: 0.9rem;
+        border-bottom: 2px solid color-mix(in srgb, var(--cream) 15%, transparent);
+      }
+      .manifesto__lines p:last-child {
+        border-bottom: 0;
+      }
+      .manifesto__lines .accent {
+        background: linear-gradient(
+          to bottom,
+          transparent 12%,
+          var(--orange-bright) 12%,
+          var(--orange-bright) 84%,
+          transparent 84%
+        );
+        color: var(--ink);
+        padding: 0 0.12em;
+      }
+      .manifesto__lines .strike {
+        position: relative;
+        color: color-mix(in srgb, var(--cream) 35%, transparent);
+      }
+      .manifesto__lines .strike::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 4px;
+        background: var(--orange-bright);
+      }
+
+      /* ============== CTA ============== */
+      .cta {
+        padding-block: 8rem;
+        border-top: 2px solid var(--ink);
+        position: relative;
+        background: var(--orange-bright);
+      }
+      .cta__grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 5rem;
+        align-items: end;
+      }
+      @media (max-width: 900px) {
+        .cta__grid {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+      }
+      .cta__title {
+        font-family: var(--display);
+        font-size: clamp(2.8rem, 8vw, 7rem);
+        line-height: 0.9;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+      .cta__title .accent {
+        background: linear-gradient(
+          to bottom,
+          transparent 12%,
+          var(--ink) 12%,
+          var(--ink) 84%,
+          transparent 84%
+        );
+        color: var(--orange-bright);
+        padding: 0 0.12em;
+      }
+      .cta__contact {
+        font-family: var(--mono);
+        font-size: 0.86rem;
+        letter-spacing: 0.06em;
+        line-height: 1.7;
+        color: var(--ink-soft);
+        font-weight: 500;
+      }
+      .cta__contact a {
+        color: var(--ink);
+        border-bottom: 2px solid var(--ink);
+        font-weight: 700;
+      }
+
+      /* ============== FOOTER — NIGHT ============== */
+      .foot {
+        padding-block: 3.5rem 5rem;
+        border-top: 2px solid var(--ink);
+        background: var(--ink);
+        color: var(--cream);
+      }
+      .foot,
+      .foot a {
+        cursor: none;
+      }
+      .foot__grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 3rem;
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        line-height: 1.8;
+        color: color-mix(in srgb, var(--cream) 70%, transparent);
+        font-weight: 500;
+      }
+      @media (max-width: 760px) {
+        .foot__grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+        }
+      }
+      .foot .wordmark {
+        color: var(--cream);
+      }
+      .foot .wordmark__mark {
+        color: var(--orange-bright);
+      }
+      .foot h4 {
+        font-size: 0.74rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--orange-bright);
+        margin-bottom: 0.8rem;
+        font-weight: 700;
+      }
+      .foot a:hover {
+        color: var(--cream);
+      }
+      .foot__bottom {
+        margin-top: 4rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid color-mix(in srgb, var(--cream) 18%, transparent);
+        display: flex;
+        justify-content: space-between;
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--cream) 50%, transparent);
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      /* ============== FONT PICKER (tabbed: body + mono) ============== */
+      .picker {
+        position: fixed;
+        bottom: 1.4rem;
+        right: 1.4rem;
+        z-index: 300;
+        background: var(--ink);
+        color: var(--cream);
+        border: 2px solid var(--ink);
+        padding: 0;
+        box-shadow: 0 18px 40px -12px rgba(17, 10, 8, 0.5);
+        overflow: hidden;
+        width: 280px;
+        border-radius: 6px;
+      }
+      .picker__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0.8rem;
+        background: var(--orange-bright);
+        color: var(--ink);
+        font-family: var(--mono);
+        font-size: 0.66rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        font-weight: 700;
+        border-bottom: 2px solid var(--ink);
+        cursor: none;
+      }
+      .picker__head .picker__toggle {
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: none;
+        line-height: 1;
+        padding: 0 0.2em;
+      }
+      .picker__tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: var(--ink-2);
+        font-family: var(--mono);
+      }
+      .picker__tab {
+        background: transparent;
+        border: 0;
+        color: color-mix(in srgb, var(--cream) 55%, transparent);
+        padding: 0.55rem 0.6rem;
+        font-size: 0.66rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        font-weight: 700;
+        cursor: none;
+        border-bottom: 2px solid transparent;
+        transition:
+          color 0.2s var(--ease-out),
+          background 0.2s var(--ease-out),
+          border-color 0.2s var(--ease-out);
+      }
+      .picker__tab:hover {
+        color: var(--cream);
+      }
+      .picker__tab[aria-selected="true"] {
+        color: var(--orange-bright);
+        border-bottom-color: var(--orange-bright);
+        background: var(--ink);
+      }
+      .picker__panel {
+        max-height: 17rem;
+        overflow-y: auto;
+        transition: max-height 0.3s var(--ease-out);
+      }
+      .picker__panel[hidden] {
+        display: none;
+      }
+      .picker.is-collapsed .picker__panel,
+      .picker.is-collapsed .picker__tabs {
+        display: none;
+      }
+      .picker__opt {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.6rem;
+        padding: 0.55rem 0.8rem;
+        border: 0;
+        background: transparent;
+        color: var(--cream);
+        width: 100%;
+        font-size: 0.82rem;
+        letter-spacing: 0.01em;
+        cursor: none;
+        text-align: left;
+        border-bottom: 1px solid color-mix(in srgb, var(--cream) 10%, transparent);
+        transition: background 0.2s var(--ease-out);
+      }
+      .picker__opt:last-child {
+        border-bottom: 0;
+      }
+      .picker__opt:hover {
+        background: color-mix(in srgb, var(--cream) 10%, transparent);
+      }
+      .picker__opt[aria-pressed="true"] {
+        background: var(--orange-bright);
+        color: var(--ink);
+        font-weight: 700;
+      }
+      .picker__opt .key {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, currentColor 55%, transparent);
+        flex-shrink: 0;
+      }
+
+      /* Reveal */
+      .reveal {
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+          opacity 0.9s var(--ease-out),
+          transform 0.9s var(--ease-out);
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .reveal--up-1 {
+        transition-delay: 0.06s;
+      }
+      .reveal--up-2 {
+        transition-delay: 0.16s;
+      }
+      .reveal--up-3 {
+        transition-delay: 0.26s;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          transition-duration: 0.001ms !important;
+        }
+        .reveal {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Bracket Bear logo as reusable symbol -->
+    <svg
+      width="0"
+      height="0"
+      style="position: absolute"
+      aria-hidden="true"
+    >
+      <symbol id="bb-logo" viewBox="0 0 400.89 249.73">
+        <path
+          fill="currentColor"
+          d="m69.98,172.24v-94.76c0-4.14,3.36-7.5,7.5-7.5h15.14c1.66,0,3-1.34,3-3V3C95.62,1.34,94.28,0,92.62,0H15C6.72,0,0,6.72,0,15v219.73c0,8.28,6.72,15,15,15h77.62c1.66,0,3-1.34,3-3v-63.99c0-1.66-1.34-3-3-3h-15.14c-4.14,0-7.5-3.36-7.5-7.5Z"
+        />
+        <path
+          fill="currentColor"
+          fill-rule="evenodd"
+          d="m174.98,117.27c12.14,16.38,20.1,28.95,19.83,56.54-.73,66.7-62.49,74.8-77.35,75.78-1.73.11-3.19-1.26-3.19-2.99v-84.29c0-1.66-1.34-3-3-3h-19.68c-1.66,0-3-1.34-3-3v-64.05c0-1.66,1.34-3,3-3h19.68c1.66,0,3-1.34,3-3V3.05c0-1.72,1.44-3.08,3.16-3,12.12.59,55.68,6.48,69.61,59.96,7.61,29.23-3.42,50.36-12.06,57.26"
+        />
+        <path
+          fill="currentColor"
+          d="m323.41,179.74h-15.14c-1.66,0-3,1.34-3,3v63.99c0,1.66,1.34,3,3,3h77.62c8.28,0,15-6.72,15-15V15C400.89,6.72,394.18,0,385.89,0h-77.62c-1.66,0-3,1.34-3,3v63.99c0,1.66,1.34,3,3,3h15.14c4.14,0,7.5,3.36,7.5,7.5v94.76c0,4.14-3.36,7.5-7.5,7.5Z"
+        />
+        <path
+          fill="currentColor"
+          fill-rule="evenodd"
+          d="m225.92,117.28c-8.64-6.9-19.67-28.03-12.06-57.26C227.79,6.53,271.35.64,283.47.05c1.72-.08,3.16,1.28,3.16,3v83.21c0,1.66,1.34,3,3,3h19.68c1.66,0,3,1.34,3,3v64.05c0,1.66-1.34,3-3,3h-19.68c-1.66,0-3,1.34-3,3v84.29c0,1.73-1.46,3.11-3.19,2.99-14.86-.98-76.62-9.08-77.35-75.78-.27-27.6,7.69-40.17,19.83-56.54"
+        />
+      </symbol>
+    </svg>
+
+    <div class="cursor" id="cursor" aria-hidden="true"></div>
+    <div class="cursor-hand" id="cursorHand" aria-hidden="true">
+      <div class="cursor-hand__inner">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 13 14"
+          shape-rendering="crispEdges"
+        >
+          <g fill="#FFF3E3">
+            <rect x="4" y="1" width="2" height="3" />
+            <rect x="4" y="4" width="4" height="1" />
+            <rect x="4" y="5" width="6" height="1" />
+            <rect x="4" y="6" width="7" height="2" />
+            <rect x="1" y="7" width="1" height="1" />
+            <rect x="1" y="8" width="10" height="1" />
+            <rect x="2" y="9" width="9" height="1" />
+            <rect x="3" y="10" width="8" height="2" />
+            <rect x="4" y="12" width="7" height="1" />
+          </g>
+          <g fill="#110A08">
+            <rect x="4" y="0" width="2" height="1" />
+            <rect x="3" y="1" width="1" height="7" />
+            <rect x="6" y="1" width="1" height="3" />
+            <rect x="7" y="3" width="2" height="1" />
+            <rect x="8" y="4" width="2" height="1" />
+            <rect x="10" y="5" width="1" height="1" />
+            <rect x="0" y="6" width="2" height="1" />
+            <rect x="0" y="7" width="1" height="2" />
+            <rect x="2" y="7" width="1" height="1" />
+            <rect x="1" y="9" width="1" height="1" />
+            <rect x="2" y="10" width="1" height="2" />
+            <rect x="3" y="12" width="1" height="1" />
+            <rect x="11" y="6" width="1" height="7" />
+            <rect x="4" y="13" width="8" height="1" />
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ============== NAV ============== -->
+    <nav class="nav" aria-label="Primary">
+      <div class="container nav__inner">
+        <a href="#" class="wordmark" data-hot>
+          <span class="wordmark__mark" aria-hidden="true">
+            <svg><use href="#bb-logo" /></svg>
+          </span>
+          <span>BRACKET&nbsp;BEAR</span>
+        </a>
+        <div class="nav__links">
+          <a href="#work" data-hot>Work</a>
+          <a href="#approach" data-hot>Approach</a>
+          <a href="#values" data-hot>Values</a>
+          <a href="#about" data-hot>About</a>
+        </div>
+        <a href="#contact" class="pill" data-hot>
+          <span class="pill__dot" aria-hidden="true"></span>
+          <span>Start a project</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- ============== STATUS BAR ============== -->
+    <div class="status" aria-hidden="true">
+      <div class="container status__row">
+        <span class="status__live">News Feed</span>
+        <div class="ticker">
+          <div class="ticker__track">
+            <span>Now booking — summer '26</span>
+            <span>Hospitality-minded engineering</span>
+            <span>Built by people who've shipped the hard stuff</span>
+            <span>Pittsburgh × Remote</span>
+            <span>Now booking — summer '26</span>
+            <span>Hospitality-minded engineering</span>
+            <span>Built by people who've shipped the hard stuff</span>
+            <span>Pittsburgh × Remote</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== HERO ============== -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <div>
+          <div class="hero__kicker reveal">
+            <span class="label">Bracket Bear, est. 2024</span>
+          </div>
+
+          <h1 class="head hero__title reveal reveal--up-1">
+            <span class="hero__eyebrow highlight">The Agency for</span>
+            <span class="hero__punch">
+              Experience<br />
+              Agencies.
+            </span>
+          </h1>
+
+          <p class="hero__lede reveal reveal--up-2">
+            We build the technology behind experiences other people will
+            remember. <strong>Custom tools, installations, the
+            weird-shaped problems</strong> — handled with the care your work
+            deserves.
+          </p>
+
+          <div class="hero__cta reveal reveal--up-3">
+            <a href="#contact" class="btn btn--primary" data-hot>
+              <span>Tell us what's broken</span>
+            </a>
+            <a href="#approach" class="btn btn--ghost" data-hot>
+              <span>How we work →</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="stage reveal reveal--up-2" aria-hidden="true">
+          <div class="stage__field"><canvas id="stage"></canvas></div>
+          <div class="stage__crosshair stage__crosshair--tl">
+            <span>SIG / 01</span>
+            BB·STAGE
+          </div>
+          <div class="stage__crosshair stage__crosshair--tr">
+            <span>0xFF5F1F</span>
+            ORANGE / SIGNAL
+          </div>
+          <div class="stage__crosshair stage__crosshair--bl">
+            FEED · LIVE<br />
+            <span id="stageHr">SIGNAL · NOMINAL</span>
+          </div>
+          <div class="stage__crosshair stage__crosshair--br">
+            <span>PORTAL · MASKED</span>
+            FLATERALUS / PIXI
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== INTRO ============== -->
+    <section class="intro" id="approach">
+      <div class="container intro__grid">
+        <aside class="marg reveal">
+          <p>
+            Where the<br />conversation starts
+          </p>
+          <p>
+            Most engagements begin with a deck. Ours begins with a question.
+            It's a small thing, and that's why it works.
+          </p>
+        </aside>
+
+        <div>
+          <p class="intro__quote reveal reveal--up-1">
+            If you could wave a <span class="accent">magic wand</span> and fix
+            one thing keeping your team from doing the work you actually want
+            to do — what would it be?
+          </p>
+          <p class="intro__sig reveal reveal--up-2">
+            That's where we start.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== OFFERINGS ============== -->
+    <section class="sec sec--orange" id="work">
+      <div class="container">
+        <header class="sec__head reveal">
+          <div>
+            <p class="sec__num">WHAT WE DO</p>
+            <h2 class="sec__title">
+              Three ways to <span class="accent">work&nbsp;together.</span>
+            </h2>
+          </div>
+          <div class="sec__meta">
+            Pick one.<br />
+            <span class="v">Or mix them.</span>
+          </div>
+        </header>
+      </div>
+      <div class="container">
+        <div class="offers" role="list">
+          <article class="offer reveal" role="listitem" data-hot>
+            <span class="offer__num">001</span>
+            <h3 class="offer__title">Drop into your team</h3>
+            <p class="offer__body">
+              You have momentum. You don't need a kickoff deck. We
+              <strong>join the standup</strong>, learn your tools, and start
+              shipping. Specialists in creative tech, real-time graphics, and
+              the integrations nobody wants to deal with.
+            </p>
+            <span class="offer__tag">Embed<br />/ retainer</span>
+            <span class="offer__arrow">↗</span>
+          </article>
+
+          <article class="offer reveal" role="listitem" data-hot>
+            <span class="offer__num">002</span>
+            <h3 class="offer__title">Take the whole thing</h3>
+            <p class="offer__body">
+              Sketch on a napkin to a thing humans can stand in front of. We
+              handle <strong>prototype, build, install, and the boring middle
+              part</strong> where most projects quietly fall apart. You stay in
+              creative direction; we keep it on rails.
+            </p>
+            <span class="offer__tag">Project<br />/ end-to-end</span>
+            <span class="offer__arrow">↗</span>
+          </article>
+
+          <article class="offer reveal" role="listitem" data-hot>
+            <span class="offer__num">003</span>
+            <h3 class="offer__title">Give it to us straight</h3>
+            <p class="offer__body">
+              You're scoping something hard. You don't need code yet — you need
+              <strong>a sober second opinion</strong>. We've shipped a lot of
+              weird things and we're happy to tell you which fights are worth
+              picking before the contract is signed.
+            </p>
+            <span class="offer__tag">Consult<br />/ by the hour</span>
+            <span class="offer__arrow">↗</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== VALUES ============== -->
+    <section class="sec sec--bright" id="values">
+      <div class="container">
+        <header class="sec__head reveal">
+          <div>
+            <p class="sec__num">WHY US</p>
+            <h2 class="sec__title">
+              Things we <span class="accent">actually believe.</span>
+            </h2>
+          </div>
+          <div class="sec__meta">
+            ◆ Not slogans<br />
+            <span class="v">House rules</span>
+          </div>
+        </header>
+
+        <div class="values">
+          <article class="value reveal">
+            <p class="value__tag">RULE 01</p>
+            <h3 class="value__title">Hospitality is a craft.</h3>
+            <p class="value__body">
+              The agencies we partner with treat their audiences like guests.
+              We treat our partners the same way. Showing up early, sweating
+              the small stuff, leaving the room better than we found it — it
+              isn't a vibe, it's the&nbsp;job.
+            </p>
+          </article>
+
+          <article class="value reveal reveal--up-1">
+            <p class="value__tag">RULE 02</p>
+            <h3 class="value__title">No projects we wouldn't sign.</h3>
+            <p class="value__body">
+              If we wouldn't put our name on it, we won't take it on. We'd
+              rather have a smaller calendar than do work we have to be talked
+              into. So far this hasn't cost us a&nbsp;thing.
+            </p>
+          </article>
+
+          <article class="value reveal">
+            <p class="value__tag">RULE 03</p>
+            <h3 class="value__title">Built to flex, not to scale.</h3>
+            <p class="value__body">
+              We're small on purpose. We grow with our partners' projects, not
+              ahead of them. No layers, no project managers paraphrasing the
+              engineer. You talk to the people building the&nbsp;thing.
+            </p>
+          </article>
+
+          <article class="value reveal reveal--up-1">
+            <p class="value__tag">RULE 04</p>
+            <h3 class="value__title">We've shipped the hard stuff.</h3>
+            <p class="value__body">
+              Years across <strong>Downstream</strong> and
+              <strong>Deeplocal</strong> — the kind of installations and tools
+              where "almost working" doesn't count. We bring that scar tissue
+              with&nbsp;us.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== MANIFESTO ============== -->
+    <section class="manifesto" id="about" data-cursor-light>
+      <div class="manifesto__decor" aria-hidden="true">
+        <svg viewBox="0 0 400.89 249.73" preserveAspectRatio="xMaxYMid meet">
+          <path
+            d="m69.98,172.24v-94.76c0-4.14,3.36-7.5,7.5-7.5h15.14c1.66,0,3-1.34,3-3V3C95.62,1.34,94.28,0,92.62,0H15C6.72,0,0,6.72,0,15v219.73c0,8.28,6.72,15,15,15h77.62c1.66,0,3-1.34,3-3v-63.99c0-1.66-1.34-3-3-3h-15.14c-4.14,0-7.5-3.36-7.5-7.5Z"
+          />
+          <path
+            fill-rule="evenodd"
+            d="m174.98,117.27c12.14,16.38,20.1,28.95,19.83,56.54-.73,66.7-62.49,74.8-77.35,75.78-1.73.11-3.19-1.26-3.19-2.99v-84.29c0-1.66-1.34-3-3-3h-19.68c-1.66,0-3-1.34-3-3v-64.05c0-1.66,1.34-3,3-3h19.68c1.66,0,3-1.34,3-3V3.05c0-1.72,1.44-3.08,3.16-3,12.12.59,55.68,6.48,69.61,59.96,7.61,29.23-3.42,50.36-12.06,57.26"
+          />
+          <path
+            d="m323.41,179.74h-15.14c-1.66,0-3,1.34-3,3v63.99c0,1.66,1.34,3,3,3h77.62c8.28,0,15-6.72,15-15V15C400.89,6.72,394.18,0,385.89,0h-77.62c-1.66,0-3,1.34-3,3v63.99c0,1.66,1.34,3,3,3h15.14c4.14,0,7.5,3.36,7.5,7.5v94.76c0,4.14-3.36,7.5-7.5,7.5Z"
+          />
+          <path
+            fill-rule="evenodd"
+            d="m225.92,117.28c-8.64-6.9-19.67-28.03-12.06-57.26C227.79,6.53,271.35.64,283.47.05c1.72-.08,3.16,1.28,3.16,3v83.21c0,1.66,1.34,3,3,3h19.68c1.66,0,3,1.34,3,3v64.05c0,1.66-1.34,3-3,3h-19.68c-1.66,0-3,1.34-3,3v84.29c0,1.73-1.46,3.11-3.19,2.99-14.86-.98-76.62-9.08-77.35-75.78-.27-27.6,7.69-40.17,19.83-56.54"
+          />
+        </svg>
+      </div>
+      <div class="container manifesto__inner reveal">
+        <p class="label" style="color: var(--orange-bright); margin-bottom: 2.5rem; font-weight: 700;">
+          A SHORT LIST
+        </p>
+        <div class="manifesto__lines">
+          <p>We make <span class="accent">software with a pulse</span>.</p>
+          <p>
+            <span class="strike">We don't "deliver solutions."</span>
+          </p>
+          <p>We ship things people use.</p>
+          <p>
+            <span class="strike">We don't "leverage synergies."</span>
+          </p>
+          <p>We answer the <span class="accent">phone</span>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== CTA ============== -->
+    <section class="cta" id="contact">
+      <div class="container cta__grid">
+        <div class="reveal">
+          <p class="sec__num" style="margin-bottom: 2rem;">START</p>
+          <h2 class="cta__title">
+            What would your <span class="accent">magic wand</span> fix?
+          </h2>
+        </div>
+        <div class="cta__contact reveal reveal--up-1">
+          <p>Email us, write us a note, send a Loom — whatever's easiest.</p>
+          <p style="margin-top: 1.5rem;">
+            ◆&nbsp;<a href="mailto:hello@bracketbear.com">hello@bracketbear.com</a><br />
+            ◆&nbsp;Pittsburgh, PA · Remote-friendly<br />
+            ◆&nbsp;Booking summer '26
+          </p>
+          <p style="margin-top: 2rem;">
+            <a href="mailto:hello@bracketbear.com" class="btn btn--primary" data-hot>
+              <span>Open the door</span>
+            </a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== FOOTER ============== -->
+    <footer class="foot" data-cursor-light>
+      <div class="container">
+        <div class="foot__grid">
+          <div>
+            <a href="#" class="wordmark" style="margin-bottom: 1.2rem;" data-hot>
+              <span class="wordmark__mark" aria-hidden="true"></span>
+              <span>BRACKET&nbsp;BEAR</span>
+            </a>
+            <p style="max-width: 32ch; margin-top: 1rem;">
+              Studio for software with a pulse. Built by people who've shipped
+              the hard stuff.
+            </p>
+          </div>
+          <div>
+            <h4>Studio</h4>
+            <a href="#work" data-hot>Work</a><br />
+            <a href="#approach" data-hot>Approach</a><br />
+            <a href="#values" data-hot>Values</a><br />
+            <a href="#about" data-hot>About</a>
+          </div>
+          <div>
+            <h4>Contact</h4>
+            <a href="mailto:hello@bracketbear.com" data-hot>hello@bracketbear.com</a><br />
+            <a href="#" data-hot>Pittsburgh, PA</a><br />
+            <a href="#" data-hot>@bracketbear</a>
+          </div>
+          <div>
+            <h4>Now</h4>
+            ● Booking summer '26<br />
+            Open to retainers<br />
+            Slow on Fridays
+          </div>
+        </div>
+        <div class="foot__bottom">
+          <span>© 2026 Bracket Bear LLC</span>
+          <span>Drafted // v1.4.7</span>
+          <span>Built with care, not vibes</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ============== FONT PICKER (body + mono tabs) ============== -->
+    <aside class="picker" id="picker" aria-label="Font picker">
+      <header class="picker__head" data-hot>
+        <span>Fonts · live swap</span>
+        <button
+          class="picker__toggle"
+          id="pickerToggle"
+          aria-label="Toggle font picker"
+          data-hot
+        >
+          ─
+        </button>
+      </header>
+      <div class="picker__tabs" role="tablist">
+        <button
+          class="picker__tab"
+          role="tab"
+          aria-selected="true"
+          data-tab="body"
+          data-hot
+        >
+          Body
+        </button>
+        <button
+          class="picker__tab"
+          role="tab"
+          aria-selected="false"
+          data-tab="mono"
+          data-hot
+        >
+          Mono
+        </button>
+      </div>
+
+      <div class="picker__panel" id="bodyPanel" data-panel="body">
+        <button class="picker__opt" data-body="Space Grotesk" data-hot>
+          <span style="font-family: 'Space Grotesk', sans-serif">Space Grotesk</span>
+          <span class="key">01</span>
+        </button>
+        <button class="picker__opt" data-body="Plus Jakarta Sans" data-hot>
+          <span style="font-family: 'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</span>
+          <span class="key">02</span>
+        </button>
+        <button class="picker__opt" data-body="Manrope" data-hot>
+          <span style="font-family: 'Manrope', sans-serif">Manrope</span>
+          <span class="key">03</span>
+        </button>
+        <button class="picker__opt" data-body="DM Sans" data-hot>
+          <span style="font-family: 'DM Sans', sans-serif">DM Sans</span>
+          <span class="key">04</span>
+        </button>
+        <button class="picker__opt" data-body="Inter Tight" data-hot>
+          <span style="font-family: 'Inter Tight', sans-serif">Inter Tight</span>
+          <span class="key">05</span>
+        </button>
+        <button class="picker__opt" data-body="Familjen Grotesk" data-hot>
+          <span style="font-family: 'Familjen Grotesk', sans-serif">Familjen Grotesk</span>
+          <span class="key">06</span>
+        </button>
+        <button class="picker__opt" data-body="Fraunces" data-hot>
+          <span style="font-family: 'Fraunces', serif">Fraunces · serif</span>
+          <span class="key">07</span>
+        </button>
+        <button class="picker__opt" data-body="Caveat" data-hot>
+          <span style="font-family: 'Caveat', cursive; font-size: 1.1em">Caveat · for giggles</span>
+          <span class="key">08</span>
+        </button>
+      </div>
+
+      <div class="picker__panel" id="monoPanel" data-panel="mono" hidden>
+        <button class="picker__opt" data-mono="JetBrains Mono" data-hot>
+          <span style="font-family: 'JetBrains Mono', monospace">JetBrains Mono</span>
+          <span class="key">01</span>
+        </button>
+        <button class="picker__opt" data-mono="IBM Plex Mono" data-hot>
+          <span style="font-family: 'IBM Plex Mono', monospace">IBM Plex Mono</span>
+          <span class="key">02</span>
+        </button>
+        <button class="picker__opt" data-mono="Space Mono" data-hot>
+          <span style="font-family: 'Space Mono', monospace">Space Mono</span>
+          <span class="key">03</span>
+        </button>
+        <button class="picker__opt" data-mono="Fira Code" data-hot>
+          <span style="font-family: 'Fira Code', monospace">Fira Code</span>
+          <span class="key">04</span>
+        </button>
+        <button class="picker__opt" data-mono="DM Mono" data-hot>
+          <span style="font-family: 'DM Mono', monospace">DM Mono</span>
+          <span class="key">05</span>
+        </button>
+        <button class="picker__opt" data-mono="Roboto Mono" data-hot>
+          <span style="font-family: 'Roboto Mono', monospace">Roboto Mono</span>
+          <span class="key">06</span>
+        </button>
+      </div>
+    </aside>
+
+    <script>
+      // ============================================================
+      // Cursor — Disney-style blob with anticipation, squash & stretch,
+      // follow-through. State machine drives transform per frame.
+      // ============================================================
+      (function () {
+        if (window.matchMedia('(hover: none)').matches) return;
+        const cursor = document.getElementById('cursor');
+        const hand = document.getElementById('cursorHand');
+        if (!cursor || !hand) return;
+
+        // -- input
+        let mx = window.innerWidth / 2;
+        let my = window.innerHeight / 2;
+        let pmx = mx; // previous frame mouse, for velocity
+        let pmy = my;
+
+        // -- hand position (separate from blob, snaps to mouse)
+        let hx = mx;
+        let hy = my;
+
+        // -- blob state machine
+        // The button's own ::before fill handles the "arrival" visual now,
+        // so the cursor blob just dives straight along the z-axis (scales
+        // to 0 in place) and pops back up on exit. No travel-to-center.
+        //
+        // 'idle'   — blob follows mouse with velocity stretch
+        // 'zipout' — quick anticipation pulse + scale-to-zero in place
+        // 'hidden' — invisible, parked at mouse
+        // 'zipin'  — pops back up at mouse with overshoot
+        // 'settle' — damped wobble at mouse, then idle
+        let state = 'idle';
+        let stateT0 = performance.now();
+
+        // Position used for transform output
+        let bx = mx;
+        let by = my;
+        // Scale/rotation
+        let scaleA = 1; // along motion
+        let scaleP = 1; // perpendicular to motion
+        let angle = 0; // rad
+
+        function setState(next) {
+          state = next;
+          stateT0 = performance.now();
+        }
+
+        const easeOutBack = (t) => {
+          const c1 = 1.70158;
+          const c3 = c1 + 1;
+          return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+        };
+
+        window.addEventListener('mousemove', (e) => {
+          mx = e.clientX;
+          my = e.clientY;
+        });
+
+        // Press feedback on the pixel hand
+        window.addEventListener('mousedown', () => {
+          if (hand.classList.contains('is-on'))
+            hand.classList.add('is-press');
+        });
+        window.addEventListener('mouseup', () => {
+          hand.classList.remove('is-press');
+        });
+
+        // ::before fill is 6px wide → 3px native radius. Scale needed to
+        // cover the full element from any entry point = max distance from
+        // entry to any corner / 3, with a small overshoot factor.
+        const FILL_NATIVE_R = 3;
+        function fillScaleFor(localX, localY, w, h) {
+          const maxDist = Math.max(
+            Math.hypot(localX, localY),
+            Math.hypot(w - localX, localY),
+            Math.hypot(localX, h - localY),
+            Math.hypot(w - localX, h - localY)
+          );
+          return Math.ceil((maxDist / FILL_NATIVE_R) * 1.15);
+        }
+
+        function onEnter(e) {
+          const el = e.currentTarget;
+          const r = el.getBoundingClientRect();
+          const lx = e.clientX - r.left;
+          const ly = e.clientY - r.top;
+          // Anchor the absorbing fill at the cursor entry point
+          el.style.setProperty('--fx', lx + 'px');
+          el.style.setProperty('--fy', ly + 'px');
+          el.style.setProperty(
+            '--fr',
+            fillScaleFor(lx, ly, r.width, r.height)
+          );
+          el.classList.add('is-absorbed');
+          hand.classList.add('is-on');
+          setState('zipout');
+        }
+        function onLeave(e) {
+          const el = e.currentTarget;
+          const r = el.getBoundingClientRect();
+          // Re-anchor the fill toward the cursor's EXIT point so the
+          // receding fill and the cursor zip-in feel like one liquid.
+          el.style.setProperty('--fx', e.clientX - r.left + 'px');
+          el.style.setProperty('--fy', e.clientY - r.top + 'px');
+          el.style.setProperty('--fr', '0');
+          el.classList.remove('is-absorbed');
+          hand.classList.remove('is-on');
+          cursor.style.opacity = 1;
+          setState('zipin');
+        }
+        function onMoveInside() {}
+
+        function bindHotspots() {
+          document.querySelectorAll('[data-hot]').forEach((el) => {
+            if (el.__hotBound) return;
+            el.__hotBound = true;
+            el.addEventListener('mouseenter', onEnter);
+            el.addEventListener('mouseleave', onLeave);
+            el.addEventListener('mousemove', onMoveInside);
+          });
+        }
+        bindHotspots();
+        const mo = new MutationObserver(bindHotspots);
+        mo.observe(document.body, { childList: true, subtree: true });
+
+        // Durations (ms)
+        const T_ZIPOUT = 180;
+        const T_ZIPIN = 240;
+        const T_SETTLE = 320;
+
+        function tick(now) {
+          const dt = now - stateT0;
+
+          if (state === 'idle') {
+            // Velocity-based stretch on free movement
+            const vx = mx - pmx;
+            const vy = my - pmy;
+            const speed = Math.hypot(vx, vy);
+            bx += (mx - bx) * 0.28;
+            by += (my - by) * 0.28;
+            const targetA = 1 + Math.min(speed / 22, 0.55);
+            const targetP = 1 - Math.min(speed / 60, 0.25);
+            scaleA += (targetA - scaleA) * 0.25;
+            scaleP += (targetP - scaleP) * 0.25;
+            if (speed > 0.5) angle = Math.atan2(my - by, mx - bx);
+            cursor.style.opacity = 1;
+          } else if (state === 'zipout') {
+            // Pure z-axis dive: anticipate pulse, then scale to zero in place.
+            // Stay at mouse the whole time so it feels like the cursor is
+            // diving INTO the page right where you are.
+            bx = mx;
+            by = my;
+            angle = 0;
+            const k = Math.min(dt / T_ZIPOUT, 1);
+            // 0–25%: brief inflate (anticipation) up to 1.25
+            // 25–100%: ease-in shrink to 0
+            let s;
+            if (k < 0.25) {
+              s = 1 + (k / 0.25) * 0.25;
+            } else {
+              const k2 = (k - 0.25) / 0.75;
+              s = 1.25 * (1 - k2 * k2);
+            }
+            scaleA = s;
+            scaleP = s;
+            if (k >= 1) {
+              scaleA = 0;
+              scaleP = 0;
+              cursor.style.opacity = 0;
+              setState('hidden');
+            }
+          } else if (state === 'hidden') {
+            // Parked invisibly at the mouse position
+            bx = mx;
+            by = my;
+            angle = 0;
+          } else if (state === 'zipin') {
+            // Z-axis emerge: scale from 0 in place at exit point with overshoot
+            bx = mx;
+            by = my;
+            angle = 0;
+            const k = Math.min(dt / T_ZIPIN, 1);
+            const eo = easeOutBack(k);
+            scaleA = eo;
+            scaleP = eo;
+            cursor.style.opacity = 1;
+            if (k >= 1) setState('settle');
+          } else if (state === 'settle') {
+            // Damped wobble at mouse — follow-through from the zip-in pop
+            const k = Math.min(dt / T_SETTLE, 1);
+            bx += (mx - bx) * 0.5;
+            by += (my - by) * 0.5;
+            const wobbleA =
+              Math.cos(k * Math.PI * 4) * Math.exp(-k * 4.5);
+            const wobbleP =
+              Math.cos((k + 0.18) * Math.PI * 4) * Math.exp(-k * 4.5);
+            scaleA = 1 + wobbleA * 0.18;
+            scaleP = 1 - wobbleP * 0.13;
+            if (k >= 1) {
+              scaleA = 1;
+              scaleP = 1;
+              setState('idle');
+            }
+          }
+
+          // Apply transform: position → orient to motion → squash/stretch
+          cursor.style.transform =
+            'translate3d(' + bx + 'px,' + by + 'px, 0) ' +
+            'translate(-50%, -50%) ' +
+            'rotate(' + angle + 'rad) ' +
+            'scale(' + scaleA + ',' + scaleP + ')';
+
+          // Hand: snaps to mouse with light smoothing (pointer feel)
+          hx += (mx - hx) * 0.6;
+          hy += (my - hy) * 0.6;
+          hand.style.transform =
+            'translate3d(' + hx + 'px,' + hy + 'px, 0)';
+
+          pmx = mx;
+          pmy = my;
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      })();
+
+      // ============================================================
+      // Font picker — body + mono tabs, live swap, persisted
+      // ============================================================
+      (function () {
+        const root = document.documentElement;
+        const picker = document.getElementById('picker');
+        const tabs = picker.querySelectorAll('.picker__tab');
+        const panels = picker.querySelectorAll('.picker__panel');
+        const monoOpts = picker.querySelectorAll('[data-mono]');
+        const bodyOpts = picker.querySelectorAll('[data-body]');
+        const toggle = document.getElementById('pickerToggle');
+
+        function familyStack(name, fallback) {
+          // Choose fallback based on font feel
+          if (fallback === 'serif') return `"${name}", "Georgia", serif`;
+          if (fallback === 'cursive') return `"${name}", "Caveat", cursive`;
+          return `"${name}", system-ui, -apple-system, sans-serif`;
+        }
+
+        function setMono(name) {
+          root.style.setProperty(
+            '--mono',
+            `"${name}", ui-monospace, "SFMono-Regular", monospace`
+          );
+          monoOpts.forEach((b) =>
+            b.setAttribute(
+              'aria-pressed',
+              b.dataset.mono === name ? 'true' : 'false'
+            )
+          );
+          try {
+            localStorage.setItem('bb-mono', name);
+          } catch (e) {}
+        }
+
+        function setBody(name) {
+          const isSerif = name === 'Fraunces';
+          const isCursive = name === 'Caveat';
+          const stack = familyStack(
+            name,
+            isSerif ? 'serif' : isCursive ? 'cursive' : 'sans'
+          );
+          root.style.setProperty('--body', stack);
+          bodyOpts.forEach((b) =>
+            b.setAttribute(
+              'aria-pressed',
+              b.dataset.body === name ? 'true' : 'false'
+            )
+          );
+          try {
+            localStorage.setItem('bb-body', name);
+          } catch (e) {}
+        }
+
+        monoOpts.forEach((b) =>
+          b.addEventListener('click', () => setMono(b.dataset.mono))
+        );
+        bodyOpts.forEach((b) =>
+          b.addEventListener('click', () => setBody(b.dataset.body))
+        );
+
+        function activateTab(name) {
+          tabs.forEach((t) =>
+            t.setAttribute(
+              'aria-selected',
+              t.dataset.tab === name ? 'true' : 'false'
+            )
+          );
+          panels.forEach((p) => {
+            if (p.dataset.panel === name) p.removeAttribute('hidden');
+            else p.setAttribute('hidden', '');
+          });
+        }
+        tabs.forEach((t) =>
+          t.addEventListener('click', () => activateTab(t.dataset.tab))
+        );
+
+        const saved = (() => {
+          try {
+            return {
+              mono: localStorage.getItem('bb-mono'),
+              body: localStorage.getItem('bb-body'),
+            };
+          } catch (e) {
+            return {};
+          }
+        })();
+        setMono(saved.mono || 'JetBrains Mono');
+        setBody(saved.body || 'Plus Jakarta Sans');
+
+        toggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          picker.classList.toggle('is-collapsed');
+          toggle.textContent = picker.classList.contains('is-collapsed')
+            ? '+'
+            : '─';
+        });
+      })();
+
+      // ============================================================
+      // Scroll reveal
+      // ============================================================
+      (function () {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add('in');
+                io.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+        );
+        document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+      })();
+
+      // ============================================================
+      // Hero stage — BB silhouette as PORTAL MASK
+      // The BB shape masks a trippy, throbbing fluid: warm radial gradient
+      // + concentric color-cycling tunnel rings + displacement noise warp.
+      // 72-BPM lub-dub drives scale-pulse, color flash, glitch, RGB split,
+      // and shockwaves that fire OUTSIDE the mask through the chromatic chain.
+      // ============================================================
+      (function () {
+        const cv = document.getElementById('stage');
+        if (!cv || !window.PIXI) return;
+        const stageEl = cv.parentElement;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // ---- Bracket Bear logo paths (viewBox 400.89 x 249.73) ----
+        const VIEW_W = 400.89;
+        const VIEW_H = 249.73;
+        const LOGO_PATHS = [
+          { d: 'm69.98,172.24v-94.76c0-4.14,3.36-7.5,7.5-7.5h15.14c1.66,0,3-1.34,3-3V3C95.62,1.34,94.28,0,92.62,0H15C6.72,0,0,6.72,0,15v219.73c0,8.28,6.72,15,15,15h77.62c1.66,0,3-1.34,3-3v-63.99c0-1.66-1.34-3-3-3h-15.14c-4.14,0-7.5-3.36-7.5-7.5Z', fr: 'nonzero' },
+          { d: 'm174.98,117.27c12.14,16.38,20.1,28.95,19.83,56.54-.73,66.7-62.49,74.8-77.35,75.78-1.73.11-3.19-1.26-3.19-2.99v-84.29c0-1.66-1.34-3-3-3h-19.68c-1.66,0-3-1.34-3-3v-64.05c0-1.66,1.34-3,3-3h19.68c1.66,0,3-1.34,3-3V3.05c0-1.72,1.44-3.08,3.16-3,12.12.59,55.68,6.48,69.61,59.96,7.61,29.23-3.42,50.36-12.06,57.26', fr: 'evenodd' },
+          { d: 'm323.41,179.74h-15.14c-1.66,0-3,1.34-3,3v63.99c0,1.66,1.34,3,3,3h77.62c8.28,0,15-6.72,15-15V15C400.89,6.72,394.18,0,385.89,0h-77.62c-1.66,0-3,1.34-3,3v63.99c0,1.66,1.34,3,3,3h15.14c4.14,0,7.5,3.36,7.5,7.5v94.76c0,4.14-3.36,7.5-7.5,7.5Z', fr: 'nonzero' },
+          { d: 'm225.92,117.28c-8.64-6.9-19.67-28.03-12.06-57.26C227.79,6.53,271.35.64,283.47.05c1.72-.08,3.16,1.28,3.16,3v83.21c0,1.66,1.34,3,3,3h19.68c1.66,0,3,1.34,3,3v64.05c0,1.66-1.34,3-3,3h-19.68c-1.66,0-3,1.34-3,3v84.29c0,1.73-1.46,3.11-3.19,2.99-14.86-.98-76.62-9.08-77.35-75.78-.27-27.6,7.69-40.17,19.83-56.54', fr: 'evenodd' },
+        ];
+
+        // The Pixi canvas extends past the stage grid cell via .stage__field
+        // (CSS inset: -32%) so portal effects/shockwaves can bleed out.
+        const fieldEl = stageEl.querySelector('.stage__field') || stageEl;
+        // Cap at 2× — retina-sharp without 3-4× GPU cost. The metaball pipeline
+        // (blur + threshold + masked composite) dominates render time.
+        const renderResolution = Math.min(window.devicePixelRatio || 1, 2);
+        const app = new PIXI.Application({
+          view: cv,
+          resizeTo: fieldEl,
+          backgroundAlpha: 0,
+          antialias: true,
+          resolution: renderResolution,
+          autoDensity: true,
+          powerPreference: 'high-performance',
+        });
+
+        // ---- Make BB silhouette texture (used as the portal mask) ----
+        function makeLogoMaskTexture() {
+          const SCALE = 6;
+          const off = document.createElement('canvas');
+          off.width = Math.round(VIEW_W * SCALE);
+          off.height = Math.round(VIEW_H * SCALE);
+          const c = off.getContext('2d');
+          c.scale(SCALE, SCALE);
+          c.fillStyle = '#ffffff';
+          for (const p of LOGO_PATHS) c.fill(new Path2D(p.d), p.fr);
+          return PIXI.Texture.from(off);
+        }
+        const maskTex = makeLogoMaskTexture();
+
+        // ---- Alternate-dimension background — DEEP void with violet bloom ----
+        // The BB silhouette and fireflies are portals into "another dimension" —
+        // the inside palette is intentionally NON-brand: cool electric neons
+        // against deep purple/navy, opposite of the warm orange page.
+        function makeAltDimensionBg() {
+          const size = 512;
+          const off = document.createElement('canvas');
+          off.width = size; off.height = size;
+          const c = off.getContext('2d');
+          const grad = c.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+          grad.addColorStop(0.00, '#3d1a8a');   // violet bloom center
+          grad.addColorStop(0.30, '#1f0c5e');   // deep purple
+          grad.addColorStop(0.65, '#0d0530');   // near-black navy
+          grad.addColorStop(1.00, '#050218');   // void edge
+          c.fillStyle = grad;
+          c.fillRect(0, 0, size, size);
+          return PIXI.Texture.from(off);
+        }
+        const gradTex = makeAltDimensionBg();
+
+        // ---- Make displacement noise texture (SVG fractalNoise) ----
+        const NOISE_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><filter id="t"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="3"/></filter><rect width="512" height="512" filter="url(%23t)"/></svg>';
+        const noiseTex = PIXI.Texture.from('data:image/svg+xml;utf8,' + encodeURIComponent(NOISE_SVG));
+
+        // ---- 90s/Memphis decorative shapes — ALT-DIMENSION palette ----
+        // Electric neons against the void bg. Deliberately off-brand: this is
+        // the world INSIDE the portal, not the brand world outside it.
+        const SHAPE_PALETTE = [
+          { c: 0xff1f8f, w: 0.20 }, // hot pink
+          { c: 0x1ff5ff, w: 0.18 }, // electric cyan
+          { c: 0x9bff1f, w: 0.16 }, // neon green
+          { c: 0xb01fff, w: 0.16 }, // electric purple
+          { c: 0xffe71f, w: 0.14 }, // electric yellow
+          { c: 0xff8a00, w: 0.10 }, // amber (subtle bridge to brand)
+          { c: 0xfff3e3, w: 0.06 }, // cream highlights
+        ];
+        function pickShapeColor() {
+          const r = Math.random();
+          let cum = 0;
+          for (const p of SHAPE_PALETTE) {
+            cum += p.w;
+            if (r < cum) return p.c;
+          }
+          return 0x110a08;
+        }
+        function makeShape(kind, color, size) {
+          const g = new PIXI.Graphics();
+          // Beefier strokes — line shapes read with more confidence and weight
+          const lw = Math.max(3.5, size * 0.18);
+          switch (kind) {
+            case 'tri':
+              g.beginFill(color, 1);
+              g.moveTo(0, -size * 0.7);
+              g.lineTo(size * 0.6, size * 0.45);
+              g.lineTo(-size * 0.6, size * 0.45);
+              g.closePath();
+              g.endFill();
+              break;
+            case 'tri-out':
+              // drawPolygon auto-closes with mitered joins so the apex stays
+              // pointy (vs moveTo/lineTo/lineTo back to start, which leaves
+              // flat butt-caps meeting at the top vertex).
+              g.lineStyle(lw, color, 1);
+              g.drawPolygon([
+                0, -size * 0.7,
+                size * 0.6, size * 0.45,
+                -size * 0.6, size * 0.45,
+              ]);
+              break;
+            case 'circle':
+              g.beginFill(color, 1);
+              g.drawCircle(0, 0, size * 0.55);
+              g.endFill();
+              break;
+            case 'circle-out':
+              g.lineStyle(lw, color, 1);
+              g.drawCircle(0, 0, size * 0.55);
+              break;
+            case 'plus':
+              g.beginFill(color, 1);
+              g.drawRect(-size * 0.13, -size * 0.55, size * 0.26, size * 1.1);
+              g.drawRect(-size * 0.55, -size * 0.13, size * 1.1, size * 0.26);
+              g.endFill();
+              break;
+            case 'squiggle': {
+              g.lineStyle(lw, color, 1);
+              const steps = 14;
+              for (let i = 0; i <= steps; i++) {
+                const x = (i / steps - 0.5) * size * 1.7;
+                const y = Math.sin((i / steps) * Math.PI * 3) * size * 0.32;
+                if (i === 0) g.moveTo(x, y);
+                else g.lineTo(x, y);
+              }
+              break;
+            }
+            case 'zigzag': {
+              g.lineStyle(lw, color, 1);
+              const pts = 5;
+              for (let i = 0; i < pts; i++) {
+                const x = (i / (pts - 1) - 0.5) * size * 1.7;
+                const y = (i % 2 === 0) ? size * 0.32 : -size * 0.32;
+                if (i === 0) g.moveTo(x, y);
+                else g.lineTo(x, y);
+              }
+              break;
+            }
+            case 'half':
+              g.beginFill(color, 1);
+              g.arc(0, 0, size * 0.55, Math.PI, 0, false);
+              g.lineTo(-size * 0.55, 0);
+              g.endFill();
+              break;
+            case 'cross':
+              g.lineStyle(lw, color, 1);
+              g.moveTo(-size * 0.55, -size * 0.55);
+              g.lineTo(size * 0.55, size * 0.55);
+              g.moveTo(size * 0.55, -size * 0.55);
+              g.lineTo(-size * 0.55, size * 0.55);
+              break;
+            case 'dot':
+              g.beginFill(color, 1);
+              g.drawCircle(0, 0, size * 0.22);
+              g.endFill();
+              break;
+            case 'rings':
+              g.lineStyle(Math.max(2.2, size * 0.10), color, 1);
+              for (let r = 1; r <= 3; r++) g.drawCircle(0, 0, size * 0.55 * (r / 3));
+              break;
+          }
+          return g;
+        }
+        const SHAPE_KINDS = ['tri', 'tri-out', 'circle', 'circle-out', 'plus',
+                             'squiggle', 'zigzag', 'half', 'cross', 'dot', 'rings'];
+
+        // ---- Build scene graph ----
+        // The BB silhouette is a static portal mask; fireflies are individual
+        // round portal cutouts that orbit/spiral around the BB on the page.
+        //
+        // app.stage
+        //   ├─ fluidScene        (OFF-STAGE — alt-dimension, rendered to fluidRT)
+        //   ├─ noiseSprite       (alpha 0, displacement source)
+        //   ├─ bbShadowSprite    (BB drop shadow on the orange page)
+        //   ├─ fireflyShadowG    (firefly drop shadows)
+        //   ├─ heartContainer    (filters: glow — gentle violet halo)
+        //   │   ├─ bbMaskSprite  (BB silhouette — mask for portal)
+        //   │   └─ portalContent (mask: bbMaskSprite, filters: displacement)
+        //   │       └─ bbPortalSprite (full-canvas sprite of fluidRT)
+        //   └─ fireflyG          (firefly portal cutouts via fluidRT texture-fill)
+
+        const fluidScene = new PIXI.Container();
+        fluidScene.renderable = false;
+        app.stage.addChild(fluidScene);
+
+        const bgGrad = new PIXI.Sprite(gradTex);
+        bgGrad.anchor.set(0.5);
+        fluidScene.addChild(bgGrad);
+
+        const fluidShapeLayer = new PIXI.Container();
+        fluidScene.addChild(fluidShapeLayer);
+        const fluidShapes = [];
+
+        let fluidRT = null;
+
+        const noiseSprite = new PIXI.Sprite(noiseTex);
+        noiseSprite.anchor.set(0.5);
+        noiseSprite.alpha = 0;
+        app.stage.addChild(noiseSprite);
+
+        // Drop shadow under the BB silhouette
+        const bbShadowSprite = new PIXI.Sprite(maskTex);
+        bbShadowSprite.anchor.set(0.5);
+        bbShadowSprite.tint = 0x110a08;
+        bbShadowSprite.alpha = 0.42;
+        bbShadowSprite.filters = [new PIXI.BlurFilter(9, 2)];
+        app.stage.addChild(bbShadowSprite);
+
+        // Drop shadows for fireflies — drawn behind their cutouts
+        const fireflyShadowG = new PIXI.Graphics();
+        fireflyShadowG.filters = [new PIXI.BlurFilter(5, 2)];
+        app.stage.addChild(fireflyShadowG);
+
+        const heartContainer = new PIXI.Container();
+        app.stage.addChild(heartContainer);
+
+        const bbMaskSprite = new PIXI.Sprite(maskTex);
+        bbMaskSprite.anchor.set(0.5);
+        heartContainer.addChild(bbMaskSprite);
+
+        const portalContent = new PIXI.Container();
+        portalContent.mask = bbMaskSprite;
+        heartContainer.addChild(portalContent);
+
+        const bbPortalSprite = new PIXI.Sprite();
+        portalContent.addChild(bbPortalSprite);
+
+        // Firefly cutouts — graphics drawn at canvas world coords, sampling
+        // the alt-dim texture so each circle is a portal at its position.
+        const fireflyG = new PIXI.Graphics();
+        app.stage.addChild(fireflyG);
+        const fireflies = [];
+
+        // ---- Filters ----
+        const F = PIXI.filters || {};
+        const displaceFilter = new PIXI.DisplacementFilter(noiseSprite);
+        displaceFilter.scale.set(6);
+        portalContent.filters = [displaceFilter];
+        fireflyG.filters = [displaceFilter];
+
+        const glow = F.GlowFilter
+          ? new F.GlowFilter({ distance: 30, outerStrength: 0.4, innerStrength: 0, color: 0xb01fff, quality: 0.3 })
+          : null;
+        if (glow) heartContainer.filters = [glow];
+
+        // ---- Layout ----
+        let bgGradBaseScale = 1;
+        let canvasW = 0, canvasH = 0;
+        let bbCenterX = 0, bbCenterY = 0; // BB position in canvas coords
+        let bbRadius = 100;                // approx BB silhouette radius (for boid avoidance)
+
+        function layout() {
+          const W = app.screen.width;
+          const H = app.screen.height;
+          canvasW = W; canvasH = H;
+
+          // Canvas is symmetric around the stage box — BB sits at canvas center
+          bbCenterX = W / 2;
+          bbCenterY = H / 2;
+
+          heartContainer.position.set(bbCenterX, bbCenterY);
+          heartContainer.pivot.set(0, 0);
+
+          // BB scale relative to the canvas; pad keeps it from crowding the stage
+          const stageAR = W / H;
+          const logoAR = VIEW_W / VIEW_H;
+          const pad = 0.46;
+          let s;
+          if (logoAR > stageAR) s = (W * pad) / VIEW_W;
+          else s = (H * pad) / VIEW_H;
+          const maskScale = s / 6;
+          bbMaskSprite.scale.set(maskScale);
+          bbMaskSprite.position.set(0, 0);
+
+          const maskWidth = VIEW_W * s;
+          const maskHeight = VIEW_H * s;
+          // Approximate BB silhouette half-extent — used to choose orbit radii
+          bbRadius = Math.max(maskWidth, maskHeight) * 0.5;
+
+          // fluidRT is canvas-sized; gradient centers on the BB
+          if (!fluidRT || fluidRT.width !== W || fluidRT.height !== H) {
+            if (fluidRT) fluidRT.destroy(true);
+            fluidRT = PIXI.RenderTexture.create({
+              width: W,
+              height: H,
+              resolution: app.renderer.resolution,
+            });
+            bbPortalSprite.texture = fluidRT;
+          }
+
+          // Gradient bloom centers on the BB so the violet pool sits behind it
+          bgGrad.position.set(bbCenterX, bbCenterY);
+
+          // Bloom large enough to cover the ENTIRE field, not just the BB
+          // silhouette area — so the cursor portal stays bright violet
+          // wherever the pointer roams (no dark void corners).
+          const gradSize = Math.max(maskWidth, maskHeight) * 6.0;
+          bgGradBaseScale = gradSize / 512;
+          bgGrad.scale.set(bgGradBaseScale);
+
+          // bbPortalSprite covers the full canvas — its top-left in
+          // heartContainer's local coords sits at -bbCenter so world coverage
+          // matches (0,0)→(W,H).
+          bbPortalSprite.position.set(-bbCenterX, -bbCenterY);
+          bbPortalSprite.width = W;
+          bbPortalSprite.height = H;
+
+          noiseSprite.position.set(bbCenterX, bbCenterY);
+          noiseSprite.scale.set(Math.max(W, H) * 1.4 / 512);
+
+          spawnFluidShapes(W, H);
+          spawnFireflies(W, H);
+        }
+
+        function spawnFluidShapes(W, H) {
+          fluidShapes.forEach(s => s.g.destroy({ children: true }));
+          fluidShapes.length = 0;
+          fluidShapeLayer.removeChildren();
+
+          // Heavily populated — these only show through the BB and firefly
+          // cutouts, so high density reads as a teeming alt-dim world.
+          const COUNT = 80 + Math.floor((W * H) / 90000);
+          for (let i = 0; i < COUNT; i++) {
+            const kind = SHAPE_KINDS[(Math.random() * SHAPE_KINDS.length) | 0];
+            const color = pickShapeColor();
+            const size = 18 + Math.random() * 62;
+
+            // Each shape gets a HARD drop shadow — solid, unblurred, offset
+            // down-right. Classic 90s zine/Memphis sticker treatment.
+            const wrapper = new PIXI.Container();
+            const shadow = makeShape(kind, 0x000000, size);
+            const offsetAmt = Math.max(3, size * 0.12);
+            shadow.position.set(offsetAmt, offsetAmt);
+            shadow.alpha = 0.75;
+            wrapper.addChild(shadow);
+            const fg = makeShape(kind, color, size);
+            wrapper.addChild(fg);
+
+            wrapper.x = Math.random() * W;
+            wrapper.y = Math.random() * H;
+            wrapper.rotation = Math.random() * Math.PI * 2;
+            wrapper.alpha = 1;
+            fluidShapeLayer.addChild(wrapper);
+            fluidShapes.push({
+              g: wrapper,
+              vx: (Math.random() - 0.5) * 0.32,
+              vy: (Math.random() - 0.5) * 0.32,
+              rs: (Math.random() - 0.5) * 0.004,
+              bobFx: 0.00015 + Math.random() * 0.00055,
+              bobFy: 0.00015 + Math.random() * 0.00055,
+              bobP: Math.random() * Math.PI * 2,
+            });
+          }
+        }
+
+        // Fireflies are clamped inside the canvas with a small inset so they
+        // never drift past the visible field. Since the canvas now extends
+        // way leftward into the hero, they have a much bigger playground.
+        let frameMinX = 0, frameMaxX = 0, frameMinY = 0, frameMaxY = 0;
+
+        function spawnFireflies(W, H) {
+          fireflies.length = 0;
+          frameMinX = W * 0.04;
+          frameMaxX = W * 0.96;
+          frameMinY = H * 0.06;
+          frameMaxY = H * 0.94;
+          const fwidth = frameMaxX - frameMinX;
+          const fheight = frameMaxY - frameMinY;
+
+          // Each firefly drifts around a HOME position with two layered
+          // sinusoids per axis (slow+large + fast+small). Mixed frequencies
+          // give organic wandering motion that doesn't loop visibly.
+          const COUNT = 28;
+          for (let i = 0; i < COUNT; i++) {
+            const tier = Math.random();
+            let radius;
+            if (tier < 0.55) radius = 12 + Math.random() * 8;
+            else if (tier < 0.88) radius = 20 + Math.random() * 10;
+            else radius = 30 + Math.random() * 14;
+
+            // Home positions scattered in a halo around the BB
+            const ang = (i / COUNT) * Math.PI * 2 + Math.random() * 0.5;
+            const haloR = bbRadius * (1.25 + Math.random() * 1.4);
+            const margin = radius + 60;
+            let hx = bbCenterX + Math.cos(ang) * haloR;
+            let hy = bbCenterY + Math.sin(ang) * haloR;
+            hx = Math.max(frameMinX + margin, Math.min(frameMaxX - margin, hx));
+            hy = Math.max(frameMinY + margin, Math.min(frameMaxY - margin, hy));
+
+            fireflies.push({
+              // hx0,hy0 = preferred home (constant). hx,hy = animated current
+              // home that lerps toward a flee target when the cursor is near.
+              hx0: hx, hy0: hy,
+              hx, hy,
+              radius,
+              ax1: 30 + Math.random() * 35,
+              ay1: 25 + Math.random() * 30,
+              fx1: 0.00012 + Math.random() * 0.00035,
+              fy1: 0.00010 + Math.random() * 0.00033,
+              px1: Math.random() * Math.PI * 2,
+              py1: Math.random() * Math.PI * 2,
+              ax2: 6 + Math.random() * 14,
+              ay2: 5 + Math.random() * 12,
+              fx2: 0.0007 + Math.random() * 0.0015,
+              fy2: 0.0008 + Math.random() * 0.0014,
+              px2: Math.random() * Math.PI * 2,
+              py2: Math.random() * Math.PI * 2,
+              // Per-firefly lateral spread for flee targets so fireflies
+              // don't all stack on the same point on the far side.
+              fleeJitterX: (Math.random() - 0.5) * bbRadius * 0.9,
+              fleeJitterY: (Math.random() - 0.5) * bbRadius * 0.9,
+              // Flee state — when triggered, lock a destination and travel
+              // there with velocity-based motion (no re-targeting mid-flight).
+              fleeing: false,
+              fleeTargetX: 0,
+              fleeTargetY: 0,
+              vx: 0,
+              vy: 0,
+              // Panic phase — for the perpendicular zigzag during flight
+              panicPhase: Math.random() * Math.PI * 2,
+              // Wander offset: a slow 2D random walk around home, so the
+              // motion stops feeling like a sine loop and starts feeling
+              // like an organism that has its own opinion.
+              wx: 0, wy: 0,
+              wvx: 0, wvy: 0,
+            });
+          }
+        }
+        layout();
+        let resizeT;
+        app.renderer.on('resize', () => {
+          clearTimeout(resizeT);
+          resizeT = setTimeout(layout, 60);
+        });
+
+        // ---- Pointer tracking (mouse + touch) ----
+        let mx = 0, my = 0, mTargetX = 0, mTargetY = 0;
+        // Cursor portal — a third lens type that follows the pointer.
+        // Coords are in canvas space (matched to fluidRT alignment).
+        let cursorX = -9999, cursorY = -9999;
+        let cursorDispX = -9999, cursorDispY = -9999;
+        let cursorActive = 0;       // 0..1 envelope, fades in/out
+        let cursorTargetActive = 0;
+        function setPointerCanvas(clientX, clientY) {
+          const r = stageEl.getBoundingClientRect();
+          const fr = fieldEl.getBoundingClientRect();
+          mTargetX = ((clientX - r.left) / r.width - 0.5) * 22;
+          mTargetY = ((clientY - r.top) / r.height - 0.5) * 18;
+          cursorX = ((clientX - fr.left) / fr.width) * canvasW;
+          cursorY = ((clientY - fr.top) / fr.height) * canvasH;
+          if (cursorDispX === -9999) {
+            cursorDispX = cursorX;
+            cursorDispY = cursorY;
+          }
+        }
+        function isInsideField(clientX, clientY) {
+          const fr = fieldEl.getBoundingClientRect();
+          return clientX >= fr.left && clientX <= fr.right &&
+                 clientY >= fr.top && clientY <= fr.bottom;
+        }
+        // Listen on window so the field's pointer-events:none doesn't block
+        // mouse tracking over the 50% bleed area beyond the .stage box.
+        window.addEventListener('mousemove', (e) => {
+          if (isInsideField(e.clientX, e.clientY)) {
+            setPointerCanvas(e.clientX, e.clientY);
+            cursorTargetActive = 1;
+          } else {
+            cursorTargetActive = 0;
+            mTargetX = 0; mTargetY = 0;
+          }
+        });
+        window.addEventListener('touchstart', (e) => {
+          if (e.touches[0] && isInsideField(e.touches[0].clientX, e.touches[0].clientY)) {
+            setPointerCanvas(e.touches[0].clientX, e.touches[0].clientY);
+            cursorTargetActive = 1;
+          }
+        }, { passive: true });
+        window.addEventListener('touchmove', (e) => {
+          if (e.touches[0] && isInsideField(e.touches[0].clientX, e.touches[0].clientY)) {
+            setPointerCanvas(e.touches[0].clientX, e.touches[0].clientY);
+            cursorTargetActive = 1;
+          } else {
+            cursorTargetActive = 0;
+          }
+        }, { passive: true });
+        window.addEventListener('touchend', () => {
+          cursorTargetActive = 0;
+        });
+
+
+
+        // ---- Animation loop ----
+        // Calm — no glitching. Just gentle drift, gradient breathing, and a
+        // soft displacement warp. The mood is "looking through a portal at
+        // a slowly stirring world", not "broadcast tearing".
+        app.ticker.add(() => {
+          const now = performance.now();
+
+          mx += (mTargetX - mx) * 0.08;
+          my += (mTargetY - my) * 0.08;
+
+          // Cursor portal — smooth position + active envelope
+          cursorActive += (cursorTargetActive - cursorActive) * 0.12;
+          if (cursorDispX !== -9999) {
+            cursorDispX += (cursorX - cursorDispX) * 0.18;
+            cursorDispY += (cursorY - cursorDispY) * 0.18;
+          }
+
+          // BB position — anchored at stage center + a tiny mouse parallax
+          heartContainer.x = bbCenterX + mx * 0.6;
+          heartContainer.y = bbCenterY + my * 0.6;
+
+          // Very gentle z-axis breath — ~12.5 second cycle, ±1.8% scale.
+          // Subtle enough to feel like a slow inhale/exhale, not animation.
+          const breath = 1 + Math.sin(now * 0.0005) * 0.018;
+          heartContainer.scale.set(breath);
+
+          // Slow gradient rotation — gives the violet bloom subtle life
+          bgGrad.rotation += 0.0014;
+
+          // Drift alt-dim Memphis shapes
+          const PAD = 100;
+          for (let i = 0; i < fluidShapes.length; i++) {
+            const s = fluidShapes[i];
+            s.g.x += s.vx + Math.sin(now * s.bobFx + s.bobP) * 0.06;
+            s.g.y += s.vy + Math.cos(now * s.bobFy + s.bobP) * 0.06;
+            s.g.rotation += s.rs;
+            if (s.g.x < -PAD) s.g.x = canvasW + PAD;
+            if (s.g.x > canvasW + PAD) s.g.x = -PAD;
+            if (s.g.y < -PAD) s.g.y = canvasH + PAD;
+            if (s.g.y > canvasH + PAD) s.g.y = -PAD;
+          }
+
+          // Render off-stage fluidScene → fluidRT (shared by BB + fireflies)
+          if (fluidRT) {
+            fluidScene.renderable = true;
+            app.renderer.render(fluidScene, { renderTexture: fluidRT, clear: true });
+            fluidScene.renderable = false;
+          }
+
+          // ---- Firefly natural drift + cursor flee ----
+          // When startled, a firefly LOCKS a single destination on the far
+          // side and travels smoothly there using velocity-based motion. No
+          // re-targeting mid-flight, so the path is one clean smooth arc.
+          // After arriving it stays put and resumes drifting.
+          const FLEE_TRIGGER = 140;
+          const FLEE_MAX_SPEED = 14;
+          const FLEE_ARRIVAL_DIST = 6;
+          fireflyG.clear();
+          fireflyShadowG.clear();
+          fireflyShadowG.beginFill(0x110a08, 0.42);
+          if (fluidRT) {
+            const ffMat = new PIXI.Matrix();
+            for (let i = 0; i < fireflies.length; i++) {
+              const ff = fireflies[i];
+              const driftX = Math.sin(now * ff.fx1 + ff.px1) * ff.ax1
+                           + Math.sin(now * ff.fx2 + ff.px2) * ff.ax2;
+              const driftY = Math.cos(now * ff.fy1 + ff.py1) * ff.ay1
+                           + Math.cos(now * ff.fy2 + ff.py2) * ff.ay2;
+
+              // Trigger a flee — only when not already fleeing. Lock the
+              // destination ONCE so the firefly aims for a fixed point.
+              if (!ff.fleeing && cursorActive > 0.1 && cursorDispX !== -9999) {
+                const curX = ff.hx + driftX;
+                const curY = ff.hy + driftY;
+                const dCx = curX - cursorDispX;
+                const dCy = curY - cursorDispY;
+                if (dCx * dCx + dCy * dCy < FLEE_TRIGGER * FLEE_TRIGGER) {
+                  const cToBBx = bbCenterX - cursorDispX;
+                  const cToBBy = bbCenterY - cursorDispY;
+                  const cToBBd = Math.hypot(cToBBx, cToBBy) || 1;
+                  const farD = bbRadius * 1.7;
+                  let tx = bbCenterX + (cToBBx / cToBBd) * farD + ff.fleeJitterX;
+                  let ty = bbCenterY + (cToBBy / cToBBd) * farD + ff.fleeJitterY;
+                  const pad = ff.radius + 30;
+                  tx = Math.max(frameMinX + pad, Math.min(frameMaxX - pad, tx));
+                  ty = Math.max(frameMinY + pad, Math.min(frameMaxY - pad, ty));
+                  ff.fleeTargetX = tx;
+                  ff.fleeTargetY = ty;
+                  ff.fleeing = true;
+                }
+              }
+
+              // Velocity-based motion toward locked destination, with a
+              // PANIC wobble — perpendicular zigzag + occasional random
+              // jolts so the flight feels frantic ("oh shoot, oh shoot")
+              // rather than a clean smooth arc.
+              if (ff.fleeing) {
+                const tdx = ff.fleeTargetX - ff.hx;
+                const tdy = ff.fleeTargetY - ff.hy;
+                const dist = Math.hypot(tdx, tdy);
+                if (dist < FLEE_ARRIVAL_DIST) {
+                  ff.fleeing = false;
+                } else {
+                  const targetSpeed = Math.min(FLEE_MAX_SPEED, dist * 0.12);
+                  // Forward velocity toward destination
+                  let targetVx = (tdx / dist) * targetSpeed;
+                  let targetVy = (tdy / dist) * targetSpeed;
+                  // Perpendicular zigzag — sine-based, alternates side to
+                  // side so the path looks like indecisive panic darts.
+                  const perpX = -tdy / dist;
+                  const perpY = tdx / dist;
+                  const wobble = Math.sin(now * 0.026 + ff.panicPhase) * targetSpeed * 0.55;
+                  targetVx += perpX * wobble;
+                  targetVy += perpY * wobble;
+                  // Snappy velocity tracking (0.22 vs 0.15) so the wobble
+                  // actually shows up in the motion as twitchy darts
+                  ff.vx += (targetVx - ff.vx) * 0.22;
+                  ff.vy += (targetVy - ff.vy) * 0.22;
+                  // Occasional random "oh shoot" impulses
+                  if (Math.random() < 0.04) {
+                    ff.vx += (Math.random() - 0.5) * 6;
+                    ff.vy += (Math.random() - 0.5) * 6;
+                  }
+                }
+                // Damp wander while fleeing so the panic flight reads cleanly
+                ff.wvx *= 0.85; ff.wvy *= 0.85;
+                ff.wx *= 0.92;  ff.wy *= 0.92;
+              } else {
+                ff.vx *= 0.92;
+                ff.vy *= 0.92;
+                // Wander steering: longer strides — bigger kicks, looser
+                // spring, lighter damping so velocity carries them farther
+                // before they're pulled back home.
+                ff.wvx += (Math.random() - 0.5) * 0.85 - ff.wx * 0.00018;
+                ff.wvy += (Math.random() - 0.5) * 0.85 - ff.wy * 0.00018;
+                ff.wvx *= 0.965;
+                ff.wvy *= 0.965;
+                ff.wx += ff.wvx;
+                ff.wy += ff.wvy;
+                // Spark — frequent tiny dart so they flit unprovoked.
+                if (Math.random() < 0.018) {
+                  ff.vx += (Math.random() - 0.5) * 5.5;
+                  ff.vy += (Math.random() - 0.5) * 5.5;
+                }
+              }
+              ff.hx += ff.vx;
+              ff.hy += ff.vy;
+
+              let cx = ff.hx + driftX + ff.wx;
+              let cy = ff.hy + driftY + ff.wy;
+              const pad = ff.radius + 2;
+              if (cx < frameMinX + pad) cx = frameMinX + pad;
+              else if (cx > frameMaxX - pad) cx = frameMaxX - pad;
+              if (cy < frameMinY + pad) cy = frameMinY + pad;
+              else if (cy > frameMaxY - pad) cy = frameMaxY - pad;
+              fireflyShadowG.drawCircle(cx + 5, cy + 4, ff.radius * 1.05);
+              fireflyG.beginTextureFill({ texture: fluidRT, matrix: ffMat });
+              fireflyG.drawCircle(cx, cy, ff.radius);
+              fireflyG.endFill();
+            }
+          }
+          fireflyShadowG.endFill();
+
+          // Sync BB drop shadow to heartContainer (offset down-right)
+          bbShadowSprite.x = heartContainer.x + 10;
+          bbShadowSprite.y = heartContainer.y + 8;
+          bbShadowSprite.scale.x = heartContainer.scale.x * bbMaskSprite.scale.x;
+          bbShadowSprite.scale.y = heartContainer.scale.y * bbMaskSprite.scale.y;
+          bbShadowSprite.rotation = heartContainer.rotation;
+
+          // Gentle, constant displacement — the alt-dim "stirs" slowly
+          noiseSprite.rotation += 0.0022;
+          noiseSprite.x = bbCenterX + Math.sin(now * 0.00033) * 50;
+          noiseSprite.y = bbCenterY + Math.cos(now * 0.00041) * 50;
+        });
+      })();
+    </script>
+  </body>
+</html>

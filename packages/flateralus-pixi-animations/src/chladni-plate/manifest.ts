@@ -1,0 +1,141 @@
+import { createManifest } from '@bracketbear/flateralus';
+import type { ManifestToControlValues } from '@bracketbear/flateralus';
+
+export const MANIFEST = createManifest({
+  id: 'chladni-plate',
+  name: 'Chladni Plate (GLSL)',
+  description:
+    'A driven plate with sand on it. The plate integrates the fourth-order Kirchhoff equation in a GPU ping-pong buffer, so its modes are eigenvalues rather than pictures. Sand is thrown off the surface wherever peak acceleration beats gravity and drifts down the amplitude gradient while airborne, which is why it collects on the nodal lines: quiet regions cannot throw it back out. The sand then mass-loads the plate, detuning the mode that placed it. The boundary is swappable, and swapping it rewrites every figure.',
+  controls: [
+    {
+      name: 'mode',
+      type: 'select',
+      label: 'Mode',
+      options: [
+        { value: 1, label: 'Interactive' },
+        { value: 0, label: 'Ambient' },
+      ],
+      defaultValue: 1,
+      debug: true,
+    },
+    {
+      name: 'boundary',
+      type: 'select',
+      label: 'Plate',
+      options: [
+        { value: 0, label: 'Square' },
+        { value: 1, label: 'Circle' },
+        { value: 2, label: 'The Mark' },
+      ],
+      defaultValue: 0,
+      debug: true,
+    },
+    {
+      name: 'stiffness',
+      type: 'number',
+      label: 'Stiffness',
+      min: 0.005,
+      max: 0.05,
+      step: 0.001,
+      defaultValue: 0.04,
+      debug: true,
+    },
+    {
+      name: 'ringTime',
+      type: 'number',
+      label: 'Ring-down (s)',
+      min: 0.5,
+      max: 30,
+      step: 0.5,
+      defaultValue: 4,
+      debug: true,
+    },
+    {
+      name: 'drive',
+      type: 'number',
+      label: 'Drive',
+      min: 0,
+      max: 3,
+      step: 0.05,
+      defaultValue: 1,
+      debug: true,
+    },
+    {
+      name: 'threshold',
+      type: 'number',
+      label: 'Throw Threshold',
+      min: 0,
+      max: 120,
+      step: 1,
+      defaultValue: 20,
+      debug: true,
+    },
+    {
+      name: 'drift',
+      type: 'number',
+      label: 'Drift',
+      min: 0,
+      max: 2,
+      step: 0.02,
+      defaultValue: 0.4,
+      debug: true,
+    },
+    {
+      name: 'jitter',
+      type: 'number',
+      label: 'Jitter',
+      min: 0,
+      max: 1,
+      step: 0.01,
+      defaultValue: 0.15,
+      debug: true,
+    },
+    {
+      name: 'load',
+      type: 'number',
+      label: 'Sand Load',
+      min: 0,
+      max: 4,
+      step: 0.1,
+      defaultValue: 1.2,
+      debug: true,
+    },
+    {
+      name: 'sweep',
+      type: 'number',
+      label: 'Sweep Rate',
+      min: 0.2,
+      max: 5,
+      step: 0.1,
+      defaultValue: 1,
+      debug: true,
+    },
+    {
+      name: 'view',
+      type: 'select',
+      label: 'View (debug)',
+      options: [
+        { value: 0, label: 'Deflection' },
+        { value: 1, label: 'Envelope' },
+      ],
+      defaultValue: 1,
+      debug: true,
+    },
+    {
+      name: 'tint',
+      type: 'select',
+      label: 'Color',
+      options: [
+        { value: 0, label: 'Slate' },
+        { value: 1, label: 'Ember' },
+        { value: 2, label: 'Ink' },
+      ],
+      defaultValue: 0,
+      debug: true,
+    },
+  ],
+} as const);
+
+export type ChladniPlateControlValues = ManifestToControlValues<
+  typeof MANIFEST
+>;

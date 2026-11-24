@@ -7,7 +7,6 @@ import { BracketBearLogo } from '@bracketbear/bear-ui-react';
 const mockSkills: CollectionEntry<'workSkills'>[] = [
   {
     id: 'react',
-    slug: 'react',
     body: '',
     collection: 'workSkills',
     data: {
@@ -22,7 +21,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'typescript',
-    slug: 'typescript',
     body: '',
     collection: 'workSkills',
     data: {
@@ -37,7 +35,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'node',
-    slug: 'node',
     body: '',
     collection: 'workSkills',
     data: {
@@ -52,7 +49,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'nextjs',
-    slug: 'nextjs',
     body: '',
     collection: 'workSkills',
     data: {
@@ -67,7 +63,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'tailwind',
-    slug: 'tailwind',
     body: '',
     collection: 'workSkills',
     data: {
@@ -82,7 +77,6 @@ const mockSkills: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'figma',
-    slug: 'figma',
     body: '',
     collection: 'workSkills',
     data: {
@@ -101,7 +95,6 @@ const mockSkillsExtended: CollectionEntry<'workSkills'>[] = [
   ...mockSkills,
   {
     id: 'docker',
-    slug: 'docker',
     body: '',
     collection: 'workSkills',
     data: {
@@ -116,7 +109,6 @@ const mockSkillsExtended: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'aws',
-    slug: 'aws',
     body: '',
     collection: 'workSkills',
     data: {
@@ -131,7 +123,6 @@ const mockSkillsExtended: CollectionEntry<'workSkills'>[] = [
   },
   {
     id: 'python',
-    slug: 'python',
     body: '',
     collection: 'workSkills',
     data: {

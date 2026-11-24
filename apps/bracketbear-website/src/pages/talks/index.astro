@@ -1,0 +1,30 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import CloseBlock from '@/components/site/CloseBlock.astro';
+import { talks } from '@/content/site/community';
+import { meta } from '@/content/site/talks';
+import { TALKS } from '@/talks';
+import { displayTitle } from '@/talks/display-title';
+---
+
+<SiteLayout meta={meta} path="/talks">
+  <section class="section">
+    <div class="section__inner">
+      <h1 class="headline">{talks.headline}</h1>
+      <p class="lede">{talks.body}</p>
+      <ul class="link-rows talks-list">
+        {
+          TALKS.map((talk) => (
+            <li>
+              <a class="link-row" href={`/talks/${talk.slug}`}>
+                {displayTitle(talk.title)}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CloseBlock />
+</SiteLayout>

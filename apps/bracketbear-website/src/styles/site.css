@@ -1,0 +1,877 @@
+@import '@fontsource/archivo-black/400.css';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/jetbrains-mono/400.css';
+
+/* ============================================================
+   site.css — the v3 site shell.
+   Palette and faces come from the holding page. Everything is
+   scoped under .bb-site (the body class SiteLayout sets). The body
+   scrolls; the Portal Mark stage fills whatever .portal box a page
+   gives it.
+   ============================================================ */
+
+.bb-site {
+  --orange: #ff5f1f;
+  --cream: #fff3e3;
+  --ink: #110a08;
+  --cream-dim: rgba(255, 243, 227, 0.72);
+  --hairline: rgba(255, 243, 227, 0.16);
+
+  --wordmark: 'Archivo Black', 'Helvetica Neue', sans-serif;
+  --body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  --rail: clamp(1.25rem, 5vw, 4rem);
+  --measure: 44rem;
+
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html:has(.bb-site) {
+  margin: 0;
+  background: #110a08;
+}
+
+.bb-site *,
+.bb-site *::before,
+.bb-site *::after {
+  box-sizing: border-box;
+}
+
+.bb-site main {
+  display: block;
+}
+
+/* ---------- skip link ---------- */
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: 0;
+  z-index: 10;
+  padding: 0.6rem 1rem;
+  background: var(--orange);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: translateY(-120%);
+}
+.skip-link:focus {
+  transform: translateY(0.75rem);
+}
+
+/* ---------- nav ---------- */
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  padding: 1.1rem var(--rail);
+  position: relative;
+  z-index: 2;
+}
+
+.site-nav__mark {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--orange);
+  text-decoration: none;
+}
+.site-nav__mark svg {
+  display: block;
+  width: 2.2rem;
+  height: auto;
+  fill: currentColor;
+}
+.site-nav__wordmark {
+  font-family: var(--wordmark);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.site-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav__link {
+  display: inline-block;
+  padding: 0.35rem 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  color: var(--cream);
+  text-decoration: none;
+  text-underline-offset: 0.3em;
+}
+.site-nav__link:hover {
+  color: var(--orange);
+}
+.site-nav__link[aria-current='page'] {
+  color: var(--orange);
+  text-decoration: underline;
+  text-decoration-color: var(--orange);
+}
+
+/* Below 640px the six items sit in two rows of three, no menu toggle.
+   Three equal columns at 360px leave about 100px each, enough for
+   "TD BRACKETS" and "COMMUNITY" at the smaller size. */
+@media (max-width: 639px) {
+  .site-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .site-nav__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.25rem 0.5rem;
+  }
+  .site-nav__link {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* ---------- focus and links ---------- */
+
+.bb-site a:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 4px;
+}
+
+.bb-site main a:not(.btn):not(.link-row) {
+  color: var(--orange);
+  text-decoration-color: rgba(255, 95, 31, 0.45);
+  text-underline-offset: 0.3em;
+}
+.bb-site main a:not(.btn):not(.link-row):hover {
+  text-decoration-color: var(--orange);
+}
+
+/* ---------- sections ---------- */
+
+.section {
+  padding: clamp(3rem, 9vh, 6rem) var(--rail);
+}
+.section + .section {
+  border-top: 1px solid var(--hairline);
+}
+.section__inner {
+  max-width: var(--measure);
+}
+
+.label {
+  margin: 0 0 0.9rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  color: var(--orange);
+}
+
+.headline {
+  margin: 0 0 1.25rem;
+  font-family: var(--wordmark);
+  font-weight: 400;
+  font-size: clamp(2rem, 6vw, 3.75rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  color: var(--cream);
+  text-wrap: balance;
+}
+
+.lede {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--cream);
+  max-width: var(--measure);
+}
+
+.body-copy {
+  margin: 0 0 1rem;
+  color: var(--cream-dim);
+  max-width: var(--measure);
+}
+
+/* ---------- link rows ---------- */
+
+.link-rows {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hairline);
+}
+.link-rows > li {
+  border-bottom: 1px solid var(--hairline);
+}
+.link-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+  color: var(--cream);
+  text-decoration: none;
+}
+.link-row::after {
+  content: '\2192';
+  color: var(--orange);
+}
+.link-row:hover {
+  color: var(--orange);
+}
+
+/* ---------- buttons ---------- */
+
+/* The quiet button is .holding__run's treatment: mono, orange, underlined. */
+.btn {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+  color: var(--orange);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 95, 31, 0.45);
+  text-underline-offset: 0.3em;
+}
+.btn:hover,
+.btn:focus-visible {
+  text-decoration-color: var(--orange);
+}
+
+/* The primary call to action: the one filled orange button. */
+.btn--primary {
+  padding: 0.85rem 1.5rem;
+  background: var(--orange);
+  color: var(--ink);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 150ms ease-out;
+}
+.btn--primary:hover,
+.btn--primary:focus-visible {
+  background: var(--cream);
+}
+
+/* ---------- close block ---------- */
+
+.close {
+  padding: clamp(3rem, 9vh, 6rem) var(--rail);
+  border-top: 1px solid var(--hairline);
+}
+.close .headline {
+  margin-bottom: 1.75rem;
+}
+
+/* ---------- footer ---------- */
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  padding: 2rem var(--rail) 2.5rem;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.9rem;
+  color: var(--cream-dim);
+}
+.site-footer__line {
+  margin: 0;
+}
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-footer__links a {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: var(--orange);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 95, 31, 0.45);
+  text-underline-offset: 0.3em;
+}
+.site-footer__links a:hover {
+  text-decoration-color: var(--orange);
+}
+
+/* ---------- the Portal Mark stage ---------- */
+
+/* A page that wants the stage gives it a .portal box; the island fills it.
+   The canvas PIXI appends fills the stage; the animation paints its own ink
+   stage, so the ground only shows until the first frame. */
+.portal {
+  position: relative;
+  overflow: hidden;
+}
+.portal__stage {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 600ms ease-out;
+  cursor: crosshair;
+}
+.portal__stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+body[data-live] .portal__stage {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal__stage,
+  .btn--primary {
+    transition: none;
+  }
+}
+
+/* ============================================================
+   Front page (/)
+   ============================================================ */
+
+/* The hero fills the first viewport. Copy sits bottom-left over the stage
+   and lets pointer events through, except on the button. */
+.home-hero {
+  min-height: calc(100vh - 4.5rem);
+  min-height: calc(100dvh - 4.5rem);
+  display: flex;
+  align-items: flex-end;
+}
+.home-hero__copy {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 0 var(--rail) clamp(2rem, 8vh, 4.5rem);
+  pointer-events: none;
+}
+.home-hero__copy a {
+  pointer-events: auto;
+}
+.home-hero__headline {
+  max-width: 20ch;
+  font-size: clamp(1.9rem, 4.2vw, 3.4rem);
+}
+.home-hero__copy .lede {
+  max-width: 36rem;
+  color: var(--cream-dim);
+}
+
+/* ticker: one marquee row; two identical lists scroll by half the track */
+.ticker {
+  overflow: hidden;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  background: var(--ink);
+  position: relative;
+  z-index: 1;
+}
+.ticker__track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 40s linear infinite;
+}
+.ticker__list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ticker__beat {
+  white-space: nowrap;
+  padding: 0.8rem 1.5rem 0.8rem 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+}
+.ticker__diamond {
+  color: var(--orange);
+  margin-right: 1.5rem;
+}
+.ticker:hover .ticker__track,
+.ticker:focus-within .ticker__track {
+  animation-play-state: paused;
+}
+@keyframes ticker-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker__track {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+  }
+  .ticker__list[aria-hidden='true'] {
+    display: none;
+  }
+  .ticker__list {
+    flex-wrap: wrap;
+  }
+}
+
+.home-doors {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3.5rem;
+}
+@media (min-width: 900px) {
+  .home-doors {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+  }
+}
+.home-door__headline {
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+}
+
+.home-community__item {
+  padding-top: 0.9rem;
+}
+.home-community__item .body-copy {
+  margin-bottom: 0;
+}
+.home-community__more {
+  margin-top: 0;
+  border-top: 0;
+}
+
+.home-bookend {
+  margin: 0;
+  padding: 2.5rem var(--rail);
+  border-top: 1px solid var(--hairline);
+  font-family: var(--wordmark);
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  color: var(--cream);
+}
+
+/* ============================================================
+   /platforms
+   ============================================================ */
+
+.platforms-parts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+@media (min-width: 900px) {
+  .platforms-parts {
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+}
+.platforms-part__name {
+  margin: 0 0 0.75rem;
+  font-family: var(--wordmark);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  line-height: 1.1;
+  color: var(--cream);
+}
+
+.platforms-history {
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hairline);
+}
+.platforms-row {
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.platforms-row__name {
+  margin: 0 0 0.4rem;
+  font-family: var(--wordmark);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  line-height: 1.1;
+  color: var(--cream);
+  overflow-wrap: anywhere;
+}
+.platforms-row__meta {
+  margin: 0 0 0.9rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+  color: var(--orange);
+}
+.platforms-row__image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-top: 1rem;
+}
+
+/* ============================================================
+   /td-brackets
+   ============================================================ */
+
+.tdb-secondary {
+  margin: 1.25rem 0 0;
+}
+
+.tdb-features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+@media (min-width: 900px) {
+  .tdb-features {
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+}
+
+.tdb-inline {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  color: var(--cream);
+}
+
+/* The quickstart scrolls inside its own box rather than widening the page. */
+.tdb-code {
+  margin: 1.5rem 0 0;
+  padding: 1.25rem 1.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--cream);
+}
+
+.tdb-apps {
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hairline);
+}
+.tdb-app {
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.tdb-app__video {
+  display: block;
+  width: 100%;
+  max-width: var(--measure);
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+/* ============================================================
+   /about
+   ============================================================ */
+
+.about-founder {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .about-founder {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+    gap: clamp(2rem, 5vw, 5rem);
+  }
+}
+.about-founder__text {
+  max-width: var(--measure);
+}
+
+/* Empty until a photo exists: a cream-outlined box at a portrait ratio. */
+.about-photo {
+  width: 100%;
+  max-width: 22rem;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--cream);
+}
+
+.about-groups {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  margin-top: 2rem;
+}
+@media (min-width: 900px) {
+  .about-groups {
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+}
+.about-group .label {
+  margin-bottom: 0;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--hairline);
+}
+.about-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.about-item {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.about-item .body-copy {
+  margin-bottom: 0;
+}
+.about-item__name {
+  margin: 0 0 0.6rem;
+  font-family: var(--wordmark);
+  font-weight: 400;
+  font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+  line-height: 1.15;
+  color: var(--cream);
+}
+
+/* ---- /community and /talks ---- */
+.bb-site .community-pending {
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+/* ============================================================
+   /contact
+   The form is made of bear-ui-react parts that carry Tailwind classes,
+   and the v3 shell does not load Tailwind. These rules style their
+   markup directly. Field puts its label above the input as a sibling.
+   ============================================================ */
+
+.bb-site .contact-form__grid {
+  display: grid;
+  gap: 0.25rem;
+}
+.bb-site .contact-form__pair {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.25rem;
+}
+@media (min-width: 640px) {
+  .bb-site .contact-form__pair {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.bb-site .contact-form__grid > .relative,
+.bb-site .contact-form__pair > .relative {
+  position: relative;
+  padding-top: 1.75rem;
+}
+.bb-site .contact-form label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+  color: var(--cream);
+}
+.bb-site .contact-form label span {
+  margin-left: 0.25rem;
+  color: var(--orange);
+}
+
+.bb-site .contact-form input,
+.bb-site .contact-form textarea,
+.bb-site .contact-form button[id='need'] {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+  color: var(--cream);
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  text-align: left;
+}
+.bb-site .contact-form textarea {
+  resize: vertical;
+  min-height: 9rem;
+}
+.bb-site .contact-form input:focus-visible,
+.bb-site .contact-form textarea:focus-visible,
+.bb-site .contact-form button:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+.bb-site .contact-form input[aria-invalid='true'],
+.bb-site .contact-form textarea[aria-invalid='true'],
+.bb-site .contact-form button[aria-invalid='true'] {
+  border-color: var(--orange);
+}
+.bb-site .contact-form input:disabled,
+.bb-site .contact-form textarea:disabled,
+.bb-site .contact-form button:disabled {
+  opacity: 0.6;
+}
+
+.bb-site .contact-form button[id='need'] {
+  position: relative;
+  padding-right: 2.5rem;
+  min-height: 2.9rem;
+  cursor: pointer;
+}
+.bb-site .contact-form button[id='need'] svg {
+  position: absolute;
+  top: 50%;
+  right: 0.7rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  transform: translateY(-50%);
+  color: var(--orange);
+}
+.bb-site .contact-form [role='listbox'] {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  background: var(--ink);
+  border: 1px solid var(--cream-dim);
+  max-height: 18rem;
+  overflow: auto;
+}
+.bb-site .contact-form [role='option'] {
+  position: relative;
+  padding: 0.7rem 2.5rem 0.7rem 0.85rem;
+  cursor: pointer;
+  color: var(--cream);
+}
+.bb-site .contact-form [role='option'][data-headlessui-state~='active'] {
+  background: rgba(255, 95, 31, 0.16);
+}
+.bb-site .contact-form [role='option'] svg {
+  position: absolute;
+  top: 50%;
+  right: 0.7rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  transform: translateY(-50%);
+  color: var(--orange);
+}
+
+.bb-site .contact-form__hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--cream-dim);
+}
+
+/* Field reserves a line for its error, shown or not. */
+.bb-site .contact-form__grid > .relative > div:last-child,
+.bb-site .contact-form__pair > .relative > div:last-child {
+  min-height: 1.75rem;
+}
+.bb-site .contact-form [role='alert'][id$='-error'] {
+  margin-top: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--orange);
+}
+
+.bb-site .contact-form__submit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+.bb-site .contact-form__submit .btn {
+  border: 0;
+  cursor: pointer;
+}
+.bb-site .contact-form__submit .btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.bb-site .contact-form__status {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--orange);
+  color: var(--cream);
+  max-width: var(--measure);
+}
+.bb-site .contact-form__status--error {
+  border-color: var(--cream-dim);
+}
+
+/* The success and error motion the form has always had. */
+@keyframes contact-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+@keyframes contact-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.bb-site .contact-form .animate-shake {
+  animation: contact-shake 300ms ease-out;
+}
+.bb-site .contact-form .animate-pop {
+  animation: contact-pop 250ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bb-site .contact-form .animate-shake,
+  .bb-site .contact-form .animate-pop {
+    animation: none;
+  }
+}

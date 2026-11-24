@@ -1,0 +1,38 @@
+/* Bracket Bear Theme Override */
+/* Dark theme with orange/red primary color for Bracket Bear website */
+
+@theme {
+  /* Monotone red/orange theme - warm light background with dark text */
+  --color-background: hsl(20, 100%, 95%); /* Warm light orange background */
+  --color-foreground: hsl(20, 100%, 15%); /* Dark orange text */
+
+  /* Primary colors - deeper orange/red */
+  --color-primary: hsl(20, 85%, 35%); /* Deep orange primary */
+  --color-primary-hover: hsl(20, 85%, 25%); /* Darker hover state */
+  --color-primary-foreground: #fff; /* White text on primary */
+
+  /* Monotone surfaces using the same warm palette */
+  --color-card: hsl(20, 100%, 98%); /* Very light warm card background */
+  --color-card-foreground: var(--color-foreground);
+  --color-muted: hsl(20, 100%, 90%); /* Light warm muted background */
+  --color-muted-foreground: hsl(20, 100%, 25%); /* Medium dark warm text */
+
+  /* Borders in the same warm tone */
+  --color-border: hsl(20, 100%, 80%); /* Light warm border */
+
+  /* Secondary colors in the same monotone palette */
+  --color-secondary: hsl(20, 100%, 85%); /* Light warm secondary */
+  --color-secondary-hover: hsl(20, 100%, 80%); /* Slightly darker on hover */
+  --color-secondary-foreground: var(--color-foreground);
+
+  /* Ring color matches the monotone theme */
+  --color-ring: hsl(20, 100%, 70%); /* Medium warm ring */
+
+  /* Brand colors for consistency */
+  --color-brand-orange: var(--color-primary); /* Use primary as brand orange */
+  --color-brand-orange-light: hsl(20, 100%, 85%); /* Light warm brand orange */
+
+  /* Text colors for monotone theme */
+  --color-text-primary: var(--color-foreground);
+  --color-text-secondary: var(--color-muted-foreground);
+}
