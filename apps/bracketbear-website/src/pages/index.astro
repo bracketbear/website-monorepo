@@ -1,164 +1,121 @@
 ---
-import HomeLayout from '@/layouts/HomeLayout.astro';
-import StatusTicker from '@/components/home/StatusTicker.astro';
-import Hero from '@/components/home/Hero.astro';
-import Intro from '@/components/home/Intro.astro';
-import Offerings from '@/components/home/Offerings.astro';
-import Receipts from '@/components/home/Receipts.astro';
-import ThreeCs from '@/components/home/ThreeCs.astro';
-import Manifesto from '@/components/home/Manifesto.astro';
-import ClosingCTA from '@/components/home/ClosingCTA.astro';
-import Footer from '@/components/home/Footer.astro';
-import { getCollection } from 'astro:content';
-import '@/styles/bb-home.css';
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PortalStage from '@/components/site/PortalStage';
+import { bookend } from '@/content/site/shared';
+import {
+  meta,
+  ticker,
+  hero,
+  doors,
+  both,
+  community,
+  contact,
+} from '@/content/site/home';
 
-const indexPageData = await getCollection('bracketbearIndexPage');
-const pageData = indexPageData[0]?.data;
-
-if (!pageData) {
-  throw new Error('Homepage content not found');
-}
+const communityItems = (community.body as string[]).map((text, i) => ({
+  text,
+  link: community.links![i],
+}));
+const communityLink = community.links![communityItems.length];
 ---
 
-<HomeLayout
-  title={pageData.title}
-  metaDescription={pageData.metaDescription || pageData.subtitle}
-  currentPage="home"
-  hideContactForm={true}
-  hideFooter={true}
-  hideNavigation={true}
-  homeBodyClass="bb-home"
->
-  <!-- Bracket Bear logo as reusable symbol -->
-  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
-    <symbol id="bb-logo" viewBox="0 0 400.89 249.73">
-      <path
-        fill="currentColor"
-        d="m69.98,172.24v-94.76c0-4.14,3.36-7.5,7.5-7.5h15.14c1.66,0,3-1.34,3-3V3C95.62,1.34,94.28,0,92.62,0H15C6.72,0,0,6.72,0,15v219.73c0,8.28,6.72,15,15,15h77.62c1.66,0,3-1.34,3-3v-63.99c0-1.66-1.34-3-3-3h-15.14c-4.14,0-7.5-3.36-7.5-7.5Z"
-      ></path>
-      <path
-        fill="currentColor"
-        fill-rule="evenodd"
-        d="m174.98,117.27c12.14,16.38,20.1,28.95,19.83,56.54-.73,66.7-62.49,74.8-77.35,75.78-1.73.11-3.19-1.26-3.19-2.99v-84.29c0-1.66-1.34-3-3-3h-19.68c-1.66,0-3-1.34-3-3v-64.05c0-1.66,1.34-3,3-3h19.68c1.66,0,3-1.34,3-3V3.05c0-1.72,1.44-3.08,3.16-3,12.12.59,55.68,6.48,69.61,59.96,7.61,29.23-3.42,50.36-12.06,57.26"
-      ></path>
-      <path
-        fill="currentColor"
-        d="m323.41,179.74h-15.14c-1.66,0-3,1.34-3,3v63.99c0,1.66,1.34,3,3,3h77.62c8.28,0,15-6.72,15-15V15C400.89,6.72,394.18,0,385.89,0h-77.62c-1.66,0-3,1.34-3,3v63.99c0,1.66,1.34,3,3,3h15.14c4.14,0,7.5,3.36,7.5,7.5v94.76c0,4.14-3.36,7.5-7.5,7.5Z"
-      ></path>
-      <path
-        fill="currentColor"
-        fill-rule="evenodd"
-        d="m225.92,117.28c-8.64-6.9-19.67-28.03-12.06-57.26C227.79,6.53,271.35.64,283.47.05c1.72-.08,3.16,1.28,3.16,3v83.21c0,1.66,1.34,3,3,3h19.68c1.66,0,3,1.34,3,3v64.05c0,1.66-1.34,3-3,3h-19.68c-1.66,0-3,1.34-3,3v84.29c0,1.73-1.46,3.11-3.19,2.99-14.86-.98-76.62-9.08-77.35-75.78-.27-27.6,7.69-40.17,19.83-56.54"
-      ></path>
-    </symbol>
-  </svg>
-
-  <!-- Cursor + pixel-hand placeholders (driven by bb-home.client.ts) -->
-  <div class="cursor" id="cursor" aria-hidden="true"></div>
-  <div class="cursor-hand" id="cursorHand" aria-hidden="true">
-    <div class="cursor-hand__inner">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 13 14"
-        shape-rendering="crispEdges"
+<SiteLayout meta={meta} path="/">
+  <section class="portal home-hero">
+    <PortalStage client:only="react" />
+    <div class="home-hero__copy">
+      <p class="label">{hero.eyebrow}</p>
+      <h1 class="headline home-hero__headline">{hero.headline}</h1>
+      <p class="lede">{hero.lede}</p>
+      <a class="btn btn--primary" href={hero.button.href}>{hero.button.label}</a
       >
-        <g fill="#FFF3E3">
-          <rect x="4" y="1" width="2" height="3"></rect>
-          <rect x="4" y="4" width="4" height="1"></rect>
-          <rect x="4" y="5" width="6" height="1"></rect>
-          <rect x="4" y="6" width="7" height="2"></rect>
-          <rect x="1" y="7" width="1" height="1"></rect>
-          <rect x="1" y="8" width="10" height="1"></rect>
-          <rect x="2" y="9" width="9" height="1"></rect>
-          <rect x="3" y="10" width="8" height="2"></rect>
-          <rect x="4" y="12" width="7" height="1"></rect>
-        </g>
-        <g fill="#110A08">
-          <rect x="4" y="0" width="2" height="1"></rect>
-          <rect x="3" y="1" width="1" height="7"></rect>
-          <rect x="6" y="1" width="1" height="3"></rect>
-          <rect x="7" y="3" width="2" height="1"></rect>
-          <rect x="8" y="4" width="2" height="1"></rect>
-          <rect x="10" y="5" width="1" height="1"></rect>
-          <rect x="0" y="6" width="2" height="1"></rect>
-          <rect x="0" y="7" width="1" height="2"></rect>
-          <rect x="2" y="7" width="1" height="1"></rect>
-          <rect x="1" y="9" width="1" height="1"></rect>
-          <rect x="2" y="10" width="1" height="2"></rect>
-          <rect x="3" y="12" width="1" height="1"></rect>
-          <rect x="11" y="6" width="1" height="7"></rect>
-          <rect x="4" y="13" width="8" height="1"></rect>
-        </g>
-      </svg>
+    </div>
+  </section>
+
+  <div class="ticker">
+    <div class="ticker__track">
+      {
+        [0, 1].map((copy) => (
+          <ul
+            class="ticker__list"
+            aria-hidden={copy === 1 ? 'true' : undefined}
+          >
+            {ticker.map((beat) => (
+              <li class="ticker__beat">
+                <span class="ticker__diamond" aria-hidden="true">
+                  &#9670;
+                </span>
+                {beat}
+              </li>
+            ))}
+          </ul>
+        ))
+      }
     </div>
   </div>
 
-  <!-- Homepage-specific nav (matches draft) -->
-  <nav class="nav" aria-label="Primary">
-    <div class="nav__inner container">
-      <a href="#" class="wordmark" data-hot>
-        <span class="wordmark__mark" aria-hidden="true">
-          <svg><use href="#bb-logo"></use></svg>
-        </span>
-        <span>BRACKET&nbsp;BEAR</span>
-      </a>
-      <div class="nav__links">
-        <a href="#work" data-hot>Work</a>
-        <a href="#approach" data-hot>Approach</a>
-        <a href="#values" data-hot>Values</a>
-        <a href="#about" data-hot>About</a>
-      </div>
-      <a href="#contact" class="pill" data-hot>
-        <span class="pill__dot" aria-hidden="true"></span>
-        <span>Start a project</span>
-      </a>
+  <section class="section">
+    <div class="home-doors">
+      {
+        doors.map((door) => (
+          <div class="home-door">
+            <p class="label">{door.label}</p>
+            <h2 class="headline home-door__headline">{door.headline}</h2>
+            <p class="body-copy">{door.body}</p>
+            <ul class="link-rows">
+              {door.links!.map((link) => (
+                <li>
+                  <a class="link-row" href={link.href}>
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
     </div>
-  </nav>
+  </section>
 
-  <StatusTicker beats={pageData.statusTicker.beats} />
+  <section class="section">
+    <div class="section__inner">
+      <p class="label">{both.label}</p>
+      <h2 class="headline">{both.headline}</h2>
+      <p class="body-copy">{both.body}</p>
+      <a class="btn btn--primary" href={both.links![0].href}
+        >{both.links![0].label}</a
+      >
+    </div>
+  </section>
 
-  <Hero
-    kicker={pageData.hero.kicker}
-    eyebrow={pageData.hero.eyebrow}
-    punchLine1={pageData.hero.punchLine1}
-    lede={pageData.hero.lede}
-    ctaPrimary={pageData.hero.ctaPrimary}
-    ctaGhost={pageData.hero.ctaGhost}
-  />
+  <section class="section">
+    <div class="section__inner">
+      <p class="label">{community.label}</p>
+      <h2 class="headline">{community.headline}</h2>
+      <ul class="link-rows home-community">
+        {
+          communityItems.map((item) => (
+            <li class="home-community__item">
+              <p class="body-copy">{item.text}</p>
+              <a class="link-row" href={item.link.href}>
+                {item.link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="home-community__more">
+        <a class="btn" href={communityLink.href}>{communityLink.label}</a>
+      </p>
+    </div>
+  </section>
 
-  <Intro
-    aside={pageData.intro.aside}
-    leadBlock={pageData.intro.leadBlock}
-    closingLine={pageData.intro.closingLine}
-  />
+  <section class="close">
+    <h2 class="headline">{contact.headline}</h2>
+    <p class="body-copy">{contact.body}</p>
+    <a class="btn btn--primary" href={contact.button.href}
+      >{contact.button.label}</a
+    >
+  </section>
 
-  <Offerings
-    eyebrow={pageData.offerings.eyebrow}
-    title={pageData.offerings.title}
-    meta={pageData.offerings.meta}
-    items={pageData.offerings.items}
-    platformLayers={pageData.offerings.platformLayers}
-  />
-
-  <Receipts {...pageData.receipts} />
-
-  <ThreeCs
-    eyebrow={pageData.commitments.eyebrow}
-    title={pageData.commitments.title}
-    meta={pageData.commitments.meta}
-    items={pageData.commitments.items}
-  />
-
-  <Manifesto
-    banner={pageData.manifesto.banner}
-    lines={pageData.manifesto.lines}
-  />
-
-  <ClosingCTA {...pageData.closingCta} />
-
-  <Footer />
-</HomeLayout>
-
-<script>
-  import '@/scripts/bb-home.client';
-</script>
+  <p class="home-bookend">{bookend}</p>
+</SiteLayout>

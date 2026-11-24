@@ -340,3 +340,120 @@ body[data-live] .portal__stage {
     transition: none;
   }
 }
+
+/* ============================================================
+   Front page (/)
+   ============================================================ */
+
+/* The hero fills the first viewport. Copy sits bottom-left over the stage
+   and lets pointer events through, except on the button. */
+.home-hero {
+  min-height: calc(100vh - 4.5rem);
+  min-height: calc(100dvh - 4.5rem);
+  display: flex;
+  align-items: flex-end;
+}
+.home-hero__copy {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 0 var(--rail) clamp(2rem, 8vh, 4.5rem);
+  pointer-events: none;
+}
+.home-hero__copy a {
+  pointer-events: auto;
+}
+.home-hero__headline {
+  max-width: 20ch;
+  font-size: clamp(1.9rem, 4.2vw, 3.4rem);
+}
+.home-hero__copy .lede {
+  max-width: 36rem;
+  color: var(--cream-dim);
+}
+
+/* ticker: one marquee row; two identical lists scroll by half the track */
+.ticker {
+  overflow: hidden;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  background: var(--ink);
+  position: relative;
+  z-index: 1;
+}
+.ticker__track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 40s linear infinite;
+}
+.ticker__list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ticker__beat {
+  white-space: nowrap;
+  padding: 0.8rem 1.5rem 0.8rem 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+}
+.ticker__diamond {
+  color: var(--orange);
+  margin-right: 1.5rem;
+}
+@keyframes ticker-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker__track {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+  }
+  .ticker__list[aria-hidden='true'] {
+    display: none;
+  }
+  .ticker__list {
+    flex-wrap: wrap;
+  }
+}
+
+.home-doors {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3.5rem;
+}
+@media (min-width: 900px) {
+  .home-doors {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+  }
+}
+.home-door__headline {
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+}
+
+.home-community__item {
+  padding-top: 0.9rem;
+}
+.home-community__item .body-copy {
+  margin-bottom: 0;
+}
+.home-community__more {
+  margin: 1.5rem 0 0;
+}
+
+.home-bookend {
+  margin: 0;
+  padding: 2.5rem var(--rail);
+  border-top: 1px solid var(--hairline);
+  font-family: var(--wordmark);
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  color: var(--cream);
+}
