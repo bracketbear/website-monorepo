@@ -3,7 +3,7 @@
 **Date:** 2026-11-22
 **Spec:** `2026-11-22-bracketbear-site-v3-design.md`
 **Register:** brand (`docs/brand/BRAND.md`)
-**Status:** Front page and `/platforms` reviewed. `/td-brackets` drafted with placeholders. `/about` and `/community` drafted. `/contact` not started.
+**Status:** Front page and `/platforms` reviewed. `/td-brackets` drafted with placeholders. `/about`, `/community` and `/contact` drafted.
 
 Written with `/bb-voice`, `/copywriting` and `/ogilvy`, then edited with
 `/copy-editing` and `/stop-slop`. Front page reviewed by Harrison 2026-11-22.
@@ -453,4 +453,61 @@ or a commit.
 - **Beliefs** (`BRAND.md`): written as what Bracket Bear gives; no sales
   push beyond the closing button; the "not for everyone" belief is not
   stated.
+- **Stop-slop:** no em dashes, no adverbs, no "X, not Y".
+
+---
+
+## `/contact`
+
+### 1. Header
+
+- **Label:** CONTACT
+- **Headline:** Tell us what you're building and when it opens.
+- **Lede:** A platform for your exhibits, one piece of one, or a
+  TouchDesigner app: send what you know so far. We'll reply with questions
+  and where we'd start.
+
+### 2. Form
+
+- **Fields:**
+  - Name
+  - Email
+  - Agency or company (optional)
+  - What do you need? (select)
+    - A platform
+    - One piece of a platform: an agent, a receiver or a CMS
+    - A TouchDesigner app
+    - The app and the platform it runs on
+    - A talk, a run, or something else
+  - When does it open? (optional)
+  - Tell us about it. Hint: "The venue, the runtime, and what your team
+    will change after launch."
+- **Button:** Send
+- **Sent:** Thanks. We'll reply from hello@bracketbear.com.
+- **Failed:** That didn't send. Email hello@bracketbear.com and we'll pick it
+  up from there.
+- **Dropped from the old form:** project types (Augment Your Team, Deliver
+  the Project, Consult & Collaborate), budget, timeline ranges, team size,
+  preferred contact method, current challenges, and the 24-hour reply
+  promise.
+
+### 3. Other ways to reach us
+
+- **Email:** hello@bracketbear.com
+- **LinkedIn:** linkedin.com/company/bracketbear
+- **Line:** Rooted in Pittsburgh, based in Portland.
+
+### Meta
+
+- **Title:** Contact | Bracket Bear
+- **Description:** Tell Bracket Bear about your platform or TouchDesigner
+  project. Email hello@bracketbear.com or use the form.
+
+### Self-check
+
+- **Named nouns:** TouchDesigner, the agent, receiver and CMS from
+  `/platforms`; Pittsburgh, Portland, LinkedIn.
+- **Headlines:** opens with "Tell", not "We".
+- **Community:** the last option routes talk and run requests through the
+  same form.
 - **Stop-slop:** no em dashes, no adverbs, no "X, not Y".
