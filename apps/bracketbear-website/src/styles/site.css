@@ -516,3 +516,60 @@ body[data-live] .portal__stage {
   height: auto;
   margin-top: 1rem;
 }
+
+/* ============================================================
+   /td-brackets
+   ============================================================ */
+
+.tdb-secondary {
+  margin: 1.25rem 0 0;
+}
+
+.tdb-features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+@media (min-width: 900px) {
+  .tdb-features {
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+}
+
+.tdb-inline {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  color: var(--cream);
+}
+
+/* The quickstart scrolls inside its own box rather than widening the page. */
+.tdb-code {
+  margin: 1.5rem 0 0;
+  padding: 1.25rem 1.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--cream);
+}
+
+.tdb-apps {
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hairline);
+}
+.tdb-app {
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.tdb-app__video {
+  display: block;
+  width: 100%;
+  max-width: var(--measure);
+  height: auto;
+  margin-bottom: 1rem;
+}

@@ -86,3 +86,22 @@ describe('platforms', () => {
     }
   });
 });
+
+describe('td-brackets', () => {
+  it('has four features, the quickstart commands and five placeholders', async () => {
+    const m = await import('./td-brackets');
+    expect(m.features).toHaveLength(4);
+    expect(m.quickstart.commands).toEqual([
+      'tdb new demo',
+      'cd demo',
+      'tdb td smoke',
+    ]);
+    const all = [m.header, m.hire]
+      .map((s) => String(s.body))
+      .concat(m.apps.map((a) => a.body));
+    expect(countPlaceholders(all)).toBe(5);
+    expect(m.header.links![0].href).toBe(
+      'https://github.com/bracketbear/td-brackets'
+    );
+  });
+});
