@@ -646,3 +646,208 @@ body[data-live] .portal__stage {
   font-size: 0.875rem;
   opacity: 0.7;
 }
+
+/* ============================================================
+   /contact
+   The form is made of bear-ui-react parts that carry Tailwind classes,
+   and the v3 shell does not load Tailwind. These rules style their
+   markup directly. Field puts its label above the input as a sibling.
+   ============================================================ */
+
+.bb-site .contact-form__grid {
+  display: grid;
+  gap: 0.25rem;
+}
+.bb-site .contact-form__pair {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.25rem;
+}
+@media (min-width: 640px) {
+  .bb-site .contact-form__pair {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.bb-site .contact-form__grid > .relative,
+.bb-site .contact-form__pair > .relative {
+  position: relative;
+  padding-top: 1.75rem;
+}
+.bb-site .contact-form label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+  color: var(--cream);
+}
+.bb-site .contact-form label span {
+  margin-left: 0.25rem;
+  color: var(--orange);
+}
+
+.bb-site .contact-form input,
+.bb-site .contact-form textarea,
+.bb-site .contact-form button[id='need'] {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+  color: var(--cream);
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  text-align: left;
+}
+.bb-site .contact-form textarea {
+  resize: vertical;
+  min-height: 9rem;
+}
+.bb-site .contact-form input:focus-visible,
+.bb-site .contact-form textarea:focus-visible,
+.bb-site .contact-form button:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+.bb-site .contact-form input[aria-invalid='true'],
+.bb-site .contact-form textarea[aria-invalid='true'],
+.bb-site .contact-form button[aria-invalid='true'] {
+  border-color: var(--orange);
+}
+.bb-site .contact-form input:disabled,
+.bb-site .contact-form textarea:disabled,
+.bb-site .contact-form button:disabled {
+  opacity: 0.6;
+}
+
+.bb-site .contact-form button[id='need'] {
+  position: relative;
+  padding-right: 2.5rem;
+  min-height: 2.9rem;
+  cursor: pointer;
+}
+.bb-site .contact-form button[id='need'] svg {
+  position: absolute;
+  top: 50%;
+  right: 0.7rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  transform: translateY(-50%);
+  color: var(--orange);
+}
+.bb-site .contact-form [role='listbox'] {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  background: var(--ink);
+  border: 1px solid var(--cream-dim);
+  max-height: 18rem;
+  overflow: auto;
+}
+.bb-site .contact-form [role='option'] {
+  position: relative;
+  padding: 0.7rem 2.5rem 0.7rem 0.85rem;
+  cursor: pointer;
+  color: var(--cream);
+}
+.bb-site .contact-form [role='option'][data-headlessui-state~='active'] {
+  background: rgba(255, 95, 31, 0.16);
+}
+.bb-site .contact-form [role='option'] svg {
+  position: absolute;
+  top: 50%;
+  right: 0.7rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  transform: translateY(-50%);
+  color: var(--orange);
+}
+
+.bb-site .contact-form__hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--cream-dim);
+}
+
+/* Field reserves a line for its error, shown or not. */
+.bb-site .contact-form__grid > .relative > div:last-child,
+.bb-site .contact-form__pair > .relative > div:last-child {
+  min-height: 1.75rem;
+}
+.bb-site .contact-form [role='alert'] {
+  margin-top: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--orange);
+}
+
+.bb-site .contact-form__submit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+.bb-site .contact-form__submit .btn {
+  border: 0;
+  cursor: pointer;
+}
+.bb-site .contact-form__submit .btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.bb-site .contact-form__status {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--orange);
+  color: var(--cream);
+  max-width: var(--measure);
+}
+.bb-site .contact-form__status--error {
+  border-color: var(--cream-dim);
+}
+
+/* The success and error motion the form has always had. */
+@keyframes contact-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+@keyframes contact-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.bb-site .contact-form .animate-shake {
+  animation: contact-shake 300ms ease-out;
+}
+.bb-site .contact-form .animate-pop {
+  animation: contact-pop 250ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bb-site .contact-form .animate-shake,
+  .bb-site .contact-form .animate-pop {
+    animation: none;
+  }
+}
