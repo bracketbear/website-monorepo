@@ -1,0 +1,33 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import CloseBlock from '@/components/site/CloseBlock.astro';
+import { talks } from '@/content/site/community';
+import { TALKS } from '@/talks';
+
+const meta = {
+  title: 'Talks | Bracket Bear',
+  description: talks.body as string,
+};
+---
+
+<SiteLayout meta={meta} path="/talks">
+  <section class="section">
+    <div class="section__inner">
+      <h1 class="headline">{talks.headline}</h1>
+      <p class="lede">{talks.body}</p>
+      <ul class="link-rows talks-list">
+        {
+          TALKS.map((talk) => (
+            <li>
+              <a class="link-row" href={`/talks/${talk.slug}`}>
+                {talk.title.toLowerCase()}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CloseBlock />
+</SiteLayout>

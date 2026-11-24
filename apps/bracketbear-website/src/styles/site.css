@@ -639,3 +639,14 @@ body[data-live] .portal__stage {
   line-height: 1.15;
   color: var(--cream);
 }
+
+/* ---- /community and /talks ---- */
+.bb-site .community-pending {
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+.bb-site .talks-list .link-row {
+  text-transform: capitalize;
+}
