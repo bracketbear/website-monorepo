@@ -3,6 +3,7 @@ import SiteLayout from '@/layouts/SiteLayout.astro';
 import CloseBlock from '@/components/site/CloseBlock.astro';
 import { talks } from '@/content/site/community';
 import { TALKS } from '@/talks';
+import { displayTitle } from '@/talks/display-title';
 
 const meta = {
   title: 'Talks | Bracket Bear',
@@ -20,7 +21,7 @@ const meta = {
           TALKS.map((talk) => (
             <li>
               <a class="link-row" href={`/talks/${talk.slug}`}>
-                {talk.title.toLowerCase()}
+                {displayTitle(talk.title)}
               </a>
             </li>
           ))
