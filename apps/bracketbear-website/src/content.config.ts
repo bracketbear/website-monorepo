@@ -31,10 +31,19 @@ function createJsonCollection({
   });
 }
 
+// The v2 page collections were retired with the v2 pages. Their config stays in
+// @bracketbear/astro-content because apps/portfolio and apps/cms still use it.
+const retired = new Set([
+  'bracketbearIndexPage',
+  'bracketbearAboutPage',
+  'bracketbearContactPage',
+  'bracketbearContactMethods',
+  'bracketbearServicesPage',
+]);
+
 // Create collections from configurations
 export const collections = Object.fromEntries(
-  Object.entries(allCollections).map(([key, config]) => [
-    key,
-    createJsonCollection(config),
-  ])
+  Object.entries(allCollections)
+    .filter(([key]) => !retired.has(key))
+    .map(([key, config]) => [key, createJsonCollection(config)])
 );

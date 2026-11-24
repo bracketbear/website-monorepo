@@ -1,0 +1,17 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { meta, notFound } from '@/content/site/not-found';
+---
+
+<SiteLayout meta={meta} path="/404">
+  <section class="section">
+    <div class="section__inner">
+      <h1 class="headline">{notFound.headline}</h1>
+      <p>
+        <a class="btn btn--primary" href={notFound.link.href}
+          >{notFound.link.label}</a
+        >
+      </p>
+    </div>
+  </section>
+</SiteLayout>

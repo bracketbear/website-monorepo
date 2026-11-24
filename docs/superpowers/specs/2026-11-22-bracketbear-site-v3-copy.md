@@ -511,3 +511,21 @@ or a commit.
 - **Community:** the last option routes talk and run requests through the
   same form.
 - **Stop-slop:** no em dashes, no adverbs, no "X, not Y".
+
+---
+
+## `/404`
+
+### 1. Page
+
+- **Headline:** This page isn't here.
+- **Link:** Back to the front page → `/`
+
+### Meta
+
+- **Title:** Not found | Bracket Bear
+- **Description:** This page isn't here.
+
+### Self-check
+
+- **Stop-slop:** no em dashes, no adverbs, no "X, not Y".
