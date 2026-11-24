@@ -1,0 +1,342 @@
+@import '@fontsource/archivo-black/400.css';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/jetbrains-mono/400.css';
+
+/* ============================================================
+   site.css — the v3 site shell.
+   Palette and faces come from the holding page. Everything is
+   scoped under .bb-site (the body class SiteLayout sets). The body
+   scrolls; the Portal Mark stage fills whatever .portal box a page
+   gives it.
+   ============================================================ */
+
+.bb-site {
+  --orange: #ff5f1f;
+  --cream: #fff3e3;
+  --ink: #110a08;
+  --cream-dim: rgba(255, 243, 227, 0.72);
+  --hairline: rgba(255, 243, 227, 0.16);
+
+  --wordmark: 'Archivo Black', 'Helvetica Neue', sans-serif;
+  --body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  --rail: clamp(1.25rem, 5vw, 4rem);
+  --measure: 44rem;
+
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html:has(.bb-site) {
+  margin: 0;
+  background: #110a08;
+}
+
+.bb-site *,
+.bb-site *::before,
+.bb-site *::after {
+  box-sizing: border-box;
+}
+
+.bb-site main {
+  display: block;
+}
+
+/* ---------- nav ---------- */
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  padding: 1.1rem var(--rail);
+  position: relative;
+  z-index: 2;
+}
+
+.site-nav__mark {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--orange);
+  text-decoration: none;
+}
+.site-nav__mark svg {
+  display: block;
+  width: 2.2rem;
+  height: auto;
+  fill: currentColor;
+}
+.site-nav__wordmark {
+  font-family: var(--wordmark);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.site-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav__link {
+  display: inline-block;
+  padding: 0.35rem 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  color: var(--cream);
+  text-decoration: none;
+  text-underline-offset: 0.3em;
+}
+.site-nav__link:hover {
+  color: var(--orange);
+}
+.site-nav__link[aria-current='page'] {
+  color: var(--orange);
+  text-decoration: underline;
+  text-decoration-color: var(--orange);
+}
+
+/* Below 640px the six items sit in two rows of three, no menu toggle.
+   Three equal columns at 360px leave about 100px each, enough for
+   "TD BRACKETS" and "COMMUNITY" at the smaller size. */
+@media (max-width: 639px) {
+  .site-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .site-nav__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.25rem 0.5rem;
+  }
+  .site-nav__link {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* ---------- focus and links ---------- */
+
+.bb-site a:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 4px;
+}
+
+.bb-site main a:not(.btn):not(.link-row) {
+  color: var(--orange);
+  text-decoration-color: rgba(255, 95, 31, 0.45);
+  text-underline-offset: 0.3em;
+}
+.bb-site main a:not(.btn):not(.link-row):hover {
+  text-decoration-color: var(--orange);
+}
+
+/* ---------- sections ---------- */
+
+.section {
+  padding: clamp(3rem, 9vh, 6rem) var(--rail);
+}
+.section + .section {
+  border-top: 1px solid var(--hairline);
+}
+.section__inner {
+  max-width: var(--measure);
+}
+
+.label {
+  margin: 0 0 0.9rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  color: var(--orange);
+}
+
+.headline {
+  margin: 0 0 1.25rem;
+  font-family: var(--wordmark);
+  font-weight: 400;
+  font-size: clamp(2rem, 6vw, 3.75rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  color: var(--cream);
+  text-wrap: balance;
+}
+
+.lede {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--cream);
+  max-width: var(--measure);
+}
+
+.body-copy {
+  margin: 0 0 1rem;
+  color: var(--cream-dim);
+  max-width: var(--measure);
+}
+
+/* ---------- link rows ---------- */
+
+.link-rows {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hairline);
+}
+.link-rows > li {
+  border-bottom: 1px solid var(--hairline);
+}
+.link-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+  color: var(--cream);
+  text-decoration: none;
+}
+.link-row::after {
+  content: '\2192';
+  color: var(--orange);
+}
+.link-row:hover {
+  color: var(--orange);
+}
+
+/* ---------- buttons ---------- */
+
+/* The quiet button is .holding__run's treatment: mono, orange, underlined. */
+.btn {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+  color: var(--orange);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 95, 31, 0.45);
+  text-underline-offset: 0.3em;
+}
+.btn:hover,
+.btn:focus-visible {
+  text-decoration-color: var(--orange);
+}
+
+/* The primary call to action: the one filled orange button. */
+.btn--primary {
+  padding: 0.85rem 1.5rem;
+  background: var(--orange);
+  color: var(--ink);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 150ms ease-out;
+}
+.btn--primary:hover,
+.btn--primary:focus-visible {
+  background: var(--cream);
+}
+
+/* ---------- close block ---------- */
+
+.close {
+  padding: clamp(3rem, 9vh, 6rem) var(--rail);
+  border-top: 1px solid var(--hairline);
+}
+.close .headline {
+  margin-bottom: 1.75rem;
+}
+
+/* ---------- footer ---------- */
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  padding: 2rem var(--rail) 2.5rem;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.9rem;
+  color: var(--cream-dim);
+}
+.site-footer__line {
+  margin: 0;
+}
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-footer__links a {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: var(--orange);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 95, 31, 0.45);
+  text-underline-offset: 0.3em;
+}
+.site-footer__links a:hover {
+  text-decoration-color: var(--orange);
+}
+
+/* ---------- the Portal Mark stage ---------- */
+
+/* A page that wants the stage gives it a .portal box; the island fills it.
+   The canvas PIXI appends fills the stage; the animation paints its own ink
+   stage, so the ground only shows until the first frame. */
+.portal {
+  position: relative;
+  overflow: hidden;
+}
+.portal__stage {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 600ms ease-out;
+  cursor: crosshair;
+}
+.portal__stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+body[data-live] .portal__stage {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal__stage,
+  .btn--primary {
+    transition: none;
+  }
+}
