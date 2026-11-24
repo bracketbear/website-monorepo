@@ -31,10 +31,14 @@ async function submit(values: ContactValues) {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: toFormBody(values).toString(),
     });
-  } catch {
+  } catch (error) {
+    console.error(error);
     throw new Error(form.failed);
   }
-  if (!response.ok) throw new Error(form.failed);
+  if (!response.ok) {
+    console.error(new Error(`Form POST failed with status ${response.status}`));
+    throw new Error(form.failed);
+  }
 }
 
 export function ContactForm() {
@@ -139,7 +143,14 @@ export function ContactForm() {
                   disabled={isSubmitting}
                   error={!!errors.need}
                   required
-                  aria-label={form.fields.need}
+                  aria-label={
+                    values.need
+                      ? `${form.fields.need}: ${
+                          form.needOptions.find((o) => o.value === values.need)
+                            ?.label
+                        }`
+                      : form.fields.need
+                  }
                   aria-describedby={errors.need ? 'need-error' : undefined}
                   aria-invalid={!!errors.need}
                 />
@@ -173,7 +184,9 @@ export function ContactForm() {
                   error={errors.message}
                   aria-required="true"
                   aria-describedby={
-                    errors.message ? 'message-error' : 'message-hint'
+                    errors.message
+                      ? 'message-error message-hint'
+                      : 'message-hint'
                   }
                 />
                 <p id="message-hint" className="contact-form__hint">

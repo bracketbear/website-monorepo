@@ -782,7 +782,7 @@ body[data-live] .portal__stage {
 .bb-site .contact-form__pair > .relative > div:last-child {
   min-height: 1.75rem;
 }
-.bb-site .contact-form [role='alert'] {
+.bb-site .contact-form [role='alert'][id$='-error'] {
   margin-top: 0.35rem;
   font-family: var(--mono);
   font-size: 0.8rem;
