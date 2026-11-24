@@ -103,9 +103,13 @@ const communityLink = community.links![communityItems.length];
           ))
         }
       </ul>
-      <p class="home-community__more">
-        <a class="btn" href={communityLink.href}>{communityLink.label}</a>
-      </p>
+      <ul class="link-rows home-community__more">
+        <li>
+          <a class="link-row" href={communityLink.href}>
+            {communityLink.label}
+          </a>
+        </li>
+      </ul>
     </div>
   </section>
 

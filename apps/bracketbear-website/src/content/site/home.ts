@@ -44,8 +44,10 @@ export const doors: [Section, Section] = [
     body: "TD Brackets is our open-source framework for TouchDesigner. An app's logic is plain Python with tests that run outside TD, its network lives in git as text, and one command opens the app, checks it and measures its frame rate. We build apps on it for agencies, and you can build on it yourself.",
     links: [
       { label: 'See TD Brackets', href: '/td-brackets' },
-      // The copy doc gives no URL. This is the organization page.
-      { label: 'View on GitHub', href: 'https://github.com/bracketbear' },
+      {
+        label: 'View on GitHub',
+        href: 'https://github.com/bracketbear/td-brackets',
+      },
     ],
   },
 ];
