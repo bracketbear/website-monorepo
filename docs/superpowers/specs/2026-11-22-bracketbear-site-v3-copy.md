@@ -101,6 +101,7 @@ Headline alternatives:
 ### Bookend and footer
 
 - **Bookend:** Welcome to Bracket Bear. We're happy you're here.
+- **Skip link:** Skip to content
 - **Footer:** Rooted in Pittsburgh, based in Portland. Now booking.
 
 ### Meta
@@ -486,6 +487,8 @@ or a commit.
 - **Sent:** Thanks. We'll reply from hello@bracketbear.com.
 - **Failed:** That didn't send. Email hello@bracketbear.com and we'll pick it
   up from there.
+- **No JavaScript:** The form needs JavaScript. Email hello@bracketbear.com
+  instead.
 - **Dropped from the old form:** project types (Augment Your Team, Deliver
   the Project, Consult & Collaborate), budget, timeline ranges, team size,
   preferred contact method, current challenges, and the 24-hour reply

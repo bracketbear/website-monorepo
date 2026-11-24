@@ -13,12 +13,16 @@ export const header: Section = {
   body: "Harrison started Bracket Bear in 2025, after building experience platforms at Downstream and Deeplocal. The studio builds platforms for experiential agencies and TouchDesigner apps on TD Brackets. It's rooted in Pittsburgh and based in Portland.",
 };
 
-export const founder: { headline: string; body: string[]; photo: string } = {
+export const founder: {
+  headline: string;
+  body: string[];
+  photo: { src?: string; alt: string };
+} = {
   headline: 'Harrison Callahan, founder',
   body: [
     "Harrison has built websites and software since 2012, and software for experiential work since 2020: the front end of Bridge at Downstream, full-stack work on Gumband at Deeplocal, and Hyperquake's Experience Platform at Bracket Bear. He gives a talk on care and creative technology, Everything Is an Experience.",
   ],
-  photo: '[PLACEHOLDER: a photo of Harrison, or none]',
+  photo: { alt: '[PLACEHOLDER: a photo of Harrison, or none]' },
 };
 
 /** The personal portfolio, served by apps/portfolio. */

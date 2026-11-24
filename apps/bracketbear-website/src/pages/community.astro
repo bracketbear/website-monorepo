@@ -46,9 +46,21 @@ const blocks = [run, talks, openSource, lab];
   <section class="section">
     <div class="section__inner">
       <p class="body-copy">{instagram.body}</p>
-      <p class="community-pending">
-        {instagram.link.label}: {instagram.link.href}
-      </p>
+      {
+        instagram.link.href.startsWith('[PLACEHOLDER') ? (
+          <p class="community-pending">
+            {instagram.link.label}: {instagram.link.href}
+          </p>
+        ) : (
+          <ul class="link-rows">
+            <li>
+              <a class="link-row" href={instagram.link.href}>
+                {instagram.link.label}
+              </a>
+            </li>
+          </ul>
+        )
+      }
     </div>
   </section>
 

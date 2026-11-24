@@ -11,6 +11,7 @@
     "astro": "astro",
     "type-check": "tsc --noEmit",
     "check:launch": "node scripts/check-launch.mjs",
+    "predeploy": "npm run build && npm run check:launch",
     "deploy": "netlify deploy --prod"
   },
   "dependencies": {

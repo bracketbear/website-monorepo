@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   ValidatedForm,
   Field,
@@ -42,6 +43,11 @@ async function submit(values: ContactValues) {
 }
 
 export function ContactForm() {
+  // The server-rendered Send is disabled, so a visitor cannot submit (and
+  // Enter cannot trigger an implicit GET with their data) before hydration.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+
   return (
     <div className="contact-form">
       {/* Hidden form for Netlify to detect. Renders exactly FIELD_NAMES. */}
@@ -199,7 +205,7 @@ export function ContactForm() {
               <Button
                 type="submit"
                 className="btn btn--primary"
-                disabled={isSubmitting}
+                disabled={!hydrated || isSubmitting}
               >
                 {form.button}
               </Button>

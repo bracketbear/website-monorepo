@@ -37,7 +37,21 @@ for (const item of howWeWork.items) {
           </li>
         </ul>
       </div>
-      <div class="about-photo" role="img" aria-label={founder.photo}></div>
+      {
+        founder.photo.src ? (
+          <img
+            class="about-photo"
+            src={founder.photo.src}
+            alt={founder.photo.alt}
+          />
+        ) : (
+          <div
+            class="about-photo"
+            aria-hidden="true"
+            data-placeholder={founder.photo.alt}
+          />
+        )
+      }
     </div>
   </section>
 

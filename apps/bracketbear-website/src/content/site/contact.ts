@@ -29,6 +29,7 @@ export const form: {
   button: 'Send';
   sent: string;
   failed: string;
+  noscript: string;
 } = {
   fields: {
     name: 'Name',
@@ -62,6 +63,7 @@ export const form: {
   button: 'Send',
   sent: `Thanks. We'll reply from ${CONTACT_EMAIL}.`,
   failed: `That didn't send. Email ${CONTACT_EMAIL} and we'll pick it up from there.`,
+  noscript: `The form needs JavaScript. Email ${CONTACT_EMAIL} instead.`,
 };
 
 export const other: { email: Link; linkedin: Link; line: string } = {

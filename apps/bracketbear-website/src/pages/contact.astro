@@ -1,7 +1,10 @@
 ---
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import { ContactForm } from '@/components/ContactForm';
-import { meta, header, other } from '@/content/site/contact';
+import { meta, header, form, other } from '@/content/site/contact';
+import { CONTACT_EMAIL, MAILTO } from '@/content/site/shared';
+
+const [noscriptBefore, noscriptAfter] = form.noscript.split(CONTACT_EMAIL);
 ---
 
 <SiteLayout meta={meta} path="/contact">
@@ -16,6 +19,11 @@ import { meta, header, other } from '@/content/site/contact';
   <section class="section">
     <div class="section__inner">
       <ContactForm client:load />
+      <noscript>
+        <p class="body-copy">
+          {noscriptBefore}<a href={MAILTO}>{CONTACT_EMAIL}</a>{noscriptAfter}
+        </p>
+      </noscript>
     </div>
   </section>
 
