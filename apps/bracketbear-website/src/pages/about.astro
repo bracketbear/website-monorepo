@@ -1,105 +1,69 @@
 ---
-import Layout from '@/layouts/Layout.astro';
-import Section from '@/components/Section.astro';
-import { getCollection } from 'astro:content';
-import { Button } from '@bracketbear/bear-ui-react';
-import { marked } from 'marked';
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import CloseBlock from '@/components/site/CloseBlock.astro';
+import {
+  meta,
+  header,
+  founder,
+  portfolio,
+  howWeWork,
+} from '@/content/site/about';
 
-// Get the about page content from CMS
-const aboutPageData = await getCollection('bracketbearAboutPage');
-const pageData = aboutPageData[0]?.data;
-
-if (!pageData) {
-  throw new Error('About page content not found');
+const groups: { label: string; items: typeof howWeWork.items }[] = [];
+for (const item of howWeWork.items) {
+  const last = groups[groups.length - 1];
+  if (last && last.label === item.label) last.items.push(item);
+  else groups.push({ label: item.label ?? '', items: [item] });
 }
 ---
 
-<Layout title={pageData.title}>
-  <!-- Hero Section -->
-  <section class="px-content py-16 lg:py-24">
-    <div class="container mx-auto text-center">
-      <h1
-        class="font-heading text-foreground mb-8 text-4xl font-bold tracking-tight uppercase lg:text-6xl"
-      >
-        {pageData.hero.title}
-      </h1>
-      <p
-        class="text-muted-foreground mx-auto max-w-4xl text-lg leading-7 lg:text-xl"
-      >
-        {pageData.hero.subtitle}
-      </p>
+<SiteLayout meta={meta} path="/about">
+  <section class="section">
+    <div class="section__inner">
+      <p class="label">{header.label}</p>
+      <h1 class="headline">{header.headline}</h1>
+      <p class="lede">{header.body}</p>
     </div>
   </section>
 
-  <!-- Our Story Section -->
-  <Section title={pageData.ourStory.title}>
-    <div
-      class="text-muted-foreground text-lg leading-7"
-      set:html={marked.parse(pageData.ourStory.content)}
-    />
-  </Section>
+  <section class="section">
+    <div class="about-founder">
+      <div class="about-founder__text">
+        <h2 class="headline">{founder.headline}</h2>
+        {founder.body.map((p) => <p class="body-copy">{p}</p>)}
+        <ul class="link-rows">
+          <li>
+            <a class="link-row" href={portfolio.href}>{portfolio.label}</a>
+          </li>
+        </ul>
+      </div>
+      <div class="about-photo" role="img" aria-label={founder.photo}></div>
+    </div>
+  </section>
 
-  <!-- Philosophy Section -->
-  <Section title={pageData.philosophy.title}>
-    <h3
-      class="font-heading text-foreground mb-6 text-xl font-bold tracking-tight"
-    >
-      {pageData.philosophy.subtitle}
-    </h3>
-    <div
-      class="text-muted-foreground text-lg leading-7"
-      set:html={marked.parse(pageData.philosophy.content)}
-    />
-  </Section>
-
-  <!-- Core Values Section -->
-  <Section title={pageData.coreValues.title}>
-    <h3
-      class="font-heading text-foreground mb-12 text-center text-xl font-bold tracking-tight"
-    >
-      {pageData.coreValues.subtitle}
-    </h3>
-    <div class="grid gap-8 lg:grid-cols-3">
+  <section class="section">
+    <div class="section__inner">
+      <h2 class="headline">{howWeWork.headline}</h2>
+      <p class="lede">{howWeWork.intro}</p>
+    </div>
+    <div class="about-groups">
       {
-        pageData.coreValues.values.map((value: any) => (
-          <div class="comic-panel">
-            <h4 class="font-heading text-foreground mb-4 text-xl font-bold tracking-tight">
-              {value.title}
-            </h4>
-            <div
-              class="text-muted-foreground prose prose-lg max-w-none"
-              set:html={marked.parse(value.description)}
-            />
+        groups.map((group) => (
+          <div class="about-group">
+            <p class="label">{group.label}</p>
+            <ul class="about-items">
+              {group.items.map((item) => (
+                <li class="about-item">
+                  <h3 class="about-item__name">{item.headline}</h3>
+                  <p class="body-copy">{item.body}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         ))
       }
     </div>
-  </Section>
-
-  <!-- Who We Are Section -->
-  <Section title={pageData.whoWeAre.title}>
-    <div
-      class="text-muted-foreground text-lg leading-7"
-      set:html={marked.parse(pageData.whoWeAre.content)}
-    />
-  </Section>
-
-  <!-- CTA Section -->
-  <section class="px-content py-12 lg:py-16">
-    <div class="container mx-auto text-center">
-      <div class="prose prose-lg mx-auto max-w-prose">
-        <div
-          class="text-foreground mb-8 text-lg leading-7"
-          set:html={marked.parse(pageData.contactCTA.text)}
-        />
-        <Button
-          href={pageData.contactCTA.buttonLink}
-          size="lg"
-          className="font-semibold"
-        >
-          {pageData.contactCTA.buttonText}
-        </Button>
-      </div>
-    </div>
   </section>
-</Layout>
+
+  <CloseBlock />
+</SiteLayout>
