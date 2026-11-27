@@ -4,7 +4,6 @@ import BracketBearLogoSvg from '@bracketbear/core/assets/bracket-bear-logo.svg?u
 export const navItems: NavItem[] = [
   { name: 'Platforms', href: '/platforms' },
   { name: 'TD Brackets', href: '/td-brackets' },
-  { name: 'Lab', href: '/lab' },
   { name: 'Community', href: '/community' },
   { name: 'About', href: '/about' },
   { name: 'Contact', href: '/contact' },

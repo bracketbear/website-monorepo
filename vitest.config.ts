@@ -14,7 +14,7 @@ export default defineConfig({
       '.astro',
       '**/*.d.ts',
       '**/node_modules/**',
-      '**/*.dist/**',
+      '**/dist/**',
       '**/*.astro',
       'packages/core/src/astro/**/*',
     ],
