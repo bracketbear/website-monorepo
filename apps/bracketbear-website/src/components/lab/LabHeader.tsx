@@ -74,19 +74,31 @@ export default function LabHeader({
       <div
         style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}
       >
-        <LabLogo />
-        <span
+        <a
+          href="/"
+          aria-label="Bracket Bear home"
           style={{
-            fontFamily: "'Archivo Black', sans-serif",
-            fontSize: '0.95rem',
-            letterSpacing: '0.015em',
-            textTransform: 'uppercase',
-            lineHeight: 1,
-            whiteSpace: 'nowrap',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.6rem',
+            color: 'inherit',
+            textDecoration: 'none',
           }}
         >
-          Bracket&nbsp;Bear
-        </span>
+          <LabLogo />
+          <span
+            style={{
+              fontFamily: "'Archivo Black', sans-serif",
+              fontSize: '0.95rem',
+              letterSpacing: '0.015em',
+              textTransform: 'uppercase',
+              lineHeight: 1,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Bracket&nbsp;Bear
+          </span>
+        </a>
         <span
           style={{
             fontFamily: MONO,

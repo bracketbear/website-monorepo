@@ -2,11 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { isCurrent, navItems } from './navigation';
 
 describe('navItems', () => {
-  it('lists the six pages in order', () => {
+  it('lists the five pages in order', () => {
     expect(navItems.map((i) => i.href)).toEqual([
       '/platforms',
       '/td-brackets',
-      '/lab',
       '/community',
       '/about',
       '/contact',
@@ -14,7 +13,6 @@ describe('navItems', () => {
     expect(navItems.map((i) => i.name)).toEqual([
       'Platforms',
       'TD Brackets',
-      'Lab',
       'Community',
       'About',
       'Contact',
